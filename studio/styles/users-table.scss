@@ -1,0 +1,39 @@
+.users-table-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--colors-slate9) var(--colors-slate1);
+
+  .dark & {
+    scrollbar-color: var(--colors-slate10) var(--colors-slate3o);
+  }
+
+  ::-webkit-scrollbar {
+    background: var(--colors-slate2);
+    height: 3px;
+    width: 0px;
+    border-radius: 0;
+
+    .dark & {
+      background: var(--colors-slate6);
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px var(--colors-slate6);
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate8);
+    }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: var(--colors-slate9);
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
+    }
+  }
+}

@@ -36,6 +36,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     createBucket,
     deleteBucket,
     toggleBucketPublic,
+    buckets,
   } = storageExplorerStore || {}
 
   const { services, isLoading } = useProjectSettings(ref as string | undefined)
@@ -76,7 +77,10 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     if (res) {
       const policies = meta.policies.list()
       const storageObjectsPolicies = filter(policies, { table: 'objects' })
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+      const formattedStorageObjectPolicies = formatPoliciesForStorage(
+        buckets,
+        storageObjectsPolicies
+      )
       const bucketPolicies = _get(
         find(formattedStorageObjectPolicies, { name: bucket.name }),
         ['policies'],

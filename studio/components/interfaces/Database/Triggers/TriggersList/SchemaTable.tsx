@@ -33,10 +33,10 @@ const SchemaTable: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
             <Table.th key="function" className="hidden xl:table-cell">
               Function
             </Table.th>
-            <Table.th key="rows" className="hidden xl:table-cell">
+            <Table.th key="rows" className="hidden xl:table-cell xl:w-1/3">
               Events
             </Table.th>
-            <Table.th key="buttons" className="w-1/6"></Table.th>
+            <Table.th key="buttons" className="w-1/12"></Table.th>
           </>
         }
         body={

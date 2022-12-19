@@ -319,7 +319,7 @@ const ColumnManagement: FC<Props> = ({
             </Button>
           )}
           <Link href="https://supabase.com/docs/guides/database/tables#data-types">
-            <a>
+            <a target="_blank" rel="noreferrer">
               <Button
                 type="text"
                 className="text-scale-1000 hover:text-scale-1200"

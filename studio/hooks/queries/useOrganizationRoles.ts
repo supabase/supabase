@@ -8,7 +8,7 @@ import { Role } from 'types'
 // otherwise, best to shift it to a store. If we do shift it, have it in the
 // App store to prevent confusion with PG roles
 
-export function useOrganizationRoles(slug: string) {
+export function useOrganizationRoles(slug?: string) {
   const url = `${API_URL}/organizations/${slug}/roles`
   const { data, error } = useSWR<any>(slug ? url : null, get)
   const anyError = data?.error || error

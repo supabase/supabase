@@ -1,142 +1,99 @@
-import { useState, useEffect, ChangeEvent } from 'react'
-import { supabase } from '../lib/supabaseClient'
-import UploadButton from '../components/UploadButton'
+import { useState, useEffect } from 'react'
+import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
 import Avatar from './Avatar'
-import { AuthSession } from '@supabase/supabase-js'
-import { DEFAULT_AVATARS_BUCKET, Profile } from '../lib/constants'
 
-export default function Account({ session }: { session: AuthSession }) {
-  const [loading, setLoading] = useState<boolean>(true)
-  const [uploading, setUploading] = useState<boolean>(false)
-  const [avatar, setAvatar] = useState<string | null>(null)
-  const [username, setUsername] = useState<string | null>(null)
-  const [website, setWebsite] = useState<string | null>(null)
+import { Database } from '../utils/database.types'
+type Profiles = Database['public']['Tables']['profiles']['Row']
+
+export default function Account({ session }: { session: Session }) {
+  const supabase = useSupabaseClient<Database>()
+  const user = useUser()
+  const [loading, setLoading] = useState(true)
+  const [username, setUsername] = useState<Profiles['username']>(null)
+  const [website, setWebsite] = useState<Profiles['website']>(null)
+  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
 
   useEffect(() => {
     getProfile()
   }, [session])
 
-  async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) console.log('Error logging out:', error.message)
-  }
-
-  async function uploadAvatar(event: ChangeEvent<HTMLInputElement>) {
-    try {
-      setUploading(true)
-
-      if (!event.target.files || event.target.files.length == 0) {
-        throw 'You must select an image to upload.'
-      }
-
-      const user = supabase.auth.user()
-      const file = event.target.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${session?.user.id}${Math.random()}.${fileExt}`
-      const filePath = `${fileName}`
-
-      let { error: uploadError } = await supabase.storage
-        .from(DEFAULT_AVATARS_BUCKET)
-        .upload(filePath, file)
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      let { error: updateError } = await supabase.from('profiles').upsert({
-        id: user!.id,
-        avatar_url: filePath,
-      })
-
-      if (updateError) {
-        throw updateError
-      }
-
-      setAvatar(null)
-      setAvatar(filePath)
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  function setProfile(profile: Profile) {
-    setAvatar(profile.avatar_url)
-    setUsername(profile.username)
-    setWebsite(profile.website)
-  }
-
   async function getProfile() {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      if (!user) throw new Error('No user')
 
-      let { data, error } = await supabase
+      let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', user!.id)
+        .eq('id', user.id)
         .single()
 
-      if (error) {
+      if (error && status !== 406) {
         throw error
       }
 
-      setProfile(data)
+      if (data) {
+        setUsername(data.username)
+        setWebsite(data.website)
+        setAvatarUrl(data.avatar_url)
+      }
     } catch (error) {
-      console.log('error', error.message)
+      alert('Error loading user data!')
+      console.log(error)
     } finally {
       setLoading(false)
     }
   }
 
-  async function updateProfile() {
+  async function updateProfile({
+    username,
+    website,
+    avatar_url,
+  }: {
+    username: Profiles['username']
+    website: Profiles['website']
+    avatar_url: Profiles['avatar_url']
+  }) {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      if (!user) throw new Error('No user')
 
       const updates = {
-        id: user!.id,
+        id: user.id,
         username,
         website,
-        updated_at: new Date(),
+        avatar_url,
+        updated_at: new Date().toISOString(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
-
-      if (error) {
-        throw error
-      }
+      let { error } = await supabase.from('profiles').upsert(updates)
+      if (error) throw error
+      alert('Profile updated!')
     } catch (error) {
-      alert(error.message)
+      alert('Error updating the data!')
+      console.log(error)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="account">
-      <div>
-        <label htmlFor="avatar">Avatar image</label>
-        <div className="avatarField">
-          <div className="avatarContainer">
-            {avatar ? (
-              <Avatar url={avatar} size={35} />
-            ) : (
-              <div className="avatarPlaceholder">?</div>
-            )}
-          </div>
-          <UploadButton onUpload={uploadAvatar} loading={uploading} />
-        </div>
-      </div>
+    <div className="form-widget">
+      <Avatar
+        uid={user!.id}
+        url={avatar_url}
+        size={150}
+        onUpload={(url) => {
+          setAvatarUrl(url)
+          updateProfile({ username, website, avatar_url: url })
+        }}
+      />
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session.user.email} disabled />
       </div>
       <div>
-        <label htmlFor="username">Name</label>
+        <label htmlFor="username">Username</label>
         <input
           id="username"
           type="text"
@@ -155,13 +112,17 @@ export default function Account({ session }: { session: AuthSession }) {
       </div>
 
       <div>
-        <button className="button primary block" onClick={() => updateProfile()} disabled={loading}>
+        <button
+          className="button primary block"
+          onClick={() => updateProfile({ username, website, avatar_url })}
+          disabled={loading}
+        >
           {loading ? 'Loading ...' : 'Update'}
         </button>
       </div>
 
       <div>
-        <button className="button block" onClick={() => signOut()}>
+        <button className="button block" onClick={() => supabase.auth.signOut()}>
           Sign Out
         </button>
       </div>

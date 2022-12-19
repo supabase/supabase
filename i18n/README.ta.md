@@ -117,8 +117,8 @@
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">சேமிப்பு-ஸேசர்ப</a></td>
   </tr>
   <tr>
-    <td>டார்ட் (ஃப்ளடர்)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-டார்ட்</a></td>
+    <td>ஃப்ளடர்</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">போஸ்ட்ஜீராஸ்ட்-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">கூட்ரூ-டார்ட்</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">நிகழ்நேரம்-டார்ட்</a></td>

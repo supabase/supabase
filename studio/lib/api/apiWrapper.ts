@@ -29,7 +29,7 @@ export default async function apiWrapper(
       }
     }
 
-    const func = withSentry(handler)
+    const func = withSentry(handler as any)
     // @ts-ignore
     return await func(req, res)
   } catch (error) {

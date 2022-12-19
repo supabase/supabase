@@ -1,28 +1,16 @@
 <template>
-  <div
-    style="
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    "
-  >
-    <div class="flex" style="gap: 30">
-      <div class="flex column w-half">
+  <div class="container" style="padding: 50px 0 100px">
+    <Auth  v-if="!state.session" />
+    <div class="row" v-else>
+      <div class="col-6">
         <h3>Account</h3>
-        <div v-if="!state.session">
-          <Auth />
-        </div>
-        <div v-else>
-          <Account :session="state.session" />
-        </div>
+        <Account :session="state.session" />
       </div>
-      <div class="flex column w-half" style="gap: 20">
+      <div class="col-6">
         <h3>Public Profiles</h3>
-        <div v-if="state.profiles.length > 0">
+        <template v-if="state.profiles.length > 0">
           <ProfileList :profiles="state.profiles" />
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -40,7 +28,9 @@ export default {
     };
   },
   mounted() {
-    this.state.session = supabase.auth.session();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      this.state.session = session;
+    });
 
     supabase.auth.onAuthStateChange((_event, session) => {
       this.state.session = session;
@@ -68,14 +58,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-</style>

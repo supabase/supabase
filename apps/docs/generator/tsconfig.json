@@ -1,0 +1,13 @@
+// generator files need their own tsconfig.json because they don't like "module": "esnext" setting that nextjs requires in the main tsconfig
+{
+  "compilerOptions": {
+    "incremental": true,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

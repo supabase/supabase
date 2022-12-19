@@ -115,13 +115,14 @@ const Modal = ({
     customFooter
   ) : (
     <Space
+      className="flex w-full space-x-2"
       style={{
         width: '100%',
         justifyContent:
           layout === 'vertical' ? 'center' : alignFooter === 'right' ? 'flex-end' : 'flex-start',
       }}
     >
-      <Button type="secondary" onClick={onCancel} disabled={loading}>
+      <Button type="default" onClick={onCancel} disabled={loading}>
         {cancelText}
       </Button>
       <Button onClick={onConfirm} loading={loading} danger={variant === 'danger'}>
@@ -186,12 +187,12 @@ function Content({ children }: { children: React.ReactNode }) {
   return <div className={__styles.content}>{children}</div>
 }
 
-export function Seperator() {
+export function Separator() {
   const __styles = styleHandler('modal')
 
-  return <div className={__styles.seperator}></div>
+  return <div className={__styles.separator}></div>
 }
 
 Modal.Content = Content
-Modal.Seperator = Seperator
+Modal.Separator = Separator
 export default Modal

@@ -23,6 +23,7 @@ export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
       'flex items-center space-x-2 rounded bg-gray-500',
       'py-0.5 px-2 text-sm',
     ].join(' ')}
+    onClick={(e: any) => e.preventDefault()}
   >
     <span>{name}</span>
     <IconX

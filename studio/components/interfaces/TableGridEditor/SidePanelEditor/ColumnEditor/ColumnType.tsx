@@ -8,6 +8,7 @@ interface Props {
   value: string
   enumTypes: PostgresType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  layout?: 'vertical' | 'horizontal'
   className?: string
   error?: any
   disabled?: boolean
@@ -21,6 +22,7 @@ const ColumnType: FC<Props> = ({
   enumTypes = [],
   className,
   size = 'medium',
+  layout,
   error,
   disabled = false,
   showLabel = true,
@@ -37,7 +39,9 @@ const ColumnType: FC<Props> = ({
         readOnly
         disabled
         label={showLabel ? 'Type' : ''}
-        layout="horizontal"
+        layout={showLabel ? 'horizontal' : undefined}
+        className="md:gap-x-0"
+        size="small"
         value={value}
         descriptionText={
           showLabel
@@ -72,7 +76,7 @@ const ColumnType: FC<Props> = ({
   return (
     <Listbox
       label={showLabel ? 'Type' : ''}
-      layout={showLabel ? 'horizontal' : 'vertical'}
+      layout={layout || (showLabel ? 'horizontal' : 'vertical')}
       value={value}
       size={size}
       error={error}

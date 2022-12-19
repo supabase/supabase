@@ -381,12 +381,40 @@ export default {
         border-scale-1200 
       `,
     },
+    'rounded-pills': {
+      list: 'flex flex-wrap gap-2',
+      base: ` 
+        relative 
+        cursor-pointer 
+        flex 
+        items-center 
+        space-x-2
+        text-center 
+        transition
+        shadow-sm
+        rounded-full
+        focus:outline-none 
+        focus-visible:ring 
+        focus-visible:ring-scale-700
+        focus-visible:border-scale-900
+        `,
+      inactive: `
+        bg-scale-400 hover:bg-scale-500
+        hover:border-scale-900
+        text-scale-900 hover:text-scale-1200
+      `,
+      active: `
+        bg-scale-1200
+        text-scale-200
+        border-scale-1200 
+      `,
+    },
     block: 'w-full flex items-center justify-center',
     size: {
       ...default__padding_and_text,
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
-    content: `focus:outline-none focus:ring text-scale-900`,
+    content: `focus:outline-none transition-height`,
   },
 
   /*
@@ -414,7 +442,7 @@ export default {
     type: {
       primary: `
         bg-brand-fixed-800 hover:bg-brand-fixed-900
-        text-lo-contrast
+        text-white
         bordershadow-brand-fixed-800 hover:bordershadow-brand-fixed-1000
         focus-visible:outline-brand-600
       `,
@@ -542,10 +570,8 @@ export default {
       ...default__padding_and_text,
     },
     disabled: 'opacity-50',
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    textarea_actions_container:
-      'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    textarea_actions_container: 'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
     textarea_actions_container_items: 'flex items-center',
   },
 
@@ -590,10 +616,8 @@ export default {
       ...default__padding_and_text,
     },
     disabled: 'opacity-50',
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
-    chevron_container:
-      'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
+    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
   },
 
@@ -638,8 +662,7 @@ export default {
     size: {
       ...default__padding_and_text,
     },
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
   },
 
   /*
@@ -695,7 +718,7 @@ export default {
       ...defaults.size.text,
     },
     description: {
-      base: `text-scale-900`,
+      base: `text-scale-1000`,
       ...defaults.size.text,
     },
     group: `space-y-3`,
@@ -974,6 +997,7 @@ export default {
     size: {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
+      xlarge: `w-screen max-w-3xl h-full`,
     },
     align: {
       left: `
@@ -987,7 +1011,7 @@ export default {
         data-closed:animate-panel-slide-right-in
       `,
     },
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1091,8 +1115,7 @@ export default {
     responsive: 'md:grid md:grid-cols-12 md:gap-x-4',
     non_responsive: 'grid grid-cols-12 gap-2',
 
-    labels_horizontal_layout:
-      'flex flex-row space-x-2 justify-between col-span-12',
+    labels_horizontal_layout: 'flex flex-row space-x-2 justify-between col-span-12',
     labels_vertical_layout: 'flex flex-col space-y-2 col-span-4',
 
     data_input_horizontal_layout: 'col-span-12',
@@ -1117,7 +1140,7 @@ export default {
       },
     },
     description: {
-      base: 'mt-2 text-scale-900',
+      base: 'mt-2 text-scale-900 leading-normal',
       size: {
         ...defaults.size.text,
       },
@@ -1222,7 +1245,7 @@ export default {
       px-4 flex items-center space-x-2 py-1.5
       text-xs
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1303,7 +1326,7 @@ export default {
       transition
       text-scale-900 hover:text-scale-1100
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1459,7 +1482,7 @@ export default {
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide  
     `,
-    seperator: `
+    separator: `
       w-full
       h-px
       my-2
@@ -1533,17 +1556,15 @@ export default {
       ...default__padding_and_text,
     },
     disabled: `opacity-50`,
-    actions_container:
-      'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    chevron_container:
-      'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
     option: `
       w-listbox
       transition cursor-pointer select-none relative py-2 pl-3 pr-9 
       text-scale-900
       text-sm
-
+      hover:bg-scale-300 dark:hover:bg-scale-500
       focus:bg-scale-300 dark:focus:bg-scale-500
       focus:text-scale-1200
       border-none

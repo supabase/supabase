@@ -1,17 +1,17 @@
 [
   {
-    "title": "CLI and Admin API",
+    "title": "CLI and Management API",
     "shipped": true,
     "date": "15th Aug 2022",
-    "description": "We are moving Supabase CLI v1 out of beta, and releasing Admin API beta.",
+    "description": "We are moving Supabase CLI v1 out of beta, and releasing Management API beta.",
     "d": 1,
     "dd": "Monday",
     "youtube_id": "OpPOaJI_Z28",
     "articles": [
       {
-        "title": "Supabase CLI v1 and Admin API Beta",
+        "title": "Supabase CLI v1 and Management API Beta",
         "url": "/blog/supabase-cli-v1-and-admin-api-beta",
-        "description": "Read our blog post outlining the new CLI and Admin API.",
+        "description": "Read our blog post outlining the new CLI and Management API.",
         "products": [
           {
             "title": "CLI Docs",
@@ -19,9 +19,9 @@
             "description": "Learn how to install the CLI"
           },
           {
-            "title": "Admin API Docs",
+            "title": "Management API Docs",
             "url": "/docs/reference/api",
-            "description": "Learn how to use the new Admin API"
+            "description": "Learn how to use the new Management API"
           }
         ]
       }
@@ -43,12 +43,12 @@
         "products": [
           {
             "title": "Supabase.js v2 Docs",
-            "url": "/docs/reference/javascript/next/installing",
+            "url": "/docs/reference/javascript/installing",
             "description": "Updated documentation for supabase-js"
           },
           {
             "title": "Typescript support",
-            "url": "/docs/reference/javascript/next/typescript-support",
+            "url": "/docs/reference/javascript/typescript-support",
             "description": "Using types generated directly from your database."
           }
         ]

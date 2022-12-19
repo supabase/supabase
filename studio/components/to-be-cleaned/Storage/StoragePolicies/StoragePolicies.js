@@ -35,7 +35,7 @@ const StoragePolicies = () => {
 
   // Policies under storage.objects
   const storageObjectsPolicies = filter(policies, { table: 'objects' })
-  const formattedStorageObjectPolicies = formatPoliciesForStorage(storageObjectsPolicies)
+  const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
   const ungroupedPolicies = get(
     find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
     ['policies'],
@@ -85,7 +85,7 @@ const StoragePolicies = () => {
 
   /*
     Functions that involve the CRUD for policies
-    For each API call within the Promise.all, return true if an error occured, else return false
+    For each API call within the Promise.all, return true if an error occurred, else return false
   */
   const onCreatePolicies = async (payloads) => {
     return await Promise.all(

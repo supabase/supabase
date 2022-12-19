@@ -21,14 +21,6 @@
         }
       },
       {
-        "title": "Realtime functionality",
-        "tiers": {
-          "free": true,
-          "pro": true,
-          "enterprise": true
-        }
-      },
-      {
         "title": "Database space",
         "tiers": {
           "free": "Up to 500 MB",
@@ -41,8 +33,8 @@
         "tooltip": "Backups are entire copies of your database that can be restored in the future.",
         "tiers": {
           "free": false,
-          "pro": "7 days of backup",
-          "enterprise": "30 days Point in Time backup"
+          "pro": "7 days of backup* (* if > 1TB, contact enterprise)",
+          "enterprise": "Custom"
         }
       },
       {
@@ -92,7 +84,7 @@
         "tiers": {
           "free": "Up to 50,000 MAUs",
           "pro": "100,000 included, then $0.00325 per MAU",
-          "enterprise": "1,000,000 included, then $0.00325 per MAU"
+          "enterprise": "Unlimited"
         }
       },
       {
@@ -151,6 +143,14 @@
           "pro": "100 / hour",
           "enterprise": "Contact Us"
         }
+      },
+      {
+        "title": "Advanced security features",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": "Contact Us"
+        }
       }
     ]
   },
@@ -159,7 +159,7 @@
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
     "features": [
       {
-        "title": "Storage total",
+        "title": "Storage",
         "tiers": {
           "free": "Up to 1 GB",
           "pro": "100 GB included, then $0.021 per GB",
@@ -191,6 +191,14 @@
           "pro": "Up to 5GB",
           "enterprise": "Unlimited"
         }
+      },
+      {
+        "title": "Asset transformations",
+        "tiers": {
+          "free": false,
+          "pro": "Unlimited transformations for 100 origin images, then 5$ per 1000 origin images",
+          "enterprise": "Unlimited"
+        }
       }
     ]
   },
@@ -199,18 +207,10 @@
     "icon": "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
     "features": [
       {
-        "title": "Runtime hours",
-        "tiers": {
-          "free": "100 hours per month",
-          "pro": "1,000 hours per month",
-          "enterprise": "Unlimited"
-        }
-      },
-      {
         "title": "Invocations",
         "tiers": {
           "free": "500K per month",
-          "pro": "2 Million per month",
+          "pro": "2 Million per month, then $2 per 1 million invocations",
           "enterprise": "Unlimited"
         }
       },
@@ -226,8 +226,46 @@
         "title": "Number of functions",
         "tiers": {
           "free": "10",
-          "pro": "100",
+          "pro": "100, then $10 per additional 100 functions",
           "enterprise": "Unlimited"
+        }
+      }
+    ]
+  },
+  "realtime": {
+    "title": "Realtime",
+    "icon": "M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59",
+    "features": [
+      {
+        "title": "Postgres Changes",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Concurrent Peak Connections",
+        "tiers": {
+          "free": "Up to 200",
+          "pro": "Up to 500, then $10 per 1000",
+          "enterprise": "Unlimited concurrent connections and volume discount"
+        }
+      },
+      {
+        "title": "Max Messages Per Month",
+        "tiers": {
+          "free": "2 Million (including database)",
+          "pro": "5 Million",
+          "enterprise": "Volume discounts on messages"
+        }
+      },
+      {
+        "title": "Max Message Size",
+        "tiers": {
+          "free": "250 Kb",
+          "pro": "3 Mb",
+          "enterprise": "Custom"
         }
       }
     ]
@@ -262,42 +300,10 @@
       }
     ]
   },
-  "support": {
-    "title": "Support and Compliance",
-    "icon": "M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z",
+  "security": {
+    "title": "Platform Security and Compliance",
+    "icon": "M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z",
     "features": [
-      {
-        "title": "Community support",
-        "tiers": {
-          "free": true,
-          "pro": true,
-          "enterprise": true
-        }
-      },
-      {
-        "title": "Email support",
-        "tiers": {
-          "free": false,
-          "pro": true,
-          "enterprise": true
-        }
-      },
-      {
-        "title": "Email support SLA",
-        "tiers": {
-          "free": false,
-          "pro": false,
-          "enterprise": true
-        }
-      },
-      {
-        "title": "Designated support",
-        "tiers": {
-          "free": false,
-          "pro": false,
-          "enterprise": true
-        }
-      },
       {
         "title": "On Premises / BYO cloud",
         "tiers": {
@@ -335,7 +341,7 @@
         "tiers": {
           "free": false,
           "pro": false,
-          "enterprise": "Coming soon"
+          "enterprise": true
         }
       },
       {
@@ -348,6 +354,69 @@
       },
       {
         "title": "99.9% SLA",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Access Roles",
+        "tiers": {
+          "free": "Owner, Developer",
+          "pro": "Owner, Developer",
+          "enterprise": "Additional owner(s), admin, read-only, billing admin, custom"
+        }
+      },
+      {
+        "title": "Vanity URLs",
+        "tiers": {
+          "free": false,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Custom Domains",
+        "tooltip": "Contact us to access this feature",
+        "tiers": {
+          "free": false,
+          "pro": "$10 per domain per month per project add on",
+          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available."
+        }
+      }
+    ]
+  },
+  "support": {
+    "title": "Support",
+    "icon": "M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z",
+    "features": [
+      {
+        "title": "Community support",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Email support",
+        "tiers": {
+          "free": false,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Email support SLA",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Designated support",
         "tiers": {
           "free": false,
           "pro": false,

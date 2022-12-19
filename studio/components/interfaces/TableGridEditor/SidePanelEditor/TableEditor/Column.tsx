@@ -157,7 +157,7 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 
@@ -170,7 +170,7 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
                   {column.format.includes('int') && (
@@ -186,7 +186,7 @@ const Column: FC<Props> = ({
                           onUpdateColumn({ isIdentity, isArray })
                         }}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 

@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
@@ -13,13 +13,24 @@ interface Props {
 }
 
 const SettingsLayout: FC<Props> = ({ title, children }) => {
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const projectRef = ui.selectedProjectRef as string
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const router = useRouter()
-  const page = router.pathname.split('/')[4]
+  // billing pages live under /billing/invoices and /billing/subscription, etc
+  // so we need to pass the [5]th part of the url to the menu
+  const page = router.pathname.includes('billing')
+    ? router.pathname.split('/')[5]
+    : router.pathname.split('/')[4]
+
   const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo)
+
+  useEffect(() => {
+    if (ui.selectedProject?.ref) {
+      meta.extensions.load()
+    }
+  }, [ui.selectedProject?.ref])
 
   return (
     <BaseLayout

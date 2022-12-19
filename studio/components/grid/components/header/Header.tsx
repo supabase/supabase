@@ -112,12 +112,13 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
   }
 
   const onRowsDelete = () => {
+    const numRows = allRowsSelected ? totalRows : selectedRows.size
     confirmAlert({
       title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${selectedRows.size} row${
-        selectedRows.size > 1 ? 's' : ''
+      message: `Are you sure you want to delete the selected ${numRows} row${
+        numRows > 1 ? 's' : ''
       }? This action cannot be undone.`,
-      confirmText: `Delete ${selectedRows.size} rows`,
+      confirmText: `Delete ${numRows} rows`,
       onAsyncConfirm: async () => {
         if (allRowsSelected) {
           const { error } =
@@ -136,7 +137,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-          const { error } = state.rowService!.delete(rows)
+          const { error } = await state.rowService!.delete(rows)
           if (error) {
             if (state.onError) state.onError(error)
           } else {

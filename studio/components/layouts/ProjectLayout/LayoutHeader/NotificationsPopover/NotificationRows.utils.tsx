@@ -129,7 +129,7 @@ export const formatNotificationText = (
                 {upgrade.changelog_link && (
                   <div className="!ml-4">
                     <Link href={upgrade.changelog_link}>
-                      <a>
+                      <a target="_blank" rel="noreferrer">
                         <IconExternalLink
                           className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
                           size={12}
@@ -146,7 +146,7 @@ export const formatNotificationText = (
       </div>
     )
   } else if (notification.data.name === NotificationName.ProjectInformational) {
-    return notification.data.message
+    return <p className="text-sm">{notification.data.message}</p>
   } else {
     return (
       <p className="text-sm">
@@ -177,7 +177,9 @@ export const formatNotificationCTAText = (
           return (
             <p className="text-sm space-x-1">
               This patch was applied on{' '}
-              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format('DD MMM YYYY, HH:mma')}
+              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format(
+                'DD MMM YYYY, HH:mma'
+              )}
             </p>
           )
         } else if (ownerReassignStatus?.desired === 'temp_role') {

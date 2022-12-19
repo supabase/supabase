@@ -1,6 +1,14 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch, IconPlus } from 'ui'
+import {
+  Popover,
+  IconCheck,
+  IconAlertCircle,
+  IconSearch,
+  IconPlus,
+  IconChevronDown,
+  Input,
+} from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
@@ -8,6 +16,7 @@ export interface MultiSelectOption {
   id: string | number
   value: string
   name: string
+  description?: string
   disabled: boolean
 }
 
@@ -112,7 +121,7 @@ export default function MultiSelect({
 
   return (
     <div className={`form-group ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
-      {label && <label>{label}</label>}
+      {label && <label className="!w-full">{label}</label>}
       <div
         className={[
           'form-control form-control--multi-select',
@@ -166,7 +175,12 @@ export default function MultiSelect({
                         `${active ? ' dark:bg-green-600 dark:bg-opacity-25' : ''}`,
                       ].join(' ')}
                     >
-                      <span>{option.name}</span>
+                      <div className="flex items-center space-x-2">
+                        <p>{option.name}</p>
+                        {option.description !== undefined && (
+                          <p className="opacity-50">{option.description}</p>
+                        )}
+                      </div>
                       {active && (
                         <IconCheck
                           size={16}
@@ -223,12 +237,14 @@ export default function MultiSelect({
         >
           <div
             className={[
-              'flex w-full flex-wrap items-start items-center gap-1.5 p-1.5',
+              'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-default',
               `${selectedOptions.length === 0 ? 'h-9' : ''}`,
             ].join(' ')}
           >
             {selectedOptions.length === 0 && placeholder && (
-              <div className="px-2 text-sm text-scale-1000">{placeholder}</div>
+              <div className="px-2 text-sm text-scale-1000 h-full flex items-center">
+                {placeholder}
+              </div>
             )}
             {selectedOptions.map((value, idx) => {
               const id = `${value}-${idx}`
@@ -250,6 +266,9 @@ export default function MultiSelect({
                 )
               }
             })}
+            <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
+              <IconChevronDown size={16} strokeWidth={2} className="text-scale-900" />
+            </div>
           </div>
         </Popover>
       </div>

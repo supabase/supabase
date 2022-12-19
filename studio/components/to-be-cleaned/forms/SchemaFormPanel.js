@@ -32,7 +32,7 @@ export default function SchemaFormPanel({
         setSubmitButtonLoading(true)
       })
       .catch((error) => {
-        console.log('Error on submitting', error)
+        console.error('Error on submitting', error)
       })
   }
 

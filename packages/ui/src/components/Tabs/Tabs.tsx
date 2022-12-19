@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import * as React from 'react'
 import { TabsContext } from './TabsContext'
 
 import * as TabsPrimitive from '@radix-ui/react-tabs'
+import { useRouter } from 'next/router'
 
 // @ts-ignore
 // import TabsStyles from './Tabs.module.css'
@@ -9,8 +10,7 @@ import * as TabsPrimitive from '@radix-ui/react-tabs'
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface TabsProps {
-  type?: 'pills' | 'underlined' | 'cards'
-  children: any
+  type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -23,10 +23,14 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
+  children: PanelPropsProps[]
 }
 
-function Tabs({
-  children,
+interface TabsSubComponents {
+  Panel: React.FC<PanelProps>
+}
+
+const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
@@ -38,8 +42,9 @@ function Tabs({
   addOnBefore,
   addOnAfter,
   listClassNames,
-}: TabsProps) {
-  const [activeTab, setActiveTab] = useState(
+  children,
+}) => {
+  const [activeTab, setActiveTab] = React.useState(
     defaultActiveId
       ? defaultActiveId
       : // if no defaultActiveId is set use the first panel
@@ -48,11 +53,14 @@ function Tabs({
       : ''
   )
 
+  const router = useRouter()
+  const hash = router?.asPath?.split('#')[1]?.toUpperCase()
+
   let __styles = styleHandler('tabs')
 
   // activeId state can be overriden externally with `active`
-  // defaults to use activeTab
-  const active = activeId ? activeId : activeTab
+  // defaults to the first panelif we have one or url hash if not
+  const active = activeId ? activeId : activeTab ? activeTab : hash
 
   function onTabClick(id: string) {
     const newTabSelected = id !== active
@@ -76,14 +84,10 @@ function Tabs({
   }
 
   return (
-    <TabsPrimitive.Root
-      defaultValue={defaultActiveId}
-      value={active}
-      className={__styles.base}
-    >
+    <TabsPrimitive.Root defaultValue={defaultActiveId} value={active} className={__styles.base}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
-        {children.map((tab: any) => {
+        {children.map((tab) => {
           const activeMatch = active === tab.props.id
 
           const triggerClasses = [__styles[type].base, __styles.size[size]]
@@ -117,21 +121,24 @@ function Tabs({
         {/* </Space> */}
         {addOnAfter}
       </TabsPrimitive.List>
-      <TabsContext.Provider value={{ activeId: active }}>
-        {children}
-      </TabsContext.Provider>
+      <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>
     </TabsPrimitive.Root>
   )
 }
 
+// bit of a hack because we map over the JSX in the parent component
+interface PanelPropsProps {
+  props: PanelProps
+}
+
 interface PanelProps {
-  children?: React.ReactNode
   id: string
   label?: string
   icon?: React.ReactNode
+  className?: string
 }
 
-export function Panel({ children, id }: PanelProps) {
+export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 
   return (
@@ -139,7 +146,7 @@ export function Panel({ children, id }: PanelProps) {
       {({ activeId }) => {
         const active = activeId === id
         return (
-          <TabsPrimitive.Content value={id} className={__styles.content}>
+          <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
             {children}
           </TabsPrimitive.Content>
         )

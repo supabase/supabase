@@ -11,7 +11,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
@@ -39,7 +39,7 @@ function Blog(props: any) {
   const router = useRouter()
 
   useEffect(() => {
-    // contruct an array of blog posts
+    // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()

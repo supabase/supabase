@@ -51,11 +51,7 @@ const LogsQueryPanel: React.FC<Props> = ({
 
   return (
     <div
-      className="
-  rounded
-  rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light
-  dark:border-panel-border-dark dark:bg-panel-header-dark
-  
+      className=" rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark
   "
     >
       <div className="flex w-full items-center justify-between px-5 py-2">

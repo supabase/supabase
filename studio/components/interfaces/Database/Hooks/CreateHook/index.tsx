@@ -61,7 +61,7 @@ class CreateHookFormState {
       enabled_mode: this.enabledMode.value,
       events: this.events.value,
       function_args: [
-        this.serviceUrl.value,
+        this.serviceUrl.value.replaceAll(' ', ''),
         this.serviceMethod.value,
         JSON.stringify(mapValues(keyBy(this.serviceHeaders.value, 'name'), 'value')),
         formatArguments(this.serviceParams.value),
@@ -412,7 +412,7 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
 
               {_localState.formState.serviceHeaders.value.length > 0 && (
                 <>
-                  <SidePanel.Seperator />
+                  <SidePanel.Separator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
                       <h5 className="text-base text-scale-1200">HTTP Headers</h5>
@@ -451,7 +451,7 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
 
               {_localState.formState.serviceParams.value.length > 0 && (
                 <>
-                  <SidePanel.Seperator />
+                  <SidePanel.Separator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
                       <h5 className="text-base text-scale-1200">HTTP Parameters</h5>
@@ -489,13 +489,13 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
               <div className="px-6">
                 <InputName />
               </div>
-              <SidePanel.Seperator />
+              <SidePanel.Separator />
               <div className="space-y-6 px-6">
                 <h5 className="text-base text-scale-1200">Conditions to fire hook</h5>
                 <TableSelection />
                 <CheckboxEvents />
               </div>
-              <SidePanel.Seperator />
+              <SidePanel.Separator />
               <div className="space-y-6 px-6">
                 <h5 className="text-base text-scale-1200">Type of hook</h5>
                 <RadioGroupHookService />

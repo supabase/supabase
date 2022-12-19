@@ -96,10 +96,10 @@ const ColumnList: FC<Props> = ({
                   )}
                 </Table.td>
                 <Table.td>
-                  <code className="text-sm">{x.data_type}</code>
+                  <code className="text-xs">{x.data_type}</code>
                 </Table.td>
                 <Table.td className="font-mono text-xs">
-                  <code className="text-sm">{x.format}</code>
+                  <code className="text-xs">{x.format}</code>
                 </Table.td>
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">
