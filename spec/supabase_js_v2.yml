@@ -968,6 +968,17 @@ functions:
         name: Query foreign tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+          ```
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
         code: |

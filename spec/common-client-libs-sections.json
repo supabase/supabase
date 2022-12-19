@@ -17,8 +17,7 @@
     "title": "Initializing",
     "id": "initializing",
     "slug": "initializing",
-    "type": "markdown",
-    "libs": ["dart", "dart_v0"]
+    "type": "function"
   },
   {
     "title": "Typescript Support",

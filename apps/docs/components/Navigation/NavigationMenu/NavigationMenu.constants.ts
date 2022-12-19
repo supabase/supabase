@@ -469,6 +469,7 @@ export const platform = {
       items: [
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
+        { name: 'Database Backups', url: '/guides/platform/backups', items: [] },
       ],
     },
     {
