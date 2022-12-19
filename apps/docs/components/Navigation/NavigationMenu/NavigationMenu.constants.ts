@@ -590,15 +590,30 @@ export const self_hosting = {
           items: [],
         },
         {
+          name: 'Auth Server Config',
+          url: '/guides/self-hosting/auth/config',
+          items: [],
+        },
+        {
           name: 'Storage Server',
           url: '/reference/self-hosting-storage/introduction',
           icon: '/img/icons/menu/reference-storage',
           items: [],
         },
         {
+          name: 'Storage Server Config',
+          url: '/guides/self-hosting/storage/config',
+          items: [],
+        },
+        {
           name: 'Realtime Server',
           url: '/reference/self-hosting-realtime/introduction',
           icon: '/img/icons/menu/reference-realtime',
+          items: [],
+        },
+        {
+          name: 'Realtime Server Config',
+          url: '/guides/self-hosting/realtime/config',
           items: [],
         },
       ],
