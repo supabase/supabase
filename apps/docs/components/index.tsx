@@ -27,6 +27,9 @@ import RefHeaderSection from './reference/RefHeaderSection'
 // Ref version specific
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 
+import Options from '~/components/Options'
+import Param from '~/components/Params'
+
 const components = {
   Admonition,
   Button,
@@ -68,6 +71,8 @@ const components = {
   code: (props: any) => <CodeBlock {...props} />,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  Options,
+  Param,
 }
 
 export default components

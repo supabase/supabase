@@ -298,6 +298,7 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
     {
@@ -468,6 +469,7 @@ export const platform = {
       items: [
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
+        { name: 'Database Backups', url: '/guides/platform/backups', items: [] },
       ],
     },
     {
@@ -673,6 +675,11 @@ export const integrations = {
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
+    },
+    {
+      name: 'Messaging',
+      url: undefined,
+      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] }],
     },
   ],
 }
