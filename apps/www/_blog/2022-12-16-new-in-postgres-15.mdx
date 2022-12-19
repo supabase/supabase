@@ -17,7 +17,7 @@ The PostgreSQL community [released](https://www.postgresql.org/docs/current/rele
 
 `CREATE` permission is revoked from all users except the database owner. It makes permission assigning more tunable ([details](https://www.postgresql.org/docs/15/ddl-schemas.html#DDL-SCHEMAS-PATTERNS)). And for the migrated database don't forget to revoke `CREATE` permission on the public schema manually to fit the new policy.
 
-There is a useful option `CREATE VIEW .. WITH security_invoker=on` to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
+There is a useful option `CREATE VIEW .. WITH (security_invoker=on)` to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
 
 ## **Performance speed-up**
 
