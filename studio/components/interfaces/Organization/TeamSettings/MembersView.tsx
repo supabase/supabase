@@ -95,6 +95,7 @@ const MembersView = () => {
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
+                const isEmailUser = x.username === x.primary_email
 
                 const validateSelectedRoleToChange = (roleId: any) => {
                   if (!role || role.id === roleId) return
@@ -126,17 +127,17 @@ const MembersView = () => {
                               <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
-                            ) : !x?.username?.includes('@') ? (
+                            ) : isEmailUser ? (
+                              <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <IconUser strokeWidth={1.5} />
+                              </div>
+                            ) : (
                               <Image
                                 src={`https://github.com/${x.username}.png?size=80`}
                                 width="40"
                                 height="40"
                                 className="rounded-full border"
                               />
-                            ) : (
-                              <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
-                                <IconUser strokeWidth={1.5} />
-                              </div>
                             )}
                           </div>
                           <div>

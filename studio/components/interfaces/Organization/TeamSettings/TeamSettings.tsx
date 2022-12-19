@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Input, IconSearch } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -24,10 +25,7 @@ const TeamSettings = observer(() => {
   const [isLeaving, setIsLeaving] = useState(false)
   const canAddMembers = rolesAddable.length > 0
 
-  const canLeave = (isOwner && ui.isOwnerAndCanLeaveOrg(members)) || !isOwner
-
-  console.log(rolesAddable)
-  console.log(PageState)
+  const canLeave = !isOwner || ui.isOwnerAndCanLeaveOrg(members)
 
   function onFilterMemberChange(e: any) {
     PageState.membersFilterString = e.target.value
@@ -82,13 +80,35 @@ const TeamSettings = observer(() => {
                 />
               </div>
             )}
-            {canLeave && (
-              <div>
-                <Button type="default" onClick={() => leaveTeam()} loading={isLeaving}>
-                  Leave team
-                </Button>
-              </div>
-            )}
+            <div>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="default"
+                    disabled={!canLeave}
+                    onClick={() => leaveTeam()}
+                    loading={isLeaving}
+                  >
+                    Leave team
+                  </Button>
+                </Tooltip.Trigger>
+                {!canLeave && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        An organization requires at least 1 owner
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
+            </div>
           </div>
         </div>
       </div>
