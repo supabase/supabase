@@ -1,10 +1,8 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'docker',
-  title: 'Self-hosting with Docker',
-  description: 'How to configure and deploy Supabase.',
-  sidebar_label: 'Docker',
+  title: 'Self-Hosting with Docker',
+  description: 'Learn how to configure and deploy Supabase with Docker.',
 }
 
 Docker is the easiest way to get started with self-hosted Supabase.
@@ -42,11 +40,11 @@ Now visit [http://localhost:3000](http://localhost:3000) to start using Supabase
 
 While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
 
-Please follow these steps to secure your Docker setup. We [strongly recommend](../../guides/hosting/overview#managing-your-secrets) using a secrets manager when deploying to production.
+Follow these steps to secure your Docker setup. We strongly recommend using a [secrets manager](../self-hosting#managing-your-secrets) when deploying to production.
 
 ### Generate API Keys
 
-Use your `JWT_SECRET` to generate a `anon` and `service` API keys using the [JWT generator](../../guides/hosting/overview#api-keys).
+Use your `JWT_SECRET` to generate a `anon` and `service` API keys using the [JWT generator](../self-hosting#api-keys).
 
 Replace the values in these files:
 
@@ -72,7 +70,7 @@ The Docker setup doesn't include a management database for managing users and lo
 
 ## Configuration
 
-Each system can be [configured](../../guides/hosting/overview#configuration) to suit your particular use-case.
+Each system can be [configured](../self-hosting#configuration) to suit your particular use-case.
 
 To keep the setup simple, we made some choices that may not be optimal for production:
 
@@ -82,7 +80,7 @@ To keep the setup simple, we made some choices that may not be optimal for produ
 
 ### Using an external database
 
-We strongly [recommend](../../guides/hosting/overview#managing-your-database) that you decouple your database from `docker-compose` before deploying.
+We strongly recommend [decoupling your database](../self-hosting#managing-your-database) from `docker-compose` before deploying.
 The middleware will run with any PostgreSQL database that has logical replication enabled. The following environment variables should be updated
 in the `.env` file to point to your external database:
 
