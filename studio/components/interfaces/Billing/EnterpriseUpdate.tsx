@@ -184,12 +184,15 @@ const EnterpriseUpdate: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+        <div className="flex-grow mt-10">
           <div className="relative space-y-4">
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+                <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+              </div>
+
               <div
-                className="space-y-8 overflow-scroll pb-8"
+                className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
                 style={{ height: 'calc(100vh - 6.4rem - 57px)' }}
               >
                 <h3 className="text-xl">
