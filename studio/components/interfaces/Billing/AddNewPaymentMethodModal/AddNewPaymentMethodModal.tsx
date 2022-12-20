@@ -34,7 +34,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   useEffect(() => {
     const loadPaymentForm = async () => {
       console.log('load payment form', { visible, captchaLoaded, captchaRef })
-      if (visible && captchaLoaded && captchaRef) {
+      if (visible && captchaRef && captchaLoaded) {
         let token = captchaToken
         if (!token) {
           const captchaResponse = await captchaRef.execute({ async: true })
@@ -49,7 +49,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     }
 
     loadPaymentForm()
-  }, [visible, captchaLoaded, captchaRef])
+  }, [visible, captchaRef, captchaLoaded])
 
   const onCaptchaLoaded = () => {
     console.log('on captcha loaded')
@@ -95,19 +95,21 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       onCancel={onCancel}
       className="PAYMENT"
     >
-      <HCaptcha
-        ref={captchaRefCallback}
-        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-        size="invisible"
-        onLoad={onCaptchaLoaded}
-        onError={(err) => console.error(err)}
-        onVerify={(token) => {
-          setCaptchaToken(token)
-        }}
-        onExpire={() => {
-          setCaptchaToken(null)
-        }}
-      />
+      {visible && (
+        <HCaptcha
+          ref={captchaRefCallback}
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+          size="invisible"
+          onError={(err) => console.error(err)}
+          onLoad={() => onCaptchaLoaded()}
+          onVerify={(token) => {
+            setCaptchaToken(token)
+          }}
+          onExpire={() => {
+            setCaptchaToken(null)
+          }}
+        />
+      )}
       <div className="space-y-4 py-4">
         {intent !== undefined ? (
           <Elements stripe={stripePromise} options={options}>
