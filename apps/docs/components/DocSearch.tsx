@@ -20,7 +20,6 @@ function SearchProviderContent({ children }: any) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [initialQuery, setInitialQuery] = useState(null)
-
   const onOpen = useCallback(() => {
     setIsOpen(true)
   }, [setIsOpen])
@@ -85,6 +84,7 @@ function SearchProviderContent({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
+                console.log('item', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')
@@ -96,7 +96,8 @@ function SearchProviderContent({ children }: any) {
                   ...item,
                   url: `${a.pathname}${hash}`,
                   __is_result: () => true,
-                  __is_parent: () => item.type === 'lvl1' && items.length > 1 && index === 0,
+                  __is_parent: () => item.type === 'lvl1' && index === 0,
+                  __is_guide: () => item.hierarchy.lvl0 === 'Guides',
                   __is_child: () =>
                     item.type !== 'lvl1' &&
                     items.length > 1 &&
@@ -129,6 +130,7 @@ function Hit({ hit, children }) {
           'DocSearch-Hit--FirstChild': hit.__is_first?.(),
           'DocSearch-Hit--LastChild': hit.__is_last?.(),
           'DocSearch-Hit--Child': hit.__is_child?.(),
+          'DocSearch-Hit--Guide': hit.__is_guide?.(),
         })}
       >
         {children}

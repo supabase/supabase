@@ -14,6 +14,8 @@ import Panel from 'components/ui/Panel'
 import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
 
 interface Props {
@@ -77,7 +79,9 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                 readOnly
                 disabled
                 className="input-mono"
-                value={`https://${apiConfig?.endpoint ?? '-'}`}
+                value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
+                  apiConfig?.endpoint ?? '-'
+                }`}
                 descriptionText="A RESTful endpoint for querying and managing your database."
                 layout="horizontal"
               />

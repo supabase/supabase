@@ -240,6 +240,12 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-workos',
     items: [],
   },
+  {
+    name: 'Zoom',
+    icon: '/docs/img/icons/zoom-icon',
+    url: '/guides/auth/social-login/auth-zoom',
+    items: [],
+  },
 ]
 
 export const PhoneLoginsItems = [
@@ -247,20 +253,20 @@ export const PhoneLoginsItems = [
     name: 'MessageBird SMS Login',
     icon: '/docs/img/icons/messagebird-icon',
     linkDescription: 'Communication between businesses and their customers — across any channel.',
-    url: '/guides/auth/passwordless-login/phone-sms-otp-messagebird',
+    url: '/guides/auth/phone-login/messagebird',
     items: [],
   },
   {
     name: 'Twilio SMS Login',
     icon: '/docs/img/icons/twilio-icon',
-    url: '/guides/auth/passwordless-login/phone-sms-otp-twilio',
+    url: '/guides/auth/phone-login/twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
     items: [],
   },
   {
     name: 'Vonage SMS Login',
     icon: '/docs/img/icons/vonage-icon',
-    url: '/guides/auth/passwordless-login/phone-sms-otp-vonage',
+    url: '/guides/auth/phone-login/vonage',
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     items: [],
@@ -281,24 +287,18 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email', items: [] },
+        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link', items: [] },
         {
-          name: 'Passwordless Login',
-          url: '/guides/auth/passwordless-login',
-          items: [
-            {
-              name: 'Magic Link Login',
-              icon: '',
-              url: '/guides/auth/passwordless-login/email-otp-magic-link',
-              items: [],
-            },
-            ...PhoneLoginsItems,
-          ],
+          name: 'Phone Login',
+          url: '/guides/auth/phone-login',
+          items: [...PhoneLoginsItems],
         },
         {
           name: 'Social Login',
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
     {
@@ -469,12 +469,14 @@ export const platform = {
       items: [
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
+        { name: 'Database Backups', url: '/guides/platform/backups', items: [] },
       ],
     },
     {
       name: 'Platform Management',
       url: undefined,
       items: [
+        { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
@@ -483,8 +485,27 @@ export const platform = {
           url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
+        { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+      ],
+    },
+    {
+      name: 'Single sign-on',
+      url: undefined,
+      items: [
+        {
+          name: 'Enable SSO for your organization',
+          url: '/guides/platform/sso',
+          items: [],
+        },
+        { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure', items: [] },
+        {
+          name: 'SSO with Google Workspace',
+          url: '/guides/platform/sso/gsuite',
+          items: [],
+        },
+        { name: 'SSO with Okta', url: '/guides/platform/sso/okta', items: [] },
       ],
     },
     {
@@ -500,7 +521,8 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    // removing until the examples page is reworked
+    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -512,8 +534,8 @@ export const resources = {
           items: [],
         },
         {
-          name: 'Firebase Data',
-          url: '/guides/resources/migrating-to-supabase/firebase-data',
+          name: 'Firestore Data',
+          url: '/guides/resources/migrating-to-supabase/firestore-data',
           items: [],
         },
         {
@@ -543,37 +565,7 @@ export const resources = {
         },
         {
           name: 'Managing Environments',
-          url: '/guides/cli/managing-environments',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Self-Hosting',
-      items: [
-        { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
-        { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
-      ],
-    },
-    {
-      name: 'Self-Hosting Reference',
-      items: [
-        {
-          name: 'Auth Server',
-          url: '/reference/self-hosting-auth/introduction',
-          icon: '/img/icons/menu/reference-auth',
-          items: [],
-        },
-        {
-          name: 'Storage Server',
-          url: '/reference/self-hosting-storage/introduction',
-          icon: '/img/icons/menu/reference-storage',
-          items: [],
-        },
-        {
-          name: 'Realtime Server',
-          url: '/reference/self-hosting-realtime/introduction',
-          icon: '/img/icons/menu/reference-realtime',
+          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
@@ -581,12 +573,34 @@ export const resources = {
   ],
 }
 
-export const selfHosting = {
-  label: 'Self-Hosting',
+export const self_hosting = {
+  title: 'Self-Hosting',
+  icon: 'resources',
   url: '/guides/self-hosting',
   items: [
-    { name: 'Overview', url: '/guides/hosting/overview', items: [] },
-    { name: 'Docker', url: '/guides/hosting/docker', items: [] },
+    { name: 'Overview', url: '/guides/self-hosting', items: [] },
+    { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker', items: [] },
+    {
+      name: 'Auth Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-auth/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/auth/config', items: [] },
+      ],
+    },
+    {
+      name: 'Storage Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-storage/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/storage/config', items: [] },
+      ],
+    },
+    {
+      name: 'Realtime Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-realtime/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/realtime/config', items: [] },
+      ],
+    },
   ],
 }
 
@@ -653,6 +667,11 @@ export const integrations = {
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
+    },
+    {
+      name: 'Messaging',
+      url: undefined,
+      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] }],
     },
   ],
 }
