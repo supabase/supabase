@@ -27,13 +27,14 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
   const captchaRefCallback = useCallback((node) => {
+    console.log({ node })
     setCaptchaRef(node)
   }, [])
 
   useEffect(() => {
     const loadPaymentForm = async () => {
+      console.log('load payment form', { visible, captchaLoaded, captchaRef })
       if (visible && captchaLoaded && captchaRef) {
-        console.log('load payment form', { visible, captchaLoaded })
         let token = captchaToken
         if (!token) {
           const captchaResponse = await captchaRef.execute({ async: true })
