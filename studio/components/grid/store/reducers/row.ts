@@ -1,5 +1,10 @@
 import update from 'immutability-helper'
-import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_INITIAL, TOTAL_ROWS_RESET } from '../../constants'
+import {
+  REFRESH_PAGE_DEBOUNCED,
+  REFRESH_PAGE_IMMEDIATELY,
+  TOTAL_ROWS_INITIAL,
+  TOTAL_ROWS_RESET,
+} from '../../constants'
 import { Dictionary, SupaRow } from '../../types'
 import { INIT_ACTIONTYPE } from './base'
 
@@ -142,7 +147,7 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         ...state,
         rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
         totalRows: totalRows,
-        refreshPageFlag: Number(state.totalRows > state.page),
+        refreshPageFlag: state.totalRows > state.rowsPerPage ? REFRESH_PAGE_DEBOUNCED : 0,
       }
     }
     case 'REMOVE_ALL_ROWS': {
