@@ -152,9 +152,6 @@ const Content = (props) => {
 
   return (
     <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
-      {/* // */}
-      {console.log(id && `GUIDE MENU ${id} changed`)}
-      {/* // */}
       <Link href={`${menu.parent ?? '/'}`} passHref>
         <a
           className={[
@@ -181,8 +178,6 @@ const Content = (props) => {
       </Link>
 
       {menu.items.map((x, index) => {
-        // console.log('1st type of link?', x.items && x.items.length > 0)
-        // console.log()
         return (
           <div key={x.url}>
             {x.items && x.items.length > 0 ? (
@@ -200,28 +195,6 @@ const Content = (props) => {
             ) : (
               <ContentLink url={x.url} icon={x.icon} name={x.name} />
             )}
-          </div>
-        )
-      })}
-      {menu.extras && (
-        <>
-          <div className="h-px w-full bg-green-500 my-3"></div>
-          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-2">
-            Resources
-          </span>
-        </>
-      )}
-      {menu.extras?.map((x) => {
-        return (
-          <div key={x.name}>
-            <li>
-              <Link href={`${x.href}`} passHref>
-                <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
-                  {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
-                  {x.name}
-                </a>
-              </Link>
-            </li>
           </div>
         )
       })}
