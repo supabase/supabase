@@ -1,5 +1,6 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
+import Image from 'next/image'
 import { GlassPanel } from 'ui'
 import { integrations } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
@@ -20,7 +21,7 @@ Explore a variety of integrations from Supabase partners. Need a different integ
             <GlassPanel
               title={integration.name}
               background={false}
-              icon={<img className="w-10 h-10 rounded" src={`/docs/img/integrations/logos/${integration.name.toLowerCase()}_logo.png`}/>}
+              icon={<Image height={40} width={40} className="rounded" src={`/docs/img/integrations/logos/${integration.name.toLowerCase()}_logo.png`}/>}
             >
               {integration.description}
 
