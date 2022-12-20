@@ -38,6 +38,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 # in /studio
 
 npm i # install dependencies
+npm run dev:secrets:pull # Supabase internal use: if you are working on the platform version of the Studio
 npm run dev # start dev server
 npm run test # run tests
 npm run -- --watch # run tests in watch mode

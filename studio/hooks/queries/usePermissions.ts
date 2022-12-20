@@ -1,5 +1,5 @@
 import jsonLogic from 'json-logic-js'
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import useSWR from 'swr'
@@ -39,9 +39,6 @@ export function checkPermissions(
   organizationId?: number
 ) {
   if (!IS_PLATFORM) return true
-
-  const enablePermissions = useFlag('enablePermissions')
-  if (!enablePermissions) return true
 
   const { ui } = useStore()
   const orgid = organizationId ?? ui?.selectedOrganization?.id

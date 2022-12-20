@@ -29,11 +29,14 @@ const TableEditorLayout: FC<Props> = ({
   onDuplicateTable = () => {},
   children,
 }) => {
-  const { meta, ui } = useStore()
+  const { vault, meta, ui } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
+
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {
@@ -42,8 +45,16 @@ const TableEditorLayout: FC<Props> = ({
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
+      meta.extensions.load()
+      meta.foreignTables.load()
     }
   }, [ui.selectedProject?.ref])
+
+  useEffect(() => {
+    if (isEnabled) {
+      vault.load()
+    }
+  }, [ui.selectedProject?.ref, isEnabled])
 
   useEffect(() => {
     let cancel = false

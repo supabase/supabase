@@ -6,6 +6,8 @@ import RolesSettings from './Roles/RolesSettings'
 
 import Extensions from './Extensions/Extensions'
 
+import Wrappers from './Wrappers/Wrappers'
+
 import PublicationsList from './Publications/PublicationsList'
 import PublicationsTables from './Publications/PublicationsTables'
 
@@ -25,6 +27,7 @@ export {
   RolesList,
   RolesSettings,
   Extensions,
+  Wrappers,
   PublicationsList,
   PublicationsTables,
   BackupsList,

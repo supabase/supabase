@@ -12,7 +12,7 @@ import Connecting from 'components/ui/Loading/Loading'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { ProUpgrade } from 'components/interfaces/Billing'
 import { PaymentMethod } from 'components/interfaces/Billing/Billing.types'
-import { DatabaseAddon } from 'components/interfaces/Billing/AddOns/AddOns.types'
+import { SubscriptionAddon } from 'components/interfaces/Billing/AddOns/AddOns.types'
 
 const BillingUpdatePro: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -24,7 +24,7 @@ const BillingUpdatePro: NextPageWithLayout = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [products, setProducts] = useState<{ tiers: any[]; addons: DatabaseAddon[] }>()
+  const [products, setProducts] = useState<{ tiers: any[]; addons: SubscriptionAddon[] }>()
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>()
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 

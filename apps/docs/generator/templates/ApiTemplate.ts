@@ -35,7 +35,7 @@ toc_max_heading_level: 3
 <% if(operation.parameters && operation.parameters.filter((parameter) => parameter.in === 'path').length > 0){ %>
 #### Path Parameters
 
-<ul className="method-list-group">
+<ul className="method-list-group not-prose">
 <%  operation.parameters
 .filter((parameter) => parameter.in === 'path').forEach(function(parameter){ %>
 <li className="method-list-item">
@@ -68,7 +68,7 @@ toc_max_heading_level: 3
 
 <% if(operation.parameters && operation.parameters.filter((parameter) => parameter.in === 'header').length > 0){ %>
 #### Header Parameters
-<ul className="method-list-group">
+<ul className="method-list-group not-prose">
 <%  operation.parameters
 .filter((parameter) => parameter.in === 'header').forEach(function(parameter){ %>
 <li className="method-list-item">

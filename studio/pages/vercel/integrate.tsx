@@ -10,7 +10,8 @@ import Divider from 'components/ui/Divider'
 import { Dictionary } from 'components/grid'
 
 import { useStore, withAuth } from 'hooks'
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { get } from 'lib/common/fetch'
 import {
   VERCEL_INTEGRATION_CONFIGS,
@@ -280,7 +281,7 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full rounded-sm border border-border-secondary-light 
+        className="w-full rounded-sm border border-border-secondary-light
       bg-panel-header-light dark:border-border-secondary-dark dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
@@ -369,7 +370,9 @@ const ProjectLinks: FC = observer(() => {
 
         // Then create env for vercel project with supabase project
         const vercelEnvs = prepareVercelEvns(defaultVercelEnvs, {
-          endpoint: `https://${projectDetails.autoApiService.endpoint}`,
+          endpoint: `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
+            projectDetails.autoApiService.endpoint
+          }`,
           anon_key: projectDetails.autoApiService.defaultApiKey,
           service_key: projectDetails.autoApiService.serviceApiKey,
         })
