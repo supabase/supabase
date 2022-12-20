@@ -86,8 +86,8 @@ const PITRSelection = ({}) => {
 
   // Start: Variables specifically for date picker component
   // Required as it only works with vanilla Date object which is not timezone localized
-  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('DD-MMM-YYYY'))
-  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('DD-MMM-YYYY'))
+  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('YYYY-MM-DD'))
+  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('YYYY-MM-DD'))
   const isSelectedOnEarliest = checkMatchingDates(selectedDate, earliestAvailableBackupFormatted)
   const isSelectedOnLatest = checkMatchingDates(selectedDate, latestAvailableBackupFormatted)
   const availableDates = getDatesBetweenRange(
@@ -185,7 +185,7 @@ const PITRSelection = ({}) => {
                       <Button
                         as="span"
                         type="warning"
-                        disabled={isSelectedOutOfRange}
+                        disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}
                       >
                         Review restore details

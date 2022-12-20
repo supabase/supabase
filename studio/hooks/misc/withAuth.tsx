@@ -8,7 +8,13 @@ import { useProfile, useStore, usePermissions } from 'hooks'
 import Error500 from '../../pages/500'
 import { NextPageWithLayout } from 'types'
 
-const PLATFORM_ONLY_PAGES = ['reports', 'settings']
+const PLATFORM_ONLY_PAGES = [
+  'reports',
+  'settings',
+  'auth/providers',
+  'auth/templates',
+  'auth/url-configuration',
+]
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -23,7 +29,7 @@ export function withAuth<T>(
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
-    const page = router.pathname.split('/')[3]
+    const page = router.pathname.split('/').slice(3).join('/')
 
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
@@ -37,7 +43,9 @@ export function withAuth<T>(
       mutate: mutatePermissions,
     } = usePermissions(profile, returning)
 
-    const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
+    const isAccessingBlockedPage =
+      !IS_PLATFORM &&
+      PLATFORM_ONLY_PAGES.some((platformOnlyPage) => page.startsWith(platformOnlyPage))
     const isRedirecting =
       isAccessingBlockedPage ||
       checkRedirectTo(isLoading, router, profile, error, redirectTo, redirectIfFound)
@@ -84,11 +92,13 @@ export function withAuth<T>(
         <Head>
           {/* This script will quickly (before the main JS loads) redirect the user
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
-            }}
-          />
+          {IS_PLATFORM && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
+              }}
+            />
+          )}
         </Head>
         <WrappedComponent {...props} />
       </>
@@ -105,7 +115,7 @@ export function withAuth<T>(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/sign-in'
+  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/projects'
 }
 
 function checkRedirectTo(

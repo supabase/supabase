@@ -18,7 +18,7 @@ For example, a `public.profiles` table might look like this:
 
 ```sql
 create table public.profiles (
-  id uuid references auth.users not null,
+  id uuid references auth.users not null on delete cascade,
   first_name text,
   last_name text,
 
@@ -27,6 +27,12 @@ create table public.profiles (
 
 alter table public.profiles enable row level security;
 ```
+
+<Admonition type="note">
+
+Make sure to specify the `on delete cascade` clause when referencing `auth.users`. Omitting it may cause problems when deleting users.
+
+</Admonition>
 
 ## Public access
 

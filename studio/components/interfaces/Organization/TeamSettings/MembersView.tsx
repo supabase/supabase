@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal } from 'ui'
 
 import { Member, Role } from 'types'
-import { useStore, useFlag, useOrganizationDetail } from 'hooks'
+import { useStore, useOrganizationDetail } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
@@ -28,16 +28,12 @@ const MembersView = () => {
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug || ''
-  const isOwner = ui.selectedOrganization?.is_owner
 
-  const enablePermissions = useFlag('enablePermissions')
   const { mutateOrgMembers } = useOrganizationDetail(slug)
 
   const [loading, setLoading] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
-
-  const hasAccessToMemberActions = enablePermissions ? true : isOwner
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -87,7 +83,7 @@ const MembersView = () => {
               <Table.th key="header-status"></Table.th>,
               <Table.th key="header-role" className="flex items-center space-x-2">
                 <span>Role</span>
-                {enablePermissions && <RolesHelperModal />}
+                <RolesHelperModal />
               </Table.th>,
               <Table.th key="header-action"></Table.th>,
             ]}
@@ -99,6 +95,7 @@ const MembersView = () => {
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
+                const isEmailUser = x.username === x.primary_email
 
                 const validateSelectedRoleToChange = (roleId: any) => {
                   if (!role || role.id === roleId) return
@@ -130,6 +127,10 @@ const MembersView = () => {
                               <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
+                            ) : isEmailUser ? (
+                              <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <IconUser strokeWidth={1.5} />
+                              </div>
                             ) : (
                               <Image
                                 src={`https://github.com/${x.username}.png?size=80`}
@@ -157,71 +158,64 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
-                        {!role && !enablePermissions && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
+                        {!role && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
                         {role && (
-                          <>
-                            {!enablePermissions ? (
-                              <p>{role?.name ?? 'Developer'}</p>
-                            ) : (
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <Listbox
-                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger>
+                              <Listbox
+                                className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                disabled={disableRoleEdit}
+                                value={role.id}
+                                onChange={validateSelectedRoleToChange}
+                              >
+                                {roles.map((r: any) => (
+                                  <Listbox.Option
+                                    key={r.id}
+                                    value={r.id}
+                                    label={r.name}
                                     disabled={disableRoleEdit}
-                                    value={role.id}
-                                    onChange={validateSelectedRoleToChange}
                                   >
-                                    {roles.map((r: any) => (
-                                      <Listbox.Option
-                                        key={r.id}
-                                        value={r.id}
-                                        label={r.name}
-                                        disabled={disableRoleEdit}
-                                      >
-                                        {r.name}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox>
-                                </Tooltip.Trigger>
-                                {memberIsPendingInvite ? (
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-scale-1200">
-                                        Role can only be changed after the user has accepted the
-                                        invite
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                ) : !memberIsUser && !canRemoveRole ? (
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-scale-1200">
-                                        You need additional permissions to manage this team member
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                ) : (
-                                  <></>
-                                )}
-                              </Tooltip.Root>
+                                    {r.name}
+                                  </Listbox.Option>
+                                ))}
+                              </Listbox>
+                            </Tooltip.Trigger>
+                            {memberIsPendingInvite ? (
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                    'border border-scale-200 ', //border
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    Role can only be changed after the user has accepted the invite
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            ) : !memberIsUser && !canRemoveRole ? (
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                    'border border-scale-200 ', //border
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    You need additional permissions to manage this team member
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            ) : (
+                              <></>
                             )}
-                          </>
+                          </Tooltip.Root>
                         )}
                       </Table.td>
                       <Table.td>
-                        {hasAccessToMemberActions && !memberIsUser && (
+                        {!memberIsUser && (
                           <MemberActions members={PageState.members} member={x} roles={roles} />
                         )}
                       </Table.td>

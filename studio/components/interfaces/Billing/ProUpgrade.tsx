@@ -21,18 +21,19 @@ import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import UpdateSuccess from './UpdateSuccess'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
-import { DatabaseAddon } from './AddOns/AddOns.types'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
   formatCustomDomainOptions,
   formatPITROptions,
 } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
+import SupportPlan from './AddOns/SupportPlan'
 
 // Do not allow compute size changes for af-south-1
 
 interface Props {
-  products: { tiers: any[]; addons: DatabaseAddon[] }
+  products: { tiers: any[]; addons: SubscriptionAddon[] }
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
@@ -77,15 +78,21 @@ const ProUpgrade: FC<Props> = ({
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
   // of unnecessary state management on this complex page.
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+  const [selectedComputeSize, setSelectedComputeSize] = useState<SubscriptionAddon>(
     currentAddons.computeSize
   )
-  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<SubscriptionAddon>(
     currentAddons.pitrDuration
   )
-  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<SubscriptionAddon>(
     currentAddons.customDomains
   )
+
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as SubscriptionAddon[]
 
   // [Joshen] Scaffolded here
   const selectedAddons = {
@@ -121,8 +128,10 @@ const ProUpgrade: FC<Props> = ({
     if (!selectedTier) return
 
     const payload = formSubscriptionUpdatePayload(
+      currentSubscription,
       selectedTier,
       selectedAddons,
+      nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion
     )
@@ -141,8 +150,10 @@ const ProUpgrade: FC<Props> = ({
 
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
+      currentSubscription,
       selectedTier,
       selectedAddons,
+      nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion
     )
@@ -190,94 +201,101 @@ const ProUpgrade: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+        <div className="flex-grow mt-10">
           <div className="relative space-y-4">
-            <BackButton onClick={() => onSelectBack()} />
-            <div className="space-y-8">
-              <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
-              <div
-                className="space-y-8 overflow-scroll pb-8"
-                style={{ height: 'calc(100vh - 9rem - 57px)' }}
-              >
-                <div className="space-y-2">
-                  {!isManagingProSubscription ? (
-                    <>
-                      <h3 className="text-xl">
-                        Welcome to <span className="text-brand-900">Pro</span>
-                      </h3>
-                      <p className="text-base text-scale-1100">
-                        Your new subscription will begin immediately after payment
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-3xl">
-                        Managing your <span className="text-brand-900">Pro</span> plan
-                      </h3>
-                      {/* <p className="text-base text-scale-1100">
+            <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+              <BackButton onClick={() => onSelectBack()} />
+              <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+            </div>
+
+            <div
+              className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
+              style={{ height: 'calc(100vh - 9rem - 57px)' }}
+            >
+              <div className="space-y-2">
+                {!isManagingProSubscription ? (
+                  <>
+                    <h3 className="text-xl">
+                      Welcome to <span className="text-brand-900">Pro</span>
+                    </h3>
+                    <p className="text-base text-scale-1100">
+                      Your new subscription will begin immediately after payment
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-3xl">
+                      Managing your <span className="text-brand-900">Pro</span> plan
+                    </h3>
+                    {/* <p className="text-base text-scale-1100">
                         Your billing cycle will reset after payment
                       </p> */}
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <p>Enable spend cap</p>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 transition hover:opacity-100"
-                        onClick={() => setShowSpendCapHelperModal(true)}
-                      />
-                    </div>
-                    <p className="text-sm text-scale-1100">
-                      If enabled, additional resources will not be charged on a per-usage basis
-                    </p>
-                  </div>
-                  <Toggle
-                    checked={isSpendCapEnabled}
-                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                  />
-                </div>
-                {projectRegion !== 'af-south-1' && (
-                  <>
-                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <CustomDomainSelection
-                          options={customDomainOptions}
-                          currentOption={
-                            isManagingProSubscription ? currentAddons.customDomains : undefined
-                          }
-                          selectedOption={selectedAddons.customDomains}
-                          onSelectOption={setSelectedCustomDomainOption}
-                        />
-                      </>
-                    )}
-                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <PITRDurationSelection
-                          pitrDurationOptions={pitrDurationOptions}
-                          currentPitrDuration={
-                            isManagingProSubscription ? currentAddons.pitrDuration : undefined
-                          }
-                          selectedPitrDuration={selectedAddons.pitrDuration}
-                          onSelectOption={setSelectedPITRDuration}
-                        />
-                      </>
-                    )}
-                    <Divider light />
-                    <ComputeSizeSelection
-                      computeSizes={computeSizes || []}
-                      currentComputeSize={currentAddons.computeSize}
-                      selectedComputeSize={selectedAddons.computeSize}
-                      onSelectOption={setSelectedComputeSize}
-                    />
                   </>
                 )}
               </div>
+              <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <p>Enable spend cap</p>
+                    <IconHelpCircle
+                      size={16}
+                      strokeWidth={1.5}
+                      className="cursor-pointer opacity-50 transition hover:opacity-100"
+                      onClick={() => setShowSpendCapHelperModal(true)}
+                    />
+                  </div>
+                  <p className="text-sm text-scale-1100">
+                    If enabled, additional resources will not be charged on a per-usage basis
+                  </p>
+                </div>
+                <Toggle
+                  checked={isSpendCapEnabled}
+                  onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                />
+              </div>
+              {projectRegion !== 'af-south-1' && (
+                <>
+                  {currentAddons.supportPlan !== undefined && (
+                    <>
+                      <Divider light />
+                      <SupportPlan currentOption={currentAddons.supportPlan} />
+                    </>
+                  )}
+                  {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                    <>
+                      <Divider light />
+                      <CustomDomainSelection
+                        options={customDomainOptions}
+                        currentOption={
+                          isManagingProSubscription ? currentAddons.customDomains : undefined
+                        }
+                        selectedOption={selectedAddons.customDomains}
+                        onSelectOption={setSelectedCustomDomainOption}
+                      />
+                    </>
+                  )}
+                  {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
+                    <>
+                      <Divider light />
+                      <PITRDurationSelection
+                        pitrDurationOptions={pitrDurationOptions}
+                        currentPitrDuration={
+                          isManagingProSubscription ? currentAddons.pitrDuration : undefined
+                        }
+                        selectedPitrDuration={selectedAddons.pitrDuration}
+                        onSelectOption={setSelectedPITRDuration}
+                      />
+                    </>
+                  )}
+                  <Divider light />
+                  <ComputeSizeSelection
+                    computeSizes={computeSizes || []}
+                    currentComputeSize={currentAddons.computeSize}
+                    selectedComputeSize={selectedAddons.computeSize}
+                    onSelectOption={setSelectedComputeSize}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -289,6 +307,7 @@ const ProUpgrade: FC<Props> = ({
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
             currentAddons={currentAddons}
+            currentSubscription={currentSubscription}
             // Selected subscription configuration based on UI
             selectedPlan={selectedTier}
             selectedAddons={selectedAddons}
