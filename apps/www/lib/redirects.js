@@ -542,9 +542,9 @@ module.exports = [
     destination: '/docs/guides/platform',
   },
   {
-    permanent: false,
-    source: '/docs/guides/self-hosting',
-    destination: '/docs/guides/hosting/overview',
+    permanent: true,
+    source: '/docs/guides/self-hosting/overview',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
@@ -1800,12 +1800,22 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/hosting/overview',
-    destination: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
     source: '/docs/guides/hosting/docker',
-    destination: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
   },
   {
     permanent: true,
