@@ -104,6 +104,8 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
         onVerify={(token) => {
           setCaptchaToken(token)
         }}
+        onClose={() => console.log('onclose')}
+        onOpen={() => console.log('onopen')}
         onExpire={() => {
           setCaptchaToken(null)
         }}
