@@ -214,7 +214,7 @@ const ColumnManagement: FC<Props> = ({
                     ].join(' ')}
                   >
                     <span className="text-xs text-scale-1200">
-                      Recommended to use lowercase and use an underscore to seperate words e.g.
+                      Recommended to use lowercase and use an underscore to separate words e.g.
                       column_name
                     </span>
                   </div>
