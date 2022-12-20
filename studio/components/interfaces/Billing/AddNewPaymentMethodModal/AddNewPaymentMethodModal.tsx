@@ -30,6 +30,13 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     setCaptchaRef(node)
   }, [])
 
+  /**
+   * We want to load the Stripe payment elements only after successfully verifying captcha.
+   * To execute hCaptcha when displaying the modal, we need to ensure hCaptcha is actually loaded.
+   * The `onLoad` method from hCaptcha is only executed ONCE for the entire application, so we cannot listen to it.
+   * One way to find out if hCaptcha has been initialized, is checking `window.hcaptcha`. When checking via window,
+   * we know if the hCaptcha has been initialized from a different part of the app or through this component.
+   */
   useEffect(() => {
     setCaptchaLoaded(true)
     // @ts-ignore
@@ -37,15 +44,12 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
 
   useEffect(() => {
     const loadPaymentForm = async () => {
-      console.log('load payment form', { visible, captchaLoaded, captchaRef })
       if (visible && captchaRef && captchaLoaded) {
         let token = captchaToken
         if (!token) {
           const captchaResponse = await captchaRef.execute({ async: true })
           token = captchaResponse?.response ?? null
         }
-
-        console.log('Setting up intent', { token })
 
         await setupIntent(token ?? undefined)
         resetCaptcha()
@@ -56,7 +60,6 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   }, [visible, captchaRef, captchaLoaded])
 
   const resetCaptcha = () => {
-    console.log('Resetting  captcha')
     setCaptchaToken(null)
     captchaRef?.resetCaptcha()
   }
@@ -113,7 +116,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       <div className="space-y-4 py-4">
         {intent !== undefined ? (
           <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
+            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onLocalCancel} />
           </Elements>
         ) : (
           <div className="flex w-full items-center justify-center py-20">
