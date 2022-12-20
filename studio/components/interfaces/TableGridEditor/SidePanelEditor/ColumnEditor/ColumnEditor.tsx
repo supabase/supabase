@@ -190,7 +190,7 @@ const ColumnEditor: FC<Props> = ({
           <Input
             label="Name"
             type="text"
-            descriptionText="Recommended to use lowercase and use an underscore to seperate words e.g. column_name"
+            descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
             placeholder='column_name'
             error={errors.name}
             value={columnFields?.name ?? ''}
