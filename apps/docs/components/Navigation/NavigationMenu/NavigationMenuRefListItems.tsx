@@ -15,6 +15,30 @@ import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 import React from 'react'
 import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
 
+const HeaderImage = React.memo(function HeaderImage(props: any) {
+  const router = useRouter()
+  const { isDarkMode } = useTheme()
+
+  return (
+    <Image
+      alt={props.icon}
+      width={15}
+      height={15}
+      src={`${router.basePath}` + `/img/icons/menu/${props.icon}${isDarkMode ? '' : '-light'}.svg`}
+    />
+  )
+})
+
+const HeaderLink = React.memo(function HeaderLink(props: any) {
+  const router = useRouter()
+
+  return (
+    <span className={['text-base text-brand-1200 ', !props.title && 'capitalize'].join(' ')}>
+      {props.title ?? props.id}
+    </span>
+  )
+})
+
 const FunctionLink = ({
   title,
   id,
@@ -85,9 +109,6 @@ interface INavigationMenuRefList {
 }
 
 const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, spec }) => {
-  const router = useRouter()
-  const { isDarkMode } = useTheme()
-
   const allowedClientKeys = spec ? generateAllowedClientLibKeys(commonSections, spec) : undefined
 
   console.log(
@@ -168,19 +189,10 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
       </Link>
 
       <div className="flex items-center gap-3 my-3">
-        <Image
-          alt={id}
-          width={24}
-          height={24}
-          src={`${router.basePath}/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`}
-          className="rounded"
-        />
-        <span className={['text-base text-brand-1200 ', !menu.title && 'capitalize'].join(' ')}>
-          {menu.title}
-        </span>
+        <HeaderImage icon={menu.icon} />
+        <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
-      {/* )} */}
 
       <ul className="function-link-list">
         {sections.map((fn: any, fnIndex) => {
