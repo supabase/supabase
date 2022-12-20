@@ -153,6 +153,11 @@ const ProUpgrade: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const onConfirmPayment = async () => {
     let token = captchaToken
     if (!token) {
@@ -166,18 +171,19 @@ const ProUpgrade: FC<Props> = ({
       nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion,
-      token ?? undefined,
+      token ?? undefined
     )
 
     setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+
+    resetCaptcha()
+
     if (res?.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update subscription: ${res?.error?.message}`,
       })
-      setCaptchaToken(null)
-      captchaRef.current?.resetCaptcha()
     } else {
       if (isChangingComputeSize) {
         app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)

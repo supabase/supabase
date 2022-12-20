@@ -100,6 +100,11 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     }
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const downgradeProject = async (values?: any) => {
     const downgradeMessage = values?.message ?? message
 
@@ -123,9 +128,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         hcaptchaToken: token ?? undefined,
       })
 
+      resetCaptcha()
+
       if (res?.error) {
-        setCaptchaToken(null)
-        captchaRef.current?.resetCaptcha()
         return ui.setNotification({
           category: 'error',
           message: `Failed to cancel subscription: ${res?.error?.message}`,
