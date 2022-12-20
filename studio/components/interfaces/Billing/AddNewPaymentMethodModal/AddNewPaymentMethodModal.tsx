@@ -76,7 +76,6 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     appearance: { theme: 'night', labels: 'floating' },
   } as any
 
-  // Needs to be re-rendered properly for hCaptcha to work seamlessly
   return (
     <>
       <HCaptcha
@@ -84,6 +83,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
         size="invisible"
         onLoad={onCaptchaLoaded}
+        onError={(err) => console.error(err)}
         onVerify={(token) => {
           setCaptchaToken(token)
         }}
