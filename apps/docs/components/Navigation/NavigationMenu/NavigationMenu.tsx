@@ -195,14 +195,14 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'integrations'} active={isIntegrationsActive} />
       <NavigationMenuGuideList id={'reference'} active={isReferenceActive} />
       {/* // Client Libs */}
-      {/* <NavigationMenuRefList
+      <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v1'}
         active={isReference_Javascript_V1}
         commonSections={libCommonSections}
         lib="javascript"
         spec={spec_js_v1}
-      /> */}
+      />
       <NavigationMenuRefList
         key={'reference-js-menu'}
         id={'reference_javascript_v2'}
@@ -211,7 +211,7 @@ const SideNav = () => {
         lib="javascript"
         spec={spec_js_v2}
       />
-      {/* <NavigationMenuRefList
+      <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v0'}
         active={isReference_Dart_V0}
@@ -226,9 +226,9 @@ const SideNav = () => {
         commonSections={libCommonSections}
         lib="dart"
         spec={spec_dart_v1}
-      /> */}
+      />
       {/* // Tools */}
-      {/* <NavigationMenuRefList
+      <NavigationMenuRefList
         key={'reference-cli-menu'}
         id={'reference_cli'}
         active={isReference_Cli}
@@ -241,9 +241,9 @@ const SideNav = () => {
         active={isReference_Api}
         commonSections={apiCommonSections}
         lib="api"
-      /> */}
+      />
       {/* // Self Hosting Server */}
-      {/* <NavigationMenuRefList
+      <NavigationMenuRefList
         key={'reference-self-hosting-auth-menu'}
         id={'reference_self_hosting_auth'}
         active={isReference_Self_Hosting_Auth}
@@ -263,7 +263,7 @@ const SideNav = () => {
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-auth"
-      /> */}
+      />
     </div>
   )
 }

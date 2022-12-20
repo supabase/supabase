@@ -25,11 +25,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   active,
   spec,
 }) => {
-  // console.log(filterIds)
-  // console.log(modifierIds)
-
-  // const level = useMenuLevelId()
-
   return (
     <div
       className={[
