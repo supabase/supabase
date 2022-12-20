@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { IconLoader, Modal } from 'ui'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -24,16 +24,23 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const [captchaLoaded, setCaptchaLoaded] = useState(false)
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const captchaRef = useRef<HCaptcha>(null)
+  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+
+  const captchaRefCallback = useCallback((node) => {
+    setCaptchaRef(node)
+  }, [])
 
   useEffect(() => {
     const loadPaymentForm = async () => {
-      if (visible && captchaLoaded) {
+      if (visible && captchaLoaded && captchaRef) {
+        console.log('load payment form', { visible, captchaLoaded })
         let token = captchaToken
         if (!token) {
-          const captchaResponse = await captchaRef.current?.execute({ async: true })
+          const captchaResponse = await captchaRef.execute({ async: true })
           token = captchaResponse?.response ?? null
         }
+
+        console.log('Setting up intent', { token })
 
         await setupIntent(token ?? undefined)
         resetCaptcha()
@@ -41,15 +48,17 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     }
 
     loadPaymentForm()
-  }, [visible, captchaLoaded])
+  }, [visible, captchaLoaded, captchaRef])
 
   const onCaptchaLoaded = () => {
+    console.log('on captcha loaded')
     setCaptchaLoaded(true)
   }
 
   const resetCaptcha = () => {
+    console.log('Resetting  captcha')
     setCaptchaToken(null)
-    captchaRef.current?.resetCaptcha()
+    captchaRef?.resetCaptcha()
   }
 
   const setupIntent = async (hcaptchaToken: string | undefined) => {
@@ -77,9 +86,16 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   } as any
 
   return (
-    <>
+    <Modal
+      hideFooter
+      size="medium"
+      visible={visible}
+      header="Add new payment method"
+      onCancel={onCancel}
+      className="PAYMENT"
+    >
       <HCaptcha
-        ref={captchaRef}
+        ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
         size="invisible"
         onLoad={onCaptchaLoaded}
@@ -91,27 +107,18 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
           setCaptchaToken(null)
         }}
       />
-      <Modal
-        hideFooter
-        size="medium"
-        visible={visible}
-        header="Add new payment method"
-        onCancel={onCancel}
-        className="PAYMENT"
-      >
-        <div className="space-y-4 py-4">
-          {intent !== undefined ? (
-            <Elements stripe={stripePromise} options={options}>
-              <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
-            </Elements>
-          ) : (
-            <div className="flex w-full items-center justify-center py-20">
-              <IconLoader size={16} className="animate-spin" />
-            </div>
-          )}
-        </div>
-      </Modal>
-    </>
+      <div className="space-y-4 py-4">
+        {intent !== undefined ? (
+          <Elements stripe={stripePromise} options={options}>
+            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
+          </Elements>
+        ) : (
+          <div className="flex w-full items-center justify-center py-20">
+            <IconLoader size={16} className="animate-spin" />
+          </div>
+        )}
+      </div>
+    </Modal>
   )
 }
 
