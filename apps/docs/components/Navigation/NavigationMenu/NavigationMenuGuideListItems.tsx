@@ -146,7 +146,6 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 })
 
 const Content = (props) => {
-  console.log(props.id, props)
   const { id } = props
 
   const menu = NavItems[id]
