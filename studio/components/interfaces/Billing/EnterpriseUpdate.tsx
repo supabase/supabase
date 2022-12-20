@@ -2,26 +2,34 @@ import { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
-import { formatComputeSizes } from './AddOns/AddOns.utils'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
+import {
+  formatComputeSizes,
+  formatCustomDomainOptions,
+  formatPITROptions,
+} from './AddOns/AddOns.utils'
 import {
   AddNewPaymentMethodModal,
   ComputeSizeSelection,
+  PITRDurationSelection,
   StripeSubscription,
   PaymentSummaryPanel,
   UpdateSuccess,
+  CustomDomainSelection,
 } from './'
-import { SubscriptionPreview } from './Billing.types'
-import { formSubscriptionUpdatePayload } from './Billing.utils'
+import { PaymentMethod, SubscriptionPreview } from './Billing.types'
+import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import SupportPlan from './AddOns/SupportPlan'
 
 interface Props {
-  products: { tiers: any[]; addons: any[] }
-  paymentMethods?: any[]
+  products: { tiers: any[]; addons: SubscriptionAddon[] }
+  paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
 }
@@ -34,6 +42,8 @@ const EnterpriseUpdate: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const isCustomDomainsEnabled = useFlag('customDomains')
+  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
@@ -41,12 +51,36 @@ const EnterpriseUpdate: FC<Props> = ({
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
-  const currentComputeSize =
-    computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
-    computeSizes.find((option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro')
+  const pitrDurationOptions = formatPITROptions(addons)
+  const customDomainOptions = formatCustomDomainOptions(addons)
+  const currentAddons = getCurrentAddons(currentSubscription, addons)
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
-  const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
+  // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
+  // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
+  // of unnecessary state management on this complex page.
+  const [selectedComputeSize, setSelectedComputeSize] = useState<SubscriptionAddon>(
+    currentAddons.computeSize
+  )
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<SubscriptionAddon>(
+    currentAddons.pitrDuration
+  )
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<SubscriptionAddon>(
+    currentAddons.customDomains
+  )
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as SubscriptionAddon[]
+
+  // [Joshen] Scaffolded here
+  const selectedAddons = {
+    computeSize: selectedComputeSize,
+    pitrDuration: selectedPITRDuration,
+    customDomains: selectedCustomDomainOption,
+  }
+
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<any>()
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   const [isRefreshingPreview, setIsRefreshingPreview] = useState(false)
@@ -54,15 +88,15 @@ const EnterpriseUpdate: FC<Props> = ({
   const [isSuccessful, setIsSuccessful] = useState(false)
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
-  const isChangingComputeSize = currentComputeSize?.id !== selectedComputeSize.id
+  const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption])
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
-      setSelectedPaymentMethod(paymentMethods[0].id)
+      setSelectedPaymentMethodId(paymentMethods[0].id)
     }
   }, [isLoadingPaymentMethods, paymentMethods])
 
@@ -71,9 +105,11 @@ const EnterpriseUpdate: FC<Props> = ({
     // Only allow add-ons changing
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
-        selectedComputeSize,
-        selectedPaymentMethod,
+        selectedAddons,
+        nonChangeableAddons,
+        selectedPaymentMethodId,
         projectRegion
       ),
       tier: currentSubscription.tier.price_id,
@@ -95,9 +131,11 @@ const EnterpriseUpdate: FC<Props> = ({
   const onConfirmPayment = async () => {
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
-        selectedComputeSize,
-        selectedPaymentMethod,
+        selectedAddons,
+        nonChangeableAddons,
+        selectedPaymentMethodId,
         projectRegion
       ),
       tier: currentSubscription.tier.price_id,
@@ -146,12 +184,15 @@ const EnterpriseUpdate: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10">
-          <div className="relative space-y-4 px-5">
+        <div className="flex-grow mt-10">
+          <div className="relative space-y-4">
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+                <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+              </div>
+
               <div
-                className="space-y-8 overflow-scroll pb-8"
+                className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
                 style={{ height: 'calc(100vh - 6.4rem - 57px)' }}
               >
                 <h3 className="text-xl">
@@ -163,7 +204,7 @@ const EnterpriseUpdate: FC<Props> = ({
                     'flex max-w-[600px] items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm',
                   ].join(' ')}
                 >
-                  <p>
+                  <p className="text-sm">
                     If you'd like to change your subscription away from enterprise, please reach out
                     to <span className="text-brand-900">enterprise@supabase.io</span> with your
                     request.
@@ -171,11 +212,39 @@ const EnterpriseUpdate: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {currentAddons.supportPlan !== undefined && (
+                      <>
+                        <Divider light />
+                        <SupportPlan currentOption={currentAddons.supportPlan} />
+                      </>
+                    )}
+                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <CustomDomainSelection
+                          options={customDomainOptions}
+                          currentOption={currentAddons.customDomains}
+                          selectedOption={selectedAddons.customDomains}
+                          onSelectOption={setSelectedCustomDomainOption}
+                        />
+                      </>
+                    )}
+                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
+                      <>
+                        <Divider light />
+                        <PITRDurationSelection
+                          pitrDurationOptions={pitrDurationOptions}
+                          currentPitrDuration={currentAddons.pitrDuration}
+                          selectedPitrDuration={selectedAddons.pitrDuration}
+                          onSelectOption={setSelectedPITRDuration}
+                        />
+                      </>
+                    )}
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
-                      currentComputeSize={currentComputeSize}
-                      selectedComputeSize={selectedComputeSize}
+                      currentComputeSize={currentAddons.computeSize}
+                      selectedComputeSize={selectedAddons.computeSize}
                       onSelectOption={setSelectedComputeSize}
                     />
                   </>
@@ -184,19 +253,22 @@ const EnterpriseUpdate: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[32rem]">
+        <div className="w-[34rem]">
           <PaymentSummaryPanel
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}
             isRefreshingPreview={isRefreshingPreview}
+            currentSubscription={currentSubscription}
             subscriptionPreview={subscriptionPreview}
+            // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
-            currentComputeSize={currentComputeSize}
-            selectedComputeSize={selectedComputeSize}
+            currentAddons={currentAddons}
+            // Selected subscription configuration based on UI
+            selectedAddons={selectedAddons}
             paymentMethods={paymentMethods}
             isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethod}
-            onSelectPaymentMethod={setSelectedPaymentMethod}
+            selectedPaymentMethod={selectedPaymentMethodId}
+            onSelectPaymentMethod={setSelectedPaymentMethodId}
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}

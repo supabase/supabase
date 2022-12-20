@@ -10,6 +10,7 @@ import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
   fetchDetail: (projectRef: string, callback?: (project: Project) => void) => Promise<void>
+  fetchSubscriptionTier: (project: Project) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
@@ -77,7 +78,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
   async fetchSubscriptionTier(project: Project) {
     const { id: projectId, ref: projectRef, status } = project
-    if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+    if (status !== PROJECT_STATUS.REMOVED) {
       const url = `${this.url}/${projectRef}/subscription`
       const headers = constructHeaders(this.headers)
       const response = await get(url, { headers })

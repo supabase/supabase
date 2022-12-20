@@ -32,7 +32,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                 <Dropdown.Item
                   onClick={() => {
                     router.push({
-                      pathname: `/project/${ref}/logs-explorer`,
+                      pathname: `/project/${ref}/logs/explorer`,
                       query: {
                         q: props.params.sql,
                         its: props.params.iso_timestamp_start,

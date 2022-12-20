@@ -1,23 +1,17 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectBase } from 'types'
-import { checkPermissions } from '../../../hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
+  const isVaultEnabled = useFlag('vaultExtension')
+
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
-  const canReadStorage = checkPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const canReadInvoices = checkPermissions(PermissionAction.BILLING_READ, 'stripe.invoices')
-  const canReadSubscriptions = checkPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
-
   return [
     {
-      title: 'Project settings',
+      title: 'Project Settings',
       items: [
         {
           name: 'General',
@@ -37,27 +31,67 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
         },
-        {
-          name: 'Authentication',
-          key: 'auth',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/settings`,
-          items: [],
-        },
-        {
-          name: 'Storage',
-          key: 'storage',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/settings`,
-          items: [],
-          // disabled: canReadStorage,
-        },
-        {
-          name: 'Billing & Usage',
-          key: 'billing',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing`,
-          items: [],
-          // disabled: canReadInvoices && canReadSubscriptions,
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Storage',
+                key: 'storage',
+                url: `/project/${ref}/settings/storage`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(isVaultEnabled
+          ? [
+              {
+                name: 'Vault',
+                key: 'vault',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+                items: [],
+                label: 'BETA',
+              },
+            ]
+          : []),
       ],
     },
+    ...(IS_PLATFORM
+      ? [
+          {
+            title: 'Billing',
+            items: [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: isProjectBuilding
+                  ? buildingUrl
+                  : `/project/${ref}/settings/billing/subscription`,
+                items: [],
+              },
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                items: [],
+              },
+              {
+                name: 'Invoices',
+                key: 'invoices',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 }

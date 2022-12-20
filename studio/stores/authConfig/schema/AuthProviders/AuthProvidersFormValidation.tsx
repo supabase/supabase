@@ -48,7 +48,7 @@ const PROVIDER_EMAIL = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -72,6 +72,11 @@ const PROVIDER_PHONE = {
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
       ],
+    },
+    RATE_LIMIT_SMS_SENT: {
+      type: 'number',
+      title: 'Rate limit for sending SMS messages',
+      description: 'How many SMS messages can be sent per hour',
     },
 
     // Twilio
@@ -279,7 +284,7 @@ const PROVIDER_PHONE = {
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -310,7 +315,7 @@ Client identifier when authenticating or validating users.
       title: 'Secret key',
       description: `
 The secret key is a JWT token that must be generated.
-[Learn more](https://supabase.com/docs/guides/auth/auth-apple#generate-a-client_secret)`,
+[Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
@@ -332,7 +337,7 @@ The secret key is a JWT token that must be generated.
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple secrets will self expire every 6 months`,
       description: `You will need to regenerate before the 6 months elapses otherwise your users using Apple Login will no longer be able to log back in.`,
@@ -357,7 +362,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -1338,6 +1343,14 @@ export const OLD = {
       title: 'Rate limit',
       type: 'number',
       help: 'Maximum number of emails sent per hour (Default: 30, Max: 32,767)',
+      minimum: 1,
+      maximum: 32767,
+      multipleof: 1,
+    },
+    RATE_LIMIT_SMS_SENT: {
+      title: 'Rate limit',
+      type: 'number',
+      help: 'Maximum number of SMS-es sent per hour (Default: 30, Max: 32,767)',
       minimum: 1,
       maximum: 32767,
       multipleof: 1,

@@ -1,7 +1,7 @@
 import * as Yup from 'yup'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, Form, IconDownload, Input } from '@supabase/ui'
+import { Button, Form, IconDownload, Input } from 'ui'
 
 import supabase from '~/lib/supabase'
 import CTABanner from 'components/CTABanner/index'

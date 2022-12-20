@@ -350,7 +350,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                     <div className="px-6">
                       <InputName />
                     </div>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <div className="space-y-12 px-6">
                       <h5>Conditions to fire trigger</h5>
                       <ListboxTable />
@@ -358,7 +358,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                       <ListboxActivation />
                       <SelectOrientation />
                     </div>
-                    <SidePanel.Seperator />
+                    <SidePanel.Separator />
                     <FunctionForm />
                   </>
                 )}

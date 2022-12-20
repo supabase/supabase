@@ -70,7 +70,7 @@ module.exports = {
     scale8: 'var(--colors-gray8)',
     scale9: 'var(--colors-gray9)',
     scale10: 'var(--colors-gray10)',
-    scale11: 'var(--colors-gray11)',
+    scale11: '#bbbbbb',
     scale12: 'var(--colors-gray12)',
   },
   scaleADark: {

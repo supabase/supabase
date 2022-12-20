@@ -1,0 +1,19 @@
+name: Automatically fix typos
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - uses: sobolevn/misspell-fixer-action@master
+      - uses: peter-evans/create-pull-request@v4
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

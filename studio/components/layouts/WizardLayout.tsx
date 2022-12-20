@@ -32,7 +32,7 @@ const Header: FC<any> = ({ organization, project }) => {
         <div className="Breadcrumbs flex justify-between">
           <div className="flex items-center text-sm">
             <div className="flex items-center space-x-2">
-              <Link href="/">
+              <Link href="/projects">
                 <a>
                   <img
                     src="/img/supabase-logo.svg"

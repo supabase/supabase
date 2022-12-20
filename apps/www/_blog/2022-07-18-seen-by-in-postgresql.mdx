@@ -536,11 +536,11 @@ Average is coming in at `2.50ms` which is 16% slower than simple-hstore and 21% 
 
 We'll just draw [the rest of the owl][kym-rest-of-owl] now.
 
-What's [HyperLogLog][wiki-hll] you ask? Well it's just a probablistic data structure! Don't worry if you've never heard of it before, it's a reasonably advanced concept.
+What's [HyperLogLog][wiki-hll] you ask? Well it's just a probabilistic data structure! Don't worry if you've never heard of it before, it's a reasonably advanced concept.
 
 You may have heard of [Bloom Filters][wiki-bloom-filter] and they're _somewhat_ related but they're not quite a great fit for the problem we're solving since we want to know how many people have seen a particular post. Knowing whether one user has seen a particular post is useful too -- but not quite what we're solving for here (and we'd have to double-check our false positives anyway if we wanted to be absolutely sure).
 
-HyperLogLog provides a probablistic data structure that is good at counting _distinct_ entries, so that means that the count _will not_ be exact, but be reasonably close (depending on how we tune). We won't have false positives (like with a bloom filter) -- we'll have a degree of error (i.e. the actual count may be 1000, but the HLL reports 1004).
+HyperLogLog provides a probabilistic data structure that is good at counting _distinct_ entries, so that means that the count _will not_ be exact, but be reasonably close (depending on how we tune). We won't have false positives (like with a bloom filter) -- we'll have a degree of error (i.e. the actual count may be 1000, but the HLL reports 1004).
 
 We have to take this into account on the UI side but and maybe retrieve the full count if anyone ever _really_ needs to know/view individual users that have seen the content, so we can fall back to our association table there.
 
@@ -732,7 +732,7 @@ As usual, Postgres has the tools to solve the problem _reasonably_ well (if not 
 [pg-gin]: https://www.postgresql.org/docs/14/indexes-types.html#INDEXES-TYPES-GIN
 [wiki-muri]: https://en.wikipedia.org/wiki/Muri_(Japanese_term)
 [lz4]: https://github.com/lz4/lz4
-[clickhouse]: clickhouse.tech/
+[clickhouse]: https://clickhouse.com
 [wiki-bloom-filter]: https://en.wikipedia.org/wiki/Bloom_filter
 [wiki-hll]: https://en.wikipedia.org/wiki/HyperLogLog
 [pg-cron]: https://github.com/citusdata/pg_cron

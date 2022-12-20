@@ -15,18 +15,18 @@ const ServiceConfigForm: FC = observer(({}) => {
     <>
       {_localState.formState.hookService.value === 'http_request' ? (
         <>
-          <SidePanel.Seperator />
+          <SidePanel.Separator />
           <div className="space-y-10">
             <div className="space-y-6 px-6">
               <h5>HTTP Request</h5>
               <SelectServiceMethod />
               <InputServiceUrl />
             </div>
-            <SidePanel.Seperator />
+            <SidePanel.Separator />
             <div className="px-6">
               <InputMultiServiceHeaders />
             </div>
-            <SidePanel.Seperator />
+            <SidePanel.Separator />
             <div className="px-6">
               <InputMultiServiceParams />
             </div>

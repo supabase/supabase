@@ -7,20 +7,22 @@ import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from './../lib/fetchWrapper'
 import { ThemeProvider } from '~/components/Providers'
+import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
-  function telemetry() {
+  function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
+      route,
     })
   }
 
   useEffect(() => {
-    function handleRouteChange() {
-      telemetry()
+    function handleRouteChange(url: string) {
+      telemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -35,6 +37,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <Meta />
       <DefaultSeo
         title={site_title}

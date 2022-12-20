@@ -99,7 +99,7 @@ const FeedbackWidget: FC<Props> = ({ onClose }) => {
         value={feedback}
         onChange={onFeedbackChange}
       />
-      <Popover.Seperator />
+      <Popover.Separator />
       <div className="w-80 space-y-3 px-3 py-2 pb-4">
         <div className="flex justify-between space-x-2">
           <Button type="default" onClick={onClose} className="hover:border-gray-500">
