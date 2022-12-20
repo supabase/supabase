@@ -1,17 +1,5 @@
-import * as Accordion from '@radix-ui/react-accordion'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft } from 'ui'
-import * as NavItems from './NavigationMenu.constants'
-
-import { find } from 'lodash'
-import Image from 'next/image'
-import { useTheme } from 'common/Providers'
-
 // import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
 
-import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId, useMenuLevelId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 import NavigationMenuRefListItems from './NavigationMenuRefListItems'
 
@@ -26,14 +14,16 @@ interface INavigationMenuRefList {
   // if undefined, we show all the menu items
   allowedClientKeys?: string[]
   active: boolean
+  spec?: any
 }
 
 const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   id,
   lib,
   commonSections,
-  allowedClientKeys,
+
   active,
+  spec,
 }) => {
   // console.log(filterIds)
   // console.log(modifierIds)
@@ -53,12 +43,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
-      <NavigationMenuRefListItems
-        id={id}
-        lib={lib}
-        commonSections={commonSections}
-        allowedClientKeys={allowedClientKeys}
-      />
+      <NavigationMenuRefListItems id={id} lib={lib} commonSections={commonSections} spec={spec} />
     </div>
   )
 }

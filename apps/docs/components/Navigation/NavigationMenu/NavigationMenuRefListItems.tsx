@@ -13,6 +13,7 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 import React from 'react'
+import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
 
 const FunctionLink = ({
   title,
@@ -80,16 +81,14 @@ interface INavigationMenuRefList {
   // the keys of menu items that are allowed to be shown on the side menu
   // if undefined, we show all the menu items
   allowedClientKeys?: string[]
+  spec?: any
 }
 
-const Content: React.FC<INavigationMenuRefList> = ({
-  id,
-  lib,
-  commonSections,
-  allowedClientKeys,
-}) => {
+const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, spec }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
+
+  const allowedClientKeys = spec ? generateAllowedClientLibKeys(commonSections, spec) : undefined
 
   console.log(
     id && 'id changed',
