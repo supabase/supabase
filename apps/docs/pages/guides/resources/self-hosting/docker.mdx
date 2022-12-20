@@ -42,7 +42,7 @@ Now visit [http://localhost:3000](http://localhost:3000) to start using Supabase
 
 While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
 
-Please follow these steps to secure your Docker setup. We [strongly recommend](../self-hosting#managing-your-secrets) using a secrets manager when deploying to production.
+Follow these steps to secure your Docker setup. We strongly recommend using a [secrets manager](../self-hosting#managing-your-secrets) when deploying to production.
 
 ### Generate API Keys
 
@@ -82,7 +82,7 @@ To keep the setup simple, we made some choices that may not be optimal for produ
 
 ### Using an external database
 
-We strongly [recommend](../self-hosting#managing-your-database) that you decouple your database from `docker-compose` before deploying.
+We strongly recommend [decoupling your database](../self-hosting#managing-your-database) from `docker-compose` before deploying.
 The middleware will run with any PostgreSQL database that has logical replication enabled. The following environment variables should be updated
 in the `.env` file to point to your external database:
 
