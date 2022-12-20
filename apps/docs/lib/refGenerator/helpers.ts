@@ -60,6 +60,8 @@ function recurseThroughParams(paramDefinition: any) {
       children = dereferenced.children
     } else if (dereferenced.type?.declaration?.children) {
       children = dereferenced.type.declaration.children
+    } else if (dereferenced.type?.type === 'query') {
+      // skip: ignore types created from `typeof` for now, like `type Fetch = typeof fetch`
     } else if (dereferenced.type?.type === 'union') {
       // skip: we don't want to show unions as nested parameters
     } else if (Object.keys(dereferenced).length === 0) {

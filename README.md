@@ -142,7 +142,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blanke" rel="noopener noreferrer">storage-java</a></td>
     <td>-</td>
   </tr>
   <tr>
