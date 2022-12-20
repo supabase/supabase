@@ -224,11 +224,13 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
               active = true
             } else if (
               (isModifier && !isFilter && !isAuthServer && props.id === 'using-modifiers') ||
+              // @ts-expect-error // REMOVE TODO
               (activeAccordianItem === 'using-modifiers' && props.id === 'using-modifiers')
             ) {
               active = true
             } else if (
               (isAuthServer && !isFilter && !isModifier && props.id === 'admin-api') ||
+              // @ts-expect-error // REMOVE TODO
               (activeAccordianItem === 'admin-api' && props.id === 'admin-api')
             ) {
               active = true
