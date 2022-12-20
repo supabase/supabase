@@ -46,6 +46,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     setCaptchaLoaded(true)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const setupIntent = async (hcaptchaToken: string | undefined) => {
     setIntent(undefined)
 
@@ -54,10 +59,9 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       hcaptchaToken,
     })
 
-    if (intent.error) {
-      setCaptchaToken(null)
-      captchaRef.current?.resetCaptcha()
+    resetCaptcha()
 
+    if (intent.error) {
       return ui.setNotification({
         category: 'error',
         message: intent.error.message,
@@ -65,7 +69,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       })
     }
 
-    setIntent(intent)
+    captchaRef.current?.resetCaptcha()
   }
 
   const options = {

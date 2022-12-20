@@ -132,6 +132,11 @@ const EnterpriseUpdate: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
     let token = captchaToken
@@ -155,9 +160,9 @@ const EnterpriseUpdate: FC<Props> = ({
 
     setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+    resetCaptcha()
+
     if (res?.error) {
-      setCaptchaToken(null)
-      captchaRef.current?.resetCaptcha()
       ui.setNotification({
         category: 'error',
         message: `Failed to update subscription: ${res?.error?.message}`,
