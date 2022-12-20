@@ -94,14 +94,9 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   }
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={visible}
-      header="Add new payment method"
-      onCancel={onLocalCancel}
-      className="PAYMENT"
-    >
+    // We cant display the hCaptcha in the modal, as the modal auto-closes when clicking the captcha
+    // So we only show the modal if the captcha has been executed successfully (intent loaded)
+    <>
       <HCaptcha
         ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
@@ -113,18 +108,22 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
           setCaptchaToken(null)
         }}
       />
-      <div className="space-y-4 py-4">
-        {intent !== undefined ? (
+
+      <Modal
+        hideFooter
+        size="medium"
+        visible={visible && intent !== undefined}
+        header="Add new payment method"
+        onCancel={onLocalCancel}
+        className="PAYMENT"
+      >
+        <div className="space-y-4 py-4">
           <Elements stripe={stripePromise} options={options}>
             <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onLocalCancel} />
           </Elements>
-        ) : (
-          <div className="flex w-full items-center justify-center py-20">
-            <IconLoader size={16} className="animate-spin" />
-          </div>
-        )}
-      </div>
-    </Modal>
+        </div>
+      </Modal>
+    </>
   )
 }
 
