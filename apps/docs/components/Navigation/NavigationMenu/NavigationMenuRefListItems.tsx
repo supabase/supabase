@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { useTheme } from 'common/Providers'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-// import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 import React from 'react'
@@ -39,7 +39,7 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
   )
 })
 
-const FunctionLink = ({
+const FunctionLink = React.memo(function FunctionLink({
   title,
   id,
   icon,
@@ -53,9 +53,9 @@ const FunctionLink = ({
   product?: string
   library: string
   slug: string
-}) => {
+}) {
   const router = useRouter()
-  const activeAccordianItem = '1' // useMenuActiveRefId()
+  const activeAccordianItem = useMenuActiveRefId()
 
   // check if we're on a versioned page
   let version = ''
@@ -83,7 +83,7 @@ const FunctionLink = ({
       </Link>
     </li>
   )
-}
+})
 
 const SideMenuTitle = ({ title }: { title: string }) => {
   return (
