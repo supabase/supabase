@@ -2,7 +2,7 @@
   {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
-    "position": "",
+    "position": "Engineering",
     "author_url": "https://github.com/dragarcia",
     "author_image_url": "https://github.com/dragarcia.png"
   },
@@ -221,5 +221,48 @@
     "position": "Engineering",
     "author_url": "https://github.com/burggraf",
     "author_image_url": "https://github.com/burggraf.png"
+  },
+  {
+    "author_id": "pavel",
+    "author": "Pavel Borisov",
+    "username": "pavel",
+    "position": "Postgres Engineer",
+    "author_url": "https://github.com/pashkinelfe",
+    "author_image_url": "https://avatars.githubusercontent.com/u/63344111?v=4"
+  },
+  {
+    "author_id": "ramiro",
+    "author": "Ramiro Nunez Dosio",
+    "position": "Growth Marketer",
+    "author_url": "https://twitter.com/ramiro__nd",
+    "author_image_url": "https://avatars.githubusercontent.com/u/20600542?v=4"
+  },
+  {
+    "author_id": "jonny",
+    "author": "Jonathan Summers-Muir",
+    "position": "Engineering",
+    "author_url": "https://github.com/mildtomato",
+    "author_image_url": "https://github.com/mildtomato.png"
+  },
+  {
+    "author_id": "fabrizio",
+    "author": "Fabrizio Fenoglio",
+    "position": "Engineering",
+    "author_url": "https://github.com/fenos",
+    "author_image_url": "https://github.com/fenos.png"
+  },
+  {
+    "author_id": "bo_lu",
+    "author": "Bo Lu",
+    "position": "Engineering",
+    "author_url": "https://github.com/burmecia",
+    "author_image_url": "https://github.com/burmecia.png"
+  },
+  {
+    "author_id": "stojan",
+    "author": "Stojan Dimitrovski",
+    "position": "Engineering",
+    "author_url": "https://github.com/hf",
+    "author_image_url": "https://github.com/hf.png"
   }
 ]

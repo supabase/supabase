@@ -11,12 +11,16 @@
         "url": "/auth"
       },
       {
-        "text": "Storage",
-        "url": "/storage"
-      },
-      {
         "text": "Functions",
         "url": "/edge-functions"
+      },
+      {
+        "text": "Realtime",
+        "url": "/realtime"
+      },
+      {
+        "text": "Storage",
+        "url": "/storage"
       },
       {
         "text": "Pricing",
@@ -36,8 +40,8 @@
         "url": "/support"
       },
       {
-        "text": "Brand Assets / Logos",
-        "url": "/brand-assets"
+        "text": "System Status",
+        "url": "https://status.supabase.com/"
       },
       {
         "text": "Integrations",
@@ -48,16 +52,8 @@
         "url": "/partners/experts"
       },
       {
-        "text": "System Status",
-        "url": "https://status.supabase.com/"
-      },
-      {
-        "text": "Terms of service",
-        "url": "/docs/company/terms"
-      },
-      {
-        "text": "Privacy Policy",
-        "url": "/docs/company/privacy"
+        "text": "Brand Assets / Logos",
+        "url": "/brand-assets"
       },
       {
         "text": "DPA",
@@ -65,7 +61,7 @@
       },
       {
         "text": "SOC2",
-        "url": "/legal/soc2"
+        "url": "https://forms.supabase.com/soc2"
       }
     ]
   },
@@ -77,16 +73,28 @@
         "url": "/docs"
       },
       {
-        "text": "API Reference",
-        "url": "/docs/guides/api"
-      },
-      {
-        "text": "Guides",
-        "url": "/docs/"
-      },
-      {
         "text": "Changelog",
         "url": "/changelog"
+      },
+      {
+        "text": "Contributing",
+        "url": "/docs/handbook/contributing"
+      },
+      {
+        "text": "Open Source",
+        "url": "/oss"
+      },
+      {
+        "text": "SupaSquad",
+        "url": "/supasquad"
+      },
+      {
+        "text": "DevTo",
+        "url": "https://dev.to/supabase"
+      },
+      {
+        "text": "RSS",
+        "url": "/rss.xml"
       }
     ]
   },
@@ -98,16 +106,28 @@
         "url": "/blog"
       },
       {
-        "text": "Open Source",
-        "url": "/docs/oss"
-      },
-      {
         "text": "Careers",
-        "url": "https://about.supabase.com/careers"
+        "url": "/careers"
       },
       {
         "text": "Company",
         "url": "/company"
+      },
+      {
+        "text": "Terms of Service",
+        "url": "/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "url": "/privacy"
+      },
+      {
+        "text": "Acceptable Use Policy",
+        "url": "/aup"
+      },
+      {
+        "text": "Service Level Agreement",
+        "url": "/sla"
       },
       {
         "text": "Humans.txt",

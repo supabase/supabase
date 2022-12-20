@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-import { Button, Badge, IconStar, IconChevronDown } from '@supabase/ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -153,10 +153,10 @@ const Nav = () => {
     <div
       className={
         `
-        text-scale-1200 hover:text-brand-900 
-        inline-flex cursor-pointer items-center 
-        border-b-2 
-        border-transparent 
+        text-scale-1200 hover:text-brand-900
+        inline-flex cursor-pointer items-center
+        border-b-2
+        border-transparent
         px-1
         text-sm font-medium
         transition-colors
@@ -180,7 +180,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement />
+      {/* <Announcement /> */}
       <div className="sticky top-0 z-50">
         <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
         <nav className="border-scale-400 border-b backdrop-blur-sm">
@@ -234,6 +234,19 @@ const Nav = () => {
                       Blog
                     </a>
                   </Link>
+                  <div className="xl:block hidden">
+                    <Link href="/launch-week">
+                      <a
+                        className={`
+                        text-brand-900 hover:text-brand-900 hover:border-brand-1000 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        border-b-2 border-transparent p-5 px-1
+                        text-sm font-medium
+                      `}
+                      >
+                        Launch Week 6
+                      </a>
+                    </Link>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -247,15 +260,15 @@ const Nav = () => {
                   icon={
                     <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className="text-scale-900 flex h-3 w-3 items-center justify-center 
-                      
-                      transition-all  
-                      group-hover:h-4 
-                      group-hover:w-4 
-                      group-hover:text-yellow-900  
-                      group-focus:h-4 
-                      group-focus:w-4 
-                      
+                        className="text-scale-900 flex h-3 w-3 items-center justify-center
+
+                      transition-all
+                      group-hover:h-4
+                      group-hover:w-4
+                      group-hover:text-yellow-900
+                      group-focus:h-4
+                      group-focus:w-4
+
                       group-focus:text-yellow-900"
                       >
                         <IconStar strokeWidth={2} />
@@ -361,6 +374,14 @@ const Nav = () => {
                       className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                     >
                       Blog
+                    </a>
+                  </Link>
+                  <Link href="/launch-week">
+                    <a
+                      target="_blank"
+                      className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      Launch Week 6
                     </a>
                   </Link>
                 </div>

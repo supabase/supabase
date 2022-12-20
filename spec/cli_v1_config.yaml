@@ -39,7 +39,7 @@ info:
 # This section is an array of public functions which a user might need to execute.
 parameters:
   - id: 'project_id' # {string} A unique identifier for this param.
-    title: 'project_id' # {string} Any a name.
+    title: 'project_id' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     required: true
     # default: '5432'

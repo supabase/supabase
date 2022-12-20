@@ -71,7 +71,7 @@ const Column: FC<Props> = ({
             size="small"
             title={column.name}
             disabled={hasImportContent}
-            placeholder="Column name"
+            placeholder="column_name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
@@ -157,7 +157,7 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 
@@ -170,7 +170,7 @@ const Column: FC<Props> = ({
                         className="p-4"
                         onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
                   {column.format.includes('int') && (
@@ -186,7 +186,7 @@ const Column: FC<Props> = ({
                           onUpdateColumn({ isIdentity, isArray })
                         }}
                       />
-                      <Popover.Seperator />
+                      <Popover.Separator />
                     </>
                   )}
 

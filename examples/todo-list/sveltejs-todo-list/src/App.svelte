@@ -12,8 +12,8 @@
       user = session?.user ?? null;
     });
 
-    const { subscription: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+    const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
+      (_, session) => {
         const currentUser = session?.user;
         user = currentUser ?? null;
       }

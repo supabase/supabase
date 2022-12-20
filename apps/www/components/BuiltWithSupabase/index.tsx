@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Button, IconGitHub } from '@supabase/ui'
+import { Button, IconGitHub } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 

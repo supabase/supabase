@@ -52,7 +52,7 @@ const ProjectDropdown = () => {
                 </a>
               </Link>
             ))}
-          <Popover.Seperator />
+          <Popover.Separator />
           <Link href={`/new/${selectedOrganizationSlug}`}>
             <a className="block">
               <Dropdown.Item icon={<IconPlus size="tiny" />}>New project</Dropdown.Item>

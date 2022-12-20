@@ -1,33 +1,14 @@
 import dayjs from 'dayjs'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, SeverityFormatter } from '../LogsFormatters'
+import {
+  jsonSyntaxHighlight,
+  SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
+  SeverityFormatter,
+} from '../LogsFormatters'
 
 const FunctionLogsSelectionRender = ({ log }: any) => {
-  const timestamp = dayjs(log.timestamp / 1000)
   const metadata = log.metadata[0]
-
-  const DetailedRow = ({
-    label,
-    value,
-    code,
-  }: {
-    label: string
-    value: string | React.ReactNode
-    code?: boolean
-  }) => {
-    return (
-      <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-        <span
-          className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${
-            code && 'text-xs font-mono'
-          }`}
-        >
-          {value}
-        </span>
-      </div>
-    )
-  }
 
   return (
     <>
@@ -39,11 +20,15 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
       </div>
       <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        <DetailedRow label="Severity" value={<SeverityFormatter value={metadata.level} />} />
-        <DetailedRow label="Deployment version" value={metadata.version} />
-        <DetailedRow label="Timestamp" value={timestamp.format('DD MMM, YYYY HH:mm')} />
-        <DetailedRow label="Execution ID" value={metadata.execution_id} />
-        <DetailedRow label="Deployment ID" value={metadata.deployment_id} />
+        <SelectionDetailedRow
+          label="Severity"
+          value={metadata.level}
+          valueRender={<SeverityFormatter value={metadata.level} />}
+        />
+        <SelectionDetailedRow label="Deployment version" value={metadata.version} />
+        <SelectionDetailedTimestampRow value={log.timestamp} />
+        <SelectionDetailedRow label="Execution ID" value={metadata.execution_id} />
+        <SelectionDetailedRow label="Deployment ID" value={metadata.deployment_id} />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>

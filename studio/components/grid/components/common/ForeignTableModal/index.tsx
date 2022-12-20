@@ -146,7 +146,7 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
             onChange={onFilterChange}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="foreign-table-modal__content-container">
             <div

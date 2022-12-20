@@ -1,16 +1,16 @@
-import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from '@supabase/ui'
+import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from 'ui'
 import Link from 'next/link'
 
 function ExampleCard(props: any) {
   return (
     <>
       <div
-        className="dark:bg-scale-300 
-          border-scale-400 
-          flex 
-          h-40 
+        className="dark:bg-scale-300
+          border-scale-400
+          flex
+          h-40
           flex-col
-          justify-between rounded rounded-b-none 
+          justify-between rounded rounded-b-none
           border
           border-t border-r border-l
           bg-white p-5

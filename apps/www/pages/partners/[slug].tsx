@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
@@ -224,6 +224,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let { data: partner } = await supabase
     .from('partners')
     .select('*')
+    .eq('approved', true)
     .eq('slug', params!.slug as string)
     .single()
 

@@ -7,7 +7,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-caching',
-    destination: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
   },
   {
     permanent: true,
@@ -537,14 +537,14 @@ module.exports = [
   },
 
   {
-    permanent: false,
-    source: '/docs/guides/platform',
-    destination: '/docs/guides/hosting/platform',
+    permanent: true,
+    source: '/docs/guides/hosting/platform',
+    destination: '/docs/guides/platform',
   },
   {
-    permanent: false,
-    source: '/docs/guides/self-hosting',
-    destination: '/docs/guides/hosting/overview',
+    permanent: true,
+    source: '/docs/guides/self-hosting/overview',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
@@ -555,11 +555,6 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/javascript/reset-password-email',
     destination: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-  },
-  {
-    permanent: true,
-    source: '/oss',
-    destination: '/docs/oss',
   },
   {
     permanent: true,
@@ -588,13 +583,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/database/introduction',
-    destination: '/guides/database',
-  },
-  {
-    permanent: true,
-    source: '/guides/auth',
-    destination: '/guides/auth/intro',
+    source: '/docs/guides/database/introduction',
+    destination: '/docs/guides/database',
   },
   {
     permanent: false,
@@ -609,7 +599,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1325,8 +1315,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/postgres-cdc',
+    source: '/docs/guides/realtime/postgres-cdc',
+    destination: '/docs/guides/realtime/postgres-changes',
   },
   {
     permanent: true,
@@ -1341,7 +1331,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs/reference',
+    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1357,6 +1347,11 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/auth-helpers/sveltekit',
     destination: '/docs/guides/auth/auth-helpers/sveltekit',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/migrating-between-projects',
+    destination: '/docs/guides/platform/migrating-and-upgrading-projects',
   },
 
   // supabase-js v1 to v2 redirects
@@ -1437,7 +1432,7 @@ module.exports = [
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
     destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
   {
     permanent: true,
@@ -1496,7 +1491,7 @@ module.exports = [
     source: '/docs/reference/dart/reset-password-email',
     destination: '/docs/reference/dart/auth-resetpasswordforemail',
   },
-  // signIn method is now split into signInWithPassword ,signInWithPasswordless ,signInWithOAuth
+  // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v0 docs instead
   {
     permanent: true,
@@ -1534,5 +1529,377 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/dart/getsubscriptions',
     destination: '/docs/reference/dart/v0/getsubscriptions',
+  },
+  {
+    permanent: true,
+    source: '/docs/going-into-prod',
+    destination: '/docs/guides/platform/going-into-prod',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/disk-usage',
+    destination: '/docs/guides/platform/database-usage',
+  },
+  {
+    permanent: true,
+    source: '/sign-in',
+    destination: 'https://app.supabase.com/sign-in',
+  },
+  {
+    permanent: true,
+    source: '/sign-up',
+    destination: 'https://app.supabase.com/sign-up',
+  },
+  {
+    permanent: true,
+    source: '/forgot-password',
+    destination: 'https://app.supabase.com/forgot-password',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage-cdn',
+    destination: '/docs/guides/storage/cdn',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples',
+    destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/projects',
+    destination: 'https://app.supabase.com/projects',
+  },
+  // START docs 2.0, moving pages in to structure
+  {
+    permanent: true,
+    source: '/docs/oss',
+    destination: '/oss',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/aup',
+    destination: '/aup',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/terms',
+    destination: '/terms',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/privacy',
+    destination: '/privacy',
+  },
+  {
+    permanent: true,
+    source: '/docs/company/sla',
+    destination: '/sla',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference',
+    destination: '/docs#reference-documentation',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login',
+    destination: '/docs/guides/auth/phone-login',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
+  },
+  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-messagebird',
+    destination: '/docs/guides/auth/phone-login/messagebird',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-twilio',
+    destination: '/docs/guides/auth/phone-login/twilio',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-vonage',
+    destination: '/docs/guides/auth/phone-login/vonage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-google',
+    destination: '/docs/guides/auth/social-login/auth-google',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-facebook',
+    destination: '/docs/guides/auth/social-login/auth-facebook',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-apple',
+    destination: '/docs/guides/auth/social-login/auth-apple',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-azure',
+    destination: '/docs/guides/auth/social-login/auth-azure',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-twitter',
+    destination: '/docs/guides/auth/social-login/auth-twitter',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-github',
+    destination: '/docs/guides/auth/social-login/auth-github',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-gitlab',
+    destination: '/docs/guides/auth/social-login/auth-gitlab',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-bitbucket',
+    destination: '/docs/guides/auth/social-login/auth-bitbucket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-discord',
+    destination: '/docs/guides/auth/social-login/auth-discord',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-keycloak',
+    destination: '/docs/guides/auth/social-login/auth-keycloak',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-linkedin',
+    destination: '/docs/guides/auth/social-login/auth-linkedin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-notion',
+    destination: '/docs/guides/auth/social-login/auth-notion',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-slack',
+    destination: '/docs/guides/auth/social-login/auth-slack',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-spotify',
+    destination: '/docs/guides/auth/social-login/auth-spotify',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-twitch',
+    destination: '/docs/guides/auth/social-login/auth-twitch',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-workos',
+    destination: '/docs/guides/auth/social-login/auth-workos',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database',
+    destination: '/docs/guides/database/overview',
+  },
+  {
+    permanent: true,
+    source: '/docs/architecture',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
+    source: '/docs/features',
+    destination: '/docs/guides/getting-started/features',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-nextjs',
+    destination: '/docs/guides/getting-started/tutorials/with-nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-react',
+    destination: '/docs/guides/getting-started/tutorials/with-react',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-vue-3',
+    destination: '/docs/guides/getting-started/tutorials/with-vue-3',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-nuxt-3',
+    destination: '/docs/guides/getting-started/tutorials/with-nuxt-3',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-angular',
+    destination: '/docs/guides/getting-started/tutorials/with-angular',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-redwoodjs',
+    destination: '/docs/guides/getting-started/tutorials/with-redwoodjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-svelte',
+    destination: '/docs/guides/getting-started/tutorials/with-svelte',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-sveltekit',
+    destination: '/docs/guides/getting-started/tutorials/with-sveltekit',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-flutter',
+    destination: '/docs/guides/getting-started/tutorials/with-flutter',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-expo',
+    destination: '/docs/guides/getting-started/tutorials/with-expo',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-ionic-react',
+    destination: '/docs/guides/getting-started/tutorials/with-ionic-react',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-ionic-vue',
+    destination: '/docs/guides/getting-started/tutorials/with-ionic-vue',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/with-ionic-angular',
+    destination: '/docs/guides/getting-started/tutorials/with-ionic-angular',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/examples',
+    destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/examples',
+    destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/hosting/overview',
+    destination: '/docs/guides/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli',
+    destination: '/docs/guides/resources/supabase-cli',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/resources/supabase-cli/local-development',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/resources/supabase-cli/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/migrations/firestore-data',
+    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/migrations/firebase-auth',
+    destination: '/docs/guides/resources/migrating-to-supabase/firebase-auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/migrations/firebase-storage',
+    destination: '/docs/guides/resources/migrating-to-supabase/firebase-storage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/migrations/heroku',
+    destination: '/docs/guides/resources/migrating-to-supabase/heroku',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript',
+    destination: '/docs/reference/javascript/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart',
+    destination: '/docs/reference/dart/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli',
+    destination: '/docs/reference/cli/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/api',
+    destination: '/docs/reference/api/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/auth',
+    destination: '/docs/reference/auth/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/storage',
+    destination: '/docs/reference/storage/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/realtime',
+    destination: '/docs/reference/realtime/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/handbook/supasquad',
+    destination: '/supasquad',
+  },
+  {
+    permanent: true,
+    source: '/contact/enterprise',
+    destination: 'https://forms.supabase.com/enterprise',
+  },
+  {
+    permanent: true,
+    source: '/legal/soc2',
+    destination: 'https://forms.supabase.com/soc2',
   },
 ]

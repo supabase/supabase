@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'

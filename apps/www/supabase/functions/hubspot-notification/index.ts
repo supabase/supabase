@@ -33,7 +33,20 @@ serve(async (req) => {
 
   switch (input.table) {
     case 'partner_contacts':
-      formData = { ...formData, jobtitle, website, partner_gallery_type }
+      formData = {
+        ...formData,
+        supabase_table_id,
+        country,
+        form_note,
+        company,
+        company_size,
+        phone,
+        lastName,
+        firstName,
+        jobtitle,
+        website,
+        partner_gallery_type,
+      }
       break
     case 'soc2_requests':
     case 'enterprise_contacts':

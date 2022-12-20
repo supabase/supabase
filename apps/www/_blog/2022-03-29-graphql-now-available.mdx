@@ -67,9 +67,6 @@ create table "Account"(
     "createdAt" timestamp not null,
     "updatedAt" timestamp not null
 );
-
--- Rebuild the GraphQL Schema Cache
-select graphql.rebuild_schema();
 ```
 
 Translates to the GraphQL base type
@@ -114,7 +111,7 @@ type Mutation {
   ): AccountDeleteResponse!
 ```
 
-For a complete example with relationships, check out the [reflection docs](https://supabase.github.io/pg_graphql/reflection/).
+For a complete example with relationships, check out the [API docs](https://supabase.github.io/pg_graphql/api/).
 
 ## Security
 
