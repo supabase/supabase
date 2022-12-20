@@ -91,12 +91,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/new/auth</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/docs/handbook/contributing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -104,6 +98,12 @@
 
   <url>
     <loc>https://supabase.com/docs/handbook/introduction</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/new/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -218,6 +218,12 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/auth/auth-captcha</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/auth/auth-email-templates</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -391,6 +397,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/integrations/onesignal</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/integrations/pgmustard</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -458,6 +470,12 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/platform/access-control</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/platform/backups</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -937,12 +955,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/self-hosting/docker</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/firebase-auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -962,6 +974,12 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/heroku</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/resources/self-hosting/docker</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1522,6 +1540,12 @@
 
   <url>
     <loc>https://supabase.com/docs/reference/javascript/storage-from-list</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/reference/javascript/v1/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
