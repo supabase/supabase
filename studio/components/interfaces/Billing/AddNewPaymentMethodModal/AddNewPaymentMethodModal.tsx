@@ -27,9 +27,13 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
   const captchaRefCallback = useCallback((node) => {
-    console.log({ node })
     setCaptchaRef(node)
   }, [])
+
+  useEffect(() => {
+    setCaptchaLoaded(true)
+    // @ts-ignore
+  }, [window.hcaptcha])
 
   useEffect(() => {
     const loadPaymentForm = async () => {
@@ -50,11 +54,6 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
 
     loadPaymentForm()
   }, [visible, captchaRef, captchaLoaded])
-
-  const onCaptchaLoaded = () => {
-    console.log('on captcha loaded')
-    setCaptchaLoaded(true)
-  }
 
   const resetCaptcha = () => {
     console.log('Resetting  captcha')
@@ -86,30 +85,31 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     appearance: { theme: 'night', labels: 'floating' },
   } as any
 
+  const onLocalCancel = () => {
+    setIntent(undefined)
+    return onCancel()
+  }
+
   return (
     <Modal
       hideFooter
       size="medium"
       visible={visible}
       header="Add new payment method"
-      onCancel={onCancel}
+      onCancel={onLocalCancel}
       className="PAYMENT"
     >
-      {visible && (
-        <HCaptcha
-          ref={captchaRefCallback}
-          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-          size="invisible"
-          onError={(err) => console.error(err)}
-          onLoad={() => onCaptchaLoaded()}
-          onVerify={(token) => {
-            setCaptchaToken(token)
-          }}
-          onExpire={() => {
-            setCaptchaToken(null)
-          }}
-        />
-      )}
+      <HCaptcha
+        ref={captchaRefCallback}
+        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+        size="invisible"
+        onVerify={(token) => {
+          setCaptchaToken(token)
+        }}
+        onExpire={() => {
+          setCaptchaToken(null)
+        }}
+      />
       <div className="space-y-4 py-4">
         {intent !== undefined ? (
           <Elements stripe={stripePromise} options={options}>
