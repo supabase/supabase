@@ -142,8 +142,8 @@ const ColumnManagement: FC<Props> = ({
 
   return (
     <>
-      <div className="table-editor-columns w-full space-y-4">
-        <div className="flex w-full items-center justify-between">
+      <div className="w-full space-y-4 table-editor-columns">
+        <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           {isNewRecord && (
             <>
@@ -214,7 +214,7 @@ const ColumnManagement: FC<Props> = ({
                     ].join(' ')}
                   >
                     <span className="text-xs text-scale-1200">
-                      Recommended to use lowercase and use an underscore to seperate words e.g.
+                      Recommended to use lowercase and use an underscore to separate words e.g.
                       column_name
                     </span>
                   </div>
