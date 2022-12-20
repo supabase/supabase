@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import components from '~/components'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
-import OldLayout from '~/layouts/Default'
+
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
@@ -33,18 +33,6 @@ const RefSectionHandler = (props) => {
       document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
     }
   })
-
-  /*
-   * handle old ref pages
-   */
-  if (!isNewDocs) {
-    return (
-      // @ts-ignore
-      <OldLayout meta={props.pageProps.meta} toc={props.pageProps.toc}>
-        <MDXRemote {...props.pageProps.content} components={components} />
-      </OldLayout>
-    )
-  }
 
   return (
     <RefSubLayout>
