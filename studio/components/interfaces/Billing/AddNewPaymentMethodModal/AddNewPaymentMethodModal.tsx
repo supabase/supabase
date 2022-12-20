@@ -36,6 +36,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
         }
 
         await setupIntent(token ?? undefined)
+        resetCaptcha()
       }
     }
 
@@ -59,17 +60,15 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       hcaptchaToken,
     })
 
-    resetCaptcha()
-
     if (intent.error) {
       return ui.setNotification({
         category: 'error',
         message: intent.error.message,
         error: intent.error,
       })
+    } else {
+      setIntent(intent)
     }
-
-    captchaRef.current?.resetCaptcha()
   }
 
   const options = {
@@ -77,15 +76,9 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     appearance: { theme: 'night', labels: 'floating' },
   } as any
 
+  // Needs to be re-rendered properly for hCaptcha to work seamlessly
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={visible}
-      header="Add new payment method"
-      onCancel={onCancel}
-      className="PAYMENT"
-    >
+    <>
       <HCaptcha
         ref={captchaRef}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
@@ -98,18 +91,27 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
           setCaptchaToken(null)
         }}
       />
-      <div className="space-y-4 py-4">
-        {intent !== undefined ? (
-          <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
-          </Elements>
-        ) : (
-          <div className="flex w-full items-center justify-center py-20">
-            <IconLoader size={16} className="animate-spin" />
-          </div>
-        )}
-      </div>
-    </Modal>
+      <Modal
+        hideFooter
+        size="medium"
+        visible={visible}
+        header="Add new payment method"
+        onCancel={onCancel}
+        className="PAYMENT"
+      >
+        <div className="space-y-4 py-4">
+          {intent !== undefined ? (
+            <Elements stripe={stripePromise} options={options}>
+              <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
+            </Elements>
+          ) : (
+            <div className="flex w-full items-center justify-center py-20">
+              <IconLoader size={16} className="animate-spin" />
+            </div>
+          )}
+        </div>
+      </Modal>
+    </>
   )
 }
 
