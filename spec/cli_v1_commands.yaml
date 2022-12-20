@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.24.0
+  version: 1.27.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -58,6 +58,11 @@ commands:
     usage: supabase vanity-subdomains get
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -72,6 +77,11 @@ commands:
     usage: supabase vanity-subdomains delete
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -89,6 +99,11 @@ commands:
         description: |
           The desired vanity subdomain to use for your Supabase project.
         default_value: ''
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -111,6 +126,11 @@ commands:
         description: |
           The desired vanity subdomain to use for your Supabase project.
         default_value: ''
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -372,6 +392,11 @@ commands:
         name: --db-allow-cidr <strings>
         description: CIDR to allow DB connections from.
         default_value: '[]'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -384,6 +409,63 @@ commands:
     usage: supabase network-restrictions get
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-network-bans
+    title: supabase network-bans
+    summary: Manage network bans
+    description: |-
+      Network bans are IPs that get temporarily blocked if their traffic pattern looks abusive (e.g. multiple failed auth attempts).
+
+      The subcommands help you view the current bans, and unblock IPs if desired.
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-network-bans-get
+      - supabase-network-bans-remove
+    flags: []
+  - id: supabase-network-bans-remove
+    title: supabase network-bans remove
+    summary: Remove a network ban
+    tags: []
+    links: []
+    usage: supabase network-bans remove [flags]
+    subcommands: []
+    flags:
+      - id: db-unban-ip
+        name: --db-unban-ip <strings>
+        description: IP to allow DB connections from.
+        default_value: '[]'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-network-bans-get
+    title: supabase network-bans get
+    summary: Get the current network bans
+    tags: []
+    links: []
+    usage: supabase network-bans get
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -407,6 +489,10 @@ commands:
     usage: supabase migration repair <version> [flags]
     subcommands: []
     flags:
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
       - id: status
         name: --status <[ applied | reverted ]>
         description: Version status to update.
@@ -722,6 +808,7 @@ commands:
     links: []
     subcommands:
       - supabase-db-diff
+      - supabase-db-dump
       - supabase-db-lint
       - supabase-db-push
       - supabase-db-remote
@@ -804,6 +891,22 @@ commands:
         name: -s, --schema <strings>
         description: List of schema to include.
         default_value: '[public]'
+  - id: supabase-db-dump
+    title: supabase db dump
+    summary: Dumps schemas from the remote database
+    tags: []
+    links: []
+    usage: supabase db dump [flags]
+    subcommands: []
+    flags:
+      - id: file
+        name: -f, --file <string>
+        description: File path to save the dumped schema.
+        default_value: ''
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
   - id: supabase-db-diff
     title: supabase db diff
     summary: Diffs the local database for schema changes
@@ -814,7 +917,7 @@ commands:
     flags:
       - id: file
         name: -f, --file <string>
-        description: Saves schema diff to a file.
+        description: Saves schema diff to a new migration file.
         default_value: ''
       - id: linked
         name: --linked
