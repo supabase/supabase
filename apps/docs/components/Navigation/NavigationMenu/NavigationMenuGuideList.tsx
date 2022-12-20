@@ -73,7 +73,6 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                   `/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`
                 }
               />
-              {/* </div> */}
               <span
                 className={[
                   ' ',
