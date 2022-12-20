@@ -41,7 +41,7 @@ export const meta = {
 
     <StepHikeCompact.Details title="Create a Flutter app">
 
-    Create a Flutter app using the `flutter create` command.
+    Create a Flutter app using the `flutter create` command. You can skip this step if you already have a working app.
 
     </StepHikeCompact.Details>
 
@@ -60,8 +60,8 @@ export const meta = {
     <StepHikeCompact.Details title="Install the Supabase client library">
 
       The fastest way to get started is to use the [`supabase_flutter`](https://pub.dev/packages/supabase_flutter) client library which provides a convenient interface for working with Supabase from a Flutter app.
-      
-      Open the `pubspec.yaml` file inside your Flutter app and add `supabase_flutter`.
+
+      Open the `pubspec.yaml` file inside your Flutter app and add `supabase_flutter` as a dependency.
 
     </StepHikeCompact.Details>
 
@@ -79,13 +79,15 @@ export const meta = {
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Open `main.dart` edit the main function to include the initialization code for Supabase using your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+      Open `lib/main.dart` and edit the main function to initialize Supabase using your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```dart lib/main.dart
+      import 'package:supabase_flutter/supabase_flutter.dart';
+
       Future<void> main() async {
         WidgetsFlutterBinding.ensureInitialized();
 
@@ -106,8 +108,8 @@ export const meta = {
     <StepHikeCompact.Details title="Query data from the app">
 
       Use a `FutureBuilder` to fetch the data when the home page loads and display the query result in a `ListView`.
-      
-      Replace the default `MyApp` and `HomePage` classes with the following code.
+
+      Replace the default `MyApp` and `MyHomePage` classes with the following code.
 
     </StepHikeCompact.Details>
 
@@ -161,19 +163,18 @@ export const meta = {
             ),
           );
         }
-      }      
+      }
       ```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run your app on a platform of your choosing! By default an app should launch in your web browser. 
-    
+    Run your app on a platform of your choosing! By default an app should launch in your web browser.
+
     Note that `supabase_flutter` is compatible with web, iOS, Android, macOS, and Windows apps.
 
     </StepHikeCompact.Details>
@@ -181,7 +182,7 @@ export const meta = {
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      flutter run 
+      flutter run
       ```
 
     </StepHikeCompact.Code>
