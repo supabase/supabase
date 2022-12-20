@@ -79,7 +79,7 @@ We might _additionally_ launch server-side presets as we add transformations bec
 Behind the scenes, we've provided a few small niceties:
 
 - **No footguns:** an image will never be resized bigger than original dimensions (even if the user specifies larger dimensions)
-- **Sane defaults:** default mode maintains aspect ratio and the resize mode is `fill`
+- **Sane defaults:** default mode maintains aspect ratio and the resize mode is `cover`
 - **Standardization**: resize modes mirror the [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) property of CSS. We support the contain, cover and fill modes.
 
 ## Smart CDN

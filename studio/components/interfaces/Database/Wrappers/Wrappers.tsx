@@ -9,6 +9,7 @@ import { checkPermissions, useParams, useStore } from 'hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { WRAPPERS } from './Wrappers.constants'
 import WrapperRow from './WrapperRow'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Wrappers = () => {
@@ -26,6 +27,7 @@ const Wrappers = () => {
 
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isLoadingExtensions = meta.extensions.isLoading
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
 
   const isWrappersEnabled =
@@ -120,7 +122,13 @@ const Wrappers = () => {
         </div> */}
       </div>
 
-      {isWrappersEnabled ? (
+      {isLoadingExtensions ? (
+        <div className="border rounded border-scale-500 p-12 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : isWrappersEnabled ? (
         <div>
           {WRAPPERS.map((wrapper, i) => {
             return (
@@ -181,7 +189,7 @@ const Wrappers = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                    <Link href="https://supabase.com/docs">
+                    <Link href="https://supabase.com/docs/guides/database/wrappers">
                       <a target="_blank">
                         <Button type="default" icon={<IconExternalLink />}>
                           About Wrappers
@@ -192,7 +200,7 @@ const Wrappers = () => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Link href="https://supabase.com/docs">
+                  <Link href="https://supabase.com/docs/guides/database/wrappers">
                     <a target="_blank">
                       <Button type="default" icon={<IconExternalLink />}>
                         About Wrappers

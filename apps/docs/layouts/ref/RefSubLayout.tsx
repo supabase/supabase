@@ -4,6 +4,7 @@ import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/Custom
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
+import Image from 'next/image'
 
 interface ISectionContainer {
   id: string
@@ -34,7 +35,9 @@ type StickyHeader = {
 
 type RefSubLayoutType = {}
 
-interface IEducationRow {}
+interface IEducationRow {
+  className?: string
+}
 interface IEducationSection {
   id: string
   title?: string
@@ -75,7 +78,12 @@ const Section: FC<ISectionContainer> = (props) => {
 
 const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   const router = useRouter()
+
   const { setActiveRefItem } = useNavigationMenuContext()
+
+  // we're serving search bots a different file (/crawlers/[...slug])
+  // and need to modify content to suit that
+  const isCrawlerPage = router.route.includes('/crawlers/[...slug]')
 
   const { ref } = useInView({
     threshold: 1,
@@ -97,21 +105,25 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
       {icon && (
         <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
-          <img className="w-6 h-6" src={`${icon}.svg`} />
+          <Image width={16} height={16} alt={icon} src={`${icon}.svg`} />
         </div>
       )}
-      <h2
-        ref={ref}
-        id={props.slug}
-        data-ref-id={props.id}
-        className={[
-          'text-2xl font-medium text-scale-1200 scroll-mt-24',
-          !icon && 'mb-8',
-          props.monoFont && 'font-mono',
-        ].join(' ')}
-      >
-        {props.title && <span className="max-w-xl">{props.title}</span>}
-      </h2>
+      {isCrawlerPage ? (
+        <h1>{props.title}</h1>
+      ) : (
+        <h2
+          ref={ref}
+          id={props.slug}
+          data-ref-id={props.id}
+          className={[
+            'text-2xl font-medium text-scale-1200 scroll-mt-24',
+            !icon && 'mb-8',
+            props.monoFont && 'font-mono',
+          ].join(' ')}
+        >
+          {props.title && <span className="max-w-xl">{props.title}</span>}
+        </h2>
+      )}
     </div>
   )
 }
@@ -129,7 +141,11 @@ const Examples: FC<ISectionExamples> = (props) => {
 }
 
 const EducationRow: FC<IEducationRow> = (props) => {
-  return <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">{props.children}</div>
+  return (
+    <div className={['grid lg:grid-cols-2 gap-8 lg:gap-16', props.className].join(' ')}>
+      {props.children}
+    </div>
+  )
 }
 
 const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {

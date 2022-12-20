@@ -104,6 +104,9 @@ const SideNav = () => {
       case url.includes(`/docs/guides/resources`) && url:
         menuState.setMenuLevelId('resources')
         break
+      case url.includes(`/docs/guides/self-hosting`) && url:
+        menuState.setMenuLevelId('self_hosting')
+        break
       case url.includes(`/docs/guides/integrations`) && url:
         menuState.setMenuLevelId('integrations')
         break

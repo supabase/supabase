@@ -1,14 +1,13 @@
+import Link from 'next/link'
 import { FC } from 'react'
-import { useRouter } from 'next/router'
 import { Badge, IconAlertCircle, Radio, Button } from 'ui'
 
-import { useFlag, useStore } from 'hooks'
+import { useFlag, useParams, useStore } from 'hooks'
 import { SubscriptionAddon } from './AddOns.types'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import InformationBox from 'components/ui/InformationBox'
 import { getSemanticVersion } from './AddOns.utils'
-import Link from 'next/link'
 
 interface Props {
   pitrDurationOptions: SubscriptionAddon[]
@@ -24,12 +23,14 @@ const PITRDurationSelection: FC<Props> = ({
   onSelectOption,
 }) => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  const projectRegion = ui.selectedProject?.region ?? ''
+
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  const canUsePITR = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') >= 141044
+  const sufficientPgVersion = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') >= 141044
+  const isDisabledForRegion = ['ap-northeast-2'].includes(projectRegion)
 
   return (
     <div className="space-y-4">
@@ -41,7 +42,7 @@ const PITRDurationSelection: FC<Props> = ({
         <p className="text-sm text-scale-1100">
           Restore your database from a specific point in time
         </p>
-        {canUsePITR && !currentPitrDuration?.isLocked && (
+        {sufficientPgVersion && !isDisabledForRegion && !currentPitrDuration?.isLocked && (
           <div className="mt-2">
             <InformationBox
               icon={<IconAlertCircle strokeWidth={2} />}
@@ -53,7 +54,7 @@ const PITRDurationSelection: FC<Props> = ({
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
-      ) : !canUsePITR ? (
+      ) : !sufficientPgVersion ? (
         <InformationBox
           hideCollapse
           defaultVisibility
@@ -95,6 +96,27 @@ const PITRDurationSelection: FC<Props> = ({
             </Link>
           </div>
         </div>
+      ) : isDisabledForRegion ? (
+        <InformationBox
+          hideCollapse
+          defaultVisibility
+          title={`PITR is not available for your project's region (${projectRegion})`}
+          description={
+            <div className="flex items-center justify-between m-1">
+              <p className="text-sm leading-normal">
+                Reach out to us if you're interested! We'll see what we can do for you.
+              </p>
+              <Link
+                href={`/support/new?ref=${ref}&category=sales&subject=Enquiry%20on%20PITR%20for%20project%20in%20${projectRegion}`}
+              >
+                <a>
+                  <Button type="default">Contact support</Button>
+                </a>
+              </Link>
+            </div>
+          }
+          icon={<IconAlertCircle strokeWidth={2} />}
+        />
       ) : (
         <Radio.Group type="cards" className="billing-compute-radio">
           {pitrDurationOptions.map((option: any) => {

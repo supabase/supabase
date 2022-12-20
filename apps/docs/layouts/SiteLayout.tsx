@@ -13,8 +13,9 @@ import {
   // useMenuMobileOpen
 } from '~/hooks/useMenuState'
 import { useEffect } from 'react'
+import Footer from '~/components/Navigation/Footer'
 
-const SiteRefLayout = ({ children }) => {
+const SiteLayout = ({ children }) => {
   const { isDarkMode } = useTheme()
 
   useEffect(() => {
@@ -68,6 +69,10 @@ const SiteRefLayout = ({ children }) => {
     resources: {
       icon: '/docs/img/icons/menu/resources',
       name: 'Resources',
+    },
+    self_hosting: {
+      icon: '/docs/img/icons/menu/self-hosting',
+      name: 'Self-Hosting',
     },
     integrations: {
       icon: '/docs/img/icons/menu/integrations',
@@ -276,31 +281,8 @@ const SiteRefLayout = ({ children }) => {
             </div>
             <div className="grow px-5 max-w-7xl mx-auto py-16">
               {children}
-
-              <div className="mt-32">
-                <FooterHelpCallout />
-              </div>
-              <hr className="border-scale-400  mt-8"></hr>
-              <div className="flex flex-col lg:flex-row gap-3 mt-6">
-                <span className="text-xs text-scale-900">Supabase 2022</span>
-                <span className="text-xs text-scale-900">—</span>
-                <Link href="/handbook/contributing">
-                  <a className="text-xs text-scale-800 hover:underline">Contributing</a>
-                </Link>
-                <Link href="https://supabase.com/changelog">
-                  <a className="text-xs text-scale-800 hover:underline">Changelog</a>
-                </Link>
-
-                <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
-                  <a className="text-xs text-scale-800 hover:underline">Author Styleguide</a>
-                </Link>
-                <Link href="https://supabase.com/docs/oss">
-                  <a className="text-xs text-scale-800 hover:underline">Open Source</a>
-                </Link>
-                <Link href="https://supabase.com/docs/handbook/supasquad">
-                  <a className="text-xs text-scale-800 hover:underline">Supasquad</a>
-                </Link>
-              </div>
+              <FooterHelpCallout />
+              <Footer />
             </div>
 
             <div
@@ -323,4 +305,4 @@ const SiteRefLayout = ({ children }) => {
   )
 }
 
-export default SiteRefLayout
+export default SiteLayout

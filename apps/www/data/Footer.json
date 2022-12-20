@@ -61,7 +61,7 @@
       },
       {
         "text": "SOC2",
-        "url": "/legal/soc2"
+        "url": "https://forms.supabase.com/soc2"
       }
     ]
   },
@@ -86,7 +86,7 @@
       },
       {
         "text": "SupaSquad",
-        "url": "/docs/handbook/supasquad"
+        "url": "/supasquad"
       },
       {
         "text": "DevTo",

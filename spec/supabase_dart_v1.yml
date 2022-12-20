@@ -504,7 +504,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final data = await supabase
+          await supabase
               .from('cities')
               .insert({'name': 'The Shire', 'country_id': 554});
           ```
@@ -512,10 +512,20 @@ functions:
         name: Bulk create
         code: |
           ```dart
-          final res = await supabase.from('cities').insert([
+          await supabase.from('cities').insert([
             {'name': 'The Shire', 'country_id': 554},
             {'name': 'Rohan', 'country_id': 555},
           ]);
+          ```
+      - id: fetch-inserted-data
+        name: Fetch inserted record
+        code: |
+          ```dart
+          final List<Map<String, dynamic>> data =
+                  await supabase.from('cities').insert([
+                {'name': 'The Shire', 'country_id': 554},
+                {'name': 'Rohan', 'country_id': 555},
+              ]).select();
           ```
 
   - id: update
@@ -526,17 +536,17 @@ functions:
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
       - id: updating-your-data
-        name: Updating your data
+        name: Update your data
         isSpotlight: true
         code: |
           ```dart
-          final data = await supabase
+          await supabase
             .from('cities')
             .update({ 'name': 'Middle Earth' })
             .match({ 'name': 'Auckland' });
           ```
       - id: updating-json-data
-        name: Updating JSON data
+        name: Update JSON data
         description: |
           Postgres offers a
           [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
@@ -544,7 +554,7 @@ functions:
           but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
         code: |
           ```dart
-          final data = await supabase
+          await supabase
             .from('users')
             .update({
               'address': {
@@ -553,6 +563,18 @@ functions:
               }
             })
             .eq('address->postcode', 90210);
+          ```
+      - id: fetch-updated-rows
+        name: Fetch updated rows
+        code: |
+          ```dart
+          final List<Map<String, dynamic>> data = await supabase
+              .from('users')
+              .update({
+                'address': {'street': 'Melrose Place', 'postcode': 90210}
+              })
+              .eq('address->postcode', 90210)
+              .select();
           ```
 
   - id: upsert
@@ -568,7 +590,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final data = await supabase
+          await supabase
             .from('messages')
             .upsert({ 'id': 3, 'message': 'foo', 'username': 'supabot' });
           ```
@@ -581,7 +603,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final data = await supabase
+          await supabase
             .from('users')
             .upsert({ 'username': 'supabot' }, { 'onConflict': 'username' });
           ```
@@ -612,10 +634,20 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final data = await supabase
+          await supabase
             .from('cities')
             .delete()
             .match({ 'id': 666 });
+          ```
+      - id: fetch-delete-records
+        name: Fetch deleted records
+        code: |
+          ```dart
+          final List<Map<String,dynamic>> data = await supabase
+            .from('cities')
+            .delete()
+            .match({ 'id': 666 })
+            .select();
           ```
 
   - id: rpc
