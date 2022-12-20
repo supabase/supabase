@@ -34,7 +34,7 @@ Sentry.init({
     // [Joshen] This is a chrome specific error, fix is out in chromium, pending chrome update
     // Ref: https://stackoverflow.com/questions/72437786/chrome-evalerror-possible-side-effect-in-debug
     'Possible side-effect in debug-evaluate',
-    // [Joshen] This event started occuring after our fix in the org dropdown by reading the slug from
+    // [Joshen] This event started occurring after our fix in the org dropdown by reading the slug from
     // the URL params instead of the store, but we cannot repro locally, staging nor on prod
     // Safe to ignore since it's not a user-facing issue + we've not received any user feedback/report about it
     // Ref: https://github.com/supabase/supabase/pull/9729
