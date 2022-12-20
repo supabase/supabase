@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react'
 import { Badge, Button, IconAlertCircle, Loading } from 'ui'
 
-import { useStore, useProjectUsage, useFlag } from 'hooks'
+import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
@@ -56,21 +56,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     )
   }
 
-  const storageImageResizeEnabled = useFlag('storageImageResize')
-
-  // Filter out storage_image_render_count if feature flag is not enabled
-  const usageBasedProducts = USAGE_BASED_PRODUCTS.map((usageBasedProduct) => ({
-    ...usageBasedProduct,
-    features: usageBasedProduct.features.filter(
-      (it) => it.key !== 'storage_image_render_count' || storageImageResizeEnabled
-    ),
-  }))
-
   return (
     <Loading active={isLoading}>
       {usage && (
         <div>
-          {usageBasedProducts.map((product) => {
+          {USAGE_BASED_PRODUCTS.map((product) => {
             const isExceededUsage =
               showUsageExceedMessage &&
               product.features
