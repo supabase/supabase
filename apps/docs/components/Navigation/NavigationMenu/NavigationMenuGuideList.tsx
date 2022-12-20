@@ -37,4 +37,4 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
   )
 }
 
-export default React.memo(NavigationMenuGuideList)
+export default NavigationMenuGuideList

@@ -7,15 +7,155 @@ import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 
-const Content = ({ id }) => {
+interface ImPureProps {
+  // users: Array<User>
+}
+
+const HeaderImage = React.memo(function HeaderImage(props: any) {
   const router = useRouter()
   const { isDarkMode } = useTheme()
+
+  return (
+    <Image
+      alt={props.icon}
+      width={15}
+      height={15}
+      src={`${router.basePath}` + `/img/icons/menu/${props.icon}${isDarkMode ? '' : '-light'}.svg`}
+    />
+  )
+})
+
+const HeaderLink = React.memo(function HeaderLink(props: any) {
+  const router = useRouter()
+
+  return (
+    <span
+      className={[
+        ' ',
+        !props.title && 'capitalize',
+        props.url === router.pathname ? 'text-brand-900' : 'hover:text-brand-900 text-scale-1200',
+      ].join(' ')}
+    >
+      {props.title ?? props.id}
+    </span>
+  )
+})
+
+const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
+  const router = useRouter()
+  const { isDarkMode } = useTheme()
+
+  let subItemMenuOpen = false
+
+  if (router.asPath.includes(props.subItem.url)) {
+    subItemMenuOpen = true
+  }
+
+  const LinkContainer = (props) => {
+    return (
+      <Link href={props.url} passHref>
+        <a className={props.className}>{props.children}</a>
+      </Link>
+    )
+  }
+
+  return (
+    <>
+      {props.subItemIndex === 0 && (
+        <>
+          <div className="h-px w-full bg-green-500 my-3"></div>
+          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+            {props.parent.name}
+          </span>
+        </>
+      )}
+      <Accordion.Item key={props.subItem.label} value={props.subItem.url}>
+        <li key={props.subItem.name}>
+          <LinkContainer
+            url={props.subItem.url}
+            className={[
+              'flex items-center gap-2',
+              'cursor-pointer transition text-sm',
+              props.subItem.url === router.pathname
+                ? 'text-brand-900'
+                : 'hover:text-brand-900 text-scale-1000',
+            ].join(' ')}
+            parent={props.subItem.parent}
+          >
+            {props.subItem.icon && (
+              <Image
+                alt={props.subItem.name + router.basePath}
+                src={
+                  `${router.basePath}` + `${props.subItem.icon}${!isDarkMode ? '-light' : ''}.svg`
+                }
+                width={15}
+                height={15}
+              />
+            )}
+            {props.subItem.name}
+          </LinkContainer>
+        </li>
+
+        {props.subItem.items && props.subItem.items.length > 0 && (
+          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
+            {props.subItem.items.map((subSubItem) => {
+              return (
+                <li key={props.subItem.name}>
+                  <Link href={`${subSubItem.url}`} passHref>
+                    <a
+                      className={[
+                        'cursor-pointer transition text-sm',
+                        subSubItem.url === router.pathname
+                          ? 'text-brand-900'
+                          : 'hover:text-brand-900 text-scale-1000',
+                      ].join(' ')}
+                    >
+                      {subSubItem.name}
+                    </a>
+                  </Link>
+                </li>
+              )
+            })}
+          </Accordion.Content>
+        )}
+      </Accordion.Item>
+    </>
+  )
+})
+
+const ContentLink = React.memo(function ContentLink(props: any) {
+  const router = useRouter()
+
+  return (
+    <li>
+      <Link href={`${props.url}`} passHref>
+        <a
+          className={[
+            'cursor-pointer transition text-sm',
+            props.url === router.pathname
+              ? 'text-brand-900'
+              : 'hover:text-brand-900 text-scale-1000',
+          ].join(' ')}
+        >
+          {props.icon && <img className="w-3" src={`${router.basePath}${props.icon}`} />}
+          {props.name}
+        </a>
+      </Link>
+    </li>
+  )
+})
+
+const Content = (props) => {
+  console.log(props.id, props)
+  const { id } = props
 
   const menu = NavItems[id]
 
   return (
     <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
-      {console.log(id && 'GUIDE MENU id changed')}
+      {/* // */}
+      {console.log(id && `GUIDE MENU ${id} changed`)}
+      {/* // */}
       <Link href={`${menu.parent ?? '/'}`} passHref>
         <a
           className={[
@@ -35,27 +175,8 @@ const Content = ({ id }) => {
       <Link href={menu.url ?? ''} passHref>
         <a>
           <div className="flex items-center gap-3 my-3">
-            <Image
-              alt={menu.icon}
-              width={15}
-              height={15}
-              src={
-                `${router.basePath}` +
-                `/img/icons/menu/${menu.icon}${isDarkMode ? '' : '-light'}.svg`
-              }
-            />
-            {/* </div> */}
-            <span
-              className={[
-                ' ',
-                !menu.title && 'capitalize',
-                menu.url === router.pathname
-                  ? 'text-brand-900'
-                  : 'hover:text-brand-900 text-scale-1200',
-              ].join(' ')}
-            >
-              {menu.title ?? id}
-            </span>
+            <HeaderImage icon={menu.icon} />
+            <HeaderLink title={menu.title} url={menu.url} id={id} />
           </div>
         </a>
       </Link>
@@ -68,106 +189,17 @@ const Content = ({ id }) => {
             {x.items && x.items.length > 0 ? (
               <div>
                 {x.items.map((subItem, subItemIndex) => {
-                  // console.log('subitem', { subItem })
-                  // console.log('router', router)
-                  //console.log('subitem url', subItem.url)
-                  let subItemMenuOpen = false
-
-                  if (router.asPath.includes(subItem.url)) {
-                    subItemMenuOpen = true
-                  }
-
-                  const LinkContainer = (props) => {
-                    return (
-                      <Link href={props.url} passHref>
-                        <a className={props.className}>{props.children}</a>
-                      </Link>
-                    )
-                  }
-
                   return (
-                    <>
-                      {subItemIndex === 0 && (
-                        <>
-                          <div className="h-px w-full bg-green-500 my-3"></div>
-                          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
-                            {x.name}
-                          </span>
-                        </>
-                      )}
-                      <Accordion.Item key={subItem.label} value={subItem.url}>
-                        <li key={subItem.name}>
-                          <LinkContainer
-                            url={subItem.url}
-                            className={[
-                              'flex items-center gap-2',
-                              'cursor-pointer transition text-sm',
-                              subItem.url === router.pathname
-                                ? 'text-brand-900'
-                                : 'hover:text-brand-900 text-scale-1000',
-                            ].join(' ')}
-                            parent={subItem.parent}
-                          >
-                            {subItem.icon && (
-                              <Image
-                                alt={subItem.name + router.basePath}
-                                src={
-                                  `${router.basePath}` +
-                                  `${subItem.icon}${!isDarkMode ? '-light' : ''}.svg`
-                                }
-                                width={15}
-                                height={15}
-                              />
-                            )}
-                            {subItem.name}
-                          </LinkContainer>
-                        </li>
-
-                        {subItem.items && subItem.items.length > 0 && (
-                          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-                            {subItem.items.map((subSubItem, subSubItemIndex) => {
-                              return (
-                                <li key={subItem.name}>
-                                  <Link href={`${subSubItem.url}`} passHref>
-                                    <a
-                                      className={[
-                                        'cursor-pointer transition text-sm',
-                                        subSubItem.url === router.pathname
-                                          ? 'text-brand-900'
-                                          : 'hover:text-brand-900 text-scale-1000',
-                                      ].join(' ')}
-                                    >
-                                      {subSubItem.name}
-                                    </a>
-                                  </Link>
-                                </li>
-                              )
-                            })}
-                          </Accordion.Content>
-                        )}
-                      </Accordion.Item>
-                    </>
+                    <ContentAccordionLink
+                      subItem={subItem}
+                      subItemIndex={subItemIndex}
+                      parent={x}
+                    />
                   )
                 })}
               </div>
             ) : (
-              <>
-                <li>
-                  <Link href={`${x.url}`} passHref>
-                    <a
-                      className={[
-                        'cursor-pointer transition text-sm',
-                        x.url === router.pathname
-                          ? 'text-brand-900'
-                          : 'hover:text-brand-900 text-scale-1000',
-                      ].join(' ')}
-                    >
-                      {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
-                      {x.name}
-                    </a>
-                  </Link>
-                </li>
-              </>
+              <ContentLink url={x.url} icon={x.icon} name={x.name} />
             )}
           </div>
         )
