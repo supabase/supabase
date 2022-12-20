@@ -22,7 +22,7 @@ import { flattenSections } from '~/lib/helpers'
 import NavigationMenuHome from './HomeMenu'
 
 // Filter libCommonSections for just the relevant sections in the current library
-function generateAllowedClientLibKeys(sections, spec) {
+export function generateAllowedClientLibKeys(sections, spec) {
   // Filter parent sections first
 
   const specIds = spec.functions.map((func) => {
@@ -198,7 +198,7 @@ const SideNav = () => {
         active={isReference_Javascript_V1}
         commonSections={libCommonSections}
         lib="javascript"
-        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v1)}
+        spec={spec_js_v1}
       /> */}
       <NavigationMenuRefList
         key={'reference-js-menu'}
@@ -206,7 +206,7 @@ const SideNav = () => {
         active={isReference_Javascript_V2}
         commonSections={libCommonSections}
         lib="javascript"
-        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_js_v2)}
+        spec={spec_js_v2}
       />
       {/* <NavigationMenuRefList
         key={'reference-dart-menu'}
@@ -214,15 +214,15 @@ const SideNav = () => {
         active={isReference_Dart_V0}
         commonSections={libCommonSections}
         lib="dart"
-        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
-      /> */}
-      {/* <NavigationMenuRefList
+        spec={spec_dart_v0}
+      />
+      <NavigationMenuRefList
         key={'reference-dart-menu'}
         id={'reference_dart_v1'}
         active={isReference_Dart_V1}
         commonSections={libCommonSections}
         lib="dart"
-        allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v1)}
+        spec={spec_dart_v1}
       /> */}
       {/* // Tools */}
       {/* <NavigationMenuRefList
@@ -231,8 +231,8 @@ const SideNav = () => {
         active={isReference_Cli}
         commonSections={cliCommonSections}
         lib="cli"
-      /> */}
-      {/* <NavigationMenuRefList
+      />
+      <NavigationMenuRefList
         key={'reference-api-menu'}
         id={'reference_api'}
         active={isReference_Api}
@@ -246,15 +246,15 @@ const SideNav = () => {
         active={isReference_Self_Hosting_Auth}
         commonSections={authServerCommonSections}
         lib="self-hosting-auth"
-      /> */}
-      {/* <NavigationMenuRefList
+      />
+      <NavigationMenuRefList
         key={'reference-self-hosting-storage-menu'}
         id={'reference_self_hosting_storage'}
         active={isReference_Self_Hosting_Storage}
         commonSections={storageServerCommonSections}
         lib="self-hosting-storage"
-      /> */}
-      {/* <NavigationMenuRefList
+      />
+      <NavigationMenuRefList
         key={'reference-self-hosting-realtime-menu'}
         id={'reference_self_hosting_realtime'}
         active={isReference_Self_Hosting_Realtime}

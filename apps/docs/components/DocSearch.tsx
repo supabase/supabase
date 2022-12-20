@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, createContext, useContext, useEffect } from 'react'
+import { useState, useCallback, useRef, createContext, useContext, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Head from 'next/head'
@@ -16,7 +16,7 @@ const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID
 
 const SearchContext = createContext(null)
 
-export function SearchProvider({ children }: any) {
+function SearchProviderContent({ children }: any) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [initialQuery, setInitialQuery] = useState(null)
@@ -113,6 +113,10 @@ export function SearchProvider({ children }: any) {
     </>
   )
 }
+
+const SearchProvider = memo(SearchProviderContent)
+
+export { SearchProvider }
 
 // @ts-ignore
 function Hit({ hit, children }) {
