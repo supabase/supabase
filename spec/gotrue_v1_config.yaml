@@ -11,11 +11,11 @@ info:
   title: 'GoTrue' # {string} A readable name.
   source: 'https://github.com/supabase/gotrue' # {string} Where developers can find the source code.
   bugs: 'https://github.com/supabase/gotrue/issues' # {string} Where developers can file bugs.
-  spec: 'https://github.com/supabase/supabase/blob/master/web/spec/cli_config_001.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  spec: 'https://github.com/supabase/supabase/blob/master/spec/gotrue_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
-    A `config.toml` file is generated after running `supabase init`.
+    A sample `.env` file is located in the [auth repository](https://github.com/supabase/gotrue/blob/master/example.env).
 
-    This file is located in the `supabase` folder under `supabase/config.toml`.
+    Use this file to configure your environment variables for your Auth server.
   tags:
     - id: general
       title: General
