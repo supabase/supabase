@@ -85,6 +85,65 @@ const FunctionLink = React.memo(function FunctionLink({
   )
 })
 
+const RenderLink = React.memo(function RenderLink(props: any) {
+  const activeAccordianItem = useMenuActiveRefId()
+  let active = false
+
+  const isFilter = props.filterIds?.includes(activeAccordianItem)
+  const isModifier = props.modifierIds?.includes(activeAccordianItem)
+  const isAuthServer = props.authServerIds?.includes(activeAccordianItem)
+
+  if (
+    (isFilter && props.id === 'using-filters') ||
+    (activeAccordianItem === 'using-filters' && props.id === 'using-filters')
+  ) {
+    active = true
+  } else if (
+    (isModifier && props.id === 'using-modifiers') ||
+    (activeAccordianItem === 'using-modifiers' && props.id === 'using-modifiers')
+  ) {
+    active = true
+  } else if (
+    (isAuthServer && props.id === 'admin-api') ||
+    (activeAccordianItem === 'admin-api' && props.id === 'admin-api')
+  ) {
+    active = true
+  } else {
+    active = false
+  }
+
+  return (
+    <Accordion.Root
+      collapsible
+      key={props.id + '-accordian-root-for-func-' + props.index}
+      type="single"
+      value={active ? props.id : ''}
+    >
+      <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
+        <FunctionLink library={props.lib} title={props.title} id={props.id} slug={props.slug} />
+        <Accordion.Content
+          key={props.id + '-sub-items-accordion-container'}
+          className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
+        >
+          {props.items &&
+            props.items
+              .filter((item) => props.allowedKeys.includes(item.id))
+              .map((item) => {
+                return (
+                  <FunctionLink
+                    library={props.lib}
+                    title={item.title}
+                    id={item.id}
+                    slug={item.slug}
+                  />
+                )
+              })}
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion.Root>
+  )
+})
+
 const SideMenuTitle = ({ title }: { title: string }) => {
   return (
     <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-3">
@@ -216,65 +275,6 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
             return <></>
           }
 
-          const RenderLink = (props) => {
-            const activeAccordianItem = 'using-filters' // useMenuActiveRefId()
-            let active = false
-
-            const isFilter =
-              filterIds && filterIds.length > 0 && filterIds.includes(activeAccordianItem)
-            const isModifier =
-              modifierIds && modifierIds.length > 0 && modifierIds.includes(activeAccordianItem)
-            const isAuthServer =
-              authServerIds &&
-              authServerIds.length > 0 &&
-              authServerIds.includes(activeAccordianItem)
-
-            if (
-              (isFilter && !isModifier && !isAuthServer && props.id === 'using-filters') ||
-              (activeAccordianItem === 'using-filters' && props.id === 'using-filters')
-            ) {
-              active = true
-            } else if (
-              (isModifier && !isFilter && !isAuthServer && props.id === 'using-modifiers') ||
-              // @ts-expect-error // REMOVE TODO
-              (activeAccordianItem === 'using-modifiers' && props.id === 'using-modifiers')
-            ) {
-              active = true
-            } else if (
-              (isAuthServer && !isFilter && !isModifier && props.id === 'admin-api') ||
-              // @ts-expect-error // REMOVE TODO
-              (activeAccordianItem === 'admin-api' && props.id === 'admin-api')
-            ) {
-              active = true
-            } else {
-              active = false
-            }
-
-            return (
-              <Accordion.Root
-                collapsible
-                key={props.id + '-accordian-root-for-func-' + fnIndex}
-                type="single"
-                value={active ? props.id : ''}
-              >
-                <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
-                  <FunctionLink {...props} library={lib} />
-                  <Accordion.Content
-                    key={props.id + '-sub-items-accordion-container'}
-                    className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
-                  >
-                    {props.items &&
-                      props.items
-                        .filter((item) => allowedKeys.includes(item.id))
-                        .map((item) => {
-                          return <FunctionLink {...item} library={lib} />
-                        })}
-                  </Accordion.Content>
-                </Accordion.Item>
-              </Accordion.Root>
-            )
-          }
-
           // handle subtitles with subitems
           if (!fn.id) {
             return (
@@ -287,7 +287,18 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
                     .map((item) => {
                       // run allow check
                       if (isFuncNotInLibraryOrVersion(item.id, item.type)) return <></>
-                      return <RenderLink {...item} library={menu.title} />
+                      return (
+                        <RenderLink
+                          {...item}
+                          library={menu.title}
+                          index={fnIndex}
+                          modifierIds={modifierIds}
+                          filterIds={filterIds}
+                          authServerIds={authServerIds}
+                          lib={lib}
+                          allowedKeys={allowedKeys}
+                        />
+                      )
                     })}
               </>
             )
@@ -299,7 +310,18 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
                 {fn.items &&
                   fn.items
                     //.filter((item) => item.libs.includes(lib))
-                    .map((item) => <RenderLink {...item} library={menu.title} />)}
+                    .map((item) => (
+                      <RenderLink
+                        {...item}
+                        library={menu.title}
+                        index={fnIndex}
+                        modifierIds={modifierIds}
+                        filterIds={filterIds}
+                        authServerIds={authServerIds}
+                        lib={lib}
+                        allowedKeys={allowedKeys}
+                      />
+                    ))}
               </>
             )
           }
