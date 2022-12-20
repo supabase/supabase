@@ -1,13 +1,14 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react'
-import { IconLoader, Modal } from 'ui'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
+import { FC, useCallback, useEffect, useState } from 'react'
 
+import { Modal } from 'ui'
 import { useStore } from 'hooks'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { post } from 'lib/common/fetch'
 import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 interface Props {
   visible: boolean
@@ -21,7 +22,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
 
-  const [captchaLoaded, setCaptchaLoaded] = useState(false)
+  const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -29,18 +30,6 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
   const captchaRefCallback = useCallback((node) => {
     setCaptchaRef(node)
   }, [])
-
-  /**
-   * We want to load the Stripe payment elements only after successfully verifying captcha.
-   * To execute hCaptcha when displaying the modal, we need to ensure hCaptcha is actually loaded.
-   * The `onLoad` method from hCaptcha is only executed ONCE for the entire application, so we cannot listen to it.
-   * One way to find out if hCaptcha has been initialized, is checking `window.hcaptcha`. When checking via window,
-   * we know if the hCaptcha has been initialized from a different part of the app or through this component.
-   */
-  useEffect(() => {
-    setCaptchaLoaded(true)
-    // @ts-ignore
-  }, [window.hcaptcha])
 
   useEffect(() => {
     const loadPaymentForm = async () => {
@@ -118,7 +107,7 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
         onCancel={onLocalCancel}
         className="PAYMENT"
       >
-        <div className="space-y-4 py-4">
+        <div className="py-4 space-y-4">
           <Elements stripe={stripePromise} options={options}>
             <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onLocalCancel} />
           </Elements>
