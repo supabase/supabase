@@ -173,7 +173,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'reference'} />
       {/* // Client Libs */}
       <NavigationMenuRefList
-        key={'reference-js-menu'}
+        key={'reference-js-menu-v1'}
         id={'reference_javascript_v1'}
         commonSections={libCommonSections}
         lib="javascript"
@@ -194,7 +194,7 @@ const SideNav = () => {
         allowedClientKeys={generateAllowedClientLibKeys(libCommonSections, spec_dart_v0)}
       />
       <NavigationMenuRefList
-        key={'reference-dart-menu'}
+        key={'reference-dart-menu-v1'}
         id={'reference_dart_v1'}
         commonSections={libCommonSections}
         lib="dart"
