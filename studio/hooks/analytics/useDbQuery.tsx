@@ -4,12 +4,12 @@ import {
   DbQueryData,
   DbQueryHandler,
   MetaQueryResponse,
-  PresetSql,
+  DbQuery,
 } from 'components/interfaces/Reports/Reports.types'
 import { useStore } from 'hooks'
 import useSWR from 'swr'
 
-type UseDbQuery = (sql: PresetSql, params?: BaseReportParams) => [DbQueryData, DbQueryHandler]
+type UseDbQuery = (sql: DbQuery['sql'], params?: BaseReportParams) => [DbQueryData, DbQueryHandler]
 const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
   const { meta } = useStore()
 
