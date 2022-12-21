@@ -6,13 +6,12 @@ export const LAYOUT_COLUMN_COUNT = 24
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last 7 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    text: 'Last day',
     calcTo: () => '',
-    default: true,
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
   },
   {
-    text: 'Last 14 days',
+    text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },

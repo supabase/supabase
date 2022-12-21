@@ -63,6 +63,12 @@ export const usePresetReport = (hooks: PresetHookResult[]) => {
     })
   }
   const isLoading = data.map((datum) => datum.isLoading).some((v) => v)
+  const helpers = REPORTS_DATEPICKER_HELPERS.map((helper, index) => {
+    if (tier?.key === 'FREE' && index === 0) return { ...helper, default: true }
+    if (tier?.key === 'PRO' && index === 1) return { ...helper, default: true }
+    return { ...helper, default: false }
+  })
+
   const Layout: React.FC<{ title: string }> = ({ title, children }) => (
     <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <h1 className="text-2xl text-scale-1200">{title}</h1>
@@ -70,8 +76,8 @@ export const usePresetReport = (hooks: PresetHookResult[]) => {
         <DatePickers
           onChange={handleDatepickerChange}
           to={data[0]?.params?.iso_timestamp_end || ''}
-          from={data[0]?.params?.iso_timestamp_end || ''}
-          helpers={REPORTS_DATEPICKER_HELPERS}
+          from={data[0]?.params?.iso_timestamp_start || ''}
+          helpers={helpers}
         />
         <Button
           type="default"
