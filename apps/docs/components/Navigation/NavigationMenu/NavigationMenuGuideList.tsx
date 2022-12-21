@@ -191,7 +191,15 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId, context 
                             : 'hover:text-brand-900 text-scale-1000',
                         ].join(' ')}
                       >
-                        {x.icon && <img className="w-3" src={`${router.basePath}${x.icon}`} />}
+                        {x.icon && (
+                          <Image
+                            width={12}
+                            height={12}
+                            alt={x.icon}
+                            src={`${router.basePath}${x.icon}`}
+                          />
+                        )}
+
                         {x.name}
                       </a>
                     </Link>
@@ -215,7 +223,14 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId, context 
               <li>
                 <Link href={`${x.href}`} passHref>
                   <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
-                    {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
+                    {x.icon && (
+                      <Image
+                        width={15}
+                        height={15}
+                        alt={x.icon}
+                        src={`${router.basePath}${x.icon}`}
+                      />
+                    )}
                     {x.name}
                   </a>
                 </Link>

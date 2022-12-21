@@ -8,11 +8,11 @@ import { find } from 'lodash'
 import Image from 'next/image'
 import { useTheme } from 'common/Providers'
 
-// import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
-
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId, useMenuLevelId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
+import { isFuncNotInLibraryOrVersion } from './NavigationMenu.utils'
+import { Fragment } from 'react'
 
 const FunctionLink = ({
   title,
@@ -140,9 +140,6 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         }).items.map((x) => x.id)
       : []
 
-  // console.log(filterIds)
-  // console.log(modifierIds)
-
   const level = useMenuLevelId()
 
   return (
@@ -192,24 +189,8 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
 
         <ul className="function-link-list">
           {sections.map((fn: any, fnIndex) => {
-            //
-            // check if the link is allowed to be displayed
-            function isFuncNotInLibraryOrVersion(id, type) {
-              if (id && allowedKeys && !allowedKeys.includes(id) && type !== 'markdown') {
-                /*
-                 * Remove this menu link from side bar, as it does not exist for either
-                 * this language, or for this lib version
-                 *
-                 * */
-                return true
-              } else {
-                return false
-              }
-            }
-
-            // run allow check
-            if (isFuncNotInLibraryOrVersion(fn.id, fn.type)) {
-              return <></>
+            if (isFuncNotInLibraryOrVersion(fn.id, fn.type, allowedKeys)) {
+              return
             }
 
             const RenderLink = (props) => {
@@ -261,7 +242,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
                         props.items
                           .filter((item) => allowedKeys.includes(item.id))
                           .map((item) => {
-                            return <FunctionLink {...item} library={lib} />
+                            return <FunctionLink {...item} library={lib} key={item.id} />
                           })}
                     </Accordion.Content>
                   </Accordion.Item>
@@ -269,34 +250,28 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
               )
             }
 
-            // handle subtitles with subitems
-            if (!fn.id) {
-              return (
-                <>
-                  <Divider />
-                  <SideMenuTitle title={fn.title} />
-                  {fn.items &&
-                    fn.items
-                      //.filter((item) => item.libs && item.libs.includes(lib))
-                      .map((item) => {
-                        // run allow check
-                        if (isFuncNotInLibraryOrVersion(item.id, item.type)) return <></>
-                        return <RenderLink {...item} library={menu.title} />
-                      })}
-                </>
-              )
-            } else {
-              // handle normal links
-              return (
-                <>
-                  <RenderLink {...fn} library={menu.title} />
-                  {fn.items &&
-                    fn.items
-                      //.filter((item) => item.libs.includes(lib))
-                      .map((item) => <RenderLink {...item} library={menu.title} />)}
-                </>
-              )
-            }
+            return fn.id ? (
+              <Fragment key={fn.id}>
+                <RenderLink {...fn} library={menu.title} key={menu.title} />
+                {fn.items &&
+                  fn.items.map((item) => (
+                    <RenderLink {...item} library={menu.title} key={menu.title} />
+                  ))}
+              </Fragment>
+            ) : (
+              <Fragment key={fn.title}>
+                <Divider />
+                <SideMenuTitle title={fn.title} />
+                {fn.items &&
+                  fn.items.map((item, i) =>
+                    isFuncNotInLibraryOrVersion(item.id, item.type, allowedKeys) ? (
+                      <Fragment key={item.id + i}></Fragment>
+                    ) : (
+                      <RenderLink {...item} library={menu.title} key={item.id + i} />
+                    )
+                  )}
+              </Fragment>
+            )
           })}
         </ul>
       </div>
