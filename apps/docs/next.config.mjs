@@ -48,7 +48,12 @@ const nextConfig = {
   basePath: '/docs',
   images: {
     dangerouslyAllowSVG: true,
-    domains: ['avatars.githubusercontent.com', 'github.com', 'user-images.githubusercontent.com'],
+    domains: [
+      'avatars.githubusercontent.com',
+      'github.com',
+      'user-images.githubusercontent.com',
+      'raw.githubusercontent.com',
+    ],
   },
   experimental: {
     mdxRs: true,
