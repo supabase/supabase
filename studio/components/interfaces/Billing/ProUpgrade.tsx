@@ -160,16 +160,20 @@ const ProUpgrade: FC<Props> = ({
 
   const onConfirmPayment = async () => {
     setIsSubmitting(true)
+    let token = captchaToken
 
-    const token =
-      captchaToken ?? (await captchaRef.current?.execute({ async: true }))?.response ?? undefined
-
-    console.log('confirm', { token })
-
-    if (!token) {
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      console.log('ERRORR', error)
       setIsSubmitting(false)
       return
     }
+
+    console.log('TOKEN', { token })
 
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
