@@ -62,7 +62,7 @@ export type RefKeyOptions =
   | 'self-hosting-storage'
   | 'self-hosting-realtime'
 
-const SideNav = () => {
+const NavigationMenu = ({ context }) => {
   const router = useRouter()
 
   let version = ''
@@ -160,17 +160,17 @@ const SideNav = () => {
     <div className="flex relative">
       {/* // main menu */}
       <NavigationMenuHome />
-      <NavigationMenuGuideList id={'gettingstarted'} />
-      <NavigationMenuGuideList id={'database'} />
-      <NavigationMenuGuideList id={'auth'} />
-      <NavigationMenuGuideList id={'functions'} />
-      <NavigationMenuGuideList id={'realtime'} />
-      <NavigationMenuGuideList id={'storage'} />
-      <NavigationMenuGuideList id={'platform'} />
-      <NavigationMenuGuideList id={'resources'} />
-      <NavigationMenuGuideList id={'integrations'} />
-      <NavigationMenuGuideList id={'self_hosting'} />
-      <NavigationMenuGuideList id={'reference'} />
+      <NavigationMenuGuideList id={'gettingstarted'} context={context} />
+      <NavigationMenuGuideList id={'database'} context={context} />
+      <NavigationMenuGuideList id={'auth'} context={context} />
+      <NavigationMenuGuideList id={'functions'} context={context} />
+      <NavigationMenuGuideList id={'realtime'} context={context} />
+      <NavigationMenuGuideList id={'storage'} context={context} />
+      <NavigationMenuGuideList id={'platform'} context={context} />
+      <NavigationMenuGuideList id={'resources'} context={context} />
+      <NavigationMenuGuideList id={'integrations'} context={context} />
+      <NavigationMenuGuideList id={'self_hosting'} context={context} />
+      <NavigationMenuGuideList id={'reference'} context={context} />
       {/* // Client Libs */}
       <NavigationMenuRefList
         key={'reference-js-menu-v1'}
@@ -236,4 +236,4 @@ const SideNav = () => {
   )
 }
 
-export default memo(SideNav)
+export default memo(NavigationMenu)
