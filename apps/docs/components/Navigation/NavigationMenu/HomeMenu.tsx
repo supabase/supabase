@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMenuLevelId } from '~/hooks/useMenuState'
 import { useTheme } from 'common/Providers'
+import { Fragment } from 'react'
 
 const home = [
   [
@@ -129,7 +130,7 @@ const NavigationMenuHome = () => {
       <ul className="relative w-full flex flex-col gap-4">
         {home.map((section, sectionIndex) => {
           return (
-            <div key={`section-container-${sectionIndex}-border`}>
+            <Fragment key={`section-container-${sectionIndex}-border`}>
               {sectionIndex !== 0 && (
                 <div
                   className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
@@ -176,7 +177,7 @@ const NavigationMenuHome = () => {
                   })}
                 </div>
               </div>
-            </div>
+            </Fragment>
           )
         })}
       </ul>
