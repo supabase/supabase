@@ -170,7 +170,7 @@ const SiteLayout = ({ children }) => {
               </div>
             </div>
             <div className={['pb-10 px-5 md:px-10 md:flex'].join(' ')}>
-              <NavigationMenu />
+              <NavigationMenu context="side" />
             </div>
           </div>
         </div>
@@ -183,7 +183,6 @@ const SiteLayout = ({ children }) => {
           ].join(' ')}
         >
           <div className="flex flex-col relative">
-            {/* <NavigationMenu /> */}
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
               <TopNavBarRef />
             </div>
@@ -269,7 +268,7 @@ const SiteLayout = ({ children }) => {
                       : 'left-[-40px] h-0 opacity-0 invisible',
                   ].join(' ')}
                 >
-                  <NavigationMenu />
+                  <NavigationMenu context="mobile" />
                 </div>
               </div>
             </div>
