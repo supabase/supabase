@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Friday'
+  const liveDay = null
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -219,11 +219,6 @@ export default function launchweek() {
             )}
           ></div>
         </div>
-        <a className="flex items-center justify-center mb-20" href="#currentDay">
-          <div className="border border-slate-600 text-black dark:text-white text-sm rounded-full bg-slate-400 px-2 py-1 hover:bg-slate-600">
-            Jump to current day
-          </div>
-        </a>
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
             <SectionContainer className="!py-0 ">
