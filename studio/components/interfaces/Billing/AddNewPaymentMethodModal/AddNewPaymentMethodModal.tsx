@@ -35,9 +35,14 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     const loadPaymentForm = async () => {
       if (visible && captchaRef && captchaLoaded) {
         let token = captchaToken
-        if (!token) {
-          const captchaResponse = await captchaRef.execute({ async: true })
-          token = captchaResponse?.response ?? null
+
+        try {
+          if (!token) {
+            const captchaResponse = await captchaRef.execute({ async: true })
+            token = captchaResponse?.response ?? null
+          }
+        } catch (error) {
+          return
         }
 
         await setupIntent(token ?? undefined)
