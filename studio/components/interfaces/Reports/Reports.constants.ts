@@ -6,23 +6,20 @@ export const LAYOUT_COLUMN_COUNT = 24
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
-    calcTo: () => '',
-    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-  },
-  {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    default: true,
+  },
+  {
+    text: 'Last 14 days',
+    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
   },
   {
     text: 'Last 30 days',
     calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
-  },
-  {
-    text: 'Last 90 days',
-    calcFrom: () => dayjs().subtract(90, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
 ]
@@ -157,18 +154,18 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
     title: 'Auth',
     queries: {
       bannedUsers: {
-        queryType: "db",
-        sql: (_params)=> `
+        queryType: 'db',
+        sql: (_params) => `
 select 
   count(distinct u.id) as count
 from auth.users u
 where u.banned_until is not null and u.banned_until > now()
 limit 1
-        `
-      },  
+        `,
+      },
       unverifiedUsers: {
-        queryType: "db",
-        sql: (params)=> `
+        queryType: 'db',
+        sql: (params) => `
 select 
   date_trunc('day', u.created_at) as timestamp,
   count(distinct u.id) as count
@@ -176,10 +173,10 @@ from auth.users u
 where u.confirmed_at is null and '${params.iso_timestamp_start}' < u.created_at 
 group by timestamp
 order by timestamp desc
-        `
-      },  
+        `,
+      },
       signUpProviders: {
-        queryType: "db",
+        queryType: 'db',
         sql: (params) => `
 select 
   sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count, 
@@ -190,17 +187,17 @@ join auth.identities as i on u.id = i.user_id
 where date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
 group by timestamp, provider
 order by timestamp desc
-        `
-      },  
+        `,
+      },
       failedMigrations: {
-        queryType: "logs",
+        queryType: 'logs',
         sql: `
 select count(f.id)
 from auth_logs
 where json_value(f.event_message, "$.level") = "fatal"
   and regexp_contains(f.event_message, "error executing migrations") 
 limit 1
-`
+`,
       },
       dailyActiveUsers: {
         queryType: 'logs',
@@ -218,7 +215,7 @@ order by
       },
       cumulativeUsers: {
         queryType: 'db',
-        sql: params => `
+        sql: (params) => `
         
 select 
   date_trunc('day', u.created_at) as timestamp, 
@@ -231,7 +228,7 @@ order by timestamp desc
       },
       newUsers: {
         queryType: 'db',
-        sql: params => `
+        sql: (params) => `
 select 
 date_trunc('day', u.created_at) as timestamp,
 count(u.id) as count
