@@ -42,7 +42,7 @@ interface Props {
   isLoadingPaymentMethods: boolean
   onSelectPaymentMethod: (method: any) => void
   onSelectAddNewPaymentMethod: () => void
-  beforeConfirmPayment?: () => Promise<void>
+  beforeConfirmPayment: () => Promise<boolean>
   onConfirmPayment: () => void
   isSubmitting: boolean
 
@@ -134,11 +134,16 @@ const PaymentSummaryPanel: FC<Props> = ({
         message: error,
       })
     } else {
-      await beforeConfirmPayment?.()
-
-      isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
-        ? setShowConfirmModal(true)
-        : onConfirmPayment()
+      // [Joshen] We're validating captcha before subsequent actions as there's an issue
+      // with the hcaptcha overlay and the modal component, such that clicking on the hcaptcha closes
+      // both the hcaptcha overlay and the modal. Need to figure that out first, then we can validate
+      // the hcaptcha within onConfirmPayment()
+      const hasValidCaptcha = await beforeConfirmPayment()
+      if (hasValidCaptcha) {
+        isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
+          ? setShowConfirmModal(true)
+          : onConfirmPayment()
+      }
     }
   }
 
