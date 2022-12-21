@@ -348,6 +348,14 @@
       "maximum": 32767,
       "multipleof": 1
     },
+    "RATE_LIMIT_SMS_SENT": {
+      "title": "Rate limit",
+      "type": "number",
+      "help": "Maximum number of SMS messages sent per hour (Default: 30, Max: 32,767)",
+      "minimum": 1,
+      "maximum": 32767,
+      "multipleof": 1
+    },
     "MAILER_SECURE_EMAIL_CHANGE_ENABLED": {
       "title": "Double confirm email changes",
       "type": "boolean",

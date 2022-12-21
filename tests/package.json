@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "These tests can be run with Docker.",
   "scripts": {
-    "docker:up": "cd ../docker && ENABLE_EMAIL_AUTOCONFIRM=true docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
-    "docker:down": "cd ../docker && docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml down",
+    "docker:up": "cd ../docker && ENABLE_EMAIL_AUTOCONFIRM=true docker compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
+    "docker:down": "cd ../docker && docker compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml down",
     "test": "jest",
     "test:local": "jest --testNamePattern '^((?!\\[skip-local\\]).)*$' --testPathPattern '^((?!realtime).)*$' --detectOpenHandles",
     "test:stage": "jest --testNamePattern '^((?!\\[skip-stage\\]).)*$' --detectOpenHandles",

@@ -104,6 +104,9 @@ const SideNav = () => {
       case url.includes(`/docs/guides/resources`) && url:
         menuState.setMenuLevelId('resources')
         break
+      case url.includes(`/docs/guides/self-hosting`) && url:
+        menuState.setMenuLevelId('self_hosting')
+        break
       case url.includes(`/docs/guides/integrations`) && url:
         menuState.setMenuLevelId('integrations')
         break
@@ -166,6 +169,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'platform'} />
       <NavigationMenuGuideList id={'resources'} />
       <NavigationMenuGuideList id={'integrations'} />
+      <NavigationMenuGuideList id={'self_hosting'} />
       <NavigationMenuGuideList id={'reference'} />
       {/* // Client Libs */}
       <NavigationMenuRefList

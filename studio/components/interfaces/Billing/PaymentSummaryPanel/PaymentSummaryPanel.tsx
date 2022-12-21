@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useRef, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -44,6 +44,8 @@ interface Props {
   onSelectAddNewPaymentMethod: () => void
   onConfirmPayment: () => void
   isSubmitting: boolean
+
+  captcha: React.ReactNode
 }
 
 // Use case of this panel is actually only for upgrading from Free to Pro
@@ -72,6 +74,7 @@ const PaymentSummaryPanel: FC<Props> = ({
   onSelectAddNewPaymentMethod,
   onConfirmPayment,
   isSubmitting,
+  captcha,
 }) => {
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
@@ -120,7 +123,7 @@ const PaymentSummaryPanel: FC<Props> = ({
     ).toFixed(2)
   }
 
-  const validateOrder = () => {
+  const validateOrder = async () => {
     const error = validateSubscriptionUpdatePayload(selectedAddons)
     if (error) {
       return ui.setNotification({
@@ -381,6 +384,8 @@ const PaymentSummaryPanel: FC<Props> = ({
             </Listbox>
           )}
         </div>
+
+        <div className="self-center">{captcha}</div>
 
         <div className="flex items-center justify-end">
           <Tooltip.Root delayDuration={0}>
