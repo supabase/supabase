@@ -152,6 +152,7 @@ const EnterpriseUpdate: FC<Props> = ({
       return false
     }
 
+    setIsSubmitting(false)
     return true
   }
 
