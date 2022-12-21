@@ -158,7 +158,7 @@ const ProUpgrade: FC<Props> = ({
     captchaRef.current?.resetCaptcha()
   }
 
-  const beforeConfirmPayment = async () => {
+  const beforeConfirmPayment = async (): Promise<boolean> => {
     setIsSubmitting(true)
     let token = captchaToken
 
@@ -170,8 +170,10 @@ const ProUpgrade: FC<Props> = ({
       }
     } catch (error) {
       setIsSubmitting(false)
-      return
+      return false
     }
+
+    return true
   }
 
   const onConfirmPayment = async () => {
