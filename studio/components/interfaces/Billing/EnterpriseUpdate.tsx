@@ -137,6 +137,25 @@ const EnterpriseUpdate: FC<Props> = ({
     captchaRef.current?.resetCaptcha()
   }
 
+  const beforeConfirmPayment = async (): Promise<boolean> => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+        setCaptchaToken(token)
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return false
+    }
+
+    setIsSubmitting(false)
+    return true
+  }
+
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
     setIsSubmitting(true)
@@ -296,6 +315,7 @@ const EnterpriseUpdate: FC<Props> = ({
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}
+            beforeConfirmPayment={beforeConfirmPayment}
             onConfirmPayment={onConfirmPayment}
             captcha={
               <HCaptcha
