@@ -3,7 +3,7 @@ import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { Fragment } from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
 import { useMenuLevelId } from '~/hooks/useMenuState'
 import * as NavItems from './NavigationMenu.constants'
@@ -11,8 +11,9 @@ import * as NavItems from './NavigationMenu.constants'
 interface Props {
   id: string
   setMenuLevelId?: any
+  context: 'side' | 'mobile'
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId, context }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -30,7 +31,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
   return (
     <Accordion.Root
       collapsible
-      key={id}
+      key={id + context}
       type="single"
       value={firstLevelRoute}
       className={[
@@ -92,7 +93,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
           // console.log('1st type of link?', x.items && x.items.length > 0)
           // console.log()
           return (
-            <div key={x.url}>
+            <div key={x.name + context}>
               {x.items && x.items.length > 0 ? (
                 <div>
                   {x.items.map((subItem, subItemIndex) => {
@@ -114,7 +115,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                     }
 
                     return (
-                      <>
+                      <Fragment key={x.name + context + subItemIndex}>
                         {subItemIndex === 0 && (
                           <>
                             <div className="h-px w-full bg-green-500 my-3"></div>
@@ -123,8 +124,8 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                             </span>
                           </>
                         )}
-                        <Accordion.Item key={subItem.label} value={subItem.url}>
-                          <li key={subItem.name}>
+                        <Accordion.Item key={subItem.label + context} value={subItem.url}>
+                          <li key={subItem.name + context}>
                             <LinkContainer
                               url={subItem.url}
                               className={[
@@ -155,7 +156,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                             <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
                               {subItem.items.map((subSubItem, subSubItemIndex) => {
                                 return (
-                                  <li key={subItem.name}>
+                                  <li key={subItem.name + context}>
                                     <Link href={`${subSubItem.url}`} passHref>
                                       <a
                                         className={[
@@ -174,12 +175,12 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                             </Accordion.Content>
                           )}
                         </Accordion.Item>
-                      </>
+                      </Fragment>
                     )
                   })}
                 </div>
               ) : (
-                <>
+                <Fragment key={x.url + context}>
                   <li>
                     <Link href={`${x.url}`} passHref>
                       <a
@@ -195,7 +196,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
                       </a>
                     </Link>
                   </li>
-                </>
+                </Fragment>
               )}
             </div>
           )
@@ -210,7 +211,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, setMenuLevelId }) => {
         )}
         {menu.extras?.map((x) => {
           return (
-            <div key={x.name}>
+            <div key={x.name + context}>
               <li>
                 <Link href={`${x.href}`} passHref>
                   <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
