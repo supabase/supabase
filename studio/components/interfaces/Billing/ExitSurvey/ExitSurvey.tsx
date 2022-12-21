@@ -11,6 +11,7 @@ import { CANCELLATION_REASONS } from '../Billing.constants'
 import { UpdateSuccess } from '../'
 import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 interface Props {
   freeTier: any
@@ -23,6 +24,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const { app, ui } = useStore()
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
+
+  const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const formRef = useRef<any>()
 
@@ -38,7 +42,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   // Anything above a micro instance size will involve a change in compute size
-  const willChangeComputeSize = (subscription?.addons ?? []).length > 0
+  // as downgrading back to free will bring the project back to micro
   const currentComputeSize = subscription?.addons.find((option) =>
     option.supabase_prod_id.includes('addon_instance')
   )
@@ -59,7 +63,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     }
   }
 
-  const getDowngradeSuccessMessage = () => {
+  const getDowngradeRefundMessage = () => {
     return `A total of $${returnedAmount} will be refunded as credits on ${billingDate.toLocaleDateString(
       'en-US',
       {
@@ -88,15 +92,33 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
     }
 
-    if (willChangeComputeSize) {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
+    if (currentComputeSize !== undefined) {
       setMessage(values.message)
       return setShowConfirmModal(true)
     } else {
-      downgradeProject(values)
+      downgradeProject(values, token as string)
     }
   }
 
-  const downgradeProject = async (values?: any) => {
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
+  const downgradeProject = async (values?: any, hcaptchaToken?: string) => {
     const downgradeMessage = values?.message ?? message
 
     try {
@@ -110,7 +132,10 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         tier,
         addons,
         proration_date,
+        hcaptchaToken: captchaToken ?? hcaptchaToken,
       })
+
+      resetCaptcha()
 
       if (res?.error) {
         return ui.setNotification({
@@ -119,11 +144,11 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           error: res.error,
         })
       } else {
-        if (willChangeComputeSize) {
+        if (currentComputeSize !== undefined) {
           app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'info',
-            message: getDowngradeSuccessMessage(),
+            message: getDowngradeRefundMessage(),
             duration: 8000,
           })
           ui.setNotification({
@@ -139,9 +164,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       }
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-	additionalFeedback: downgradeMessage,
-	exitAction: 'downgrade',
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: downgradeMessage,
+        exitAction: 'downgrade',
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
@@ -159,7 +184,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       <UpdateSuccess
         projectRef={projectRef || ''}
         title="Your project has been updated"
-        message={getDowngradeSuccessMessage()}
+        message={getDowngradeRefundMessage()}
       />
     )
   }
@@ -173,7 +198,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
       >
-        <div className="w-4/5 space-y-8">
+        <div className="w-full xl:w-4/5 space-y-8">
           <div ref={formRef} className="relative">
             <div className="absolute top-[2px] -left-24">
               <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
@@ -244,6 +269,19 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                       The unused amount for the remaining of your billing cycle will be refunded as
                       credits
                     </p>
+                  </div>
+                  <div className="self-center">
+                    <HCaptcha
+                      ref={captchaRef}
+                      sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                      size="invisible"
+                      onVerify={(token) => {
+                        setCaptchaToken(token)
+                      }}
+                      onExpire={() => {
+                        setCaptchaToken(null)
+                      }}
+                    />
                   </div>
                 </div>
               )}
