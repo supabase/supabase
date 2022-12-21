@@ -139,10 +139,14 @@ const EnterpriseUpdate: FC<Props> = ({
 
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
-    let token = captchaToken
+    setIsSubmitting(true)
+
+    const token =
+      captchaToken ?? (await captchaRef.current?.execute({ async: true }))?.response ?? undefined
+
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      setIsSubmitting(false)
+      return
     }
 
     const payload = {
@@ -157,8 +161,6 @@ const EnterpriseUpdate: FC<Props> = ({
       ),
       tier: currentSubscription.tier.price_id,
     }
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
     resetCaptcha()
 
