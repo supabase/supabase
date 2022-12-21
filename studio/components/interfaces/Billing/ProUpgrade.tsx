@@ -158,7 +158,7 @@ const ProUpgrade: FC<Props> = ({
     captchaRef.current?.resetCaptcha()
   }
 
-  const onConfirmPayment = async () => {
+  const beforeConfirmPayment = async (): Promise<boolean> => {
     setIsSubmitting(true)
     let token = captchaToken
 
@@ -166,12 +166,18 @@ const ProUpgrade: FC<Props> = ({
       if (!token) {
         const captchaResponse = await captchaRef.current?.execute({ async: true })
         token = captchaResponse?.response ?? null
+        setCaptchaToken(token)
       }
     } catch (error) {
       setIsSubmitting(false)
-      return
+      return false
     }
 
+    setIsSubmitting(false)
+    return true
+  }
+
+  const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
@@ -179,7 +185,7 @@ const ProUpgrade: FC<Props> = ({
       nonChangeableAddons,
       selectedPaymentMethodId,
       projectRegion,
-      token ?? undefined
+      captchaToken ?? undefined
     )
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
     resetCaptcha()
@@ -223,17 +229,17 @@ const ProUpgrade: FC<Props> = ({
         enter="transition ease-out duration-300"
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
-        className="flex w-full items-start justify-between"
+        className="flex items-start justify-between w-full"
       >
         <div className="flex-grow mt-10">
           <div className="relative space-y-4">
-            <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+            <div className="px-32 mx-auto space-y-4 2xl:min-w-5xl">
               <BackButton onClick={() => onSelectBack()} />
               <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
             </div>
 
             <div
-              className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
+              className="px-32 pb-8 mx-auto space-y-8 overflow-y-auto 2xl:min-w-5xl"
               style={{ height: 'calc(100vh - 9rem - 57px)' }}
             >
               <div className="space-y-2">
@@ -257,14 +263,14 @@ const ProUpgrade: FC<Props> = ({
                   </>
                 )}
               </div>
-              <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
+              <div className="flex items-center justify-between gap-16 px-6 py-4 border rounded border-panel-border-light border-panel-border-dark bg-panel-body-light drop-shadow-sm dark:bg-panel-body-dark">
                 <div>
                   <div className="flex items-center space-x-2">
                     <p>Enable spend cap</p>
                     <IconHelpCircle
                       size={16}
                       strokeWidth={1.5}
-                      className="cursor-pointer opacity-50 transition hover:opacity-100"
+                      className="transition opacity-50 cursor-pointer hover:opacity-100"
                       onClick={() => setShowSpendCapHelperModal(true)}
                     />
                   </div>
@@ -342,6 +348,7 @@ const ProUpgrade: FC<Props> = ({
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}
+            beforeConfirmPayment={beforeConfirmPayment}
             onConfirmPayment={onConfirmPayment}
             isSubmitting={isSubmitting}
             captcha={
@@ -375,7 +382,7 @@ const ProUpgrade: FC<Props> = ({
         header="Enabling spend cap"
         onCancel={() => setShowSpendCapHelperModal(false)}
       >
-        <div className="space-y-4 py-4">
+        <div className="py-4 space-y-4">
           <Modal.Content>
             <div className="space-y-4">
               <p className="text-sm">
@@ -390,7 +397,7 @@ const ProUpgrade: FC<Props> = ({
               </p>
               {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
               {/* Maybe ideate this in Figma first but this is good enough for now */}
-              <div className="rounded border border-scale-600 bg-scale-500">
+              <div className="border rounded border-scale-600 bg-scale-500">
                 <div className="flex items-center px-4 pt-2 pb-1">
                   <p className="w-[50%] text-sm text-scale-1100">Item</p>
                   <p className="w-[25%] text-sm text-scale-1100">Limit</p>
@@ -417,7 +424,7 @@ const ProUpgrade: FC<Props> = ({
                           <IconHelpCircle
                             size={16}
                             strokeWidth={1.5}
-                            className="cursor-pointer opacity-50 transition hover:opacity-100"
+                            className="transition opacity-50 cursor-pointer hover:opacity-100"
                           />
                         </Tooltip.Trigger>
                         <Tooltip.Content side="bottom">

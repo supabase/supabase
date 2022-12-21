@@ -1789,16 +1789,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/hosting/overview',
     destination: '/docs/guides/self-hosting',
   },
