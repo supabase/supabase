@@ -28,12 +28,12 @@ export interface PresetConfig {
   queries: Record<string, DbQuery | LogsQuery>
 }
 
-interface DbQuery {
+export interface DbQuery {
   queryType: 'db'
-  sql: (params: BaseReportParams) => string
+  sql: string | ((params: BaseReportParams) => string)
 }
 
-interface LogsQuery {
+export interface LogsQuery {
   queryType: 'logs'
   sql: string
 }
