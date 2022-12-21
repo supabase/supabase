@@ -16,7 +16,7 @@ const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID
 
 const SearchContext = createContext(null)
 
-function SearchProviderContent({ children }: any) {
+export function SearchProvider({ children }: any) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [initialQuery, setInitialQuery] = useState(null)
@@ -114,10 +114,6 @@ function SearchProviderContent({ children }: any) {
     </>
   )
 }
-
-const SearchProvider = memo(SearchProviderContent)
-
-export { SearchProvider }
 
 // @ts-ignore
 function Hit({ hit, children }) {
