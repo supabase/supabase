@@ -129,7 +129,7 @@ const NavigationMenuHome = () => {
       <ul className="relative w-full flex flex-col gap-4">
         {home.map((section, sectionIndex) => {
           return (
-            <>
+            <div key={`section-container-${sectionIndex}-border`}>
               {sectionIndex !== 0 && (
                 <div
                   className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
@@ -176,7 +176,7 @@ const NavigationMenuHome = () => {
                   })}
                 </div>
               </div>
-            </>
+            </div>
           )
         })}
       </ul>

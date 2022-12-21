@@ -136,13 +136,6 @@
         "type": "operation"
       },
       {
-        "id": "retrieve-object-info",
-        "title": "Retrieve object info",
-        "slug": "retrieve-object-info",
-        "summary": "Retrieve object info",
-        "type": "operation"
-      },
-      {
         "id": "copies-an-object",
         "title": "Copies an object",
         "slug": "copies-an-object",
