@@ -168,12 +168,9 @@ const ProUpgrade: FC<Props> = ({
         token = captchaResponse?.response ?? null
       }
     } catch (error) {
-      console.log('ERRORR', error)
       setIsSubmitting(false)
       return
     }
-
-    console.log('TOKEN', { token })
 
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
