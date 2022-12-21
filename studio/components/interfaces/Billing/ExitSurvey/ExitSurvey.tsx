@@ -42,7 +42,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   // Anything above a micro instance size will involve a change in compute size
-  const willChangeComputeSize = (subscription?.addons ?? []).length > 0
+  // as downgrading back to free will bring the project back to micro
   const currentComputeSize = subscription?.addons.find((option) =>
     option.supabase_prod_id.includes('addon_instance')
   )
@@ -63,7 +63,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     }
   }
 
-  const getDowngradeSuccessMessage = () => {
+  const getDowngradeRefundMessage = () => {
     return `A total of $${returnedAmount} will be refunded as credits on ${billingDate.toLocaleDateString(
       'en-US',
       {
@@ -105,7 +105,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       return
     }
 
-    if (willChangeComputeSize) {
+    if (currentComputeSize !== undefined) {
       setMessage(values.message)
       return setShowConfirmModal(true)
     } else {
@@ -144,11 +144,11 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           error: res.error,
         })
       } else {
-        if (willChangeComputeSize) {
+        if (currentComputeSize !== undefined) {
           app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'info',
-            message: getDowngradeSuccessMessage(),
+            message: getDowngradeRefundMessage(),
             duration: 8000,
           })
           ui.setNotification({
@@ -184,7 +184,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       <UpdateSuccess
         projectRef={projectRef || ''}
         title="Your project has been updated"
-        message={getDowngradeSuccessMessage()}
+        message={getDowngradeRefundMessage()}
       />
     )
   }
