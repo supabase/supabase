@@ -164,6 +164,8 @@ const ProUpgrade: FC<Props> = ({
     const token =
       captchaToken ?? (await captchaRef.current?.execute({ async: true }))?.response ?? undefined
 
+    console.log('confirm', { token })
+
     if (!token) {
       setIsSubmitting(false)
       return
