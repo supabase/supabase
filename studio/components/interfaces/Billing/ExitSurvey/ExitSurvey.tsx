@@ -25,8 +25,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
 
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const formRef = useRef<any>()
 
@@ -92,11 +92,24 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
     }
 
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
     if (willChangeComputeSize) {
       setMessage(values.message)
       return setShowConfirmModal(true)
     } else {
-      downgradeProject(values)
+      downgradeProject(values, token as string)
     }
   }
 
@@ -105,14 +118,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     captchaRef.current?.resetCaptcha()
   }
 
-  const downgradeProject = async (values?: any) => {
+  const downgradeProject = async (values?: any, hcaptchaToken?: string) => {
     const downgradeMessage = values?.message ?? message
-
-    let token = captchaToken
-    if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
-    }
 
     try {
       setIsSubmitting(true)
@@ -125,7 +132,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         tier,
         addons,
         proration_date,
-        hcaptchaToken: token ?? undefined,
+        hcaptchaToken: captchaToken ?? hcaptchaToken,
       })
 
       resetCaptcha()
@@ -191,7 +198,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
       >
-        <div className="w-4/5 space-y-8">
+        <div className="w-full xl:w-4/5 space-y-8">
           <div ref={formRef} className="relative">
             <div className="absolute top-[2px] -left-24">
               <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
