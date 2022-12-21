@@ -219,11 +219,6 @@ export default function launchweek() {
             )}
           ></div>
         </div>
-        <a className="flex items-center justify-center mb-20" href="#currentDay">
-          <div className="border border-slate-600 text-black dark:text-white text-sm rounded-full bg-slate-400 px-2 py-1 hover:bg-slate-600">
-            Jump to current day
-          </div>
-        </a>
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
             <SectionContainer className="!py-0 ">
