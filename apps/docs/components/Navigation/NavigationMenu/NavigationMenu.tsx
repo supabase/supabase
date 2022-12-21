@@ -196,7 +196,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'reference'} active={isReferenceActive} />
       {/* // Client Libs */}
       <NavigationMenuRefList
-        key={'reference-js-menu'}
+        key={'reference-js-menu-v1'}
         id={'reference_javascript_v1'}
         active={isReference_Javascript_V1}
         commonSections={libCommonSections}
@@ -220,7 +220,7 @@ const SideNav = () => {
         spec={spec_dart_v0}
       />
       <NavigationMenuRefList
-        key={'reference-dart-menu'}
+        key={'reference-dart-menu-v1'}
         id={'reference_dart_v1'}
         active={isReference_Dart_V1}
         commonSections={libCommonSections}

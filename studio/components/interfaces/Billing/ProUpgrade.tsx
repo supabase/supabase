@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -29,6 +29,7 @@ import {
 } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 import SupportPlan from './AddOns/SupportPlan'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 // Do not allow compute size changes for af-south-1
 
@@ -51,6 +52,9 @@ const ProUpgrade: FC<Props> = ({
   const router = useRouter()
   const isCustomDomainsEnabled = useFlag('customDomains')
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
@@ -133,7 +137,8 @@ const ProUpgrade: FC<Props> = ({
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion
+      projectRegion,
+      undefined
     )
 
     setIsRefreshingPreview(true)
@@ -148,18 +153,37 @@ const ProUpgrade: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion
+      projectRegion,
+      token ?? undefined
     )
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+    resetCaptcha()
+
     if (res?.error) {
       ui.setNotification({
         category: 'error',
@@ -320,6 +344,19 @@ const ProUpgrade: FC<Props> = ({
             }}
             onConfirmPayment={onConfirmPayment}
             isSubmitting={isSubmitting}
+            captcha={
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            }
           />
         </div>
       </Transition>
