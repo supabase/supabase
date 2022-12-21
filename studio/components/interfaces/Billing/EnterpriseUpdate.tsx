@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 
@@ -6,6 +6,7 @@ import { useStore, useFlag } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 import Divider from 'components/ui/Divider'
 import { SubscriptionAddon } from './AddOns/AddOns.types'
@@ -44,6 +45,9 @@ const EnterpriseUpdate: FC<Props> = ({
   const router = useRouter()
   const isCustomDomainsEnabled = useFlag('customDomains')
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
@@ -110,7 +114,8 @@ const EnterpriseUpdate: FC<Props> = ({
         selectedAddons,
         nonChangeableAddons,
         selectedPaymentMethodId,
-        projectRegion
+        projectRegion,
+        undefined
       ),
       tier: currentSubscription.tier.price_id,
     }
@@ -127,8 +132,26 @@ const EnterpriseUpdate: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
     const payload = {
       ...formSubscriptionUpdatePayload(
         currentSubscription,
@@ -136,13 +159,14 @@ const EnterpriseUpdate: FC<Props> = ({
         selectedAddons,
         nonChangeableAddons,
         selectedPaymentMethodId,
-        projectRegion
+        projectRegion,
+        token ?? undefined
       ),
       tier: currentSubscription.tier.price_id,
     }
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+    resetCaptcha()
+
     if (res?.error) {
       ui.setNotification({
         category: 'error',
@@ -184,12 +208,15 @@ const EnterpriseUpdate: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+        <div className="flex-grow mt-10">
           <div className="relative space-y-4">
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+                <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+              </div>
+
               <div
-                className="space-y-8 overflow-scroll pb-8"
+                className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
                 style={{ height: 'calc(100vh - 6.4rem - 57px)' }}
               >
                 <h3 className="text-xl">
@@ -270,6 +297,19 @@ const EnterpriseUpdate: FC<Props> = ({
               setShowAddPaymentMethodModal(true)
             }}
             onConfirmPayment={onConfirmPayment}
+            captcha={
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            }
           />
         </div>
       </Transition>

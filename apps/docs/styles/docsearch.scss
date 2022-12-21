@@ -138,7 +138,7 @@
   display: none;
 }
 
-.DocSearch-Cancel {
+button[type='reset'].DocSearch-Cancel {
   appearance: none;
   flex: none;
   font-size: 0;
@@ -202,7 +202,7 @@
   @apply ring-scale-300 bg-white shadow-sm ring-1 dark:bg-slate-700 dark:ring-0;
 }
 
-.DocSearch-Hit--Parent .DocSearch-Hit-icon {
+.DocSearch-Hit--Parent.DocSearch-Hit--Guide .DocSearch-Hit-icon {
   /* book icon */
   background-image: url("data:image/svg+xml,%3Csvg width='14' height='10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M3.5 0c1.093 0 2.117.27 3 .743V10a6.344 6.344 0 0 0-3-.743c-1.093 0-2.617.27-3.5.743V.743C.883.27 2.407 0 3.5 0Z' fill='%23BAE6FD'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M10.5 0c1.093 0 2.617.27 3.5.743V10c-.883-.473-2.407-.743-3.5-.743s-2.117.27-3 .743V.743a6.344 6.344 0 0 1 3-.743Z' fill='%2338BDF8'/%3E%3C/svg%3E");
 }
@@ -289,7 +289,11 @@
 }
 
 .DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-action path {
-  stroke: white;
+  stroke: #777;
+
+  .dark & {
+    stroke: #aaa;
+  }
 }
 
 .DocSearch-Hit > a {
@@ -392,7 +396,7 @@
 
 .DocSearch-StartScreen {
   .DocSearch-Help {
-    @apply text-center py-16; 
+    @apply text-center py-16;
   }
 }
 

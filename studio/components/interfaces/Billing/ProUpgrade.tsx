@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -29,6 +29,7 @@ import {
 } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 import SupportPlan from './AddOns/SupportPlan'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 // Do not allow compute size changes for af-south-1
 
@@ -51,6 +52,9 @@ const ProUpgrade: FC<Props> = ({
   const router = useRouter()
   const isCustomDomainsEnabled = useFlag('customDomains')
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
@@ -133,7 +137,8 @@ const ProUpgrade: FC<Props> = ({
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion
+      projectRegion,
+      undefined
     )
 
     setIsRefreshingPreview(true)
@@ -148,18 +153,37 @@ const ProUpgrade: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion
+      projectRegion,
+      token ?? undefined
     )
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+    resetCaptcha()
+
     if (res?.error) {
       ui.setNotification({
         category: 'error',
@@ -201,100 +225,101 @@ const ProUpgrade: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+        <div className="flex-grow mt-10">
           <div className="relative space-y-4">
-            <BackButton onClick={() => onSelectBack()} />
-            <div className="space-y-8">
-              <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
-              <div
-                className="space-y-8 overflow-scroll pb-8"
-                style={{ height: 'calc(100vh - 9rem - 57px)' }}
-              >
-                <div className="space-y-2">
-                  {!isManagingProSubscription ? (
-                    <>
-                      <h3 className="text-xl">
-                        Welcome to <span className="text-brand-900">Pro</span>
-                      </h3>
-                      <p className="text-base text-scale-1100">
-                        Your new subscription will begin immediately after payment
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-3xl">
-                        Managing your <span className="text-brand-900">Pro</span> plan
-                      </h3>
-                      {/* <p className="text-base text-scale-1100">
+            <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+              <BackButton onClick={() => onSelectBack()} />
+              <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+            </div>
+
+            <div
+              className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
+              style={{ height: 'calc(100vh - 9rem - 57px)' }}
+            >
+              <div className="space-y-2">
+                {!isManagingProSubscription ? (
+                  <>
+                    <h3 className="text-xl">
+                      Welcome to <span className="text-brand-900">Pro</span>
+                    </h3>
+                    <p className="text-base text-scale-1100">
+                      Your new subscription will begin immediately after payment
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-3xl">
+                      Managing your <span className="text-brand-900">Pro</span> plan
+                    </h3>
+                    {/* <p className="text-base text-scale-1100">
                         Your billing cycle will reset after payment
                       </p> */}
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <p>Enable spend cap</p>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 transition hover:opacity-100"
-                        onClick={() => setShowSpendCapHelperModal(true)}
-                      />
-                    </div>
-                    <p className="text-sm text-scale-1100">
-                      If enabled, additional resources will not be charged on a per-usage basis
-                    </p>
-                  </div>
-                  <Toggle
-                    checked={isSpendCapEnabled}
-                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                  />
-                </div>
-                {projectRegion !== 'af-south-1' && (
-                  <>
-                    {currentAddons.supportPlan !== undefined && (
-                      <>
-                        <Divider light />
-                        <SupportPlan currentOption={currentAddons.supportPlan} />
-                      </>
-                    )}
-                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <CustomDomainSelection
-                          options={customDomainOptions}
-                          currentOption={
-                            isManagingProSubscription ? currentAddons.customDomains : undefined
-                          }
-                          selectedOption={selectedAddons.customDomains}
-                          onSelectOption={setSelectedCustomDomainOption}
-                        />
-                      </>
-                    )}
-                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <PITRDurationSelection
-                          pitrDurationOptions={pitrDurationOptions}
-                          currentPitrDuration={
-                            isManagingProSubscription ? currentAddons.pitrDuration : undefined
-                          }
-                          selectedPitrDuration={selectedAddons.pitrDuration}
-                          onSelectOption={setSelectedPITRDuration}
-                        />
-                      </>
-                    )}
-                    <Divider light />
-                    <ComputeSizeSelection
-                      computeSizes={computeSizes || []}
-                      currentComputeSize={currentAddons.computeSize}
-                      selectedComputeSize={selectedAddons.computeSize}
-                      onSelectOption={setSelectedComputeSize}
-                    />
                   </>
                 )}
               </div>
+              <div className="flex items-center justify-between gap-16 rounded border border-panel-border-light border-panel-border-dark bg-panel-body-light px-6 py-4 drop-shadow-sm dark:bg-panel-body-dark">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <p>Enable spend cap</p>
+                    <IconHelpCircle
+                      size={16}
+                      strokeWidth={1.5}
+                      className="cursor-pointer opacity-50 transition hover:opacity-100"
+                      onClick={() => setShowSpendCapHelperModal(true)}
+                    />
+                  </div>
+                  <p className="text-sm text-scale-1100">
+                    If enabled, additional resources will not be charged on a per-usage basis
+                  </p>
+                </div>
+                <Toggle
+                  checked={isSpendCapEnabled}
+                  onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                />
+              </div>
+              {projectRegion !== 'af-south-1' && (
+                <>
+                  {currentAddons.supportPlan !== undefined && (
+                    <>
+                      <Divider light />
+                      <SupportPlan currentOption={currentAddons.supportPlan} />
+                    </>
+                  )}
+                  {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
+                    <>
+                      <Divider light />
+                      <CustomDomainSelection
+                        options={customDomainOptions}
+                        currentOption={
+                          isManagingProSubscription ? currentAddons.customDomains : undefined
+                        }
+                        selectedOption={selectedAddons.customDomains}
+                        onSelectOption={setSelectedCustomDomainOption}
+                      />
+                    </>
+                  )}
+                  {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
+                    <>
+                      <Divider light />
+                      <PITRDurationSelection
+                        pitrDurationOptions={pitrDurationOptions}
+                        currentPitrDuration={
+                          isManagingProSubscription ? currentAddons.pitrDuration : undefined
+                        }
+                        selectedPitrDuration={selectedAddons.pitrDuration}
+                        onSelectOption={setSelectedPITRDuration}
+                      />
+                    </>
+                  )}
+                  <Divider light />
+                  <ComputeSizeSelection
+                    computeSizes={computeSizes || []}
+                    currentComputeSize={currentAddons.computeSize}
+                    selectedComputeSize={selectedAddons.computeSize}
+                    onSelectOption={setSelectedComputeSize}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -319,6 +344,19 @@ const ProUpgrade: FC<Props> = ({
             }}
             onConfirmPayment={onConfirmPayment}
             isSubmitting={isSubmitting}
+            captcha={
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            }
           />
         </div>
       </Transition>

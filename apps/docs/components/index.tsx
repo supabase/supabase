@@ -27,6 +27,10 @@ import RefHeaderSection from './reference/RefHeaderSection'
 // Ref version specific
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 
+import Options from '~/components/Options'
+import Param from '~/components/Params'
+import Image from 'next/image'
+
 const components = {
   Admonition,
   Button,
@@ -68,6 +72,15 @@ const components = {
   code: (props: any) => <CodeBlock {...props} />,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  Options,
+  Param,
+  img: (props: any) => {
+    return (
+      <span className={['next-image--dynamic-fill'].join(' ')}>
+        <Image {...props} className={['rounded-md border'].join(' ')} layout="fill" />
+      </span>
+    )
+  },
 }
 
 export default components

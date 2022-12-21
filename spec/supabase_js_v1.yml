@@ -16,6 +16,68 @@ info:
       version: '0.0.1'
 
 functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    examples:
+      - id: create-client
+        name: Create Client
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            // Create a single supabase client for interacting with your database
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - id: with-additional-parameters
+        name: With Additional Parameters
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const options = {
+              schema: 'public',
+              headers: { 'x-my-custom-header': 'my-app-name' },
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+            }
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+          ```
+      - id: api-schemas
+        name: API schemas
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const options = {
+              schema: 'public',
+              headers: { 'x-my-custom-header': 'my-app-name' },
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+            }
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+          ```
+        description: |
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`. 
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: custom-fetch-implementation
+        name: Custom Fetch Implementation
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+              fetch: fetch.bind(globalThis),
+            })
+          ```
+        description: |
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -134,7 +196,9 @@ functions:
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
 
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+          any URL path on your website (the URL must either be on the same domain as your [Site URL](https://app.supabase.com/project/_/auth/url-configuration) or match one of the Redirect URLs).
+
+          See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -502,8 +566,10 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
     notes: |
       Sends a password reset request to an email address.
-      When the user clicks the reset link in the email they are redirected back to your application.
-      Prompt the user for a new password and call `auth.update()`:
+      - When the user clicks the reset link in the email they are redirected back to your application.
+      You can configure the URL that the user is redirected to via the `redirectTo` param. 
+      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.update({
         password: new_password,
@@ -516,7 +582,8 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
           ```
       - id: reset-password-react
@@ -529,7 +596,8 @@ functions:
            * This email contains a link which sends the user back to your application.
            */
           const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-            'user@email.com'
+            email,
+            { redirectTo: 'https://example.com/update-password' }
           )
 
           /**
