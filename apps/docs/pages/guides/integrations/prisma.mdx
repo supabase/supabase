@@ -63,7 +63,7 @@ This project comes with TypeScript configured and has the following structure.
 
 ### Configuring the project to use PostgreSQL
 
-Prisma init migrations will try to drop `postgres` database by default, and this may lead to conflicts with Supabase initial migrations that are critically needed for the correct functioning of our managed databases. For such cases Prisma has a feature called [Shadow Databases](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database#cloud-hosted-shadow-databases-must-be-created-manually).
+By default, Prisma migrations will try to drop the `postgres` database, which can lead to conflicts with Supabase databases. For this scenario, use [Prisma Shadow Databases](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database#cloud-hosted-shadow-databases-must-be-created-manually).
 
 Create a shadow database with the local database (or create another database in your PostgreSQL server with the same Supabase project) using the `psql` CLI and the `DATABASE_URL` from the previous steps.
 
