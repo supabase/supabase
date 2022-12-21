@@ -159,11 +159,16 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const onConfirmPayment = async () => {
-    let token = captchaToken
+    setIsSubmitting(true)
+
+    const token =
+      captchaToken ?? (await captchaRef.current?.execute({ async: true }))?.response ?? undefined
+
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      setIsSubmitting(false)
+      return
     }
+
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
@@ -173,8 +178,6 @@ const ProUpgrade: FC<Props> = ({
       projectRegion,
       token ?? undefined
     )
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
 
     resetCaptcha()
