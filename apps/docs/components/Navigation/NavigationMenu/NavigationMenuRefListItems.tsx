@@ -170,13 +170,6 @@ interface INavigationMenuRefList {
 const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, spec }) => {
   const allowedClientKeys = spec ? generateAllowedClientLibKeys(commonSections, spec) : undefined
 
-  console.log(
-    id && 'id changed',
-    lib && 'lib changed',
-    commonSections && 'commonSections changed',
-    allowedClientKeys && 'allowedClientKeys changed'
-  )
-
   let sections = commonSections
 
   const allowedKeys = allowedClientKeys
@@ -225,9 +218,6 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
           id: 'admin-api',
         }).items.map((x) => x.id)
       : []
-
-  // console.log(filterIds)
-  // console.log(modifierIds)
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>

@@ -84,7 +84,7 @@ export function SearchProvider({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
-                console.log('item', item)
+                // console.log('item', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')
