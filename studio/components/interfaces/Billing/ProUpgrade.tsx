@@ -179,7 +179,6 @@ const ProUpgrade: FC<Props> = ({
       token ?? undefined
     )
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
-
     resetCaptcha()
 
     if (res?.error) {
