@@ -698,7 +698,7 @@ export const reference = {
           icon: '/img/icons/menu/reference-dart',
         },
         // {
-        //   name: 'supbase-python',
+        //   name: 'supabase-python',
         //   url: '/reference/python/start',
         //   level: 'reference_python',
         //   items: [],
