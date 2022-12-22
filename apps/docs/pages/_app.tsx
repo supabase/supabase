@@ -13,7 +13,6 @@ import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 import { post } from '~/lib/fetchWrappers'
-import { menuState } from '~/hooks/useMenuState'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
