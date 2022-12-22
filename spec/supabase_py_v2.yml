@@ -71,7 +71,16 @@ pages:
       - name: Sign up with additional user metadata
         code: |
           ```python3
-
+          res = supabase.auth.signUp({
+            email: 'example@email.com',
+            password: 'example-password',
+            options: {
+              data: {
+                first_name: 'John',
+                age: 27,
+              }
+            }
+          })
           ```
   auth.sign_out():
     title: 'sign_out()'
