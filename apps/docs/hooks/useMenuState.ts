@@ -7,7 +7,7 @@ export const menuState = proxy({
   setMenuActiveRefId: (value) => {
     menuState.menuActiveRefId = value
   },
-  menuLevelId: '',
+  menuLevelId: 'home',
   setMenuLevelId: (value) => {
     menuState.menuMobileOpen = false
     menuState.menuLevelId = value

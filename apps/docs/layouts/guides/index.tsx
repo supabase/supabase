@@ -31,9 +31,10 @@ const Layout: FC<Props> = (props) => {
   const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
-  const page = getPageType(asPath)
 
   const router = useRouter()
+
+  const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
 
   useEffect(() => {
     if (hash && tocList.length > 0) {
@@ -76,7 +77,7 @@ const Layout: FC<Props> = (props) => {
         }}
       />
 
-      <div className={['grid grid-cols-12 relative'].join(' ')}>
+      <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
         <div
           className={[
             'relative',
@@ -100,18 +101,23 @@ const Layout: FC<Props> = (props) => {
             )}
             <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-8"></div>
             <MDXProvider components={components}>{props.children}</MDXProvider>
-            <div className="mt-16 not-prose">
-              <div>
-                <Link
-                  href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                  passHref
-                >
-                  <a className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200">
-                    Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
-                  </a>
-                </Link>
+
+            {EDIT_BUTTON_EXCLUDE_LIST.includes(router.route) ? (
+              <></>
+            ) : (
+              <div className="mt-16 not-prose">
+                <div>
+                  <Link
+                    href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
+                    passHref
+                  >
+                    <a className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200">
+                      Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
+                    </a>
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </article>
         </div>
         {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (

@@ -299,6 +299,7 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
     {
@@ -469,6 +470,7 @@ export const platform = {
       items: [
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
+        { name: 'Database Backups', url: '/guides/platform/backups', items: [] },
       ],
     },
     {
@@ -569,45 +571,37 @@ export const resources = {
         },
       ],
     },
-    {
-      name: 'Self-Hosting',
-      items: [
-        { name: 'Overview', url: '/guides/resources/self-hosting', items: [] },
-        { name: 'Docker', url: '/guides/resources/self-hosting/docker', items: [] },
-      ],
-    },
-    {
-      name: 'Self-Hosting Reference',
-      items: [
-        {
-          name: 'Auth Server',
-          url: '/reference/self-hosting-auth/introduction',
-          icon: '/img/icons/menu/reference-auth',
-          items: [],
-        },
-        {
-          name: 'Storage Server',
-          url: '/reference/self-hosting-storage/introduction',
-          icon: '/img/icons/menu/reference-storage',
-          items: [],
-        },
-        {
-          name: 'Realtime Server',
-          url: '/reference/self-hosting-realtime/introduction',
-          icon: '/img/icons/menu/reference-realtime',
-          items: [],
-        },
-      ],
-    },
   ],
 }
 
-export const selfHosting = {
-  label: 'Self-Hosting',
+export const self_hosting = {
+  title: 'Self-Hosting',
+  icon: 'resources',
   url: '/guides/self-hosting',
   items: [
-    { name: 'Overview', url: '/guides/hosting/overview', items: [] },
-    { name: 'Docker', url: '/guides/hosting/docker', items: [] },
+    { name: 'Overview', url: '/guides/self-hosting', items: [] },
+    { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker', items: [] },
+    {
+      name: 'Auth Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-auth/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/auth/config', items: [] },
+      ],
+    },
+    {
+      name: 'Storage Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-storage/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/storage/config', items: [] },
+      ],
+    },
+    {
+      name: 'Realtime Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-realtime/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/realtime/config', items: [] },
+      ],
+    },
   ],
 }
 
@@ -674,6 +668,11 @@ export const integrations = {
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
       ],
+    },
+    {
+      name: 'Messaging',
+      url: undefined,
+      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal', items: [] }],
     },
   ],
 }
