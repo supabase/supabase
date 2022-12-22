@@ -11,6 +11,7 @@ import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api'
 import { AuthReport } from 'pages/project/[ref]/reports/auth'
 import userEvent from '@testing-library/user-event'
+import { StorageReport } from 'pages/project/[ref]/reports/storage'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -31,6 +32,7 @@ beforeEach(() => {
 describe.each([
   { Page: ApiReport, contains: ['API'] },
   { Page: AuthReport, contains: ['Auth'] },
+  { Page: StorageReport, contains: ['Storage'] },
 ])('$Page rendering', ({ Page, contains }) => {
   test(`contains ${contains}`, async () => {
     render(<Page />)
