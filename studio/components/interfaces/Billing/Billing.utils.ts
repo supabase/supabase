@@ -52,8 +52,7 @@ export const formSubscriptionUpdatePayload = (
   },
   nonChangeableAddons: SubscriptionAddon[],
   selectedPaymentMethod: string,
-  region: string,
-  hcaptchaToken: string | undefined
+  region: string
 ) => {
   const { computeSize, pitrDuration, customDomains } = selectedAddons
 
@@ -78,8 +77,7 @@ export const formSubscriptionUpdatePayload = (
     ...(tierPriceId && { tier: tierPriceId.id }),
     addons,
     proration_date,
-    payment_method: selectedPaymentMethod,
-    hcaptchaToken
+    payment_method: selectedPaymentMethod
   }
 }
 
