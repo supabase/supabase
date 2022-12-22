@@ -60,11 +60,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
               </div>
             )}
-            {/* {functionMarkdownContent && (
-                        <div className="prose">
-                          <MDXRemote {...functionMarkdownContent} components={components} />
-                        </div>
-                      )} */}
+
             {item.notes && (
               <div className="prose">
                 <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
