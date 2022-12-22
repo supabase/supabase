@@ -75,7 +75,7 @@ const Layout: FC<Props> = (props) => {
             {
               url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
                 ogPageType ? `&type=${ogPageType}` : ''
-              }&title=${props.meta?.title}&description=${props.meta?.description}`,
+              }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(props.meta?.description)}`,
             },
           ],
         }}
