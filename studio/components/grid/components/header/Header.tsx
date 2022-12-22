@@ -41,10 +41,7 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
           onAddRow={onAddRow}
         />
       )}
-      <div className="sb-grid-header__inner">
-        {headerActions}
-        <StatusLabel />
-      </div>
+      <div className="sb-grid-header__inner">{headerActions}</div>
     </div>
   )
 }
