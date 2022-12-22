@@ -151,11 +151,11 @@ export const meta = {
                 }
                 final countries = snapshot.data!;
                 return ListView.builder(
-                  itemCount: items.length,
+                  itemCount: countries.length,
                   itemBuilder: ((context, index) {
-                    final country = items[index];
+                    final country = countries[index];
                     return ListTile(
-                      title: Text(item['name']),
+                      title: Text(country['name']),
                     );
                   }),
                 );
