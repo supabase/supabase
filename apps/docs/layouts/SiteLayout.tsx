@@ -186,7 +186,7 @@ const SideMenu = memo(function SideMenu() {
         'top-[0px]',
         'bg-scale-200',
         // desktop styles
-        'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-8 lg:flex',
+        'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
         'lg:opacity-100 lg:visible',
       ].join(' ')}
     >
