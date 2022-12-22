@@ -73,7 +73,9 @@ const Layout: FC<Props> = (props) => {
           url: `https://supabase.com/docs${asPath}`,
           images: [
             {
-              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${ogPageType ? `&type=${ogPageType}` : ''}&title=${props.meta?.title}&description=${props.meta?.description}`,
+              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+                ogPageType ? `&type=${ogPageType}` : ''
+              }&title=${props.meta?.title}&description=${props.meta?.description}`,
             },
           ],
         }}
