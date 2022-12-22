@@ -242,6 +242,98 @@ order by
       },
     },
   },
+  [Presets.STORAGE]: {
+    title: 'Storage',
+    queries: {
+      largestObjectsPerBucket: {
+        queryType: 'db',
+        sql: (_params) => `
+select *
+from (
+    SELECT 
+      metadata->>'mimetype' as mimetype,
+      bucket_id, 
+      path_tokens,
+      (metadata->>'size')::bigint as size, 
+      row_number() over (partition by bucket_id ORDER BY (metadata->>'size')::bigint DESC ) AS row
+    FROM storage.objects
+) as f
+where f.row <= 10
+order by size desc`,
+      },
+      topDownloaded: {
+        queryType: 'logs',
+        sql: `
+select 
+  count(f.id) as count,
+  r.path as path
+from edge_logs f
+cross join unnest(f.metadata) as m
+cross join unnest(m.request) as r
+where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+group by  path
+order by count desc
+`,
+      },
+      mostFiles: {
+        queryType: 'db',
+        sql: () => `
+select owner,
+count(id) as file_count,
+sum((metadata->>'size')::bigint)::bigint as total_size
+from storage.objects
+where owner is not null
+group by owner
+order by total_size desc
+        `,
+      },
+      staleFiles: {
+        queryType: 'db',
+        sql: () => `
+select
+count(id) filter (where last_accessed_at < (NOW() - interval '1 month') ) as one_month,
+count(id) filter (where last_accessed_at < (NOW() - interval '3 month') ) as three_month,
+count(id) filter (where last_accessed_at < (NOW() - interval '6 month') ) as six_month,
+count(id) filter (where last_accessed_at < (NOW() - interval '1 year') ) as one_year
+from storage.objects
+        `,
+      },
+      topSizes: {
+        queryType: 'logs',
+        sql: `
+SELECT 
+count(f.id) as count,
+r.search as search
+from edge_logs  f
+cross join unnest(f.metadata) as m
+cross join unnest(m.request) as r
+where starts_with(r.path, '/storage/v1/object')
+and r.method = 'GET'
+and regexp_contains(r.search, 'width|height') 
+group by search
+order by count desc   
+        `,
+      },
+      cacheHitRate: {
+        queryType: 'logs',
+        sql: `
+SELECT
+timestamp_trunc(timestamp, hour) as timestamp,
+countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
+countif( h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC') ) as miss_count
+from edge_logs f
+cross join unnest(f.metadata) as m
+cross join unnest(m.request) as r
+cross join unnest(m.response) as res
+cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object')
+and r.method = 'GET'
+group by timestamp
+order by timestamp desc
+`,
+      },
+    },
+  },
 }
 
 export const DATETIME_FORMAT = 'MMM D, ha'
