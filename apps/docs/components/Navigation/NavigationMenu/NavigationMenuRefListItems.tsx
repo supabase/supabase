@@ -296,7 +296,7 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
             // handle normal links
             return (
               <>
-                <RenderLink {...fn} library={menu.title} />
+                <RenderLink {...fn} lib={lib} />
                 {fn.items &&
                   fn.items
                     //.filter((item) => item.libs.includes(lib))
