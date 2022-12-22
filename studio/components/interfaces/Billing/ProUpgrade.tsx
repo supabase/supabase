@@ -137,8 +137,7 @@ const ProUpgrade: FC<Props> = ({
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion,
-      undefined
+      projectRegion
     )
 
     setIsRefreshingPreview(true)
@@ -184,8 +183,7 @@ const ProUpgrade: FC<Props> = ({
       selectedAddons,
       nonChangeableAddons,
       selectedPaymentMethodId,
-      projectRegion,
-      captchaToken ?? undefined
+      projectRegion
     )
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
     resetCaptcha()
