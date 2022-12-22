@@ -8,7 +8,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { IconHelpCircle } from '@supabase/ui'
 
 export interface ReportWidgetProps<T = any> {
-  data: T[]
+  data: T[] 
   title: string
   description?: string
   tooltip?: string
@@ -86,7 +86,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           </Dropdown>
         </div>
 
-        <LoadingOpacity active={props.isLoading}>{props.renderer(props)}</LoadingOpacity>
+        <LoadingOpacity active={props.isLoading}>{props.data === undefined ? null : props.renderer(props)}</LoadingOpacity>
       </Panel.Content>
     </Panel>
   )
