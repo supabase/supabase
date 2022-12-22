@@ -140,28 +140,6 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
 
           <Divider />
         </ul>
-        {menu.extras && (
-          <>
-            <Divider />{' '}
-            <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-2">
-              Resources
-            </span>
-          </>
-        )}
-        {menu.extras?.map((x) => {
-          return (
-            <div key={x.name}>
-              <li>
-                <Link href={`${x.href}`} passHref>
-                  <a className="cursor-pointer transition text-scale-1100 text-sm hover:text-brand-900 flex gap-3 my-1">
-                    {x.icon && <img className="w-4" src={`${router.basePath}${x.icon}`} />}
-                    {x.name}
-                  </a>
-                </Link>
-              </li>
-            </div>
-          )
-        })}
       </div>
     </div>
   )

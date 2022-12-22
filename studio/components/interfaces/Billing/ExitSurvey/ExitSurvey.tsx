@@ -109,7 +109,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       setMessage(values.message)
       return setShowConfirmModal(true)
     } else {
-      downgradeProject(values, token as string)
+      downgradeProject(values)
     }
   }
 
@@ -118,7 +118,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     captchaRef.current?.resetCaptcha()
   }
 
-  const downgradeProject = async (values?: any, hcaptchaToken?: string) => {
+  const downgradeProject = async (values?: any) => {
     const downgradeMessage = values?.message ?? message
 
     try {
@@ -132,7 +132,6 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         tier,
         addons,
         proration_date,
-        hcaptchaToken: captchaToken ?? hcaptchaToken,
       })
 
       resetCaptcha()

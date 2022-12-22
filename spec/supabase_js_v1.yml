@@ -285,7 +285,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
       User email: By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
