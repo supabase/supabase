@@ -62,7 +62,7 @@ export type RefKeyOptions =
   | 'self-hosting-storage'
   | 'self-hosting-realtime'
 
-const NavigationMenu = ({ context }) => {
+const NavigationMenu = () => {
   const router = useRouter()
 
   let version = ''
