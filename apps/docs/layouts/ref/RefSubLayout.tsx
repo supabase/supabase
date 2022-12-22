@@ -55,7 +55,6 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 }
 
 const Section: FC<ISectionContainer> = (props) => {
-  // console.log({ props })
   return (
     <article
       key={props.id}
@@ -149,7 +148,6 @@ const EducationRow: FC<IEducationRow> = (props) => {
 }
 
 const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
-  // console.log({ props })
   return (
     <article
       key={props.id}
