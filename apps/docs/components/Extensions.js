@@ -9,7 +9,10 @@ export default function Extensions() {
         <label className="text-xs mb-2">Filter extensions</label>
         <input
           type="text"
-          className="border text-gray-200"
+          className="border bg-gray-200
+          transition
+          hover:border-scale-600
+          border-scale-500 rounded"
           placeholder="Extension name"
           onChange={(e) => setFilter(e.target.value)}
         />
