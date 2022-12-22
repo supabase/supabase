@@ -294,8 +294,10 @@ const SiteLayout = ({ children }) => {
     if (!key) {
       // Default to dark mode if no preference config
       document.documentElement.className = 'dark'
+      document.documentElement.style.colorScheme = 'dark'
     } else {
       document.documentElement.className = key === 'true' ? 'dark' : ''
+      document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
     }
   }, [])
 
