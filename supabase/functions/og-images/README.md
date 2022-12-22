@@ -6,31 +6,27 @@ Generate  OG Images for the sites at supabase.
 
 To use the og image generator, you will need to visit the site with the following parameters:
 
-`site`: a string indicating which site you want to generate an image for. Currently, the only available option is docs.
+`site`: indicating which site you want to generate an image for. Currently, the only available option is docs.
 
-`title`: a string representing the title of the image you want to generate.
+`title`: representing the title of the image you want to generate.
 
-`description`: a string representing the description of the image you want to generate.
+`description`: representing the description of the image you want to generate.
 
-`type`: a string indicating the type of image you want to generate. This is optional and is only used for the docs site.
+`type` (optional): indicating the type of image you want to generate. This is optional and is only used for the docs site.
 
-`icon`: a string indicating the icon you want to use for the image. This is optional and is only used for the docs site.
+`icon` (optional): indicating the icon you want to use for the image. This is optional and is only used for the docs site.
 
-If any of these required parameters are missing, you will receive a 404 response with a message indicating that some parameters are missing.
-
-If the site parameter is not recognized, you will receive a 404 response with a message indicating that the site was not found.
-
-If all required parameters are provided and the site is recognized, you will receive an image in the form of a PNG file with the specified title, description, and other optional parameters included. The image will have a width of 1200 pixels and a height of 600 pixels.
+If any of the required parameters are missing, you will receive a 404 response with a message indicating that some parameters are missing. If the site parameter is not recognized, you will receive a 404 response with a message indicating that the site was not found.
 
 Here is an example link that you can use to test the website:
 
-https://www.example.com/image-generator?site=docs&title=Example%20Title&description=Example%20Description&type=Auth&icon=google
+https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs&title=Example%20Title&description=Example%20Description&type=Auth&icon=google
 
 This link will generate an image for the docs site with the title "Example Title", the description "Example Description", the Auth type, and the Google icon.
 
 ## Run locally
 
-First we need to start supabase using the [supabase cli](https://supabase.com/docs/reference/cli/introduction)
+First we need to start up supabase using the [supabase cli](https://supabase.com/docs/reference/cli/introduction)
 
 ```bash
 supabase start
