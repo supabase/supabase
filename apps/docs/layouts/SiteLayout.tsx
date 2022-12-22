@@ -1,15 +1,14 @@
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
-import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 import { memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
+import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
   home: {
@@ -163,43 +162,21 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   return (
     <div
       className={[
-        'hidden',
         'h-full',
         'left-0',
         'right-0',
         'z-10',
         'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-blackA-600',
-        mobileMenuOpen ? 'absolute h-full w-full' : 'hidden h-0',
+        mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
+        // always hide on desktop
+        'lg:hidden',
       ].join(' ')}
       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
     ></div>
   )
 })
 
-// const SideMenu = memo(function SideMenu() {
-//   const mobileMenuOpen = useMenuMobileOpen()
-
-//   return (
-//     <div
-//       className={[
-//         'transition-all ease-out duration-200',
-//         'absolute left-0 right-0 h-screen',
-//         'px-5 pl-5 py-16',
-//         'top-[0px]',
-//         'bg-scale-200',
-//         mobileMenuOpen
-//           ? 'overflow-y-auto opacity-100 left-[0px] visible'
-//           : 'left-[-40px] h-0 opacity-0 invisible',
-//       ].join(' ')}
-//     >
-//       <NavigationMenu />
-//     </div>
-//   )
-// })
-
 const SideMenu = memo(function SideMenu() {
-  const mobileMenuOpen = useMenuMobileOpen()
-
   return (
     <div
       className={[
@@ -208,9 +185,7 @@ const SideMenu = memo(function SideMenu() {
         'px-5 pl-5 py-16',
         'top-[0px]',
         'bg-scale-200',
-        // mobileMenuOpen
-        //   ? 'overflow-y-auto opacity-100 left-[0px] visible z-50'
-        //   : 'left-[-40px] h-0 opacity-0 invisible',
+        // desktop styles
         'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-8 lg:flex',
         'lg:opacity-100 lg:visible',
       ].join(' ')}
@@ -249,7 +224,9 @@ const Container = memo(function Container(props) {
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
         'absolute lg:relative',
-        mobileMenuOpen ? 'ml-[75%] overflow-hidden' : 'overflow-auto',
+        mobileMenuOpen
+          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
+          : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
       ].join(' ')}
@@ -267,7 +244,7 @@ const NavContainer = memo(function NavContainer() {
       className={[
         // 'hidden',
         'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] left-0' : 'w-0 -left-[280px]',
+        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',

@@ -181,7 +181,7 @@ const SideNav = () => {
   const isReference_Self_Hosting_Realtime = 'reference_self_hosting_realtime' === level
 
   return (
-    <div className="flex relative">
+    <div className={['flex relative', 'justify-center lg:justify-start'].join(' ')}>
       {/* // main menu */}
       <NavigationMenuHome active={isHomeActive} />
       <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
