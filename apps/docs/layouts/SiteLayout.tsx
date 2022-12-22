@@ -224,9 +224,7 @@ const Container = memo(function Container(props) {
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
         'absolute lg:relative',
-        mobileMenuOpen
-          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
-          : 'overflow-auto',
+        mobileMenuOpen ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%]' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
       ].join(' ')}
@@ -287,7 +285,7 @@ const NavContainer = memo(function NavContainer() {
 })
 
 const SiteLayout = ({ children }) => {
-  // const mobileMenuOpen = useMenuMobileOpen()
+  const mobileMenuOpen = useMenuMobileOpen()
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
@@ -299,9 +297,26 @@ const SiteLayout = ({ children }) => {
     }
   }, [])
 
+  useEffect(() => {
+    window.addEventListener('resize', (e: UIEvent) => {
+      const w = e.target as Window
+      if (mobileMenuOpen && w.innerWidth >= 640) {
+        menuState.setMenuMobileOpen(!mobileMenuOpen)
+      }
+    })
+    return () => {
+      window.removeEventListener('resize', () => {})
+    }
+  }, [])
+
   return (
     <main>
-      <div className="flex flex-row h-screen">
+      <div
+        className={[
+          'flex flex-row h-screen',
+          mobileMenuOpen ? 'relative overflow-hidden' : '',
+        ].join(' ')}
+      >
         <NavContainer />
         <Container>
           <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
