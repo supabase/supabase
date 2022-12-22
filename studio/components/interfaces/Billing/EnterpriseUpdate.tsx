@@ -114,8 +114,7 @@ const EnterpriseUpdate: FC<Props> = ({
         selectedAddons,
         nonChangeableAddons,
         selectedPaymentMethodId,
-        projectRegion,
-        undefined
+        projectRegion
       ),
       tier: currentSubscription.tier.price_id,
     }
@@ -178,8 +177,7 @@ const EnterpriseUpdate: FC<Props> = ({
         selectedAddons,
         nonChangeableAddons,
         selectedPaymentMethodId,
-        projectRegion,
-        token ?? undefined
+        projectRegion
       ),
       tier: currentSubscription.tier.price_id,
     }
