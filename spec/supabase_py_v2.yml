@@ -60,7 +60,7 @@ pages:
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
-      - name: Sign up.
+      - name: Sign up
         code: |
           ```python3
           res = supabase.auth.signUp({
@@ -68,7 +68,7 @@ pages:
             password: 'example-password',
           })
           ```
-      - name: Sign up with additional user metadata.
+      - name: Sign up with additional user metadata
         code: |
           ```python3
 
@@ -91,7 +91,7 @@ pages:
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
     examples:
-      - name: Verify Sms One-Time Password (OTP)
+      - name: Verify SMS One-Time Password (OTP)
         code: |
           ```python3
           res = supabase.auth.verify_otp(phone, token)
@@ -147,7 +147,7 @@ pages:
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
     examples:
-      - name: Basic invocation.
+      - name: Basic invocation
         description:
         code: |
           ```python3
