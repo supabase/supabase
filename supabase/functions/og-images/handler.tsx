@@ -34,12 +34,16 @@ export async function handler(req: Request) {
     })
   }
 
-  if (site === 'docs') {
-    return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ), { ...options })
+  switch (site) {
+    case 'docs':
+      return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ), { ...options })
+      break;
+  
+    default:
+      return new Response(JSON.stringify({message: 'site not found'}), {
+        headers: { ...corsHeaders },
+        status: 404,
+      })
+      break;
   }
-
-  return new Response(JSON.stringify({error: 'Internal server error'}), {
-    headers: { ...corsHeaders },
-    status: 500
-  })
 }
