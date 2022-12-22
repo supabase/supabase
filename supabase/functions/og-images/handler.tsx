@@ -8,16 +8,10 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 }
 
-const options = {
-  width: 1200,
-  height: 600,
-  status: 200,
-  headers: {
-    'content-type': 'image/png',
-    'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
-    'cdn-cache-control': 'max-age=31536000',
-  },
-}
+// Load custom font
+const FONT_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/CircularStd-Book.otf'
+const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+const fontData = await font
 
 export async function handler(req: Request) {
   const url = new URL(req.url)
@@ -36,7 +30,23 @@ export async function handler(req: Request) {
 
   switch (site) {
     case 'docs':
-      return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ), { ...options })
+      return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ),
+        {
+          width: 1200,
+          height: 630,
+          fonts: [
+            {
+              name: 'Circular',
+              data: fontData,
+              style: 'normal',
+            },
+          ],
+          headers: {
+            'content-type': 'image/png',
+            'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
+            'cdn-cache-control': 'max-age=31536000',
+          },
+        })
       break;
   
     default:
