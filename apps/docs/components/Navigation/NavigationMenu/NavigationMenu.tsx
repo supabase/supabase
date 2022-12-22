@@ -167,6 +167,7 @@ const SideNav = () => {
   const isStorageActive = 'storage' === level
   const isPlatformActive = 'platform' === level
   const isResourcesActive = 'resources' === level
+  const isSelfHosting = 'self_hosting' === level
   const isIntegrationsActive = 'integrations' === level
   const isReferenceActive = 'reference' === level
 
@@ -192,6 +193,7 @@ const SideNav = () => {
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
       <NavigationMenuGuideList id={'resources'} active={isResourcesActive} />
+      <NavigationMenuGuideList id={'self_hosting'} active={isSelfHosting} />
       <NavigationMenuGuideList id={'integrations'} active={isIntegrationsActive} />
       <NavigationMenuGuideList id={'reference'} active={isReferenceActive} />
       {/* // Client Libs */}
