@@ -19,6 +19,7 @@ const Docs = (props: Props) => {
           flexDirection: 'column',
           color: 'white',
           backgroundColor: '#1c1c1c',
+          fontFamily: 'Circular',
           backgroundImage: 'url(https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/gradient.svg)',
           backgroundRepeat: 'no-repeat',
         }}
