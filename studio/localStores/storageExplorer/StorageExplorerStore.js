@@ -50,8 +50,10 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-const BATCH_SIZE = 10
+// const BATCH_SIZE = 10
+const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
+const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
 
 class StorageExplorerStore {
   projectRef = ''
@@ -646,14 +648,14 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const infoToastId = toast('Please do not close the browser until the upload is completed', {
-      duration: Infinity,
-    })
-    const toastId = toast.loading(
-      `Uploading ${formattedFilesToUpload.length} file${
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: `Uploading ${formattedFilesToUpload.length} file${
         formattedFilesToUpload.length > 1 ? 's' : ''
-      }`
-    )
+      }...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
+    })
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
@@ -722,12 +724,15 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          `Uploading ${formattedFilesToUpload.length} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: `Uploading ${formattedFilesToUpload.length} file${
             formattedFilesToUpload.length > 1 ? 's' : ''
-          }... (${(this.uploadProgress * 100).toFixed(2)}%)`,
-          { id: toastId }
-        )
+          }...`,
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          progress: this.uploadProgress * 100,
+        })
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
@@ -767,7 +772,6 @@ class StorageExplorerStore {
         category: 'error',
       })
     }
-    toast.dismiss(infoToastId)
 
     const t2 = new Date()
     console.log(
@@ -865,9 +869,7 @@ class StorageExplorerStore {
 
   deleteFiles = async (files, isDeleteFolder = false) => {
     this.closeFilePreview()
-    const infoToastId = toast('Please do not close the browser until the delete is completed', {
-      duration: Infinity,
-    })
+    let progress = 0
 
     // If every file has the 'prefix' property, then just construct the prefix
     // directly (from delete folder). Otherwise go by the opened folders.
@@ -887,11 +889,14 @@ class StorageExplorerStore {
 
     const toastId = this.ui.setNotification({
       category: 'loading',
-      message: `Deleting ${prefixes.length} file(s)`,
+      message: `Deleting ${prefixes.length} file(s)...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
     })
 
     // batch BATCH_SIZE prefixes per request
     const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
+      progress = progress + batch.length / prefixes.length
       return this.supabaseClient.storage.from(this.selectedBucket.name).remove(batch)
     })
 
@@ -899,6 +904,13 @@ class StorageExplorerStore {
     await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
+      this.ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Deleting ${prefixes.length} file(s)...`,
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        progress: progress * 100,
+      })
     }, Promise.resolve())
 
     // Clear file preview cache if deleted files exist in cache
@@ -929,8 +941,6 @@ class StorageExplorerStore {
     } else {
       toast.dismiss(toastId)
     }
-
-    toast.dismiss(infoToastId)
   }
 
   downloadSelectedFiles = async () => {
