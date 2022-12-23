@@ -11,6 +11,12 @@ const FeedbackDropdown = () => {
     setIsOpen((isOpen) => !isOpen)
   }
 
+  function onClose() {
+    setFeedback('')
+    setScreenshot(undefined)
+    setIsOpen(false)
+  }
+
   return (
     <Popover
       open={isOpen}
@@ -20,7 +26,7 @@ const FeedbackDropdown = () => {
       align="end"
       overlay={
         <FeedbackWidget
-          onClose={() => setIsOpen(false)}
+          onClose={onClose}
           feedback={feedback}
           setFeedback={setFeedback}
           screenshot={screenshot}
