@@ -212,15 +212,26 @@ const TableEditor: FC<Props> = ({
               // @ts-ignore
               description={
                 <>
-                  Restrict access to your table by enabling RLS and writing Postgres policies.
-                  <br />
-                  If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                  <p>
+                    Restrict access to your table by enabling RLS and writing Postgres policies.
+                  </p>
+
+                  <p>
+                    If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                  </p>
+                  {!tableFields.isRLSEnabled && (
+                    <p className="mt-3 bg-yellow-300 p-2 transition">
+                      Turning off RLS means that you are allowing <u>anonymous access</u> to your
+                      table.
+                    </p>
+                  )}
                 </>
               }
               checked={tableFields.isRLSEnabled}
               onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
               size="medium"
             />
+
             <Checkbox
               id="enable-realtime"
               label="Enable Realtime"
