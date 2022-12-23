@@ -28,6 +28,7 @@ export interface IRowService {
 
   update: (
     row: SupaRow,
+    originalRow: SupaRow,
     changedColumn?: string,
     onRowUpdate?: (value: any) => void
   ) => { row?: SupaRow; error?: ServiceError }
