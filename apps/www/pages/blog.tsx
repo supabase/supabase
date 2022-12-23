@@ -19,10 +19,16 @@ export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
+  // @ts-ignore
+  const swagPosts = allPostsData.filter((post) => post.tags.includes('swag'))
+  const swagrss = generateRss(swagPosts)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
+
+  // create separate feed for just swag posts
+  fs.writeFileSync('./public/swag-rss.xml', swagrss)
 
   return {
     props: {
