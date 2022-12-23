@@ -401,7 +401,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-            const { data, error } = supabase.auth.setSession({ 
+            const { data, error } = supabase.auth.setSession({
               access_token,
               refresh_token
             )
@@ -433,7 +433,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
       - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
-      - Currently, `onAuthStateChange()` does not work across tabs. 
+      - Currently, `onAuthStateChange()` does not work across tabs.
       For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
 
     examples:
@@ -453,7 +453,7 @@ functions:
           supabase.auth.onAuthStateChange((event, session) => {
             if (event == 'PASSWORD_RECOVERY') {
               console.log('PASSWORD_RECOVERY', session)
-              
+
               // show screen to update user's password
               showPasswordResetScreen(true)
             }
@@ -509,8 +509,8 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.mfa.enroll({ 
-            factorType: 'totp' 
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'totp'
           })
 
           // Use the id to create a challenge.
@@ -530,7 +530,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.mfa.challenge({ 
+          const { data, error } = await supabase.auth.mfa.challenge({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
           })
           ```
@@ -545,9 +545,9 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.mfa.verify({ 
+          const { data, error } = await supabase.auth.mfa.verify({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15', 
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             code: '123456'
           })
           ```
@@ -565,7 +565,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.challengeAndVerify({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15', 
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             code: '123456'
           })
           ```
@@ -729,18 +729,18 @@ functions:
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
-      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password. 
-      - The `resetPasswordForEmail()` only sends a password reset link to the user's email. 
+      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`updateUser()`](/docs/reference/javascript/auth-updateuser).
-      - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked. 
+      - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
-      You can configure the URL that the user is redirected to with the `redirectTo` parameter. 
+      You can configure the URL that the user is redirected to with the `redirectTo` parameter.
       See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
-      const { data, error } = await supabase.auth.updateUser({ 
-        password: new_password 
+      const { data, error } = await supabase.auth.updateUser({
+        password: new_password
       })
       ```
     examples:
@@ -934,10 +934,10 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.admin.mfa.deleteFactor({ 
+          const { data, error } = await supabase.auth.admin.mfa.deleteFactor({
             id: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             userId: 'a89baba7-b1b7-440f-b4bb-91026967f66b',
-          }) 
+          })
           ```
   - id: select
     title: 'Fetch data: select()'
@@ -2976,7 +2976,7 @@ functions:
   - id: text-search
     title: textSearch()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
-    notes:
+    notes: |
       - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
     examples:
       - id: text-search

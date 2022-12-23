@@ -62,7 +62,7 @@ export type RefKeyOptions =
   | 'self-hosting-storage'
   | 'self-hosting-realtime'
 
-const SideNav = () => {
+const NavigationMenu = () => {
   const router = useRouter()
 
   let version = ''
@@ -270,4 +270,4 @@ const SideNav = () => {
   )
 }
 
-export default memo(SideNav)
+export default memo(NavigationMenu)
