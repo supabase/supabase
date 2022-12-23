@@ -134,9 +134,9 @@ interface Props {
 
 const Account: Component<Props> = ({ session }) => {
   const [loading, setLoading] = createSignal(true)
-  const [username, setUsername] = createSignal<string | null>(null);
-  const [website, setWebsite] = createSignal<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null);
+  const [username, setUsername] = createSignal<string | null>(null)
+  const [website, setWebsite] = createSignal<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = createSignal<string | null>(null)
 
   createEffect(() => {
     getProfile()
