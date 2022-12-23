@@ -153,6 +153,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
+                          {example.description && (
+                            <div className="prose">
+                              <ReactMarkdown className="text-sm">
+                                {example.description}
+                              </ReactMarkdown>
+                            </div>
+                          )}
+
                           {((tables && tables.length > 0) || sql) && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-data`}
@@ -203,15 +211,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   .replace('js', '')
                                   .replace('ts', ''))}
                           </CodeBlock>
-
-                          {example.description && (
-                            <div className="bg-scale-300 prose px-4 py-2 rounded-md">
-                              <h5 className="text-sm m-0 text-scale-1100">Example Notes</h5>
-                              <ReactMarkdown className="text-sm">
-                                {example.description}
-                              </ReactMarkdown>
-                            </div>
-                          )}
 
                           {response && (
                             <RefDetailCollapse
