@@ -1709,6 +1709,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-zoom',
+    destination: '/docs/guides/auth/social-login/auth-zoom',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database',
     destination: '/docs/guides/database/overview',
   },
