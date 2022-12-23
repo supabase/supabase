@@ -4,14 +4,14 @@
     "id": "introduction",
     "slug": "introduction",
     "type": "markdown",
-    "libs": ["js", "js_v1", "dart", "dart_v0"]
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
   },
   {
     "title": "Installing",
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "libs": ["js", "js_v1", "dart", "dart_v0"]
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
   },
   {
     "title": "Initializing",
@@ -28,7 +28,7 @@
   },
   {
     "title": "Database",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"],
     "items": [
       {
         "id": "select",
@@ -36,7 +36,7 @@
         "slug": "select",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "insert",
@@ -44,7 +44,7 @@
         "slug": "insert",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "update",
@@ -52,7 +52,7 @@
         "slug": "update",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "upsert",
@@ -60,7 +60,7 @@
         "slug": "upsert",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "delete",
@@ -68,7 +68,7 @@
         "slug": "delete",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "rpc",
@@ -76,7 +76,7 @@
         "slug": "rpc",
         "product": "database",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "using-filters",
@@ -85,7 +85,7 @@
         "slug": "using-filters",
         "product": "database",
         "type": "function",
-        "libs": ["js", "dart", "dart_v0"],
+        "libs": ["js", "dart", "dart_v0", "csharp"],
         "items": [
           {
             "id": "eq",
@@ -94,7 +94,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "neq",
@@ -103,7 +103,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "gt",
@@ -112,7 +112,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "gte",
@@ -121,7 +121,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "lt",
@@ -130,7 +130,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "lte",
@@ -139,7 +139,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "like",
@@ -148,7 +148,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "ilike",
@@ -157,7 +157,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "is",
@@ -166,7 +166,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "in",
@@ -175,7 +175,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "contains",
@@ -184,7 +184,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "contained-by",
@@ -193,7 +193,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range-gt",
@@ -202,7 +202,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range-gte",
@@ -211,7 +211,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range-lt",
@@ -220,7 +220,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range-lte",
@@ -229,7 +229,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range-adjacent",
@@ -238,7 +238,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "overlaps",
@@ -247,7 +247,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "text-search",
@@ -256,7 +256,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "match",
@@ -265,7 +265,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "not",
@@ -274,7 +274,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "or",
@@ -283,7 +283,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "filter",
@@ -292,7 +292,7 @@
             "product": "database",
             "parent": "filters",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           }
         ]
       },
@@ -304,7 +304,7 @@
         "product": "database",
         "parent": "modifiers",
         "type": "function",
-        "libs": ["js", "dart", "dart_v0"],
+        "libs": ["js", "dart", "dart_v0", "csharp"],
         "items": [
           {
             "id": "db-modifiers-select",
@@ -322,7 +322,7 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "limit",
@@ -331,7 +331,7 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "range",
@@ -340,7 +340,7 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "abort-signal",
@@ -358,7 +358,7 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "libs": ["js", "dart", "dart_v0", "csharp"]
           },
           {
             "id": "maybe-single",
@@ -384,7 +384,7 @@
   },
   {
     "title": "Auth",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"],
     "items": [
       {
         "id": "auth-api",
@@ -399,7 +399,7 @@
         "slug": "auth-signup",
         "product": "auth",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "sign-in",
@@ -407,7 +407,7 @@
         "slug": "auth-signin",
         "product": "auth",
         "type": "function",
-        "libs": ["js_v1", "dart_v0"]
+        "libs": ["js_v1", "dart_v0", "csharp"]
       },
       {
         "id": "sign-in-with-provider",
@@ -415,7 +415,7 @@
         "slug": "auth-signinwithprovider",
         "product": "auth",
         "type": "function",
-        "libs": ["dart_v0"]
+        "libs": ["dart_v0", "csharp"]
       },
       {
         "id": "sign-in-with-password",
@@ -559,7 +559,7 @@
         "slug": "auth-onauthstatechange",
         "product": "auth",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "reset-password-for-email",
@@ -567,7 +567,7 @@
         "slug": "auth-resetpasswordforemail",
         "product": "auth",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "mfa-enroll",
@@ -718,7 +718,7 @@
   },
   {
     "title": "Functions",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"],
     "items": [
       {
         "id": "invoke",
@@ -726,13 +726,13 @@
         "slug": "auth-admin-invoke",
         "product": "functions",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       }
     ]
   },
   {
     "title": "Realtime",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"],
     "items": [
       {
         "id": "stream",
@@ -740,7 +740,7 @@
         "slug": "stream",
         "product": "realtime",
         "type": "function",
-        "libs": ["dart", "dart_v0"]
+        "libs": ["dart", "dart_v0", "csharp"]
       },
       {
         "id": "subscribe",
@@ -748,7 +748,7 @@
         "slug": "subscribe",
         "product": "realtime",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "remove-subscription",
@@ -756,7 +756,7 @@
         "slug": "removesubscription",
         "product": "realtime",
         "type": "function",
-        "libs": ["dart_v0", "js_v1"]
+        "libs": ["dart_v0", "csharp", "js_v1"]
       },
       {
         "id": "remove-all-subscriptions",
@@ -803,7 +803,7 @@
   },
   {
     "title": "Storage",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
+    "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"],
     "items": [
       {
         "id": "create-bucket",
@@ -811,7 +811,7 @@
         "slug": "storage-createbucket",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "get-bucket",
@@ -819,7 +819,7 @@
         "slug": "storage-getbucket",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "list-buckets",
@@ -827,7 +827,7 @@
         "slug": "storage-listbuckets",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "update-bucket",
@@ -835,7 +835,7 @@
         "slug": "storage-updatebucket",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "delete-bucket",
@@ -843,7 +843,7 @@
         "slug": "storage-deletebucket",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "empty-bucket",
@@ -851,7 +851,7 @@
         "slug": "storage-emptybucket",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-upload",
@@ -859,7 +859,7 @@
         "slug": "storage-from-upload",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-download",
@@ -867,7 +867,7 @@
         "slug": "storage-from-download",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-list",
@@ -875,7 +875,7 @@
         "slug": "storage-from-list",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-update",
@@ -883,7 +883,7 @@
         "slug": "storage-from-update",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-move",
@@ -891,7 +891,7 @@
         "slug": "storage-from-move",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-copy",
@@ -907,7 +907,7 @@
         "slug": "storage-from-remove",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-create-signed-url",
@@ -915,7 +915,7 @@
         "slug": "storage-from-createsignedurl",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       },
       {
         "id": "from-create-signed-urls",
@@ -931,7 +931,7 @@
         "slug": "storage-from-getpublicurl",
         "product": "storage",
         "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "libs": ["js", "js_v1", "dart", "dart_v0", "csharp"]
       }
     ]
   },
