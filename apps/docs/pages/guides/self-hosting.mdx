@@ -1,16 +1,14 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'overview',
-  title: 'Self Hosting',
-  sidebar_label: 'Overview',
-  description: 'Getting started with Self Hosting.',
+  title: 'Self-Hosting',
+  description: 'Getting started with self-hosting Supabase.',
 }
 
 There are several ways to use Supabase:
 
 - [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure.
-- [Docker](../../guides/hosting/docker): deploy to your own infrastructure.
+- [Docker](/docs/guides/self-hosting/docker): deploy to your own infrastructure.
 - Kubernetes: coming soon.
 
 ## Architecture
@@ -74,7 +72,7 @@ For working with JWT and Auth functions.
 
 Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
 [schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
-[role passwords](./docker#securing-your-setup) before deploying to production environments.
+[role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
 
 ##### `postgres`
 
@@ -151,7 +149,7 @@ We realize that database migrations are difficult, and this is one of the proble
 
 While Supabase officially supports Docker, we have several other deployment strategies managed by the community:
 
-- [supabase-docker](../../guides/hosting/docker) (Official)
+- [supabase-docker](/docs/guides/self-hosting/docker) (Official)
 - [supabase-kubernetes](https://github.com/supabase-community/supabase-kubernetes) (Unofficial)
 - [supabase-terraform](https://github.com/supabase-community/supabase-terraform) (Unofficial)
 - [supabase-traefik](https://github.com/supabase-community/supabase-traefik) (Unofficial)

@@ -83,9 +83,9 @@ Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 ```jsx title=pages/_app.js
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
-  const router = useRouter()
   // Create a new supabase browser client on every first render.
   const [supabaseClient] = useState(() => createBrowserSupabaseClient())
 
@@ -108,6 +108,7 @@ Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component
 ```tsx lines=2,8 title=pages/_app.tsx
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 function MyApp({
   Component,

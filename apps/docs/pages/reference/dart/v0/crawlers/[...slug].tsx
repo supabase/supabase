@@ -7,6 +7,7 @@ import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { useRouter } from 'next/router'
+import RefSEO from '~/components/reference/RefSEO'
 
 const sections = flattenSections(clientLibsCommonSections)
 
@@ -15,13 +16,20 @@ export default function JSReference(props) {
   const slug = router.query.slug[0]
   const filteredSection = sections.filter((section) => section.id === slug)
 
+  const pageTitle = filteredSection[0]?.title
+    ? `${filteredSection[0]?.title} | Supabase`
+    : 'Supabase'
   return (
-    <RefSectionHandler
-      sections={filteredSection}
-      spec={spec}
-      typeSpec={typeSpec}
-      pageProps={props}
-    />
+    <>
+      <RefSEO title={pageTitle} />
+
+      <RefSectionHandler
+        sections={filteredSection}
+        spec={spec}
+        typeSpec={typeSpec}
+        pageProps={props}
+      />
+    </>
   )
 }
 

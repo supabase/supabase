@@ -33,7 +33,7 @@ export const formatComputeSizes = (addons: SubscriptionAddon[]) => {
     metadata: {
       default_price_id: undefined,
       supabase_prod_id: 'addon_instance_micro',
-      features: '2 CPUs • 1GB memory • 2,085Mbps Disk IO',
+      features: '2-core ARM (shared) • 1GB memory • 2,085Mbps Disk IO',
     },
     prices: [
       {
