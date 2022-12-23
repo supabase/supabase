@@ -10,7 +10,7 @@ import { Input, Button, IconDownload, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
@@ -39,13 +39,10 @@ ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</S
 export default observer(ProjectSettings)
 
 const ResetDbPassword: FC<any> = () => {
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
+  const { ui, app, meta } = useStore()
+  const { ref } = useParams()
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canResetDbPassword = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'projects')
-    : ui.selectedOrganization?.is_owner
+  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -86,10 +83,13 @@ const ResetDbPassword: FC<any> = () => {
   }
 
   const confirmResetDbPass = async () => {
+    if (!ref) return
+
     if (passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
       setIsUpdatingPassword(true)
-      const res = await patch(`${API_URL}/projects/${projectRef}/db-password`, { password })
+      const res = await patch(`${API_URL}/projects/${ref}/db-password`, { password })
       if (!res.error) {
+        await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {
@@ -351,7 +351,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             }
           >
             <Panel.Content>
-              <Tabs type="underlined">
+              <Tabs type="underlined" size="small">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
                   <Input copy readOnly disabled value={psqlConnString} />

@@ -1,0 +1,105 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'dashibase',
+  title: 'Dashibase',
+  description: 'Create an internal CRUD dashboard with Supabase and Dashibase in 15 mins.',
+}
+
+Are you tired of building admin panels? [Dashibase](https://dashibase.com/) is a super fast way to build internal CRUD dashboards with a Notion-like UI.
+
+This guide walks you through how to build a customer admin panel using Supabase on the backend and Dashibase on the front so that you and your team can easily find and update customer information.
+
+## Quick explanation
+
+Just so we are on the same page, here are some of the terms we use:
+
+- **Data source:** This is the data that powers your dashboard (i.e. your Supabase database).
+- **Dashboard:** This is the friendly interface that you build on top of your Supabase database using Dashibase.
+- **Page:** Each dashboard can have multiple pages. Each page can have multiple blocks of text or tables.
+
+Now that is out of the way, let's build our customer admin panel.
+
+(Start your stopwatch!)
+
+## Step 1. Connect Supabase to Dashibase
+
+First, in Dashibase, go to “Data Sources” via the left sidebar and click on “Connect data source” in the upper-right corner.
+
+Note: We do not download or store any of your database data.
+
+![Connect Supabase to Dashibase](/docs/img/guides/integrations/dashibase/connect-database.png)
+
+Enter your database credentials, which you can find in Supabase under Settings > Database > Connection info. For additional security, you can also download your SSL certificate and upload it to Dashibase.
+
+![Supabase credentials](/docs/img/guides/integrations/dashibase/supabase-credentials.png)
+
+## Step 2. Set up your data access policy
+
+Once you have connected your database, you can also control what your team can see and edit in your database via Dashibase. There are usually certain data that you don’t want others to edit or even see (e.g. address, email, identification number).
+
+Note: If you prefer to restrict access to your database _before_ you connect to Dashibase for security reasons, you can [create a restricted user](https://aws.amazon.com/blogs/database/managing-postgresql-users-and-roles/) via [Supabase's SQL Editor](/docs/guides/database#the-sql-editor). The slight advantage of doing this in Dashibase is that there is a GUI, which makes it easier to set up the access control (but we understand some developers might find it more secure to restrict the access themselves).
+
+![Set data access in Dashibase](/docs/img/guides/integrations/dashibase/set-data-access.png)
+
+You can even control which columns within a table that others can see and edit. In the example below, for the `tags` table, the `name` column can be read and updated, the `created_at` column can be read, and the `id` column cannot even be read.
+
+![Set column-level access in Dashibase](/docs/img/guides/integrations/dashibase/set-column-access.png)
+
+Once you are happy with the data access control, you can decide who in your organization can edit this data source (usually other developers) or use this data source to create dashboards.
+
+![Set user access to data source in Dashibase](/docs/img/guides/integrations/dashibase/data-source-user-access.png)
+
+## Step 3. Build your dashboard
+
+To create a dashboard, go to “Dashboards” via the left sidebar in Dashibase and click on “Create dashboard” in the upper-right corner.
+
+Here’s where the fun begins. There are many ways to build your dashboards in Dashibase using features such as markdown formatting and slash command.
+
+You will see some automatically-generated content in your dashboard so that you can set up your dashboard more quickly. For this example, let's clear them out and start from scratch.
+
+![Automatically-generated content for your dashboard](/docs/img/guides/integrations/dashibase/initial-dashboard-content.png)
+
+Using our Notion-like UI, you can quickly build out your dashboard through typing. For example, you can type '/table' to add a table from your database to your dashboard. No more dragging components across your screen and dropping them on a blank canvas repeatedly.
+
+![Automatically-generated content for your dashboard](/docs/img/guides/integrations/dashibase/slash-command.gif)
+
+If you have set up [foreign keys in your Supabase database](/docs/guides/database/tables#joining-tables-with-foreign-keys), you can easily show data from multiple tables on the table in your Dashibase dashboard. Simply click on the "Columns" button beside the "Filter" button and select the columns you want to show or hide. For this example, we want to show the customers' country and plan price, which are in separate `countries` and `plans` tables.
+
+![Setting up the Customers table](/docs/img/guides/integrations/dashibase/customers-table.png)
+
+For all the tables in your dashboard, you can rename the column headers, add filter and sort, adjust the column width, and more.
+
+You can also add text to provide context or instructions for the rest of your team as they are using your dashboard. This saves you the trouble of having your dashboard and documentation in separate places.
+
+![Customers table with instructions](/docs/img/guides/integrations/dashibase/customers-table-with-text.png)
+
+Most importantly, we automatically generate a single-item view for each of the items on your table so that you do not have to manually create it yourself. You can easily edit or rearrange the blocks just like in Notion.
+
+![Automatically generated single-item view](/docs/img/guides/integrations/dashibase/single-item-view.png)
+
+## Step 4. Share your dashboard with your team
+
+Finally, save and share the dashboard with your team. There are two levels of access:
+
+- Edit dashboard: Edit the text blocks, edit the tables, etc.
+- Use dashboard: View and update the data via the dashboard
+
+Click on the “Share” button in the upper-right corner of your dashboard to share access:
+
+![Share dashboard access](/docs/img/guides/integrations/dashibase/share-dashboard.png)
+
+Now your team can use this customer admin panel to find and update customer information easily!
+
+P.S. How long did we take? :)
+
+## Resources
+
+- [Dashibase website](https://dashibase.com/)
+- [Dashibase open-source repo](https://github.com/dashibase)
+- [Dashibase Twitter](https://twitter.com/dashibase)
+- [Dashibase Discord](https://discord.gg/crhDFYvbbq)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
