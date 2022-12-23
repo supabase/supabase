@@ -1223,9 +1223,8 @@ class StorageExplorerStore {
     const toastId = this.ui.setNotification({
       category: 'loading',
       message: `Renaming folder to ${newName}`,
-    })
-    const infoToastId = toast('Please do not close the browser until the rename is completed', {
-      duration: Infinity,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
     })
 
     /**
@@ -1246,7 +1245,9 @@ class StorageExplorerStore {
     this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
     const files = await this.getAllItemsAlongFolder(folder)
 
+    let progress = 0
     let hasErrors = false
+
     // Make this batched promises into a reusable function for storage, i think this will be super helpful
     const promises = files.map((file) => {
       const fromPath = `${file.prefix}/${file.name}`
@@ -1258,6 +1259,7 @@ class StorageExplorerStore {
         .join('/')
       return () => {
         return new Promise(async (resolve) => {
+          progress = progress + 1 / files.length
           const { error } = await this.supabaseClient.storage
             .from(this.selectedBucket.name)
             .move(fromPath, toPath)
@@ -1280,6 +1282,13 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
+        this.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: `Renaming folder to ${newName}`,
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          progress: progress * 100,
+        })
       }, Promise.resolve())
 
       if (!hasErrors) {
@@ -1310,7 +1319,6 @@ class StorageExplorerStore {
         category: 'error',
       })
     }
-    toast.dismiss(infoToastId)
   }
 
   /*
