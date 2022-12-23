@@ -73,6 +73,11 @@ const PROVIDER_PHONE = {
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
       ],
     },
+    RATE_LIMIT_SMS_SENT: {
+      type: 'number',
+      title: 'Rate limit for sending SMS messages',
+      description: 'How many SMS messages can be sent per hour',
+    },
 
     // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
@@ -1338,6 +1343,14 @@ export const OLD = {
       title: 'Rate limit',
       type: 'number',
       help: 'Maximum number of emails sent per hour (Default: 30, Max: 32,767)',
+      minimum: 1,
+      maximum: 32767,
+      multipleof: 1,
+    },
+    RATE_LIMIT_SMS_SENT: {
+      title: 'Rate limit',
+      type: 'number',
+      help: 'Maximum number of SMS-es sent per hour (Default: 30, Max: 32,767)',
       minimum: 1,
       maximum: 32767,
       multipleof: 1,

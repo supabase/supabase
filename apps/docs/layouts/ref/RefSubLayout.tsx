@@ -4,6 +4,7 @@ import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/Custom
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
+import Image from 'next/image'
 
 interface ISectionContainer {
   id: string
@@ -54,10 +55,9 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 }
 
 const Section: FC<ISectionContainer> = (props) => {
-  // console.log({ props })
   return (
     <article
-      key={props.id}
+      key={props.id + 'section'}
       className={[
         props.singleColumn ? 'prose dark:prose-dark w-full' : 'w-full',
         'py-16 lg:py-32 first:pt-8 last:pb-8',
@@ -77,7 +77,12 @@ const Section: FC<ISectionContainer> = (props) => {
 
 const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   const router = useRouter()
+
   const { setActiveRefItem } = useNavigationMenuContext()
+
+  // we're serving search bots a different file (/crawlers/[...slug])
+  // and need to modify content to suit that
+  const isCrawlerPage = router.route.includes('/crawlers/[...slug]')
 
   const { ref } = useInView({
     threshold: 1,
@@ -99,21 +104,25 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
       {icon && (
         <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
-          <img className="w-6 h-6" src={`${icon}.svg`} />
+          <Image width={16} height={16} alt={icon} src={`${icon}.svg`} />
         </div>
       )}
-      <h2
-        ref={ref}
-        id={props.slug}
-        data-ref-id={props.id}
-        className={[
-          'text-2xl font-medium text-scale-1200 scroll-mt-24',
-          !icon && 'mb-8',
-          props.monoFont && 'font-mono',
-        ].join(' ')}
-      >
-        {props.title && <span className="max-w-xl">{props.title}</span>}
-      </h2>
+      {isCrawlerPage ? (
+        <h1>{props.title}</h1>
+      ) : (
+        <h2
+          ref={ref}
+          id={props.slug}
+          data-ref-id={props.id}
+          className={[
+            'text-2xl font-medium text-scale-1200 scroll-mt-24',
+            !icon && 'mb-8',
+            props.monoFont && 'font-mono',
+          ].join(' ')}
+        >
+          {props.title && <span className="max-w-xl">{props.title}</span>}
+        </h2>
+      )}
     </div>
   )
 }
@@ -139,10 +148,9 @@ const EducationRow: FC<IEducationRow> = (props) => {
 }
 
 const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
-  // console.log({ props })
   return (
     <article
-      key={props.id}
+      key={props.id + 'education'}
       className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
