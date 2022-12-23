@@ -535,11 +535,15 @@ module.exports = [
     source: '/docs/reference/postgres/publications',
     destination: '/docs/guides/database/replication',
   },
-
   {
     permanent: true,
     source: '/docs/guides/hosting/platform',
     destination: '/docs/guides/platform',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/hosting/platform/access-control',
+    destination: '/docs/guides/platform/access-control',
   },
   {
     permanent: true,
