@@ -197,9 +197,14 @@ services:
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_HOST: /var/run/postgresql
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
