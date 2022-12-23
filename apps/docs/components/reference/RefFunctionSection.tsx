@@ -204,7 +204,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             </RefDetailCollapse>
                           )}
 
-
                           <CodeBlock
                             className="useless-code-block-class"
                             language={codeBlockLang}
