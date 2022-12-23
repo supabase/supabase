@@ -54,34 +54,38 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    if (values.schema === 'custom') {
-      const { error } = await meta.query(`create schema if not exists ${values.name}`)
-      if (error) {
+
+    const schema =
+      defaultSchema !== undefined && defaultSchema !== null
+        ? defaultSchema
+        : values.schema === 'custom'
+        ? values.name
+        : values.schema
+
+    if (!schema.startsWith('pg_')) {
+      const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
+      if (createSchemaError) {
         return ui.setNotification({
-          error,
+          error: createSchemaError,
           category: 'error',
-          message: `Failed to create schema: ${error.message}`,
+          message: `Failed to create schema: ${createSchemaError.message}`,
         })
       }
     }
 
-    const schema = defaultSchema
-      ? defaultSchema
-      : values.schema === 'custom'
-      ? values.name
-      : values.schema
-
-    const { error } = await meta.extensions.create({
+    const { error: createExtensionError } = await meta.extensions.create({
       schema,
       name: extension.name,
       version: extension.default_version,
       cascade: true,
     })
-    if (error) {
+    if (createExtensionError) {
       ui.setNotification({
-        error,
+        error: createExtensionError,
         category: 'error',
-        message: `Failed to toggle ${extension.name.toUpperCase()}: ${error.message}`,
+        message: `Failed to toggle ${extension.name.toUpperCase()}: ${
+          createExtensionError.message
+        }`,
       })
     } else {
       ui.setNotification({

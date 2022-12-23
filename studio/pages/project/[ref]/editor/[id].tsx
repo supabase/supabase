@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Modal } from 'ui'
+import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
@@ -24,6 +25,8 @@ const TableEditorPage: NextPage = () => {
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isDuplicating, setIsDuplicating] = useState<boolean>(false)
+  const [isDeleteWithCascade, setIsDeleteWithCascade] = useState(false)
+
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
@@ -34,9 +37,11 @@ const TableEditorPage: NextPage = () => {
 
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
+  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
+
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
-      tables.find((table) => table.id === Number(id))
+      tables.concat(foreignTables).find((table) => table.id === Number(id))
     : id !== undefined
     ? tryParseJson(Base64.decode(id))
     : undefined
@@ -70,6 +75,7 @@ const TableEditorPage: NextPage = () => {
   const onDeleteColumn = (column: PostgresColumn) => {
     setIsDeleting(true)
     setSelectedColumnToDelete(column)
+    setIsDeleteWithCascade(false)
   }
 
   const onAddTable = () => {
@@ -87,6 +93,7 @@ const TableEditorPage: NextPage = () => {
   const onDeleteTable = (table: PostgresTable) => {
     setIsDeleting(true)
     setSelectedTableToDelete(table)
+    setIsDeleteWithCascade(false)
   }
 
   const onDuplicateTable = (table: PostgresTable) => {
@@ -120,12 +127,20 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteColumn = async () => {
     try {
-      const response: any = await meta.columns.del(selectedColumnToDelete!.id)
+      if (selectedColumnToDelete === undefined) return
+
+      const response: any = await meta.columns.del(selectedColumnToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
-      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete!.name)
+      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
+
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
+      })
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
+      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -139,9 +154,9 @@ const TableEditorPage: NextPage = () => {
 
   const onConfirmDeleteTable = async () => {
     try {
-      if (isUndefined(selectedTableToDelete)) return
+      if (selectedTableToDelete === undefined) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id)
+      const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
@@ -154,8 +169,9 @@ const TableEditorPage: NextPage = () => {
       }
       ui.setNotification({
         category: 'success',
-        message: `Successfully deleted ${selectedTableToDelete.name}`,
+        message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
+      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -195,36 +211,98 @@ const TableEditorPage: NextPage = () => {
       />
       <ConfirmationModal
         danger
+        size="small"
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
+            <div className="py-4 space-y-4">
+              <p className="text-sm text-scale-1100">
+                Are you sure you want to delete the selected column? This action cannot be undone.
+              </p>
+              <Checkbox
+                label="Drop column with cascade?"
+                description="Deletes the column and its dependent objects"
+                checked={isDeleteWithCascade}
+                onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
+              />
+              {isDeleteWithCascade && (
+                <Alert
+                  withIcon
+                  variant="warning"
+                  title="Warning: Dropping with cascade may result in unintended consequences"
+                >
+                  <p className="mb-4">
+                    All dependent objects will be removed, as will any objects that depend on them,
+                    recursively.
+                  </p>
+                  <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
+                    <a target="_blank">
+                      <Button size="tiny" type="default" icon={<IconExternalLink />}>
+                        About dependency tracking
+                      </Button>
+                    </a>
+                  </Link>
+                </Alert>
+              )}
+            </div>
           </Modal.Content>
         }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
+        onSelectCancel={() => {
+          setIsDeleting(false)
+          setSelectedColumnToDelete(undefined)
+        }}
         onSelectConfirm={onConfirmDeleteColumn}
       />
       <ConfirmationModal
         danger
+        size="small"
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
         header={
           <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
         }
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
+            <div className="py-4 space-y-4">
+              <p className="text-sm text-scale-1100">
+                Are you sure you want to delete the selected table? This action cannot be undone.
+              </p>
+              <Checkbox
+                label="Drop table with cascade?"
+                description="Deletes the table and its dependent objects"
+                checked={isDeleteWithCascade}
+                onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
+              />
+              {isDeleteWithCascade && (
+                <Alert
+                  withIcon
+                  variant="warning"
+                  title="Warning: Dropping with cascade may result in unintended consequences"
+                >
+                  <p className="mb-4">
+                    All dependent objects will be removed, as will any objects that depend on them,
+                    recursively.
+                  </p>
+                  <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
+                    <a target="_blank">
+                      <Button size="tiny" type="default" icon={<IconExternalLink />}>
+                        About dependency tracking
+                      </Button>
+                    </a>
+                  </Link>
+                </Alert>
+              )}
+            </div>
           </Modal.Content>
         }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
+        onSelectCancel={() => {
+          setIsDeleting(false)
+          setSelectedTableToDelete(undefined)
+        }}
         onSelectConfirm={onConfirmDeleteTable}
       />
     </TableEditorLayout>

@@ -1,33 +1,32 @@
 [
   {
     "type": "Announcement",
-    "title": "Works With Supabase - announcing our Partner Gallery",
-    "description": "Introducing our Partner Gallery - open source and made with Supabase.",
-    "imgUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
-    "logoUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
+    "title": "Supabase Launch Week 6",
+    "description": "One new feature (or more) every day during a week.",
+    "imgUrl": "/images/launchweek/launch-week-6.jpg",
+    "logoUrl": "/images/launchweek/launch-week-6.jpg",
     "organization": "Supabase",
-    "url": "/blog/2022/04/20/partner-gallery-works-with-supabase",
+    "url": "/launch-week",
     "postMeta": {
-      "name": "Thor Shcaeff, Alaister Young, Shane Rice",
-      "publishDate": "Apr 20, 2022",
+      "name": "Paul Copplestone",
+      "publishDate": "Dec 12, 2022",
       "readLength": 5
     },
-    "ctaText": "Read blog post"
+    "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week 4",
-    "description": "Launch Week 4 had something for everybody: Community Day, GraphQL support, Edge Functions, and more.",
-    "imgUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo-cal.png",
-    "logoUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo.png",
+    "title": "The Supabase Content Storm",
+    "description": "We worked with dozens of content creators from around the world to create Supabase-related content and publish everything on the same day!",
+    "imgUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
+    "logoUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
     "organization": "Supabase",
-    "url": "/blog/2022/03/25/supabase-launch-week-four",
+    "url": "/blog/the-supabase-content-storm",
     "postMeta": {
-      "name": "Paul Copplestone",
-      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Mar 25, 2022",
+      "name": "Ramiro",
+      "publishDate": "Dec 06, 2022",
       "readLength": 4
     },
-    "ctaText": "Read blog post"
+    "ctaText": "See the full list"
   }
 ]

@@ -3,15 +3,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect, FC } from 'react'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
-import { useTheme } from '../Providers'
+import { useTheme } from 'common/Providers'
 import { REFERENCES } from './Navigation.constants'
 import { SearchButton } from '../DocSearch'
 
-interface Props {
-  currentPage: string
-}
+import { getPageType } from '~/lib/helpers'
 
-const NavBar: FC<Props> = ({ currentPage }) => {
+const NavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -26,6 +24,8 @@ const NavBar: FC<Props> = ({ currentPage }) => {
   const version = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
     ? pathSegments[pathSegments.indexOf(library) + 1]
     : versions[0]
+
+  const pageType = getPageType(asPath)
 
   useEffect(() => {
     setMounted(true)
@@ -96,7 +96,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
                 <Link href={p.link}>
                   <a
                     className={`text-sm ${
-                      currentPage.includes(p.key) ? 'text-brand-900' : 'text-scale-1100'
+                      pageType.includes(p.key) ? 'text-brand-900' : 'text-scale-1100'
                     }`}
                   >
                     {p.text}
@@ -197,7 +197,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
           <div className="flex items-center justify-between space-x-6 bg-scale-300 border border-scale-700 pl-3 pr-1.5 py-1.5 rounded">
             <div className="flex items-center space-x-2">
               <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-              <p className="text-scale-800 text-sm">Search docs</p>
+              <p className="text-scale-800 text-sm">Search</p>
             </div>
             <div className="flex items-center space-x-1">
               <div className="hidden text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
