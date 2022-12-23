@@ -46,7 +46,7 @@ PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
 PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. Call it `src/lib/supabaseClient.ts`. 
+Now that we have the API credentials in place, create a `src/lib/supabaseClient.ts` helper file to initialize the Supabase client.
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js title=src/lib/supabaseClient.ts
