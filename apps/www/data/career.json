@@ -1,0 +1,148 @@
+{
+  "company": [
+    {
+      "number": "50+",
+      "text": "team members\n\nin 20+ countries"
+    },
+    {
+      "number": "15+",
+      "text": "languages spoken"
+    },
+    {
+      "number": "$116M",
+      "text": "in funding"
+    },
+    {
+      "number": "8500+",
+      "text": "community members"
+    },
+    {
+      "number": "1000+",
+      "text": "memes posted\n\n(and counting)"
+    }
+  ],
+  "humanPowered": [
+    {
+      "icon": "egoless",
+      "title": "Egoless",
+      "text": "Willing to do the schlep, the team goals come first."
+    },
+    {
+      "icon": "curious",
+      "title": "Polyglot",
+      "text": "Broad skillsets. Growth mindset."
+    },
+    {
+      "icon": "process",
+      "title": "Process Driven",
+      "text": "Engineer yourself out of the job."
+    },
+    {
+      "icon": "honesty",
+      "title": "Intellectual Honesty",
+      "text": "Put our own biases aside."
+    },
+    {
+      "icon": "flexibility",
+      "title": "Kaizen mindset",
+      "text": "Continuously improve all functions."
+    }
+  ],
+  "contributors": [
+    "Isaiah-Hamilton",
+    "Hallidayo",
+    "mertovich",
+    "mikqi",
+    "florian-lefebvre",
+    "m4salah",
+    "carlosstenzel",
+    "M4Tdev",
+    "MisterJimson",
+    "aminamos",
+    "vasudeveloper001",
+    "erondpowell",
+    "alfredlua",
+    "saloni137",
+    "rubensdemelo",
+    "zernonia",
+    "timsonner",
+    "sureshdsk",
+    "owlnai"
+  ],
+  "benefits": [
+    {
+      "icon": "remote",
+      "title": "Fully Remote",
+      "text": "We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a co-working membership that you can use anywhere in the world."
+    },
+    {
+      "icon": "tech_allowance",
+      "title": "Hardware Budget",
+      "text": "Use this budget for anything you need to set up your work environment from tech to office setup."
+    },
+    {
+      "icon": "healthcare",
+      "title": "Health Benefits",
+      "text": "We provide 100% health coverage for employees and 80% for dependants. It's important to us that you & your family have health care covered."
+    },
+    {
+      "icon": "offsite",
+      "title": "Annual Off-Sites",
+      "text": "We believe in the value of in-person time, so we all come together annually for a week. Each year we pick somewhere different in the world. It's a highlight of the year!"
+    },
+    {
+      "icon": "flexibility",
+      "title": "Flexible Work",
+      "text": "Work remotely from anywhere in the world. We work in teams, but we work asynchronously. You know what you need to do and when it needs to be done."
+    },
+    {
+      "icon": "education",
+      "title": "Professional Development",
+      "text": "An annual allowance to spend on professional development and education. Use this for courses, books, conferences, or anything that supports your continuous learning."
+    }
+  ],
+  "positions": [
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    },
+    {
+      "title": "Elixir Engineers",
+      "location": "US time zone",
+      "employment": "Full-time",
+      "description": "Elixir is powering more and more backend"
+    }
+  ],
+  "hiring": [
+    {
+      "title": "Recruiter Interview",
+      "text": "Chat with our recruiter to tell us about your career journey, professional goals and we'll share more about Supabase, the role & our recruitment process."
+    },
+    {
+      "title": "Technical / Skill-based Interview",
+      "text": "Meet with the team lead. In this interview we'll aim to learn about your hard skills and problem solving approach."
+    },
+    {
+      "title": "Another Technical / Skill-based Interview",
+      "text": "You'll either meet the department lead or peer. This interview will dive deeper into your hard skills and our expectations for this role."
+    },
+    {
+      "title": "Final Founders Interview",
+      "text": "Our co-founders meet every candidate as the final step. Learn more about Supabase's values, mission and vision directly from them."
+    }
+  ]
+}

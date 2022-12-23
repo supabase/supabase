@@ -63,6 +63,8 @@ const DatabaseTables: NextPageWithLayout = () => {
   }
 
   const onColumnUpdated = async () => {
+    if (selectedTable === undefined) return
+
     const updatedTable = await meta.tables.loadById(selectedTable.id)
     setSelectedTable(updatedTable)
   }

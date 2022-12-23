@@ -3,8 +3,6 @@ import { Filter, ServiceError, Sort, SupaRow } from '../../types'
 export interface IRowService {
   count: (filters: Filter[]) => Promise<{ data?: number; error?: ServiceError }>
 
-  create: (row: SupaRow) => Promise<{ data?: SupaRow; error?: ServiceError }>
-
   fetchPage: (
     page: number,
     rowsPerPage: number,
@@ -25,7 +23,7 @@ export interface IRowService {
    * Right now, we remove rows immediately, so it's confused when delete operation fails
    * and rows are already removed from the grid
    */
-  delete: (rows: SupaRow[]) => { error?: ServiceError }
+  delete: (rows: SupaRow[]) => Promise<{ error?: ServiceError }>
   deleteAll: (filters: Filter[]) => Promise<{ error?: ServiceError }>
 
   update: (

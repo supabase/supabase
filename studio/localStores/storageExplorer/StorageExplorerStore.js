@@ -24,6 +24,8 @@ import {
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
 import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -112,21 +114,26 @@ class StorageExplorerStore {
   /* Methods which are commonly used + For better readability */
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        multiTab: false,
-        detectSessionInUrl: false,
-        localStorage: {
-          getItem: (key) => {
-            return undefined
+    console.debug(serviceEndpoint)
+    this.supabaseClient = createClient(
+      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      serviceKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          multiTab: false,
+          detectSessionInUrl: false,
+          localStorage: {
+            getItem: (key) => {
+              return undefined
+            },
+            setItem: (key, value) => {},
+            removeItem: (key) => {},
           },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
         },
-      },
-    })
+      }
+    )
   }
 
   updateFileInPreviewCache = (fileCache) => {
@@ -459,7 +466,8 @@ class StorageExplorerStore {
         message: error.message,
         category: 'error',
       })
-      return this.closeCreateBucketModal()
+      this.closeCreateBucketModal()
+      return undefined
     }
 
     await this.fetchBuckets()
@@ -1176,7 +1184,7 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    const isFolderOpen = this.openedFolders[this.openedFolders.length - 1].name === folder.name
+    const isFolderOpen = this.openedFolders[this.openedFolders.length - 1]?.name === folder.name
     if (isFolderOpen) {
       this.popColumnAtIndex(folder.columnIndex)
       this.popOpenedFoldersAtIndex(folder.columnIndex - 1)

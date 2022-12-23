@@ -37,11 +37,7 @@ export class SqlRowService implements IRowService {
     }
   }
 
-  async create(row: SupaRow) {
-    return { error: { message: 'not implemented' } }
-  }
-
-  delete(rows: SupaRow[]) {
+  async delete(rows: SupaRow[]) {
     const { primaryKeys, error } = this.getPrimaryKeys()
     if (error) return { error }
 
@@ -53,14 +49,7 @@ export class SqlRowService implements IRowService {
     })
 
     const query = queryChains.toSql()
-    SupabaseGridQueue.add(async () => {
-      const { error } = await this.onSqlQuery(query)
-      if (error) throw error
-    }).catch((error) => {
-      this.onError(error)
-    })
-
-    return {}
+    return await this.onSqlQuery(query)
   }
 
   // For deleting all rows based on a given filter

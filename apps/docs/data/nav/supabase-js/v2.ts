@@ -28,9 +28,15 @@ const Nav = [
       { name: 'signOut()', url: '/reference/javascript/auth-signout', items: [] },
       { name: 'verifyOtp()', url: '/reference/javascript/auth-verifyotp', items: [] },
       { name: 'getSession()', url: '/reference/javascript/auth-getsession', items: [] },
+      { name: 'refreshSession()', url: '/reference/javascript/auth-refreshsession', items: [] },
       { name: 'getUser()', url: '/reference/javascript/auth-getuser', items: [] },
       { name: 'updateUser()', url: '/reference/javascript/auth-updateuser', items: [] },
-      { name: 'setSession()', url: '/reference/javascript/auth-setSession', items: [] },
+      { name: 'setSession()', url: '/reference/javascript/auth-setsession', items: [] },
+      {
+        name: 'onAuthStateChange()',
+        url: '/reference/javascript/auth-onauthstatechange',
+        items: [],
+      },
       {
         name: 'resetPasswordForEmail()',
         url: '/reference/javascript/auth-resetpasswordforemail',
