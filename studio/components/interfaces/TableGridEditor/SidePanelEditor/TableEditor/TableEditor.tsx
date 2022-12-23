@@ -220,7 +220,7 @@ const TableEditor: FC<Props> = ({
                     If RLS is not enabled, anyone with the anon key can modify and delete your data.
                   </p>
                   {!tableFields.isRLSEnabled && (
-                    <p className="mt-3 bg-yellow-300 p-2 transition">
+                    <p className="mt-3 bg-yellow-300 p-2">
                       Turning off RLS means that you are allowing <u>anonymous access</u> to your
                       table.
                     </p>
