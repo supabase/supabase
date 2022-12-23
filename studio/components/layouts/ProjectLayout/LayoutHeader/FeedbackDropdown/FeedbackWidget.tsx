@@ -42,8 +42,6 @@ const FeedbackWidget: FC<Props> = ({
     setFeedback(e.target.value)
   }
 
-  console.log('feedback:', feedback)
-
   const captureScreenshot = () => {
     setIsSavingScreenshot(true)
 
