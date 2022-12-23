@@ -10,7 +10,6 @@ import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { Badge, Button } from 'ui'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -91,18 +90,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        <Button
-          onClick={() =>
-            ui.setNotification({
-              category: 'loading',
-              message: 'Uploading 24 files...',
-              description: "Please do not close the browser until it's completed",
-              progress: 50,
-            })
-          }
-        >
-          Click
-        </Button>
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}
