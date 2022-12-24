@@ -128,6 +128,7 @@ Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component
 import { useState } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import { AppProps } from 'next/app'
 
 function MyApp({
   Component,
