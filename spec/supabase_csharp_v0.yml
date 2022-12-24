@@ -418,7 +418,7 @@ functions:
       - id: fetch-inserted-data
         name: Fetch inserted record
         code: |
-          ```dart
+          ```c#
           var result = await supabase
             .From<City>()
             .Insert(models, new QueryOptions { Returning = ReturnType.Representation });
@@ -508,7 +508,7 @@ functions:
       Performs a DELETE on the table.
     title: 'Delete data: Delete()'
     notes: |
-      - `delete()` should always be combined with [Filters](/docs/reference/csharp/using-filters) to target the item(s) you wish to delete.
+      - `Delete()` should always be combined with [Filters](/docs/reference/csharp/using-filters) to target the item(s) you wish to delete.
     examples:
       - id: delete-records
         name: Delete records
@@ -522,7 +522,7 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Stored Procedures: Rpc()'
     description: |
       You can call stored procedures as a "Remote Procedure Call".
 
@@ -534,62 +534,55 @@ functions:
         isSpotlight: true
         description: This is an example invoking a stored procedure.
         code: |
-          ```dart
-          final data = await supabase
-            .rpc('hello_world');
+          ```c#
+          await supabase.Rpc("hello_world", null);
           ```
       - id: with-parameters
         name: With Parameters
         code: |
-          ```dart
-          final data = await supabase
-            .rpc('echo_city', params: { 'name': 'The Shire' });
+          ```c#
+          await supabase.Rpc("hello_world", new Dictionary<string, object> { { "foo", "bar"} });
           ```
 
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
-    title: 'on().subscribe()'
+    title: 'From<Model>().On()'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
-      - id: listen-to-all-database-changes
-        name: Listen to all database changes
-        isSpotlight: true
-        code: |
-          ```dart
-          supabase.channel('*').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: '*'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
-          ```
       - id: listening-to-a-specific-table
         name: Listening to a specific table
+        isSpotlight: true
         code: |
-          ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          ```c#
+          await supabase.From<City>().On(ChannelEventType.All, (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          });
+          ```
+      - id: listen-to-all-database-changes
+        name: Listen to all database changes
+        code: |
+          ```c#
+          var channel = supabase.Realtime.Channel("realtime", "public", "*");
+
+          channel.OnMessage += (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          };
+
+          await channel.Subscribe();
           ```
       - id: listening-to-inserts
         name: Listening to inserts
         code: |
-          ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          ```c#
+          await supabase.From<City>().On(ChannelEventType.Insert, (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          });
           ```
       - id: listening-to-updates
         name: Listening to updates
@@ -601,14 +594,11 @@ functions:
           alter table "your_table" replica identity full;
           ```
         code: |
-          ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'UPDATE', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          ```c#
+          await supabase.From<City>().On(ChannelEventType.Update, (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          });
           ```
       - id: listening-to-deletes
         name: Listening to deletes
@@ -620,51 +610,31 @@ functions:
           alter table "your_table" replica identity full;
           ```
         code: |
-          ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
-          ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
-        code: |
-          ```dart
-          supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
-              ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
-              (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).on(RealtimeListenTypes.postgresChanges,
-              ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
-              (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).subscribe();
+          ```c#
+          await supabase.From<City>().On(ChannelEventType.Delete, (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          });
           ```
       - id: listening-to-row-level-changes
         name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
-          ```dart
-          supabase.channel('public:countries:id=eq.200').on(
-              RealtimeListenTypes.postgresChanges,
-              ChannelFilter(
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'countries',
-                filter: 'id=eq.200',
-              ), (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).subscribe();
+          ```c#
+          var channel = supabase.Realtime.Channel("realtime", "public", "countries", "id", "id=eq.200");
+
+          channel.OnMessage += (sender, args) =>
+          {
+              Debug.WriteLine(args.Response.Payload);
+          };
+
+          await channel.Subscribe();
           ```
 
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
-    title: 'removeChannel()'
+    title: 'Unsubscribe()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -672,130 +642,120 @@ functions:
         name: Remove a channel
         isSpotlight: true
         code: |
-          ```dart
-          final status = await supabase.removeChannel(channel);
-          ```
+          ```c#
+          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, args) => { });
+          channel.Unsubscribe();
 
-  - id: remove-all-channels
-    description: |
-      Unsubscribes and removes all Realtime channels from Realtime client.
-    title: 'removeAllChannels()'
-    notes: |
-      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
-    examples:
-      - id: remove-all-channels
-        name: Remove all channels
-        isSpotlight: true
-        code: |
-          ```dart
-          final statuses = await supabase.removeAllChannels();
+          // OR
+
+          var channel = supabase.Realtime.Channel("realtime", "public", "*");
+          channel.Unsubscribe()
           ```
 
   - id: get-channels
     description: |
       Returns all Realtime channels.
-    title: 'getChannels()'
+    title: 'Subscriptions'
     examples:
       - id: get-all-channels
         name: Get all channels
         isSpotlight: true
         code: |
-          ```dart
-          final channels = supabase.getChannels();
+          ```c#
+          var channels = supabase.Realtime.Subscriptions;
           ```
 
-  - id: stream
-    description: |
-      Notifies of data at the queried table.
-    title: 'stream()'
-    notes: |
-      - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
-      - Takes a list of primary key columns as its argument.
-    examples:
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
-        isSpotlight: true
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: listening-to-a-specific-rows-within-a-table
-        name: Listening to a specific rows within a table
-        description: |
-          You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-          This syntax is the as how you can filter data in Realtime
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .eq('id', '120')
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: with-order
-        name: With `order()`
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .order('name', ascending: true)
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: with-limit
-        name: With `limit()`
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .order('name', ascending: true)
-            .limit(10)
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: using-stream-with-stream-builder
-        name: Using `stream()` with `StreamBuilder`
-        description: |
-          When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
-        code: |
-          ```dart
-          final supabase = Supabase.instance.client;
+  # - id: stream
+  #   description: |
+  #     Notifies of data at the queried table.
+  #   title: 'stream()'
+  #   notes: |
+  #     - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
+  #     - Takes a list of primary key columns as its argument.
+  #   examples:
+  #     - id: listening-to-a-specific-table
+  #       name: Listening to a specific table
+  #       isSpotlight: true
+  #       code: |
+  #         ```dart
+  #         supabase.from('countries')
+  #           .stream(primaryKey: ['id'])
+  #           .listen((List<Map<String, dynamic>> data) {
+  #           // Do something awesome with the data
+  #         });
+  #         ```
+  #     - id: listening-to-a-specific-rows-within-a-table
+  #       name: Listening to a specific rows within a table
+  #       description: |
+  #         You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+  #         This syntax is the as how you can filter data in Realtime
+  #       code: |
+  #         ```dart
+  #         supabase.from('countries')
+  #           .stream(primaryKey: ['id'])
+  #           .eq('id', '120')
+  #           .listen((List<Map<String, dynamic>> data) {
+  #           // Do something awesome with the data
+  #         });
+  #         ```
+  #     - id: with-order
+  #       name: With `order()`
+  #       code: |
+  #         ```dart
+  #         supabase.from('countries')
+  #           .stream(primaryKey: ['id'])
+  #           .order('name', ascending: true)
+  #           .listen((List<Map<String, dynamic>> data) {
+  #           // Do something awesome with the data
+  #         });
+  #         ```
+  #     - id: with-limit
+  #       name: With `limit()`
+  #       code: |
+  #         ```dart
+  #         supabase.from('countries')
+  #           .stream(primaryKey: ['id'])
+  #           .order('name', ascending: true)
+  #           .limit(10)
+  #           .listen((List<Map<String, dynamic>> data) {
+  #           // Do something awesome with the data
+  #         });
+  #         ```
+  #     - id: using-stream-with-stream-builder
+  #       name: Using `stream()` with `StreamBuilder`
+  #       description: |
+  #         When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
+  #       code: |
+  #         ```dart
+  #         final supabase = Supabase.instance.client;
 
-          class MyWidget extends StatefulWidget {
-            const MyWidget({Key? key}) : super(key: key);
+  #         class MyWidget extends StatefulWidget {
+  #           const MyWidget({Key? key}) : super(key: key);
 
-            @override
-            State<MyWidget> createState() => _MyWidgetState();
-          }
+  #           @override
+  #           State<MyWidget> createState() => _MyWidgetState();
+  #         }
 
-          class _MyWidgetState extends State<MyWidget> {
-            // Persist the stream in a local variable to prevent refetching upon rebuilds
-            final _stream = supabase.from('countries').stream(primaryKey: ['id']);
+  #         class _MyWidgetState extends State<MyWidget> {
+  #           // Persist the stream in a local variable to prevent refetching upon rebuilds
+  #           final _stream = supabase.from('countries').stream(primaryKey: ['id']);
 
-            @override
-            Widget build(BuildContext context) {
-              return StreamBuilder(
-                stream: _stream,
-                builder: (context, snapshot) {
-                  // Return your widget with the data from the snapshot
-                },
-              );
-            }
-          }
-          ```
+  #           @override
+  #           Widget build(BuildContext context) {
+  #             return StreamBuilder(
+  #               stream: _stream,
+  #               builder: (context, snapshot) {
+  #                 // Return your widget with the data from the snapshot
+  #               },
+  #             );
+  #           }
+  #         }
+  #         ```
 
   - id: list-buckets
     description: |
       Retrieves the details of all Storage buckets within an existing product.
-    title: 'listBuckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
+    title: 'ListBuckets()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -805,17 +765,14 @@ functions:
         name: List buckets
         isSpotlight: true
         code: |
-          ```dart
-          final List<Bucket> buckets = await supabase
-            .storage
-            .listBuckets();
+          ```c#
+          var buckets = await supabase.Storage.ListBuckets();
           ```
 
   - id: get-bucket
     description: |
       Retrieves the details of an existing Storage bucket.
-    title: 'getBucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
+    title: 'GetBucket()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -825,16 +782,14 @@ functions:
         name: Get bucket
         isSpotlight: true
         code: |
-          ```dart
-          final Bucket bucket = await supabase
-            .storage
-            .getBucket('avatars');
+          ```c#
+          var bucket = await supabase.Storage.GetBucket("avatars");
           ```
 
   - id: create-bucket
     description: |
       Creates a new Storage bucket
-    title: 'createBucket()'
+    title: 'CreateBucket()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `insert`
@@ -844,16 +799,14 @@ functions:
         name: Create bucket
         isSpotlight: true
         code: |
-          ```dart
-          final String bucketId = await supabase
-            .storage
-            .createBucket('avatars');
+          ```c#
+          var bucket = await supabase.Storage.CreateBucket("avatars");
           ```
 
   - id: empty-bucket
     description: |
       Removes all objects inside a single bucket.
-    title: 'emptyBucket()'
+    title: 'EmptyBucket()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -863,15 +816,13 @@ functions:
         name: Empty bucket
         isSpotlight: true
         code: |
-          ```dart
-          final String result = await supabase
-            .storage
-            .emptyBucket('avatars');
+          ```c#
+          var bucket = await supabase.Storage.EmptyBucket("avatars");
           ```
   - id: update-bucket
     description: |
       Updates a new Storage bucket
-    title: 'updateBucket()'
+    title: 'UpdateBucket()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `update`
@@ -881,16 +832,14 @@ functions:
         name: Update bucket
         isSpotlight: true
         code: |
-          ```dart
-          final res = await supabase
-            .storage
-            .updateBucket('avatars', const BucketOptions(public: false));
+          ```c#
+          var bucket = await supabase.Storage.UpdateBucket("avatars", new BucketUpsertOptions { Public = false });
           ```
 
   - id: delete-bucket
     description: |
       Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
-    title: 'deleteBucket()'
+    title: 'DeleteBucket()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` and `delete`
@@ -901,16 +850,13 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final String result = await supabase
-            .storage
-            .deleteBucket('avatars');
+          var result = await supabase.Storage.DeleteBucket("avatars");
           ```
 
   - id: from-upload
     description: |
       Uploads a file to an existing bucket.
-    title: 'from.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
+    title: 'From().Upload()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -920,19 +866,28 @@ functions:
         name: Upload file
         isSpotlight: true
         code: |
-          ```dart
-          final avatarFile = File('path/to/file');
-          final String path = await supabase.storage.from('avatars').upload(
-                'public/avatar1.png',
-                avatarFile,
-                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-              );
+          ```c#
+          var imagePath = Path.Combine("Assets", "fancy-avatar.png");
+
+          await supabase.Storage
+            .From("avatars")
+            .Upload(imagePath, "fancy-avatar.png", new FileOptions { CacheControl = "3600", Upsert = false });
+          ```
+      - id: upload-file-with-progress
+        name: Upload file with Progress
+        code: |
+          ```c#
+          var imagePath = Path.Combine("Assets", "fancy-avatar.png");
+
+          await supabase.Storage
+            .From("avatars")
+            .Upload(imagePath, "fancy-avatar.png", onProgress: (sender, progress) => Debug.WriteLine($"{progress}%"));
           ```
 
   - id: from-update
     description: |
       Replaces an existing file at the specified path with a new one.
-    title: 'from.update()'
+    title: 'From().update()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -942,19 +897,15 @@ functions:
         name: Update file
         isSpotlight: true
         code: |
-          ```dart
-          final avatarFile = File('path/to/local/file');
-          final String path = await supabase.storage.from('avatars').update(
-                'public/avatar1.png',
-                avatarFile,
-                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-              );
+          ```c#
+          var imagePath = Path.Combine("Assets", "fancy-avatar.png");
+          await supabase.Storage.From("avatars").Update(imagePath, "fancy-avatar.png");
           ```
 
   - id: from-move
     description: |
       Moves an existing file, optionally renaming it at the same time.
-    title: 'from.move()'
+    title: 'From().Move()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -964,17 +915,15 @@ functions:
         name: Move file
         isSpotlight: true
         code: |
-          ```dart
-          final String result = await supabase
-            .storage
-            .from('avatars')
-            .move('public/avatar1.png', 'private/avatar2.png');
+          ```c#
+          await supabase.Storage.From("avatars")
+            .Move("public/fancy-avatar.png", "private/fancy-avatar.png");
           ```
 
   - id: from-create-signed-url
     description: |
       Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
-    title: 'from.createSignedUrl()'
+    title: 'From().CreateSignedUrl()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -984,27 +933,8 @@ functions:
         name: Create Signed URL
         isSpotlight: true
         code: |
-          ```dart
-          final String signedUrl = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl('avatar1.png', 60);
-          ```
-      - id: create-signed-url-with-transform
-        name: With transform
-        code: |
-          ```dart
-          final String signedUrl = await supabase
-            .storage
-            .from('avatars')
-            .createSignedUrl(
-              'avatar1.png',
-              60,
-              transform: TransformOptions(
-                width: 200,
-                height: 200,
-              ),
-            );
+          ```c#
+          var url = await supabase.Storage.From("avatars").CreateSignedUrl("public/fancy-avatar.png", 60);
           ```
 
   - id: from-get-public-url
@@ -1012,7 +942,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [UpdateBucket()](/docs/reference/csharp/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
@@ -1021,33 +951,14 @@ functions:
         name: Returns the URL for an asset in a public bucket
         isSpotlight: true
         code: |
-          ```dart
-          final String publicUrl = supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl('avatar1.png');
-          ```
-      - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
-        name: With transform
-        isSpotlight: true
-        code: |
-          ```dart
-          final String publicUrl = await supabase
-            .storage
-            .from('public-bucket')
-            .getPublicUrl(
-              'avatar1.png',
-              transform: TransformOptions(
-                width: 200,
-                height: 200,
-              ),
-            );
+          ```c#
+          var publicUrl = supabase.Storage.From("avatars").GetPublicUrl("public/fancy-avatar.png");
           ```
 
   - id: from-download
     description: |
       Downloads a file.
-    title: 'from.download()'
+    title: 'From().Download()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -1057,33 +968,22 @@ functions:
         name: Download file
         isSpotlight: true
         code: |
-          ```dart
-          final Uint8List file = await supabase
-            .storage
-            .from('avatars')
-            .download('avatar1.png');
+          ```c#
+          var bytes = await supabase.Storage.From("avatars").Download("public/fancy-avatar.png");
           ```
-      - id: download-file-with-transform
-        name: With transform
-        isSpotlight: true
+      - id: download-file-with-progress
+        name: Download file with Progress
         code: |
-          ```dart
-          final Uint8List file = await supabase
-            .storage
-            .from('avatars')
-            .download(
-              'avatar1.png',
-              transform: TransformOptions(
-                width: 200,
-                height: 200,
-              ),
-            );
+          ```c#
+          var bytes = await supabase.Storage
+            .From("avatars")
+            .Download("public/fancy-avatar.png", (sender, progress) => Debug.WriteLine($"{progress}%"));
           ```
 
   - id: from-remove
     description: |
       Deletes files within the same bucket
-    title: 'from.remove()'
+    title: 'From().Remove()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -1093,17 +993,14 @@ functions:
         name: Delete file
         isSpotlight: true
         code: |
-          ```dart
-          final List<FileObject> objects = await supabase
-            .storage
-            .from('avatars')
-            .remove(['avatar1.png']);
+          ```c#
+          await supabase.Storage.From("avatars").Remove(new List<string> { "public/fancy-avatar.png" });
           ```
 
   - id: from-list
     description: |
       Lists all the files within a bucket.
-    title: 'from.list()'
+    title: 'From().list()'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -1113,11 +1010,8 @@ functions:
         name: List files in a bucket
         isSpotlight: true
         code: |
-          ```dart
-          final List<FileObject> objects = await supabase
-            .storage
-            .from('avatars')
-            .list();
+          ```c#
+          var objects = await supabase.Storage.From("avatars").List();
           ```
   - id: using-modifiers
     title: Using Modifiers
@@ -1125,94 +1019,105 @@ functions:
       Filters work on the row level—they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
-      change the format of the response (e.g., returning a CSV string).
-
-      Modifiers must be specified after filters. Some modifiers only apply for
-      queries that return rows (e.g., `select()` or `rpc()` on a function that
-      returns a table response).
+      change the format of the response (e.g., setting a limit or offset).
 
   - id: limit
-    title: limit()
+    title: Limit()
     description: |
       Limits the result with the specified count.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .limit(1);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Limit(10)
+            .Get();
           ```
       - id: with-embedded-resources
         name: With embedded resources
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .limit(1,  foreignTable: 'cities' );
+          ```c#
+          var result = await supabase.From<Country>()
+            .Select("name, cities(name)")
+            .Filter("name", Operator.Equals, "United States")
+            .Limit(10, "cities")
+            .Get();
           ```
 
   - id: order
-    title: order()
+    title: Order()
     description: |
       Orders the result with the specified column.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .order('id',  ascending: false );
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Order("id", Ordering.Descending)
+            .Get();
           ```
       - id: with-embedded-resources
         name: With embedded resources
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .order('name', foreignTable: 'cities');
+          ```c#
+           var result = await supabase.From<Country>()
+            .Select("name, cities(name)")
+            .Filter("name", Operator.Equals, "United States")
+            .Order("cities", "name", Ordering.Descending)
+            .Get();
           ```
 
   - id: range
-    title: range()
+    title: Range()
     description: |
       Limits the result to rows within the specified range, inclusive.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .range(0,3);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Range(0, 3)
+            .Get();
+          ```
+
+  - id: offset
+    title: Offset()
+    description: |
+      Specifies the offset of the queried rows to be returned (useful in pagination)
+    examples:
+      - id: with-select
+        name: With `Select()`
+        isSpotlight: true
+        code: |
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Offset(25)
+            .Get();
           ```
 
   - id: single
-    title: single()
+    title: Single()
     description: |
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .single();
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Single();
           ```
 
   - id: using-filters
@@ -1220,61 +1125,25 @@ functions:
     description: |
       Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters can be used on `Select()`, `update()`, and `Delete()` queries.
 
       If a Database function returns a table response, you can also apply filters.
     examples:
       - id: applying-filters
         name: Applying Filters
         description: |
-          Filters must be applied after any of `select()`, `update()`, `upsert()`,
-          `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
+          Filters must be applied after any of `Select()`, `update()`, `upsert()`,
+          `Delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/csharp/using-modifiers).
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The Shire');  // Correct
-
-          final data = await supabase
-            .from('cities')
-            .eq('name', 'The Shire')  // Incorrect
-            .select('name, country_id');
-          ```
-      - id: chaining-filters
-        name: Chaining Filters
-        description: |
-          Filters must be applied after any of `select()`, `update()`, `upsert()`,
-          `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The Shire');  // Correct
-
-          final data = await supabase
-            .from('cities')
-            .eq('name', 'The Shire')  // Incorrect
-            .select('name, country_id');
-          ```
-      - id: conditional-chaining
-        name: Conditional Chaining
-        description: |
-          Filters can be built up one step at a time and then executed. For example:
-        code: |
-          ```dart
-          final data = await supabase
-            .from('users')
-            .select()
-            .eq('address->postcode', 90210);
+          ```c#
+          var result = await supabase.From<City>()
+                .Select("name, country_id")
+                .Filter("name", Operator.Equals, "The Shire")
+                .Single();
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
-        description: |
-          Filters can be built up one step at a time and then executed. For example:
         data:
           sql: |
             ```sql
@@ -1308,25 +1177,20 @@ functions:
           }
           ```
         code: |
-          ```dart
-          final data = await supabase
-            .from('users')
-            .select()
-            .eq('address->postcode', 90210);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("address->postcode", Operator.Equals, 90210)
+            .Get();
           ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('''
-              name,
-              cities!inner (
-                name
-              )
-            ''')
-            .eq('cities.name', 'Bali');
+          ```c#
+          var results = await supabase.From<Country>()
+            .Select("name, cities!inner(name)")
+            .Filter("cities.name", Operator.Equals, "Bali")
+            .Get();
           ```
         data:
           sql: |
@@ -1369,940 +1233,409 @@ functions:
             }
             ```
   - id: or
-    title: or()
+    title: Or()
     description: |
       Finds all rows satisfying at least one of the filters.
-    notes: |
-      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```dart
-        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
-        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
-        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
-        ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.eq.20,id.eq.30');
+          ```c#
+          var filters = new List<QueryFilter>
+          {
+              new QueryFilter("id", Operator.Equals, 20),
+              new QueryFilter("id", Operator.Equals, 30)
+          };
+
+          var result = await supabase.From<Country>()
+            .Or(filters)
+            .Get();
           ```
       - id: use-or-with-and
         name: Use `or` with `and`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
+          ```c#
+          var filters = new List<QueryFilter>
+          {
+              new QueryFilter("id", Operator.Equals, 20),
+              new QueryFilter("id", Operator.Equals, 30),
+              new QueryFilter(Operator.And, new List<QueryFilter>
+              {
+                  new QueryFilter("name", Operator.Equals, "New Zealand"),
+                  new QueryFilter("name", Operator.Equals, "France")
+              })
+          };
+
+          var result = await supabase.From<Country>()
+            .Or(filters)
+            .Get();
           ```
 
   - id: not
-    title: not()
+    title: Not()
     description: |
       Finds all rows which doesn't satisfy the filter.
-    notes: |
-      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
-
-        ```dart
-        .not('name','eq','Paris')
-        .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-        .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-        .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
-        ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .not('name', 'eq', 'Paris');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .not('name', 'eq', 'Paris');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .not('name', 'eq', 'Paris');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities)
-            .not('name', 'eq', 'Paris');
+          ```c#
+          var result = await supabase.From<Country>()
+            .Select("id, name")
+            .Not("name", Operator.Equals, "Paris")
+            .Get();
           ```
 
   - id: match
-    title: match()
+    title: Match()
     description: |
-      Finds all rows whose columns match the specified `query` object.
+      - Finds a model given a class (useful when hydrating models and correlating with database)
+      - Finds all rows whose columns match the specified `Dictionary<string, string>` object.
     examples:
-      - id: with-select
-        name: With `select()`
+      - id: with-model
+        name: With Model
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({'name': 'Beijing', 'country_id': 156});
+          ```c#
+          var city = new City
+          {
+              Id = 224,
+              Name = "Atlanta"
+          };
+
+          var model = supabase.From<City>().Match(city).Single();
           ```
-      - id: with-update
-        name: With `update()`
+      - id: with-dictionary
+        name: With Dictionary
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .match({'name': 'Beijing', 'country_id': 156});
+          ```c#
+          var opts = new Dictionary<string, string>
+          {
+              {"name","Beijing"},
+              {"country_id", "156"}
+          };
+
+          var model = supabase.From<City>().Match(opts).Single();
           ```
 
   - id: eq
-    title: eq()
+    title: Operator.Equals
     description: |
       Finds all rows whose value on the stated `column` exactly matches the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The shire');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .eq('name', 'San Francisco');
+          ```c#
+          var result = await supabase.From<City>()
+            .Filter("name", Operator.Equals, "Bali")
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
           ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .eq('name', 'Mordor');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco');
+          await supabase.From<City>()
+            .Filter("name", Operator.Equals, "Bali")
+            .Delete();
           ```
 
   - id: neq
-    title: neq()
+    title: Operator.NotEqual
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .neq('name', 'The shire');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .neq('name', 'San Francisco');
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("name", Operator.NotEqual, "Bali")
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .neq('name', 'Mordor');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos');
+          ```c#
+          await supabase.From<City>()
+            .Filter("name", Operator.NotEqual, "Bali")
+            .Delete();
           ```
 
   - id: gt
-    title: gt()
+    title: Operator.GreaterThan
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gt('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .gt('country_id', 250);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("country_id", Operator.GreaterThan, 250)
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .gt('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .gt('country_id', 250);
+          ```c#
+          await supabase.From<City>()
+            .Filter("country_id", Operator.GreaterThan, 250)
+            .Delete();
           ```
 
   - id: gte
-    title: gte()
+    title: Operator.GreaterThanOrEqual
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gte('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .gte('country_id', 250);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("country_id", Operator.GreaterThanOrEqual, 250)
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .gte('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .gte('country_id', 250);
+          ```c#
+          await supabase.From<City>()
+            .Filter("country_id", Operator.GreaterThanOrEqual, 250)
+            .Delete();
           ```
 
   - id: lt
-    title: lt()
+    title: Operator.LessThan
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lt('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .lt('country_id', 250);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("country_id", Operator.LessThan, 250)
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .lt('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .lt('country_id', 250);
+          ```c#
+          await supabase.From<City>()
+            .Filter("country_id", Operator.LessThan, 250)
+            .Delete();
           ```
 
   - id: lte
-    title: lte()
+    title: Operator.LessThanOrEqual
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lte('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .lte('country_id', 250);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("country_id", Operator.LessThanOrEqual, 250)
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .lte('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .lte('country_id', 250);
+          ```c#
+          await supabase.From<City>()
+            .Filter("country_id", Operator.LessThanOrEqual, 250)
+            .Delete();
           ```
 
   - id: like
-    title: like()
+    title: Operator.Like
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .like('name', '%la%');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .like('name', '%la%');
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("name", Operator.Like, "%la%")
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .like('name', '%la%');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .like('name', '%la%');
+          ```c#
+          await supabase.From<City>()
+            .Filter("name", Operator.Like, "%la%")
+            .Delete();
           ```
 
   - id: ilike
-    title: ilike()
+    title: Operator.ILike
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .ilike('name', '%la%');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .ilike('name', '%la%');
+          ```c#
+          await supabase.From<City>()
+            .Filter("name", Operator.ILike, "%la%")
+            .Delete();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .ilike('name', '%la%');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .ilike('name', '%la%');
+          ```c#
+           await supabase.From<City>()
+            .Filter("name", Operator.ILike, "%la%")
+            .Delete();
           ```
 
   - id: is
-    title: is_()
+    title: Operator.Is
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
-
-      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .is_('name', null);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .is_('name', null);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("name", Operator.Is, null)
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .is_('name', null);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .is_('name', null);
+          ```c#
+          await supabase.From<City>()
+            .Filter("name", Operator.Is, null)
+            .Delete();
           ```
 
   - id: in
-    title: in_()
+    title: Operator.In
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
-
-      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id")
+            .Filter("name", Operator.In, new List<object> { "Rio de Janiero", "San Francisco" })
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```c#
+          await supabase.From<City>()
+            .Filter("name", Operator.In, new List<object> { "Rio de Janiero", "San Francisco" })
+            .Delete();
           ```
 
   - id: contains
-    title: contains()
+    title: Operator.Contains
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .contains('main_exports', ['oil']);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .contains('main_exports', ['oil']);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id, main_exports")
+            .Filter("main_exports", Operator.Contains, new List<object> { "oil", "fish" })
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .contains('main_exports', ['oil']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .contains('main_exports', ['oil']);
+          ```c#
+          await supabase.From<City>()
+            .Filter("main_exports", Operator.Contains, new List<object> { "oil", "fish" })
+            .Delete();
           ```
 
   - id: contained-by
-    title: containedBy()
+    title: Operator.ContainedIn
     examples:
       - id: with-select
-        name: With `select()`
+        name: With `Select()`
         isSpotlight: true
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country_id, main_exports")
+            .Filter("main_exports", Operator.ContainedIn, new List<object> { "oil", "fish" })
+            .Get();
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With `Delete()`
         code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
-          ```
-
-  - id: range-lt
-    title: rangeLt()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-
-  - id: range-gt
-    title: rangeGt()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-
-  - id: range-gte
-    title: rangeGte()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-
-  - id: range-lte
-    title: rangeLte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', [150, 250]);
-          ```
-
-  - id: range-adjacent
-    title: rangeAdjacent()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-
-  - id: overlaps
-    title: overlaps()
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .overlaps('main_exports', ['computers', 'minerals']);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .overlaps('main_exports', ['computers', 'minerals']);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .overlaps('main_exports', ['computers', 'minerals']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .overlaps('main_exports', ['computers', 'minerals']);
+          ```c#
+          await supabase.From<City>()
+            .Filter("main_exports", Operator.ContainedIn, new List<object> { "oil", "fish" })
+            .Delete();
           ```
 
   - id: text-search
-    title: textSearch()
+    title: Operator.[FTS,PLFTS,PHFTS,WFTS] (Full Text Search)
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
     examples:
       - id: text-search
         name: Text search
         code: |
-          ```dart
-          final data = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",
-              config: 'english'
-            );
+          ```c#
+          var result = await supabase.From<Quote>()
+            .Select("catchphrase")
+            .Filter("catchphrase", Operator.FTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Get();
           ```
       - id: basic-normalization
         name: Basic normalization
         description: Uses PostgreSQL's `plainto_tsquery` function.
         code: |
-          ```dart
-          final data = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",
-              type: TextSearchType.plain,
-              config: 'english'
-            );
+          ```c#
+          var result = await supabase.From<Quote>()
+            .Select("catchphrase")
+            .Filter("catchphrase", Operator.PLFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Get();
           ```
       - id: full-normalization
         name: Full normalization
         description: Uses PostgreSQL's `phraseto_tsquery` function.
         code: |
-          ```dart
-          final data = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",
-              type: TextSearchType.phrase,
-              config: 'english'
-            );
+          ```c#
+          var result = await supabase.From<Quote>()
+            .Select("catchphrase")
+            .Filter("catchphrase", Operator.PHFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Get();
           ```
       - id: web-search
         name: Websearch
@@ -2317,72 +1650,9 @@ functions:
           - `-`: a dash will be converted to the ! operator.
 
         code: |
-          ```dart
-          final data = await supabase
-            .from('quotes')
-            .select('catchphrase')
-            .textSearch('catchphrase', "'fat or cat'",
-              type: TextSearchType.websearch,
-              config: 'english'
-            );
-          ```
-
-  - id: filter
-    title: filter()
-    description: |
-      Finds all rows whose `column` satisfies the filter.
-    notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
-        ```dart
-          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
-          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
-        ```
-    examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .filter('name', 'in', '("Paris","Tokyo")');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")');
-          ```
-      - id: filter-embedded-resources
-        name: Filter embedded resources
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")');
+          ```c#
+          var result = await supabase.From<Quote>()
+            .Select("catchphrase")
+            .Filter("catchphrase", Operator.WFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Get();
           ```
