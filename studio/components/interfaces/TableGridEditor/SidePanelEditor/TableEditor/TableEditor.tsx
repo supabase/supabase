@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input } from 'ui'
+import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
 import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -220,10 +220,17 @@ const TableEditor: FC<Props> = ({
                     If RLS is not enabled, anyone with the anon key can modify and delete your data.
                   </p>
                   {!tableFields.isRLSEnabled && (
-                    <p className="mt-3 bg-yellow-300 p-2">
-                      Turning off RLS means that you are allowing <u>anonymous access</u> to your
-                      table.
-                    </p>
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      className="!px-4 !py-3 mt-3"
+                      // @ts-ignore
+                      title={
+                        <span className="text-amber-1100 text-sm">
+                          Turning off RLS means that you are allowing anonymous access to your table
+                        </span>
+                      }
+                    />
                   )}
                 </>
               }
