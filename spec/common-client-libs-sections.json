@@ -17,7 +17,8 @@
     "title": "Initializing",
     "id": "initializing",
     "slug": "initializing",
-    "type": "function"
+    "type": "markdown",
+    "libs": ["csharp"]
   },
   {
     "title": "Typescript Support",
@@ -341,6 +342,15 @@
             "parent": "modifiers",
             "type": "function",
             "libs": ["js", "dart", "dart_v0", "csharp"]
+          },
+          {
+            "id": "offset",
+            "title": "Offset the Query",
+            "slug": "offset",
+            "product":"database",
+            "parent":"modifiers",
+            "type": "function",
+            "libs": ["csharp"]
           },
           {
             "id": "abort-signal",
