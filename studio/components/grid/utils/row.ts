@@ -9,7 +9,11 @@ export async function fetchCount(
 ) {
   if (!state.rowService) return
 
-  const { data, error } = await state.rowService.count(filters)
+  // Remove unavailable columns from filters
+  const columnNames = state.table?.columns.map((column) => column.name) ?? []
+  const cleanedFilters = filters.filter((filter) => columnNames.includes(filter.column))
+
+  const { data, error } = await state.rowService.count(cleanedFilters)
   if (error) {
     // TODO: handle fetch rows count error
   } else {
@@ -35,11 +39,16 @@ export async function fetchPage(
 
   dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: true } })
 
+  // Remove unavailable columns from sorts & filter
+  const columnNames = state.table?.columns.map((column) => column.name) ?? []
+  const cleanedFilters = filters.filter((filter) => columnNames.includes(filter.column))
+  const cleanedSorts = sorts.filter((sort) => columnNames.includes(sort.column))
+
   const { data, error } = await state.rowService.fetchPage(
     state.page,
     state.rowsPerPage,
-    filters,
-    sorts
+    cleanedFilters,
+    cleanedSorts
   )
   if (error) {
     // TODO: handle fetch rows data error
