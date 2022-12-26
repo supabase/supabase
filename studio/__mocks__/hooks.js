@@ -16,3 +16,5 @@ window.matchMedia = jest.fn().mockReturnValue({
   removeEventListener: jest.fn(),
 })
 export const StoreProvider = StoreProvider
+
+export const withAuth = jest.fn()

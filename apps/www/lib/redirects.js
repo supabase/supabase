@@ -535,11 +535,15 @@ module.exports = [
     source: '/docs/reference/postgres/publications',
     destination: '/docs/guides/database/replication',
   },
-
   {
     permanent: true,
     source: '/docs/guides/hosting/platform',
     destination: '/docs/guides/platform',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/hosting/platform/access-control',
+    destination: '/docs/guides/platform/access-control',
   },
   {
     permanent: true,
@@ -1709,6 +1713,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-zoom',
+    destination: '/docs/guides/auth/social-login/auth-zoom',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database',
     destination: '/docs/guides/database/overview',
   },
@@ -1786,16 +1795,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/with-ionic-angular',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-angular',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
   },
   {
     permanent: true,
