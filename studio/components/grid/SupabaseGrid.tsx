@@ -95,6 +95,36 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   }, [])
 
   useEffect(() => {
+    if (state.refreshPageFlag == 0) {
+      return
+    }
+
+    const columnNames = state.table?.columns.map((column) => column.name)
+
+    if (
+      columnNames &&
+      (sorts.some((sortInstance) => !columnNames.includes(sortInstance.column)) ||
+        filters.some((filterInstance) => !columnNames.includes(filterInstance.column)))
+    ) {
+      // Remove unavailable columns from "sort" and "filter" query string parameters
+      setParams((prevParams) => {
+        return {
+          ...prevParams,
+          filter: filters
+            .filter((filterInstance) => columnNames.includes(filterInstance.column))
+            .map(
+              (filterInstance) =>
+                `${filterInstance.column}:${filterInstance.operator}:${filterInstance.value}`
+            ),
+          sort: sorts
+            .filter((sortInstance) => columnNames.includes(sortInstance.column))
+            .map(
+              (sortInstance) => `${sortInstance.column}:${sortInstance.ascending ? 'asc' : 'desc'}`
+            ),
+        }
+      })
+    }
+
     if (state.refreshPageFlag === REFRESH_PAGE_IMMEDIATELY) {
       fetchPage(state, dispatch, sorts, filters)
     } else if (state.refreshPageFlag !== 0) {

@@ -4,13 +4,11 @@ import { Query, Dictionary } from 'components/grid'
 import { Modal } from 'ui'
 import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore, useUrlState } from 'hooks'
+import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { onLoadStorage, saveStorageDebounced } from 'components/grid/SupabaseGrid.utils'
-import { InitialStateType } from 'components/grid/store/reducers'
 
 interface Props {
   selectedSchema: string
@@ -45,11 +43,9 @@ const SidePanelEditor: FC<Props> = ({
   onColumnSaved = () => {},
 }) => {
   const { meta, ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
-  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const tables = meta.tables.list()
 
@@ -117,65 +113,6 @@ const SidePanelEditor: FC<Props> = ({
     }
   }
 
-  /**
-   * Renames a column's filter and/or sort rules if the related column has been renamed.
-   */
-  const updateSortsAndFiltersAfterColumnRename = (oldColumnName: string, newColumnName: string) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-
-      return {
-        ...prevParams,
-        filter: existingFilters.map((filter: string) => {
-          const [column] = filter.split(':')
-          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
-        }),
-        sort: existingSorts.map((sort: string) => {
-          const [column] = sort.split(':')
-          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
-        }),
-      }
-    })
-  }
-
-  /**
-   * Removes tables's column filter and/or sort rules if the related column unavailable 
-   * (resulting from name change or deleted column)
-   */
-  const updateSavedStateAfterTableUpdate = (
-    storageRef: string,
-    tableName: string,
-    schema: string | null,
-    tableColumns: ColumnField[]
-  ) => {
-    const savedState = onLoadStorage(storageRef, tableName, schema)
-    const columnNames = tableColumns.map((columnInstance) => columnInstance.name)
-    const { filters, sorts }: { filters?: string[]; sorts?: string[] } = savedState
-    const state = {
-      table: { name: tableName, schema },
-      gridColumns: savedState?.gridColumns,
-    } as InitialStateType
-
-    const newSorts = sorts?.filter((filterQuery) => {
-      const [column] = filterQuery.split(':')
-
-      return columnNames.includes(column)
-    })
-    const newFilters = filters?.filter((sortrQuery) => {
-      const [column] = sortrQuery.split(':')
-
-      return columnNames.includes(column)
-    })
-
-    saveStorageDebounced(
-      state,
-      storageRef,
-      newSorts?.length ? newSorts : undefined,
-      newFilters?.length ? newFilters : undefined
-    )
-  }
-
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
@@ -201,15 +138,6 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      if (
-        !isNewRecord &&
-        payload.name &&
-        selectedColumnToEdit &&
-        selectedColumnToEdit.name !== payload.name
-      ) {
-        updateSortsAndFiltersAfterColumnRename(selectedColumnToEdit.name, payload.name)
-      }
-
       await meta.tables.loadById(selectedTable!.id)
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
@@ -304,14 +232,6 @@ const SidePanelEditor: FC<Props> = ({
             category: 'success',
             message: `Successfully updated ${table.name}!`,
           })
-        }
-        if (projectRef) {
-          updateSavedStateAfterTableUpdate(
-            projectRef,
-            selectedTableToEdit.name,
-            selectedTableToEdit.schema,
-            columns
-          )
         }
       }
     } catch (error: any) {
