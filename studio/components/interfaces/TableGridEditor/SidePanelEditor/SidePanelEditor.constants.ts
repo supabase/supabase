@@ -3,12 +3,12 @@ import { PostgresDataTypeOption } from './SidePanelEditor.types'
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
 export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric']
-export const JSON_TYPES = ['jsonb']
-export const TEXT_TYPES = ['text']
+export const JSON_TYPES = ['json', 'jsonb']
+export const TEXT_TYPES = ['text', 'varchar']
 
-export const TIMESTAMP_TYPES = ['timestamptz']
+export const TIMESTAMP_TYPES = ['timestamp', 'timestamptz']
 export const DATE_TYPES = ['date']
-export const TIME_TYPES = ['time']
+export const TIME_TYPES = ['time', 'timetz']
 export const DATETIME_TYPES = concat(TIMESTAMP_TYPES, DATE_TYPES, TIME_TYPES)
 
 export const OTHER_DATA_TYPES = ['uuid', 'bool']
@@ -48,22 +48,12 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
     type: 'number',
   },
   {
-    name: 'json',
-    description: 'Textual JSON data',
-    type: 'json',
-  },
-  {
     name: 'jsonb',
     description: 'Binary JSON data, decomposed',
     type: 'json',
   },
   {
     name: 'text',
-    description: 'Variable-length character string',
-    type: 'text',
-  },
-  {
-    name: 'varchar',
     description: 'Variable-length character string',
     type: 'text',
   },
@@ -80,16 +70,6 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'time',
     description: 'Time of day (no time zone)',
-    type: 'time',
-  },
-  {
-    name: 'timetz',
-    description: 'Time of day, including time zone',
-    type: 'time',
-  },
-  {
-    name: 'timestamp',
-    description: 'Date and time (no time zone)',
     type: 'time',
   },
   {
