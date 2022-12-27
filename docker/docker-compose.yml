@@ -209,3 +209,4 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
+      - ./volumes/db/data:/var/lib/postgresql/data
