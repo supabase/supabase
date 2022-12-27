@@ -3,12 +3,12 @@ import { PostgresDataTypeOption } from './SidePanelEditor.types'
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
 export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric']
-export const JSON_TYPES = ['json', 'jsonb']
-export const TEXT_TYPES = ['text', 'varchar']
+export const JSON_TYPES = ['jsonb']
+export const TEXT_TYPES = ['text']
 
-export const TIMESTAMP_TYPES = ['timestamp', 'timestamptz']
+export const TIMESTAMP_TYPES = ['timestamptz']
 export const DATE_TYPES = ['date']
-export const TIME_TYPES = ['time', 'timetz']
+export const TIME_TYPES = ['time']
 export const DATETIME_TYPES = concat(TIMESTAMP_TYPES, DATE_TYPES, TIME_TYPES)
 
 export const OTHER_DATA_TYPES = ['uuid', 'bool']
