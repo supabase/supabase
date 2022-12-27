@@ -1,9 +1,9 @@
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useParams } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 
@@ -16,14 +16,12 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-
-const GeneralSettings = observer(() => {
-  const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
+const GeneralSettings = () => {
+  const { app, ui } = useStore()
+  const { slug } = useParams()
 
   const formId = 'org-general-settings'
-  const initialValues = { name: PageState.organization.name }
+  const initialValues = { name: ui.selectedOrganization?.name ?? '' }
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -37,9 +35,9 @@ const GeneralSettings = observer(() => {
 
     setSubmitting(true)
 
-    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, {
+    const response = await patch(`${API_URL}/organizations/${slug}`, {
       ...values,
-      billing_email: PageState.organization?.billing_email ?? '',
+      billing_email: ui.selectedOrganization?.billing_email ?? '',
     })
 
     if (response.error) {
@@ -54,7 +52,7 @@ const GeneralSettings = observer(() => {
         initialValues: { name },
       })
 
-      PageState.onOrgUpdated(response)
+      app.onOrgUpdated(response)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',
@@ -70,9 +68,9 @@ const GeneralSettings = observer(() => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = { name: PageState.organization.name }
+            const values = { name: ui.selectedOrganization?.name ?? '' }
             resetForm({ values, initialValues: values })
-          }, [PageState.organization.slug])
+          }, [ui.selectedOrganization?.slug])
 
           return (
             <FormPanel
@@ -105,6 +103,6 @@ const GeneralSettings = observer(() => {
       {canDeleteOrganization && <OrganizationDeletePanel />}
     </div>
   )
-})
+}
 
-export default GeneralSettings
+export default observer(GeneralSettings)
