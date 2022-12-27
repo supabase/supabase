@@ -139,7 +139,7 @@ Middleware runs before every route declared in the `matcher` array. Since we don
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a new file at `/pages/middleware.js` and populate with the following:
+Create a new file at `/app/middleware.js` and populate with the following:
 
 ```jsx title="middleware.js"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -166,7 +166,7 @@ export const config = {
 
 <TabPanel id="ts" label="TypeScript">
 
-Create a new file at `/middleware.ts` (a sibling of /pages) and populate with the following:
+Create a new file at `app/middleware.ts` and populate with the following:
 
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -322,7 +322,7 @@ Create a `/components/supabase-listener.tsx` file and add the following:
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import supabase from '../utils/supabase'
+import supabase from '../utils/supabase-browser'
 
 export default function SupabaseListener({ accessToken }: { accessToken?: string }) {
   const router = useRouter()
