@@ -23,7 +23,7 @@ const OrgGeneralSettings: NextPage = () => {
         },
       ]}
     >
-      {ui.selectedOrganization === undefined ? (
+      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
