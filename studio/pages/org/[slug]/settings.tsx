@@ -177,7 +177,7 @@ const OrganizationSettings: NextPageWithLayout = () => {
         ) : selectedTab == 'BILLING' ? (
           <div />
         ) : selectedTab == 'INVOICES' ? (
-          <InvoicesSettings organization={organization} />
+          <div />
         ) : null}
       </div>
     </div>
