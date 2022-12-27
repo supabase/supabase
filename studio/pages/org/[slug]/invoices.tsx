@@ -6,7 +6,7 @@ import { Tabs } from 'ui'
 import { useParams, useStore } from 'hooks'
 import Loading from 'components/ui/Loading'
 import { AccountLayout } from 'components/layouts'
-import { GeneralSettings } from 'components/interfaces/Organization'
+import { InvoicesSettings } from 'components/interfaces/Organization'
 
 const OrgInvoices: NextPage = () => {
   const { ui } = useStore()
@@ -23,7 +23,7 @@ const OrgInvoices: NextPage = () => {
         },
       ]}
     >
-      {ui.selectedOrganization === undefined ? (
+      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
@@ -51,7 +51,7 @@ const OrgInvoices: NextPage = () => {
           </div>
 
           <div className="mb-8">
-            <GeneralSettings />
+            <InvoicesSettings />
           </div>
         </div>
       )}
