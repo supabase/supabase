@@ -171,11 +171,11 @@ const OrganizationSettings: NextPageWithLayout = () => {
 
       <div className="mb-8">
         {selectedTab == 'GENERAL' ? (
-          <GeneralSettings />
+          <div />
         ) : selectedTab == 'TEAM' ? (
-          <TeamSettings />
+          <div />
         ) : selectedTab == 'BILLING' ? (
-          <BillingSettings organization={organization} projects={projects} />
+          <div />
         ) : selectedTab == 'INVOICES' ? (
           <InvoicesSettings organization={organization} />
         ) : null}
