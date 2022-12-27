@@ -5,7 +5,7 @@ import { Tabs } from 'ui'
 
 import { useParams, useStore } from 'hooks'
 import Loading from 'components/ui/Loading'
-import { AccountLayout, AccountLayoutWithoutAuth } from 'components/layouts'
+import { AccountLayout } from 'components/layouts'
 import { GeneralSettings } from 'components/interfaces/Organization'
 
 const OrgGeneralSettings: NextPage = () => {
@@ -37,6 +37,7 @@ const OrgGeneralSettings: NextPage = () => {
               <Tabs
                 size="small"
                 type="underlined"
+                activeId="general"
                 onChange={(id: any) => {
                   if (id !== 'general') router.push(`/org/${slug}/${id}`)
                 }}
