@@ -18,7 +18,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
           level: warning
-          command: npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+          command: npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
 
         # run: |-
         #   function run_check() {
