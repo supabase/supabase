@@ -565,7 +565,6 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.challengeAndVerify({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             code: '123456'
           })
           ```
