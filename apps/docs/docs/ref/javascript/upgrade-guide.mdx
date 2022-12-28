@@ -10,11 +10,28 @@ No new features will be added to supabase-js v1 , but we'll continuing merging s
 
 ## Upgrade the client library
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Install the latest version
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
 ```sh
 npm install @supabase/supabase-js@2
 ```
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 _Optionally_ if you are using custom configuration with `createClient` then follow below:
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -48,15 +65,24 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 Read more about the [constructor options](/docs/reference/javascript/release-notes#explicit-constructor-options).
 
 ### Auth methods
 
 The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Sign in with email and password
 
-<Tabs
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+ <Tabs
   scrollable
   size="small"
   type="underlined"
@@ -81,9 +107,17 @@ const {
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Sign in with magic link
 
-<Tabs
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
   scrollable
   size="small"
   type="underlined"
@@ -105,7 +139,16 @@ const { error } = await supabase.auth.signInWithOtp({ email })
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Sign in with a third-party provider
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -129,9 +172,17 @@ const { error } = await supabase.auth.signInWithOAuth({ provider })
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Sign in with phone
 
-<Tabs
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
   scrollable
   size="small"
   type="underlined"
@@ -153,7 +204,16 @@ const { error } = await supabase.auth.signInWithPassword({ phone, password })
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Sign in with phone using OTP
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -180,7 +240,16 @@ const { data, error } = await supabase.auth.verifyOtp({ phone, token })
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Reset password for email
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -204,7 +273,16 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email)
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Get the user's current session
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -230,7 +308,16 @@ const {
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Get the logged-in user
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -257,7 +344,16 @@ const { user } = session
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Update user data for a logged-in user
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -284,7 +380,16 @@ const {
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Use a custom `access_token` JWT with Supabase
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -314,7 +419,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 </TabPanel>
 </Tabs>
 
-#### Cookie methods
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Cookie methods
 
 The cookie-related methods like `setAuthCookie` and `getUserByCookie` have been removed.
 
@@ -329,7 +437,13 @@ Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional bac
 
 Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Insert and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -353,7 +467,16 @@ const { data, error } = await supabase.auth.insert({ new_data }).select()
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Update and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -377,9 +500,18 @@ const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).se
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ### Realtime methods
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Subscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -411,7 +543,16 @@ const userListener = supabase
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 #### Unsubscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -434,3 +575,6 @@ supabase.removeChannel(userListener)
 
 </TabPanel>
 </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
