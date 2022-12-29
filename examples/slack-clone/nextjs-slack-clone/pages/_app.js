@@ -12,17 +12,10 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session }}) => {
-      setSession(session)
-      setUserLoaded(session ? true : false)
-      if (session?.user) {
-        signIn()
-        router.push('/channels/[id]', '/channels/1')
-      }
-    })
-
-
-    const { subscription: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    function saveSession(
+      /** @type {Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']} */
+      session
+    ) {
       setSession(session)
       const currentUser = session?.user
       setUser(currentUser ?? null)
@@ -31,7 +24,11 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
         signIn(currentUser.id, currentUser.email)
         router.push('/channels/[id]', '/channels/1')
       }
-    })
+    }
+
+    supabase.auth.getSession().then(({ data: { session }}) => saveSession(session))
+
+    const { subscription: authListener } = supabase.auth.onAuthStateChange(async (event, session) => saveSession(session))
 
     return () => {
       authListener.unsubscribe()

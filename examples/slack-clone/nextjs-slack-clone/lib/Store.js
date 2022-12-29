@@ -62,9 +62,9 @@ export const useStore = (props) => {
       .subscribe()
     // Cleanup on unmount
     return () => {
-      supabase.removeChannel('public:messages')
-      supabase.removeChannel('public:users')
-      supabase.removeChannel('public:channels')
+      supabase.removeChannel(supabase.channel('public:messages'))
+      supabase.removeChannel(supabase.channel('public:users'))
+      supabase.removeChannel(supabase.channel('public:channels'))
     }
   }, [])
 
@@ -179,7 +179,7 @@ export const fetchMessages = async (channelId, setState) => {
       .from('messages')
       .select(`*, author:user_id(*)`)
       .eq('channel_id', channelId)
-      .order('inserted_at', true)
+      .order('inserted_at', { ascending: true })
     if (setState) setState(data)
     return data
   } catch (error) {
