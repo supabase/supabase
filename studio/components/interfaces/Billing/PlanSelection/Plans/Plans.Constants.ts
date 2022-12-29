@@ -62,7 +62,7 @@ export const PRICING_META = {
     from: true,
     priceMonthly: 599,
     warning: '+ additional use',
-    description: 'For professionals, scales with your team.',
+    description: 'For teams with fine-grained access controls, scales with your business.',
     features: [
       'ABAC Permissions (Owner, Admin, Dev, Read, Billing)',
       'Standardised Security Questionnaire',
