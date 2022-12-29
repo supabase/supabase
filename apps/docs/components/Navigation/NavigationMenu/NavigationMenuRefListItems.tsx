@@ -12,8 +12,9 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
-import React from 'react'
+import React, { Fragment } from 'react'
 import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
+import { isFuncNotInLibraryOrVersion } from './NavigationMenu.utils'
 
 const HeaderImage = React.memo(function HeaderImage(props: any) {
   const router = useRouter()
@@ -131,6 +132,7 @@ const RenderLink = React.memo(function RenderLink(props: any) {
               .map((item) => {
                 return (
                   <FunctionLink
+                    key={item.title}
                     library={props.lib}
                     title={item.title}
                     id={item.id}
@@ -245,76 +247,56 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
 
       <ul className="function-link-list">
         {sections.map((fn: any, fnIndex) => {
-          //
-          // check if the link is allowed to be displayed
-          function isFuncNotInLibraryOrVersion(id, type) {
-            if (id && allowedKeys && !allowedKeys.includes(id) && type !== 'markdown') {
-              /*
-               * Remove this menu link from side bar, as it does not exist for either
-               * this language, or for this lib version
-               *
-               * */
-              return true
-            } else {
-              return false
-            }
-          }
-
           // run allow check
-          if (isFuncNotInLibraryOrVersion(fn.id, fn.type)) {
-            return <></>
+          if (isFuncNotInLibraryOrVersion(fn.id, fn.type, allowedKeys)) {
+            return <Fragment key={fn.id}></Fragment>
           }
 
           // handle subtitles with subitems
-          if (!fn.id) {
-            return (
-              <>
-                <Divider />
-                <SideMenuTitle title={fn.title} />
-                {fn.items &&
-                  fn.items
-                    //.filter((item) => item.libs && item.libs.includes(lib))
-                    .map((item) => {
-                      // run allow check
-                      if (isFuncNotInLibraryOrVersion(item.id, item.type)) return <></>
-                      return (
-                        <RenderLink
-                          {...item}
-                          library={menu.title}
-                          index={fnIndex}
-                          modifierIds={modifierIds}
-                          filterIds={filterIds}
-                          authServerIds={authServerIds}
-                          lib={lib}
-                          allowedKeys={allowedKeys}
-                        />
-                      )
-                    })}
-              </>
-            )
-          } else {
-            // handle normal links
-            return (
-              <>
-                <RenderLink {...fn} lib={lib} />
-                {fn.items &&
-                  fn.items
-                    //.filter((item) => item.libs.includes(lib))
-                    .map((item) => (
-                      <RenderLink
-                        {...item}
-                        library={menu.title}
-                        index={fnIndex}
-                        modifierIds={modifierIds}
-                        filterIds={filterIds}
-                        authServerIds={authServerIds}
-                        lib={lib}
-                        allowedKeys={allowedKeys}
-                      />
-                    ))}
-              </>
-            )
-          }
+          return fn.id ? (
+            <Fragment key={fn.id}>
+              <RenderLink {...fn} lib={lib} />
+              {fn.items &&
+                fn.items
+                  //.filter((item) => item.libs.includes(lib))
+                  .map((item) => (
+                    <RenderLink
+                      {...item}
+                      library={menu.title}
+                      index={fnIndex}
+                      modifierIds={modifierIds}
+                      filterIds={filterIds}
+                      authServerIds={authServerIds}
+                      lib={lib}
+                      allowedKeys={allowedKeys}
+                    />
+                  ))}
+            </Fragment>
+          ) : (
+            <Fragment key={fn.title}>
+              <Divider />
+              <SideMenuTitle title={fn.title} />
+              {fn.items &&
+                fn.items.map((item, i) => {
+                  // run allow check
+                  if (isFuncNotInLibraryOrVersion(item.id, item.type, allowedKeys))
+                    return <Fragment key={item.id + i}></Fragment>
+                  return (
+                    <RenderLink
+                      {...item}
+                      key={item.id + i}
+                      library={menu.title}
+                      index={fnIndex}
+                      modifierIds={modifierIds}
+                      filterIds={filterIds}
+                      authServerIds={authServerIds}
+                      lib={lib}
+                      allowedKeys={allowedKeys}
+                    />
+                  )
+                })}
+            </Fragment>
+          )
         })}
       </ul>
     </div>
