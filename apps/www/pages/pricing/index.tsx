@@ -75,6 +75,30 @@ export default function IndexPage() {
       cta: 'Get Started',
     },
     {
+      name: 'Team',
+      costUnit: '/month + usage',
+      href: 'https://app.supabase.com/new/new-project',
+      from: true,
+      priceMonthly: 599,
+      description: 'For production applications with the option to scale.',
+      features: [
+        'ABAC Permissions (owner, dev, read only, billing)',
+        'Standardised security questionnaire',
+        'SOC2',
+        'SSO for Supabase Dashboard',
+        'Priority email support',
+        '100,000 social MAUs',
+        '1 XS compute instance',
+        '14 day backups',
+        '28 day log retention',
+      ],
+      scale: 'Additional fees apply for usage and storage.',
+      shutdown: '',
+      preface: '',
+      additional: 'Need more? Contact us for enterprise plan',
+      cta: 'Get Started',
+    },
+    {
       name: 'Enterprise',
       href: 'https://forms.supabase.com/enterprise',
       description: 'For large-scale applications managing serious workloads.',
@@ -163,7 +187,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl flex-col">
+        <div className="mx-auto flex max-w-[90vw] flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -172,7 +196,7 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-5 lg:space-y-0">
+            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-[90vw] lg:grid-cols-4 lg:gap-5 lg:space-y-0">
               {tiers.map((tier) => (
                 <div
                   key={tier.name}
@@ -307,7 +331,7 @@ export default function IndexPage() {
       </div>
 
       <div className="bg-scale-200">
-        <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
+        <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24">
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Compare Plans</h2>
             <p className="text-scale-1100 mb-16 text-lg">
@@ -418,6 +442,55 @@ export default function IndexPage() {
                 icon={pricing.support.icon}
               />
 
+              {/* Team - Mobile  */}
+              <MobileHeaders
+                tier="Team"
+                from={true}
+                price={'599'}
+                priceDescription={'/mo + additional use'}
+                description={'Everything you need to scale your project into production'}
+              />
+              <PricingTableRowMobile
+                category={pricing.database}
+                tier={'team'}
+                icon={Solutions['database'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.auth}
+                tier={'team'}
+                icon={Solutions['authentication'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.storage}
+                tier={'team'}
+                icon={Solutions['storage'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.realtime}
+                tier={'team'}
+                icon={Solutions['realtime'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing['edge-functions']}
+                tier={'team'}
+                icon={Solutions['edge-functions'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.dashboard}
+                tier={'team'}
+                icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.security}
+                tier={'team'}
+                icon={pricing.security.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.support}
+                tier={'team'}
+                icon={pricing.support.icon}
+              />
+
               {/* Enterprise - Mobile  */}
               <MobileHeaders
                 tier="Enterprise"
@@ -488,7 +561,7 @@ export default function IndexPage() {
                     </th>
 
                     <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal"
+                      className="text-scale-1200 w-1/5 px-6 py-4 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span>Free</span>
@@ -499,7 +572,7 @@ export default function IndexPage() {
                     </th>
 
                     <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
+                      className="text-scale-1200 w-1/5 px-6 py-4 text-left text-sm font-normal leading-6"
                       scope="col"
                     >
                       <span>Pro</span>
@@ -510,7 +583,18 @@ export default function IndexPage() {
                     </th>
 
                     <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
+                      className="text-scale-1200 w-1/5 px-6 py-4 text-left text-sm font-normal leading-6"
+                      scope="col"
+                    >
+                      <span>Team</span>
+                      <div
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
+                        style={{ height: '1px' }}
+                      ></div>
+                    </th>
+
+                    <th
+                      className="text-scale-1200 w-1/5 px-6 py-4 text-left text-sm font-normal leading-6"
                       scope="col"
                     >
                       <span>Enterprise</span>
@@ -551,6 +635,25 @@ export default function IndexPage() {
                       <div className="relative table h-full">
                         <span className="h1 text-scale-1200">$25</span>
                         <p className="p">/project/month + usage costs</p>
+
+                        <p className="p text-sm">
+                          Everything you need to scale your project into production
+                        </p>
+
+                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                          <a>
+                            <Button size="medium" type="default">
+                              Get Started
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </td>
+
+                    <td className="h-full px-6 py-8 align-top">
+                      <div className="relative table h-full">
+                        <span className="h1 text-scale-1200">$599</span>
+                        <p className="p">/month + usage costs</p>
 
                         <p className="p text-sm">
                           Everything you need to scale your project into production
@@ -621,6 +724,16 @@ export default function IndexPage() {
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>
+
+                    <td className="px-6 pt-5">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                        <a>
+                          <Button size="medium" type="default" block>
+                            Get started
+                          </Button>
+                        </a>
+                      </Link>
+                    </td>
 
                     <td className="px-6 pt-5">
                       <Link href="https://app.supabase.com" as="https://app.supabase.com">

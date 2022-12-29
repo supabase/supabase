@@ -65,6 +65,7 @@ export const PricingTableRowDesktop = (props: any) => {
         <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
         <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
         <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {

@@ -1,5 +1,9 @@
 Pricing Changelog
 
+### 29 Dec 2022
+
+Introduced new Team Plan
+
 ### 02 Nov 2022
 ----
 
