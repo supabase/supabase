@@ -111,8 +111,6 @@ const BillingUpdate: NextPageWithLayout = () => {
     )
   }
 
-  console.log({ tiers: products?.tiers })
-
   return (
     <>
       <div className="mx-auto my-10 max-w-[80vw] px-6">
