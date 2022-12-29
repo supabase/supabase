@@ -10,7 +10,6 @@ import { checkPermissions, useOrganizationDetail, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { toJS } from 'mobx'
 
 interface Props {
   user: User
