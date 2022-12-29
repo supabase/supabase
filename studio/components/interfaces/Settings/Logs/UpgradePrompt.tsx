@@ -44,6 +44,10 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.PRO.text}</p>
                 </div>
                 <div className="flex items-center px-4 py-1">
+                  <p className="w-[40%] text-sm">Team</p>
+                  <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
+                </div>
+                <div className="flex items-center px-4 py-1">
                   <p className="w-[40%] text-sm">Enterprise</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.ENTERPRISE.text}</p>
                 </div>

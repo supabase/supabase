@@ -631,5 +631,6 @@ export const TIER_QUERY_LIMITS: {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }

@@ -17,5 +17,6 @@ export const formatTierOptions = (tiers: any[]) => {
   return tiers
     .filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
     .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PRO))
+    .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.TEAM))
     .concat([enterpriseOption])
 }

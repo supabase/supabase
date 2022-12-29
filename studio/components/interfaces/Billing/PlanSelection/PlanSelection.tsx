@@ -25,7 +25,7 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
       <div className="space-y-8">
         <h4 className="text-lg">Change your project's subscription</h4>
         {/* FE will make a call to fetch all plans first at the page level */}
-        <div className="grid lg:grid-cols-3 gap-8 py-8">
+        <div className="grid lg:grid-cols-4 gap-8 py-8">
           <Plans plans={formattedTiers} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
         </div>
         <div className="flex justify-center items-center">
