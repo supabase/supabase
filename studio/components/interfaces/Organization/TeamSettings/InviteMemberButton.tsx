@@ -10,6 +10,7 @@ import { checkPermissions, useOrganizationDetail, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { toJS } from 'mobx'
 
 interface Props {
   user: User
@@ -147,6 +148,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                       <div className="space-y-2">
                         {roles && (
                           <Select
+                            defaultValue={roles.find((role) => role.name === 'Developer')?.id}
                             name="role"
                             label="Member role"
                             error={
