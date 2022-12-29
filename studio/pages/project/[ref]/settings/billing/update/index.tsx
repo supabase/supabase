@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from 'ui'
 
-import { useFreeProjectLimitCheck, useStore } from 'hooks'
+import { useFlag, useFreeProjectLimitCheck, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -111,12 +111,20 @@ const BillingUpdate: NextPageWithLayout = () => {
     )
   }
 
+  const teamTierEnabled = useFlag('teamTier')
+
+  const productTiers = (products?.tiers ?? []).filter(
+    (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM
+  )
+
+  console.log({ teamTierEnabled, productTiers })
+
   return (
     <>
-      <div className="mx-auto my-10 max-w-[80vw] px-6">
+      <div className={["mx-auto my-10 px-6", teamTierEnabled ? 'max-w-[80vw]' : 'max-w-6xl'].join(' ')}>
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
-          tiers={products?.tiers ?? []}
+          tiers={productTiers}
           currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
         />

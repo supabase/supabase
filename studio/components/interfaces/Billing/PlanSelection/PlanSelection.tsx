@@ -4,7 +4,6 @@ import { Transition } from '@headlessui/react'
 
 import Plans from './Plans/Plans'
 import { formatTierOptions } from './PlanSelection.utils'
-import { useFlag } from 'hooks'
 
 interface Props {
   visible: boolean

@@ -62,10 +62,10 @@ export const PRICING_META = {
     from: true,
     priceMonthly: 599,
     warning: '+ additional use',
-    description: 'For production applications with the option to scale.',
+    description: 'For professionals, scales with your team.',
     features: [
-      'ABAC Permissions (owner, dev, read only, billing)',
-      'Standardised security questionnaire',
+      'ABAC Permissions (Owner, Admin, Dev, Read, Billing)',
+      'Standardised Security Questionnaire',
       'SOC2',
       'SSO for Supabase Dashboard',
       'Priority email support',
