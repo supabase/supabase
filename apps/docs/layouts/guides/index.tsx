@@ -60,6 +60,8 @@ const Layout: FC<Props> = (props) => {
 
   const hasTableOfContents = tocList.length > 0
 
+  const ogPageType = asPath.split('/')[2]
+
   return (
     <>
       <NextSeo
@@ -71,7 +73,11 @@ const Layout: FC<Props> = (props) => {
           url: `https://supabase.com/docs${asPath}`,
           images: [
             {
-              url: `https://supabase.com/docs/img/supabase-og-image.png`,
+              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+                ogPageType ? `&type=${ogPageType}` : ''
+              }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
+                props.meta?.description
+              )}`,
             },
           ],
         }}
