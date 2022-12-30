@@ -441,7 +441,7 @@ const { env, session } = useLoaderData()
 const fetcher = useFetcher()
 
 const [supabase] = useState(
-  () => createBrowserClient < Database > (env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  () => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
 )
 
 const serverAccessToken = session?.access_token
