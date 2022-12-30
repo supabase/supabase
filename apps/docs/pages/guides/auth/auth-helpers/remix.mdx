@@ -440,8 +440,8 @@ And then use a `fetcher` to simulate submitting a form to our action, inside the
 const { env, session } = useLoaderData()
 const fetcher = useFetcher()
 
-const [supabase] = useState(
-  () => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+const [supabase] = useState(() =>
+  createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
 )
 
 const serverAccessToken = session?.access_token
@@ -451,6 +451,8 @@ useEffect(() => {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
     if (session?.access_token !== serverAccessToken) {
+      // server and client are out of sync.
+      // Remix recalls active loaders after actions complete
       fetcher.submit(null, {
         method: 'post',
         action: '/handle-supabase-auth',
