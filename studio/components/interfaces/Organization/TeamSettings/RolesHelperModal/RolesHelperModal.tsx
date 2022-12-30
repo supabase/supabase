@@ -12,7 +12,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
   const roleColumnClassName =
     'w-[12%] text-sm h-8 flex items-center justify-center border-l border-scale-600 font-bold'
 
-  const enterpriseTooltip = (
+  const accessTooltip = (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
         <IconInfo size={14} strokeWidth={2} />
@@ -20,7 +20,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <Tooltip.Content side="top">
         <Tooltip.Arrow className="radix-tooltip-arrow" />
 
-        <span className="text-xs text-scale-1200">Only available in Enterprise plan.</span>
+        <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
       </Tooltip.Content>
     </Tooltip.Root>
   )
@@ -55,8 +55,8 @@ const RolesHelperModal: FC<Props> = ({}) => {
                 <div className={roleColumnClassName}>Owner</div>
                 <div className={roleColumnClassName}>Adminstrator</div>
                 <div className={roleColumnClassName}>Developer</div>
-                <div className={roleColumnClassName}>Read-only&nbsp;{enterpriseTooltip}</div>
-                <div className={roleColumnClassName}>Billing-only&nbsp;{enterpriseTooltip}</div>
+                <div className={roleColumnClassName}>Read-only&nbsp;{accessTooltip}</div>
+                <div className={roleColumnClassName}>Billing-only&nbsp;{accessTooltip}</div>
               </div>
 
               <div className="max-h-[425px] overflow-y-auto">
