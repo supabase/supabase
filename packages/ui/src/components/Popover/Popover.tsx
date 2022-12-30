@@ -1,10 +1,8 @@
-import React from 'react'
-
+import * as React from 'react'
 import * as RadixPopover from '@radix-ui/react-popover'
 import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
 
 import { IconX } from '../Icon/icons/IconX'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface RootProps {

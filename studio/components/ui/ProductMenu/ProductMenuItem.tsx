@@ -13,7 +13,7 @@ interface Props {
   onClick?: () => void
   textClassName?: string
   hoverText?: string
-  isPreview?: boolean
+  label?: string
 }
 
 const ProductMenuItem: FC<Props> = ({
@@ -27,20 +27,20 @@ const ProductMenuItem: FC<Props> = ({
   onClick,
   textClassName = '',
   hoverText = '',
-  isPreview = false,
+  label,
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
-      <div className="flex w-full items-center justify-between">
-        <span
+      <div className="flex w-full items-center justify-between gap-1">
+        <div
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
-          className={'flex items-center gap-2 truncate ' + textClassName}
+          className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           {name}{' '}
-          {isPreview && (
-            <span className="uppercase text-orange-800 text-xs font-normal">Alpha</span>
+          {label !== undefined && (
+            <span className="text-orange-800 text-xs font-normal">{label}</span>
           )}
-        </span>
+        </div>
         {action}
       </div>
     </Menu.Item>

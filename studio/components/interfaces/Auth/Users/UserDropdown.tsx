@@ -1,9 +1,9 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, Divider, IconTrash, IconMail, IconMoreHorizontal } from 'ui'
+import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOff } from 'ui'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -14,9 +14,11 @@ import { User } from './Users.types'
 interface Props {
   user: User
   canRemoveUser: boolean
+  canRemoveMFAFactors: boolean
 }
 
-const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
+const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) => {
+  const showDeleteFactorsDropdown = useFlag('mfaSso')
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
@@ -120,6 +122,33 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
     })
   }
 
+  async function handleDeleteFactors() {
+    await timeout(200)
+
+    confirmAlert({
+      title: 'Confirm to delete',
+      message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
+      onAsyncConfirm: async () => {
+        setLoading(true)
+        const response = await delete_(
+          `${API_URL}/auth/${PageState.projectRef}/users/${user.id}/factors`
+        )
+        if (response.error) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to delete factors: ${response.error.message}`,
+          })
+        } else {
+          ui.setNotification({
+            category: 'success',
+            message: "Successfully deleted the user's factors",
+          })
+        }
+        setLoading(false)
+      },
+    })
+  }
+
   return (
     <Dropdown
       size="medium"
@@ -141,6 +170,38 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
             </Dropdown.Item>
           ) : null}
           <Dropdown.Separator />
+          {showDeleteFactorsDropdown && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Dropdown.Item
+                  onClick={handleDeleteFactors}
+                  icon={<IconShieldOff size="tiny" />}
+                  disabled={!canRemoveMFAFactors}
+                >
+                  Remove MFA factors
+                </Dropdown.Item>
+              </Tooltip.Trigger>
+              {/* 
+                [Joshen] Deleting MFA factors should be different ABAC perms i think
+                 need to double check with KM / anyone familiar with ABAC 
+              */}
+              {!canRemoveMFAFactors && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to remove a user's authentication factors.
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
+          )}
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <Dropdown.Item

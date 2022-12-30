@@ -216,6 +216,24 @@ div.fixed.inset-0 {
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.text-area-resize-none {
+  textarea {
+    @apply resize-none;
+  }
+}
+
 .capitalize-sentence:first-letter {
   text-transform: capitalize;
+}
+
+.input-clear {
+  input {
+    @apply pr-7;
+  }
 }

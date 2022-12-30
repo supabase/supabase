@@ -69,6 +69,13 @@ export const USAGE_BASED_PRODUCTS = [
         units: 'bytes',
         costPerUnit: 0.09,
       },
+      {
+        key: 'storage_image_render_count',
+        attribute: 'total_storage_image_render_count',
+        title: 'Storage Images Transformed',
+        units: 'absolute',
+        costPerUnit: 0.005,
+      },
     ],
   },
   {
@@ -76,7 +83,7 @@ export const USAGE_BASED_PRODUCTS = [
     icon: <IconCode className="dark:text-scale-100" size={16} strokeWidth={2} />,
     features: [
       {
-        key: 'total_func_count',
+        key: 'func_count',
         attribute: 'total_func_count',
         title: 'Function Count',
         units: 'absolute',
@@ -84,7 +91,7 @@ export const USAGE_BASED_PRODUCTS = [
       },
 
       {
-        key: 'total_func_invocations',
+        key: 'func_invocations',
         attribute: 'total_func_invocations',
         title: 'Function Invocations',
         units: 'absolute',

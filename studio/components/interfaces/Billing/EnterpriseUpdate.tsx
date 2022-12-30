@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 
@@ -6,9 +6,10 @@ import { useStore, useFlag } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 import Divider from 'components/ui/Divider'
-import { DatabaseAddon } from './AddOns/AddOns.types'
+import { SubscriptionAddon } from './AddOns/AddOns.types'
 import {
   formatComputeSizes,
   formatCustomDomainOptions,
@@ -25,9 +26,10 @@ import {
 } from './'
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
+import SupportPlan from './AddOns/SupportPlan'
 
 interface Props {
-  products: { tiers: any[]; addons: DatabaseAddon[] }
+  products: { tiers: any[]; addons: SubscriptionAddon[] }
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
@@ -44,6 +46,9 @@ const EnterpriseUpdate: FC<Props> = ({
   const isCustomDomainsEnabled = useFlag('customDomains')
   const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
+
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
   const projectRegion = ui.selectedProject?.region ?? ''
@@ -57,15 +62,20 @@ const EnterpriseUpdate: FC<Props> = ({
   // [Joshen TODO] Ideally we just have a state to hold all the add ons selection, rather than individual
   // Even better if we can just use the <Form> component to handle all of these. Mainly to reduce the amount
   // of unnecessary state management on this complex page.
-  const [selectedComputeSize, setSelectedComputeSize] = useState<DatabaseAddon>(
+  const [selectedComputeSize, setSelectedComputeSize] = useState<SubscriptionAddon>(
     currentAddons.computeSize
   )
-  const [selectedPITRDuration, setSelectedPITRDuration] = useState<DatabaseAddon>(
+  const [selectedPITRDuration, setSelectedPITRDuration] = useState<SubscriptionAddon>(
     currentAddons.pitrDuration
   )
-  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<DatabaseAddon>(
+  const [selectedCustomDomainOption, setSelectedCustomDomainOption] = useState<SubscriptionAddon>(
     currentAddons.customDomains
   )
+  // [Joshen TODO] Future - We may need to also include any add ons outside of
+  // compute size, pitr, custom domain and support plan, although we dont have any now
+  const nonChangeableAddons = [currentAddons.supportPlan].filter(
+    (x) => x !== undefined
+  ) as SubscriptionAddon[]
 
   // [Joshen] Scaffolded here
   const selectedAddons = {
@@ -86,7 +96,7 @@ const EnterpriseUpdate: FC<Props> = ({
 
   useEffect(() => {
     getSubscriptionPreview()
-  }, [selectedComputeSize, selectedPITRDuration])
+  }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption])
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -99,8 +109,10 @@ const EnterpriseUpdate: FC<Props> = ({
     // Only allow add-ons changing
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
@@ -119,20 +131,59 @@ const EnterpriseUpdate: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
+  const beforeConfirmPayment = async (): Promise<boolean> => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+        setCaptchaToken(token)
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return false
+    }
+
+    setIsSubmitting(false)
+    return true
+  }
+
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
     const payload = {
       ...formSubscriptionUpdatePayload(
+        currentSubscription,
         null,
         selectedAddons,
+        nonChangeableAddons,
         selectedPaymentMethodId,
         projectRegion
       ),
       tier: currentSubscription.tier.price_id,
     }
-
-    setIsSubmitting(true)
     const res = await patch(`${API_URL}/projects/${projectRef}/subscription`, payload)
+    resetCaptcha()
+
     if (res?.error) {
       ui.setNotification({
         category: 'error',
@@ -174,12 +225,15 @@ const EnterpriseUpdate: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <div className="2xl:min-w-5xl mx-auto mt-10 px-32">
+        <div className="flex-grow mt-10">
           <div className="relative space-y-4">
             <div className="space-y-8">
-              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <div className="space-y-4 2xl:min-w-5xl mx-auto px-32">
+                <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
+              </div>
+
               <div
-                className="space-y-8 overflow-scroll pb-8"
+                className="space-y-8 overflow-y-auto pb-8 2xl:min-w-5xl mx-auto px-32"
                 style={{ height: 'calc(100vh - 6.4rem - 57px)' }}
               >
                 <h3 className="text-xl">
@@ -199,6 +253,12 @@ const EnterpriseUpdate: FC<Props> = ({
                 </div>
                 {projectRegion !== 'af-south-1' && (
                   <>
+                    {currentAddons.supportPlan !== undefined && (
+                      <>
+                        <Divider light />
+                        <SupportPlan currentOption={currentAddons.supportPlan} />
+                      </>
+                    )}
                     {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
                       <>
                         <Divider light />
@@ -239,6 +299,7 @@ const EnterpriseUpdate: FC<Props> = ({
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}
             isRefreshingPreview={isRefreshingPreview}
+            currentSubscription={currentSubscription}
             subscriptionPreview={subscriptionPreview}
             // Current subscription configuration based on DB
             currentPlan={currentSubscription.tier}
@@ -252,7 +313,21 @@ const EnterpriseUpdate: FC<Props> = ({
             onSelectAddNewPaymentMethod={() => {
               setShowAddPaymentMethodModal(true)
             }}
+            beforeConfirmPayment={beforeConfirmPayment}
             onConfirmPayment={onConfirmPayment}
+            captcha={
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                size="invisible"
+                onVerify={(token) => {
+                  setCaptchaToken(token)
+                }}
+                onExpire={() => {
+                  setCaptchaToken(null)
+                }}
+              />
+            }
           />
         </div>
       </Transition>

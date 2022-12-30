@@ -29,10 +29,12 @@ Jon M
 Jonny Summers-Muir
 Joshen Lim
 Kang Ming Tay
+Karlo Ison
 Kevin Grüneberg
 Lakshmipathi G
 Laura C
 Leo T
+Long Hoang
 Margarita Sandomirskaia
 Marijana Šimag
 Mark Burggraf
@@ -59,7 +61,7 @@ ____________
 
 JOBS
 
-If you are interested in working with us check out the open roles here: https://about.supabase.com/careers
+If you are interested in working with us check out the open roles here: https://supabase.com/careers
 
 ___________
 

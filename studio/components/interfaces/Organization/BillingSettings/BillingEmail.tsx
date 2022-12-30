@@ -1,17 +1,11 @@
 import { useContext, useEffect } from 'react'
 import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 
 import { PageContext } from 'pages/org/[slug]/settings'
 
@@ -24,12 +18,7 @@ const BillingEmail = () => {
     billing_email: PageState.organization?.billing_email ?? '',
   }
 
-  const enablePermissions = useFlag('enablePermissions')
-
-  const canUpdateOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
-
+  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
