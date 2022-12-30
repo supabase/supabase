@@ -103,10 +103,10 @@ npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
 Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 
 ```jsx title=pages/_app.js
-import { useState } from 'react'
 import '../styles/globals.css'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
