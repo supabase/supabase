@@ -80,7 +80,7 @@ export default function IndexPage() {
       href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 599,
-      description: 'For production applications with the option to scale.',
+      description: 'For collaborative teams with different permissions and access.',
       features: [
         'ABAC Permissions (owner, dev, read only, billing)',
         'Standardised security questionnaire',
@@ -196,7 +196,7 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-[90vw] lg:grid-cols-4 lg:gap-5 lg:space-y-0">
+            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-5xl lg:grid-cols-2 xl:max-w-[90vw] xl:grid-cols-4 lg:gap-5 lg:space-y-0">
               {tiers.map((tier) => (
                 <div
                   key={tier.name}
@@ -448,7 +448,7 @@ export default function IndexPage() {
                 from={true}
                 price={'599'}
                 priceDescription={'/mo + additional use'}
-                description={'Everything you need to scale your project into production'}
+                description={'For collaborative teams with different permissions and access.'}
               />
               <PricingTableRowMobile
                 category={pricing.database}
@@ -656,7 +656,7 @@ export default function IndexPage() {
                         <p className="p">/month + usage costs</p>
 
                         <p className="p text-sm">
-                          Everything you need to scale your project into production
+                          For collaborative teams with different permissions and access.
                         </p>
 
                         <Link href="https://app.supabase.com" as="https://app.supabase.com">

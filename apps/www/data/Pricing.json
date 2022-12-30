@@ -36,8 +36,8 @@
         "tooltip": "Backups are entire copies of your database that can be restored in the future.",
         "tiers": {
           "free": false,
-          "pro": "7 days of backup* (* if > 1TB, contact enterprise)",
-          "team": "7 days of backup* (* if > 1TB, contact enterprise)",
+          "pro": "7 days of backup (if > 1TB, contact enterprise)",
+          "team": "7 days of backup (if > 1TB, contact enterprise)",
           "enterprise": "Custom"
         }
       },
@@ -46,7 +46,7 @@
         "tiers": {
           "free": false,
           "pro": false,
-          "team": "$100 per 7 day rollback period, if > 28 days contact enterprise",
+          "team": "$100 per 7 day rollback period (if > 28 days contact enterprise)",
           "enterprise": true
         }
       },
@@ -251,7 +251,7 @@
         "tiers": {
           "free": "10",
           "pro": "100, then $10 per additional 100 functions",
-          "team": "$10 per additional 100 functions",
+          "team": "$10 per 100 functions",
           "enterprise": "Unlimited"
         }
       }

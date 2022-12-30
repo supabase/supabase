@@ -3,6 +3,16 @@ Pricing Changelog
 ### 29 Dec 2022
 
 Introduced new Team Plan
+No included quota besides MAU, everything is usage based.
+- ABAC Permissions (owner, dev, read only, billing)
+- Standardised security questionnaire
+- SOC2
+- SSO for Supabase Dashboard
+- Priority email support
+- 100,000 social MAUs
+- 1 XS compute instance
+- 14 day backups
+- 28 day log retention
 
 ### 02 Nov 2022
 ----
