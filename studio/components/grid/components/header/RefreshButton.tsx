@@ -1,5 +1,6 @@
-import { FC, useState } from 'react'
-import { Button, IconRefreshCw } from 'ui'
+import { FC, useState, useEffect } from 'react'
+import { Button, IconRefreshCw, IconCheck } from 'ui'
+import { SupabaseGridQueue } from '../../constants'
 import { Filter, Sort } from 'components/grid/types'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { fetchCount, fetchPage } from 'components/grid/utils'
@@ -10,9 +11,33 @@ interface Props {
 }
 
 const RefreshButton: FC<Props> = ({ sorts, filters }) => {
-  const [loading, setLoading] = useState(false)
   const state = useTrackedState()
   const dispatch = useDispatch()
+
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<string>()
+
+  useEffect(() => {
+    let isMounted = true
+    let timer: number | null
+
+    SupabaseGridQueue.on('active', () => {
+      if (timer) clearTimeout(timer)
+
+      if (isMounted) setStatus('saving')
+    })
+    SupabaseGridQueue.on('idle', () => {
+      if (timer) clearTimeout(timer)
+      timer = window.setTimeout(() => setStatus(undefined), 2000)
+
+      if (isMounted) setStatus('saved')
+    })
+
+    return () => {
+      isMounted = false
+      if (timer) clearTimeout(timer)
+    }
+  }, [])
 
   async function onClick() {
     setLoading(true)
@@ -25,14 +50,20 @@ const RefreshButton: FC<Props> = ({ sorts, filters }) => {
     <Button
       type="text"
       icon={
-        <div className="text-scale-1000">
-          <IconRefreshCw strokeWidth={1.5} />
-        </div>
+        !status ? (
+          <IconRefreshCw className="text-scale-1000" strokeWidth={1.5} />
+        ) : status === 'saved' ? (
+          <IconCheck className="text-brand-900" strokeWidth={3} />
+        ) : (
+          <></>
+        )
       }
-      onClick={onClick}
-      loading={loading}
+      onClick={() => {
+        if (!status) onClick()
+      }}
+      loading={loading || status === 'saving'}
     >
-      Refresh
+      {!status ? 'Refresh' : status === 'saved' ? 'Changes saved' : 'Saving changes'}
     </Button>
   )
 }

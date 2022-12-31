@@ -6,6 +6,6 @@ export type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout
 }
 
-export type NextPageWithLayout = NextPage & {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }

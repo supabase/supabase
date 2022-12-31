@@ -34,7 +34,7 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
         </div>
       ) : (
         <div className="flex cursor-pointer items-center">
-          <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+          <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
             <Button type="text" icon={<IconEdit2 />}>
               Navigate
@@ -224,6 +224,7 @@ const FileExplorerHeader = ({
               autoFocus
               key="pathSet"
               type="text"
+              size="small"
               value={pathString}
               onChange={onUpdatePathString}
               placeholder="e.g Parent Folder/Child Folder"

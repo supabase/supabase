@@ -14,7 +14,7 @@
           { "key": "pricing", "title": "Pricing", "value": "$0" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
-          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,085 Mbps" },
+          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,606 Mbps" },
           {
             "key": "directConnections",
             "title": "Connections: Direct",
@@ -33,7 +33,7 @@
           { "key": "pricing", "title": "Pricing", "value": "$5" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
-          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,085 Mbps" },
+          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,606 Mbps" },
           {
             "key": "directConnections",
             "title": "Connections: Direct",
@@ -52,7 +52,7 @@
           { "key": "pricing", "title": "Pricing", "value": "$50" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
-          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,085 Mbps" },
+          { "key": "diskIO", "title": "Disk IO Bandwidth", "value": "Up to 2,606 Mbps" },
           {
             "key": "directConnections",
             "title": "Connections: Direct",

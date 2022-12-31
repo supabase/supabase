@@ -1,14 +1,17 @@
+import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink } from 'ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
 import {
   PostgresColumn,
+  PostgresExtension,
   PostgresRelationship,
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
 
+import { useFlag, useParams, useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -25,20 +28,25 @@ import {
 } from './ColumnEditor.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
-import Link from 'next/link'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 
 interface Props {
   column?: PostgresColumn
   selectedTable: PostgresTable
   tables: PostgresTable[]
-  enumTypes: PostgresType[]
   visible: boolean
   closePanel: () => void
   saveChanges: (
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
     isNewRecord: boolean,
-    configuration: { columnId: string | undefined },
+    configuration: {
+      columnId: string | undefined
+      isEncrypted: boolean
+      keyId?: string
+      keyName?: string
+    },
     resolve: any
   ) => void
   updateEditorDirty: () => void
@@ -48,24 +56,37 @@ const ColumnEditor: FC<Props> = ({
   column,
   selectedTable,
   tables = [],
-  enumTypes = [],
   visible = false,
   closePanel = () => {},
   saveChanges = () => {},
   updateEditorDirty = () => {},
 }) => {
+  const { ref } = useParams()
+  const { meta, vault } = useStore()
+  const isTCEEnabled = useFlag('transparentColumnEncryption')
+
   const isNewRecord = isUndefined(column)
   const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+
+  const keys = vault.listKeys()
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
 
+  const [pgsodiumExtension] = meta.extensions.list(
+    (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
+  )
+  const isPgSodiumInstalled = pgsodiumExtension?.installed_version !== null
+
   useEffect(() => {
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? generateColumnField()
+        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
         : generateColumnFieldFromPostgresColumn(column!, selectedTable)
       setColumnFields(columnFields)
     }
@@ -126,7 +147,12 @@ const ColumnEditor: FC<Props> = ({
         const foreignKey = columnFields.foreignKey
           ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
           : undefined
-        const configuration = { columnId: column?.id }
+        const configuration = {
+          columnId: column?.id,
+          isEncrypted: columnFields.isEncrypted,
+          keyId: columnFields.keyId,
+          keyName: columnFields.keyName,
+        }
         saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
       } else {
         resolve()
@@ -136,7 +162,7 @@ const ColumnEditor: FC<Props> = ({
 
   return (
     <SidePanel
-      size="large"
+      size="xlarge"
       key="ColumnEditor"
       visible={visible}
       // @ts-ignore
@@ -159,54 +185,51 @@ const ColumnEditor: FC<Props> = ({
         }
       }}
     >
-      <SidePanel.Content>
-        <div className="space-y-10 py-6">
+      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
             label="Name"
-            layout="horizontal"
             type="text"
+            descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
+            placeholder='column_name'
             error={errors.name}
             value={columnFields?.name ?? ''}
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
           />
           <Input
             label="Description"
-            placeholder="Optional"
-            layout="horizontal"
+            labelOptional="Optional"
             type="text"
             value={columnFields?.comment ?? ''}
             onChange={(event: any) => onUpdateField({ comment: event.target.value })}
           />
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 md:col-span-8 md:col-start-5">
-              <Checkbox
-                label="Is Primary Key"
-                description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
-                checked={columnFields?.isPrimaryKey ?? false}
-                onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
-              />
-            </div>
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={
+          <FormSectionLabel className="lg:!col-span-4">Foreign Key Relation</FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <div>
+            <ColumnForeignKey
+              column={columnFields}
+              originalForeignKey={originalForeignKey}
+              onSelectEditRelation={() => setIsEditingRelation(true)}
+              onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
+            />
           </div>
-        </div>
-      </SidePanel.Content>
-
+        </FormSectionContent>
+      </FormSection>
       <SidePanel.Separator />
-
-      <SidePanel.Content>
-        <div className="space-y-10 py-6">
-          <ColumnForeignKey
-            column={columnFields}
-            originalForeignKey={originalForeignKey}
-            onSelectEditRelation={() => setIsEditingRelation(true)}
-            onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
-          />
-        </div>
-      </SidePanel.Content>
-      <SidePanel.Separator />
-      <SidePanel.Content>
-        <div className="space-y-10 py-6">
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Data Type</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
           <ColumnType
             value={columnFields?.format ?? ''}
+            layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
@@ -227,11 +250,10 @@ const ColumnEditor: FC<Props> = ({
             }
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
-
           {isUndefined(columnFields.foreignKey) && (
-            <div className="grid grid-cols-12 gap-4">
+            <div className="space-y-4">
               {columnFields.format.includes('int') && (
-                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                <div className="w-full">
                   <Checkbox
                     label="Is Identity"
                     description="Automatically assign a sequential unique number to the column"
@@ -245,7 +267,7 @@ const ColumnEditor: FC<Props> = ({
                 </div>
               )}
               {!columnFields.isPrimaryKey && (
-                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                <div className="w-full">
                   <Checkbox
                     label="Define as Array"
                     description="Allow column to be defined as variable-length multidimensional arrays"
@@ -265,38 +287,93 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             onUpdateField={onUpdateField}
           />
-          {!columnFields.isPrimaryKey && (
-            <>
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 md:col-span-8 md:col-start-5">
-                  <Checkbox
-                    label="Allow Nullable"
-                    description="Allow the column to assume a NULL value if no value is provided"
-                    checked={columnFields.isNullable}
-                    onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
-                  />
-                </div>
-                <div className="col-span-12 md:col-span-8 md:col-start-5">
-                  <Checkbox
-                    label="Is Unique"
-                    description="Enforce values in the column to be unique across rows"
-                    checked={columnFields.isUnique}
-                    onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          <ForeignKeySelector
-            tables={tables}
-            column={columnFields}
-            visible={isEditingRelation}
-            closePanel={() => setIsEditingRelation(false)}
-            saveChanges={saveColumnForeignKey}
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Configuration</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <Toggle
+            label="Is Primary Key"
+            descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
+            checked={columnFields?.isPrimaryKey ?? false}
+            onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
           />
-        </div>
-      </SidePanel.Content>
+          <Toggle
+            label="Allow Nullable"
+            descriptionText="Allow the column to assume a NULL value if no value is provided"
+            checked={columnFields.isNullable}
+            onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
+          />
+          <Toggle
+            label="Is Unique"
+            descriptionText="Enforce values in the column to be unique across rows"
+            checked={columnFields.isUnique}
+            onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+          />
+        </FormSectionContent>
+      </FormSection>
+      {isNewRecord && isTCEEnabled && (
+        <>
+          <SidePanel.Separator />
+          <FormSection
+            header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Toggle
+                label="Encrypt Column"
+                error={errors?.isEncrypted}
+                disabled={!isPgSodiumInstalled}
+                // @ts-ignore
+                descriptionText={
+                  <div className="space-y-2">
+                    <p>
+                      Encrypt the column's data with pgsodium's Transparent Column Encryption (TCE).
+                      Decrypted values will be stored within the "decrypted_{selectedTable.name}"
+                      view.
+                    </p>
+                    {!isPgSodiumInstalled ? (
+                      <p>
+                        You will need to{' '}
+                        <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
+                          <a className="text-brand-800 hover:text-brand-900 transition">install</a>
+                        </Link>{' '}
+                        the extension <code className="text-xs">pgsodium</code> first before being
+                        able to encrypt your column.
+                      </p>
+                    ) : (
+                      <p>
+                        Note: Only columns of <code className="text-xs">text</code> type can be
+                        encrypted.
+                      </p>
+                    )}
+                  </div>
+                }
+                checked={columnFields.isEncrypted}
+                onChange={() => onUpdateField({ isEncrypted: !columnFields.isEncrypted })}
+              />
+              {columnFields.isEncrypted && (
+                <EncryptionKeySelector
+                  label="Select a key to encrypt your column with"
+                  error={errors?.keyName}
+                  selectedKeyId={columnFields.keyId}
+                  onSelectKey={(id) => onUpdateField({ keyId: id })}
+                  onUpdateDescription={(name) => onUpdateField({ keyName: name })}
+                />
+              )}
+            </FormSectionContent>
+          </FormSection>
+        </>
+      )}
+
+      <ForeignKeySelector
+        tables={tables}
+        column={columnFields}
+        visible={isEditingRelation}
+        closePanel={() => setIsEditingRelation(false)}
+        saveChanges={saveColumnForeignKey}
+      />
     </SidePanel>
   )
 }

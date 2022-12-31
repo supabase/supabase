@@ -1,11 +1,11 @@
-import { parse } from 'crypto-js/enc-utf8'
 import { tryParseJson } from 'lib/helpers'
-import { isUnixMicro, PreviewLogData, unixMicroToIsoTimestamp } from '..'
+import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import {
   jsonSyntaxHighlight,
   ResponseCodeFormatter,
   SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
   SeverityFormatter,
 } from '../LogsFormatters'
 
@@ -30,14 +30,7 @@ const AuthSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
         </div>
       </div>
 
-      <SelectionDetailedRow
-        label="ISO Timestamp"
-        value={
-          isUnixMicro(log.timestamp)
-            ? unixMicroToIsoTimestamp(log.timestamp)
-            : String(log.timestamp)
-        }
-      />
+      <SelectionDetailedTimestampRow value={log.timestamp} />
       {parsed?.status && (
         <SelectionDetailedRow
           label="Status"
