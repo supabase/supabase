@@ -23,7 +23,7 @@
 }
 
 body {
-  @apply bg-white dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-100 dark:bg-[#1c1c1c] #{!important};
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -34,14 +34,14 @@ body {
   color: #333 !important;
 }
 
-a {
-  text-decoration: none !important;
-}
+// a {
+//   text-decoration: none !important;
+// }
 
 article h1 {
-  margin-bottom: 2rem !important;
-  font-size: 3rem !important;
-  font-weight: 400 !important;
+  // margin-bottom: 2rem !important;
+  // font-size: 3rem !important;
+  // font-weight: 400 !important;
 }
 
 .thin-scrollbar {
@@ -55,7 +55,7 @@ article h1 {
 .docs-width {
   max-width: calc(100% - var(--sidebar-width));
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     max-width: none;
   }
 }
@@ -67,7 +67,6 @@ article h1 {
 
 .width-full {
   width: 100% !important;
-  max-width: max-content !important;
 }
 
 .p:not(.prose *):not(.overwrite) {
@@ -100,15 +99,11 @@ pre[class*='language-'] {
     overflow-wrap: anywhere;
   }
   .method-list-item-validation {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap gap-2 items-center;
   }
   .method-list-item-description {
     @apply text-sm space-y-2;
   }
-}
-
-.method-list-group li:last-child {
-  border-bottom: 1px solid var(--colors-scale3);
 }
 
 .method-list-title-isChild {
@@ -126,7 +121,7 @@ pre[class*='language-'] {
 }
 
 .method-list-group {
-  @apply p-0 m-0 list-none;
+  @apply p-0 m-0 list-none border-b;
 }
 
 .method-list-group .method-list-group {
@@ -189,9 +184,7 @@ pre[class*='language-'] {
 // format <code> inside <p>
 h2 code,
 h3 code,
-h4 code,
-li code,
-p code {
+h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
   padding: 0.1rem 0.35rem !important;
@@ -220,8 +213,62 @@ a:has(code) {
   box-shadow: none !important;
 }
 
-pre code {
-  @media screen and (max-width: 768px) {
-    white-space: normal !important;
+// fix code line wrapping
+// need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
+article p code {
+  &::before,
+  &::after {
+    display: none !important;
   }
+}
+
+.short-inline-codeblock {
+  @media screen and (min-width: 769px) {
+    white-space: pre !important;
+  }
+}
+
+// fix firefox issue with li wrapping
+.doc-content-container ul li div.relative {
+  display: inline-block;
+}
+
+// fix ToC links when they have <code> inside
+.toc-menu li a code {
+  background: none;
+  border: none;
+}
+
+// prevent horizontal scroll on mobile for tablist tab headers
+div[role='tablist'] {
+  @media screen and (min-width: 320px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 600px) {
+    max-width: 520px;
+  }
+
+  @media screen and (min-width: 769px) {
+    max-width: 620px;
+  }
+}
+
+/*
+* sets the image in @Next/Image components
+* to respect the height of the content
+*
+*/
+.next-image--dynamic-fill {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+.next-image--dynamic-fill > span {
+  position: relative !important;
+}
+.next-image--dynamic-fill img {
+  object-fit: contain;
+  width: 100% !important;
+  position: relative !important;
+  height: unset !important;
 }

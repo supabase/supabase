@@ -43,6 +43,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     isPrimaryKey: false,
     isIdentity: false,
     isNewColumn: true,
+    isEncrypted: false,
   }
 }
 
@@ -69,6 +70,7 @@ export const generateColumnFieldFromPostgresColumn = (
     isUnique: column.is_unique,
 
     isNewColumn: false,
+    isEncrypted: false,
     isPrimaryKey: primaryKeyColumns.includes(column.name),
   }
 }
@@ -162,6 +164,12 @@ export const validateFields = (field: ColumnField) => {
   }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
+  }
+  if (field.isEncrypted && field.keyId === 'create-new' && (field?.keyName ?? '').length === 0) {
+    errors['keyName'] = 'Please provide a name for your new key'
+  }
+  if (field.isEncrypted && field.format !== 'text') {
+    errors['isEncrypted'] = 'Only columns of type text can be encrypted'
   }
   return errors
 }

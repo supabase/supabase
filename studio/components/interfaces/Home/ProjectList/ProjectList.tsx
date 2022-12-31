@@ -3,6 +3,7 @@ import { Button, IconPlus } from 'ui'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
+import { IS_PLATFORM } from 'lib/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { Organization, Project } from 'types'
 import { makeRandomString } from 'lib/helpers'
@@ -20,7 +21,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
 
-  const isLoadingPermissions = (ui?.permissions ?? []).length === 0
+  const isLoadingPermissions = IS_PLATFORM ? (ui?.permissions ?? []).length === 0 : false
 
   return (
     <>
