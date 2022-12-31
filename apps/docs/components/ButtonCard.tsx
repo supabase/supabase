@@ -6,8 +6,8 @@ interface Props {
   title: string
   description?: string
   to: string
-  icon?: string | ReactNode
-  children?: ReactNode
+  icon?: string | any
+  children?: any
   layout?: 'vertical' | 'horizontal'
 }
 
@@ -25,7 +25,7 @@ const ButtonCard: FC<Props> = ({
         className={[
           'h-full block shadow-none bg-scale-300 rounded transition',
           'border border-transparent hover:border-scale-600',
-        ].join('')}
+        ].join(' ')}
       >
         {children ? (
           children
@@ -43,7 +43,7 @@ const ButtonCard: FC<Props> = ({
             ) : (
               icon
             )}
-            <h3 className="my-0 text-base">{title}</h3>
+            <h3 className="my-0 text-base text-scale-1200">{title}</h3>
             <p className="my-0 text-sm">{description}</p>
           </div>
         )}

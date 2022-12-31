@@ -49,7 +49,7 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
 
     autorun(() => {
       if (ui.notification) {
-        const { id, category, error, message, progress, duration } = ui.notification
+        const { id, category, error, message, description, progress, duration } = ui.notification
         const toastDuration = duration || 4000
         switch (category) {
           case 'info':
@@ -60,20 +60,20 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
             console.error('Error:', { error, message })
             return toast.error(message, { id, duration: duration || Infinity })
           case 'loading':
-            if (progress) {
+            if (progress !== undefined) {
               return toast.loading(
-                <div
-                  className="flex flex-col space-y-1"
-                  style={{ minWidth: '200px', maxWidth: '267px' }}
-                >
+                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                   <SparkBar
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-green-500"
+                    barClass="bg-brand-900"
                     labelBottom={message}
                     labelTop={`${progress.toFixed(2)}%`}
                   />
+                  {description !== undefined && (
+                    <p className="text-xs text-scale-1100">{description}</p>
+                  )}
                 </div>,
                 { id }
               )

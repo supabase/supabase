@@ -24,6 +24,8 @@ import {
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
 import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -48,8 +50,10 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-const BATCH_SIZE = 10
+// const BATCH_SIZE = 10
+const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
+const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
 
 class StorageExplorerStore {
   projectRef = ''
@@ -112,21 +116,26 @@ class StorageExplorerStore {
   /* Methods which are commonly used + For better readability */
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        multiTab: false,
-        detectSessionInUrl: false,
-        localStorage: {
-          getItem: (key) => {
-            return undefined
+    console.debug(serviceEndpoint)
+    this.supabaseClient = createClient(
+      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      serviceKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          multiTab: false,
+          detectSessionInUrl: false,
+          localStorage: {
+            getItem: (key) => {
+              return undefined
+            },
+            setItem: (key, value) => {},
+            removeItem: (key) => {},
           },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
         },
-      },
-    })
+      }
+    )
   }
 
   updateFileInPreviewCache = (fileCache) => {
@@ -459,7 +468,8 @@ class StorageExplorerStore {
         message: error.message,
         category: 'error',
       })
-      return this.closeCreateBucketModal()
+      this.closeCreateBucketModal()
+      return undefined
     }
 
     await this.fetchBuckets()
@@ -638,14 +648,14 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const infoToastId = toast('Please do not close the browser until the upload is completed', {
-      duration: Infinity,
-    })
-    const toastId = toast.loading(
-      `Uploading ${formattedFilesToUpload.length} file${
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: `Uploading ${formattedFilesToUpload.length} file${
         formattedFilesToUpload.length > 1 ? 's' : ''
-      }`
-    )
+      }...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
+    })
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
@@ -714,12 +724,15 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          `Uploading ${formattedFilesToUpload.length} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: `Uploading ${formattedFilesToUpload.length} file${
             formattedFilesToUpload.length > 1 ? 's' : ''
-          }... (${(this.uploadProgress * 100).toFixed(2)}%)`,
-          { id: toastId }
-        )
+          }...`,
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          progress: this.uploadProgress * 100,
+        })
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
@@ -759,7 +772,6 @@ class StorageExplorerStore {
         category: 'error',
       })
     }
-    toast.dismiss(infoToastId)
 
     const t2 = new Date()
     console.log(
@@ -857,9 +869,7 @@ class StorageExplorerStore {
 
   deleteFiles = async (files, isDeleteFolder = false) => {
     this.closeFilePreview()
-    const infoToastId = toast('Please do not close the browser until the delete is completed', {
-      duration: Infinity,
-    })
+    let progress = 0
 
     // If every file has the 'prefix' property, then just construct the prefix
     // directly (from delete folder). Otherwise go by the opened folders.
@@ -879,11 +889,14 @@ class StorageExplorerStore {
 
     const toastId = this.ui.setNotification({
       category: 'loading',
-      message: `Deleting ${prefixes.length} file(s)`,
+      message: `Deleting ${prefixes.length} file(s)...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
     })
 
     // batch BATCH_SIZE prefixes per request
     const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
+      progress = progress + batch.length / prefixes.length
       return this.supabaseClient.storage.from(this.selectedBucket.name).remove(batch)
     })
 
@@ -891,6 +904,13 @@ class StorageExplorerStore {
     await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
+      this.ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Deleting ${prefixes.length} file(s)...`,
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        progress: progress * 100,
+      })
     }, Promise.resolve())
 
     // Clear file preview cache if deleted files exist in cache
@@ -921,8 +941,6 @@ class StorageExplorerStore {
     } else {
       toast.dismiss(toastId)
     }
-
-    toast.dismiss(infoToastId)
   }
 
   downloadSelectedFiles = async () => {
@@ -1176,7 +1194,7 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    const isFolderOpen = this.openedFolders[this.openedFolders.length - 1].name === folder.name
+    const isFolderOpen = this.openedFolders[this.openedFolders.length - 1]?.name === folder.name
     if (isFolderOpen) {
       this.popColumnAtIndex(folder.columnIndex)
       this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
@@ -1205,9 +1223,8 @@ class StorageExplorerStore {
     const toastId = this.ui.setNotification({
       category: 'loading',
       message: `Renaming folder to ${newName}`,
-    })
-    const infoToastId = toast('Please do not close the browser until the rename is completed', {
-      duration: Infinity,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
     })
 
     /**
@@ -1228,7 +1245,9 @@ class StorageExplorerStore {
     this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
     const files = await this.getAllItemsAlongFolder(folder)
 
+    let progress = 0
     let hasErrors = false
+
     // Make this batched promises into a reusable function for storage, i think this will be super helpful
     const promises = files.map((file) => {
       const fromPath = `${file.prefix}/${file.name}`
@@ -1240,6 +1259,7 @@ class StorageExplorerStore {
         .join('/')
       return () => {
         return new Promise(async (resolve) => {
+          progress = progress + 1 / files.length
           const { error } = await this.supabaseClient.storage
             .from(this.selectedBucket.name)
             .move(fromPath, toPath)
@@ -1262,6 +1282,13 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
+        this.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: `Renaming folder to ${newName}`,
+          description: STORAGE_PROGRESS_INFO_TEXT,
+          progress: progress * 100,
+        })
       }, Promise.resolve())
 
       if (!hasErrors) {
@@ -1292,7 +1319,6 @@ class StorageExplorerStore {
         category: 'error',
       })
     }
-    toast.dismiss(infoToastId)
   }
 
   /*

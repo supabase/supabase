@@ -36,13 +36,13 @@ const Subscription: FC<Props> = ({
   const router = useRouter()
 
   const { ref } = router.query
-  const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
-  const canUpdateSubscription = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
-    : ui.selectedOrganization?.is_owner
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const { usage, isLoading: loadingUsage } = useProjectUsage(ref as string)
 
@@ -112,10 +112,8 @@ const Subscription: FC<Props> = ({
                             <br />
                             Our engineers are working on a fix.
                           </>
-                        ) : !canUpdateSubscription && enablePermissions ? (
+                        ) : !canUpdateSubscription ? (
                           'You need additional permissions to amend subscriptions'
-                        ) : !canUpdateSubscription && !enablePermissions ? (
-                          'Only the organization owner can amend subscriptions'
                         ) : (
                           ''
                         )}

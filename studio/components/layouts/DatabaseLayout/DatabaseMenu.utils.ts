@@ -1,11 +1,14 @@
 import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
+
+  const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
 
   return [
     {
@@ -17,14 +20,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           key: 'triggers',
           url: `/project/${ref}/database/triggers`,
           items: [],
-          isPreview: false,
         },
         {
           name: 'Functions',
           key: 'functions',
           url: `/project/${ref}/database/functions`,
           items: [],
-          isPreview: false,
         },
         {
           name: 'Extensions',
@@ -46,7 +47,18 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 key: 'hooks',
                 url: `/project/${ref}/database/hooks`,
                 items: [],
-                isPreview: true,
+                label: 'ALPHA',
+              },
+            ]
+          : []),
+        ...(foreignDataWrappersEnabled
+          ? [
+              {
+                name: 'Wrappers',
+                key: 'wrappers',
+                url: `/project/${ref}/database/wrappers`,
+                items: [],
+                label: 'ALPHA',
               },
             ]
           : []),
