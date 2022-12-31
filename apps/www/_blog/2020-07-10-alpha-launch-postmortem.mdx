@@ -37,13 +37,13 @@ GitHub stars rocketed for our two main repos, [supabase](https://github.com/supa
 
 Here are the things that survived well.
 
-### Middleware: docker-compose up
+### Middleware: docker compose up
 
-This was the most surprising survivor. Our middleware was served from a single Ubuntu server with 4 CPUs and 8GB of RAM. This server was running our middleware using `docker-compose up`:
+This was the most surprising survivor. Our middleware was served from a single Ubuntu server with 4 CPUs and 8GB of RAM. This server was running our middleware using `docker compose up`:
 
-![This image shows in middleware architecture. We used docker-compose to pull up 5 open source tools: Kong, Realtime, PostgREST, PG-API, and PG-BOSS.](/images/blog/supabase-middleware-docker.png)
+![This image shows in middleware architecture. We used docker compose to pull up 5 open source tools: Kong, Realtime, PostgREST, PG-API, and PG-BOSS.](/images/blog/supabase-middleware-docker.png)
 
-In case you're wondering why any sane company would use that in production, it's because we weren't planning to launch - the HackerNews post was created by an early GitHub follower, while we were alpha testing, and it was too scary to migrate the middleware while it was servicing the thundering herd. All Supabase projects use the same middleware stack (sans docker-compose), so I guess this counts as as a successful load test.
+In case you're wondering why any sane company would use that in production, it's because we weren't planning to launch - the HackerNews post was created by an early GitHub follower, while we were alpha testing, and it was too scary to migrate the middleware while it was servicing the thundering herd. All Supabase projects use the same middleware stack (without docker compose), so I guess this counts as a successful load test.
 
 We have since migrated our middleware to multiple ECS clusters, globally load-balanced using AWS's [Global Accelerator](https://aws.amazon.com/global-accelerator/).
 

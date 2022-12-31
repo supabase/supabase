@@ -15,7 +15,7 @@ const PortalToast = () => (
       position="top-right"
       toastOptions={{
         className:
-          'bg-bg-primary-light dark:bg-bg-primary-dark text-typography-body-strong-light dark:text-typography-body-strong-dark border dark:border-dark',
+          'bg-bg-primary-light dark:bg-bg-primary-dark text-typography-body-strong-light dark:text-typography-body-strong-dark border dark:border-dark !max-w-[380px]',
         style: {
           padding: '8px',
           paddingLeft: '16px',
@@ -32,14 +32,22 @@ const PortalToast = () => (
           {({ icon, message }) => (
             <>
               {icon}
-              {message}
-              {t.type !== 'loading' && (
-                <div className="ml-4">
-                  <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
-                    <IconX size={14} strokeWidth={2} />
-                  </Button>
+              <div className="flex items-center">
+                <div
+                  className={`toast-message w-full ${
+                    t.type === 'loading' ? 'max-w-[350px]' : 'max-w-[260px]'
+                  }`}
+                >
+                  {message}
                 </div>
-              )}
+                {t.type !== 'loading' && (
+                  <div className="ml-4">
+                    <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
+                      <IconX size={14} strokeWidth={2} />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </ToastBar>

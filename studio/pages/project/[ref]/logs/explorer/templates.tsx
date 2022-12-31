@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import { observer, useStaticRendering } from 'mobx-react-lite'
-import { IconCode, Badge, Collapsible, Button, Popover } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { IconCode, Button, Popover } from 'ui'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
@@ -14,7 +14,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
-      <LogsExplorerHeader />
+      <LogsExplorerHeader subtitle="Templates" />
       <div className="grid grid-cols-3 gap-6 mt-4">
         {TEMPLATES.sort((a, b) => a.label!.localeCompare(b.label!))
           .filter((template) => template.mode === 'custom')
@@ -40,7 +40,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
                   </div>
                 }
                 containerHeightClassName="h-40"
-                linkHref={`/project/${ref}/logs-explorer?q=${encodeURI(template.searchString)}`}
+                linkHref={`/project/${ref}/logs/explorer?q=${encodeURI(template.searchString)}`}
                 description={template.description}
                 footer={
                   <div className="flex flex-row justify-end">

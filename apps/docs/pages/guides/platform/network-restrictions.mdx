@@ -1,0 +1,75 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'network-restrictions',
+  title: 'Network Restrictions',
+  description: "Apply network restrictions for your project's database.",
+}
+
+<Admonition type="note">
+
+Network Restrictions are currently in beta and are being slowly made available to all projects.
+
+The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer. Support for restricting connections to PostgREST, Storage, and Auth will be added at a later date.
+
+</Admonition>
+
+Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and PgBouncer ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
+
+To get started:
+
+1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
+1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
+
+## Check restrictions
+
+You can use the `get` subcommand of the CLI to retrieve the restrictions currently in effect.
+
+If restrictions have been applied, the output of the `get` command will reflect the IP ranges allowed to connect:
+
+```bash
+> supabase network-restrictions --project-ref {ref} get --experimental
+DB Allowed CIDRs: [128.12.1.1/16 183.12.1.1/24]
+Restrictions applied successfully: true
+```
+
+If restrictions have never been applied to your project, the list of allowed CIDRs will be empty, but they will also not have been applied ("Restrictions applied successfully: false"). As a result, all IPs are allowed to connect to your database:
+
+```bash
+> supabase network-restrictions --project-ref {ref} get --experimental
+DB Allowed CIDRs: []
+Restrictions applied successfully: false
+```
+
+## Update restrictions
+
+The `update` subcommand is used to apply network restrictions to your project:
+
+```bash
+> supabase network-restrictions --project-ref {ref} update --db-allow-cidr 128.12.1.1/16 --db-allow-cidr 183.12.1.1/24 --experimental
+DB Allowed CIDRs: [128.12.1.1/16 183.12.1.1/24]
+Restrictions applied successfully: true
+```
+
+The restrictions specified (in the form of CIDRs) replaces any restrictions that might have been applied in the past.
+To add to the existing restrictions, you must include the existing restrictions within the list of CIDRs provided to the `update` command.
+
+## Remove restrictions
+
+To remove all restrictions on your project, you can use the `update` subcommand with the CIDR `0.0.0.0/0`:
+
+```bash
+> supabase network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --experimental
+DB Allowed CIDRs: [0.0.0.0/0]
+Restrictions applied successfully: true
+```
+
+## Limitations
+
+1. Network Restrictions do not currently apply to APIs offered over HTTPS (e.g. PostgREST, Storage, Auth).
+1. Network Restrictions should not be used if you require you need to connect to your Postgres database using Edge Functions.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
