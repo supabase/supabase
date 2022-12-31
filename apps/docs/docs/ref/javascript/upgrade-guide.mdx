@@ -89,7 +89,7 @@ The signIn() method has been deprecated in favor of more explicit method signatu
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { user, error } = await supabase
   .auth
@@ -98,7 +98,7 @@ const { user, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const {
   data: { user },
@@ -128,7 +128,7 @@ const {
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -137,7 +137,7 @@ const { error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -165,7 +165,7 @@ const { error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -174,7 +174,7 @@ const { error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -201,7 +201,7 @@ const { error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -210,7 +210,7 @@ const { error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -238,7 +238,7 @@ const { error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { error } = await supabase
   .auth
@@ -248,7 +248,7 @@ const { error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .auth
@@ -256,8 +256,8 @@ const { data, error } = await supabase
 
 // After receiving a SMS with a OTP.
 const { data, error } = await supabase
-  .auth
-  .verifyOtp({ phone, token })
+.auth
+.verifyOtp({ phone, token })
 ```
 
 </TabPanel>
@@ -281,7 +281,7 @@ const { data, error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .auth
@@ -291,7 +291,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .auth
@@ -390,7 +390,7 @@ const { user } = session
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { user, error } = await supabase
   .auth
@@ -404,9 +404,7 @@ const { user, error } = await supabase
 const {
   data: { user },
   error,
-} = await supabase
-  .auth
-  .updateUser({ attributes })
+} = await supabase.auth.updateUser({ attributes })
 ```
 
 </TabPanel>
@@ -437,11 +435,11 @@ const { user, error } = supabase.auth.setAuth(access_token)
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const supabase = createClient(
-  SUPABASE_URL, 
-  SUPABASE_ANON_KEY, 
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
   {
     global: {
       headers: {
@@ -488,7 +486,7 @@ Previously, these methods return inserted/updated/deleted rows by default (which
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -497,7 +495,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -526,7 +524,7 @@ const { data, error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -536,7 +534,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -566,7 +564,7 @@ const { data, error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -575,7 +573,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -604,7 +602,7 @@ const { data, error } = await supabase
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
@@ -614,7 +612,7 @@ const { data, error } = await supabase
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
   .from('my_table')
