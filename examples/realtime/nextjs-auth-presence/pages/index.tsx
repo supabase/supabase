@@ -12,9 +12,8 @@ const HomePage: NextPage = () => {
   const [userState, setUserState] = useState<RealtimePresenceState>({})
 
   useEffect(() => {
-    console.log('user : ', this_user);
+    console.log('user : ', this_user)
 
-    
     const channel = supabaseClient.channel('online-users', {
       config: {
         presence: {
@@ -28,24 +27,21 @@ const HomePage: NextPage = () => {
 
       console.log(' inside presence ', presentState)
 
-      setUserState({...presentState});
-
+      setUserState({ ...presentState })
     })
 
     channel.on('presence', { event: 'join' }, ({ newPresences }) => {
       console.log('New users have joined: ', newPresences)
     })
 
-    channel.subscribe(
-      async (status) => {
+    channel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         const status = await channel.track({
           user_name: this_user?.email ? this_user?.email : 'Unknown',
         })
         console.log(status)
       }
-    }
-    )
+    })
   }, [])
   return (
     <>

@@ -28,7 +28,8 @@ Go to the Project Settings (the cog icon), open the API tab, and find your API U
 
 The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. 
 
-![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
+![Supabase Anon Key](supabase_anon_key.jpg?raw=true "Supabase Anon Key")
+
 
 
 ### 4. Pull this example git repository
@@ -39,8 +40,8 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 Create a .env.local file and add following environment variables.
 
- ```
- NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
+```
+NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
 
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<<insert-your-anon-key-here>> 
 ```
