@@ -20,5 +20,5 @@ export const formatTierOptions = (tiers: any[]) => {
     .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.TEAM))
     .concat([enterpriseOption])
     // Team plan might not be enabled yet, make sure to filter out null/undefined
-    .filter((it) => it)
+    .filter(Boolean)
 }
