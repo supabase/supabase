@@ -51,13 +51,11 @@ import * as SecureStore from "expo-secure-store";
 import { createClient } from '@supabase/supabase-js'
 
 const ExpoSecureStorageAdapter = {
-  getItem: async (key: string) => {
-    const value = (await SecureStore.getItemAsync(key)) as string;
-
-    return JSON.parse(value);
+  getItem: (key: string) => {
+    return SecureStore.getItemAsync(key);
   },
   setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, JSON.stringify(value));
+    SecureStore.setItemAsync(key, value);
   },
   removeItem: (key: string) => {
     SecureStore.deleteItemAsync(key);
