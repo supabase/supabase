@@ -50,15 +50,17 @@ These variables will be exposed on the browser, and that's completely fine since
 import * as SecureStore from "expo-secure-store";
 import { createClient } from '@supabase/supabase-js'
 
-const ExpoSecureStoreAdapter = {
+const ExpoSecureStorageAdapter = {
   getItem: async (key: string) => {
-    return await SecureStore.getItemAsync(key);
+    const value = (await SecureStore.getItemAsync(key)) as string;
+
+    return JSON.parse(value);
   },
-  setItem: async (key: string, value: string) => {
+  setItem: (key: string, value: string) => {
     SecureStore.setItemAsync(key, JSON.stringify(value));
   },
-  removeItem: async (key: string) => {
-    await SecureStore.deleteItemAsync(key);
+  removeItem: (key: string) => {
+    SecureStore.deleteItemAsync(key);
   },
 };
 
