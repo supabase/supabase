@@ -131,11 +131,11 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                     item.examples.map((example, exampleIndex) => {
                       const exampleString = ''
 
-                      const codeBlockLang = example?.code?.includes('```js')
+                      const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
-                        : example?.code?.includes('```ts')
+                        : example?.code?.startsWith('```ts')
                         ? 'ts'
-                        : example?.code?.includes('```dart')
+                        : example?.code?.startsWith('```dart')
                         ? 'dart'
                         : 'js'
                       //                     `
