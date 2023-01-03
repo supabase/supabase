@@ -40,7 +40,10 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
           onAddRow={onAddRow}
         />
       )}
-      <div className="sb-grid-header__inner">{headerActions}</div>
+      <div className="sb-grid-header__inner">
+        <RefreshButton filters={filters} sorts={sorts} />
+        {headerActions}
+      </div>
     </div>
   )
 }
@@ -74,7 +77,6 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton filters={filters} sorts={sorts} />
         <FilterDropdown />
         <SortPopover />
       </div>

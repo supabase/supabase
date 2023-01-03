@@ -16,12 +16,11 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
 
   const keys = vault.listKeys()
-  const defaultKey = keys.find((key) => key.name === 'default_vault_key') || keys[0]
 
   useEffect(() => {
     if (visible) {
       setShowSecretValue(false)
-      setSelectedKeyId(defaultKey?.id)
+      setSelectedKeyId(keys[0]?.id ?? 'create-new')
     }
   }, [visible])
 
@@ -38,7 +37,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
     setSubmitting(true)
     let encryptionKeyId = selectedKeyId
 
-    if (values.keyId === 'create-new') {
+    if (selectedKeyId === 'create-new') {
       const addKeyRes = await vault.addKey(values.keyName || undefined)
       if (addKeyRes.error) {
         return ui.setNotification({
@@ -127,18 +126,18 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
                   />
                   <InformationBox
                     icon={<IconHelpCircle size={18} strokeWidth={2} />}
-                    url="asd"
+                    url="https://supabase.com/docs/guides/database/vault"
                     urlLabel="Vault documentation"
                     title="What is a key?"
                     description={
                       <div className="space-y-2">
                         <p>
-                          Every secret in the Vault is encrypted with a key. The Vault comes with a
-                          default value for this key which is sufficient for simple purposes.
+                          Keys are used to encrypt data inside your database, and every secret in
+                          the Vault is encrypted with a key.
                         </p>
                         <p>
-                          However, you may also use a custom key for more advanced use cases, such
-                          as having different secrets visible to different users
+                          You may create different keys for different purposes, such as one for
+                          encrypting user data, and another for application data.
                         </p>
                       </div>
                     }

@@ -404,7 +404,7 @@ functions:
             const { data, error } = supabase.auth.setSession({
               access_token,
               refresh_token
-            )
+            })
           ```
   - id: refresh-session
     title: 'refreshSession()'

@@ -18,7 +18,7 @@ import {
   IconHelpCircle,
 } from 'ui'
 
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { ServerOption, Wrapper } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
@@ -30,6 +30,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 
 interface Props {
   wrapper: Wrapper
+  tables: any[]
   isLoading: boolean
   isEnabled: boolean
   isOpen: boolean
@@ -122,13 +123,14 @@ const InputField: FC<{
   }
 }
 
-const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }) => {
+const WrapperRow: FC<Props> = ({ wrapper, tables, isLoading, isEnabled, isOpen, onOpen }) => {
   const getInitialFormState = () =>
     Object.fromEntries(
       wrapper.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     )
 
   const { ui } = useStore()
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const { mutateAsync: createFDW } = useFDWCreateMutation()
   const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
@@ -141,9 +143,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
   const [formState, setFormState] = useState(getInitialFormState)
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  // [Joshen TODO] Fix this logic
-  const noChanges = false
-  // const noChanges = JSON.stringify(getInitialFormState()) === JSON.stringify(formState)
+  const noChanges = JSON.stringify(getInitialFormState()) === JSON.stringify(formState)
 
   const onUpdateTable = (values: any) => {
     setNewTables((prev) => {
@@ -207,6 +207,10 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             wrapper,
+          })
+          ui.setNotification({
+            category: 'success',
+            message: `Successfully removed ${wrapper.label} foreign data wrapper`,
           })
         } catch (error: any) {
           ui.setNotification({
@@ -292,6 +296,31 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                       title={`${wrapper.label} foreign data wrapper is currently enabled`}
                       description="If you'd like to edit this wrapper, you'll need to disable the wrapper first and create it again with any updated configuration."
                     />
+                    <div className="space-y-2">
+                      <p className="text-sm">Foreign Tables</p>
+                      <div className="space-y-1">
+                        {tables.map((table) => (
+                          <div
+                            key={table.id}
+                            className="rounded border border-scale-600 bg-scale-100 py-3 dark:border-scale-500 dark:bg-scale-400 px-4 py-2 flex items-center justify-between space-x-4"
+                          >
+                            <div className="space-y-1">
+                              <p className="text-sm">
+                                {table.schema}.{table.name}
+                              </p>
+                              <p className="text-sm text-scale-1100">
+                                Columns: {table.columns.map((c: any) => c.name).join(', ')}
+                              </p>
+                            </div>
+                            <Link href={`/project/${ref}/editor/${table.id}`}>
+                              <a>
+                                <Button type="default">View table</Button>
+                              </a>
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <div className="flex items-center justify-end !mt-8">
                       <div className="flex items-center space-x-3">
                         <Link href={wrapper.docsUrl}>
@@ -304,7 +333,6 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                         <Button
                           type="default"
                           loading={isSubmitting}
-                          disabled={noChanges}
                           onClick={() => onDeleteWrapper()}
                         >
                           Disable wrapper
@@ -347,7 +375,7 @@ const WrapperRow: FC<Props> = ({ wrapper, isLoading, isEnabled, isOpen, onOpen }
                           </div>
                         )}
                         {newTables.map((table, i) => (
-                          <div className="flex items-center justify-between px-4 py-2 space-y-1 border rounded-md border-scale-600">
+                          <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}
