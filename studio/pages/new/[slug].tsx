@@ -27,8 +27,9 @@ import {
   withAuth,
   useSubscriptionStats,
   checkPermissions,
-  useFreeProjectLimitCheck,
+  useParams,
 } from 'hooks'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -42,14 +43,14 @@ import {
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useParams()
   const { app, ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
   const subscriptionStats = useSubscriptionStats()
-  const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheck(slug as string)
+  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -213,7 +214,7 @@ const Wizard: NextPageWithLayout = () => {
         </div>
       }
       footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
+        <div key="panel-footer" className="flex items-center justify-between w-full">
           <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
@@ -242,7 +243,7 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="border-t border-panel-border-interior-light pb-8 dark:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
@@ -296,7 +297,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -318,7 +319,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"
