@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { IconAlertCircle } from 'ui'
 import InformationBox from 'components/ui/InformationBox'
-import { MemberWithFreeProjectLimit } from 'hooks'
+import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
 
 interface Props {
   membersExceededLimit: MemberWithFreeProjectLimit[]
@@ -21,7 +21,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
               The following members have reached their maximum limits for the number of active free
               tier projects within organizations where they are an administrator or owner:
             </p>
-            <ul className="list-disc pl-5">
+            <ul className="pl-5 list-disc">
               {membersExceededLimit.map((member, idx: number) => (
                 <li key={`member-${idx}`}>
                   {member.username || member.primary_email} (Limit: {member.free_project_limit} free
