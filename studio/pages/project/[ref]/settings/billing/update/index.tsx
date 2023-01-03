@@ -117,11 +117,9 @@ const BillingUpdate: NextPageWithLayout = () => {
     (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM
   )
 
-  console.log({ teamTierEnabled, productTiers })
-
   return (
     <>
-      <div className={["mx-auto my-10 px-6", teamTierEnabled ? 'max-w-[80vw]' : 'max-w-6xl'].join(' ')}>
+      <div className="mx-auto my-10 w-[80rem] max-w-[90vw]">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={productTiers}

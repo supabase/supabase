@@ -16,7 +16,7 @@ const AnimatedGradientBackground = () => (
   <div
     className={[
       'absolute top-0 left-0 h-full w-full animate-sway',
-      'bg-gradient-to-b from-transparent via-transparent to-green-800',
+      'bg-gradient-to-b from-transparent via-transparent to-green-900',
     ].join(' ')}
   />
 )
@@ -59,7 +59,7 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
             )}
             <div className="flex h-full flex-col overflow-hidden rounded border">
               {isCurrentPlan && <CurrentSubscriptionBanner />}
-              <div className="bg-white px-8 py-6 dark:bg-scale-300">
+              <div className="bg-white px-6 py-6 dark:bg-scale-300">
                 <span
                   className="text-cd inline-flex rounded-full text-base font-normal tracking-wide text-scale-1200"
                   id="tier-standard"
@@ -70,20 +70,18 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
                   <div className="flex space-x-2">
                     {PRICING_META[plan.id].priceMonthly !== undefined ? (
                       <>
-                        <div className="flex items-end gap-1">
+                        <div>
                           {PRICING_META[plan.id].from && (
-                            <span className="text-base font-medium text-scale-1200">From</span>
+                            <span className="text-sm font-medium text-scale-1200 mr-1">From</span>
                           )}
-                          <div>
-                            <span className="text-2xl">${PRICING_META[plan.id].priceMonthly}</span>
-                            <span className="ml-1 text-xl font-medium text-scale-900">/mo</span>
-                          </div>
+                          <span className="text-2xl">${PRICING_META[plan.id].priceMonthly}</span>
+                          <span className="text-xl font-medium text-scale-900">/mo</span>
                         </div>
                       </>
                     ) : (
                       <span className="text-2xl">Contact Us</span>
                     )}
-                    <div className="flex h-8">
+                    <div className="flex h-8 -mt-[2px]">
                       {PRICING_META[plan.id].warning && (
                         <div className="mt-2 rounded-md bg-brand-300 bg-opacity-30 px-2 py-1 text-xs text-brand-1000">
                           {PRICING_META[plan.id].warning}
@@ -106,26 +104,30 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
                   'flex-1 flex-col justify-between',
                   'space-y-6 border-t dark:border-scale-400',
                   'bg-scale-100 dark:bg-scale-300',
-                  'hidden h-full px-8 py-6 lg:flex',
+                  'hidden h-full px-6 py-6 lg:flex',
                 ].join(' ')}
               >
-                {PRICING_META[plan.id].preface && (
-                  <p className="text-sm text-scale-1200">{PRICING_META[plan.id].preface}</p>
-                )}
-                <ul role="list" className="divide-y dark:divide-scale-400">
-                  {PRICING_META[plan.id].features.map((feature) => (
-                    <li key={feature} className="flex items-center py-2">
-                      <IconCheck
-                        className="h-3 w-3 text-brand-900 "
-                        aria-hidden="true"
-                        strokeWidth={3}
-                      />
-                      <p className="mb-0 ml-3 text-xs text-scale-1100 dark:text-scale-1200">
-                        {feature}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-6">
+                  {PRICING_META[plan.id].preface && (
+                    <p className="text-sm text-scale-1200">{PRICING_META[plan.id].preface}</p>
+                  )}
+                  <ul role="list" className="divide-y dark:divide-scale-400">
+                    {PRICING_META[plan.id].features.map((feature) => (
+                      <li key={feature} className="flex py-2">
+                        <div className="w-[12px]">
+                          <IconCheck
+                            className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                            aria-hidden="true"
+                            strokeWidth={3}
+                          />
+                        </div>
+                        <p className="mb-0 ml-3 text-xs text-scale-1100 dark:text-scale-1200">
+                          {feature}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <div className="flex flex-col gap-6">
                   <div className="space-y-2">
                     {PRICING_META[plan.id].additional && (
