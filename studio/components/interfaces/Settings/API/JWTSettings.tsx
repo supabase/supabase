@@ -23,9 +23,10 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { uuidv4 } from 'lib/helpers'
-import { useStore, useProjectPostgrestConfig, checkPermissions, useParams } from 'hooks'
+import { useStore, checkPermissions, useParams } from 'hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -53,8 +54,7 @@ const JWTSettings: FC<Props> = ({}) => {
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
-
-  const { config, isError } = useProjectPostgrestConfig(projectRef as string | undefined)
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
