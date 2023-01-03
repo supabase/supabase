@@ -24,8 +24,7 @@ const GeneralContent = ({ autoApiService, selectedLang, page, showApiKey }: any)
         showApiKey={showApiKey}
       />
     )
-  if (selected == 'tables-intro')
-    return <TablesIntroduction autoApiService={autoApiService} selectedLang={selectedLang} />
+  if (selected == 'tables-intro') return <TablesIntroduction selectedLang={selectedLang} />
   if (selected == 'rpc-intro') return <RpcIntroduction />
   else
     return (
