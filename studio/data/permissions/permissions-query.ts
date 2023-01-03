@@ -26,7 +26,7 @@ export const usePermissionsQuery = <TData = PermissionsData>({
   ...options
 }: UseQueryOptions<PermissionsData, PermissionsError, TData> = {}) =>
   useQuery<PermissionsData, PermissionsError, TData>(
-    permissionKeys.permissions(),
+    permissionKeys.list(),
     ({ signal }) => getPermissions(signal),
     options
   )
@@ -35,6 +35,6 @@ export const usePermissionsPrefetch = () => {
   const client = useQueryClient()
 
   return useCallback(() => {
-    client.prefetchQuery(permissionKeys.permissions(), ({ signal }) => getPermissions(signal))
+    client.prefetchQuery(permissionKeys.list(), ({ signal }) => getPermissions(signal))
   }, [])
 }
