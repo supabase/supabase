@@ -18,7 +18,7 @@ For example, a `public.profiles` table might look like this:
 
 ```sql
 create table public.profiles (
-  id uuid references auth.users not null on delete cascade,
+  id uuid not null references auth.users on delete cascade,
   first_name text,
   last_name text,
 

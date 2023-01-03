@@ -70,7 +70,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
 
   const onSelectCreateBucket = async (bucketName: string, isPublic: boolean) => {
     const bucket = await createBucket(bucketName, isPublic)
-    if (bucket.name) router.push(`/project/${projectRef}/storage/buckets/${bucket.name}`)
+    if (bucket !== undefined) router.push(`/project/${projectRef}/storage/buckets/${bucket.name}`)
   }
 
   const onSelectDeleteBucket = async (bucket: any) => {

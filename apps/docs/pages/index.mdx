@@ -11,9 +11,9 @@ export const meta = {
 
 <h2 className="text-base max-w-xl m-0">
   Supabase is an open source Firebase alternative providing all the backend features you need to
-  build a product. [Learn more](/docs/architecture) about Supabase, start with the
-  [tutorials](/docs/guides/getting-started#tutorials), or dive straight into the different products
-  and APIs.
+  build a product. [Learn more](/docs/guides/getting-started/architecture) about Supabase, start
+  with the [tutorials](/docs/guides/getting-started#tutorials), or dive straight into the different
+  products and APIs.
 </h2>
 
 {/* start container */}
@@ -30,7 +30,7 @@ export const meta = {
     ">
     <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
       <img className="hidden lg:visible absolute right-0 top-0 w-[500px]" src="/docs/img/cards/dark.png" />
-      <div classNam="">
+      <div className="">
         <h3 className="text-2xl m-0 mb-3">Getting Started</h3>
 
         Discover how to set up a database to an app making queries in just a few minutes.
@@ -144,7 +144,7 @@ export const meta = {
           key={product.title}
           passHref
         >
-          <a className={'col-span-12 md:col-span-4'}>
+          <a className={'col-span-12 md:col-span-6'}>
             <GlassPanel {...product} background={false} showIconBg={true}>
               {product.description}
             </GlassPanel>
@@ -243,6 +243,7 @@ export const apis = [
     hasLightIcon: true,
     href: 'reference/javascript/introduction',
     description: 'Official client libraries for JavaScript and TypeScript.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Flutter Client Library',
@@ -250,6 +251,7 @@ export const apis = [
     hasLightIcon: true,
     href: 'reference/dart/introduction',
     description: 'Official client libraries for Flutter and Dart.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Management API',
@@ -257,6 +259,7 @@ export const apis = [
     hasLightIcon: true,
     href: 'reference/api/introduction',
     description: 'Manage your Supabase projects and organizations programmatically.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Supabase CLI',
@@ -265,6 +268,7 @@ export const apis = [
     href: 'reference/cli/introduction',
     description:
       'Use the CLI to develop your project locally, manage database migrations, and deploy to the Supabase Platform or self-host.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Self-Hosting Auth',
@@ -306,6 +310,13 @@ export const platform = [
     hasLightIcon: true,
     href: 'guides/resources',
     description: 'View examples, curated content from the community, migration guides, and more.',
+  },
+  {
+    title: 'Self-Hosting Supabase',
+    icon: '/docs/img/icons/menu/platform',
+    hasLightIcon: true,
+    href: 'guides/self-hosting',
+    description: 'Learn how to self-host Supabase and deploy to your own infrastructure.',
   },
   {
     // header: '/docs/img/cards/sample-card-header-2.svg',

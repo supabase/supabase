@@ -17,7 +17,7 @@ The PostgreSQL community [released](https://www.postgresql.org/docs/current/rele
 
 `CREATE` permission is revoked from all users except the database owner. It makes permission assigning more tunable ([details](https://www.postgresql.org/docs/15/ddl-schemas.html#DDL-SCHEMAS-PATTERNS)). And for the migrated database don't forget to revoke `CREATE` permission on the public schema manually to fit the new policy.
 
-There is a useful option `CREATE VIEW .. WITH security_invoker=on` to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
+There is a useful option `CREATE VIEW .. WITH (security_invoker=on)` to create a view that uses permissions of a view caller rather than a view creator to access underlying tables. With this, you should not worry that a user that doesn't have access to a table could see its data through a view.
 
 ## **Performance speed-up**
 
@@ -68,3 +68,15 @@ Before choosing to upgrade, don't forget to check the list of rare cases that ne
 - If you're self-hosting, upgrading between major PostgreSQL is easily done with [pg_upgrade](https://www.postgresql.org/docs/current/pgupgrade.html) utility or a set of recommended practices in the [official docs](https://www.postgresql.org/docs/current/upgrading.html).
 - If you're starting a new project on Supabase, you'll already be on PG15.
 - If you want to upgrade an existing project, check out our [Upgrading](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) documentation.
+
+## More Launch Week 6
+
+- [Day 1: New Supabase Docs, built with Next.js](https://supabase.com/blog/new-supabase-docs-built-with-nextjs)
+- [Day 2: Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn)
+- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://supabase.com/blog/mfa-auth-via-rls)
+- [Day 4: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
+- [Day 5: Supabase Vault is now in Beta](https://supabase.com/blog/vault-now-in-beta)
+- [Community Day](https://supabase.com/blog/launch-week-6-community-day)
+- [Point in Time Recovery is now available](https://supabase.com/blog/postgres-point-in-time-recovery)
+- [Custom Domain Names are now available](https://supabase.com/blog/custom-domain-names)
+- [Wrap Up: everything we shipped](https://supabase.com/blog/launch-week-6-wrap-up)

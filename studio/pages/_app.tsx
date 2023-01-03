@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
+import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { StoreProvider } from 'hooks'
 import { GOTRUE_ERRORS } from 'lib/constants'
 import { auth } from 'lib/gotrue'
@@ -115,6 +116,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               </RouteValidationWrapper>
             </PageTelemetry>
 
+            <HCaptchaLoadedStore />
             <PortalToast />
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
           </FlagProvider>

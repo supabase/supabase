@@ -535,16 +535,20 @@ module.exports = [
     source: '/docs/reference/postgres/publications',
     destination: '/docs/guides/database/replication',
   },
-
   {
     permanent: true,
     source: '/docs/guides/hosting/platform',
     destination: '/docs/guides/platform',
   },
   {
-    permanent: false,
-    source: '/docs/guides/self-hosting',
-    destination: '/docs/guides/hosting/overview',
+    permanent: true,
+    source: '/docs/guides/hosting/platform/access-control',
+    destination: '/docs/guides/platform/access-control',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/self-hosting/overview',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
@@ -1709,6 +1713,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-zoom',
+    destination: '/docs/guides/auth/social-login/auth-zoom',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database',
     destination: '/docs/guides/database/overview',
   },
@@ -1789,23 +1798,23 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/hosting/overview',
-    destination: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
     source: '/docs/guides/hosting/docker',
-    destination: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
   },
   {
     permanent: true,

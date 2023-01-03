@@ -16,6 +16,68 @@ info:
       version: '0.0.1'
 
 functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    examples:
+      - id: create-client
+        name: Create Client
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            // Create a single supabase client for interacting with your database
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - id: with-additional-parameters
+        name: With Additional Parameters
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const options = {
+              schema: 'public',
+              headers: { 'x-my-custom-header': 'my-app-name' },
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+            }
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+          ```
+      - id: api-schemas
+        name: API schemas
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const options = {
+              schema: 'public',
+              headers: { 'x-my-custom-header': 'my-app-name' },
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+            }
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+          ```
+        description: |
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`. 
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: custom-fetch-implementation
+        name: Custom Fetch Implementation
+        code: |
+          ```js
+            import { createClient } from '@supabase/supabase-js'
+
+            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+              fetch: fetch.bind(globalThis),
+            })
+          ```
+        description: |
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -223,7 +285,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
       User email: By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/settings).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
