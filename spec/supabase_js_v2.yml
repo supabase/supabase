@@ -1564,7 +1564,7 @@ functions:
           ```ts
           const { data, error } = await supabase
             .from('users')
-            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
+            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' }, { onConflict: 'handle' })
             .select()
           ```
         data:
