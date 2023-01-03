@@ -50,8 +50,10 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
     enabled = true,
     ...options
   }: UseQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
-) =>
-  useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>(
+) => {
+  const client = useQueryClient()
+
+  return useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>(
     configKeys.jwtSecretUpdatingStatus(projectRef),
     ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
     {
@@ -67,9 +69,13 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
 
         return interval
       },
+      onSuccess() {
+        client.invalidateQueries(configKeys.postgrest(projectRef))
+      },
       ...options,
     }
   )
+}
 
 export const useJwtSecretUpdatingStatusPrefetch = ({
   projectRef,

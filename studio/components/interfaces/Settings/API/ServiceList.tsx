@@ -2,27 +2,28 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import { useParams, useProjectPostgrestConfig, useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
 import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { configKeys } from 'data/config/keys'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
+import { useQueryClient } from '@tanstack/react-query'
 
 const ServiceList = () => {
   const { ui } = useStore()
+  const client = useQueryClient()
 
   const { ref: projectRef } = useParams()
   const { data: settings, isError } = useProjectApiQuery({
     projectRef,
   })
-
-  const { mutateConfig } = useProjectPostgrestConfig(projectRef as string | undefined)
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
@@ -37,8 +38,9 @@ const ServiceList = () => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
         case Updated:
-          mutateConfig()
-          // mutateSettings()
+          client.invalidateQueries(configKeys.settings(projectRef))
+          client.invalidateQueries(configKeys.postgrest(projectRef))
+
           ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
           break
         case Failed:
