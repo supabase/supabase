@@ -222,7 +222,7 @@ export default function SupabaseListener({ accessToken }) {
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
       if (session?.access_token !== accessToken) {
-        router.refresh()
+        router.reload()
       }
     })
   }, [accessToken])
@@ -322,7 +322,7 @@ Create a `/components/supabase-listener.tsx` file and add the following:
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import supabase from '../utils/supabase'
+import supabase from '../utils/supabase-browser'
 
 export default function SupabaseListener({ accessToken }: { accessToken?: string }) {
   const router = useRouter()

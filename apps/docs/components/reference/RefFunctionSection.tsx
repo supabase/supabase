@@ -9,6 +9,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
+import { Fragment } from 'react'
 
 interface ICommonFunc {
   id: string
@@ -32,11 +33,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   // gracefully return nothing if function does not exist
   if (!item) return <></>
 
-  if (item && !item['$ref']) {
-    //console.warn('🚩 issue with $ref in:', item.id)
-  }
-
-  // console.log(item)
   const hasTsRef = item['$ref'] || null
 
   const tsDefinition =
@@ -64,11 +60,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
               </div>
             )}
-            {/* {functionMarkdownContent && (
-                        <div className="prose">
-                          <MDXRemote {...functionMarkdownContent} components={components} />
-                        </div>
-                      )} */}
+
             {item.notes && (
               <div className="prose">
                 <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
@@ -89,25 +81,29 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                     })
 
                     const paramItem = overide?.length > 0 ? overide[0] : param
-
                     return (
-                      <Param {...paramItem}>
+                      <Param {...paramItem} key={param.name}>
                         {paramItem.subContent && (
                           <div className="mt-3">
                             <Options>
                               {param.subContent.map((param) => {
                                 return (
-                                  <>
+                                  <Fragment key={param.name + 'subcontent'}>
                                     <Options.Option {...param}>
                                       {param.subContent && (
                                         <Options>
                                           {param.subContent.map((param) => {
-                                            return <Options.Option {...param} />
+                                            return (
+                                              <Options.Option
+                                                {...param}
+                                                key={param.name + 'subcontent-option'}
+                                              />
+                                            )
                                           })}
                                         </Options>
                                       )}
                                     </Options.Option>
-                                  </>
+                                  </Fragment>
                                 )
                               })}
                             </Options>
@@ -134,6 +130,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
                       const exampleString = ''
+
+                      const codeBlockLang = example?.code?.startsWith('```js')
+                        ? 'js'
+                        : example?.code?.startsWith('```ts')
+                        ? 'ts'
+                        : example?.code?.startsWith('```dart')
+                        ? 'dart'
+                        : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 
@@ -150,9 +154,18 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       return (
                         <Tabs.Panel
                           id={example.id}
+                          key={example.id}
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
+                          {example.description && (
+                            <div className="prose">
+                              <ReactMarkdown className="text-sm">
+                                {example.description}
+                              </ReactMarkdown>
+                            </div>
+                          )}
+
                           {((tables && tables.length > 0) || sql) && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-data`}
@@ -191,9 +204,10 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             </RefDetailCollapse>
                           )}
 
+
                           <CodeBlock
                             className="useless-code-block-class"
-                            language="js"
+                            language={codeBlockLang}
                             hideLineNumbers={true}
                           >
                             {exampleString +
@@ -201,8 +215,10 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                 example.code
                                   .replace(/```/g, '')
                                   .replace('js', '')
-                                  .replace('ts', ''))}
+                                  .replace('ts', '')
+                                  .replace('dart', ''))}
                           </CodeBlock>
+
                           {response && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-response`}
@@ -211,7 +227,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             >
                               <CodeBlock
                                 className="useless-code-block-class"
-                                language="js"
+                                language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
                                 {response.replace(/```/g, '').replace('json', '')}

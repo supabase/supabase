@@ -147,6 +147,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                       <div className="space-y-2">
                         {roles && (
                           <Select
+                            defaultValue={roles.find((role) => role.name === 'Developer')?.id}
                             name="role"
                             label="Member role"
                             error={
