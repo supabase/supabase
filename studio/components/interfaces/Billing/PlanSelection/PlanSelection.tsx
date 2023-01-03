@@ -27,7 +27,7 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
     >
       <div>
         <h4 className="text-lg mb-8">Change your project's subscription</h4>
-        <div className={`grid py-8 grid-cols-2 ${gridCols}`}>
+        <div className={`grid py-8 gap-8 grid-cols-2 xl:grid-cols-3`}>
           <Plans plans={formattedTiers} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
         </div>
         <div className="flex justify-center items-center mt-4">
