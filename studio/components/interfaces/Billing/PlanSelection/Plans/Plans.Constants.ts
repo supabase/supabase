@@ -65,7 +65,7 @@ export const PRICING_META = {
     description: 'For collaborative teams with different permissions and access.',
     features: [
       'Usage-based pricing for space and egress',
-      '100,000 monthly active users',
+      '100,000 monthly active users included',
       'Member roles (Owner, Administrator, Developer, Read-only, Billing)',
       'Standardised Security Questionnaire',
       'SOC2',
