@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input } from 'ui'
+import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
 import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -212,15 +212,33 @@ const TableEditor: FC<Props> = ({
               // @ts-ignore
               description={
                 <>
-                  Restrict access to your table by enabling RLS and writing Postgres policies.
-                  <br />
-                  If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                  <p>
+                    Restrict access to your table by enabling RLS and writing Postgres policies.
+                  </p>
+
+                  <p>
+                    If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                  </p>
+                  {!tableFields.isRLSEnabled && (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      className="!px-4 !py-3 mt-3"
+                      // @ts-ignore
+                      title={
+                        <span className="text-amber-1100 text-sm">
+                          Turning off RLS means that you are allowing anonymous access to your table
+                        </span>
+                      }
+                    />
+                  )}
                 </>
               }
               checked={tableFields.isRLSEnabled}
               onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
               size="medium"
             />
+
             <Checkbox
               id="enable-realtime"
               label="Enable Realtime"

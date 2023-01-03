@@ -95,7 +95,7 @@ Create a new file at `/utils/supabase-browser.ts` and populate with the followin
 
 ```ts
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '../db_types'
+import { Database } from '../lib/database.types'
 
 export default createBrowserSupabaseClient<Database>()
 ```
@@ -109,7 +109,7 @@ Create a new file at `/utils/supabase-server.ts` and populate with the following
 ```ts title="/utils/supabase-server.ts"
 import { headers, cookies } from 'next/headers'
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '../db_types'
+import { Database } from '../lib/database.types'
 
 export default () =>
   createServerComponentSupabaseClient<Database>({
@@ -139,6 +139,8 @@ Middleware runs before every route declared in the `matcher` array. Since we don
 >
 <TabPanel id="js" label="JavaScript">
 
+Create a new file at `/pages/middleware.js` and populate with the following:
+
 ```jsx title="middleware.js"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
@@ -163,6 +165,8 @@ export const config = {
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
+Create a new file at `/middleware.ts` (a sibling of /pages) and populate with the following:
 
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -218,7 +222,7 @@ export default function SupabaseListener({ accessToken }) {
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
       if (session?.access_token !== accessToken) {
-        router.refresh()
+        router.reload()
       }
     })
   }, [accessToken])
@@ -254,7 +258,7 @@ export default async function RootLayout({ children }) {
 }
 ```
 
-We don't want Next.js to cache this `session` value, so we need to export a `revalidate` value of `0`.
+We don't want Next.js to cache this `session` value, so we need to export a `revalidate` value of `0` in the layout file.
 
 ```jsx
 export const revalidate = 0
@@ -318,7 +322,7 @@ Create a `/components/supabase-listener.tsx` file and add the following:
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import supabase from '../utils/supabase'
+import supabase from '../utils/supabase-browser'
 
 export default function SupabaseListener({ accessToken }: { accessToken?: string }) {
   const router = useRouter()
@@ -641,7 +645,7 @@ Create a new file at `/app/realtime/posts.tsx` and populate with the following:
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Database } from '../../db_types'
+import { Database } from '../lib/database.types'
 import supabase from '../../utils/supabase-browser'
 
 type Post = Database['public']['Tables']['posts']['Row']
