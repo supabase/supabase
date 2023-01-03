@@ -8,13 +8,14 @@ import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Setting
 import { API_URL } from 'lib/constants'
 import useSWR from 'swr'
 import { get } from 'lib/common/fetch'
-interface Data {
+export interface LogsQueryData {
   params: LogsEndpointParams
   isLoading: boolean
   logData: LogData[]
+  data?: never
   error: string | Object | null
 }
-interface Handlers {
+export interface LogsQueryHandlers {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
@@ -23,7 +24,7 @@ interface Handlers {
 const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
-): [Data, Handlers] => {
+): [LogsQueryData, LogsQueryHandlers] => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',

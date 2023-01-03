@@ -137,7 +137,14 @@ const ContentLink = React.memo(function ContentLink(props: any) {
               : 'hover:text-brand-900 text-scale-1000',
           ].join(' ')}
         >
-          {props.icon && <img className="w-3" src={`${router.basePath}${props.icon}`} />}
+          {props.icon && (
+            <Image
+              alt={props.icon}
+              width={12}
+              height={12}
+              src={`${router.basePath}${props.icon}`}
+            />
+          )}
           {props.name}
         </a>
       </Link>
@@ -177,14 +184,15 @@ const Content = (props) => {
         </a>
       </Link>
 
-      {menu.items.map((x, index) => {
+      {menu.items.map((x) => {
         return (
-          <div key={x.url}>
+          <div key={x.name}>
             {x.items && x.items.length > 0 ? (
               <div>
                 {x.items.map((subItem, subItemIndex) => {
                   return (
                     <ContentAccordionLink
+                      key={subItem.name}
                       subItem={subItem}
                       subItemIndex={subItemIndex}
                       parent={x}
@@ -193,7 +201,7 @@ const Content = (props) => {
                 })}
               </div>
             ) : (
-              <ContentLink url={x.url} icon={x.icon} name={x.name} />
+              <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
             )}
           </div>
         )

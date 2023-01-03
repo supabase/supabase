@@ -57,7 +57,7 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
 const Section: FC<ISectionContainer> = (props) => {
   return (
     <article
-      key={props.id}
+      key={props.id + 'section'}
       className={[
         props.singleColumn ? 'prose dark:prose-dark w-full' : 'w-full',
         'py-16 lg:py-32 first:pt-8 last:pb-8',
@@ -150,7 +150,7 @@ const EducationRow: FC<IEducationRow> = (props) => {
 const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
   return (
     <article
-      key={props.id}
+      key={props.id + 'education'}
       className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
