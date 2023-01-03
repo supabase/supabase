@@ -1,3 +1,3 @@
 export const permissionKeys = {
-  permissions: () => ['permissions'] as const,
+  list: () => ['permissions'] as const,
 }
