@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from 'ui'
 
-import { useFreeProjectLimitCheck, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -19,7 +20,7 @@ const BillingUpdate: NextPageWithLayout = () => {
   const orgSlug = ui.selectedOrganization?.slug
   const projectRef = ui.selectedProject?.ref
 
-  const { membersExceededLimit } = useFreeProjectLimitCheck(orgSlug as string)
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
@@ -103,7 +104,7 @@ const BillingUpdate: NextPageWithLayout = () => {
 
   if (isLoadingProducts || isEnterprise) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
+      <div className="flex items-center justify-center w-full h-full">
         <Connecting />
       </div>
     )
@@ -111,7 +112,7 @@ const BillingUpdate: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="mx-auto my-10 max-w-6xl px-6">
+      <div className="max-w-6xl px-6 mx-auto my-10">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={products?.tiers ?? []}
@@ -142,14 +143,14 @@ const BillingUpdate: NextPageWithLayout = () => {
         header="Your organization has members who have exceeded their free project limits"
         onCancel={() => setShowDowngradeError(false)}
       >
-        <div className="space-y-4 py-4">
+        <div className="py-4 space-y-4">
           <Modal.Content>
             <div className="space-y-2">
               <p className="text-sm text-scale-1100">
                 The following members have reached their maximum limits for the number of active
                 free tier projects within organizations where they are an administrator or owner:
               </p>
-              <ul className="list-disc pl-5 text-sm text-scale-1100">
+              <ul className="pl-5 text-sm list-disc text-scale-1100">
                 {(membersExceededLimit || []).map((member, idx: number) => (
                   <li key={`member-${idx}`}>
                     {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
