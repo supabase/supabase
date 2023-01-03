@@ -2,7 +2,8 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import { useJwtSecretUpdateStatus, useParams, useProjectPostgrestConfig, useStore } from 'hooks'
+import { useParams, useProjectPostgrestConfig, useStore } from 'hooks'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
 import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
@@ -22,9 +23,12 @@ const ServiceList = () => {
   })
 
   const { mutateConfig } = useProjectPostgrestConfig(projectRef as string | undefined)
-  const { jwtSecretUpdateError, jwtSecretUpdateStatus }: any = useJwtSecretUpdateStatus(projectRef)
 
-  const previousJwtSecretUpdateStatus = useRef()
+  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
+  const jwtSecretUpdateError = data?.jwtSecretUpdateError
+
+  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]

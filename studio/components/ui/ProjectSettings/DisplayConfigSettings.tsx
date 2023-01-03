@@ -1,7 +1,8 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useJwtSecretUpdateStatus, useParams } from 'hooks'
+import { useParams } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { FC } from 'react'
@@ -18,10 +19,11 @@ const DisplayConfigSettings = () => {
   })
 
   const {
+    data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-    jwtSecretUpdateStatus,
-  }: any = useJwtSecretUpdateStatus(projectRef)
+  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated

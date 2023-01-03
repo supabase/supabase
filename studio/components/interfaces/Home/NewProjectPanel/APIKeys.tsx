@@ -8,9 +8,10 @@ import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { checkPermissions, useJwtSecretUpdateStatus, useParams } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -30,10 +31,11 @@ const APIKeys = () => {
   })
 
   const {
-    jwtSecretUpdateStatus,
+    data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  }: any = useJwtSecretUpdateStatus(projectRef)
+  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
 
