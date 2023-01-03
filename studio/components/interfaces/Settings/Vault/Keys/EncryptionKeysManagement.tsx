@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useEffect, useState } from 'react'
 import {
   Alert,
@@ -15,6 +15,7 @@ import {
   IconKey,
   IconLoader,
   IconX,
+  IconExternalLink,
 } from 'ui'
 import { useParams, useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
@@ -134,9 +135,18 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               </Listbox>
             </div>
           </div>
-          <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
-            Add new key
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Link href="https://supabase.com/docs/guides/database/vault">
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  Vault Documentation
+                </Button>
+              </a>
+            </Link>
+            <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
+              Add new key
+            </Button>
+          </div>
         </div>
 
         {/* Table of keys */}
