@@ -389,6 +389,11 @@ export const database = {
           url: '/guides/database/extensions/pgnet',
           items: [],
         },
+        {
+          name: 'PostGIS: Geo queries',
+          url: '/guides/database/extensions/postgis',
+          items: [],
+        },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
         {
           name: 'uuid-ossp: Unique Identifiers',
