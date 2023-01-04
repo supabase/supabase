@@ -166,7 +166,7 @@ const { data, error } = await supabase.rpc('nearby_restaurants_with_distance', {
 
 ### Finding all data points within a bounding box
 
-![Screen Shot 2022-12-28 at 20.09.53.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5cc5332a-9225-49e2-86e7-9ec79fbe818d/Screen_Shot_2022-12-28_at_20.09.53.png)
+![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
 When you are working on a map-based application where the user scrolls through your map, you might want to load the that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like.
 
