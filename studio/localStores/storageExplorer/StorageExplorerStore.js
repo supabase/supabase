@@ -542,7 +542,10 @@ class StorageExplorerStore {
 
   // https://stackoverflow.com/a/53058574
   getFilesDataTransferItems = async (items) => {
-    const toastId = toast.loading('Retrieving items to upload...')
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: 'Retrieving items to upload...',
+    })
     const files = []
     const queue = []
     for (const item of items) {
@@ -623,9 +626,9 @@ class StorageExplorerStore {
       return file
     })
 
-    const uploadedTopLevelFolders = []
     this.uploadProgress = 0
-    let numberOfFilesToUpload = formattedFilesToUpload.length
+    const uploadedTopLevelFolders = []
+    const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
     let numberOfFilesUploadedFail = 0
 
@@ -732,28 +735,34 @@ class StorageExplorerStore {
       if (numberOfFilesToUpload === 0) {
         toast.dismiss(toastId)
       } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
-        toast.error(
-          `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
-          { id: toastId }
-        )
+        this.ui.setNotification({
+          id: toastId,
+          category: 'error',
+          message: `Failed to upload ${numberOfFilesToUpload} file${
+            numberOfFilesToUpload > 1 ? 's' : ''
+          }!`,
+        })
       } else if (numberOfFilesUploadedSuccess === numberOfFilesToUpload) {
-        toast.success(
-          `Successfully uploaded ${numberOfFilesToUpload} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Successfully uploaded ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
-        )
+        })
       } else {
-        toast.success(
-          `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
-        )
+        })
       }
     } catch (e) {
-      console.error(e)
       this.ui.setNotification({
+        id: toastId,
+        error: e,
         message: 'Failed to upload files',
         category: 'error',
       })
@@ -1060,13 +1069,12 @@ class StorageExplorerStore {
   }
 
   downloadFile = async (file, showToast = true, returnBlob = false) => {
-    let toastId
     const fileName = file.name
     const fileMimeType = get(file, ['metadata', 'mimetype'], null)
 
-    if (showToast) {
-      toastId = toast.loading(`Retrieving ${fileName}...`, { autoClose: false })
-    }
+    const toastId = showToast
+      ? this.ui.setNotification({ category: 'loading', message: `Retrieving ${fileName}...` })
+      : undefined
 
     const pathToFile = this.openedFolders
       .slice(0, file.columnIndex)
@@ -1093,16 +1101,20 @@ class StorageExplorerStore {
       link.parentNode.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
-        toast.success(`Downloading ${fileName}`, {
+        this.ui.setNotification({
           id: toastId,
+          category: 'success',
+          message: `Downloading ${fileName}`,
         })
       }
       return true
     } else {
-      console.error('Failed to download:', fileName)
       if (toastId) {
-        toast.error(`Failed to download ${fileName}`, {
+        this.ui.setNotification({
+          error,
           id: toastId,
+          category: 'error',
+          message: `Failed to download ${fileName}`,
         })
       }
       return false
