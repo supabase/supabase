@@ -1,31 +1,20 @@
+import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import {
-  find,
-  compact,
-  isEqual,
-  isNull,
-  isNil,
-  isUndefined,
-  has,
-  some,
-  chunk,
-  get,
-  uniq,
-} from 'lodash'
-import toast from 'react-hot-toast'
+import { find, compact, isEqual, isNil, has, some, chunk, get, uniq } from 'lodash'
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
-import { useStore } from 'hooks'
 
+import { useStore } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { copyToClipboard } from 'lib/helpers'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -319,10 +308,8 @@ class StorageExplorerStore {
   addNewFolder = async (folderName, columnIndex) => {
     const autofix = false
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
+    if (formattedName === null) return
 
-    if (isNull(formattedName)) {
-      return
-    }
     /**
      * todo: move this to a util file, as renameFolder() uses same logic
      */
@@ -374,7 +361,7 @@ class StorageExplorerStore {
 
       const fetchedAt = get(cachedPreview, ['fetchedAt'], null)
       const expiresIn = get(cachedPreview, ['expiresIn'], null)
-      const existsInCache = !isNull(fetchedAt) && !isNull(expiresIn)
+      const existsInCache = fetchedAt !== null && expiresIn !== null
       const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
 
       if (!isExpired) {
@@ -566,7 +553,7 @@ class StorageExplorerStore {
       const entry = queue.shift() || {}
       if (entry.isFile) {
         const file = await this.getFile(entry)
-        if (!isUndefined(file)) {
+        if (file !== undefined) {
           file.path = entry.fullPath.slice(1)
           files.push(file)
         }
@@ -945,30 +932,43 @@ class StorageExplorerStore {
 
   downloadSelectedFiles = async () => {
     const showIndividualToast = false
+    const returnBlob = true
     const toastId = toast.loading(`Retrieving ${this.selectedItems.length} files...`, {
       autoClose: false,
       hideProgressBar: true,
     })
 
     const res = await Promise.all(
-      this.selectedItems.map(async (item) => await this.downloadFile(item, showIndividualToast))
+      this.selectedItems.map(
+        async (item) => await this.downloadFile(item, showIndividualToast, returnBlob)
+      )
     )
+    const uploadedFiles = res.filter(Boolean)
 
-    const numberOfSuccessfullyDownloadedFiles = res.filter((x) => x === true).length
-    toast.success(`Downloaded ${numberOfSuccessfullyDownloadedFiles} files`, {
-      id: toastId,
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    uploadedFiles.forEach((file) => {
+      zipWriter.add(file.name, new BlobReader(file.blob))
     })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `supabase-files.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+
+    toast.success(`Downloaded ${uploadedFiles.length} files`, { id: toastId })
   }
 
-  downloadFile = async (file, showToast = true) => {
+  downloadFile = async (file, showToast = true, returnBlob = false) => {
     let toastId
     const fileName = file.name
     const fileMimeType = get(file, ['metadata', 'mimetype'], null)
 
     if (showToast) {
-      toastId = toast.loading(`Retrieving ${fileName}...`, {
-        autoClose: false,
-      })
+      toastId = toast.loading(`Retrieving ${fileName}...`, { autoClose: false })
     }
 
     const pathToFile = this.openedFolders
@@ -984,8 +984,10 @@ class StorageExplorerStore {
     if (!error) {
       const blob = data
       const newBlob = new Blob([blob], { type: fileMimeType })
-      const blobUrl = window.URL.createObjectURL(newBlob)
 
+      if (returnBlob) return { name: fileName, blob: newBlob }
+
+      const blobUrl = window.URL.createObjectURL(newBlob)
       const link = document.createElement('a')
       link.href = blobUrl
       link.setAttribute('download', `${fileName}`)
@@ -1333,7 +1335,7 @@ class StorageExplorerStore {
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
 
-    if (isUndefined(prefix)) {
+    if (prefix === undefined) {
       const pathToFolder = this.openedFolders
         .slice(0, columnIndex)
         .map((folder) => folder.name)
@@ -1361,8 +1363,8 @@ class StorageExplorerStore {
       }
     }
 
-    const subfolders = folderContents?.filter((item) => isNull(item.id)) ?? []
-    const folderItems = folderContents?.filter((item) => !isNull(item.id)) ?? []
+    const subfolders = folderContents?.filter((item) => item.id === null) ?? []
+    const folderItems = folderContents?.filter((item) => item.id !== null) ?? []
 
     folderItems.forEach((item) => items.push({ ...item, prefix: formattedPathToFolder }))
 
