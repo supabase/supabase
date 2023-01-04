@@ -59,7 +59,7 @@ export default class UiStore implements IUiStore {
       const found = this.rootStore.app.projects.find(
         (x: Project) => x.ref === this.selectedProjectRef
       )
-      return !!found?.connectionString ? found : undefined
+      return found
     }
     return undefined
   }
