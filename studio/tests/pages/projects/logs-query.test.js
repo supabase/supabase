@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
-import { useProjectSubscription } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -153,8 +153,8 @@ test('query warnings', async () => {
 
 describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscription.mockReturnValue({
-      subscription: {
+    useProjectSubscriptionQuery.mockReturnValue({
+      data: {
         tier: {
           supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
           key,

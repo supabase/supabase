@@ -28,10 +28,12 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import { useFlag, useProjectSubscription } from 'hooks'
+import { useFlag } from 'hooks'
+jest.mock('data/subscriptions/project-subscription-query')
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 useFlag.mockReturnValue(true)
-useProjectSubscription.mockReturnValue({
-  subscription: undefined,
+useProjectSubscriptionQuery.mockReturnValue({
+  data: undefined,
 })
 
 beforeEach(() => {
