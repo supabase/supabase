@@ -1,4 +1,6 @@
 import fs from 'fs'
+import fetch from 'cross-fetch'
+
 import crypto from 'crypto'
 import path from 'path'
 import matter from 'gray-matter'
@@ -26,10 +28,38 @@ const ignoredFiles = [
   'pages/oss.tsx',
   'pages/_app.tsx',
   'pages/_document.tsx',
-  'pages/[...slug].tsx',
   'pages/handbook/contributing.mdx',
   'pages/handbook/introduction.mdx',
   'pages/handbook/supasquad.mdx',
+  'pages/[...slug].tsx',
+  'pages/reference/api/[...slug].tsx',
+  'pages/reference/auth/[...slug].tsx',
+  'pages/reference/cli/[...slug].tsx',
+  'pages/reference/dart/[...slug].tsx',
+  'pages/reference/dart/crawlers/[...slug].tsx',
+  'pages/reference/dart/v0/[...slug].tsx',
+  'pages/reference/dart/v0/crawlers/[...slug].tsx',
+  'pages/reference/javascript/[...slug].tsx',
+  'pages/reference/javascript/crawlers/[...slug].tsx',
+  'pages/reference/javascript/v1/[...slug].tsx',
+  'pages/reference/javascript/v1/crawlers/[...slug].tsx',
+  'pages/reference/self-hosting-auth/[...slug].tsx',
+  'pages/reference/self-hosting-realtime/[...slug].tsx',
+  'pages/reference/self-hosting-storage/[...slug].tsx',
+  'pages/reference/storage/[...slug].tsx',
+  'pages/.DS_Store',
+  'pages/guides/.DS_Store',
+  'pages/guides/auth/.DS_Store',
+  'pages/guides/auth/auth-helpers/.DS_Store',
+  'pages/guides/auth/social-login/.DS_Store',
+  'pages/guides/database/.DS_Store',
+  'pages/guides/getting-started/.DS_Store',
+  'pages/guides/resources/.DS_Store',
+  'pages/guides/resources/self-hosting/.DS_Store',
+  'pages/guides/resources/supabase-cli/.DS_Store',
+  'pages/reference/.DS_Store',
+  'pages/reference/javascript/.DS_Store',
+  'pages/reference/javascript/v1/.DS_Store',
 ]
 
 async function walk(dir) {
@@ -47,7 +77,14 @@ async function walk(dir) {
   return files.reduce((all, folderContents) => all.concat(folderContents), [])
 }
 
-;(async function () {
+async function getPlainHtmlFromMarkdown(slug) {
+  const response = await fetch(`http://localhost:3001/docs/api/seed-search/${slug}`)
+
+  const body = await response.text()
+  return body
+}
+
+async function generateSearchObjects() {
   // initialize environment variables
   dotenv.config()
 
@@ -70,11 +107,18 @@ async function walk(dir) {
     const guidePages = (await walk('pages')).filter((slug) => !ignoredFiles.includes(slug))
 
     // generate search objects for mdx guide pages
-    const guidePagesearchObjects = guidePages
-      .map((slug) => {
-        let id, title, description
+    const guidePagesearchObjects = await Promise.all(
+      guidePages.map(async (slug) => {
+        //console.log('the slug in guide pages', slug)
+        let id, title, description, plainPageContent
         const fileContents = fs.readFileSync(slug, 'utf8')
-        const { data, content } = matter(fileContents)
+        const { data } = matter(fileContents)
+
+        // We need to render the mdx content to generate plain html to send to Algolia
+        if (slug.includes('.mdx')) {
+          plainPageContent = await getPlainHtmlFromMarkdown(slug)
+          console.log('plainPageContent', plainPageContent)
+        }
 
         if (isEmpty(data)) {
           // Guide pages do not have front-matter meta, unlike reference pages, have to manually extract
@@ -111,7 +155,7 @@ async function walk(dir) {
           url,
           source,
           //pageContent: content,
-          pageContent: '',
+          pageContent: plainPageContent,
           category: undefined,
           version: undefined,
 
@@ -127,12 +171,13 @@ async function walk(dir) {
             lvl6: null,
           },
         }
-
+        //console.log('object:', object)
         return object
       })
-      // Some of the reference generated files come with an 'index' page that we can ignore
-      .filter((object) => !object.url.endsWith('/index'))
-      .filter((object) => !object.url.endsWith('/.gitkeep'))
+    )
+    // Some of the reference generated files come with an 'index' page that we can ignore
+    // .filter((object) => !object.url.endsWith('/index'))
+    // .filter((object) => !object.url.endsWith('/.gitkeep'))
 
     const combinedSearchObjects = guidePagesearchObjects.concat(
       clientLibSearchObjects,
@@ -140,16 +185,20 @@ async function walk(dir) {
       cliObjects
     )
 
-    //@ts-ignore
-    await index.clearObjects()
-    console.log(`Successfully cleared records from ${indexName}`)
+    //    console.log(combinedSearchObjects)
 
     //@ts-ignore
-    const algoliaResponse = await index.saveObjects(combinedSearchObjects)
+    //await index.clearObjects()
+    //console.log(`Successfully cleared records from ${indexName}`)
 
     //@ts-ignore
-    console.log(`Successfully saved ${algoliaResponse.objectIDs.length} records into ${indexName}.`)
+    //const algoliaResponse = await index.saveObjects(combinedSearchObjects)
+
+    //@ts-ignore
+    //console.log(`Successfully saved ${algoliaResponse.objectIDs.length} records into ${indexName}.`)
   } catch (error) {
     console.log('Error:', error)
   }
-})()
+}
+
+generateSearchObjects()

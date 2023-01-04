@@ -1,4 +1,4 @@
-import { Button, Tabs, Alert } from 'ui'
+import { Button, Tabs, Alert, GlassPanel } from 'ui'
 
 // Common components
 import Admonition from './Admonition'
@@ -30,12 +30,14 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const components = {
   Admonition,
   Button,
   ButtonCard,
   CodeBlock,
+  GlassPanel,
   Frameworks,
   AuthProviders,
   FunctionsExamples,
@@ -81,6 +83,7 @@ const components = {
       </span>
     )
   },
+  Link,
 }
 
 export default components
