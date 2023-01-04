@@ -930,10 +930,54 @@ class StorageExplorerStore {
     }
   }
 
+  downloadFolder = async (folder) => {
+    const toastId = toast.loading(`Retrieving files from folder...`, {
+      autoClose: false,
+      hideProgressBar: true,
+    })
+
+    const files = await this.getAllItemsAlongFolder(folder)
+    const res = await Promise.all(
+      files.map(async (file) => {
+        const fileMimeType = file.metadata?.mimetype ?? null
+        const { data, error } = await this.supabaseClient.storage
+          .from(this.selectedBucket.name)
+          .download(`${file.prefix}/${file.name}`)
+        if (!error) {
+          const blob = data
+          return {
+            name: file.name,
+            prefix: file.prefix,
+            blob: new Blob([blob], { type: fileMimeType }),
+          }
+        } else {
+          return false
+        }
+      })
+    )
+    const uploadedFiles = res.filter(Boolean)
+
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    uploadedFiles.forEach((file) => {
+      zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+    })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `${folder.name}.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+
+    toast.success(`Downloading folder "${folder.name}"`, { id: toastId })
+  }
+
   downloadSelectedFiles = async () => {
-    const showIndividualToast = false
     const returnBlob = true
-    const toastId = toast.loading(`Retrieving ${this.selectedItems.length} files...`, {
+    const showIndividualToast = false
+    const toastId = toast.loading(`Downloading ${this.selectedItems.length} files...`, {
       autoClose: false,
       hideProgressBar: true,
     })

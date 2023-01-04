@@ -26,6 +26,7 @@ import {
   CONTEXT_MENU_KEYS,
 } from '../Storage.constants.ts'
 import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const RowIcon = ({ view, status, fileType, mimeType }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
@@ -85,6 +86,9 @@ const FileExplorerRow = ({
   onSelectItemRename = () => {},
   onSelectItemMove = () => {},
 }) => {
+  const storageExplorerStore = useStorageStore()
+  const { downloadFolder } = storageExplorerStore
+
   const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = find(selectedItems, item) !== undefined
   const isOpened =
@@ -150,6 +154,11 @@ const FileExplorerRow = ({
             name: 'Rename',
             icon: <IconEdit size="tiny" />,
             onClick: () => onSelectItemRename(itemWithColumnIndex),
+          },
+          {
+            name: 'Download',
+            icon: <IconDownload size="tiny" />,
+            onClick: () => downloadFolder(itemWithColumnIndex),
           },
           { name: 'Separator' },
           {
