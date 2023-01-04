@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { IconSearch, Input } from '~/../../packages/ui'
 import extensions from '../data/extensions.json'
 
 export default function Extensions() {
@@ -7,13 +8,11 @@ export default function Extensions() {
     <>
       <div className="mb-8 grid">
         <label className="text-xs mb-2">Filter extensions</label>
-        <input
+        <Input
           type="text"
-          className="border bg-gray-200
-          transition
-          hover:border-scale-600
-          border-scale-500 rounded"
-          placeholder="Extension name"
+          className="border text-scale-900"
+          placeholder="Search extension names..."
+          icon={<IconSearch size="small" />}
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
