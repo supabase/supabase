@@ -27,10 +27,7 @@ const StorageExplorer = observer(({ bucket }) => {
     clearSelectedItemsToDelete,
     openedFolders,
     pushOpenedFolderAtIndex,
-    clearOpenedFolders,
-    popColumn,
     popColumnAtIndex,
-    popOpenedFolders,
     popOpenedFoldersAtIndex,
     setSelectedItemToRename,
     selectedItemsToMove,
@@ -49,7 +46,6 @@ const StorageExplorer = observer(({ bucket }) => {
     addNewFolder,
     fetchFolderContents,
     fetchMoreFolderContents,
-    fetchFoldersByPath,
     renameFolder,
     deleteFolder,
     uploadFiles,
@@ -60,12 +56,10 @@ const StorageExplorer = observer(({ bucket }) => {
   } = storageExplorerStore
 
   const storageExplorerRef = useRef(null)
-  const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
-  const [isSearching, setIsSearching] = useState(false)
   const [itemSearchString, setItemSearchString] = useState('')
 
   // Requires a fixed height to ensure that explorer is constrained to the viewport
@@ -120,19 +114,6 @@ const StorageExplorer = observer(({ bucket }) => {
     popOpenedFoldersAtIndex(columnIndex - 1)
     pushOpenedFolderAtIndex(folder, columnIndex)
     await fetchFolderContents(folder.id, folder.name, columnIndex)
-  }
-
-  const onSetPathByString = async (paths) => {
-    if (paths.length === 0) {
-      popColumnAtIndex(0)
-      clearOpenedFolders()
-      closeFilePreview()
-    } else {
-      const pathString = paths.join('/')
-      setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath(paths)
-      setLoading({ isLoading: false, message: '' })
-    }
   }
 
   /** Checkbox selection methods */
@@ -234,13 +215,6 @@ const StorageExplorer = observer(({ bucket }) => {
   }
 
   /** Misc UI methods */
-
-  const onSelectBack = () => {
-    popColumn()
-    popOpenedFolders()
-    closeFilePreview()
-  }
-
   const onSelectColumnEmptySpace = (columnIndex) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
@@ -254,13 +228,6 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const onChangeSortByOrder = (sortByOrder) => setSortByOrder(sortByOrder)
 
-  const onToggleSearch = (bool) => {
-    setIsSearching(bool)
-    if (bool === false) {
-      setItemSearchString('')
-    }
-  }
-
   return (
     <div
       ref={storageExplorerRef}
@@ -271,14 +238,9 @@ const StorageExplorer = observer(({ bucket }) => {
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
-          loading={loading}
-          isSearching={isSearching}
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
-          onToggleSearch={onToggleSearch}
           onFilesUpload={onFilesUpload}
-          onSelectBack={onSelectBack}
-          onSetPathByString={onSetPathByString}
         />
       ) : (
         <FileExplorerHeaderSelection />
