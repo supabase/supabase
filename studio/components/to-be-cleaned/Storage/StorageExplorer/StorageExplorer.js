@@ -38,9 +38,7 @@ const StorageExplorer = observer(({ bucket }) => {
     clearSelectedItemsToMove,
     view,
     setView,
-    sortBy,
     setSortBy,
-    sortByOrder,
     setSortByOrder,
     currentBucketName,
     copyFileURLToClipboard,
@@ -244,10 +242,6 @@ const StorageExplorer = observer(({ bucket }) => {
     closeFilePreview()
   }
 
-  const onSelectBreadcrumb = (columnIndex) => {
-    popColumnAtIndex(columnIndex)
-  }
-
   const onSelectColumnEmptySpace = (columnIndex) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
@@ -278,24 +272,14 @@ const StorageExplorer = observer(({ bucket }) => {
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
-          view={view}
-          sortBy={sortBy}
-          sortByOrder={sortByOrder}
           loading={loading}
-          breadcrumbs={columns.map((column) => column.name)}
-          backDisabled={columns.length <= 1}
           isSearching={isSearching}
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
-          onChangeView={onChangeView}
-          onChangeSortBy={onChangeSortBy}
-          onChangeSortByOrder={onChangeSortByOrder}
           onToggleSearch={onToggleSearch}
           onFilesUpload={onFilesUpload}
           onSelectBack={onSelectBack}
-          onSelectCreateFolder={onSelectCreateFolder}
           onSetPathByString={onSetPathByString}
-          onSelectBreadcrumb={onSelectBreadcrumb}
         />
       ) : (
         <FileExplorerHeaderSelection />
