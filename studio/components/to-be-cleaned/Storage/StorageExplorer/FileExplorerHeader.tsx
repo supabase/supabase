@@ -92,31 +92,26 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
 }
 
 interface Props {
-  loading: { isLoading: boolean; message: string }
   isSearching: boolean
   itemSearchString: string
+  setIsSearching: (value: boolean) => void
   setItemSearchString: (value: string) => void
-  onSetPathByString: (paths: any[]) => void
-  onToggleSearch: (bool: boolean) => void
   onFilesUpload: (event: any, columnIndex: number) => void
-  onSelectBack: () => void
 }
 
 const FileExplorerHeader: FC<Props> = ({
-  loading = {},
-  isSearching = false,
   itemSearchString = '',
   setItemSearchString = () => {},
-  onToggleSearch = () => {},
-  onSetPathByString = () => {},
   onFilesUpload = () => {},
-  onSelectBack = () => {},
 }) => {
   const debounceDuration = 300
-  const [isEditingPath, setIsEditingPath] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
+  const [loading, setLoading] = useState({ isLoading: false, message: '' })
+
+  const [isEditingPath, setIsEditingPath] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
 
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
@@ -130,9 +125,14 @@ const FileExplorerHeader: FC<Props> = ({
     setSortBy,
     sortByOrder,
     setSortByOrder,
+    popColumn,
     popColumnAtIndex,
+    popOpenedFolders,
+    fetchFoldersByPath,
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
+    clearOpenedFolders,
+    closeFilePreview,
   } = storageExplorerStore
 
   const breadcrumbs = columns.map((column: any) => column.name)
@@ -156,6 +156,12 @@ const FileExplorerHeader: FC<Props> = ({
     setSearchString(event.target.value)
     // @ts-ignore
     searchInputHandler(event.target.value)
+  }
+
+  const onSelectBack = () => {
+    popColumn()
+    popOpenedFolders()
+    closeFilePreview()
   }
 
   const onSelectUpload = () => {
@@ -184,6 +190,19 @@ const FileExplorerHeader: FC<Props> = ({
     onSetPathByString(compact(pathString.split('/')))
   }
 
+  const onSetPathByString = async (paths: any[]) => {
+    if (paths.length === 0) {
+      popColumnAtIndex(0)
+      clearOpenedFolders()
+      closeFilePreview()
+    } else {
+      const pathString = paths.join('/')
+      setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
+      await fetchFoldersByPath(paths)
+      setLoading({ isLoading: false, message: '' })
+    }
+  }
+
   const cancelSetPathString = () => {
     setIsEditingPath(false)
   }
@@ -193,11 +212,13 @@ const FileExplorerHeader: FC<Props> = ({
   // Searching for column view requires much more thinking
   const toggleSearch = () => {
     setIsEditingPath(false)
-    onToggleSearch(true)
+    setIsSearching(true)
   }
+
   const onCancelSearch = () => {
     setSearchString('')
-    onToggleSearch(false)
+    setIsSearching(false)
+    setItemSearchString('')
   }
 
   /** Methods for breadcrumbs */
