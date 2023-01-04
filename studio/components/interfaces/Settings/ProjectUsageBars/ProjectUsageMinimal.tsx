@@ -1,12 +1,12 @@
 import { FC } from 'react'
 import { Loading } from 'ui'
 
-import { useProjectSubscription } from 'hooks'
+import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface ProjectUsageMinimalProps {
   projectRef?: string
@@ -17,7 +17,9 @@ interface ProjectUsageMinimalProps {
 
 const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
   const { data: usage, error: usageError, isLoading } = useProjectUsageQuery({ projectRef })
-  const { subscription, error: subscriptionError } = useProjectSubscription(projectRef)
+  const { data: subscription, error: subscriptionError } = useProjectSubscriptionQuery({
+    projectRef,
+  })
 
   if (
     subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG ||

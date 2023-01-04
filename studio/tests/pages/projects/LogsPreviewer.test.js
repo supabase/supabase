@@ -16,7 +16,7 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscription } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
@@ -423,8 +423,8 @@ test('filters accept filterOverride', async () => {
 
 describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscription.mockReturnValue({
-      subscription: {
+    useProjectSubscriptionQuery.mockReturnValue({
+      data: {
         tier: {
           supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
           key,

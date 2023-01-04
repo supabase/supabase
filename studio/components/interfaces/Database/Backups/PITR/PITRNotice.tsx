@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
-import { useParams, useProjectSubscription } from 'hooks'
+import { useParams } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
-  const { ref } = useParams()
-  const { subscription } = useProjectSubscription(ref)
+  const { ref: projectRef } = useParams()
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const retentionPeriod = getPITRRetentionDuration(subscription?.addons ?? [])
 
   return (
@@ -14,10 +15,10 @@ const PITRNotice = ({}) => {
       disabled={true}
       footer={
         <div className="flex items-center justify-between p-6">
-          <span className="text-scale-1000 text-sm">
+          <span className="text-sm text-scale-1000">
             You can also increase your recovery retention period updating your PITR add-on
           </span>
-          <Link href={`/project/${ref}/settings/billing/update/pro`}>
+          <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
             <a>
               <Button as="span" type="default">
                 Increase retention period
@@ -27,8 +28,8 @@ const PITRNotice = ({}) => {
         </div>
       }
     >
-      <div className="p-6 flex space-x-6">
-        <div className="h-10 w-10 rounded flex items-center justify-center bg-scale-700">
+      <div className="flex p-6 space-x-6">
+        <div className="flex items-center justify-center w-10 h-10 rounded bg-scale-700">
           <IconCalendar strokeWidth={2} />
         </div>
         <div className="space-y-2">
