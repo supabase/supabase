@@ -21,14 +21,7 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import {
-  useStore,
-  useFlag,
-  withAuth,
-  useSubscriptionStats,
-  checkPermissions,
-  useParams,
-} from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
@@ -48,7 +41,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const subscriptionStats = useSubscriptionStats()
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
@@ -75,10 +67,7 @@ const Wizard: NextPageWithLayout = () => {
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const canCreateProject =
-    isAdmin &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
     projectName !== '' &&
@@ -203,11 +192,7 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={
-        !app.organizations.isInitialized ||
-        subscriptionStats.isLoading ||
-        isLoadingFreeProjectLimitCheck
-      }
+      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
