@@ -146,8 +146,17 @@ const FileExplorerRow = ({
       ? [{ name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) }]
       : item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
-          { name: 'Rename', onClick: () => onSelectItemRename(itemWithColumnIndex) },
-          { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
+          {
+            name: 'Rename',
+            icon: <IconEdit size="tiny" />,
+            onClick: () => onSelectItemRename(itemWithColumnIndex),
+          },
+          { name: 'Separator' },
+          {
+            name: 'Delete',
+            icon: <IconTrash size="tiny" />,
+            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+          },
         ]
       : [
           ...(!item.isCorrupted
