@@ -161,7 +161,7 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
               <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={onClose}>
+                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
                   <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>

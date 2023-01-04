@@ -42,7 +42,15 @@ const PortalToast = () => (
                 </div>
                 {t.type !== 'loading' && (
                   <div className="ml-4">
-                    <Button className="!p-1" type="text" onClick={() => toast.dismiss(t.id)}>
+                    <Button
+                      className="!p-1"
+                      type="text"
+                      onClick={(event) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        toast.dismiss(t.id)
+                      }}
+                    >
                       <IconX size={14} strokeWidth={2} />
                     </Button>
                   </div>
