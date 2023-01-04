@@ -1,28 +1,20 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { NextPage } from 'next'
 import { Tabs } from 'ui'
 
+import { NextPageWithLayout } from 'types'
 import { useParams, useStore } from 'hooks'
 import Loading from 'components/ui/Loading'
-import { AccountLayout } from 'components/layouts'
+import { OrganizationLayout } from 'components/layouts'
 import { BillingSettings } from 'components/interfaces/Organization'
 
-const OrgBillingSettings: NextPage = () => {
+const OrgBillingSettings: NextPageWithLayout = () => {
   const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
 
   return (
-    <AccountLayout
-      title={ui.selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[
-        {
-          key: `org-settings`,
-          label: 'Settings',
-        },
-      ]}
-    >
+    <>
       {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
@@ -55,8 +47,9 @@ const OrgBillingSettings: NextPage = () => {
           </div>
         </div>
       )}
-    </AccountLayout>
+    </>
   )
 }
 
+OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
 export default observer(OrgBillingSettings)
