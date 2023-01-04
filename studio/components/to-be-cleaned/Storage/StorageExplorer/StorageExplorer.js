@@ -57,7 +57,6 @@ const StorageExplorer = observer(({ bucket }) => {
     uploadFiles,
     deleteFiles,
     downloadFile,
-    downloadSelectedFiles,
     renameFile,
     moveFiles,
   } = storageExplorerStore
@@ -183,10 +182,6 @@ const StorageExplorer = observer(({ bucket }) => {
     renameFolder(folder, newName, columnIndex)
   }
 
-  const onSelectItemsDelete = () => {
-    setSelectedItemsToDelete(selectedItems)
-  }
-
   const onSelectItemDelete = (file) => {
     setSelectedItemsToDelete([file])
   }
@@ -195,16 +190,8 @@ const StorageExplorer = observer(({ bucket }) => {
     setSelectedItemToRename(file)
   }
 
-  const onSelectItemsMove = () => {
-    setSelectedItemsToMove(selectedItems)
-  }
-
   const onSelectItemMove = (file) => {
     setSelectedItemsToMove([file])
-  }
-
-  const onSelectItemsDownload = async () => {
-    await downloadSelectedFiles()
   }
 
   const onCopyFileURL = async (file) => {
@@ -311,13 +298,7 @@ const StorageExplorer = observer(({ bucket }) => {
           onSelectBreadcrumb={onSelectBreadcrumb}
         />
       ) : (
-        <FileExplorerHeaderSelection
-          selectedItems={selectedItems}
-          onSelectItemsDownload={onSelectItemsDownload}
-          onSelectItemsDelete={onSelectItemsDelete}
-          onSelectItemsMove={onSelectItemsMove}
-          onUnselectAllItems={clearSelectedItems}
-        />
+        <FileExplorerHeaderSelection />
       )}
       <div className="flex h-full" style={{ height: fileExplorerHeight }}>
         <FileExplorer
