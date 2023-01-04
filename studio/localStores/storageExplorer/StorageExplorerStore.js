@@ -39,7 +39,6 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-// const BATCH_SIZE = 10
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
@@ -931,31 +930,57 @@ class StorageExplorerStore {
   }
 
   downloadFolder = async (folder) => {
-    const toastId = toast.loading(`Retrieving files from folder...`, {
-      autoClose: false,
-      hideProgressBar: true,
+    let progress = 0
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: 'Retrieving files from folder...',
     })
 
     const files = await this.getAllItemsAlongFolder(folder)
-    const res = await Promise.all(
-      files.map(async (file) => {
-        const fileMimeType = file.metadata?.mimetype ?? null
-        const { data, error } = await this.supabaseClient.storage
-          .from(this.selectedBucket.name)
-          .download(`${file.prefix}/${file.name}`)
-        if (!error) {
-          const blob = data
-          return {
-            name: file.name,
-            prefix: file.prefix,
-            blob: new Blob([blob], { type: fileMimeType }),
+    this.ui.setNotification({
+      id: toastId,
+      category: 'loading',
+      message: `Downloading ${files.length} files...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
+    })
+
+    const promises = files.map((file) => {
+      const fileMimeType = file.metadata?.mimetype ?? null
+      return () => {
+        return new Promise(async (resolve) => {
+          const { data, error } = await this.supabaseClient.storage
+            .from(this.selectedBucket.name)
+            .download(`${file.prefix}/${file.name}`)
+
+          progress = progress + 1 / files.length
+
+          if (!error) {
+            resolve({
+              name: file.name,
+              prefix: file.prefix,
+              blob: new Blob([data], { type: fileMimeType }),
+            })
+          } else {
+            resolve(false)
           }
-        } else {
-          return false
-        }
+        })
+      }
+    })
+
+    const batchedPromises = chunk(promises, 10)
+    const uploadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
+      const previousResults = await previousPromise
+      const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+      this.ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        progress: progress * 100,
       })
-    )
-    const uploadedFiles = res.filter(Boolean)
+      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
+    }, Promise.resolve())
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
@@ -971,7 +996,11 @@ class StorageExplorerStore {
     link.click()
     link.parentNode.removeChild(link)
 
-    toast.success(`Downloading folder "${folder.name}"`, { id: toastId })
+    this.ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Downloading folder "${folder.name}"`,
+    })
   }
 
   downloadSelectedFiles = async () => {
