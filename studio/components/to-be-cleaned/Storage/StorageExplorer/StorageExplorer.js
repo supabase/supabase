@@ -68,7 +68,6 @@ const StorageExplorer = observer(({ bucket }) => {
   const [isSearching, setIsSearching] = useState(false)
   const [itemSearchString, setItemSearchString] = useState('')
 
-  const previewPaneWidth = 450
   // Requires a fixed height to ensure that explorer is constrained to the viewport
   const fileExplorerHeight = window.innerHeight - 122
 
@@ -313,14 +312,7 @@ const StorageExplorer = observer(({ bucket }) => {
             fetchMoreFolderContents(index, column, itemSearchString)
           }
         />
-        <PreviewPane
-          isOpen={!isEmpty(selectedFilePreview)}
-          file={selectedFilePreview}
-          width={previewPaneWidth}
-          onCopyFileURL={onCopyFileURL}
-          onSelectFileDelete={onSelectItemDelete}
-          onClosePreviewPane={closeFilePreview}
-        />
+        <PreviewPane />
       </div>
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
