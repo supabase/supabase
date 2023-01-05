@@ -643,7 +643,7 @@ functions:
       - Defaults to return 50 users per page.
     examples:
       - id: get-a-full-list-of-users
-        name: Get a full list of users
+        name: Get a page of users
         isSpotlight: true
         code: |
           ```js
