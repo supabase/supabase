@@ -13,6 +13,13 @@ export const WRAPPERS: Wrapper[] = [
       name: 'stripe_server',
       options: [
         {
+          name: 'name',
+          label: 'Wrapper Name',
+          required: true,
+          encrypted: false,
+          hidden: false,
+        },
+        {
           name: 'api_key_id',
           label: 'Stripe Secret Key',
           required: true,
