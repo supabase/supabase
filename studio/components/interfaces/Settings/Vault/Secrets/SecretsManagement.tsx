@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { FC, Fragment, useState } from 'react'
-import { IconSearch, Input, Button, Listbox, IconLoader } from 'ui'
+import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink } from 'ui'
 
 import SecretRow from './SecretRow'
 import EditSecretModal from './EditSecretModal'
@@ -77,9 +78,18 @@ const SecretsManagement: FC<Props> = ({}) => {
               </Listbox>
             </div>
           </div>
-          <Button type="primary" onClick={() => setShowAddSecretModal(true)}>
-            Add new secret
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Link href="https://supabase.com/docs/guides/database/vault">
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  Vault Documentation
+                </Button>
+              </a>
+            </Link>
+            <Button type="primary" onClick={() => setShowAddSecretModal(true)}>
+              Add new secret
+            </Button>
+          </div>
         </div>
 
         {/* Table of secrets */}

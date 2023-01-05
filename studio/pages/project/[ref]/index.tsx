@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
@@ -12,6 +12,7 @@ import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
+  const { ref } = useParams()
 
   const project = ui.selectedProject
   const projectTier = ui.selectedProject?.subscription_tier
