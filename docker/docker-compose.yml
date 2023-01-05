@@ -105,28 +105,29 @@ services:
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.25.1
+    image: supabase/realtime:v2.0.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
     restart: unless-stopped
     environment:
+      PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: supabase_admin
+      DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_SSL: "false"
-      PORT: 4000
-      JWT_SECRET: ${JWT_SECRET}
-      REPLICATION_MODE: RLS
-      REPLICATION_POLL_INTERVAL: 100
-      SECURE_CHANNELS: "true"
-      SLOT_NAME: supabase_realtime_rls
-      TEMPORARY_SLOT: "true"
+      DB_NAME: ${POSTGRES_DB}
+      DB_ENC_KEY: supabaserealtime
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: false
+      DNS_NODES: "''"
     command: >
-      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
-      && ./prod/rel/realtime/bin/realtime start"
+      sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
 
   storage:
     container_name: supabase-storage
@@ -208,5 +209,6 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/realtime.sql
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
       - ./volumes/db/data:/var/lib/postgresql/data
