@@ -29,7 +29,8 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
     error ||
     (!isApproachingUsageLimits && !isOverUsageLimits) ||
     tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    tier === PRICING_TIER_PRODUCT_IDS.TEAM
   ) {
     return <></>
   }
