@@ -1,6 +1,6 @@
 import { IconRefreshCw } from '@supabase/ui'
-import useLogsSqlQuery from 'data/logs/logs-sql-query'
-import useLogsQuery, { LogsQueryData, LogsQueryHandlers } from 'hooks/analytics/useLogsQuery'
+import { LogsQueryData, LogsQueryHandlers, useLogsQuery } from 'data/analytics/logs-query'
+import { useLogsSqlQuery } from 'data/analytics/logs-sql-query'
 import React from 'react'
 import { Button } from 'ui'
 import { DatePickerToFrom } from '../Settings/Logs'
