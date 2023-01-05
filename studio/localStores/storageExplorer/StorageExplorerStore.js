@@ -276,8 +276,12 @@ class StorageExplorerStore {
     this.selectedItems = items
   }
 
-  clearSelectedItems = () => {
-    this.selectedItems = []
+  clearSelectedItems = (columnIndex) => {
+    if (columnIndex !== undefined) {
+      this.selectedItems = this.selectedItems.filter((item) => item.columnIndex !== columnIndex)
+    } else {
+      this.selectedItems = []
+    }
   }
 
   setSelectedItemsToDelete = (items) => {
@@ -978,7 +982,7 @@ class StorageExplorerStore {
     })
 
     const batchedPromises = chunk(promises, 10)
-    const uploadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
+    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
       this.ui.setNotification({
@@ -993,7 +997,7 @@ class StorageExplorerStore {
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
-    uploadedFiles.forEach((file) => {
+    downloadedFiles.forEach((file) => {
       zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
     })
 
@@ -1012,35 +1016,45 @@ class StorageExplorerStore {
     })
   }
 
-  downloadSelectedFiles = async () => {
+  downloadSelectedFiles = async (files) => {
+    const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
+
+    const formattedFilesWithPrefix = files.map((file) => {
+      const { name, columnIndex } = file
+      const pathToFile = this.openedFolders
+        .slice(lowestColumnIndex, columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
+      const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${name}` : name
+      return { ...file, formattedPathToFile }
+    })
+
     let progress = 0
     const returnBlob = true
     const showIndividualToast = false
     const toastId = this.ui.setNotification({
       category: 'loading',
-      message: `Downloading ${this.selectedItems.length} files...`,
+      message: `Downloading ${files.length} files...`,
     })
 
-    const promises = this.selectedItems.map((file) => {
+    const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
         return new Promise(async (resolve) => {
           const data = await this.downloadFile(file, showIndividualToast, returnBlob)
-          progress = progress + 1 / this.selectedItems.length
-          resolve(data)
+          progress = progress + 1 / formattedFilesWithPrefix.length
+          resolve({ ...data, name: file.formattedPathToFile })
         })
       }
     })
 
     const batchedPromises = chunk(promises, 10)
-    const uploadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
+    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
       this.ui.setNotification({
         id: toastId,
         category: 'loading',
-        message: `Downloading ${this.selectedItems.length} file${
-          this.selectedItems.length > 1 ? 's' : ''
-        }...`,
+        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
         description: STORAGE_PROGRESS_INFO_TEXT,
         progress: progress * 100,
       })
@@ -1049,7 +1063,7 @@ class StorageExplorerStore {
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
-    uploadedFiles.forEach((file) => {
+    downloadedFiles.forEach((file) => {
       zipWriter.add(file.name, new BlobReader(file.blob))
     })
 
@@ -1064,7 +1078,7 @@ class StorageExplorerStore {
     this.ui.setNotification({
       id: toastId,
       category: 'success',
-      message: `Successfully downloaded ${uploadedFiles.length} files`,
+      message: `Successfully downloaded ${downloadedFiles.length} files`,
     })
   }
 

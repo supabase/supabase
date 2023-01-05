@@ -111,6 +111,7 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const onSelectFolder = async (columnIndex, folder) => {
     closeFilePreview()
+    clearSelectedItems(columnIndex + 1)
     popOpenedFoldersAtIndex(columnIndex - 1)
     pushOpenedFolderAtIndex(folder, columnIndex)
     await fetchFolderContents(folder.id, folder.name, columnIndex)
@@ -129,9 +130,11 @@ const StorageExplorer = observer(({ bucket }) => {
   }
 
   const onSelectAllItemsInColumn = (columnIndex) => {
-    const columnFiles = columns[columnIndex].items.filter(
-      (item) => item.type === STORAGE_ROW_TYPES.FILE
-    )
+    const columnFiles = columns[columnIndex].items
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => {
+        return { ...item, columnIndex }
+      })
     const columnFilesId = compact(columnFiles.map((item) => item.id))
     const selectedItemsFromColumn = selectedItems.filter((item) => columnFilesId.includes(item.id))
 
