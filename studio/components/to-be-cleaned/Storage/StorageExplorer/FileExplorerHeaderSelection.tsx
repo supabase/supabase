@@ -33,7 +33,7 @@ const FileExplorerHeaderSelection = () => {
             if (selectedItems.length === 1) {
               await downloadFile(selectedItems[0])
             } else {
-              await downloadSelectedFiles()
+              await downloadSelectedFiles(selectedItems)
             }
           }}
         >
