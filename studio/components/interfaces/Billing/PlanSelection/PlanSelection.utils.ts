@@ -14,8 +14,13 @@ export const formatTierOptions = (tiers: any[]) => {
   }
 
   // Fix the order of plans here
-  return tiers
-    .filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
-    .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PRO))
-    .concat([enterpriseOption])
+  return (
+    tiers
+      .filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
+      .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PRO))
+      .concat(tiers.filter((tier: any) => tier.id === STRIPE_PRODUCT_IDS.TEAM))
+      .concat([enterpriseOption])
+      // Team plan might not be enabled yet, make sure to filter out null/undefined
+      .filter(Boolean)
+  )
 }
