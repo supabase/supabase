@@ -23,6 +23,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
 
   const projectHasNoLimits =
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.TEAM ||
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   const showUsageExceedMessage = subscriptionTier !== undefined && !projectHasNoLimits
@@ -31,6 +32,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
     [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
     [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
     [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
   }
 
