@@ -1062,7 +1062,7 @@ functions:
           If you're in a situation where your tables are **NOT** directly
           related, but instead are joined by a _join table_, you can still use
           the `select()` method to query the related data. The join table needs
-          to have the foreign keys as part of its composite primary key.              
+          to have the foreign keys as part of its composite primary key.
         hideCodeBlock: true
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
