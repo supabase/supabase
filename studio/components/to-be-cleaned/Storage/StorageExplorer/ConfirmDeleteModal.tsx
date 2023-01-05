@@ -1,7 +1,14 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Modal, Button, Alert } from 'ui'
 
-const ConfirmDeleteModal = ({
+interface Props {
+  visible: boolean
+  selectedItemsToDelete: any[]
+  onSelectCancel: () => void
+  onSelectDelete: () => void
+}
+
+const ConfirmDeleteModal: FC<Props> = ({
   visible = false,
   selectedItemsToDelete = [],
   onSelectCancel = () => {},

@@ -6,7 +6,7 @@ export const meta = {
   description: 'Add Twitter OAuth to your Supabase project',
 }
 
-To enable Twitter Auth for your project, you need to set up a Twitter OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Twitter Auth for your project, you need to set up a Twitter OAuth application with [elevated access](https://developer.twitter.com/en/portal/products/elevated) and add the application credentials in the Supabase Dashboard.
 
 ## Overview
 
@@ -25,19 +25,7 @@ Setting up Twitter logins for your application consists of 3 parts:
 
 ## Find your callback URL
 
-The next step requires a callback URL, which looks like this:
-
-`https://<project-ref>.supabase.co/auth/v1/callback`
-
-- Go to your [Supabase Project Dashboard](https://app.supabase.com).
-- Click on the `Settings` icon at the bottom of the left sidebar.
-- Click on `API` in the list.
-- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
-- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
-</video>
+<SocialProviderSetup provider="Twitter" />
 
 ## Create a Twitter OAuth app
 
@@ -61,13 +49,7 @@ The next step requires a callback URL, which looks like this:
 
 ## Enter your Twitter credentials into your Supabase Project
 
-- Go to your [Supabase Project Dashboard](https://app.supabase.com).
-- In the left sidebar, click the `Authentication` icon (near the top).
-- Click `Settings` from the list to go to the `Authentication Settings` page.
-- Enter the final (hosted) URL of your app under `Site URL` (this is important).
-- Under `External OAuth Providers` turn `Twitter Enabled` to ON.
-- Enter your `API Key` (`client_id`) and `API Secret Key` (`client_secret`) saved in the previous step.
-- Click `Save`.
+<SocialProviderSettingsSupabase provider="Twitter" />
 
 ## Add login code to your client app
 
