@@ -4,7 +4,7 @@ export const checkPermissions = jest.fn().mockReturnValue(true)
 const { useStore, StoreProvider } = jest.requireActual('hooks')
 export const useStore = useStore
 
-export const useParams = jest.fn().mockImplementation(() => ({ ref: '123' }))
+// export const useParams = jest.fn().mockImplementation(() => ({ ref: '123' }))
 
 // mocks browser event listener adding/removing
 window.matchMedia = jest.fn().mockReturnValue({
