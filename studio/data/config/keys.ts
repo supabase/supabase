@@ -4,4 +4,5 @@ export const configKeys = {
   postgrest: (projectRef: string | undefined) => ['projects', projectRef, 'postgrest'] as const,
   jwtSecretUpdatingStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'jwt-secret-updating-status'] as const,
+  storage: (projectRef: string | undefined) => ['projects', projectRef, 'storage'] as const,
 }
