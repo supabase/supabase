@@ -8,7 +8,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 
-const useLogsSqlQuery = (
+export const useLogsSqlQuery = (
   sql: DbQuery['sql'],
   params: BaseReportParams = DEFAULT_QUERY_PARAMS
 ): [DbQueryData, DbQueryHandler] => {
@@ -45,5 +45,3 @@ const useLogsSqlQuery = (
     { runQuery: () => refetch() },
   ]
 }
-
-export default useLogsSqlQuery
