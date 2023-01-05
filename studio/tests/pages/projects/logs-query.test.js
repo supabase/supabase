@@ -8,6 +8,7 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+// import { useParams } from 'hooks'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -53,6 +54,7 @@ test('q= query param will populate the query input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, type: 'api', q: 'some_query' }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   // should populate editor with the query param
   await waitFor(() => {
@@ -72,6 +74,7 @@ test('ite= and its= query param will populate the datepicker', async () => {
     ite: end.toISOString(),
   }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   // should populate editor with the query param
   await waitFor(() => {
@@ -147,6 +150,7 @@ test('query warnings', async () => {
     ite: dayjs().toISOString(),
   }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
 })
@@ -171,6 +175,7 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
       ite: dayjs().toISOString(),
     }
     useRouter.mockReturnValue(router)
+    // useParams.mockReturnValue(router.query)
     render(<LogsExplorerPage />)
     await screen.findByText(/Log retention/) // assert modal title is present
   })

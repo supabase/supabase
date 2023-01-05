@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+// import { useParams } from 'hooks'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -232,6 +233,7 @@ test('s= query param will populate the search bar', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, s: 'someSearch' }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   // should populate search input with the search param
   await screen.findByDisplayValue('someSearch')
@@ -246,6 +248,7 @@ test('te= query param will populate the timestamp to input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, ite: iso }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
@@ -263,6 +266,7 @@ test('ts= query param will populate the timestamp from input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, its: iso }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
@@ -350,6 +354,7 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   const router = defaultRouterMock()
   router.query = { ...router.query, s: 'simple-query' }
   useRouter.mockReturnValue(router)
+  // useParams.mockReturnValue(router.query)
   rerender(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await screen.findByDisplayValue('simple-query')
@@ -441,6 +446,7 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
       ite: dayjs().toISOString(),
     }
     useRouter.mockReturnValue(router)
+    // useParams.mockReturnValue(router.query)
     render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
     await screen.findByText('Log retention') // assert modal title is present
   })
