@@ -70,7 +70,7 @@ export default function IndexPage() {
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
-      preface: 'Everything below included in the base plan',
+      preface: 'Includes all features in the free tier',
       additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
@@ -79,7 +79,6 @@ export default function IndexPage() {
       href: 'https://forms.supabase.com/enterprise',
       description: 'For large-scale applications managing serious workloads.',
       features: [
-        `Point in time recovery`,
         `Designated Support manager & SLAs`,
         `Enterprise OAuth providers`,
         `SSO/ SAML`,
@@ -302,6 +301,10 @@ export default function IndexPage() {
           <PricingAddOnTable
             icon={<SupportIcon className="h-8 w-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.support}
+          />
+          <PricingAddOnTable
+            icon={<SupportIcon className="h-8 w-8" strokeWidth={1.5} />}
+            pricing={pricingAddOn.pitr}
           />
         </div>
       </div>

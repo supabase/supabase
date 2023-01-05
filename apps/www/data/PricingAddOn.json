@@ -307,5 +307,29 @@
         ]
       }
     ]
+  },
+  "pitr": {
+    "title": "Point-in-time Recovery",
+    "features": ["Restore your database to any point in time", "Recover from disasters"],
+    "rows": [
+      {
+        "columns": [
+          { "key": "plan", "title": "Restoration Period", "value": "Up to 7 days" },
+          { "key": "pricing", "title": "Pricing", "value": "100$" }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Restoration Period", "value": "Up to 14 days" },
+          { "key": "pricing", "title": "Pricing", "value": "200$" }
+        ]
+      },
+      {
+        "columns": [
+          { "key": "plan", "title": "Restoration Period", "value": "Up to 28 days" },
+          { "key": "pricing", "title": "Pricing", "value": "400$" }
+        ]
+      }
+    ]
   }
 }
