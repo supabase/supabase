@@ -12,8 +12,8 @@ export default function JSReference(props) {
   return <RefSectionHandler sections={sections} pageProps={props} />
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/self-hosting-realtime', '/self-hosting-realtime')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/self-hosting-realtime')
 }
 
 export function getStaticPaths() {
