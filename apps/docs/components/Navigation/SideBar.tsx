@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
+import { IconChevronRight, IconArrowLeft } from '@supabase/ui'
 import { REFERENCES } from './Navigation.constants'
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -42,22 +42,21 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-16
-      h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container hidden lg:block"
+      className="sticky hidden h-screen px-6 py-8 overflow-y-scroll border-r dark:bg-scale-200 dark:border-scale-400 sidebar-width top-16 sidebar-menu-container lg:block"
     >
       {isInReferencePages && (
         <>
           <Link href="/reference">
             <a>
-              <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
+              <div className="flex items-center space-x-4 transition opacity-75 hover:opacity-100">
                 <IconArrowLeft size={16} strokeWidth={2} className="text-scale-1200" />
                 <span className="text-sm text-scale-1200">All Reference Docs</span>
               </div>
             </a>
           </Link>
           {referenceMeta !== undefined && (
-            <div className="my-5 flex items-center space-x-4">
-              <div className="h-10 w-10 rounded bg-scale-500 flex items-center justify-center">
+            <div className="flex items-center my-5 space-x-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded bg-scale-500">
                 <Image
                   className="rounded"
                   width={24}
@@ -66,7 +65,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   src={referenceMeta.icon}
                 />
               </div>
-              <p className="text-scale-1200 font-bold">{referenceMeta.name}</p>
+              <p className="font-bold text-scale-1200">{referenceMeta.name}</p>
             </div>
           )}
         </>
@@ -108,11 +107,11 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                <span className="text-sm transition text-scale-1200 group-hover:text-brand-900">
                   {group.label}
                 </span>
               </Accordion.Trigger>
-              <Accordion.Content className="transition my-2 data-open:animate-slide-down data-closed:animate-slide-up">
+              <Accordion.Content className="my-2 transition data-open:animate-slide-down data-closed:animate-slide-up">
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
@@ -149,7 +148,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                            <span className="text-sm transition text-scale-1200 group-hover:text-brand-900">
                               {section.name}
                             </span>
                           </Accordion.Trigger>

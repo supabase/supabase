@@ -12,7 +12,7 @@ import {
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
 import dayjs from 'dayjs'
-import { ButtonProps } from 'ui/src/components/Button/Button'
+import { ButtonProps } from '@supabase/ui'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
 export interface DatePickerProps {
@@ -116,7 +116,7 @@ function _DatePicker({
       header={
         <>
           <div className="flex items-stretch justify-between py-2">
-            <div className="flex grow flex-col gap-1">
+            <div className="flex flex-col gap-1 grow">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -140,7 +140,7 @@ function _DatePicker({
             >
               <IconArrowRight strokeWidth={1.5} size={14} />
             </div>
-            <div className="flex grow flex-col gap-1">
+            <div className="flex flex-col gap-1 grow">
               <TimeSplitInput
                 type="end"
                 startTime={startTime}
@@ -178,7 +178,7 @@ function _DatePicker({
                 nextMonthButtonDisabled,
               }) => (
                 <div className="flex items-center justify-between px-2 py-2">
-                  <div className="flex w-full items-center justify-between">
+                  <div className="flex items-center justify-between w-full">
                     <button
                       onClick={decreaseMonth}
                       disabled={prevMonthButtonDisabled}
@@ -212,7 +212,7 @@ function _DatePicker({
             to: endDate?.toISOString() || null,
           })}
           <Popover.Separator />
-          <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
+          <div className="flex items-center justify-end gap-2 px-3 py-2 pb-4">
             <Button type="default" onClick={() => handleClear()}>
               Clear
             </Button>

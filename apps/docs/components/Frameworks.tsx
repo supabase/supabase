@@ -1,5 +1,5 @@
 import ButtonCard from './ButtonCard'
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 
 const Frameworks = () => {
   const { isDarkMode } = useTheme()
@@ -87,7 +87,7 @@ const Frameworks = () => {
     },
   ]
   return (
-    <div className="grid md:grid-cols-12 gap-4 not-prose">
+    <div className="grid gap-4 md:grid-cols-12 not-prose">
       {frameworks.map((x) => (
         <div key={x.name} className="col-span-3">
           <ButtonCard

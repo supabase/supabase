@@ -1,16 +1,16 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconGitHub, IconTwitter } from '~/../../packages/ui'
+import { Button, IconGitHub, IconTwitter } from '@supabase/ui'
 import footerData from '~/data/footer.json'
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 
 const Footer = () => {
   const { isDarkMode } = useTheme()
   return (
     <div>
-      <hr className="border-scale-400  mt-8"></hr>
-      <div className="flex gap-4 items-center mt-6 justify-between">
-        <div className="flex flex-col lg:flex-row gap-3 ">
+      <hr className="mt-8 border-scale-400"></hr>
+      <div className="flex items-center justify-between gap-4 mt-6">
+        <div className="flex flex-col gap-3 lg:flex-row ">
           <span className="text-xs text-scale-900">Supabase 2022</span>
           <span className="text-xs text-scale-900">—</span>
           {footerData.map((item) => (

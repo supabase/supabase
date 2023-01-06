@@ -5,7 +5,7 @@ import { FC, useEffect, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from '@supabase/ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 
 import { getPageType } from '~/lib/helpers'
 

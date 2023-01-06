@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { IconXCircle } from '~/../../packages/ui'
+import { IconXCircle } from '@supabase/ui'
 
 interface IOptions {
   name?: string
@@ -48,15 +48,10 @@ const Options: FC<IOptions> & OptionsSubComponents = (props) => {
 const Option: FC<IOption> = (props) => {
   return (
     <div
-      className="
-        px-5 py-3 first:border-t border-b border-l border-r
-        border-scale-500
-        last:rounded-bl-lg last:rounded-br-lg
-        flex flex-col gap-3
-      "
+      className="flex flex-col gap-3 px-5 py-3 border-b border-l border-r  first:border-t border-scale-500 last:rounded-bl-lg last:rounded-br-lg"
     >
-      <div className="flex gap-3 items-center">
-        <span className="text-sm text-scale-1200 font-mono font-medium">
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-sm font-medium text-scale-1200">
           {props.name ?? 'no-name'}
         </span>
         <span>
@@ -68,9 +63,9 @@ const Option: FC<IOption> = (props) => {
             </div>
           )}
         </span>
-        <span className="text-scale-900 text-xs">{props.type ?? 'no type'}</span>
+        <span className="text-xs text-scale-900">{props.type ?? 'no type'}</span>
       </div>
-      <p className="text-sm text-scale-1000 m-0">{props.description ?? 'nodescription'}</p>
+      <p className="m-0 text-sm text-scale-1000">{props.description ?? 'nodescription'}</p>
       {props.children}
     </div>
   )

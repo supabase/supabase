@@ -43,7 +43,6 @@ function ContextMenu({
       </RadixContextMenu.Trigger>
 
       <RadixContextMenu.Content
-        sideOffset={alignOffset}
         // className={classes.join(' ')}
         style={style}
       >
@@ -101,7 +100,8 @@ export function Checkbox({
 }: CheckboxProps) {
   const [checked, setChecked] = useState(propsChecked ? propsChecked : false)
 
-  const handleChange = (e: boolean) => {
+  const handleChange = (e: boolean | 'indeterminate') => {
+    if (e === 'indeterminate') return
     if (onChange) onChange(e)
     setChecked(e)
   }
@@ -152,11 +152,7 @@ interface RadioGroupProps {
   onChange?(x: string): void
 }
 
-export function RadioGroup({
-  children,
-  value: propsValue,
-  onChange,
-}: RadioGroupProps) {
+export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
   const handleChange = (e: string) => {

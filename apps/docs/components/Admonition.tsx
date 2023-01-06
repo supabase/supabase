@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconInfo, IconHelpCircle, IconAlertTriangle } from 'ui'
+import { IconInfo, IconHelpCircle, IconAlertTriangle } from '@supabase/ui'
 
 interface Props {
   type: 'note' | 'tip' | 'info' | 'caution' | 'danger'
@@ -41,9 +41,9 @@ const Admonition: FC<Props> = ({ type = 'note', label, children }) => {
         ) : (
           <IconInfo className="text-scale-1200" size={18} strokeWidth={1.5} />
         )}
-        <p className="text-sm text-scale-1200 uppercase my-0 font-bold">{label || type}</p>
+        <p className="my-0 text-sm font-bold uppercase text-scale-1200">{label || type}</p>
       </div>
-      <div className="admonition-content text-scale-1200 text-base space-y-1">{children}</div>
+      <div className="space-y-1 text-base admonition-content text-scale-1200">{children}</div>
     </div>
   )
 }

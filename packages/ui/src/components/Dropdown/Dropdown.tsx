@@ -6,18 +6,16 @@ import { IconCheck } from '../Icon/icons/IconCheck'
 // @ts-ignore
 // import DropdownStyles from './Dropdown.module.css'
 
-import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
-
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
 
 interface RootProps {
   open?: boolean
   arrow?: boolean
-  onOpenChange?: RadixDropdownTypes.DropdownMenuProps['onOpenChange'] //   DropdownMenu['onOpenChange']
-  side?: RadixDropdownTypes.DropdownMenuContentProps['side']
-  align?: RadixDropdownTypes.DropdownMenuContentProps['align']
-  sideOffset?: RadixDropdownTypes.DropdownMenuContentProps['sideOffset']
+  onOpenChange?: RadixDropdown.DropdownMenuProps['onOpenChange'] //   DropdownMenu['onOpenChange']
+  side?: RadixDropdown.DropdownMenuContentProps['side']
+  align?: RadixDropdown.DropdownMenuContentProps['align']
+  sideOffset?: RadixDropdown.DropdownMenuContentProps['sideOffset']
   overlay?: React.ReactNode
   children?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
@@ -50,26 +48,27 @@ function Dropdown({
   return (
     <RadixDropdown.Root onOpenChange={onOpenChange} open={open}>
       {isNested ? (
-        <RadixDropdown.TriggerItem className={[__styles.item_nested].join(' ')}>
+        <RadixDropdown.Trigger className={[__styles.item_nested].join(' ')}>
           {children}
-        </RadixDropdown.TriggerItem>
+        </RadixDropdown.Trigger>
       ) : (
         <RadixDropdown.Trigger className={__styles.trigger}>{children}</RadixDropdown.Trigger>
       )}
 
-      <RadixDropdown.Content
-        portalled={true}
-        sideOffset={sideOffset}
-        side={side}
-        align={align}
-        className={classes.join(' ')}
-        style={style}
-      >
-        {arrow && (
-          <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
-        )}
-        {overlay}
-      </RadixDropdown.Content>
+      <RadixDropdown.Portal>
+        <RadixDropdown.Content
+          sideOffset={sideOffset}
+          side={side}
+          align={align}
+          className={classes.join(' ')}
+          style={style}
+        >
+          {arrow && (
+            <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
+          )}
+          {overlay}
+        </RadixDropdown.Content>
+      </RadixDropdown.Portal>
     </RadixDropdown.Root>
   )
 }
@@ -143,7 +142,8 @@ export function Checkbox({
 
   let __styles = styleHandler('dropdown')
 
-  const handleChange = (e: boolean) => {
+  const handleChange = (e: boolean | 'indeterminate') => {
+    if (e === 'indeterminate') return
     if (onChange) onChange(e)
     setChecked(e)
   }

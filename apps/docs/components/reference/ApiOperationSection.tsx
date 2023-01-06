@@ -1,4 +1,4 @@
-import { Tabs } from '~/../../packages/ui'
+import { Tabs } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
@@ -20,13 +20,13 @@ const ApiOperationSection = (props) => {
     >
       <RefSubLayout.Details>
         <div className="mt-4">
-          <code className="text-md flex gap-4 text-md text-scale-900 break-all">
+          <code className="flex gap-4 break-all text-md text-scale-900">
             <span
               className="
-                uppercase 
-                whitespace-nowrap 
-                bg-scale-1200 text-scale-100 
-                flex items-center justify-center 
+                uppercase
+                whitespace-nowrap
+                bg-scale-1200 text-scale-100
+                flex items-center justify-center
                 rounded-full font-mono font-medium text-xs px-2 py-0.5"
             >
               {operation.operation}
@@ -34,13 +34,13 @@ const ApiOperationSection = (props) => {
             {operation.path}
           </code>
         </div>
-        <div className="prose dark:prose-dark py-4">
+        <div className="py-4 prose dark:prose-dark">
           <p>{operation.description}</p>
         </div>
         {/* Path Parameters */}
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'path').length > 0 && (
-            <div className="not-prose mt-12">
+            <div className="mt-12 not-prose">
               <h5 className="mb-3 text-base text-scale-1200">Path Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
@@ -56,7 +56,7 @@ const ApiOperationSection = (props) => {
         {/* Query Parameters */}
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'query').length > 0 && (
-            <div className="not-prose mt-12">
+            <div className="mt-12 not-prose">
               <h5 className="mb-3 text-base text-scale-1200">Query Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
@@ -72,7 +72,7 @@ const ApiOperationSection = (props) => {
         {/* Header Parameters */}
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'header').length > 0 && (
-            <div className="not-prose mt-12">
+            <div className="mt-12 not-prose">
               <h5 className="mb-3 text-base text-scale-1200">Query Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&

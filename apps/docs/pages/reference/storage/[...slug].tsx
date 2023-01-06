@@ -1,6 +1,6 @@
 import specFile from '~/../../spec/transforms/storage_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
-import { Tabs } from '~/../../packages/ui'
+import { Tabs } from '@supabase/ui'
 
 // @ts-ignore
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -45,12 +45,12 @@ export default function Config() {
             <p>{generatedSpec.info.description}</p>
           </div>
 
-          <div className="grid gap-32 mx-auto max-w-5xl mt-24">
+          <div className="grid max-w-5xl gap-32 mx-auto mt-24">
             {generatedSpec.sections.map((section) => (
               <>
                 <h2 className="text-3xl">{section.title}</h2>
                 {section.operations.map((operation: any) => (
-                  <div className="border-b pb-8">
+                  <div className="pb-8 border-b">
                     <RefSubLayout.Section
                       slug={operation.id}
                       title={operation.summary}
@@ -59,7 +59,7 @@ export default function Config() {
                     >
                       <RefSubLayout.Details>
                         <div className="mt-4">
-                          <code className="text-md flex gap-4 text-md text-scale-900 break-all">
+                          <code className="flex gap-4 break-all text-md text-scale-900">
                             <span className="uppercase">{operation.operation}</span>
                             {operation.fullPath}
                           </code>
@@ -69,14 +69,14 @@ export default function Config() {
                           operation.parameters.filter((parameter) => parameter.in === 'path')
                             .length > 0 && (
                             <div className="mt-12">
-                              <h2 className="border-b pb-2 text-xl">Path parameters</h2>
+                              <h2 className="pb-2 text-xl border-b">Path parameters</h2>
                               <ul className="mt-4">
                                 {operation.parameters &&
                                   operation.parameters
                                     .filter((parameter: any) => parameter.in === 'path')
                                     .map((parameter: any) => (
-                                      <li className="mt-8 border-b pb-6">
-                                        <div className="flex gap-4 items-center">
+                                      <li className="pb-6 mt-8 border-b">
+                                        <div className="flex items-center gap-4">
                                           <span className="font-bold">{parameter.name}</span>
                                           <span className="font-mono text-xs break-all">
                                             {parameter.required && (
@@ -86,7 +86,7 @@ export default function Config() {
                                             )}
                                           </span>
                                         </div>
-                                        <div className="mt-4 flex gap-4 items-center">
+                                        <div className="flex items-center gap-4 mt-4">
                                           <span>Example:</span>
                                           <span className="font-mono text-xs break-all">
                                             {parameter.example}
@@ -103,20 +103,20 @@ export default function Config() {
                           operation.parameters.filter((parameter) => parameter.in === 'header')
                             .length > 0 && (
                             <div className="mt-12">
-                              <h2 className="border-b pb-2 text-xl">Header parameters</h2>
+                              <h2 className="pb-2 text-xl border-b">Header parameters</h2>
                               <ul className="mt-4">
                                 {operation.parameters &&
                                   operation.parameters
                                     .filter((parameter: any) => parameter.in === 'header')
                                     .map((parameter: any) => (
-                                      <li className="mt-8 border-b pb-6">
-                                        <div className="flex gap-4 items-center">
+                                      <li className="pb-6 mt-8 border-b">
+                                        <div className="flex items-center gap-4">
                                           <span className="font-bold">{parameter.name}</span>
                                           <span className="font-mono text-xs break-all">
                                             {parameter.required && 'required'}
                                           </span>
                                         </div>
-                                        <div className="mt-4 flex gap-4 items-center">
+                                        <div className="flex items-center gap-4 mt-4">
                                           <span>Example:</span>
                                           <span className="font-mono text-xs break-all">
                                             {parameter.example}

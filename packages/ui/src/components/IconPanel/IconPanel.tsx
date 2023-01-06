@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 import * as React from 'react'
 import { ChevronRight } from 'react-feather'
 
@@ -66,7 +66,7 @@ const IconPanel = ({
               <h5 className="text-base text-scale-1200 m-0">{title}</h5>
               <div
                 className="
-                transition-all ease-out -ml-1 opacity-0 
+                transition-all ease-out -ml-1 opacity-0
                 text-scale-800
                 group-hover:opacity-100
                 group-hover:ml-0"
@@ -81,8 +81,8 @@ const IconPanel = ({
       </div>
       <div
         className="
-        absolute transition-all ease-in 
-        -z-10 -inset-3 rounded-2xl 
+        absolute transition-all ease-in
+        -z-10 -inset-3 rounded-2xl
         bg-scale-200 dark:bg-whiteA-300 opacity-0 peer-hover:opacity-100"
       ></div>
     </div>

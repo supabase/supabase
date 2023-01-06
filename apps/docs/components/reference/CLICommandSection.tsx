@@ -1,4 +1,4 @@
-import { IconChevronRight } from '~/../../packages/ui'
+import { IconChevronRight } from '@supabase/ui'
 // @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -63,14 +63,14 @@ const CliCommandSection = (props) => {
     >
       <RefSubLayout.Details>
         <div className="grid ref-container" id={command.id}>
-          <div className="border-b pb-8" key={command.id}>
+          <div className="pb-8 border-b" key={command.id}>
             <header
               className={[
                 // 'border-b sticky top-16 z-10',
                 ' mb-16',
               ].join(' ')}
             >
-              <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
+              <p className="mt-0 mb-4 text-base capitalize scroll-mt-16 text-scale-1100">
                 {command.summary}
               </p>
             </header>
@@ -83,7 +83,7 @@ const CliCommandSection = (props) => {
 
             {command.subcommands.length > 0 && (
               <div className="mb-3">
-                <h3 className="text-lg text-scale-1200 mb-3">Available Commands</h3>
+                <h3 className="mb-3 text-lg text-scale-1200">Available Commands</h3>
                 <ul>
                   {command.subcommands.map((subcommand) => (
                     <li key={subcommand} className="flex items-center gap-3">
@@ -103,7 +103,7 @@ const CliCommandSection = (props) => {
             )}
             {command.flags.length > 0 && (
               <>
-                <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
+                <h3 className="mb-3 text-lg text-scale-1200">Flags</h3>
                 <ul className="">
                   {command.flags.map((flag: Flag) => (
                     <>

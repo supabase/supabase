@@ -13,7 +13,7 @@ import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 
 import { useState } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 
 interface Props {
   title?: string

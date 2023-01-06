@@ -6,7 +6,7 @@ import * as NavItems from './NavigationMenu.constants'
 
 import { find } from 'lodash'
 import Image from 'next/image'
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'

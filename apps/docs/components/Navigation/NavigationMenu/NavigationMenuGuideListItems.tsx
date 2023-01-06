@@ -1,9 +1,9 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from '@supabase/ui'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
+import { IconChevronLeft } from '@supabase/ui'
 import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 
@@ -53,8 +53,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     <>
       {props.subItemIndex === 0 && (
         <>
-          <div className="h-px w-full bg-green-500 my-3"></div>
-          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+          <div className="w-full h-px my-3 bg-green-500"></div>
+          <span className="font-mono text-xs font-medium tracking-wider uppercase text-scale-1200">
             {props.parent.name}
           </span>
         </>
@@ -87,7 +87,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
         </li>
 
         {props.subItem.items && props.subItem.items.length > 0 && (
-          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
+          <Accordion.Content className="ml-2 transition data-open:animate-slide-down data-closed:animate-slide-up">
             {props.subItem.items.map((subSubItem) => {
               return (
                 <li key={props.subItem.name}>
@@ -157,7 +157,7 @@ const Content = (props) => {
           ].join(' ')}
         >
           <div className="relative w-2">
-            <div className="transition-all ease-out ml-0 group-hover:-ml-1">
+            <div className="ml-0 transition-all ease-out group-hover:-ml-1">
               <IconChevronLeft size={10} strokeWidth={3} />
             </div>
           </div>
