@@ -91,7 +91,7 @@ export const meta = {
         const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
         async function getCountries() {
-          const countries = await supabase.from('countries').select('*')
+          const countries = await supabase.from('countries').select()
           console.log(countries)
         }
 
