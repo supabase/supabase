@@ -257,20 +257,18 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
             <Fragment key={fn.id}>
               <RenderLink {...fn} lib={lib} />
               {fn.items &&
-                fn.items
-                  //.filter((item) => item.libs.includes(lib))
-                  .map((item) => (
-                    <RenderLink
-                      {...item}
-                      library={menu.title}
-                      index={fnIndex}
-                      modifierIds={modifierIds}
-                      filterIds={filterIds}
-                      authServerIds={authServerIds}
-                      lib={lib}
-                      allowedKeys={allowedKeys}
-                    />
-                  ))}
+                fn.items.map((item) => (
+                  <RenderLink
+                    {...item}
+                    library={menu.title}
+                    index={fnIndex}
+                    modifierIds={modifierIds}
+                    filterIds={filterIds}
+                    authServerIds={authServerIds}
+                    lib={lib}
+                    allowedKeys={allowedKeys}
+                  />
+                ))}
             </Fragment>
           ) : (
             <Fragment key={fn.title}>
