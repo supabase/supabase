@@ -7,7 +7,7 @@ Thanks for your interest in [Supabase docs](https://supabase.com/docs) and for w
 [existing issues](https://github.com/supabase/supabase/issues).
 This document describes how to set up your development environment to contribute to [Supabase docs](https://supabase.com/docs).
 
-For a complete run-down on how all of our tools work together, see the main DEVELOPERS.md. That readme describes how to get setup locally in lots of detail, including details minimum requirements, our Turborepo setup, installing packages, sharing components across projects and more. This readme deals specifically with the docs site.
+For a complete run-down on how all of our tools work together, see the main DEVELOPERS.md. That readme describes how to get set up locally in lots of detail, including minimum requirements, our Turborepo setup, installing packages, sharing components across projects, and more. This readme deals specifically with the docs site.
 
 ## Local setup
 
@@ -24,7 +24,7 @@ For a complete run-down on how all of our tools work together, see the main DEVE
 
 ### Guides
 
-The primary, instructional type of content. Basically anything that lives on the `https://supabase.com/docs/guides` route. This includes Guides for Auth, Database, Storage, Realtime as well as general resources, self-hosting instructions and integrations. These are all [`.mdx`](https://mdxjs.com/) files — a combination of Markdown and Javascript.
+The primary, instructional type of content. Basically anything that lives on the `https://supabase.com/docs/guides` route. This includes Guides for Auth, Database, Storage, Realtime, Edge Functions, as well as general resources, self-hosting instructions, and integrations. These are all [`.mdx`](https://mdxjs.com/) files — a combination of Markdown and Javascript.
 
 #### Things to know
 
@@ -36,7 +36,7 @@ Some things to note:
 2. The files need to export a `Page` at the bottom with the `<Layout>` component
 3. The files frontmatter is stored in `const meta = {}`. You should always include `id`, `title` and `description`.
 4. You can write Markdown as you normally would, but you can also write regular Javascript and JSX. Note the `examples` array that we iterate over.
-5. Any Javascript variables you use in these files need to be exported in order to be used. IE: `export const examples = []`
+5. Any Javascript variables you use in these files need to be exported in order to be used (i.e., `export const examples = []`).
 
 ##### Using components
 
@@ -46,7 +46,7 @@ You can use any standard React components in these `.mdx` files without having t
 
 We maintain client libraries for [Javascript](https://supabase.com/docs/reference/javascript) and [Flutter/Dart](https://supabase.com/docs/reference/dart) (with more to come). These reference docs document every object and method available for developers to use. The are assembled from different sources and work much differently than the `.mdx` Guides we just looked at.
 
-The client libraries are essentially wrappers around the clients for the various tools we use — GoTrue, PostgREST, Storage, Functions and Realtime. The easiest way to describe how the things fit together is to look at an example and trace where the various pieces of information are coming from.
+The client libraries are essentially wrappers around the clients for the various tools we use — GoTrue, PostgREST, Storage, Functions, and Realtime. The easiest way to describe how the things fit together is to look at an example and trace where the various pieces of information are coming from.
 
 #### Example
 
@@ -54,17 +54,17 @@ Let's look at the `updateUser()` function in the `supabase-js` library.
 
 #### Common file
 
-Several pieces of information for this function come from a [common file](https://github.com/supabase/supabase/blob/master/spec/common-client-libs-sections.json#L548) where we store information shared by all libraries.
+Several pieces of information for this function come from a [common file](https://github.com/supabase/supabase/blob/3d774b3b7bcdcb410e25726d832467584ebea686/spec/common-client-libs-sections.json#L548) where we store information shared by all libraries.
 
 1. id — used to identify this function
 2. title - the human-readable title
 3. slug — the url slug
-4. product - the supabase tool or product that "owns" this function. Since `updateUser()` is an auth function, it's product is `auth`
+4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an auth function, its product is `auth`
 5. type — `updateUser()` is a function and marked as such, but we can also have sections of markdown interspersed with these function definitions.
 
 #### Function Parameters
 
-The `updateUser()` function takes one parameter: `attributes`. The details for this parameter live in the GoTrue client library, referenced via a `$ref` property in the `supabase-js` [spec file](https://github.com/supabase/supabase/blob/master/spec/supabase_js_v2.yml#L357). Here, the `$ref` property is pointing to the [actual function definition](https://github.com/supabase/gotrue-js/blob/master/src/GoTrueClient.ts#L590) in the `gotrue-js` library. The accepted values for the `attributes` parameter come from the [type definition](https://github.com/supabase/gotrue-js/blob/16d3deb822097e8640a3a15b94a5690b3beaf11b/src/lib/types.ts#L233).
+The `updateUser()` function takes one parameter: `attributes`. The details for this parameter live in the GoTrue client library, referenced via a `$ref` property in the `supabase-js` [spec file](https://github.com/supabase/supabase/blob/cb04d85262db6a371539dda7df9b00ba5a901e87/spec/supabase_js_v2.yml#L357). Here, the `$ref` property is pointing to the [actual function definition](https://github.com/supabase/gotrue-js/blob/2d60e79073b96ae8c97a6ce18e2601ed1e2a2712/src/GoTrueClient.ts#L590) in the `gotrue-js` library. The accepted values for the `attributes` parameter come from the [type definition](https://github.com/supabase/gotrue-js/blob/16d3deb822097e8640a3a15b94a5690b3beaf11b/src/lib/types.ts#L233).
 
 These individual library spec files are fetched via this [Makefile](https://github.com/supabase/supabase/blob/master/spec/Makefile), and get [transformed](https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/supabase_dereferenced.json) to combine the information we need (params, types, etc). If you're working on docs, you likely won't need to touch this part of the setup, but we've included this detail here to point you in the right direction in case you do.
 
@@ -74,11 +74,11 @@ The `updateUser()` function has three examples listed with it. The examples are 
 
 #### Rendering in Next.JS
 
-These reference docs are rendered by Next.JS via a dynamic route using a [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx). Here, we use the library [spec file](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx#L4) and the [common file](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx#L1) to output the info you see on the page.
+These reference docs are rendered by Next.JS via a dynamic route using a [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx). Here, we use the library [spec file](https://github.com/supabase/supabase/blob/bd0514553c627db8f1e8d0b3ae440ccb6759d228/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx#L4) and the [common file](https://github.com/supabase/supabase/blob/bd0514553c627db8f1e8d0b3ae440ccb6759d228/apps/docs/pages/reference/javascript/%5B...slug%5D.tsx#L1) to output the info you see on the page.
 
 ### Other reference docs
 
-The reference docs for the [Supabase Management API](https://supabase.com/docs/reference/api) and the [Supabase CLI](https://supabase.com/docs/reference/cli) are a little more straightforward than the client libraries. Both files also have a [common file](https://github.com/supabase/supabase/blob/master/spec/common-cli-sections.json) which handles things like `title`, `id` and `slug`. Both also have a spec file detailing things like parameters, descriptions and responses ([Management API](https://github.com/supabase/supabase/blob/master/spec/api_v0_openapi.json) / [CLI](https://github.com/supabase/supabase/blob/master/spec/cli_v1_commands.yaml))
+The reference docs for the [Supabase Management API](https://supabase.com/docs/reference/api) and the [Supabase CLI](https://supabase.com/docs/reference/cli) are a little more straightforward than the client libraries. Both files also have a [common file](https://github.com/supabase/supabase/blob/master/spec/common-cli-sections.json) which handles things like `title`, `id` and `slug`. Both also have a spec file detailing things like parameters, descriptions, and responses ([Management API](https://github.com/supabase/supabase/blob/master/spec/api_v0_openapi.json) / [CLI](https://github.com/supabase/supabase/blob/master/spec/cli_v1_commands.yaml))
 
 On the Next.JS side of things, these work almost exactly the same as the client libaries with a dynamic [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/cli/%5B...slug%5D.tsx).
 
