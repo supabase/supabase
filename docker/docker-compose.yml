@@ -104,7 +104,7 @@ services:
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
   realtime:
-    container_name: supabase-realtime
+    container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.0.2
     depends_on:
       db: # Disable this if you are using an external Postgres database
