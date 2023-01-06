@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '../Button'
 import { Divider } from '../Divider'
-import { IconSettings, IconLogOut } from '../../index'
+import { IconSettings, IconLogOut } from '../../../internals/icons'
 import Typography from '../Typography'
 
 import { ContextMenu } from '.'
@@ -45,14 +45,10 @@ export const Default = (args: any) => (
         </ContextMenu.Misc>,
         <Divider light />,
         <ContextMenu.Label>Group label</ContextMenu.Label>,
-        <ContextMenu.Item onClick={() => console.log('clicked')}>
-          Account
-        </ContextMenu.Item>,
+        <ContextMenu.Item onClick={() => console.log('clicked')}>Account</ContextMenu.Item>,
         <ContextMenu.Item>Settings</ContextMenu.Item>,
         <Divider light />,
-        <ContextMenu.Item icon={<IconLogIn size="tiny" />}>
-          Log out
-        </ContextMenu.Item>,
+        <ContextMenu.Item icon={<IconLogIn size="tiny" />}>Log out</ContextMenu.Item>,
       ]}
     >
       {triggerArea}
@@ -130,9 +126,7 @@ export const Checkbox = (args: any) => {
       <ContextMenu
         {...args}
         overlay={[
-          <ContextMenu.Item icon={<IconSettings size="small" />}>
-            Account
-          </ContextMenu.Item>,
+          <ContextMenu.Item icon={<IconSettings size="small" />}>Account</ContextMenu.Item>,
           <ContextMenu.Item>Settings</ContextMenu.Item>,
           <Divider light />,
           <ContextMenu.Checkbox checked={checked} onChange={setChecked}>

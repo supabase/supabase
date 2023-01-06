@@ -12,7 +12,7 @@ const Template = (args: any) => {
   return <Toast {...args} />
 }
 
-Template.args = { message: 'Lorem ipsum', duration: 60000 }
+Template.args = { message: 'Lorem ipsum', duration: 60000, type: 'success', actions: [<></>] }
 
 export const Default = Template.bind({})
 Default.args = Template.args
@@ -33,7 +33,7 @@ withActions.args = {
 }
 
 export const UsingToasts = ({ message, duration, ...rest }: any) => (
-  <div className="flex flex-col w-full justify-between">
+  <div className="flex flex-col justify-between w-full">
     <Toast.Toaster />
     <Button
       onClick={() => {
@@ -106,7 +106,6 @@ export const UsingToasts = ({ message, duration, ...rest }: any) => (
 
 UsingToasts.args = {
   message: 'Lorem ipsum',
-  description:
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit oluptatum tenetur.',
+  description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit oluptatum tenetur.',
   duration: 60000,
 }

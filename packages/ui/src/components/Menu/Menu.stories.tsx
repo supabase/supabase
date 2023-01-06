@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Divider } from '../Divider'
-import { IconMail } from './../../index'
+import { Mail } from 'react-feather'
 import Typography from '../Typography'
 
 import { Menu } from './'
@@ -15,7 +15,7 @@ export default {
   component: Menu,
 }
 
-const SampleIcon = () => <IconMail size={14} strokeWidth={2} />
+const SampleIcon = () => <Mail size={14} strokeWidth={2} />
 
 export const Default = (args: any) => (
   <Menu type="text">
@@ -105,7 +105,7 @@ export const CustomNode = () => (
       // @ts-ignore
       title={
         <>
-          <div className="w-full flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             <span>All tables</span>
             <button className="cursor-pointer">
               <IconRefreshCcw className={'animate-spin'} size={14} />

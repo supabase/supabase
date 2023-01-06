@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { IconMail, Typography } from './../../index'
+import { IconMail } from '../../../internals/icons'
+import Typography from '../Typography'
 
 export default {
   title: 'General/Icon',
@@ -24,14 +25,14 @@ Default.args = {
 
 // export const IconList = (args: any) => (
 //   <>
-//     <div className="font-sans text-xl bg-blue-100 p-5 mb-3 rounded-md">
+//     <div className="p-5 mb-3 font-sans text-xl bg-blue-100 rounded-md">
 //       This icons uses react-feather from Feather Icons. For detail you can check
 //       it <a href="https://github.com/feathericons/react-feather">here</a> and{' '}
 //       <a href="https://feathericons.com/">here</a>
 //     </div>
 //     <div className="flex flex-wrap font-sans">
 //       {LIST_ICONS.map((icon) => (
-//         <div className="m-2 shadow-lg rounded-lg w-36 h-36 flex flex-col justify-center items-center dark:text-white">
+//         <div className="flex flex-col items-center justify-center m-2 rounded-lg shadow-lg w-36 h-36 dark:text-white">
 //           <Icon type={icon} key={icon} {...args} />
 //           <span className="mt-2">{icon}</span>
 //         </div>

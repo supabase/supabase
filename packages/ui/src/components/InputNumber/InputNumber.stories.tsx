@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 // import { AutoForm } from 'uniforms'
 
 import { InputNumber } from '.'
-import { IconPackage } from './../../index'
+import { IconPackage } from '../../../internals/icons'
 import { Button } from '../Button'
 import { Space } from '../Space'
 
@@ -18,7 +18,7 @@ export const ErrorState = (args: any) => <InputNumber {...args} />
 export const WithIcon = (args: any) => <InputNumber {...args} />
 
 export const Controlled = (props: any) => {
-  const [state, setState] = useState(() => undefined)
+  const [state, setState] = useState('')
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // console.log({ e, value: e.currentTarget.value })

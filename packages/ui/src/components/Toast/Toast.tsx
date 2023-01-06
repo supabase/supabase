@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import { Toaster as HotToaster, toast as hotToast, resolveValue } from 'react-hot-toast'
-import { Toast as HotToastProps, ToastType } from 'react-hot-toast/dist/core/types'
+import { Toast as HotToastProps, ToastType } from 'react-hot-toast'
 import * as Portal from '@radix-ui/react-portal'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { IconLoader } from '../Icon/icons/IconLoader'

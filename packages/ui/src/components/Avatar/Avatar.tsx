@@ -48,7 +48,7 @@ export default function Avatar({
     }
   }
 
-  if (imageExist && src) {
+  if (imageExist() && src) {
     classes.push(AvatarStyles['sbui-avatar-image'])
     objectToRender = (
       <img
@@ -61,40 +61,28 @@ export default function Avatar({
   } else if (AvatarIcon) {
     classes.push(AvatarStyles['sbui-avatar-icon'])
     objectToRender = (
-      <div
-        className={classes.join(' ')}
-        style={{ height: size, width: size, ...style }}
-      >
+      <div className={classes.join(' ')} style={{ height: size, width: size, ...style }}>
         <AvatarIcon />
       </div>
     )
   } else if (text) {
     classes.push(AvatarStyles['sbui-avatar-text'])
     objectToRender = (
-      <div
-        className={classes.join(' ')}
-        style={{ height: size, width: size, ...style }}
-      >
+      <div className={classes.join(' ')} style={{ height: size, width: size, ...style }}>
         <p>{text[0]}</p>
       </div>
     )
   } else if (children) {
     classes.push(AvatarStyles['sbui-avatar-children'])
     objectToRender = (
-      <div
-        className={classes.join(' ')}
-        style={{ height: size, width: size, ...style }}
-      >
+      <div className={classes.join(' ')} style={{ height: size, width: size, ...style }}>
         {children}
       </div>
     )
   } else {
     classes.push(AvatarStyles['sbui-avatar-fallback'])
     objectToRender = (
-      <div
-        className={classes.join(' ')}
-        style={{ height: size, width: size, ...style }}
-      >
+      <div className={classes.join(' ')} style={{ height: size, width: size, ...style }}>
         <IconUser />
       </div>
     )

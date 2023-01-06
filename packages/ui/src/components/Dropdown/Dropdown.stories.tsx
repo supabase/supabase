@@ -7,7 +7,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconHardDrive,
-} from './../../index'
+} from '../../../internals/icons'
 import Typography from '../Typography'
 
 import { Dropdown } from './'
@@ -21,26 +21,11 @@ export default {
 }
 
 const DemoContainer = ({ children }: { children: React.ReactNode }) => (
-  <div
-    className="
-      flex justify-center items-center
-      w-screen h-screen
-    "
-  >
-    <div
-      className="
-      p-3 px-5 
-      bg-scale-300 border border-scale-600 rounded flex gap-4 
-      justify-between
-      items-center
-      w-3/4
-      "
-    >
+  <div className="flex items-center justify-center w-screen h-screen ">
+    <div className="flex items-center justify-between w-3/4 gap-4 p-3 px-5 border rounded bg-scale-300 border-scale-600">
       <div>
-        <h4 className="text-scale-1200 text-base">
-          Shall we nest some components?
-        </h4>
-        <p className="text-scale-1100 text-sm">yea sure, go on then.</p>
+        <h4 className="text-base text-scale-1200">Shall we nest some components?</h4>
+        <p className="text-sm text-scale-1100">yea sure, go on then.</p>
       </div>
       <div className="relative">{children}</div>
     </div>
@@ -70,9 +55,7 @@ export const DefaultFull = (args: any) => {
           </Dropdown.Misc>,
           <Dropdown.Separator />,
           <Dropdown.Label>Group label</Dropdown.Label>,
-          <Dropdown.Item onClick={() => console.log('clicked')}>
-            Account
-          </Dropdown.Item>,
+          <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
           <Dropdown.Item>
             Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
           </Dropdown.Item>,
@@ -97,9 +80,7 @@ export const DefaultFull = (args: any) => {
               </Dropdown.RadioGroup>,
               <Dropdown.Separator />,
               <Dropdown.Label>Group label</Dropdown.Label>,
-              <Dropdown.Item onClick={() => console.log('clicked')}>
-                Account
-              </Dropdown.Item>,
+              <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
               <Dropdown.Item>
                 Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
               </Dropdown.Item>,
@@ -113,9 +94,7 @@ export const DefaultFull = (args: any) => {
             </Dropdown.TriggerItem>
           </Dropdown>,
           <Dropdown.Separator />,
-          <Dropdown.Item icon={<IconLogIn size="tiny" />}>
-            Log out
-          </Dropdown.Item>,
+          <Dropdown.Item icon={<IconLogIn size="tiny" />}>Log out</Dropdown.Item>,
         ]}
       >
         <Button as="span" type="default" iconRight={<IconChevronDown />}>
@@ -144,9 +123,7 @@ export const Default = (args: any) => (
         </Dropdown.Misc>,
         <Dropdown.Separator />,
         <Dropdown.Label>Group label</Dropdown.Label>,
-        <Dropdown.Item onClick={() => console.log('clicked')}>
-          Account
-        </Dropdown.Item>,
+        <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
         <Dropdown.Item>
           Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
         </Dropdown.Item>,
@@ -233,7 +210,7 @@ export const SearchList = (args: any) => (
       {...args}
       overlay={[
         <Dropdown.Item>
-          <Input size="tiny" icon={<IconSearch />} autofocus={false} />
+          <Input size="tiny" icon={<IconSearch />} />
         </Dropdown.Item>,
         <Dropdown.Item>
           <Typography.Text>Signed in as </Typography.Text>
@@ -266,9 +243,7 @@ export const Checkbox = (args: any) => {
       <Dropdown
         {...args}
         overlay={[
-          <Dropdown.Item icon={<IconSettings size="small" />}>
-            Account
-          </Dropdown.Item>,
+          <Dropdown.Item icon={<IconSettings size="small" />}>Account</Dropdown.Item>,
           <Dropdown.Item>Settings</Dropdown.Item>,
           <Dropdown.Separator />,
           <Dropdown.Checkbox checked={checked} onChange={setChecked}>

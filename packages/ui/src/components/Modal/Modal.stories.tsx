@@ -8,7 +8,7 @@ import { Badge } from '../Badge'
 import { Form } from '../Form'
 import { Button } from '../Button'
 import { Space } from '../Space'
-import { IconTrash, IconAlertCircle, IconCheck } from './../../index'
+import { IconTrash, IconAlertCircle, IconCheck } from '../../../internals/icons'
 import { Dropdown } from '../Dropdown'
 import { IconGlobe } from '../Icon/icons/IconGlobe'
 import { IconLink2 } from '../Icon/icons/IconLink2'
@@ -25,36 +25,12 @@ export const withUseState = () => {
 
   return (
     <>
-      <div
-        className="
-          py-4 px-8
-          bg-scale-300 
-          border 
-          border-scale-500 
-          rounded flex gap-4 
-          shadow-sm
-          justify-between
-          items-center
-          
-          fixed
-          top-1/2
-          left-1/2
-          w-3/4
-
-          -translate-x-1/2
-          -translate-y-1/2"
-      >
+      <div className="fixed flex items-center justify-between w-3/4 gap-4 px-8 py-4 -translate-x-1/2 -translate-y-1/2 border rounded shadow-sm bg-scale-300 border-scale-500 top-1/2 left-1/2">
         <div>
-          <h4 className="text-scale-1200 text-base">Delete your project</h4>
-          <p className="text-scale-1100 text-sm">
-            It will be sad to see you go
-          </p>
+          <h4 className="text-base text-scale-1200">Delete your project</h4>
+          <p className="text-sm text-scale-1100">It will be sad to see you go</p>
         </div>
-        <Button
-          type="default"
-          onClick={() => setVisible(!visible)}
-          icon={<IconTrash />}
-        >
+        <Button type="default" onClick={() => setVisible(!visible)} icon={<IconTrash />}>
           Delete this project
         </Button>
       </div>
@@ -102,24 +78,19 @@ export const withUseState = () => {
               console.log('errors in form', errors)
               console.log('touched in form', touched)
               return (
-                <div className="space-y-4 mb-4">
-                  <div className="px-5 py-3 bg-amber-100 border-t border-b border-amber-300">
-                    <span className="flex gap-3 items-center text-xs text-amber-900">
+                <div className="mb-4 space-y-4">
+                  <div className="px-5 py-3 border-t border-b bg-amber-100 border-amber-300">
+                    <span className="flex items-center gap-3 text-xs text-amber-900">
                       <IconAlertCircle strokeWidth={2} />
                       <span>
-                        Once deleted, this project cannot be restored. Please
-                        proceed carefully.
+                        Once deleted, this project cannot be restored. Please proceed carefully.
                       </span>
                     </span>
                   </div>
                   <div className="px-5">
                     <p className="text-sm text-scale-1100">
-                      This action cannot be undone. This will permanently delete
-                      the project{' '}
-                      <span className="text-scale-1200 font-regular">
-                        MyProject
-                      </span>
-                      .
+                      This action cannot be undone. This will permanently delete the project{' '}
+                      <span className="text-scale-1200 font-regular">MyProject</span>.
                     </p>
                   </div>
                   <div className="border-t border-scale-300 dark:border-scale-500"></div>
@@ -169,9 +140,8 @@ export const Default = (args: any) => (
     }
   >
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -179,9 +149,8 @@ export const Default = (args: any) => (
 export const withIcon = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -189,9 +158,8 @@ export const withIcon = (args: any) => (
 export const withVerticalLayout = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -208,9 +176,8 @@ export const withCloseButton = (args: any) => (
 export const rightAlignedFooter = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -218,9 +185,8 @@ export const rightAlignedFooter = (args: any) => (
 export const hideFooter = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -228,9 +194,8 @@ export const hideFooter = (args: any) => (
 export const withFooterBackground = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -238,9 +203,8 @@ export const withFooterBackground = (args: any) => (
 export const customFooter = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -248,9 +212,8 @@ export const customFooter = (args: any) => (
 export const customFooterVertical = (args: any) => (
   <Modal {...args}>
     <Typography.Text type="secondary">
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via{' '}
-      <Typography.Text code>{'{children}'}</Typography.Text>
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via <Typography.Text code>{'{children}'}</Typography.Text>
     </Typography.Text>
   </Modal>
 )
@@ -258,182 +221,182 @@ export const customFooterVertical = (args: any) => (
 export const LongModal = () => (
   <div>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <p>
-      Modal content is inserted here, if you need to insert anything into the
-      Modal you can do so via
+      Modal content is inserted here, if you need to insert anything into the Modal you can do so
+      via
     </p>
     <Modal visible={true}>
       <Typography.Text type="secondary">
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <p>
-          Modal content is inserted here, if you need to insert anything into
-          the Modal you can do so via
+          Modal content is inserted here, if you need to insert anything into the Modal you can do
+          so via
         </p>
         <Typography.Text code>{'{children}'}</Typography.Text>
       </Typography.Text>
@@ -459,12 +422,8 @@ export const modalWithDropdowns = () => {
           // className="pointer-events-auto"
           overlay={
             <>
-              <Dropdown.Item onClick={() => console.log('item 1 clicked')}>
-                Item 1
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => console.log('item 2 clicked')}>
-                Item 2
-              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('item 1 clicked')}>Item 1</Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('item 2 clicked')}>Item 2</Dropdown.Item>
             </>
           }
         >
@@ -493,7 +452,7 @@ withFooterBackground.args = {
   description: 'And i am the description',
 }
 
-const icon = <IconAlertCircle background="brand" size="xlarge" />
+const icon = <IconAlertCircle size="xlarge" />
 
 withIcon.args = {
   visible: true,
@@ -585,12 +544,11 @@ customFooterVertical.args = {
 customFooterOneButton.args = {
   visible: true,
   size: 'small',
-  icon: <IconCheck background="brand" size="xxxlarge" />,
+  icon: <IconCheck size="xxxlarge" />,
   onCancel: action('onCancel'),
   onConfirm: action('onConfirm'),
   title: 'Payment successful',
-  description:
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.',
+  description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.',
   layout: 'vertical',
   customFooter: [
     <Space style={{ width: '100%' }}>

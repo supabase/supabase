@@ -2,7 +2,7 @@ import React from 'react'
 // import { AutoForm } from 'uniforms'
 
 import { Collapsible } from '.'
-import { IconChevronUp } from '../..'
+import { IconChevronUp } from '../../../internals/icons'
 import { Button } from '../Button'
 
 export default {
@@ -18,10 +18,10 @@ export const Default = (args: any) => {
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group text-scale-1200 flex justify-between items-center w-full bg-scale-300 rounded border border-scale-500 p-3"
+            className="flex items-center justify-between w-full p-3 border rounded group text-scale-1200 bg-scale-300 border-scale-500"
           >
             Hello
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <IconChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
               <Button
                 onClick={(e) => {
@@ -34,7 +34,7 @@ export const Default = (args: any) => {
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="group text-scale-1200 flex justify-between items-center w-full bg-scale-300 rounded border border-scale-500 p-3">
+          <div className="flex items-center justify-between w-full p-3 border rounded group text-scale-1200 bg-scale-300 border-scale-500">
             <h3 className="text-tomato-900">I am content</h3>
             <h3 className="text-tomato-900">I am content</h3>
             <h3 className="text-tomato-900">I am content</h3>

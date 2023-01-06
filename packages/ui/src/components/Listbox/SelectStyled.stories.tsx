@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import Listbox from './Listbox2'
-import { IconBook, IconUser } from '../../index'
+import { IconBook, IconUser } from '../../../internals/icons'
 import { Button } from '../Button'
 import Typography from '../Typography'
 
@@ -142,20 +142,12 @@ export const People = (args: any) => (
             value={person.value}
             label={person.label}
             addOnBefore={({ active, selected }: any) => [
-              <img
-                src={person.avatar}
-                alt=""
-                className="h-6 w-6 rounded-full"
-              />,
+              <img src={person.avatar} alt="" className="w-6 h-6 rounded-full" />,
             ]}
             children={({ active, selected }: any) => {
               // console.log('selected', selected)
               // console.log('active', active)
-              return (
-                <span className={'font-normal block truncate'}>
-                  {person.label}
-                </span>
-              )
+              return <span className={'font-normal block truncate'}>{person.label}</span>
             }}
           />
         )
@@ -191,18 +183,10 @@ export const WithState = (args: any) => {
             value={person.value}
             label={person.label}
             addOnBefore={({ active, selected }: any) => [
-              <img
-                src={person.avatar}
-                alt=""
-                className="h-6 w-6 rounded-full"
-              />,
+              <img src={person.avatar} alt="" className="w-6 h-6 rounded-full" />,
             ]}
             children={({ active, selected }: any) => {
-              return (
-                <span className={'font-normal block truncate'}>
-                  {person.label}
-                </span>
-              )
+              return <span className={'font-normal block truncate'}>{person.label}</span>
             }}
           />
         )
@@ -233,20 +217,12 @@ export const WithIcon = (args: any) => (
             value={person.value}
             label={person.label}
             addOnBefore={({ active, selected }: any) => [
-              <img
-                src={person.avatar}
-                alt=""
-                className="h-6 w-6 rounded-full"
-              />,
+              <img src={person.avatar} alt="" className="w-6 h-6 rounded-full" />,
             ]}
             children={({ active, selected }: any) => {
               // console.log('selected', selected)
               // console.log('active', active)
-              return (
-                <span className={'font-normal block truncate'}>
-                  {person.label}
-                </span>
-              )
+              return <span className={'font-normal block truncate'}>{person.label}</span>
             }}
           />
         )
@@ -284,7 +260,7 @@ export const ErrorState = (args: any) => (
           label={person.label}
           value={person.value}
           addOnBefore={({ active, selected }: any) => [
-            <img src={person.avatar} alt="" className="h-6 w-6 rounded-full" />,
+            <img src={person.avatar} alt="" className="w-6 h-6 rounded-full" />,
           ]}
         >
           {person.label}
@@ -300,12 +276,7 @@ ErrorState.args = {
 }
 
 export const ListBoxChildrenPropChange = (args: any) => {
-  const [countries, setCountries] = useState<any[]>([
-    'England',
-    'Wales',
-    'Scotland',
-    'Ireland',
-  ])
+  const [countries, setCountries] = useState<any[]>(['England', 'Wales', 'Scotland', 'Ireland'])
 
   function handlePop() {
     console.log('handlepop')
@@ -348,12 +319,7 @@ ListBoxChildrenPropChange.args = {
 }
 
 export const ValueChange = (args: any) => {
-  const [countries, setCountries] = useState<any[]>([
-    'England',
-    'Wales',
-    'Scotland',
-    'Ireland',
-  ])
+  const [countries, setCountries] = useState<any[]>(['England', 'Wales', 'Scotland', 'Ireland'])
 
   const [value, setValue] = useState<string>('England')
 
@@ -379,12 +345,7 @@ export const ValueChange = (args: any) => {
               </Listbox.Option>
             )
           })}
-          <Listbox.Option
-            label="disabled country"
-            value="disabled"
-            disabled
-            key="disabled"
-          >
+          <Listbox.Option label="disabled country" value="disabled" disabled key="disabled">
             Disabled
           </Listbox.Option>
         </Listbox>

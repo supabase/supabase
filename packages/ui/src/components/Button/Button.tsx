@@ -42,7 +42,7 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 
 interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
 
-interface RefHandle {
+export interface RefHandle {
   // container: () => HTMLElement | null
   button: () => HTMLButtonElement | null
 }

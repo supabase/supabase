@@ -17,41 +17,23 @@ import { Form } from './../'
 import { Collapsible } from '../../Collapsible'
 
 import { Modal } from '../../Modal'
-import AuthFormSchema from './AuthFormSchema.json'
-
-// import GoogleIcon './../../../static/icons/google-icon.svg'
+import AuthFormSchema from '../examples/AuthFormSchema.json'
 
 const DocsButton = () => {
   return (
-    <button
-      className="
-                bg-scale-300
-                dark:bg-scale-100
-                border-scale-500  
-                hover:border-scale-700  
-                dark:border-scale-300 
-                dark:hover:border-scale-500 group
-                my-6 flex
-                w-full items-center 
-                gap-6 
-                rounded-md border px-6
-                py-4 text-left
-                shadow-sm
-                transition
-              "
-    >
-      <div className="bg-brand-900 h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
+    <button className="flex items-center w-full gap-6 px-6 py-4 my-6 text-left transition border rounded-md shadow-sm bg-scale-300 dark:bg-scale-100 border-scale-500 hover:border-scale-700 dark:border-scale-300 dark:hover:border-scale-500 group">
+      <div className="w-10 h-10 p-1 transition duration-500 rounded bg-brand-900 group-hover:-rotate-3 group-hover:scale-110">
         {/* <img
-            className="text-white w-12 h-12"
+            className="w-12 h-12 text-white"
             src="/icons/docs-illustration.svg"
           /> */}
       </div>
       <div className="grow">
         <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
-        <p className="text-scale-900 text-xs">
+        <p className="text-xs text-scale-900">
           Learn how to use Supabase Auth with Auth Policies to pick and choose what users see what.
         </p>
-        <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">
+        <p className="flex items-center gap-1 mt-2 text-xs text-brand-900">
           See Documenation
           <span className="transition group-hover:translate-x-1">
             <IconArrowRight strokeWidth={2} width={12} />
@@ -76,19 +58,13 @@ const CardForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div
-      className="
-      bg-scale-100 
-      dark:bg-scale-300 
-      
-      border-scale-400 my-8 overflow-hidden rounded-md border shadow"
-    >
+    <div className="my-8 overflow-hidden border rounded-md shadow bg-scale-100 dark:bg-scale-300 border-scale-400">
       {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
+        <div className="px-8 py-4 border-b bg-scale-100 dark:bg-scale-200 border-scale-400">
           {header}
         </div>
       )}
-      <div className="space-y-6 py-6">{children}</div>
+      <div className="py-6 space-y-6">{children}</div>
       {footer}
     </div>
   )
@@ -120,7 +96,7 @@ const CardForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'
@@ -136,8 +112,8 @@ const CardForm = () => {
           <Panel
             footer={
               <>
-                <div className="border-scale-400 border-t"></div>
-                <div className="flex justify-end gap-2 py-3 px-6">
+                <div className="border-t border-scale-400"></div>
+                <div className="flex justify-end gap-2 px-6 py-3">
                   <Button type="default" htmlType="reset" onClick={() => handleReset()}>
                     Cancel
                   </Button>
@@ -154,7 +130,7 @@ const CardForm = () => {
             }
           >
             <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Signups</label>}
+              header={<label className="col-span-4 text-sm text-scale-1200">User Signups</label>}
             >
               <Toggle
                 id="enable_signups"
@@ -164,9 +140,9 @@ const CardForm = () => {
                 descriptionText="If this is disabled, new users will not be able to sign up to your application."
               />
             </Section>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-t border-scale-400"></div>
             <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Sessions</label>}
+              header={<label className="col-span-4 text-sm text-scale-1200">User Sessions</label>}
             >
               <InputNumber
                 className="col-span-8"
@@ -193,7 +169,7 @@ AuthFormSchema.map((provider) => {
 
 console.log('form initialState', initialState)
 
-function providersReducer(state, action) {
+function providersReducer(state: any, action: any) {
   switch (action.type) {
     case 'update':
       return Object.assign(state, action.values)
@@ -219,13 +195,13 @@ const AuthForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div className="bg-scale-300 border-scale-400 mx-auto my-8 w-3/4 overflow-hidden rounded-md border shadow">
+    <div className="w-3/4 mx-auto my-8 overflow-hidden border rounded-md shadow bg-scale-300 border-scale-400">
       {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
+        <div className="px-8 py-4 border-b bg-scale-100 dark:bg-scale-200 border-scale-400">
           {header}
         </div>
       )}
-      <div className="space-y-6 py-6">{children}</div>
+      <div className="py-6 space-y-6">{children}</div>
       {footer}
     </div>
   )
@@ -251,16 +227,7 @@ const AuthForm = () => {
     header?: React.ReactNode
   }) => {
     return (
-      <div
-        className="
-          bg-scale-400 border-scale-500 hover:border-scale-700 hover:bg-scale-500 mx-auto overflow-hidden
-          border shadow
-          transition first:rounded-tr  
-          first:rounded-tl
-          last:rounded-br
-          last:rounded-bl
-        "
-      >
+      <div className="mx-auto overflow-hidden transition border shadow bg-scale-400 border-scale-500 hover:border-scale-700 hover:bg-scale-500 first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl">
         {children}
       </div>
     )
@@ -292,38 +259,16 @@ const AuthForm = () => {
       <Collapsible
         open={open}
         onOpenChange={setOpen}
-        className="
-            bg-scale-100 dark:bg-scale-300 
-            hover:bg-scale-200 dark:hover:bg-scale-500
-            data-open:bg-scale-200 dark:data-open:bg-scale-500 
-            border-scale-300 
-            dark:border-scale-500 hover:border-scale-500 
-            dark:hover:border-scale-700 data-open:border-scale-700
-
-            data-open:pb-px col-span-12 mx-auto
-            -space-y-px overflow-hidden
-            border shadow  
-            
-            transition
-            first:rounded-tr
-
-            first:rounded-tl
-            last:rounded-br last:rounded-bl
-            hover:z-50
-            "
+        className="col-span-12 mx-auto -space-y-px overflow-hidden transition border shadow bg-scale-100 dark:bg-scale-300 hover:bg-scale-200 dark:hover:bg-scale-500 data-open:bg-scale-200 dark:data-open:bg-scale-500 border-scale-300 dark:border-scale-500 hover:border-scale-500 dark:hover:border-scale-700 data-open:border-scale-700 data-open:pb-px first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl hover:z-50"
       >
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="
-              
-              text-scale-1200 group 
-              flex 
-              w-full items-center justify-between rounded p-3 px-6"
+            className="flex items-center justify-between w-full p-3 px-6 rounded text-scale-1200 group"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
-                className="text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180 transition"
+                className="transition text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
               />
 
@@ -338,14 +283,14 @@ const AuthForm = () => {
             </div>
             <div className="flex items-center gap-3">
               {active ? (
-                <div className="bg-brand-200 border-brand-700 text-brand-900 flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
+                <div className="flex items-center gap-1 px-1 py-1 text-xs border rounded-full bg-brand-200 border-brand-700 text-brand-900">
                   <span className="bg-brand-900 text-brand-200 rounded-full p-0.5 text-xs">
                     <IconCheck strokeWidth={2} size={12} />
                   </span>
                   <span className="px-1">Enabled</span>
                 </div>
               ) : (
-                <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-scale-900 rounded-md border py-1 px-3 text-xs">
+                <div className="px-3 py-1 text-xs border rounded-md bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-scale-900">
                   Disabled
                 </div>
               )}
@@ -401,20 +346,15 @@ const AuthForm = () => {
         >
           {({ isSubmitting, handleReset }: any) => (
             <Collapsible.Content>
-              <div
-                className="
-                  bg-scale-100 dark:bg-scale-300
-                  text-scale-1200 border-scale-500 group border-t py-6 px-6
-                "
-              >
-                <div className="mx-auto max-w-md space-y-6">
+              <div className="px-6 py-6 border-t bg-scale-100 dark:bg-scale-300 text-scale-1200 border-scale-500 group">
+                <div className="max-w-md mx-auto space-y-6">
                   <Toggle
                     id={`${provider.name.toLowerCase()}-active`}
                     name={`${provider.name.toLowerCase()}-active`}
                     label={`Enable ${provider.name} Provider`}
                     layout="flex"
                   />
-                  <div className="border-scale-400 border-t"></div>
+                  <div className="border-t border-scale-400"></div>
                   {provider.form.map((x) => {
                     return (
                       <Input
@@ -427,7 +367,7 @@ const AuthForm = () => {
                       />
                     )
                   })}
-                  <div className="border-scale-400 border-t"></div>
+                  <div className="border-t border-scale-400"></div>
                   <div className="flex items-center justify-end gap-3">
                     <Button
                       htmlType="reset"
@@ -465,7 +405,7 @@ const AuthForm = () => {
 }
 
 // type to do later..
-let domainInitialState: any = ['https://summersmuir.com', 'http://localhost:3000']
+let domainInitialState: string[] = ['https://summersmuir.com', 'http://localhost:3000']
 
 // AuthFormSchema.map((provider) => {
 //   domainInitialState[`${provider.name.toLowerCase()}-active`] =
@@ -496,7 +436,7 @@ console.log('form domainInitialState', domainInitialState)
 //   }
 // }
 
-function domainsReducer(state, action) {
+function domainsReducer(state: any, action: any) {
   let _state = []
   switch (action.type) {
     case 'update':
@@ -548,13 +488,13 @@ const DomainsForm = () => {
 
     return (
       <>
-        <div className="my-6 flex items-center justify-between">
+        <div className="flex items-center justify-between my-6">
           <div>
-            <h3 className="text-scale-1200 mb-2 text-2xl">Authorised domains</h3>
-            <p className="text-scale-900 text-sm">
+            <h3 className="mb-2 text-2xl text-scale-1200">Authorised domains</h3>
+            <p className="text-sm text-scale-900">
               Turn payment methods on and off in one click – no engineering time required.
             </p>
-            <p className="text-scale-900 text-sm">
+            <p className="text-sm text-scale-900">
               Use our guide to check which payment methods are compatible with your integration.
             </p>
           </div>
@@ -564,7 +504,7 @@ const DomainsForm = () => {
             visible={open}
             onCancel={() => setOpen(!open)}
             header={
-              <div className="text-scale-1200 flex items-center gap-2">
+              <div className="flex items-center gap-2 text-scale-1200">
                 <div className="flex items-baseline gap-2">
                   <h3 className="text-sm">Add a new domain</h3>
                 </div>
@@ -605,14 +545,14 @@ const DomainsForm = () => {
                 // console.log('errors in form', errors)
                 // console.log('touched in form', touched)
                 return (
-                  <div className="mb-4 space-y-4 pt-4">
+                  <div className="pt-4 mb-4 space-y-4">
                     <div className="px-5">
-                      <p className="text-scale-1100 text-sm">
+                      <p className="text-sm text-scale-1100">
                         This will add a domain to a list of allowed domains that can interact with
                         your Authenticaton services for this project.
                       </p>
                     </div>
-                    <div className="border-overlay-border border-t"></div>
+                    <div className="border-t border-overlay-border"></div>
                     <div className="px-5">
                       <Input
                         id="domain"
@@ -621,7 +561,7 @@ const DomainsForm = () => {
                         placeholder="https://mydomain.com"
                       />
                     </div>
-                    <div className="border-overlay-border border-t"></div>
+                    <div className="border-t border-overlay-border"></div>
                     <div className="px-5">
                       <Button
                         form="new-domain-form"
@@ -652,14 +592,7 @@ const DomainsForm = () => {
         {domainsFormState.map((domain) => {
           return (
             <>
-              <div
-                className="bg-scale-300 border-scale-500 text-scale-1200 flex items-center 
-              justify-between gap-2
-              border px-6 
-              py-4 text-sm
-            first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl
-            "
-              >
+              <div className="flex items-center justify-between gap-2 px-6 py-4 text-sm border bg-scale-300 border-scale-500 text-scale-1200 first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl ">
                 <div className="flex items-center gap-2 font-mono">
                   <span className="text-scale-900">
                     <IconGlobe strokeWidth={2} size={14} />
@@ -686,7 +619,7 @@ const DomainsForm = () => {
         visible={deleteOpen}
         onCancel={() => setDeleteOpen(!open)}
         header={
-          <div className="text-scale-1200 flex items-center gap-2">
+          <div className="flex items-center gap-2 text-scale-1200">
             <div className="flex items-baseline gap-2">
               <h3 className="text-sm">Remove domain</h3>
             </div>
@@ -695,17 +628,17 @@ const DomainsForm = () => {
         contentStyle={{ padding: 0 }}
         hideFooter
       >
-        <div className="mb-4 space-y-4 pt-4">
+        <div className="pt-4 mb-4 space-y-4">
           <div className="px-5">
-            <p className="text-scale-1100 mb-2 text-sm">
+            <p className="mb-2 text-sm text-scale-1100">
               Are you sure you want to remove{' '}
               <span className="text-scale-1200">{selectedDomain}</span>?
             </p>
-            <p className="text-scale-900 text-sm">
+            <p className="text-sm text-scale-900">
               This domain will no longer work with your Authentication configuration.
             </p>
           </div>
-          <div className="border-overlay-border border-t"></div>
+          <div className="border-t border-overlay-border"></div>
           <div className="flex gap-3 px-5">
             <Button
               type="secondary"
@@ -756,19 +689,13 @@ const SmtpForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div
-      className="
-      bg-scale-100 
-      dark:bg-scale-300 
-      
-      border-scale-400 my-8 overflow-hidden rounded-md border shadow"
-    >
+    <div className="my-8 overflow-hidden border rounded-md shadow bg-scale-100 dark:bg-scale-300 border-scale-400">
       {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
+        <div className="px-8 py-4 border-b bg-scale-100 dark:bg-scale-200 border-scale-400">
           {header}
         </div>
       )}
-      <div className="space-y-6 py-6">{children}</div>
+      <div className="py-6 space-y-6">{children}</div>
       {footer}
     </div>
   )
@@ -800,7 +727,7 @@ const SmtpForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'
@@ -816,8 +743,8 @@ const SmtpForm = () => {
           <Panel
             footer={
               <>
-                <div className="border-scale-400 border-t"></div>
-                <div className="flex justify-end gap-2 py-3 px-6">
+                <div className="border-t border-scale-400"></div>
+                <div className="flex justify-end gap-2 px-6 py-3">
                   <Button
                     loading={isSubmitting}
                     type="secondary"
@@ -840,7 +767,7 @@ const SmtpForm = () => {
           >
             {/* <Section
               header={
-                <label className="text-sm text-scale-1200 col-span-4">
+                <label className="col-span-4 text-sm text-scale-1200">
                   Enable SMTP
                 </label>
               }
@@ -855,12 +782,12 @@ const SmtpForm = () => {
               descriptionText="If this is disabled, new users will not be able to sign up to your application."
             />
             {/* </Section> */}
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-t border-scale-400"></div>
             <Section
               header={
                 <div className="w-full">
-                  <label className="text-scale-1100 text-sm">SMTP details</label>
-                  <p className="text-scale-900 text-sm">
+                  <label className="text-sm text-scale-1100">SMTP details</label>
+                  <p className="text-sm text-scale-900">
                     These settings can be found in your SMTP provider config
                   </p>
                 </div>
@@ -903,18 +830,13 @@ const TemplatesForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div
-      className="
-      bg-scale-100 
-      dark:bg-scale-300 
-      border-scale-400 mb-8 overflow-hidden rounded-md border shadow"
-    >
+    <div className="mb-8 overflow-hidden border rounded-md shadow bg-scale-100 dark:bg-scale-300 border-scale-400">
       {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
+        <div className="px-8 py-4 border-b bg-scale-100 dark:bg-scale-200 border-scale-400">
           {header}
         </div>
       )}
-      <div className="space-y-6 py-6">{children}</div>
+      <div className="py-6 space-y-6">{children}</div>
       {footer}
     </div>
   )
@@ -946,7 +868,7 @@ const TemplatesForm = () => {
             setSubmitting(false)
           }, 400)
         }}
-        validate={(values: Values) => {
+        validate={(values) => {
           const errors: any = {}
           if (!values.jwt_expiry) {
             errors.jwt_expiry = 'This is required'
@@ -977,8 +899,8 @@ const TemplatesForm = () => {
             <Panel
               footer={
                 <>
-                  <div className="border-scale-400 border-t"></div>
-                  <div className="flex justify-end gap-2 py-3 px-6">
+                  <div className="border-t border-scale-400"></div>
+                  <div className="flex justify-end gap-2 px-6 py-3">
                     <Button
                       loading={isSubmitting}
                       type="secondary"
@@ -1001,7 +923,7 @@ const TemplatesForm = () => {
             >
               {/* <Section
               header={
-                <label className="text-sm text-scale-1200 col-span-4">
+                <label className="col-span-4 text-sm text-scale-1200">
                   Enable SMTP
                 </label>
               }
@@ -1020,8 +942,8 @@ const TemplatesForm = () => {
               <Section
                 header={
                   <div className="w-full">
-                    <h3 className="text-scale-1200 mb-4 text-base">Confirm Signup</h3>
-                    <p className="text-scale-900 text-sm">
+                    <h3 className="mb-4 text-base text-scale-1200">Confirm Signup</h3>
+                    <p className="text-sm text-scale-900">
                       When a user signs up using an email address and password, you can send them a
                       confirmation email to verify their registered email address. Learn more
                     </p>
@@ -1063,27 +985,27 @@ export function WholeForm() {
     <div style={{ width: '820px' }} className="mx-auto">
       <Tabs defaultActiveId="one" type="underlined" size="medium">
         <Tabs.Panel id="one" label="Sign-in method">
-          <div className="animate-fade-in space-y-12 py-12">
+          <div className="py-12 space-y-12 animate-fade-in">
             <div>
-              <h1 className="text-scale-1200 text-3xl">Sign-in method</h1>
+              <h1 className="text-3xl text-scale-1200">Sign-in method</h1>
             </div>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-t border-scale-400"></div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">General settings</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="mb-2 text-2xl text-scale-1200">General settings</h3>
+              <p className="text-sm text-scale-900">
                 Turn payment methods on and off in one click – no engineering time required.
               </p>
-              <p className="text-scale-900 text-sm">
+              <p className="text-sm text-scale-900">
                 Use our guide to check which payment methods are compatible with your integration.
               </p>
               <CardForm />
             </div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Providers</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="mb-2 text-2xl text-scale-1200">Providers</h3>
+              <p className="text-sm text-scale-900">
                 Turn payment methods on and off in one click – no engineering time required.
               </p>
-              <p className="text-scale-900 text-sm">
+              <p className="text-sm text-scale-900">
                 Use our guide to check which payment methods are compatible with your integration.
               </p>
               <AuthForm />
@@ -1093,40 +1015,24 @@ export function WholeForm() {
           </div>
         </Tabs.Panel>
         <Tabs.Panel id="two" label="Emails">
-          <div className="animate-fade-in space-y-12 py-12">
+          <div className="py-12 space-y-12 animate-fade-in">
             <div>
-              <h1 className="text-scale-1200 text-3xl">Emails</h1>
+              <h1 className="text-3xl text-scale-1200">Emails</h1>
             </div>
-            <button
-              className="
-                bg-scale-300
-                dark:bg-scale-100
-                border-scale-500  
-                hover:border-scale-700  
-                dark:border-scale-300 
-                dark:hover:border-scale-500 group
-                my-6 flex
-                w-full items-center 
-                gap-6 
-                rounded-md border px-6
-                py-4 text-left
-                shadow-sm
-                transition
-              "
-            >
-              <div className="bg-brand-900 h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
+            <button className="flex items-center w-full gap-6 px-6 py-4 my-6 text-left transition border rounded-md shadow-sm bg-scale-300 dark:bg-scale-100 border-scale-500 hover:border-scale-700 dark:border-scale-300 dark:hover:border-scale-500 group">
+              <div className="w-10 h-10 p-1 transition duration-500 rounded bg-brand-900 group-hover:-rotate-3 group-hover:scale-110">
                 {/* <img
-            className="text-white w-12 h-12"
+            className="w-12 h-12 text-white"
             src="/icons/docs-illustration.svg"
           /> */}
               </div>
               <div className="grow">
                 <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
-                <p className="text-scale-900 text-xs">
+                <p className="text-xs text-scale-900">
                   Learn how to use Supabase Auth with Auth Policies to pick and choose what users
                   see what.
                 </p>
-                <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">
+                <p className="flex items-center gap-1 mt-2 text-xs text-brand-900">
                   See Documenation
                   <span className="transition group-hover:translate-x-1">
                     <IconArrowRight strokeWidth={2} width={12} />
@@ -1137,17 +1043,17 @@ export function WholeForm() {
                 <IconX />
               </div>
             </button>
-            <div className="border-scale-400 border-t"></div>
+            <div className="border-t border-scale-400"></div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Custom SMTP</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="mb-2 text-2xl text-scale-1200">Custom SMTP</h3>
+              <p className="text-sm text-scale-900">
                 You can use your own SMTP server instead of the built-in email service.
               </p>
               <SmtpForm />
             </div>
             <div>
-              <h3 className="text-scale-1200 mb-2 text-2xl">Templates</h3>
-              <p className="text-scale-900 text-sm">
+              <h3 className="mb-2 text-2xl text-scale-1200">Templates</h3>
+              <p className="text-sm text-scale-900">
                 You can use your own SMTP server instead of the built-in email service.
               </p>
               <TemplatesForm />

@@ -4,7 +4,8 @@
 // import customThemeExample from '../../lib/theme/customThemeExample'
 
 import { useRef, useState } from 'react'
-import { Button, IconPackage, IconChevronRight } from './../../index'
+import { IconPackage, IconChevronRight } from '../../../internals/icons'
+import { Button } from './Button'
 
 export default {
   title: 'General/Button',
@@ -14,9 +15,7 @@ export default {
 export const Default = (args: any) => <Button {...args}>Button text</Button>
 export const withStyles = (args: any) => <Button {...args}>Button text</Button>
 export const withIcon = (args: any) => <Button {...args}>Button text</Button>
-export const withIconRight = (args: any) => (
-  <Button {...args}>Button text</Button>
-)
+export const withIconRight = (args: any) => <Button {...args}>Button text</Button>
 export const withBlock = (args: any) => <Button {...args}>Button text</Button>
 export const withOnlyIcon = (args: any) => <Button {...args} />
 export const withOnlyLoading = (args: any) => <Button {...args} />
@@ -211,9 +210,7 @@ export const allButtons = (args: any) => (
   </>
 )
 
-export const withCustomTag = (args: any) => (
-  <Button {...args}>Button text</Button>
-)
+export const withCustomTag = (args: any) => <Button {...args}>Button text</Button>
 
 const icon = <IconPackage />
 

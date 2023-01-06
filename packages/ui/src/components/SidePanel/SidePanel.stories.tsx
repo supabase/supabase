@@ -1,6 +1,6 @@
 import { action } from '@storybook/addon-actions'
 import React, { useState } from 'react'
-import { Button, Space, Typography } from '../../index'
+import { Button, Space } from '../../../'
 
 import { SidePanel } from './index'
 
@@ -10,9 +10,9 @@ export default {
 }
 
 const content = (
-  <span className="text-scale-900 text-sm">
-    SidePanel content is inserted here, if you need to insert anything into the
-    SidePanel you can do so via
+  <span className="text-sm text-scale-900">
+    SidePanel content is inserted here, if you need to insert anything into the SidePanel you can do
+    so via
     <span className="text-code">children</span>
   </span>
 )
@@ -66,9 +66,7 @@ export const customFooter = (args: any) => (
 export const triggerElement = (args: any) => (
   <>
     <SidePanel {...args}>
-      <span className="text-scale-900">
-        This was opened with a trigger element
-      </span>
+      <span className="text-scale-900">This was opened with a trigger element</span>
     </SidePanel>
   </>
 )
@@ -79,26 +77,10 @@ export const nestedSidepanels = (args: any) => {
 
   return (
     <>
-      <div
-        className="
-          p-3 px-5 
-          bg-scale-300 border border-scale-600 rounded flex gap-4 
-          justify-between
-          items-center
-          
-          fixed
-          top-1/2
-          left-1/2
-          w-3/4
-
-          -translate-x-1/2
-          -translate-y-1/2"
-      >
+      <div className="fixed flex items-center justify-between w-3/4 gap-4 p-3 px-5 -translate-x-1/2 -translate-y-1/2 border rounded bg-scale-300 border-scale-600 top-1/2 left-1/2">
         <div>
-          <h4 className="text-scale-1200 text-base">
-            Shall we nest some components?
-          </h4>
-          <p className="text-scale-1100 text-sm">yea sure, go on then.</p>
+          <h4 className="text-base text-scale-1200">Shall we nest some components?</h4>
+          <p className="text-sm text-scale-1100">yea sure, go on then.</p>
         </div>
         <Button type="secondary" onClick={() => setPanel1Visible(true)}>
           Open sidepanel
@@ -110,7 +92,7 @@ export const nestedSidepanels = (args: any) => {
         onConfirm={() => setPanel1Visible(false)}
       >
         <div className="space-y-3">
-          <p className="text-sm text-scale-900 font-light">
+          <p className="text-sm font-light text-scale-900">
             This Sidepanel was opened with a trigger element
           </p>
 

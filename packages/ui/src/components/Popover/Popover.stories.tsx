@@ -1,6 +1,6 @@
 import { Button } from '../Button'
 import { Divider } from '../Divider'
-import { IconChevronDown } from '../../index'
+import { IconChevronDown } from '../../../internals/icons'
 import Typography from '../Typography'
 
 import { Popover } from '.'
@@ -22,7 +22,7 @@ export const Default = (args: any) => (
       portalled
       showClose
       header={
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <Button type="default" size="tiny">
             Clear
           </Button>
