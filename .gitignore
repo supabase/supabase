@@ -11,6 +11,7 @@ allure-report
 .nyc_output
 *.log
 
+
 # turbo
 .turbo
 
@@ -120,3 +121,7 @@ typings/
 **/supabase/.temp
 
 apps/new-docs/*
+
+# Ignore codegen so turbo can hit caches
+apps/www/public/rss.xml
+apps/www/public/sitemap_www.xml

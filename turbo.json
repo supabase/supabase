@@ -4,6 +4,9 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
+    "www#build": {
+      "outputs": ["dist/**", ".next/**", "public/rss.xml", "public/sitemap_www.xml"]
+    },
     "lint": {
       "outputs": []
     },
