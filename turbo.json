@@ -8,7 +8,7 @@
       "outputs": ["dist/**", ".next/**", "public/rss.xml", "public/sitemap_www.xml"]
     },
     "lint": {
-      "outputs": []
+      "cache": false
     },
     "dev": {
       "cache": false
