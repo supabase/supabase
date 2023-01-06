@@ -19,8 +19,14 @@ const RolesHelperModal: FC<Props> = ({}) => {
       </Tooltip.Trigger>
       <Tooltip.Content side="top">
         <Tooltip.Arrow className="radix-tooltip-arrow" />
-
-        <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+        <div
+          className={[
+            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+            'border border-scale-200 ', //border
+          ].join(' ')}
+        >
+          <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+        </div>
       </Tooltip.Content>
     </Tooltip.Root>
   )
