@@ -1,4 +1,4 @@
-import { Badge } from 'ui'
+import { Badge } from '@supabase/ui'
 import Description from './Description'
 
 const Param = ({

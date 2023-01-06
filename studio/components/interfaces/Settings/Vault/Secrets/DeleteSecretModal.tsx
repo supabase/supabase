@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Modal } from 'ui'
+import { Modal } from '@supabase/ui'
 import { VaultSecret } from 'types'
 import { useStore } from 'hooks'
 

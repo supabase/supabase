@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconCode } from 'ui'
+import { IconCode } from '@supabase/ui'
 
 import { checkPermissions, useStore, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
@@ -52,11 +52,11 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">
             <div
-              className="item-center 
-            flex 
+              className="item-center
+            flex
             flex-col
-            justify-between 
-            gap-y-4 
+            justify-between
+            gap-y-4
             xl:flex-row"
             >
               <div className="flex items-center gap-3">

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { toJS } from 'mobx'
-import { Button, Dropdown, IconPlus } from 'ui'
+import { Button, Dropdown, IconPlus } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
 const OrganizationDropdown = ({ organizations }) => {

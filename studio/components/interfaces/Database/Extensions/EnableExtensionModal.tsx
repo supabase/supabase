@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from 'ui'
+import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from '@supabase/ui'
 import { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'

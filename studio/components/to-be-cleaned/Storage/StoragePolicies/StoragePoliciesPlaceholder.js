@@ -1,4 +1,4 @@
-import { IconArchive } from 'ui'
+import { IconArchive } from '@supabase/ui'
 import Panel from 'components/ui/Panel'
 
 const StoragePoliciesPlaceholder = ({ guiHeight }) => (

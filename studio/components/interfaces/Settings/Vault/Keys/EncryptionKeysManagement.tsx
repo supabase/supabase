@@ -16,7 +16,7 @@ import {
   IconLoader,
   IconX,
   IconExternalLink,
-} from 'ui'
+} from '@supabase/ui'
 import { useParams, useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
 

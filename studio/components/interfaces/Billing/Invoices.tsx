@@ -1,5 +1,12 @@
 import { FC, useState, useEffect } from 'react'
-import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
+import {
+  Button,
+  Loading,
+  IconFileText,
+  IconDownload,
+  IconChevronLeft,
+  IconChevronRight,
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'

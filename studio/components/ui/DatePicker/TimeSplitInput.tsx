@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconClock } from 'ui'
+import { IconClock } from '@supabase/ui'
 
 import { format } from 'date-fns'
 

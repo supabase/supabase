@@ -1,5 +1,12 @@
 import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2, IconBookOpen, IconCode } from 'ui'
+import {
+  Button,
+  IconTerminal,
+  IconMaximize2,
+  IconMinimize2,
+  IconBookOpen,
+  IconCode,
+} from '@supabase/ui'
 import { useProjectSettings } from 'hooks'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'

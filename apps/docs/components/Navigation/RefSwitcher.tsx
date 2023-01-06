@@ -1,7 +1,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Badge, Dropdown, GlassPanel, IconChevronDown, IconChevronRight, Popover } from 'ui'
+import {
+  Badge,
+  Dropdown,
+  GlassPanel,
+  IconChevronDown,
+  IconChevronRight,
+  Popover,
+} from '@supabase/ui'
 
 import { references } from './NavigationMenu/NavigationMenu.constants'
 
@@ -84,19 +91,19 @@ const RefSwitcher = () => {
       >
         <div
           className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
               rounded-tr-none
               rounded-br-none
-              
+
               "
         >
           <div className="flex items-center justify-between w-full min-w-[128px]">
@@ -119,17 +126,17 @@ const RefSwitcher = () => {
         <div className="w-20">
           <div
             className="
-              flex 
+              flex
               group
-              items-center 
-              justify-between 
-              bg-scaleA-200 
-              border 
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
               transition
               hover:border-scale-600
-              hover:bg-scaleA-300 
+              hover:bg-scaleA-300
               border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded
-              
+
 
               rounded-tl-none
               rounded-bl-none

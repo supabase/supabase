@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect } from 'react'
-import { Loading } from 'ui'
+import { Loading } from '@supabase/ui'
 
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'

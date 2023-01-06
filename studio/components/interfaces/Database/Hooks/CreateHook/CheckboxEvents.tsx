@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Checkbox } from 'ui'
+import { Checkbox } from '@supabase/ui'
 import { union, without } from 'lodash'
 import { CreateHookContext } from './'
 

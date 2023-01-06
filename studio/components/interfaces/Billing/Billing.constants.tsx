@@ -1,4 +1,4 @@
-import { IconArchive, IconCode, IconDatabase, IconKey } from 'ui'
+import { IconArchive, IconCode, IconDatabase, IconKey } from '@supabase/ui'
 
 export const CANCELLATION_REASONS = [
   'Pricing',

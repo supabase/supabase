@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
-import { Input, Modal } from 'ui'
+import { Input, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'

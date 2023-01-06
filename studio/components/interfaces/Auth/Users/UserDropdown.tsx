@@ -1,7 +1,14 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOff } from 'ui'
+import {
+  Button,
+  Dropdown,
+  IconTrash,
+  IconMail,
+  IconMoreHorizontal,
+  IconShieldOff,
+} from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
@@ -181,9 +188,9 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
                   Remove MFA factors
                 </Dropdown.Item>
               </Tooltip.Trigger>
-              {/* 
+              {/*
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
-                 need to double check with KM / anyone familiar with ABAC 
+                 need to double check with KM / anyone familiar with ABAC
               */}
               {!canRemoveMFAFactors && (
                 <Tooltip.Content side="bottom">

@@ -2,7 +2,7 @@ import { FC } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from 'ui'
+import { Button, IconCheck, IconCopy } from '@supabase/ui'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
@@ -126,7 +126,7 @@ const CodeBlock: FC<Props> = ({
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
-              {/* // 
+              {/* //
               @ts-ignore */}
               <CopyToClipboard text={value || children}>
                 <Button

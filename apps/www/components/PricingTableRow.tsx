@@ -1,4 +1,4 @@
-import { IconHelpCircle } from 'ui'
+import { IconHelpCircle } from '@supabase/ui'
 import ProductIcon from 'components/ProductIcon'
 import React from 'react'
 import ReactTooltip from 'react-tooltip'

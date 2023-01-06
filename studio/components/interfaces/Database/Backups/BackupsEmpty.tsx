@@ -1,4 +1,4 @@
-import { IconInfo } from 'ui'
+import { IconInfo } from '@supabase/ui'
 
 const BackupsEmpty = () => {
   return (

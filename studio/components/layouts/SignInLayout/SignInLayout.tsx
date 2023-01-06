@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { useSWRConfig } from 'swr'
-import { Button, IconFileText } from 'ui'
+import { Button, IconFileText } from '@supabase/ui'
 
 type SignInLayoutProps = {
   heading: string

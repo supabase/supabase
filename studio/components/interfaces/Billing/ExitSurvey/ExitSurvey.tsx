@@ -2,7 +2,7 @@ import { FC, useReducer, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'ui'
+import { Button, Form, Input, Modal, IconArrowLeft, Alert } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
@@ -221,7 +221,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                         <label
                           key={option}
                           className={`
-                              flex cursor-pointer items-center space-x-2 rounded-md py-1 
+                              flex cursor-pointer items-center space-x-2 rounded-md py-1
                               pl-2 pr-3 text-center text-sm
                               shadow-sm transition-all duration-100
                               ${

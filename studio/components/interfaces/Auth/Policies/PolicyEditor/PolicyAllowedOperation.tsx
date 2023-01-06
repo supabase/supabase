@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Radio } from 'ui'
+import { Radio } from '@supabase/ui'
 
 interface Props {
   operation: string

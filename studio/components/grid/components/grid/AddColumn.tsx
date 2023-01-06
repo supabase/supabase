@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { CalculatedColumn } from '@supabase/react-data-grid'
-import { Button, IconPlus } from 'ui'
+import { Button, IconPlus } from '@supabase/ui'
 import { ADD_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
 import { DefaultFormatter } from '../formatter'

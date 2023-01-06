@@ -1,4 +1,4 @@
-import { IconDatabase } from 'ui'
+import { IconDatabase } from '@supabase/ui'
 
 const FeatureSection = (props: any) => {
   return (

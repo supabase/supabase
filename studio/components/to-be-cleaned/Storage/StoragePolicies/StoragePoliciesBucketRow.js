@@ -1,4 +1,12 @@
-import { Badge, Button, IconArchive, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
+import {
+  Badge,
+  Button,
+  IconArchive,
+  Dropdown,
+  IconEdit,
+  IconTrash,
+  IconMoreVertical,
+} from '@supabase/ui'
 import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
 

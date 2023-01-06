@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from '@supabase/ui'
 
 import { Session } from '@supabase/supabase-js'
 import { AccountLayout } from 'components/layouts'

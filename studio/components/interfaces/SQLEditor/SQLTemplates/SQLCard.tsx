@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
+import { IconChevronRight, IconLoader } from '@supabase/ui'
 import { SQLTemplate } from '../SQLEditor.types'
 
 interface Props {
@@ -12,9 +12,9 @@ const SQLCard: FC<Props> = ({ template }) => {
 
   return (
     <div
-      className="w-full cursor-pointer rounded border 
-      border-panel-border-light bg-panel-header-light transition-colors 
-      hover:border-panel-border-hover-light dark:border-panel-border-dark 
+      className="w-full cursor-pointer rounded border
+      border-panel-border-light bg-panel-header-light transition-colors
+      hover:border-panel-border-hover-light dark:border-panel-border-dark
       dark:bg-panel-header-dark dark:hover:border-panel-border-hover-dark"
     >
       <div className="flex items-center justify-between border-b px-6 py-3 dark:border-dark">

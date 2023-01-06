@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconCircle } from 'ui'
+import { Badge, IconLoader, IconCircle } from '@supabase/ui'
 import { Project } from 'types'
 
 interface Props {

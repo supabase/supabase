@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconAlertCircle } from 'ui'
+import { IconAlertCircle } from '@supabase/ui'
 import InformationBox from 'components/ui/InformationBox'
 import { MemberWithFreeProjectLimit } from 'hooks'
 

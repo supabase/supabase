@@ -1,4 +1,4 @@
-import { Button, IconCornerRightUp, Tabs } from 'ui'
+import { Button, IconCornerRightUp, Tabs } from '@supabase/ui'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 

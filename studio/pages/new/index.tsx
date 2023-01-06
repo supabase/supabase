@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input } from 'ui'
+import { Button, Input } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'

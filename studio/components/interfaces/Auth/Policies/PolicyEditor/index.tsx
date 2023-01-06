@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Modal } from 'ui'
+import { Modal } from '@supabase/ui'
 
 import PolicyName from './PolicyName'
 import PolicyDefinition from './PolicyDefinition'

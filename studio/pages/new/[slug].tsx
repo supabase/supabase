@@ -4,7 +4,7 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, Alert } from 'ui'
+import { Button, Listbox, IconUsers, Input, Alert } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -21,13 +21,7 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import {
-  useStore,
-  useFlag,
-  withAuth,
-  checkPermissions,
-  useFreeProjectLimitCheck,
-} from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions, useFreeProjectLimitCheck } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -197,10 +191,7 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={
-        !app.organizations.isInitialized ||
-        isLoadingFreeProjectLimitCheck
-      }
+      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>

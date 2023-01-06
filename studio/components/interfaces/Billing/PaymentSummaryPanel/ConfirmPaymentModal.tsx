@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Alert, Button, Modal } from 'ui'
+import { Alert, Button, Modal } from '@supabase/ui'
 
 interface Props {
   visible: boolean

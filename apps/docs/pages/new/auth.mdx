@@ -1,7 +1,7 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
 // import { useTheme } from 'common/Providers'
-import { GlassPanel } from 'ui'
+import { GlassPanel } from '@supabase/ui'
 
 {/* // export const { isDarkMode } = useTheme() */}
 
@@ -42,7 +42,8 @@ export const topArticles = [
     title: 'Enable Captcha Protection',
     header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/auth/auth-captcha',
-    description: 'Keep your platform safe from bots and malicious scripts by implementing hCaptcha.',
+    description:
+      'Keep your platform safe from bots and malicious scripts by implementing hCaptcha.',
     span: 'col-span-6',
   },
   {
@@ -62,13 +63,15 @@ export const topArticles = [
     title: 'Phone Login',
     header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/auth/phone-login',
-    description: 'Learn how to add a login flow so your users can access your platform through one-time passwords via SMS.',
+    description:
+      'Learn how to add a login flow so your users can access your platform through one-time passwords via SMS.',
   },
   {
     title: 'Social Login',
     header: '/docs/img/cards/sample-card-header-4.svg',
     href: '/guides/auth/social-login',
-    description: 'Learn how to add a login flow so your users can access your platform through social providers like Apple, Facebook, or Google.',
+    description:
+      'Learn how to add a login flow so your users can access your platform through social providers like Apple, Facebook, or Google.',
   },
 ]
 

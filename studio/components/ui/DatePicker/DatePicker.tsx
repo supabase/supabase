@@ -7,7 +7,7 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from 'ui'
+} from '@supabase/ui'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
@@ -131,9 +131,9 @@ function _DatePicker({
             </div>
             <div
               className={`
-                      flex 
-                      w-12 
-                      items-center 
+                      flex
+                      w-12
+                      items-center
                       justify-center
                       text-scale-900
                     `}

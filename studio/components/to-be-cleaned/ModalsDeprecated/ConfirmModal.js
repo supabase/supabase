@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Button, Modal } from '@supabase/ui'
 import { render, unmountComponentAtNode } from 'react-dom'
 
 function ConfirmModal({

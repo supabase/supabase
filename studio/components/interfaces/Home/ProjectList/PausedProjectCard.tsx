@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Button } from 'ui'
+import { Badge, Button } from '@supabase/ui'
 
 import { Project } from 'types'
 

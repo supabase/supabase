@@ -1,5 +1,5 @@
 import { render } from 'react-dom'
-import { IconCommand } from 'ui'
+import { IconCommand } from '@supabase/ui'
 import { createElement, FC, useEffect, useRef, Fragment } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js'

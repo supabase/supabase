@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 
-import { IconDatabase, Tabs } from 'ui'
+import { IconDatabase, Tabs } from '@supabase/ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import Options from '~/components/Options'
@@ -203,7 +203,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               </>
                             </RefDetailCollapse>
                           )}
-
 
                           <CodeBlock
                             className="useless-code-block-class"

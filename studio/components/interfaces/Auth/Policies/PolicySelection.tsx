@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconEdit, IconGrid, Modal } from 'ui'
+import { IconEdit, IconGrid, Modal } from '@supabase/ui'
 import CardButton from 'components/ui/CardButton'
 
 interface Props {
@@ -29,7 +29,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-scale-1200 text-scale-100
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -47,7 +47,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-scale-1200 text-scale-100  
+                  rounded bg-scale-1200 text-scale-100
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Loading } from 'ui'
+import { Loading } from '@supabase/ui'
 
 import { useProjectSubscription, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -21,7 +21,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
   if (
     subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG ||
     subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
-    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM 
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
   ) {
     return <></>
   }

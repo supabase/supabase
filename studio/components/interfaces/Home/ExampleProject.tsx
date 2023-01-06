@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'ui'
+import { IconChevronRight } from '@supabase/ui'
 import { useStore } from 'hooks'
 import Link from 'next/link'
 
@@ -30,7 +30,11 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
             <img
               className="transition-all group-hover:scale-110"
               src={`/img/libraries/${framework.toLowerCase()}${
-                ['expo', 'nextjs'].includes(framework.toLowerCase()) ? (isDarkTheme ? '-dark' : '') : ''
+                ['expo', 'nextjs'].includes(framework.toLowerCase())
+                  ? isDarkTheme
+                    ? '-dark'
+                    : ''
+                  : ''
               }-icon.svg`}
               alt={`${framework} logo`}
               width={26}
@@ -47,8 +51,8 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
             right-4
             top-3
             text-scale-900
-            transition-all 
-            duration-200 
+            transition-all
+            duration-200
             group-hover:right-3
             group-hover:text-scale-1200
           "

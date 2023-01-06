@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, ReactNode, useState } from 'react'
-import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from 'ui'
+import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from '@supabase/ui'
 
 interface Props {
   icon?: ReactNode

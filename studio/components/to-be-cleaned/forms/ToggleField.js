@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connectField, filterDOMProps } from 'uniforms'
-import { Toggle } from 'ui'
+import { Toggle } from '@supabase/ui'
 
 function ToggleField({
   disabled,

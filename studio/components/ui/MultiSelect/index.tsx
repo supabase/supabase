@@ -8,7 +8,7 @@ import {
   IconPlus,
   IconChevronDown,
   Input,
-} from 'ui'
+} from '@supabase/ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 

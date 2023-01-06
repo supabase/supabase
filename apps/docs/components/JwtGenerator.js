@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import KJUR from 'jsrsasign'
 import CodeBlock from './CodeBlock/CodeBlock'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
 const now = new Date()

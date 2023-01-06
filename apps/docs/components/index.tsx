@@ -1,4 +1,4 @@
-import { Button, Tabs, Alert } from 'ui'
+import { Button, Tabs, Alert } from '@supabase/ui'
 
 // Common components
 import Admonition from './Admonition'

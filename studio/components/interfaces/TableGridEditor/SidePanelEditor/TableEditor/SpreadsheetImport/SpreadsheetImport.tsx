@@ -1,6 +1,6 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
+import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../../ActionBar'
@@ -209,7 +209,9 @@ const SpreadsheetImport: FC<Props> = ({
                               <IconArrowRight size={14} />
                               <p>Extra field(s):</p>
                               {error.data?.__parsed_extra.map((value: any, i: number) => (
-                                <code key={i} className="text-sm">{value}</code>
+                                <code key={i} className="text-sm">
+                                  {value}
+                                </code>
                               ))}
                             </>
                           )}

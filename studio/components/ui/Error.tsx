@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 
 export default function EmptyPageState({ error }: any) {
   useEffect(() => {

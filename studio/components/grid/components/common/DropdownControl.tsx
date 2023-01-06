@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Dropdown } from 'ui'
+import { Dropdown } from '@supabase/ui'
 
 interface DropdownControlProps {
   options: {

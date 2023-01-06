@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
+import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresExtension,
@@ -191,7 +191,7 @@ const ColumnEditor: FC<Props> = ({
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
-            placeholder='column_name'
+            placeholder="column_name"
             error={errors.name}
             value={columnFields?.name ?? ''}
             onChange={(event: any) => onUpdateField({ name: event.target.value })}

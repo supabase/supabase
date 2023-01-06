@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { IconHelpCircle } from 'ui'
+import { IconHelpCircle } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { usePrevious } from 'hooks'

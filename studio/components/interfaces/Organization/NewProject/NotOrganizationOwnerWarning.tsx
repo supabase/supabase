@@ -1,4 +1,4 @@
-import { IconAlertCircle } from 'ui'
+import { IconAlertCircle } from '@supabase/ui'
 import InformationBox from 'components/ui/InformationBox'
 
 // [Joshen] This can just use NoPermission component i think

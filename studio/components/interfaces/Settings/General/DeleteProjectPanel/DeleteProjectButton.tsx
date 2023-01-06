@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Input } from 'ui'
+import { Button, Input } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -81,9 +81,9 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     if (!isFree) {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-	additionalFeedback: cancellationMessage,
-	exitAction: 'delete',
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: cancellationMessage,
+        exitAction: 'delete',
       })
       if (feedbackRes.error) throw feedbackRes.error
     }
@@ -134,7 +134,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
         onConfirm={handleDeleteProject}
         onCancel={toggle}
       >
-        {/* 
+        {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.

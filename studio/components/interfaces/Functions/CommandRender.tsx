@@ -1,4 +1,4 @@
-import { IconCheck, IconClipboard } from 'ui'
+import { IconCheck, IconClipboard } from '@supabase/ui'
 import { useState } from 'react'
 
 const CommandRender = ({ commands }: any) => {

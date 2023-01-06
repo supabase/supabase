@@ -1,4 +1,4 @@
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'

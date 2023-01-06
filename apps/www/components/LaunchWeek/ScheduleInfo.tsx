@@ -1,4 +1,4 @@
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 import Link from 'next/link'
 
 export function ScheduleInfo() {

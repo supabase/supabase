@@ -1,5 +1,5 @@
 import { auth, getReturnToPath } from 'lib/gotrue'
-import { Button, IconGitHub } from 'ui'
+import { Button, IconGitHub } from '@supabase/ui'
 
 const SignInWithGitHub = () => {
   async function handleGithubSignIn() {

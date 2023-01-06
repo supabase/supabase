@@ -1,4 +1,4 @@
-import { Button, IconBookOpen } from 'ui'
+import { Button, IconBookOpen } from '@supabase/ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 

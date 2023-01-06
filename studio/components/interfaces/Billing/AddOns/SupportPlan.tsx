@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 import { useParams } from 'hooks'
 
 interface Props {

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-import { Button, IconChevronDown, IconChevronUp } from 'ui'
+import { Button, IconChevronDown, IconChevronUp } from '@supabase/ui'
 
 const SizeToggleButton = () => {
   const sqlEditorStore: any = useSqlStore()

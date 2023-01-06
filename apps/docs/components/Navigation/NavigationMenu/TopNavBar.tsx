@@ -2,7 +2,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Input, Listbox } from 'ui'
+import {
+  Button,
+  IconCommand,
+  IconMenu,
+  IconMoon,
+  IconSearch,
+  IconSun,
+  Input,
+  Listbox,
+} from '@supabase/ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 import { useTheme } from 'common/Providers'

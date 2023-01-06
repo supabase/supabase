@@ -12,7 +12,7 @@ import {
   IconLoader,
   IconAlertCircle,
   IconExternalLink,
-} from 'ui'
+} from '@supabase/ui'
 import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'

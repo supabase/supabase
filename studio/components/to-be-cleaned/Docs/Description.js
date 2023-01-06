@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, IconLoader } from 'ui'
+import { Button, IconLoader } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'

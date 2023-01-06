@@ -12,7 +12,7 @@ import {
   IconTerminal,
   Badge,
   Button,
-} from 'ui'
+} from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
