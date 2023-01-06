@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next --port 3000",
     "build": "next build",
+    "lint": "next lint",
+    "type-check": "tsc --pretty --noEmit",
     "export": "next export",
     "start": "next start",
     "typecheck": "tsc",

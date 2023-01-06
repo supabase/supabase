@@ -13,8 +13,15 @@
     "dev": {
       "cache": false
     },
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
     "test": {
       "cache": false
+    },
+    "type-check": {
+      "dependsOn": ["^topo"],
+      "outputs": []
     }
   }
 }

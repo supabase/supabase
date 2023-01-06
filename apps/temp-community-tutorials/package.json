@@ -6,7 +6,8 @@
     "dev": "next dev --port 3003",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --pretty --noEmit"
   },
   "dependencies": {
     "colorette": "^1.4.0",

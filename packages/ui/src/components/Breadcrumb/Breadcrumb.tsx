@@ -2,14 +2,14 @@ import { IconChevronRight } from '../Icon/icons/IconChevronRight'
 // @ts-ignore
 import BreadcrumbStyle from './Breadcrumb.module.css'
 
-interface Props {
+export interface BreadcrumbProps {
   children?: [React.ReactNode]
   className?: string
   style?: React.CSSProperties
   spacing?: 'small' | 'medium' | 'large'
 }
 
-const Breadcrumb = ({ className, style, children, spacing = 'small' }: Props) => {
+const Breadcrumb = ({ className, style, children, spacing = 'small' }: BreadcrumbProps) => {
   let classes = [BreadcrumbStyle['sbui-breadcrumb--container']]
   let separatorClasses = [BreadcrumbStyle['sbui-breadcrumb--separator']]
 
