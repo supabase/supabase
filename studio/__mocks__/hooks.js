@@ -8,13 +8,10 @@ export const useProjectSubscription = jest.fn().mockReturnValue({
   },
 })
 
-const { useStore, StoreProvider } = jest.requireActual('hooks')
-export const useStore = useStore
+export const { useStore, StoreProvider } = jest.requireActual('hooks')
 
 // mocks browser event listener adding/removing
 window.matchMedia = jest.fn().mockReturnValue({
   removeEventListener: jest.fn(),
 })
-export const StoreProvider = StoreProvider
-
 export const withAuth = jest.fn()

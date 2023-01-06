@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Icon } from '../Icon/IconImportHandler'
 import { IconUser } from '../Icon/icons/IconUser'

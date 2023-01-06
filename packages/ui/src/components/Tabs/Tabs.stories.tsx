@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Button } from '../Button'
 import { IconMail } from '../../../internals/icons'

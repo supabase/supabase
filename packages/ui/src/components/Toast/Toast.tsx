@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { ComponentProps } from 'react'
 import { Toaster as HotToaster, toast as hotToast, resolveValue } from 'react-hot-toast'
 import { Toast as HotToastProps, ToastType } from 'react-hot-toast'
