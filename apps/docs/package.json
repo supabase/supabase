@@ -87,7 +87,7 @@
     "prettier": "^2.2.1",
     "sass": "^1.55.0",
     "ts-node": "^10.9.1",
-    "tsconfig": "*",
+    "@supabase/tsconfig": "*",
     "typescript": "^4.5.3"
   }
 }

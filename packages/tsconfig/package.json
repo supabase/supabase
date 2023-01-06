@@ -1,5 +1,5 @@
 {
-  "name": "tsconfig",
+  "name": "@supabase/tsconfig",
   "version": "0.0.0",
   "private": true,
   "main": "index.js",

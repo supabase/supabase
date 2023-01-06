@@ -82,7 +82,7 @@
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
     "tailwindcss": "^3.1.8",
-    "tsconfig": "*"
+    "@supabase/tsconfig": "*"
   },
   "license": "MIT"
 }
