@@ -3,7 +3,8 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   title: 'Use Supabase with NextJS',
-  subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.',
+  subtitle:
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
@@ -58,7 +59,7 @@ export const meta = {
     <StepHikeCompact.Details title="Install the Supabase client library">
 
       The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NextJS app.
-      
+
       Navigate to the NextJS app and install `supabase-js`.
 
     </StepHikeCompact.Details>
@@ -96,7 +97,7 @@ export const meta = {
     <StepHikeCompact.Details title="Query data from the app">
 
     Use a `getInitialProps` method to fetch the data when the page loads and display the query result as a simple list.
-    
+
     Replace the existing function in your index file in the `pages` directory with the following code.
 
     </StepHikeCompact.Details>
@@ -116,11 +117,13 @@ export const meta = {
           );
         }
 
-        Page.getInitialProps = async () => {
-          const { data, error } = await supabase.from('countries').select()
+        export async function getServerSideProps() {
+          let { data } = await supabase.from('countries').select()
 
           return {
-            countries: data
+            props: {
+             countries: data
+            },
           }
         }
 
