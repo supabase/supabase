@@ -1901,4 +1901,14 @@ module.exports = [
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/upgrade-guide',
+    destination: '/docs/guides/resources/upgrade/supabase-js-v2',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart/upgrade-guide',
+    destination: '/docs/guides/resources/upgrade/flutter-v1',
+  },
 ]
