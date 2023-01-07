@@ -530,6 +530,21 @@ export const resources = {
     // { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
+      name: 'Upgrade client library',
+      items: [
+        {
+          name: 'Javascript v2',
+          url: '/guides/resources/upgrade/supabase-js-v2',
+          items: [],
+        },
+        {
+          name: 'Flutter v1',
+          url: '/guides/resources/upgrade/flutter-v1',
+          items: [],
+        },
+      ],
+    },
+    {
       name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
@@ -747,13 +762,13 @@ export const reference_javascript_v2 = {
 
 export const reference_dart_v0 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }

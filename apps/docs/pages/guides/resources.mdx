@@ -6,7 +6,6 @@ export const meta = {
   id: 'resources',
   title: 'Resources',
   description: 'Resources for getting started building with Supabase.',
-  sidebar_label: 'Overview',
 }
 
 <div className="flex flex-col gap-12 my-12">
@@ -22,7 +21,7 @@ export const meta = {
           passHref
         >
           <a className={'col-span-12 md:col-span-4'}>
-            <GlassPanel {...resource} background={false} showIconBg={true}>
+            <GlassPanel {...resource} background={false}>
               {resource.description}
             </GlassPanel>
           </a>
@@ -96,6 +95,20 @@ export const resources = [
     href: '/guides/resources/glossary',
     description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
   },
+  {
+    title: 'Upgrade to supabase-js v2',
+    icon: '/docs/img/icons/menu/reference-javascript',
+    hasLightIcon: true,
+    href: '/guides/resources/upgrade/supabase-js-v2',
+    description: 'Learn how to upgrade the Javascript client library to supabase-js v2.',
+  },
+  {
+    title: 'Upgrade to supabase-flutter v1',
+    icon: '/docs/img/icons/menu/reference-dart',
+    hasLightIcon: true,
+    href: '/guides/resources/upgrade/flutter-v1',
+    description: 'Learn how to upgrade the Flutter client library to supabase-flutter v1.',
+  },
 ]
 
 export const migrationGuides = [
@@ -109,7 +122,7 @@ export const migrationGuides = [
     title: 'Firestore Data',
     icon: '/docs/img/icons/firebase-icon',
     href: '/guides/resources/migrating-to-supabase/firestore-data',
-    description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
+    description: 'Migrate the contents of a Firestore collection to a PostgreSQL table.',
   },
   {
     title: 'Firebase Storage',
