@@ -37,10 +37,10 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
     <>
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
-          <Table.td className="space-x-2">
+          <Table.td className="space-x-2 break-all">
             <p>{x.name}</p>
           </Table.td>
-          <Table.td className="hidden lg:table-cell">
+          <Table.td className="hidden lg:table-cell break-all">
             <p>{x.table}</p>
           </Table.td>
           <Table.td className="hidden space-x-2 xl:table-cell">
