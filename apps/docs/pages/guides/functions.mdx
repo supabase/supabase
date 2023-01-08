@@ -29,7 +29,7 @@ Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {examples.map((x) => (
-    <div className="col-span-4">
+    <div className="col-span-4" key={x.href}>
       <Link href={x.href} passHref>
         <a>
           <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>

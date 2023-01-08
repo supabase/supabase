@@ -1,9 +1,9 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag, useOrganizationRoles, useOrganizationDetail, useParams } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
@@ -11,25 +11,27 @@ import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-
-const TeamSettings = observer(() => {
-  const PageState: any = useContext(PageContext)
-  const { user, members, roles } = PageState
-  const { rolesAddable } = getRolesManagementPermissions(roles)
-
+const TeamSettings = () => {
   const { ui } = useStore()
-  const slug = ui.selectedOrganization?.slug ?? ''
+  const { slug } = useParams()
+
+  const user = ui.profile
   const isOwner = ui.selectedOrganization?.is_owner
 
+  const { members } = useOrganizationDetail(slug || '')
+  const { roles: allRoles } = useOrganizationRoles(slug)
+
+  const enableBillingOnlyReadOnly = useFlag('enableBillingOnlyReadOnlyRoles')
+  const roles = enableBillingOnlyReadOnly
+    ? allRoles
+    : (allRoles ?? []).filter((role) => ['Owner', 'Administrator', 'Developer'].includes(role.name))
+  const { rolesAddable } = getRolesManagementPermissions(roles)
+
   const [isLeaving, setIsLeaving] = useState(false)
+  const [searchString, setSearchString] = useState('')
+
   const canAddMembers = rolesAddable.length > 0
-
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
-
-  function onFilterMemberChange(e: any) {
-    PageState.membersFilterString = e.target.value
-  }
 
   const leaveTeam = async () => {
     setIsLeaving(true)
@@ -63,14 +65,14 @@ const TeamSettings = observer(() => {
           <Input
             icon={<IconSearch size="tiny" />}
             size="small"
-            value={PageState.membersFilterString}
-            onChange={onFilterMemberChange}
+            value={searchString}
+            onChange={(e: any) => setSearchString(e.target.value)}
             name="email"
             id="email"
             placeholder="Filter members"
           />
           <div className="flex items-center space-x-4">
-            {canAddMembers && (
+            {canAddMembers && user !== undefined && (
               <div>
                 <InviteMemberButton
                   user={user}
@@ -113,10 +115,10 @@ const TeamSettings = observer(() => {
         </div>
       </div>
       <div className="container my-4 max-w-4xl space-y-8">
-        <MembersView />
+        <MembersView searchString={searchString} roles={roles} members={members} />
       </div>
     </>
   )
-})
+}
 
-export default TeamSettings
+export default observer(TeamSettings)

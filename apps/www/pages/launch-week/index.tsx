@@ -38,7 +38,7 @@ export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
-  const liveDay = 'Friday'
+  const liveDay = null
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -102,7 +102,7 @@ export default function launchweek() {
             <Badge
               className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:!border-[#DFFFF1] h-fit relative ${
                 shipped
-                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#b6b6b6] dark:text-transparent dark:!border-[#163837] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]'
+                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#FFFFFF] dark:text-transparent dark:!border-[#163837] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]'
                   : ''
               }`}
             >
@@ -219,11 +219,6 @@ export default function launchweek() {
             )}
           ></div>
         </div>
-        <a className="flex items-center justify-center mb-20" href="#currentDay">
-          <div className="border border-slate-600 text-black dark:text-white text-sm rounded-full bg-slate-400 px-2 py-1 hover:bg-slate-600">
-            Jump to current day
-          </div>
-        </a>
         {process.env.NEXT_PUBLIC_LW_STARTED && (
           <>
             <SectionContainer className="!py-0 ">
@@ -335,7 +330,7 @@ export default function launchweek() {
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:border-[#DFFFF1]">
+                            <Badge className="!bg-transparent h-fit lg:ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:border-[#DFFFF1]">
                               Redesigned
                             </Badge>
                           </div>
@@ -380,7 +375,7 @@ export default function launchweek() {
                           ></div>
                           <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <div>{day2.steps[0].title}</div>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                            <Badge className="!bg-transparent h-fit lg:ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
                           </div>
@@ -459,7 +454,7 @@ export default function launchweek() {
 
                           <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start text-black dark:text-white">
                             <span>{day3.steps[0].title}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                            <Badge className="!bg-transparent h-fit lg:ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#598973] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               Updated
                             </Badge>
                           </div>
@@ -521,7 +516,7 @@ export default function launchweek() {
                           </div>
                           <div className="flex items-center flex-col-reverse lg:flex-row text-black dark:text-white">
                             <span>{day4.steps[0].title}</span>
-                            <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                            <Badge className="!bg-transparent h-fit lg:ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                               New
                             </Badge>
                           </div>
@@ -590,7 +585,7 @@ export default function launchweek() {
                               <span className="text-black dark:text-white">
                                 {day5.steps[0].title}
                               </span>
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit lg:ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 New
                               </Badge>
                             </div>
@@ -783,7 +778,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 Updated
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -828,7 +823,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 New
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -873,7 +868,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 New
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -918,7 +913,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 Experimental
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -963,7 +958,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 Upgrade
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -1008,7 +1003,7 @@ export default function launchweek() {
                               />
                             </div>
                             <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                              <Badge className="!bg-transparent h-fit ml-4 text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
+                              <Badge className="!bg-transparent h-fit text-sm !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] border-[#4d898c] dark:from-white dark:to-[#1a7a4ca1] dark:border-[#DFFFF1]">
                                 Upgrade
                               </Badge>
                               <span className="text-black dark:text-white text-center">
@@ -1034,8 +1029,10 @@ export default function launchweek() {
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40"></SectionContainer>
         <SectionContainer className="!pt-0 sm:!pb-20 !pb-40">
           <div className="flex flex-col mb-16">
-            <Badge className="mb-4 w-fit bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
-              Happening all week
+            <Badge
+              className={`w-fit !bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] dark:from-white dark:to-[#DFFFF1] h-fit relative mb-4 after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#FFFFFF] dark:text-transparent dark:!border-[#163837] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]`}
+            >
+              Submissions Closed
             </Badge>
             <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
             <p className="text-slate-900 w-[80%] lg:w-[50%]">
@@ -1217,8 +1214,14 @@ export default function launchweek() {
             })}
           </div>
           <div className="flex-1">
-            <Badge className="mb-6 bg-gradient-to-r from-[#0E3737C2] to-[#67947F] hover:to-[#39617D94] dark:hover:to-[#A6FFD899] text-whiteA-1200 dark:text-black font-normal !py-1 !px-4 dark:from-white dark:via-white dark:to-[#1a7a4c75] bg-slate-1200">
-              Currently Happening
+            <Badge
+              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-[#99bbab] to-[#396f55] !border-[#4d898c] dark:from-white dark:to-[#DFFFF1] dark:!border-[#DFFFF1] h-fit relative mb-4 ${
+                true
+                  ? 'after:absolute after:rounded-full text-black after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br after:from-[#dceef0] after:to-[#FFFFFF] dark:text-transparent dark:!border-[#163837] after:dark:from-[#14292c] after:dark:to-[#141516] after:border-[#c8d8d9] after:dark:border-[#1f3536] after:-z-10 border-[#DFFFF1]'
+                  : ''
+              }`}
+            >
+              Shipped
             </Badge>
             <h2 className="text-3xl dark:text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">

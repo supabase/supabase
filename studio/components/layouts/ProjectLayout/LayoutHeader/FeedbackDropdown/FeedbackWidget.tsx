@@ -12,17 +12,24 @@ import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface Props {
   onClose: () => void
+  feedback: string
+  setFeedback: (value: string) => void
+  screenshot: string | undefined
+  setScreenshot: (value: string | undefined) => void
 }
 
-const FeedbackWidget: FC<Props> = ({ onClose }) => {
+const FeedbackWidget: FC<Props> = ({
+  onClose,
+  feedback,
+  setFeedback,
+  screenshot,
+  setScreenshot,
+}) => {
   const router = useRouter()
   const { ref } = router.query
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
-
-  const [feedback, setFeedback] = useState('')
-  const [screenshot, setScreenshot] = useState<string>()
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
