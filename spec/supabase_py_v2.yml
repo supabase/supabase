@@ -27,7 +27,7 @@ functions:
     examples:
       - name: create_client()
         code: |
-          ```python3
+          ```
           import os
           from supabase import create_client, Client
 
@@ -37,7 +37,7 @@ functions:
           ```
       - name: With timeout option
         code: |
-          ```python3
+          ```
           import os
           from supabase import create_client, Client
 
@@ -62,7 +62,7 @@ functions:
     examples:
       - name: Sign up
         code: |
-          ```python3
+          ```
           res = supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
@@ -70,7 +70,7 @@ functions:
           ```
       - name: Sign up with additional user metadata
         code: |
-          ```python3
+          ```
           res = supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
@@ -90,7 +90,7 @@ functions:
     examples:
       - name: Sign out
         code: |
-          ```python3
+          ```
           res = supabase.auth.sign_out()
           ```
   - id: verify-otp
@@ -102,22 +102,21 @@ functions:
     examples:
       - name: Verify SMS One-Time Password (OTP)
         code: |
-          ```python3
+          ```
           res = supabase.auth.verify_otp(phone, token)
           ```
 
-  - id: auth.get_session_from_url()
+  - id: get-session
     title: 'get_session_from_url'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
       - name: Get the session data from URL
-        isSpotlight: true
         code: |
-          ```python3
+          ```
           res = supabase.auth.get_session_from_url(url)
           ```
 
-  - id: auth.set_session()
+  - id: set-session
     title: 'set_session()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
@@ -131,10 +130,10 @@ functions:
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         isSpotlight: true
         code: |
-          ```python3
+          ```
           res = supabase.auth.set_session(refresh_token)
           ```
-  - id: auth.refresh_session()
+  - id: refresh-session
     title: 'refresh_ession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
@@ -144,14 +143,14 @@ functions:
       - name: Refresh session using the current session
         isSpotlight: true
         code: |
-          ```python3
+          ```
           res = supabase.auth.refresh_session()
           ```
-  - id: invoke()
+  - id: invoke
     title: 'invoke()'
     description: |
       Invoke a Supabase Function.
-    $ref: '@supabase/functions-js.FunctionsClient.invoke'
+    $ref: '@supabase/functions-js.F'
     notes: |
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
@@ -159,7 +158,7 @@ functions:
       - name: Basic invocation
         description:
         code: |
-          ```python3
+          ```
           func = supabase.functions()
           @asyncio.coroutine
           async def test_func(loop):
@@ -171,7 +170,7 @@ functions:
           loop.close()
           ```
 
-  - id: storage.list_buckets()
+  - id: list_buckets()
     title: 'list_buckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
@@ -182,11 +181,11 @@ functions:
     examples:
       - name: List buckets
         code: |
-          ```python3
+          ```
           res = supabase.storage().list_buckets()
           ```
 
-  - id: storage.get_bucket()
+  - id: get_bucket()
     title: 'get_bucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
@@ -198,7 +197,7 @@ functions:
       - name: Get bucket
         isSpotlight: true
         code: |
-          ```python3
+          ```
           res = supabase.storage().get_bucket(name)
           ```
 
@@ -213,7 +212,7 @@ functions:
     examples:
       - name: Create bucket
         code: |
-          ```python3
+          ```
           res = supabase.storage().create_bucket(name)
           ```
 
@@ -228,7 +227,7 @@ functions:
     examples:
       - name: Empty bucket
         code: |
-          ```python3
+          ```
           res = supabase.storage().empty_bucket(name)
           ```
   - id: storage.delete_bucket()
