@@ -5,7 +5,6 @@ import { NextPageWithLayout } from 'types'
 import { checkPermissions } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
-import { FormsContainer } from 'components/ui/Forms'
 import { CreateWrapper } from 'components/interfaces/Database'
 
 const DatabaseWrappersNew: NextPageWithLayout = () => {
@@ -17,10 +16,6 @@ const DatabaseWrappersNew: NextPageWithLayout = () => {
   return <CreateWrapper />
 }
 
-DatabaseWrappersNew.getLayout = (page) => (
-  <DatabaseLayout title="Wrappers">
-    <FormsContainer>{page}</FormsContainer>
-  </DatabaseLayout>
-)
+DatabaseWrappersNew.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
 
 export default observer(DatabaseWrappersNew)
