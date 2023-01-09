@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { AvailableColumn, Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
 
 export type FDWCreateVariables = {
@@ -14,7 +15,7 @@ export type FDWCreateVariables = {
   tables: any[]
 }
 
-export function getFDWCreateSql({
+export function getCreateFDWSql({
   wrapper,
   formState,
   tables,
@@ -112,8 +113,6 @@ export function getFDWCreateSql({
     .join('\n\n')
 
   const sql = /* SQL */ `
-    begin;
-
     ${newSchemasSql}
 
     ${createWrapperSql}
@@ -123,8 +122,6 @@ export function getFDWCreateSql({
     ${createServerSql}
 
     ${createTablesSql}
-
-    commit;
   `
 
   return sql
@@ -137,7 +134,7 @@ export async function createFDW({
   formState,
   tables,
 }: FDWCreateVariables) {
-  const sql = getFDWCreateSql({ wrapper, formState, tables })
+  const sql = wrapWithTransaction(getCreateFDWSql({ wrapper, formState, tables }))
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

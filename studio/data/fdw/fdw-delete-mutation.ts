@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
 
 export type FDWDeleteVariables = {
@@ -30,13 +31,9 @@ export const getDeleteFDWSql = ({
   const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
 
   const sql = /* SQL */ `
-    begin;
-
     drop foreign data wrapper if exists ${wrapper.name} cascade;
 
     ${deleteEncryptedSecretsSql}
-
-    commit;
   `
 
   return sql
@@ -52,7 +49,7 @@ export async function deleteFDW({
     throw new Error('projectRef is required')
   }
 
-  const sql = getDeleteFDWSql({ wrapper, wrapperMeta })
+  const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
