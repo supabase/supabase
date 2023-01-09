@@ -872,318 +872,6 @@
         ]
       }
     },
-    "/v1/projects/{ref}/secrets": {
-      "get": {
-        "operationId": "getSecrets",
-        "summary": "List all secrets",
-        "description": "Returns all secrets you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string"
-                      }
-                    },
-                    "required": ["name", "value"]
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's secrets"
-          }
-        },
-        "tags": ["secrets"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "post": {
-        "operationId": "createSecrets",
-        "summary": "Bulk create secrets",
-        "description": "Creates multiple secrets and adds them to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string",
-                      "pattern": "/^(?!SUPABASE_).*/"
-                    }
-                  },
-                  "required": ["name", "value"]
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to create project's secrets"
-          }
-        },
-        "tags": ["secrets"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "deleteSecrets",
-        "summary": "Bulk delete secrets",
-        "description": "Deletes all secrets with the given names from the specified project",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to delete secrets with given names"
-          }
-        },
-        "tags": ["secrets"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/postgrest": {
-      "get": {
-        "operationId": "getPostgRESTConfig",
-        "summary": "Gets project's postgrest config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "max_rows": {
-                      "type": "integer"
-                    },
-                    "db_schema": {
-                      "type": "string"
-                    },
-                    "db_extra_search_path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's postgrest config"
-          }
-        },
-        "tags": ["services"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "updatePostgRESTConfig",
-        "summary": "Updates project's postgrest config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "max_rows": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 1000000
-                  },
-                  "db_extra_search_path": {
-                    "type": "string"
-                  },
-                  "db_schema": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "max_rows": {
-                      "type": "integer"
-                    },
-                    "db_schema": {
-                      "type": "string"
-                    },
-                    "db_extra_search_path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to update project's postgrest config"
-          }
-        },
-        "tags": ["services"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/v1/projects/{ref}/custom-hostname": {
       "get": {
         "operationId": "getCustomHostnameConfig",
@@ -1482,181 +1170,6 @@
         ]
       }
     },
-    "/v1/projects/{ref}/pgsodium": {
-      "get": {
-        "operationId": "getConfig",
-        "summary": "Gets project's pgsodium config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "root_key": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["root_key"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's pgsodium config"
-          }
-        },
-        "tags": ["pgsodium (beta)"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "put": {
-        "operationId": "updateConfig",
-        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "root_key": {
-                    "type": "string"
-                  }
-                },
-                "required": ["root_key"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "root_key": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["root_key"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to update project's pgsodium config"
-          }
-        },
-        "tags": ["pgsodium (beta)"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/types/typescript": {
-      "get": {
-        "operationId": "getTypescriptTypes",
-        "summary": "Generate TypeScript types",
-        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
-        "parameters": [
-          {
-            "name": "included_schemas",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "public",
-              "type": "string"
-            }
-          },
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "types": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["types"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to generate TypeScript types"
-          }
-        },
-        "tags": ["projects"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/v1/projects/{ref}/network-bans/retrieve": {
       "post": {
         "operationId": "getNetworkBans",
@@ -1909,6 +1422,629 @@
         },
         "tags": ["network restrictions (beta)"],
         "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/pgsodium": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Gets project's pgsodium config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "root_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["root_key"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's pgsodium config"
+          }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "root_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["root_key"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "root_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["root_key"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's pgsodium config"
+          }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/postgrest": {
+      "get": {
+        "operationId": "getPostgRESTConfig",
+        "summary": "Gets project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
+                    "db_schema": {
+                      "type": "string"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's postgrest config"
+          }
+        },
+        "tags": ["services"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updatePostgRESTConfig",
+        "summary": "Updates project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "max_rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000
+                  },
+                  "db_extra_search_path": {
+                    "type": "string"
+                  },
+                  "db_schema": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "max_rows": {
+                      "type": "integer"
+                    },
+                    "db_schema": {
+                      "type": "string"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's postgrest config"
+          }
+        },
+        "tags": ["services"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "getSecrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name", "value"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's secrets"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createSecrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string",
+                      "pattern": "/^(?!SUPABASE_).*/"
+                    }
+                  },
+                  "required": ["name", "value"]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's secrets"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSecrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete secrets with given names"
+          }
+        },
+        "tags": ["secrets"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/ssl-enforcement": {
+      "get": {
+        "operationId": "getSslEnforcementConfig",
+        "summary": "Get project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currentConfig": {
+                      "type": "object",
+                      "properties": {
+                        "database": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["database"]
+                    },
+                    "appliedSuccessfully": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["currentConfig", "appliedSuccessfully"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's SSL enforcement config"
+          }
+        },
+        "tags": ["ssl enforcement (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateSslEnforcementConfig",
+        "summary": "Update project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requestedConfig": {
+                    "type": "object",
+                    "properties": {
+                      "database": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": ["database"]
+                  }
+                },
+                "required": ["requestedConfig"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currentConfig": {
+                      "type": "object",
+                      "properties": {
+                        "database": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["database"]
+                    },
+                    "appliedSuccessfully": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["currentConfig", "appliedSuccessfully"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's SSL enforcement configuration."
+          }
+        },
+        "tags": ["ssl enforcement (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/types/typescript": {
+      "get": {
+        "operationId": "getTypescriptTypes",
+        "summary": "Generate TypeScript types",
+        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
+        "parameters": [
+          {
+            "name": "included_schemas",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "public",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "types": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["types"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to generate TypeScript types"
+          }
+        },
+        "tags": ["projects"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -2369,62 +2505,6 @@
           }
         }
       },
-      "SecretResponse": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          }
-        },
-        "required": ["name", "value"]
-      },
-      "CreateSecretBody": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string",
-            "pattern": "/^(?!SUPABASE_).*/"
-          }
-        },
-        "required": ["name", "value"]
-      },
-      "PostgrestConfigResponse": {
-        "type": "object",
-        "properties": {
-          "max_rows": {
-            "type": "integer"
-          },
-          "db_schema": {
-            "type": "string"
-          },
-          "db_extra_search_path": {
-            "type": "string"
-          }
-        },
-        "required": ["max_rows", "db_schema", "db_extra_search_path"]
-      },
-      "UpdatePostgrestConfigBody": {
-        "type": "object",
-        "properties": {
-          "max_rows": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 1000000
-          },
-          "db_extra_search_path": {
-            "type": "string"
-          },
-          "db_schema": {
-            "type": "string"
-          }
-        }
-      },
       "UpdateCustomHostnameResponse": {
         "type": "object",
         "properties": {
@@ -2455,33 +2535,6 @@
           }
         },
         "required": ["custom_hostname"]
-      },
-      "PgsodiumConfigResponse": {
-        "type": "object",
-        "properties": {
-          "root_key": {
-            "type": "string"
-          }
-        },
-        "required": ["root_key"]
-      },
-      "UpdatePgsodiumConfigBody": {
-        "type": "object",
-        "properties": {
-          "root_key": {
-            "type": "string"
-          }
-        },
-        "required": ["root_key"]
-      },
-      "TypescriptResponse": {
-        "type": "object",
-        "properties": {
-          "types": {
-            "type": "string"
-          }
-        },
-        "required": ["types"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -2544,6 +2597,131 @@
           }
         },
         "required": ["entitlement", "config", "status"]
+      },
+      "PgsodiumConfigResponse": {
+        "type": "object",
+        "properties": {
+          "root_key": {
+            "type": "string"
+          }
+        },
+        "required": ["root_key"]
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": {
+          "root_key": {
+            "type": "string"
+          }
+        },
+        "required": ["root_key"]
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
+          "db_schema": {
+            "type": "string"
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
+      },
+      "UpdatePostgrestConfigBody": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          },
+          "db_schema": {
+            "type": "string"
+          }
+        }
+      },
+      "SecretResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "CreateSecretBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "pattern": "/^(?!SUPABASE_).*/"
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "SslEnforcements": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "boolean"
+          }
+        },
+        "required": ["database"]
+      },
+      "SslEnforcementResponse": {
+        "type": "object",
+        "properties": {
+          "currentConfig": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "boolean"
+              }
+            },
+            "required": ["database"]
+          },
+          "appliedSuccessfully": {
+            "type": "boolean"
+          }
+        },
+        "required": ["currentConfig", "appliedSuccessfully"]
+      },
+      "SslEnforcementRequest": {
+        "type": "object",
+        "properties": {
+          "requestedConfig": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "boolean"
+              }
+            },
+            "required": ["database"]
+          }
+        },
+        "required": ["requestedConfig"]
+      },
+      "TypescriptResponse": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "string"
+          }
+        },
+        "required": ["types"]
       },
       "VanitySubdomainConfigResponse": {
         "type": "object",
