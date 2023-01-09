@@ -14,7 +14,7 @@ interface Props {}
 
 const SecretsManagement: FC<Props> = ({}) => {
   const { vault } = useStore()
-  const { name } = useParams()
+  const { search } = useParams()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
@@ -23,8 +23,8 @@ const SecretsManagement: FC<Props> = ({}) => {
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
 
   useEffect(() => {
-    if (name !== undefined) setSearchValue(name)
-  }, [name])
+    if (search !== undefined) setSearchValue(search)
+  }, [search])
 
   const secrets = (
     searchValue.length > 0

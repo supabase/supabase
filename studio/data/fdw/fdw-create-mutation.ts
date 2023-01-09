@@ -11,15 +11,15 @@ export type FDWCreateVariables = {
   formState: {
     [k: string]: string
   }
-  newTables: any[]
+  tables: any[]
 }
 
 export function getFDWCreateSql({
   wrapper,
   formState,
-  newTables,
-}: Pick<FDWCreateVariables, 'wrapper' | 'formState' | 'newTables'>) {
-  const newSchemasSql = newTables
+  tables,
+}: Pick<FDWCreateVariables, 'wrapper' | 'formState' | 'tables'>) {
+  const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
     .join('\n')
@@ -82,7 +82,7 @@ export function getFDWCreateSql({
     end $$;
   `
 
-  const createTablesSql = newTables
+  const createTablesSql = tables
     .map((newTable) => {
       const table = wrapper.tables[newTable.index]
 
@@ -135,9 +135,9 @@ export async function createFDW({
   connectionString,
   wrapper,
   formState,
-  newTables,
+  tables,
 }: FDWCreateVariables) {
-  const sql = getFDWCreateSql({ wrapper, formState, newTables })
+  const sql = getFDWCreateSql({ wrapper, formState, tables })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

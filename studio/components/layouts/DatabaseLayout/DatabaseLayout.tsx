@@ -14,7 +14,7 @@ interface Props {
 }
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui, backups } = useStore()
+  const { meta, ui, vault, backups } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const project = ui.selectedProject
 
@@ -35,6 +35,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       meta.publications.load()
 
       backups.load()
+      vault.load()
     }
   }, [ui.selectedProject?.ref])
 
