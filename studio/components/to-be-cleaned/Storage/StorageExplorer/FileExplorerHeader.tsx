@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { FC, useState, useEffect, useCallback, useRef } from 'react'
 import { compact, debounce, isEqual } from 'lodash'
 import {
   Button,
@@ -19,9 +19,9 @@ import {
   IconList,
 } from 'ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
+import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 
-const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
+const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
       className={`group ${!loading ? 'cursor-pointer' : ''}`}
@@ -46,11 +46,11 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
   )
 }
 
-const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
+const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
   // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
   // have the first 2 and last 2 crumbs visible
   const ellipsis = '...'
-  const breadcrumbsWithIndexes = breadcrumbs.map((name, index) => {
+  const breadcrumbsWithIndexes = breadcrumbs.map((name: string, index: number) => {
     return { name, index }
   })
 
@@ -74,7 +74,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
     </div>
   ) : (
     <div className="ml-3 flex items-center">
-      {formattedBreadcrumbs.map((crumb, idx) => (
+      {formattedBreadcrumbs.map((crumb: any, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
           <p
@@ -91,37 +91,52 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
   )
 }
 
-const FileExplorerHeader = ({
-  view = STORAGE_VIEWS.COLUMNS,
-  sortBy = STORAGE_SORT_BY.NAME,
-  sortByOrder = STORAGE_SORT_BY_ORDER.ASC,
-  loading = {},
-  breadcrumbs = [],
-  backDisabled = false,
-  isSearching = false,
+interface Props {
+  isSearching: boolean
+  itemSearchString: string
+  setIsSearching: (value: boolean) => void
+  setItemSearchString: (value: string) => void
+  onFilesUpload: (event: any, columnIndex: number) => void
+}
+
+const FileExplorerHeader: FC<Props> = ({
   itemSearchString = '',
   setItemSearchString = () => {},
-  onSetPathByString = () => {},
-  onChangeView = () => {},
-  onChangeSortBy = () => {},
-  onChangeSortByOrder = () => {},
-  onToggleSearch = () => {},
   onFilesUpload = () => {},
-  onSelectBack = () => {},
-  onSelectCreateFolder = () => {},
-  onSelectBreadcrumb = () => {},
 }) => {
   const debounceDuration = 300
-  const [isEditingPath, setIsEditingPath] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
+  const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
-  const uploadButtonRef = useRef(null)
-  const previousBreadcrumbs = useRef(null)
+  const [isEditingPath, setIsEditingPath] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+
+  const uploadButtonRef: any = useRef(null)
+  const previousBreadcrumbs: any = useRef(null)
 
   const storageExplorerStore = useStorageStore()
-  const { refetchAllOpenedFolders } = storageExplorerStore
+  const {
+    view,
+    setView,
+    columns,
+    sortBy,
+    setSortBy,
+    sortByOrder,
+    setSortByOrder,
+    popColumn,
+    popColumnAtIndex,
+    popOpenedFolders,
+    fetchFoldersByPath,
+    refetchAllOpenedFolders,
+    addNewFolderPlaceholder,
+    clearOpenedFolders,
+    closeFilePreview,
+  } = storageExplorerStore
+
+  const breadcrumbs = columns.map((column: any) => column.name)
+  const backDisabled = columns.length <= 1
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -137,9 +152,16 @@ const FileExplorerHeader = ({
   }, [breadcrumbs])
 
   const searchInputHandler = useCallback(debounce(setItemSearchString, debounceDuration), [])
-  const onSearchInputUpdate = (event) => {
+  const onSearchInputUpdate = (event: any) => {
     setSearchString(event.target.value)
+    // @ts-ignore
     searchInputHandler(event.target.value)
+  }
+
+  const onSelectBack = () => {
+    popColumn()
+    popOpenedFolders()
+    closeFilePreview()
   }
 
   const onSelectUpload = () => {
@@ -155,17 +177,30 @@ const FileExplorerHeader = ({
     if (isSearching) onCancelSearch()
   }
 
-  const onUpdatePathString = (event) => {
+  const onUpdatePathString = (event: any) => {
     setPathString(event.target.value)
   }
 
-  const navigateByPathString = (event) => {
+  const navigateByPathString = (event: any) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()
     }
     setIsEditingPath(false)
     onSetPathByString(compact(pathString.split('/')))
+  }
+
+  const onSetPathByString = async (paths: any[]) => {
+    if (paths.length === 0) {
+      popColumnAtIndex(0)
+      clearOpenedFolders()
+      closeFilePreview()
+    } else {
+      const pathString = paths.join('/')
+      setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
+      await fetchFoldersByPath(paths)
+      setLoading({ isLoading: false, message: '' })
+    }
   }
 
   const cancelSetPathString = () => {
@@ -177,17 +212,19 @@ const FileExplorerHeader = ({
   // Searching for column view requires much more thinking
   const toggleSearch = () => {
     setIsEditingPath(false)
-    onToggleSearch(true)
+    setIsSearching(true)
   }
+
   const onCancelSearch = () => {
     setSearchString('')
-    onToggleSearch(false)
+    setIsSearching(false)
+    setItemSearchString('')
   }
 
   /** Methods for breadcrumbs */
 
-  const selectBreadcrumb = (columnIndex) => {
-    onSelectBreadcrumb(columnIndex)
+  const selectBreadcrumb = (columnIndex: number) => {
+    popColumnAtIndex(columnIndex)
   }
 
   const refreshData = async () => {
@@ -278,7 +315,7 @@ const FileExplorerHeader = ({
           </Button>
           <Dropdown
             overlay={[
-              <Dropdown.RadioGroup key="viewOptions" value={view} onChange={onChangeView}>
+              <Dropdown.RadioGroup key="viewOptions" value={view} onChange={setView}>
                 <Dropdown.Radio value={STORAGE_VIEWS.COLUMNS}>Columns</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_VIEWS.LIST}>List</Dropdown.Radio>
               </Dropdown.RadioGroup>,
@@ -295,14 +332,14 @@ const FileExplorerHeader = ({
               }
               type="text"
               disabled={breadcrumbs.length === 0}
-              onChange={onChangeView}
+              onChange={setView}
             >
               View as
             </Button>
           </Dropdown>
           <Dropdown
             overlay={[
-              <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={onChangeSortBy}>
+              <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={setSortBy}>
                 <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Name</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>Time created</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>Time modified</Dropdown.Radio>
@@ -326,7 +363,7 @@ const FileExplorerHeader = ({
               <Dropdown.RadioGroup
                 key="sortOrderOptions"
                 value={sortByOrder}
-                onChange={onChangeSortByOrder}
+                onChange={setSortByOrder}
               >
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Ascending</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Descending</Dropdown.Radio>
@@ -352,6 +389,7 @@ const FileExplorerHeader = ({
         <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
         <div className="flex items-center space-x-1">
           <div className="hidden">
+            {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
           <Button
@@ -366,7 +404,7 @@ const FileExplorerHeader = ({
             icon={<IconFolderPlus size={16} strokeWidth={2} />}
             type="text"
             disabled={breadcrumbs.length === 0}
-            onClick={() => onSelectCreateFolder()}
+            onClick={() => addNewFolderPlaceholder(-1)}
           >
             Create folder
           </Button>
@@ -381,7 +419,7 @@ const FileExplorerHeader = ({
                 <Input
                   size="tiny"
                   autoFocus
-                  className="w-64"
+                  className="w-52"
                   icon={<IconSearch size={'tiny'} strokeWidth={2} />}
                   actions={[
                     <IconX
