@@ -25,7 +25,7 @@ export function getFDWCreateSql({
     .join('\n')
 
   const createWrapperSql = /* SQL */ `
-    create foreign data wrapper ${wrapper.name}
+    create foreign data wrapper ${formState.wrapper_name}
     handler ${wrapper.handlerName}
     validator ${wrapper.validatorName};
   `
@@ -34,7 +34,7 @@ export function getFDWCreateSql({
   const unencryptedOptions = wrapper.server.options.filter((option) => !option.encrypted)
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
-    const key = `${wrapper.name}_${option.name}`
+    const key = `${formState.wrapper_name}_${option.name}`
     // Escape single quotes in postgresql by doubling them up
     const value = (formState[option.name] || '').replace(/'/g, "''")
 
@@ -67,13 +67,13 @@ export function getFDWCreateSql({
       ${encryptedOptions
         .map(
           (option) =>
-            /* SQL */ `select id into v_${option.name} from pgsodium.valid_key where name = '${wrapper.name}_${option.name}' limit 1;`
+            /* SQL */ `select id into v_${option.name} from pgsodium.valid_key where name = '${formState.wrapper_name}_${option.name}' limit 1;`
         )
         .join('\n')}
     
       execute format(
-        E'create server ${wrapper.server.name}\\n'
-        '   foreign data wrapper ${wrapper.name}\\n'
+        E'create server ${formState.server_name}\\n'
+        '   foreign data wrapper ${formState.wrapper_name}\\n'
         '   options (\\n'
         '     ${optionsSqlArray}\\n'
         '   );',
@@ -94,7 +94,7 @@ export function getFDWCreateSql({
         create foreign table ${newTable.schema_name}.${newTable.table_name} (
           ${columns.map((column) => `${column.name} ${column.type}`).join(',\n          ')}
         )
-        server ${wrapper.server.name}
+        server ${formState.server_name}
         options (
           ${Object.entries(newTable)
             .filter(

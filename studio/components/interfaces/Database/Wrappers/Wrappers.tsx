@@ -11,6 +11,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import WrappersDropdown from './WrappersDropdown'
 import WrappersDisabledState from './WrappersDisabledState'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { groupBy } from 'lodash'
 
 const Wrappers = () => {
   const { meta } = useStore()
@@ -19,10 +20,10 @@ const Wrappers = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const wrappers = data?.result ?? []
-  const enabledWrapperNamesSet = new Set(wrappers.map((fdw) => fdw.name))
-
   const [open, setOpen] = useState<string>('')
+
+  const wrappers = data?.result ?? []
+  const groupedWrappers = groupBy(wrappers, 'handler')
 
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
@@ -75,21 +76,26 @@ const Wrappers = () => {
             </div>
           ) : (
             <>
+              {/* [Joshen] This probably needs to change anyways so dont get too stuck with this */}
               {WRAPPERS.map((wrapper, i) => {
-                return (
-                  <WrapperRow
-                    key={i}
-                    wrapper={wrapper}
-                    tables={wrappers.find((w) => w.name === wrapper.server.name)?.tables ?? []}
-                    isLoading={isLoading}
-                    isEnabled={enabledWrapperNamesSet.has(wrapper.server.name)}
-                    isOpen={open === wrapper.name}
-                    onOpen={(wrapperName) => {
-                      if (open !== wrapperName) setOpen(wrapperName)
-                      else setOpen('')
-                    }}
-                  />
-                )
+                const createdWrappers = groupedWrappers[wrapper.handlerName] ?? []
+                if (createdWrappers.length > 0) {
+                  return (
+                    <WrapperRow
+                      key={i}
+                      wrapperMeta={wrapper}
+                      wrappers={createdWrappers}
+                      isLoading={isLoading}
+                      isOpen={open === wrapper.name}
+                      onOpen={(wrapperName) => {
+                        if (open !== wrapperName) setOpen(wrapperName)
+                        else setOpen('')
+                      }}
+                    />
+                  )
+                } else {
+                  return <></>
+                }
               })}
             </>
           )}

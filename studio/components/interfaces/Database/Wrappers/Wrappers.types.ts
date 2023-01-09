@@ -22,7 +22,6 @@ export type ServerOption = {
 }
 
 export type Server = {
-  name: string
   options: ServerOption[]
 }
 
