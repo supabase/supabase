@@ -1,25 +1,24 @@
-import { MDXRemote } from 'next-mdx-remote'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import components from '~/components'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
 
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
+import { IAPISpec, ICommonFunc, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 
-interface Props {
-  sections: any[] // to do
-  spec: any // to do
-  typeSpec: any // to do
-  pageProps: any // to do, from staticProps
-
+interface RefSectionHandlerProps {
+  sections: ICommonFunc[]
+  spec?: ISpec | IAPISpec
+  typeSpec?: TypeSpec
+  pageProps: { docs: IRefStaticDoc[] }
   type: 'client-lib' | 'cli' | 'api'
 }
 
-const RefSectionHandler = (props) => {
+const RefSectionHandler = (props: RefSectionHandlerProps) => {
+  console.log('props', props)
   const router = useRouter()
 
   const slug = router.query.slug[0]

@@ -23,6 +23,9 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
+  if (!tsDefinition.signatures) {
+    console.log('tsDefinition', tsDefinition.signatures)
+  }
   let functionDeclaration = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
@@ -218,6 +221,12 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
   operationId: string
   operation: string
   responseList: []
+  description?: string
+  parameters?: []
+  responses?: {}
+  security?: []
+  summary?: string
+  tags?: []
 }
 
 export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {

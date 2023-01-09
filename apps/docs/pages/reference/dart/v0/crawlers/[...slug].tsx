@@ -28,6 +28,7 @@ export default function JSReference(props) {
         spec={spec}
         typeSpec={typeSpec}
         pageProps={props}
+        type="client-lib"
       />
     </>
   )
