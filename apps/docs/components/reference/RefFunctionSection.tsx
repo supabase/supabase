@@ -130,6 +130,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
                       const exampleString = ''
+
+                      const codeBlockLang = example?.code?.startsWith('```js')
+                        ? 'js'
+                        : example?.code?.startsWith('```ts')
+                        ? 'ts'
+                        : example?.code?.startsWith('```dart')
+                        ? 'dart'
+                        : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 
@@ -196,9 +204,10 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             </RefDetailCollapse>
                           )}
 
+
                           <CodeBlock
                             className="useless-code-block-class"
-                            language="js"
+                            language={codeBlockLang}
                             hideLineNumbers={true}
                           >
                             {exampleString +
@@ -206,7 +215,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                 example.code
                                   .replace(/```/g, '')
                                   .replace('js', '')
-                                  .replace('ts', ''))}
+                                  .replace('ts', '')
+                                  .replace('dart', ''))}
                           </CodeBlock>
 
                           {response && (
@@ -217,7 +227,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             >
                               <CodeBlock
                                 className="useless-code-block-class"
-                                language="js"
+                                language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
                                 {response.replace(/```/g, '').replace('json', '')}

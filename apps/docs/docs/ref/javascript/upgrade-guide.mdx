@@ -89,19 +89,23 @@ The signIn() method has been deprecated in favor of more explicit method signatu
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { user, error } = await supabase.auth.signIn({ email, password })
+const { user, error } = await supabase
+  .auth
+  .signIn({ email, password })
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
 const {
   data: { user },
   error,
-} = await supabase.auth.signInWithPassword({ email, password })
+} = await supabase
+  .auth
+  .signInWithPassword({ email, password })
 ```
 
 </TabPanel>
@@ -124,16 +128,20 @@ const {
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signIn({ email })
+const { error } = await supabase
+  .auth
+  .signIn({ email })
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signInWithOtp({ email })
+const { error } = await supabase
+  .auth
+  .signInWithOtp({ email })
 ```
 
 </TabPanel>
@@ -157,16 +165,20 @@ const { error } = await supabase.auth.signInWithOtp({ email })
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signIn({ provider })
+const { error } = await supabase
+  .auth
+  .signIn({ provider })
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signInWithOAuth({ provider })
+const { error } = await supabase
+  .auth
+  .signInWithOAuth({ provider })
 ```
 
 </TabPanel>
@@ -189,16 +201,20 @@ const { error } = await supabase.auth.signInWithOAuth({ provider })
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signIn({ phone, password })
+const { error } = await supabase
+  .auth
+  .signIn({ phone, password })
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.signInWithPassword({ phone, password })
+const { error } = await supabase
+  .auth
+  .signInWithPassword({ phone, password })
 ```
 
 </TabPanel>
@@ -222,19 +238,26 @@ const { error } = await supabase.auth.signInWithPassword({ phone, password })
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { error } = await supabase.auth.api.sendMobileOTP(phone)
+const { error } = await supabase
+  .auth
+  .api
+  .sendMobileOTP(phone)
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.signInWithOtp({ phone })
+const { data, error } = await supabase
+  .auth
+  .signInWithOtp({ phone })
 
 // After receiving a SMS with a OTP.
-const { data, error } = await supabase.auth.verifyOtp({ phone, token })
+const { data, error } = await supabase
+.auth
+.verifyOtp({ phone, token })
 ```
 
 </TabPanel>
@@ -258,16 +281,21 @@ const { data, error } = await supabase.auth.verifyOtp({ phone, token })
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
+const { data, error } = await supabase
+  .auth
+  .api
+  .resetPasswordForEmail(email)
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.resetPasswordForEmail(email)
+const { data, error } = await supabase
+  .auth
+  .resetPasswordForEmail(email)
 ```
 
 </TabPanel>
@@ -362,9 +390,11 @@ const { user } = session
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { user, error } = await supabase.auth.update({ attributes })
+const { user, error } = await supabase
+  .auth
+  .update({ attributes })
 ```
 
 </TabPanel>
@@ -405,15 +435,19 @@ const { user, error } = supabase.auth.setAuth(access_token)
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  global: {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  {
+    global: {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
     },
-  },
-})
+  }
+)
 ```
 
 </TabPanel>
@@ -452,16 +486,21 @@ Previously, these methods return inserted/updated/deleted rows by default (which
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.insert({ new_data })
+const { data, error } = await supabase
+  .from('my_table')
+  .insert({ new_data })
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.insert({ new_data }).select()
+const { data, error } = await supabase
+  .from('my_table')
+  .insert({ new_data })
+  .select()
 ```
 
 </TabPanel>
@@ -485,16 +524,101 @@ const { data, error } = await supabase.auth.insert({ new_data }).select()
   defaultActiveId="1.0x"
 >
 <TabPanel id="1.0x" label="Before">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.update({ new_data }).eq('id', id)
+const { data, error } = await supabase
+  .from('my_table')
+  .update({ new_data })
+  .eq('id', id)
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
-
+{/* prettier-ignore */}
 ```ts
-const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).select()
+const { data, error } = await supabase
+  .from('my_table')
+  .update({ new_data })
+  .eq('id', id)
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Upsert and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
+{/* prettier-ignore */}
+```ts
+const { data, error } = await supabase
+  .from('my_table')
+  .upsert({ new_data })
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+{/* prettier-ignore */}
+```ts
+const { data, error } = await supabase
+  .from('my_table')
+  .upsert({ new_data })
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Delete and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+>
+<TabPanel id="1.0x" label="Before">
+{/* prettier-ignore */}
+```ts
+const { data, error } = await supabase
+  .from('my_table')
+  .delete()
+  .eq('id', id)
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+{/* prettier-ignore */}
+```ts
+const { data, error } = await supabase
+  .from('my_table')
+  .delete()
+  .eq('id', id)
+  .select()
 ```
 
 </TabPanel>

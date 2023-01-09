@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useEffect, useState } from 'react'
 import {
   Alert,
@@ -15,6 +15,7 @@ import {
   IconKey,
   IconLoader,
   IconX,
+  IconExternalLink,
 } from 'ui'
 import { useParams, useStore } from 'hooks'
 import Divider from 'components/ui/Divider'
@@ -134,9 +135,18 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
               </Listbox>
             </div>
           </div>
-          <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
-            Add new key
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Link href="https://supabase.com/docs/guides/database/vault">
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  Vault Documentation
+                </Button>
+              </a>
+            </Link>
+            <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
+              Add new key
+            </Button>
+          </div>
         </div>
 
         {/* Table of keys */}
@@ -153,7 +163,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                   <Fragment key={key.key_id}>
                     <div className="px-6 py-4 flex items-center space-x-4">
                       <IconKey className="text-scale-1100" strokeWidth={2} />
-                      <div className="space-y-1 min-w-[37%] max-w-[37%]">
+                      <div className="space-y-1 min-w-[70%] max-w-[70%]">
                         <p
                           className="text-sm truncate text-scale-1200"
                           title={key.name || DEFAULT_KEY_NAME}
@@ -164,39 +174,16 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                           ID: <span className="font-mono">{key.id}</span>
                         </p>
                       </div>
-                      <div className="flex items-center space-x-2 w-[33%]">
-                        {key.name === 'default_vault_key' && <Badge color="green">Default</Badge>}
-                      </div>
                       <div className="flex items-center justify-end w-[30%] space-x-4">
                         <p className="text-sm text-scale-1100">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
-                            <Button
-                              type="default"
-                              className="py-2"
-                              icon={<IconTrash />}
-                              disabled={key.name === 'default_vault_key'}
-                              onClick={() => setSelectedKeyToRemove(key)}
-                            />
-                          </Tooltip.Trigger>
-                          {key.name === 'default_vault_key' && (
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-scale-1200">
-                                  The default key cannot be deleted
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          )}
-                        </Tooltip.Root>
+                        <Button
+                          type="default"
+                          className="py-2"
+                          icon={<IconTrash />}
+                          onClick={() => setSelectedKeyToRemove(key)}
+                        />
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Divider light />}
@@ -208,7 +195,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
                       <p className="text-sm text-scale-1200">No encryption keys added yet</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-scale-1100 text-center">
                         Encryption keys are created by the pgsodium extension and can be used to
                         encrypt your columns and secrets
                       </p>

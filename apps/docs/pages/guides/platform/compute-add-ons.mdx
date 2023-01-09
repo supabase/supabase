@@ -8,18 +8,18 @@ export const meta = {
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
-| Plan            | Pricing | CPU                     | Memory | Disk IO Bandwidth | Connections: Direct | Connections: Pooler  |
-| --------------- | ------- | ----------------------- | ------ | ----------------- | ------------------- | -------------------- |
-| Free (Included) | $0      | 2-core ARM (shared)     | 1 GB   | Up to 2,606 Mbps  | 10 (recommended)    | 50 (recommended)     |
-| Small           | $5      | 2-core ARM (shared)     | 2 GB   | Up to 2,606 Mbps  | 30 (recommended)    | 75 (recommended)     |
-| Medium          | $50     | 2-core ARM (shared)     | 4 GB   | Up to 2,606 Mbps  | 50 (recommended)    | 150 (recommended)    |
-| Large           | $100    | 2-core ARM (dedicated)  | 8 GB   | Up to 4,750 Mbps  | 100 (recommended)   | 300 (recommended)    |
-| XL              | $200    | 4-core ARM (dedicated)  | 16 GB  | Up to 4,750 Mbps  | 200 (recommended)   | 600 (recommended)    |
-| 2XL             | $400    | 8-core ARM (dedicated)  | 32 GB  | Up to 4,750 Mbps  | 350 (recommended)   | 1200 (recommended)   |
-| 4XL             | $950    | 16-core ARM (dedicated) | 64 GB  | Up to 4,750 Mbps  | 420 (recommended)   | 2800 (recommended)   |
-| 8XL             | $1,860  | 32-core ARM (dedicated) | 128 GB | Up to 9,000 Mbps  | 450 (recommended)   | 5600 (recommended)   |
-| 12XL            | $2,790  | 48-core ARM (dedicated) | 192 GB | Up to 13,500 Mbps | 480 (recommended)   | 8600 (recommended)   |
-| 16XL            | $3,720  | 64-core ARM (dedicated) | 256 GB | Up to 19,000 Mbps | 500 (recommended)   | 11,600 (recommended) |
+| Plan            | Pricing | CPU                     | Memory | Maximum Disk IO Bandwidth | Baseline Disk IO Bandwidth | Connections: Direct (recommended) | Connections: Pooler (recommended) |
+| --------------- | ------- | ----------------------- | ------ | ------------------------- | -------------------------- | --------------------------------- | --------------------------------- |
+| Free (Included) | $0      | 2-core ARM (shared)     | 1 GB   | 2,606 Mbps                | 87 Mbps                    | 10                                | 50                                |
+| Small           | $5      | 2-core ARM (shared)     | 2 GB   | 2,606 Mbps                | 174 Mbps                   | 30                                | 75                                |
+| Medium          | $50     | 2-core ARM (shared)     | 4 GB   | 2,606 Mbps                | 347 Mbps                   | 50                                | 150                               |
+| Large           | $100    | 2-core ARM (dedicated)  | 8 GB   | 4,750 Mbps                | 630 Mbps                   | 100                               | 300                               |
+| XL              | $200    | 4-core ARM (dedicated)  | 16 GB  | 4,750 Mbps                | 1,188 Mbps                 | 200                               | 600                               |
+| 2XL             | $400    | 8-core ARM (dedicated)  | 32 GB  | 4,750 Mbps                | 2,375 Mbps                 | 350                               | 1200                              |
+| 4XL             | $950    | 16-core ARM (dedicated) | 64 GB  | 4,750 Mbps                | 4,750 Mbps                 | 420                               | 2800                              |
+| 8XL             | $1,860  | 32-core ARM (dedicated) | 128 GB | 9,500 Mbps                | 9,500 Mbps                 | 450                               | 5600                              |
+| 12XL            | $2,790  | 48-core ARM (dedicated) | 192 GB | 14,250 Mbps               | 14,250 Mbps                | 480                               | 8600                              |
+| 16XL            | $3,720  | 64-core ARM (dedicated) | 256 GB | 19,000 Mbps               | 19,000 Mbps                | 500                               | 11,600                            |
 
 [Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
 
@@ -33,7 +33,9 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 ## Disk IO bandwidth
 
-Disk IO bandwidth can be measured in IOPS, a unit of measurement representing the number of input/output operations per second. These operations are calculated in Megabits per second. Depending on the read/write load of your application, you may need to upgrade to a larger instance capable of a higher number of IOPS. If you're unsure of how many IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). Alternatively, you can start on a smaller instance size and upgrade later as needed.
+SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection. Smaller compute instances can burst up to the maximum disk IO bandwidth for 30 minutes in a day. Beyond that, the performance reverts to the baseline disk IO bandwidth. For example, the free tier can burst up to 2,606 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. If you need consistent disk performance, choose the 4XL or larger compute add-on which has the same baseline and maximum disk IO bandwidth.
+
+If you're unsure of how many IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). If the `Daily Disk IO Budget % Remaining` stat is less than 100%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric drops to zero, the workload has used up all the burst IO throughput minutes during the day and is running at the baseline performance. These projects are good candidates for upgrading to a larger compute add with higher baseline throughput.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

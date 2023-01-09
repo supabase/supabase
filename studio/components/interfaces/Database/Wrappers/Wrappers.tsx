@@ -20,6 +20,7 @@ const Wrappers = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const wrappers = data?.result ?? []
   const enabledWrapperNamesSet = new Set(data?.result.map((fdw) => fdw.name))
 
   const [open, setOpen] = useState<string>('')
@@ -135,6 +136,7 @@ const Wrappers = () => {
               <WrapperRow
                 key={i}
                 wrapper={wrapper}
+                tables={wrappers.find((w) => w.name === wrapper.server.name)?.tables ?? []}
                 isLoading={isLoading}
                 isEnabled={enabledWrapperNamesSet.has(wrapper.server.name)}
                 isOpen={open === wrapper.name}

@@ -10,6 +10,7 @@ export const getFDWsSql = () => {
         select jsonb_agg(
           jsonb_build_object(
             'id', c.oid,
+            'schema', relnamespace::regnamespace::text,
             'name', c.relname,
             'columns', (
               select jsonb_agg(

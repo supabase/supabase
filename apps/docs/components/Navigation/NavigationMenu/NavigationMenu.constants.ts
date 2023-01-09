@@ -42,13 +42,14 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features', items: [] },
     { name: 'Architecture', url: '/guides/getting-started/architecture', items: [] },
-    // {
-    //   name: 'Quickstarts',
-    //   items: [
-    //     { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
-    //     { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
-    //   ],
-    // },
+    {
+      name: 'Framework Quickstarts',
+      items: [
+        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
+      ],
+    },
     {
       name: 'Web app tutorials',
       items: [
@@ -387,6 +388,11 @@ export const database = {
         {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pgnet',
+          items: [],
+        },
+        {
+          name: 'PostGIS: Geo queries',
+          url: '/guides/database/extensions/postgis',
           items: [],
         },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
