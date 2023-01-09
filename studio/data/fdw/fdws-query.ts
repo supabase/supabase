@@ -26,10 +26,12 @@ export const getFDWsSql = () => {
               )
               from pg_catalog.pg_attribute a
               where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-            )
+            ),
+            'options', t.ftoptions
           )
         )
         from pg_catalog.pg_class c
+        join pg_catalog.pg_foreign_table t on c.oid = t.ftrelid
         where c.oid = any (select t.ftrelid from pg_catalog.pg_foreign_table t where t.ftserver = s.oid)
       ) as "tables"
     from pg_catalog.pg_foreign_server s
@@ -48,12 +50,17 @@ export type FDWColumn = {
 export type FDWTable = {
   id: string
   name: string
+  schema: string
   columns: FDWColumn[]
+  options: string[]
 }
 
 export type FDW = {
-  id: string
+  id: number
   name: string
+  handler: string
+  server_name: string
+  server_options: string[]
   tables: FDWTable[]
 }
 

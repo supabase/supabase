@@ -19,3 +19,24 @@ export const makeValidateRequired =
 
     return errors
   }
+
+export const formatWrapperTables = (tables: any[]) => {
+  return tables.map((table, index: number) => {
+    const object = table.options.find((option: string) => option.startsWith('object='))
+    const objectValue = object !== undefined ? object.split('=')[1] : undefined
+
+    return {
+      index,
+      columns: table.columns.map((column: any) => column.name),
+      is_new_schema: false,
+      object: objectValue,
+      schema: table.schema,
+      schema_name: table.schema,
+      table_name: table.name,
+    }
+  })
+}
+
+export const convertKVStringArrayToJson = (values: string[]) => {
+  return Object.fromEntries(values.map((value) => value.split('=')))
+}

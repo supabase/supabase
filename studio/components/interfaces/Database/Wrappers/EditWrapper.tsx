@@ -1,12 +1,26 @@
 import Link from 'next/link'
 import { isEmpty } from 'lodash'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { VaultSecret } from 'types'
 import { checkPermissions, useParams, useStore } from 'hooks'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+
+import InputField from './InputField'
+import { WRAPPERS } from './Wrappers.constants'
+import WrapperTableEditor from './WrapperTableEditor'
+import {
+  formatWrapperTables,
+  makeValidateRequired,
+  convertKVStringArrayToJson,
+} from './Wrappers.utils'
+import Loading from 'components/ui/Loading'
 import {
   FormPanel,
   FormActions,
@@ -14,54 +28,65 @@ import {
   FormSectionLabel,
   FormSectionContent,
 } from 'components/ui/Forms'
-import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-
-import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
-import WrapperTableEditor from './WrapperTableEditor'
-import { makeValidateRequired } from './Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-const CreateWrapper = () => {
-  const formId = 'create-wrapper-form'
+const EditWrapper = () => {
+  const formId = 'edit-wrapper-form'
   const router = useRouter()
-  const { ui } = useStore()
-  const { ref, type } = useParams()
+  const { ui, vault } = useStore()
+  const { ref, id } = useParams()
   const { project } = useProjectContext()
-  const { mutateAsync: createFDW } = useFDWCreateMutation()
 
-  const [newTables, setNewTables] = useState<any[]>([])
+  const { data, isLoading } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const wrappers = data?.result ?? []
+  const wrapper = wrappers.find((w) => Number(w.id) === Number(id))
+  const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
+
+  const { mutateAsync: createFDW } = useFDWCreateMutation()
+  const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
+
+  const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
-  const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
     wrapperMeta !== undefined
       ? {
-          wrapper_name: '',
-          server_name: '',
-          ...Object.fromEntries(
-            wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
-          ),
+          wrapper_name: wrapper?.name,
+          server_name: wrapper?.server_name,
+          ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
         }
       : {}
 
-  if (wrapperMeta === undefined) {
-    return <div>Lol what?</div>
+  useEffect(() => {
+    if (wrapper?.id) {
+      setWrapperTables(formatWrapperTables(wrapper?.tables ?? []))
+    }
+  }, [wrapper?.id])
+
+  if (isLoading) {
+    return <Loading />
+  }
+
+  if (wrapper === undefined || wrapperMeta === undefined) {
+    return <div>Oh no</div>
   }
 
   const onUpdateTable = (values: any) => {
-    setNewTables((prev) => {
+    setWrapperTables((prev) => {
       // if the new values have tableIndex, we are editing an existing table
       if (values.tableIndex !== undefined) {
         const tableIndex = values.tableIndex
-        const newTables = [...prev]
+        const wrapperTables = [...prev]
         delete values.tableIndex
-        newTables[tableIndex] = values
-        return newTables
+        wrapperTables[tableIndex] = values
+        return wrapperTables
       }
       return [...prev, values]
     })
@@ -75,23 +100,31 @@ const CreateWrapper = () => {
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (newTables.length === 0) errors.tables = 'Please add at least one table'
+    if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
     setSubmitting(true)
     try {
+      await deleteFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapper,
+        wrapperMeta,
+      })
+
       await createFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapper: wrapperMeta,
         formState: { ...values, server_name: `${wrapper_name}_server` },
-        tables: newTables,
+        tables: wrapperTables,
       })
+
       ui.setNotification({
         category: 'success',
-        message: `Successfully created ${wrapperMeta.label} foreign data wrapper`,
+        message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
       })
-      setNewTables([])
+      setWrapperTables([])
       router.push(`/project/${ref}/database/wrappers`)
     } catch (error: any) {
       ui.setNotification({
@@ -123,7 +156,7 @@ const CreateWrapper = () => {
               </a>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta?.label} Wrapper</h3>
+          <h3 className="mb-2 text-xl text-scale-1200">Edit wrapper: {wrapper.name}</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
               <a target="_blank">
@@ -136,8 +169,42 @@ const CreateWrapper = () => {
         </div>
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues }: any) => {
+          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+            const [loadingSecrets, setLoadingSecrets] = useState(false)
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+            const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+
+            useEffect(() => {
+              const fetchEncryptedValues = async () => {
+                setLoadingSecrets(true)
+                const res = await Promise.all(
+                  encryptedOptions.map(async (option) => {
+                    const [secret] = vault.listSecrets(
+                      (secret: VaultSecret) => secret.name === `${wrapper.name}_${option.name}`
+                    )
+                    if (secret !== undefined) {
+                      const value = await vault.fetchSecretValue(secret.id)
+                      return { [option.name]: value }
+                    } else {
+                      return { [option.name]: '' }
+                    }
+                  })
+                )
+                const secretValues = res.reduce((a: any, b: any) => {
+                  const [key] = Object.keys(b)
+                  return { ...a, [key]: b[key] }
+                }, {})
+
+                resetForm({
+                  values: { ...values, ...secretValues },
+                  initialValues: { ...initialValues, ...secretValues },
+                })
+                setLoadingSecrets(false)
+              }
+
+              if (encryptedOptions.length > 0) fetchEncryptedValues()
+            }, [])
+
             return (
               <FormPanel
                 disabled={!canCreateWrapper}
@@ -164,13 +231,16 @@ const CreateWrapper = () => {
                       label="Wrapper Name"
                       error={formErrors.wrapper_name}
                       descriptionText={
-                        (values?.wrapper_name ?? '').length > 0 ? (
+                        values.wrapper_name !== initialValues.wrapper_name ? (
                           <>
-                            Your wrapper's server name will be{' '}
+                            Your wrapper's server name will be updated to{' '}
                             <code className="text-xs">{values.wrapper_name}_server</code>
                           </>
                         ) : (
-                          ''
+                          <>
+                            Your wrapper's server name is{' '}
+                            <code className="text-xs">{values.wrapper_name}_server</code>
+                          </>
                         )
                       }
                     />
@@ -184,7 +254,7 @@ const CreateWrapper = () => {
                       <InputField
                         key={option.name}
                         option={option}
-                        loading={false}
+                        loading={option.encrypted ? loadingSecrets : false}
                         error={formErrors[option.name]}
                       />
                     ))}
@@ -202,7 +272,7 @@ const CreateWrapper = () => {
                   }
                 >
                   <FormSectionContent loading={false}>
-                    {newTables.length === 0 ? (
+                    {wrapperTables.length === 0 ? (
                       <div className="flex justify-end translate-y-4">
                         <Button type="default" onClick={() => setIsEditingTable(true)}>
                           Add foreign table
@@ -210,7 +280,7 @@ const CreateWrapper = () => {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {newTables.map((table, i) => (
+                        {wrapperTables.map((table, i) => (
                           <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
                             <div>
                               <p className="text-sm">
@@ -235,7 +305,7 @@ const CreateWrapper = () => {
                                 className="px-1"
                                 icon={<IconTrash />}
                                 onClick={() => {
-                                  setNewTables((prev) => prev.filter((_, j) => j !== i))
+                                  setWrapperTables((prev) => prev.filter((_, j) => j !== i))
                                 }}
                               />
                             </div>
@@ -243,14 +313,14 @@ const CreateWrapper = () => {
                         ))}
                       </div>
                     )}
-                    {newTables.length > 0 && (
+                    {wrapperTables.length > 0 && (
                       <div className="flex justify-end">
                         <Button type="default" onClick={() => setIsEditingTable(true)}>
                           Add foreign table
                         </Button>
                       </div>
                     )}
-                    {newTables.length === 0 && formErrors.tables && (
+                    {wrapperTables.length === 0 && formErrors.tables && (
                       <p className="text-sm text-red-900 text-right">{formErrors.tables}</p>
                     )}
                   </FormSectionContent>
@@ -275,4 +345,4 @@ const CreateWrapper = () => {
   )
 }
 
-export default observer(CreateWrapper)
+export default observer(EditWrapper)

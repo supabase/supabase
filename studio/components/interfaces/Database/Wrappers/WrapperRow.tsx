@@ -7,8 +7,6 @@ import {
   Button,
   IconExternalLink,
   IconLoader,
-  IconDatabase,
-  IconServer,
   IconTrash,
   IconEdit,
 } from 'ui'
@@ -34,8 +32,6 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
   const { project } = useProjectContext()
   const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  console.log({ wrappers })
 
   const onDeleteWrapper = (wrapper: any) => {
     confirmAlert({
@@ -146,7 +142,7 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
                         <div key={metadata.name} className="flex items-center space-x-2 text-sm">
                           <p className="text-scale-1000">{metadata.label}:</p>
                           <Link
-                            href={`/project/${ref}/settings/vault/secrets?name=${wrapper.name}_${metadata.name}`}
+                            href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                           >
                             <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
                               <span>Encrypted in Vault</span>
@@ -176,13 +172,16 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button
-                        type="default"
-                        loading={isSubmitting}
-                        icon={<IconEdit strokeWidth={1.5} />}
-                        className="py-2"
-                        onClick={() => onDeleteWrapper(wrapper)}
-                      />
+                      <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
+                        <a>
+                          <Button
+                            type="default"
+                            loading={isSubmitting}
+                            icon={<IconEdit strokeWidth={1.5} />}
+                            className="py-2"
+                          />
+                        </a>
+                      </Link>
                       <Button
                         type="default"
                         loading={isSubmitting}
