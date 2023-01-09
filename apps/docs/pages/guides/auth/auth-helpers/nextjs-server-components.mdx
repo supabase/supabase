@@ -89,7 +89,7 @@ Create a new file at `/utils/supabase-server.ts` and populate with the following
 import { headers, cookies } from 'next/headers'
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
-import type { Database } from '../db_types'
+import type { Database } from '../lib/database.types'
 
 export const createClient = () =>
   createServerComponentSupabaseClient<Database>({
@@ -117,6 +117,8 @@ Next, we need a middleware file to refresh the user's session on navigation.
 >
 <TabPanel id="js" label="JavaScript">
 
+Create a new `/app/middleware.js` file and populate with the following:
+
 ```jsx title="middleware.js"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
@@ -138,11 +140,13 @@ export async function middleware(req) {
 
 <TabPanel id="ts" label="TypeScript">
 
+Create a new `/app/middleware.js` file and populate with the following:
+
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 import type { NextRequest, NextResponse } from 'next/server'
-import type { Database } from 'db_types'
+import type { Database } from '../lib/database.types'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -207,7 +211,7 @@ Create a new file at `/utils/supabase-browser.ts` and populate with the followin
 
 ```ts
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '../db_types'
+import { Database } from '../lib/database.types'
 
 export const createClient = () => createBrowserSupabaseClient<Database>()
 ```
@@ -259,7 +263,7 @@ import { createContext, useContext, useState } from 'react'
 import { createClient } from '../utils/supabase-browser'
 
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
-import type { Database } from '../db_types'
+import type { Database } from '../lib/database.types'
 
 type SupabaseContext = {
   supabase: SupabaseClient<Database>
@@ -632,7 +636,7 @@ Create a new file at `/app/realtime/posts.tsx` and populate with the following:
 import { useEffect, useState } from 'react'
 import { useSupabase } from '../../components/supabase-provider'
 
-import type { Database } from '../../db_types'
+import type { Database } from '../../lib/database.types'
 
 type Post = Database['public']['Tables']['posts']['Row']
 
