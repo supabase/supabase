@@ -3,11 +3,11 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
+import { withCors } from "https://deno.land/x/cors_protocol@1.0.0-beta.5/mod.ts";
 
 console.log(`Function "browser-with-cors" up and running!`)
 
-serve(async (req) => {
+serve(withCors(async (req) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -29,7 +29,7 @@ serve(async (req) => {
       status: 400,
     })
   }
-})
+}))
 
 // To invoke:
 // curl -i --location --request POST 'http://localhost:54321/functions/v1/browser-with-cors' \
