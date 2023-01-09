@@ -29,7 +29,6 @@ import {
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 
 import { WRAPPERS } from './Wrappers.constants'
-import WrapperRow from './WrapperRow'
 import WrapperTableEditor from './WrapperTableEditor'
 import { makeValidateRequired } from './Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -91,7 +90,7 @@ const InputField: FC<{ option: ServerOption; error: any }> = ({ option, error })
         }
         defaultValue={option.defaultValue ?? ''}
         error={error}
-        className={`${option.name === 'name' ? '' : 'input-mono'}`}
+        className={`${option.name === 'server_name' ? '' : 'input-mono'}`}
         type={!option.hidden ? 'text' : showHidden ? 'text' : 'password'}
         actions={
           option.hidden ? (
@@ -127,9 +126,13 @@ const CreateWrapper = () => {
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
     wrapperMeta !== undefined
-      ? Object.fromEntries(
-          wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
-        )
+      ? {
+          name: '',
+          server_name: '',
+          ...Object.fromEntries(
+            wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
+          ),
+        }
       : {}
 
   if (wrapperMeta === undefined) {
@@ -154,8 +157,10 @@ const CreateWrapper = () => {
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
-
     const errors: any = validate(values)
+
+    const { wrapper_name } = values
+    if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
     if (newTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
@@ -165,7 +170,7 @@ const CreateWrapper = () => {
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapper: wrapperMeta,
-        formState: values,
+        formState: { ...values, server_name: `${wrapper_name}_server` },
         newTables,
       })
       ui.setNotification({
@@ -238,10 +243,35 @@ const CreateWrapper = () => {
                   </div>
                 }
               >
-                <FormSection header={<FormSectionLabel>Server Configuration</FormSectionLabel>}>
+                <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                  <FormSectionContent loading={false}>
+                    <Input
+                      id="wrapper_name"
+                      label="Wrapper Name"
+                      error={formErrors.wrapper_name}
+                      descriptionText={
+                        (values?.wrapper_name ?? '').length > 0 ? (
+                          <>
+                            Your wrapper's server name will be{' '}
+                            <code className="text-xs">{values.wrapper_name}_server</code>
+                          </>
+                        ) : (
+                          ''
+                        )
+                      }
+                    />
+                  </FormSectionContent>
+                </FormSection>
+                <FormSection
+                  header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+                >
                   <FormSectionContent loading={false}>
                     {wrapperMeta.server.options.map((option) => (
-                      <InputField option={option} error={formErrors[option.name]} />
+                      <InputField
+                        key={option.name}
+                        option={option}
+                        error={formErrors[option.name]}
+                      />
                     ))}
                   </FormSectionContent>
                 </FormSection>
@@ -264,7 +294,7 @@ const CreateWrapper = () => {
                         </Button>
                       </div>
                     ) : (
-                      <>
+                      <div className="space-y-2">
                         {newTables.map((table, i) => (
                           <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
                             <div>
@@ -296,7 +326,7 @@ const CreateWrapper = () => {
                             </div>
                           </div>
                         ))}
-                      </>
+                      </div>
                     )}
                     {newTables.length > 0 && (
                       <div className="flex justify-end">

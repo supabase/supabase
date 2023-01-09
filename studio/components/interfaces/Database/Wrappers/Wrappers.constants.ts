@@ -10,15 +10,7 @@ export const WRAPPERS: Wrapper[] = [
     label: 'Stripe',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/stripe',
     server: {
-      name: 'stripe_server',
       options: [
-        {
-          name: 'name',
-          label: 'Wrapper Name',
-          required: true,
-          encrypted: false,
-          hidden: false,
-        },
         {
           name: 'api_key_id',
           label: 'Stripe Secret Key',
@@ -422,7 +414,6 @@ export const WRAPPERS: Wrapper[] = [
     label: 'Firebase',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/firebase',
     server: {
-      name: 'firebase_server',
       options: [
         {
           name: 'project_id',

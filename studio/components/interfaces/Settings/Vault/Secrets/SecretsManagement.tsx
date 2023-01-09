@@ -1,24 +1,30 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { FC, Fragment, useState } from 'react'
-import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink } from 'ui'
+import { FC, Fragment, useState, useEffect } from 'react'
+import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink, IconX } from 'ui'
 
+import { useStore, useParams } from 'hooks'
 import SecretRow from './SecretRow'
 import EditSecretModal from './EditSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import AddNewSecretModal from './AddNewSecretModal'
 import Divider from 'components/ui/Divider'
-import { useStore } from 'hooks'
 
 interface Props {}
 
 const SecretsManagement: FC<Props> = ({}) => {
   const { vault } = useStore()
+  const { name } = useParams()
+
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
+
+  useEffect(() => {
+    if (name !== undefined) setSearchValue(name)
+  }, [name])
 
   const secrets = (
     searchValue.length > 0
@@ -48,6 +54,19 @@ const SecretsManagement: FC<Props> = ({}) => {
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               icon={<IconSearch strokeWidth={2} size={16} />}
+              actions={
+                searchValue.length > 0
+                  ? [
+                      <Button
+                        size="tiny"
+                        type="text"
+                        icon={<IconX />}
+                        className="px-1"
+                        onClick={() => setSearchValue('')}
+                      />,
+                    ]
+                  : []
+              }
             />
             <div className="w-32">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
