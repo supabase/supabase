@@ -205,6 +205,11 @@ export const menuItems: NavMenu = {
               items: [],
             },
             {
+              name: 'PostGIS: Geo queries',
+              url: '/guides/database/extensions/postgis',
+              items: [],
+            },
+            {
               name: 'uuid-ossp: Unique Identifiers',
               url: '/guides/database/extensions/uuid-ossp',
               items: [],

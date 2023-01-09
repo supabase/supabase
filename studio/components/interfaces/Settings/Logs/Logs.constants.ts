@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
+export const LOGS_EXPLORER_DOCS_URL = "https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer"
+
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
 export const TEMPLATES: LogTemplate[] = [
@@ -631,5 +633,6 @@ export const TIER_QUERY_LIMITS: {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }

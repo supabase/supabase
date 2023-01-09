@@ -25,7 +25,6 @@ import {
   useStore,
   useFlag,
   withAuth,
-  useSubscriptionStats,
   checkPermissions,
   useFreeProjectLimitCheck,
 } from 'hooks'
@@ -47,7 +46,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const subscriptionStats = useSubscriptionStats()
   const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheck(slug as string)
 
@@ -74,10 +72,7 @@ const Wizard: NextPageWithLayout = () => {
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const canCreateProject =
-    isAdmin &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
     projectName !== '' &&
@@ -204,7 +199,6 @@ const Wizard: NextPageWithLayout = () => {
       hideHeaderStyling
       loading={
         !app.organizations.isInitialized ||
-        subscriptionStats.isLoading ||
         isLoadingFreeProjectLimitCheck
       }
       title={

@@ -15,6 +15,9 @@ interface Props {
 const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan }) => {
   const formattedTiers = formatTierOptions(tiers)
 
+  // [Kevin] TODO Remove after team plan is generally available
+  const gridCols = formattedTiers.length === 3 ? 'gap-8 xl:grid-cols-3' : 'gap-4 xl:grid-cols-4'
+
   return (
     <Transition
       show={visible}
@@ -22,13 +25,12 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
       enterFrom="transform opacity-0 -translate-x-10"
       enterTo="transform opacity-100 translate-x-0"
     >
-      <div className="space-y-8">
-        <h4 className="text-lg">Change your project's subscription</h4>
-        {/* FE will make a call to fetch all plans first at the page level */}
-        <div className="grid lg:grid-cols-3 gap-8 py-8">
+      <div>
+        <h4 className="text-lg mb-8">Change your project's subscription</h4>
+        <div className={`grid py-8 grid-cols-2 ${gridCols}`}>
           <Plans plans={formattedTiers} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />
         </div>
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center mt-4">
           <Link href="https://supabase.com/pricing">
             <a
               target="_blank"

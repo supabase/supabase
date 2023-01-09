@@ -83,7 +83,7 @@ export class RootStore implements IRootStore {
     // - project not found yet. projectStore is loading
     // - connectionString is not available. projectStore loaded
     const found = this.app.projects.find((x: Project) => x.ref === value)
-    if (!found || !found.connectionString) {
+    if (found?.connectionString === undefined) {
       this.app.projects.fetchDetail(value, (project) => {
         setProjectRefs(project)
       })

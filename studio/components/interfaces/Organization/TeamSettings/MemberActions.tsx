@@ -1,16 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { FC, useContext, useState } from 'react'
+import { FC, useState } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useOrganizationDetail, useStore } from 'hooks'
+import { checkPermissions, useOrganizationDetail, useParams, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Member, Role } from 'types'
 
-import { PageContext } from 'pages/org/[slug]/settings'
 import { isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -21,12 +20,10 @@ interface Props {
 }
 
 const MemberActions: FC<Props> = ({ members, member, roles }) => {
-  const PageState: any = useContext(PageContext)
-  const { id, slug, name: orgName } = PageState.organization
+  const { ui } = useStore()
+  const { slug } = useParams()
   const { rolesRemovable } = getRolesManagementPermissions(roles)
-
-  const { app, ui } = useStore()
-  const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
+  const { mutateOrgMembers } = useOrganizationDetail(slug || '')
 
   const [loading, setLoading] = useState(false)
 
@@ -70,35 +67,6 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
         }
       },
     })
-  }
-
-  // [Joshen] This will be deprecated after ABAC is fully rolled out
-  const handleTransferOwnership = async () => {
-    setLoading(true)
-
-    const response = await post(`${API_URL}/organizations/${slug}/transfer`, {
-      org_id: id,
-      member_id: member.id,
-    })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to transfer ownership: ${response.error.message}`,
-      })
-      setLoading(false)
-    } else {
-      const updatedMembers = members.map((m: any) => {
-        if (m.is_owner) return { ...m, is_owner: false }
-        if (m.id === member.id) return { ...m, is_owner: true }
-        else return { ...m }
-      })
-
-      mutateOrgMembers(updatedMembers)
-
-      ui.setNotification({ category: 'success', message: 'Successfully transferred organization' })
-    }
-
-    app.organizations.load()
   }
 
   async function handleResendInvite(member: Member) {
