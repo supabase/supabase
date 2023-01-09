@@ -294,9 +294,9 @@ export const menuItems: NavMenu = {
             { name: 'Authsignal', url: '/guides/integrations/authsignal', items: [] },
             { name: 'Clerk', url: '/guides/integrations/clerk', items: [] },
             { name: 'keyri', url: '/guides/integrations/keyri', items: [] },
+            { name: 'Picket', url: '/guides/integrations/picket', items: [] },
             { name: 'Stytch', url: '/guides/integrations/stytch', items: [] },
             { name: 'SuperTokens', url: '/guides/integrations/supertokens', items: [] },
-            { name: 'Picket', url: '/guides/integrations/picket', items: [] },
           ],
         },
         {
