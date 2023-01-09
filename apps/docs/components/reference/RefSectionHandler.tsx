@@ -18,7 +18,6 @@ interface RefSectionHandlerProps {
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
-  console.log('props', props)
   const router = useRouter()
 
   const slug = router.query.slug[0]

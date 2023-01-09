@@ -23,9 +23,6 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
-  if (!tsDefinition.signatures) {
-    console.log('tsDefinition', tsDefinition.signatures)
-  }
   let functionDeclaration = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
