@@ -87,7 +87,7 @@ export type TypeSpecChild = {
   typeParameter?: any
   implementedTypes?: any
   extendedTypes?: any
-  dereferenced?: TypeSpecChildComment
+  dereferenced?: TypeSpecChild
   extendedBy?: any
   indexSignature?: any
   extendsType?: any
