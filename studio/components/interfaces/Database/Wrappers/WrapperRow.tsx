@@ -46,7 +46,8 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
           await deleteFDW({
             projectRef: project?.ref,
             connectionString: project?.connectionString,
-            wrapper: wrapperMeta,
+            wrapper,
+            wrapperMeta,
           })
           ui.setNotification({
             category: 'success',
