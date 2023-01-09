@@ -19,12 +19,8 @@ const TeamSettings = () => {
   const isOwner = ui.selectedOrganization?.is_owner
 
   const { members } = useOrganizationDetail(slug || '')
-  const { roles: allRoles } = useOrganizationRoles(slug)
+  const { roles } = useOrganizationRoles(slug)
 
-  const enableBillingOnlyReadOnly = useFlag('enableBillingOnlyReadOnlyRoles')
-  const roles = enableBillingOnlyReadOnly
-    ? allRoles
-    : (allRoles ?? []).filter((role) => ['Owner', 'Administrator', 'Developer'].includes(role.name))
   const { rolesAddable } = getRolesManagementPermissions(roles)
 
   const [isLeaving, setIsLeaving] = useState(false)
