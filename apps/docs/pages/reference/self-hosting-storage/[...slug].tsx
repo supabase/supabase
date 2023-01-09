@@ -12,7 +12,7 @@ const sections = flattenSections(selfHostingStorageCommonSections)
 const spec = gen_v3(storageSpec, 'wat', { apiUrl: 'apiv0' })
 
 export default function JSReference(props) {
-  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} />
+  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="api" />
 }
 
 export async function getStaticProps() {

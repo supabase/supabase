@@ -16,7 +16,7 @@ interface ICommonFunc {
 }
 
 interface IRefFunctionSection {
-  funcData: any
+  funcData: ICommonFunc
   commonFuncData: ICommonFunc
   spec: any
 }

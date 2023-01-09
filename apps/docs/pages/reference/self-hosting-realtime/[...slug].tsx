@@ -9,7 +9,7 @@ import { gen_v3 } from '~/lib/refGenerator/helpers'
 const sections = flattenSections(selfHostingRealtimeCommonSections)
 
 export default function JSReference(props) {
-  return <RefSectionHandler sections={sections} pageProps={props} />
+  return <RefSectionHandler sections={sections} pageProps={props} type="api" />
 }
 
 export async function getStaticProps() {
