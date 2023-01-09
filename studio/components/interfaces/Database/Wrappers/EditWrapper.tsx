@@ -18,8 +18,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
 import { checkPermissions, useParams, useStore } from 'hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 
 import InputField from './InputField'
 import { WRAPPERS } from './Wrappers.constants'
@@ -55,8 +54,7 @@ const EditWrapper = () => {
   const wrapper = wrappers.find((w) => Number(w.id) === Number(id))
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
-  const { mutateAsync: createFDW } = useFDWCreateMutation()
-  const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
+  const { mutateAsync: updateFDW } = useFDWUpdateMutation()
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -83,7 +81,7 @@ const EditWrapper = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex items-center justify-center w-full h-full">
         <Loading />
       </div>
     )
@@ -92,8 +90,8 @@ const EditWrapper = () => {
   if (wrapper === undefined || wrapperMeta === undefined) {
     if (isSaving) {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
-          <div className="space-x-4 flex items-center">
+        <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
+          <div className="flex items-center space-x-4">
             <IconLoader className="animate-spin" size={16} />
             <p className="text-sm">Updating wrapper</p>
           </div>
@@ -101,10 +99,10 @@ const EditWrapper = () => {
       )
     } else {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+        <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
           <div className="space-y-2 flex flex-col items-center w-[400px]">
             <p>Unknown wrapper</p>
-            <p className="text-sm text-scale-1000 text-center">
+            <p className="text-sm text-center text-scale-1000">
               The wrapper ID {id} cannot be found in your project. Head back to select another
               wrapper.
             </p>
@@ -147,17 +145,11 @@ const EditWrapper = () => {
     setIsSaving(true)
     setSubmitting(true)
     try {
-      await deleteFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapper,
-        wrapperMeta,
-      })
-
-      await createFDW({
+      await updateFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapper: wrapperMeta,
+        wrapperMeta,
         formState: { ...values, server_name: `${wrapper_name}_server` },
         tables: wrapperTables,
       })
@@ -252,7 +244,7 @@ const EditWrapper = () => {
               <FormPanel
                 disabled={!canCreateWrapper}
                 footer={
-                  <div className="flex py-4 px-8">
+                  <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
                       isSubmitting={isSubmitting}
@@ -364,7 +356,7 @@ const EditWrapper = () => {
                       </div>
                     )}
                     {wrapperTables.length === 0 && formErrors.tables && (
-                      <p className="text-sm text-red-900 text-right">{formErrors.tables}</p>
+                      <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
                     )}
                   </FormSectionContent>
                 </FormSection>
