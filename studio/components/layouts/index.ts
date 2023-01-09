@@ -15,6 +15,7 @@ import { WizardLayoutWithoutAuth } from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
 import LogsLayout from './LogsLayout/LogsLayout'
+import ReportsLayout from './ReportsLayout/ReportsLayout'
 import OrganizationLayout from './OrganizationLayout'
 
 export {
@@ -35,6 +36,7 @@ export {
   VercelIntegrationLayout,
   BillingLayout,
   LogsLayout,
+  ReportsLayout,
   OrganizationLayout,
 }
 
