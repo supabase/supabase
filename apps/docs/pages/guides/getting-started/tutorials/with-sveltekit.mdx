@@ -56,8 +56,7 @@ import { env } from '$env/dynamic/public'
 export const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
 ```
 
-And one optional step is to update the CSS file `src/routes/style.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+Optionally, update `src/routes/style.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 If you don't add this file, you will need to remove the import statement in `src/routes/+layout.svelte` (created later).
 
 ### Supabase Auth Helpers
