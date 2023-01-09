@@ -7,11 +7,15 @@ import { useStore } from 'hooks'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string
-  wrapper: Wrapper
+  wrapper: any
+  wrapperMeta: Wrapper
 }
 
-export const getDeleteFDWSql = ({ wrapper }: Pick<FDWDeleteVariables, 'wrapper'>) => {
-  const encryptedOptions = wrapper.server.options.filter((option) => option.encrypted)
+export const getDeleteFDWSql = ({
+  wrapper,
+  wrapperMeta,
+}: Pick<FDWDeleteVariables, 'wrapper' | 'wrapperMeta'>) => {
+  const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
@@ -38,12 +42,17 @@ export const getDeleteFDWSql = ({ wrapper }: Pick<FDWDeleteVariables, 'wrapper'>
   return sql
 }
 
-export async function deleteFDW({ projectRef, connectionString, wrapper }: FDWDeleteVariables) {
+export async function deleteFDW({
+  projectRef,
+  connectionString,
+  wrapper,
+  wrapperMeta,
+}: FDWDeleteVariables) {
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
 
-  const sql = getDeleteFDWSql({ wrapper })
+  const sql = getDeleteFDWSql({ wrapper, wrapperMeta })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
