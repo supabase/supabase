@@ -3,7 +3,16 @@ import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
+import {
+  Button,
+  Form,
+  Input,
+  IconArrowLeft,
+  IconExternalLink,
+  IconEdit,
+  IconTrash,
+  IconLoader,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
@@ -27,6 +36,7 @@ import {
   FormSection,
   FormSectionLabel,
   FormSectionContent,
+  FormsContainer,
 } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
@@ -50,6 +60,7 @@ const EditWrapper = () => {
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
@@ -71,11 +82,41 @@ const EditWrapper = () => {
   }, [wrapper?.id])
 
   if (isLoading) {
-    return <Loading />
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Loading />
+      </div>
+    )
   }
 
   if (wrapper === undefined || wrapperMeta === undefined) {
-    return <div>Oh no</div>
+    if (isSaving) {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+          <div className="space-x-4 flex items-center">
+            <IconLoader className="animate-spin" size={16} />
+            <p className="text-sm">Updating wrapper</p>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+          <div className="space-y-2 flex flex-col items-center w-[400px]">
+            <p>Unknown wrapper</p>
+            <p className="text-sm text-scale-1000 text-center">
+              The wrapper ID {id} cannot be found in your project. Head back to select another
+              wrapper.
+            </p>
+          </div>
+          <Link href={`/project/${ref}/database/wrappers`}>
+            <a>
+              <Button type="default">Head back</Button>
+            </a>
+          </Link>
+        </div>
+      )
+    }
   }
 
   const onUpdateTable = (values: any) => {
@@ -103,6 +144,7 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
+    setIsSaving(true)
     setSubmitting(true)
     try {
       await deleteFDW({
@@ -133,12 +175,13 @@ const EditWrapper = () => {
         message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
       })
     } finally {
+      setIsSaving(false)
       setSubmitting(false)
     }
   }
 
   return (
-    <>
+    <FormsContainer>
       <div>
         <div className="relative flex items-center justify-between mb-6">
           <div
@@ -341,7 +384,7 @@ const EditWrapper = () => {
         onSave={onUpdateTable}
         initialData={selectedTableToEdit}
       />
-    </>
+    </FormsContainer>
   )
 }
 

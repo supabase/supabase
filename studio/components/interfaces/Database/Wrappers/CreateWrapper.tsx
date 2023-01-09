@@ -11,6 +11,7 @@ import {
   FormPanel,
   FormActions,
   FormSection,
+  FormsContainer,
   FormSectionLabel,
   FormSectionContent,
 } from 'components/ui/Forms'
@@ -50,7 +51,22 @@ const CreateWrapper = () => {
       : {}
 
   if (wrapperMeta === undefined) {
-    return <div>Lol what?</div>
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+        <div className="space-y-2 flex flex-col items-center w-[400px]">
+          <p>Unsupported wrapper type</p>
+          <p className="text-sm text-scale-1000 text-center">
+            The wrapper type {type} not supported by the dashboard. Head back to create a different
+            wrapper.
+          </p>
+        </div>
+        <Link href={`/project/${ref}/database/wrappers`}>
+          <a>
+            <Button type="default">Head back</Button>
+          </a>
+        </Link>
+      </div>
+    )
   }
 
   const onUpdateTable = (values: any) => {
@@ -105,7 +121,7 @@ const CreateWrapper = () => {
   }
 
   return (
-    <>
+    <FormsContainer>
       <div>
         <div className="relative flex items-center justify-between mb-6">
           <div
@@ -271,7 +287,7 @@ const CreateWrapper = () => {
         onSave={onUpdateTable}
         initialData={selectedTableToEdit}
       />
-    </>
+    </FormsContainer>
   )
 }
 
