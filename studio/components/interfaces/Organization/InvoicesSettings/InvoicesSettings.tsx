@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -10,15 +10,9 @@ import NoPermission from 'components/ui/NoPermission'
 
 const PAGE_LIMIT = 10
 
-/**
- * Eventually deprecate this - as we move on to show invoices by project on the organization billing page
- */
+// Refactor: Split invoices by projects so it's easier for users to identify
 
-interface Props {
-  organization: any
-}
-
-const InvoicesSettings: FC<Props> = ({ organization }) => {
+const InvoicesSettings = () => {
   const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
 
@@ -26,7 +20,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<any>([])
 
-  const { stripe_customer_id } = organization
+  const { stripe_customer_id } = ui.selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
   const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')

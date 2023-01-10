@@ -1,17 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { FC, useContext } from 'react'
+import { FC } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { Member, Role } from 'types'
 
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
-import { PageContext } from 'pages/org/[slug]/settings'
 import { isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -22,11 +21,9 @@ interface Props {
 }
 
 const MemberActions: FC<Props> = ({ members, member, roles }) => {
-  const PageState: any = useContext(PageContext)
-  const { slug } = PageState.organization
-  const { rolesRemovable } = getRolesManagementPermissions(roles)
-
   const { ui } = useStore()
+  const { slug } = useParams()
+  const { rolesRemovable } = getRolesManagementPermissions(roles)
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
@@ -78,33 +75,6 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
     })
   }
 
-  // TODO(alaister): check with Joshen and see if this can be removed
-  // [Joshen] This will be deprecated after ABAC is fully rolled out
-  const handleTransferOwnership = async () => {
-    // setLoading(true)
-    // const response = await post(`${API_URL}/organizations/${slug}/transfer`, {
-    //   org_id: id,
-    //   member_id: member.id,
-    // })
-    // if (response.error) {
-    //   ui.setNotification({
-    //     category: 'error',
-    //     message: `Failed to transfer ownership: ${response.error.message}`,
-    //   })
-    //   setLoading(false)
-    // } else {
-    //   const updatedMembers = members.map((m: any) => {
-    //     if (m.is_owner) return { ...m, is_owner: false }
-    //     if (m.id === member.id) return { ...m, is_owner: true }
-    //     else return { ...m }
-    //   })
-    //   mutateOrgMembers(updatedMembers)
-    //   setOwnerTransferIsVisible(false)
-    //   ui.setNotification({ category: 'success', message: 'Successfully transferred organization' })
-    // }
-    // app.organizations.load()
-  }
-
   const {
     mutate: createOrganizationMemberInvite,
     isLoading: isOrganizationMemberInviteCreateLoading,
@@ -121,7 +91,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   })
 
   async function handleResendInvite(member: Member) {
-    if (!member.invited_id) return
+    if (!member.invited_id || !slug) return
 
     const roleId = (member?.role_ids ?? [])[0]
     createOrganizationMemberInvite({
@@ -149,7 +119,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
 
   function handleRevokeInvitation(member: Member) {
     const invitedId = member.invited_id
-    if (!invitedId) return
+    if (!invitedId || !slug) return
 
     deleteOrganizationMemberInvite({
       slug,

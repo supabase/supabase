@@ -1,17 +1,16 @@
 import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState, useContext, Fragment } from 'react'
+import { useState, FC, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal } from 'ui'
+import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from 'ui'
 
 import { Member, Role } from 'types'
-import { useParams, useStore } from 'hooks'
+import { useStore, useParams } from 'hooks'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
-import { PageContext } from 'pages/org/[slug]/settings'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 
@@ -20,16 +19,39 @@ interface SelectedMember extends Member {
   newRoleId: number
 }
 
-const MembersView = () => {
-  const PageState: any = useContext(PageContext)
-  const { roles }: { roles: Role[] } = PageState
-  const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
+interface Props {
+  roles: Role[]
+  members: Member[]
+  searchString: string
+}
 
+const MembersView: FC<Props> = ({ searchString, roles, members }) => {
   const { ui } = useStore()
   const { slug } = useParams()
 
+  const user = ui.profile
+
+  const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
+
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
+
+  if (!members) return <div />
+
+  const filteredMembers = (
+    !searchString
+      ? members
+      : members.filter((x: any) => {
+          if (x.invited_at) {
+            return x.primary_email.includes(searchString)
+          }
+          if (x.id || x.gotrue_id) {
+            return x.username.includes(searchString) || x.primary_email.includes(searchString)
+          }
+        })
+  )
+    .slice()
+    .sort((a: any, b: any) => a.username.localeCompare(b.username))
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -71,7 +93,7 @@ const MembersView = () => {
   return (
     <>
       <div className="rounded">
-        <Loading active={!PageState.filteredMembers}>
+        <Loading active={!filteredMembers}>
           <Table
             head={[
               <Table.th key="header-user">User</Table.th>,
@@ -83,10 +105,10 @@ const MembersView = () => {
               <Table.th key="header-action"></Table.th>,
             ]}
             body={[
-              PageState.filteredMembers.map((x: Member, i: number) => {
+              ...filteredMembers.map((x: Member, i: number) => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
-                const memberIsUser = x.primary_email == PageState.user.primary_email
+                const memberIsUser = x.primary_email == user?.primary_email
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
@@ -211,22 +233,38 @@ const MembersView = () => {
                       </Table.td>
                       <Table.td>
                         {!memberIsUser && (
-                          <MemberActions members={PageState.members} member={x} roles={roles} />
+                          <MemberActions members={members} member={x} roles={roles} />
                         )}
                       </Table.td>
                     </Table.tr>
                   </Fragment>
                 )
               }),
+              ...(searchString.length > 0 && filteredMembers.length === 0
+                ? [
+                    <Table.tr
+                      key="no-results"
+                      className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
+                    >
+                      <Table.td colSpan={12}>
+                        <div className="flex items-center space-x-3 opacity-75">
+                          <IconAlertCircle size={16} strokeWidth={2} />
+                          <p className="text-scale-1100">
+                            No users matched the search query "{searchString}"
+                          </p>
+                        </div>
+                      </Table.td>
+                    </Table.tr>,
+                  ]
+                : []),
               <Table.tr
                 key="footer"
                 className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
               >
                 <Table.td colSpan={4}>
                   <p className="text-scale-1100">
-                    {PageState.membersFilterString ? `${PageState.filteredMembers.length} of ` : ''}
-                    {PageState.members.length || '0'}{' '}
-                    {PageState.members.length == 1 ? 'user' : 'users'}
+                    {searchString ? `${filteredMembers.length} of ` : ''}
+                    {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
                   </p>
                 </Table.td>
               </Table.tr>,
