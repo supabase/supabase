@@ -19,48 +19,33 @@ export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
-  // @ts-ignore
-  const planetPgPosts = allPostsData.filter((post) => post.tags.includes('planetpg'))
-
-  const planetPgPavel = planetPgPosts.filter((post) => post.author.includes('pavel'))
-  const planetPgAlexander = planetPgPosts.filter((post) => post.author.includes('alexander'))
-  const planetPgMichel = planetPgPosts.filter((post) => post.author.includes('michel'))
-  const planetPgSteve = planetPgPosts.filter((post) => post.author.includes('steve_chavez'))
-  const planetPgAngelico = planetPgPosts.filter((post) =>
-    post.author.includes('angelico_de_los_reyes')
-  )
-  const planetPgOli = planetPgPosts.filter((post) => post.author.includes('oli_rice'))
-  const planetPgMark = planetPgPosts.filter((post) => post.author.includes('burggraf'))
-  const planetPgVictor = planetPgPosts.filter((post) => post.author.includes('victor'))
-  const planetPgPaul = planetPgPosts.filter((post) => post.author.includes('paul_copplestone'))
-  const planetPgAnt = planetPgPosts.filter((post) => post.author.includes('ant_wilson'))
-
-  const planetPgrssPavel = generateRss(planetPgPavel)
-  const planetPgrssAlexander = generateRss(planetPgAlexander)
-  const planetPgrssMichel = generateRss(planetPgMichel)
-  const planetPgrssSteve = generateRss(planetPgSteve)
-  const planetPgrssAngelico = generateRss(planetPgAngelico)
-  const planetPgrssOli = generateRss(planetPgOli)
-  const planetPgrssMark = generateRss(planetPgMark)
-  const planetPgrssVictor = generateRss(planetPgVictor)
-  const planetPgrssPaul = generateRss(planetPgPaul)
-  const planetPgrssAnt = generateRss(planetPgAnt)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
 
-  // create separate feed for posts to promote in PlanetPG for each author
-  fs.writeFileSync('./public/planetpg-pavel-rss.xml', planetPgrssPavel)
-  fs.writeFileSync('./public/planetpg-alexander-rss.xml', planetPgrssAlexander)
-  fs.writeFileSync('./public/planetpg-michel-rss.xml', planetPgrssMichel)
-  fs.writeFileSync('./public/planetpg-steve-rss.xml', planetPgrssSteve)
-  fs.writeFileSync('./public/planetpg-angelico-rss.xml', planetPgrssAngelico)
-  fs.writeFileSync('./public/planetpg-oli-rss.xml', planetPgrssOli)
-  fs.writeFileSync('./public/planetpg-mark-rss.xml', planetPgrssMark)
-  fs.writeFileSync('./public/planetpg-victor-rss.xml', planetPgrssVictor)
-  fs.writeFileSync('./public/planetpg-paul-rss.xml', planetPgrssPaul)
-  fs.writeFileSync('./public/planetpg-ant-rss.xml', planetPgrssAnt)
+  // generate a series of rss feeds for each author (for PlanetPG)
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+
+  const authors = [
+    'alexander',
+    'michel',
+    'steve_chavez',
+    'angelico_de_los_reyes',
+    'oli_rice',
+    'burggraf',
+    'victor',
+    'paul_copplestone',
+    'ant_wilson',
+  ]
+
+  authors.forEach((author) => {
+    const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
+    if (authorPosts.length > 0) {
+      const authorRss = generateRss(authorPosts)
+      fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
+    }
+  })
 
   return {
     props: {
