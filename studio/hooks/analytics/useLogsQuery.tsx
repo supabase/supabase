@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
@@ -7,9 +8,6 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { useQuery } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
-
 export interface LogsQueryData {
   params: LogsEndpointParams
   isLoading: boolean
@@ -23,8 +21,7 @@ export interface LogsQueryHandlers {
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
 
-// API differs from the other query hooks, as it maintains compatibility with the old SWR hook.
-export const useLogsQuery = (
+const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
 ): [LogsQueryData, LogsQueryHandlers] => {
@@ -40,6 +37,8 @@ export const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
+  const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
+
   const queryParams = genQueryParams(params as any)
   const {
     data,
@@ -47,28 +46,19 @@ export const useLogsQuery = (
     isLoading,
     isRefetching,
     refetch,
-  } = useQuery<Logs>(
-    analyticsKeys.logs(projectRef, params),
-    async ({ signal }) => {
-      const response = await get(
-        `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`,
-        {
-          signal,
-        }
-      )
-
-      if (response.error) {
-        throw response.error
-      }
-
-      return response
-    },
+  } = useQuery(
+    ['projects', projectRef, 'logs', params],
+    ({ signal }) =>
+      get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
+        signal,
+      }),
     {
-      enabled: typeof projectRef !== 'undefined' && Boolean(params.sql),
+      enabled,
       refetchOnWindowFocus: false,
     }
   )
-  let error: null | string | object = rqError ? (rqError as any)?.message : null
+
+  let error: null | string | object = rqError ? (rqError as any).message : null
 
   if (!error && data?.error) {
     error = data?.error
@@ -80,10 +70,11 @@ export const useLogsQuery = (
   return [
     {
       params,
-      isLoading: isLoading || isRefetching,
+      isLoading: (enabled && isLoading) || isRefetching,
       logData: data?.result ? data?.result : [],
       error,
     },
     { changeQuery, runQuery: () => refetch(), setParams },
   ]
 }
+export default useLogsQuery

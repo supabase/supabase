@@ -46,7 +46,7 @@ export const clickDropdown = (elem: HTMLElement) => {
  * A custom render function for react testing library
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
-const SwrTestConfig: React.FC = ({ children }) => {
+const ReactQueryTestConfig: React.FC = ({ children }) => {
   const [rootStore] = useState(() => new RootStore())
 
   const [queryClient] = useState(
@@ -74,4 +74,4 @@ const SwrTestConfig: React.FC = ({ children }) => {
 }
 type renderParams = Parameters<typeof originalRender>
 export const render = ((ui: renderParams[0], options: renderParams[1]) =>
-  originalRender(ui, { wrapper: SwrTestConfig, ...options })) as typeof originalRender
+  originalRender(ui, { wrapper: ReactQueryTestConfig, ...options })) as typeof originalRender

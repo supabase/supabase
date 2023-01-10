@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from 'ui'
 
 import { useParams, useStore } from 'hooks'
-import { useLogsQuery } from 'data/analytics/logs-query'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'

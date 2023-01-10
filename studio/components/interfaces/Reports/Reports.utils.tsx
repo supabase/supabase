@@ -1,6 +1,6 @@
 import { IconRefreshCw } from '@supabase/ui'
-import { LogsQueryData, LogsQueryHandlers, useLogsQuery } from 'data/analytics/logs-query'
-import { useLogsSqlQuery } from 'data/analytics/logs-sql-query'
+import useDbQuery from 'hooks/analytics/useDbQuery'
+import useLogsQuery, { LogsQueryData, LogsQueryHandlers } from 'hooks/analytics/useLogsQuery'
 import React from 'react'
 import { Button } from 'ui'
 import { DatePickerToFrom } from '../Settings/Logs'
@@ -24,7 +24,7 @@ export const hooksFactory = (projectRef: string, config: PresetConfig) => {
       if (queryType === 'db') {
         return {
           ...acc,
-          [k]: () => useLogsSqlQuery(sql),
+          [k]: () => useDbQuery(sql),
         }
       } else {
         return {
