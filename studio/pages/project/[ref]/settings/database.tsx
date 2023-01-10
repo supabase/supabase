@@ -1,19 +1,18 @@
-import useSWR from 'swr'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
 import { Input, Button, IconDownload, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
-import { get, patch } from 'lib/common/fetch'
+import { checkPermissions, useParams, useStore } from 'hooks'
+import { patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -21,13 +20,12 @@ import Panel from 'components/ui/Panel'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
-        <GeneralSettings projectRef={ref} />
+        <GeneralSettings projectRef={projectRef} />
         <ConnectionPooling />
       </div>
     </div>
@@ -237,9 +235,9 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 }
 
 const GeneralSettings: FC<any> = ({ projectRef }) => {
-  const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
+  const { data, error, isLoading, isSuccess } = useProjectSettingsQuery({ projectRef })
 
-  if (data?.error || error) {
+  if (error || !isSuccess) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <p className="text-scale-1000">Error loading database settings</p>
@@ -247,7 +245,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     )
   }
 
-  if (!data) {
+  if (isLoading) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <p className="text-scale-1000">Loading...</p>
