@@ -24,7 +24,7 @@ The code for this guide is based of [this example repo](https://github.com/picke
 
 ## Step 1: Create a Picket Project
 
-First, we'll create a new project in our [Picket dashboard](https://picketapi.com/dashboard). 
+First, we'll create a new project in our [Picket dashboard](https://picketapi.com/dashboard).
 
 Click the `Create New Project` button at the top of the Projects section on your [Picket dashboard](https://picketapi.com/dashboard). Edit the project to give it a memorable name.
 
@@ -57,6 +57,7 @@ Enter `todos` as the `Name` field.
 Select `Enable Row Level Security (RLS)`.
 
 Create four columns:
+
 - `name` as `text`
 - `wallet_address` as `text`
 - `completed` as `bool` with the default value `false`
@@ -73,6 +74,7 @@ Now we want to make sure that only the `todos` owner, the user's `wallet_address
 ```sql
 ((jwt() ->> 'walletAddress'::text) = wallet_address)
 ```
+
 This expression checks that the wallet address in the requesting JWT access token is the same as the `wallet_address` in the `todos` table.
 
 ![RLS policy](/docs/img/guides/integrations/picket/rls_policy.png)
@@ -88,11 +90,12 @@ npx create-next-app@latest --typescript
 ```
 
 Create a `.env.local` file and enter the following values
--   `NEXT_PUBLIC_PICKET_PUBLISHABLE_KEY` => Copy the publishable key from the Picket project you created in step 1
--   `PICKET_PROJECT_SECRET_KEY` => Copy the secret key from the Picket project you created in the step 1
--   `NEXT_PUBLIC_SUPABASE_URL` => You can find this URL under "Settings > API" in your Supabase project
--   `NEXT_PUBLIC_SUPABASE_ANON_KEY` => You can find this project API key under "Settings > API" in your Supabase project
--   `SUAPBASE_JWT_SECRET`=> You can find this secret under "Settings > API" in your Supabase project
+
+- `NEXT_PUBLIC_PICKET_PUBLISHABLE_KEY` => Copy the publishable key from the Picket project you created in step 1
+- `PICKET_PROJECT_SECRET_KEY` => Copy the secret key from the Picket project you created in the step 1
+- `NEXT_PUBLIC_SUPABASE_URL` => You can find this URL under "Settings > API" in your Supabase project
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` => You can find this project API key under "Settings > API" in your Supabase project
+- `SUAPBASE_JWT_SECRET`=> You can find this secret under "Settings > API" in your Supabase project
 
 ```txt
 NEXT_PUBLIC_PICKET_PUBLISHABLE_KEY="YOUR_PICKET_PUBLISHABLE_KEY"
@@ -105,7 +108,7 @@ SUPABASE_JWT_SECRET="YOUR_SUPABASE_JWT_SECRET"
 ## Step 5: Setup Picket for Wallet Login
 
 > For more information on how to setup [Picket](https://picketapi.com) in your Next.js app, checkout the [Picket getting started guide](https://docs.picketapi.com/picket-docs/quick-start-guides/quick-start-guides/wallet-login)
-After initializing our app, we can setup Picket.
+> After initializing our app, we can setup Picket.
 
 Install the Picket [React](/picket-docs/reference/libraries-and-sdks/react-sdk-picket-react) and [Node](/picket-docs/reference/libraries-and-sdks/node.js-library-picket-node) libraries
 
@@ -116,76 +119,76 @@ npm i @picketapi/picket-react @picketapi/picket-node
 Update `pages/_app.tsx` to setup the `PicketProvider`
 
 ```tsx
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
+import '../styles/globals.css'
+import type { AppProps } from 'next/app'
 
-import { PicketProvider } from "@picketapi/picket-react";
+import { PicketProvider } from '@picketapi/picket-react'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <PicketProvider apiKey={process.env.NEXT_PUBLIC_PICKET_PUBLISHABLE_KEY!}>
       <Component {...pageProps} />
     </PicketProvider>
-  );
+  )
 }
 ```
 
 Update `pages/index.tsx` to let users log in and out with their wallet
 
 ```tsx
-import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
-import { useCallback } from "react";
+import { GetServerSideProps } from 'next'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 
-import styles from "../styles/Home.module.css";
+import styles from '../styles/Home.module.css'
 
-import { usePicket } from "@picketapi/picket-react";
-import { cookieName } from "../utils/supabase";
+import { usePicket } from '@picketapi/picket-react'
+import { cookieName } from '../utils/supabase'
 
 type Props = {
-  loggedIn: boolean;
-};
+  loggedIn: boolean
+}
 
 export default function Home(props: Props) {
-  const { loggedIn } = props;
-  const { login, logout, authState } = usePicket();
-  const router = useRouter();
+  const { loggedIn } = props
+  const { login, logout, authState } = usePicket()
+  const router = useRouter()
 
   const handleLogin = useCallback(async () => {
-    let auth = authState;
+    let auth = authState
     // no need to re-login if they've already connected with Picket
     if (!auth) {
       // login with Picket
-      auth = await login();
+      auth = await login()
     }
 
     // login failed
-    if (!auth) return;
+    if (!auth) return
 
     // create a corresponding supabase access token
-    await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         accessToken: auth.accessToken,
       }),
-    });
+    })
     // redirect to their todos page
-    router.push("/todos");
-  }, [authState, login, router]);
+    router.push('/todos')
+  }, [authState, login, router])
 
   const handleLogout = useCallback(async () => {
     // clear both picket and supabase session
-    await logout();
-    await fetch("/api/logout", {
-      method: "POST",
+    await logout()
+    await fetch('/api/logout', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    });
+    })
     // refresh the page
-    router.push("/");
-  }, [logout, router]);
+    router.push('/')
+  }, [logout, router])
 
   return (
     <div className={styles.container}>
@@ -197,29 +200,27 @@ export default function Home(props: Props) {
         )}
       </main>
     </div>
-  );
+  )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  req,
-}) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
   // get supabase token server-side
-  const accessToken = req.cookies[cookieName];
+  const accessToken = req.cookies[cookieName]
 
   if (!accessToken) {
     return {
       props: {
         loggedIn: false,
       },
-    };
+    }
   }
 
   return {
     props: {
       loggedIn: true,
     },
-  };
-};
+  }
+}
 ```
 
 ## Step 6: Issue a Supabase JWT on Wallet Login
@@ -235,12 +236,12 @@ npm install @supabase/supabase-js jsonwebtoken cookie js-cookie
 Create a utility function to create a Supabase client with a custom access token in `utils/supabase.ts`
 
 ```ts
-import { createClient, SupabaseClientOptions } from "@supabase/supabase-js";
+import { createClient, SupabaseClientOptions } from '@supabase/supabase-js'
 
-export const cookieName = "sb-access-token";
+export const cookieName = 'sb-access-token'
 
 const getSupabase = (accessToken: string) => {
-  const options: SupabaseClientOptions<"public"> = {};
+  const options: SupabaseClientOptions<'public'> = {}
 
   if (accessToken) {
     options.global = {
@@ -248,44 +249,41 @@ const getSupabase = (accessToken: string) => {
         // This gives Supabase information about the user (wallet) making the request
         Authorization: `Bearer ${accessToken}`,
       },
-    };
+    }
   }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     options
-  );
+  )
 
-  return supabase;
-};
+  return supabase
+}
 
-export { getSupabase };
+export { getSupabase }
 ```
 
 Create new api route `pages/api/login.ts`. This route validates the Picket access token then issues another equivalent Supabase access token for us to use with the Supabase client.
 
 ```ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import jwt from "jsonwebtoken";
-import cookie from "cookie";
-import Picket from "@picketapi/picket-node";
+import type { NextApiRequest, NextApiResponse } from 'next'
+import jwt from 'jsonwebtoken'
+import cookie from 'cookie'
+import Picket from '@picketapi/picket-node'
 
-import { cookieName } from "../../utils/supabase";
+import { cookieName } from '../../utils/supabase'
 
 // create picket node client with your picket secret api key
-const picket = new Picket(process.env.PICKET_PROJECT_SECRET_KEY!);
+const picket = new Picket(process.env.PICKET_PROJECT_SECRET_KEY!)
 
-const expToExpiresIn = (exp: number) => exp - Math.floor(Date.now() / 1000);
+const expToExpiresIn = (exp: number) => exp - Math.floor(Date.now() / 1000)
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { accessToken } = req.body;
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { accessToken } = req.body
   // omit expiration time,.it will conflict with jwt.sign
-  const { exp, ...payload } = await picket.validate(accessToken);
-  const expiresIn = expToExpiresIn(exp);
+  const { exp, ...payload } = await picket.validate(accessToken)
+  const expiresIn = expToExpiresIn(exp)
 
   const supabaseJWT = jwt.sign(
     {
@@ -295,48 +293,46 @@ export default async function handler(
     {
       expiresIn,
     }
-  );
+  )
 
   // Set a new cookie with the name
   res.setHeader(
-    "Set-Cookie",
+    'Set-Cookie',
     cookie.serialize(cookieName, supabaseJWT, {
-      path: "/",
-      secure: process.env.NODE_ENV !== "development",
+      path: '/',
+      secure: process.env.NODE_ENV !== 'development',
       // allow the cookie to be accessed client-side
       httpOnly: false,
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: expiresIn,
     })
-  );
-  res.status(200).json({});
+  )
+  res.status(200).json({})
 }
 ```
 
 And now create an equivalent logout api route `/pages/api/logout.ts` to delete the Supabase access token cookie.
 
 ```ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import cookie from "cookie";
+import type { NextApiRequest, NextApiResponse } from 'next'
+import cookie from 'cookie'
 
-import { cookieName } from "../../utils/supabase";
+import { cookieName } from '../../utils/supabase'
 
-export default async function handler(
-  _req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
   // Clear the supabase cookie
   res.setHeader(
-    "Set-Cookie",
-    cookie.serialize(cookieName, "", {
-      path: "/",
+    'Set-Cookie',
+    cookie.serialize(cookieName, '', {
+      path: '/',
       maxAge: -1,
     })
-  );
+  )
 
-  res.status(200).json({});
+  res.status(200).json({})
 }
 ```
+
 We can now login and logout to the app with our wallet!
 
 ## Step 7: Interacting with Data in Supabase
@@ -346,39 +342,39 @@ Now that we can login to the app, it's time to start interacting with Supabase. 
 Create a new file `pages/todos.tsx`
 
 ```tsx
-import { GetServerSideProps } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import { useState, useMemo } from "react";
-import jwt from "jsonwebtoken";
-import Cookies from "js-cookie";
+import { GetServerSideProps } from 'next'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useState, useMemo } from 'react'
+import jwt from 'jsonwebtoken'
+import Cookies from 'js-cookie'
 
-import styles from "../styles/Home.module.css";
+import styles from '../styles/Home.module.css'
 
-import { getSupabase, cookieName } from "../utils/supabase";
+import { getSupabase, cookieName } from '../utils/supabase'
 
 type Todo = {
-  name: string;
-  completed: boolean;
-};
+  name: string
+  completed: boolean
+}
 
 type Props = {
-  walletAddress: string;
-  todos: Todo[];
-};
+  walletAddress: string
+  todos: Todo[]
+}
 
 const displayWalletAddress = (walletAddress: string) =>
-  `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+  `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
 
 export default function Todos(props: Props) {
-  const { walletAddress } = props;
-  const [todos, setTodos] = useState(props.todos);
+  const { walletAddress } = props
+  const [todos, setTodos] = useState(props.todos)
 
   // avoid re-creating supabase client every render
   const supabase = useMemo(() => {
-    const accessToken = Cookies.get(cookieName);
-    return getSupabase(accessToken || "");
-  }, []);
+    const accessToken = Cookies.get(cookieName)
+    return getSupabase(accessToken || '')
+  }, [])
 
   return (
     <div className={styles.container}>
@@ -390,25 +386,24 @@ export default function Todos(props: Props) {
         <h1 className={styles.title}>Your Personal Todo List</h1>
         <div
           style={{
-            maxWidth: "600px",
-            textAlign: "left",
-            fontSize: "1.125rem",
-            margin: "36px 0 24px 0",
+            maxWidth: '600px',
+            textAlign: 'left',
+            fontSize: '1.125rem',
+            margin: '36px 0 24px 0',
           }}
         >
           <p>Welcome {displayWalletAddress(walletAddress)},</p>
           <p>
-            Your todo list is stored in Supabase and are only accessible to you
-            and your wallet address. Picket + Supabase makes it easy to build
-            scalable, hybrid web2 and web3 apps. Use Supabase to store
-            non-critical or private data off-chain like user app preferences or
-            todo lists.
+            Your todo list is stored in Supabase and are only accessible to you and your wallet
+            address. Picket + Supabase makes it easy to build scalable, hybrid web2 and web3 apps.
+            Use Supabase to store non-critical or private data off-chain like user app preferences
+            or todo lists.
           </p>
         </div>
         <div
           style={{
-            textAlign: "left",
-            fontSize: "1.125rem",
+            textAlign: 'left',
+            fontSize: '1.125rem',
           }}
         >
           <h2>Todo List</h2>
@@ -416,32 +411,28 @@ export default function Todos(props: Props) {
             <div
               key={todo.name}
               style={{
-                margin: "8px 0",
-                display: "flex",
-                alignItems: "center",
+                margin: '8px 0',
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
               <input
                 type="checkbox"
                 checked={todo.completed}
                 onChange={async () => {
-                  await supabase.from("todos").upsert({
+                  await supabase.from('todos').upsert({
                     wallet_address: walletAddress,
                     name: todo.name,
                     completed: !todo.completed,
-                  });
+                  })
                   setTodos((todos) =>
-                    todos.map((t) =>
-                      t.name === todo.name
-                        ? { ...t, completed: !t.completed }
-                        : t
-                    )
-                  );
+                    todos.map((t) => (t.name === todo.name ? { ...t, completed: !t.completed } : t))
+                  )
                 }}
               />
               <span
                 style={{
-                  margin: "0 0 0 8px",
+                  margin: '0 0 0 8px',
                 }}
               >
                 {todo.name}
@@ -450,13 +441,13 @@ export default function Todos(props: Props) {
           ))}
           <div
             style={{
-              margin: "24px 0",
+              margin: '24px 0',
             }}
           >
             <Link
-              href={"/"}
+              href={'/'}
               style={{
-                textDecoration: "underline",
+                textDecoration: 'underline',
               }}
             >
               Go back home &rarr;
@@ -465,78 +456,76 @@ export default function Todos(props: Props) {
         </div>
       </main>
     </div>
-  );
+  )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  req,
-}) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
   // example of fetching data server-side
-  const accessToken = req.cookies[cookieName];
+  const accessToken = req.cookies[cookieName]
 
   // require authentication
   if (!accessToken) {
     return {
       redirect: {
-        destination: "/",
+        destination: '/',
       },
       props: {
-        walletAddress: "",
+        walletAddress: '',
         todos: [],
       },
-    };
+    }
   }
 
   // check if logged in user has completed the tutorial
-  const supabase = getSupabase(accessToken);
+  const supabase = getSupabase(accessToken)
   const { walletAddress } = jwt.decode(accessToken) as {
-    walletAddress: string;
-  };
+    walletAddress: string
+  }
 
   // get todos for the users
   // if none exist, create the default todos
-  let { data } = await supabase.from("todos").select("*");
+  let { data } = await supabase.from('todos').select('*')
 
   if (!data || data.length === 0) {
-    let error = null;
-    ({ data, error } = await supabase
-      .from("todos")
+    let error = null
+    ;({ data, error } = await supabase
+      .from('todos')
       .insert([
         {
           wallet_address: walletAddress,
-          name: "Complete the Picket + Supabase Tutorial",
+          name: 'Complete the Picket + Supabase Tutorial',
           completed: true,
         },
         {
           wallet_address: walletAddress,
-          name: "Create a Picket Account (https://picketapi.com/)",
+          name: 'Create a Picket Account (https://picketapi.com/)',
           completed: false,
         },
         {
           wallet_address: walletAddress,
-          name: "Read the Picket Docs (https://docs.picketapi.com/)",
+          name: 'Read the Picket Docs (https://docs.picketapi.com/)',
           completed: false,
         },
         {
           wallet_address: walletAddress,
-          name: "Build an Awesome Web3 Experience",
+          name: 'Build an Awesome Web3 Experience',
           completed: false,
         },
       ])
-      .select("*"));
+      .select('*'))
 
     if (error) {
       // log error and redirect home
-      console.error(error);
+      console.error(error)
       return {
         redirect: {
-          destination: "/",
+          destination: '/',
         },
         props: {
-          walletAddress: "",
+          walletAddress: '',
           todos: [],
         },
-      };
+      }
     }
   }
 
@@ -545,14 +534,15 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
       walletAddress,
       todos: data as Todo[],
     },
-  };
-};
+  }
+}
 ```
 
 This is a long file, but don't be intimidated. The page is actually straightforward. It
-  1. Verifies server-side that the user is authenticated and if they are not redirects them to the homepage
-  2. Checks to see if they already have `todos` . If so, it returns them. If not, it initializes them for the users
-  3. We render the `todos` and when the user selects or deselects a todo, we update the data in the database
+
+1. Verifies server-side that the user is authenticated and if they are not redirects them to the homepage
+2. Checks to see if they already have `todos` . If so, it returns them. If not, it initializes them for the users
+3. We render the `todos` and when the user selects or deselects a todo, we update the data in the database
 
 ## Step 8: Try it Out!
 
@@ -571,10 +561,11 @@ npm run dev
 - Checkout Picket's [example Github repositories](https://github.com/picketapi)
 
 ### Common Use-Case for Picket + Supabase
--   Account linking. Allow users to associate their wallet address(es) with their existing web2 account in your app
--   Leverage Supabase's awesome libraries and ecosystem while still enabling wallet login
--   Store app-specific data, like user preferences, about your user's wallet adress off-chain
--   Cache on-chain data to improve your DApp's performance
+
+- Account linking. Allow users to associate their wallet address(es) with their existing web2 account in your app
+- Leverage Supabase's awesome libraries and ecosystem while still enabling wallet login
+- Store app-specific data, like user preferences, about your user's wallet adress off-chain
+- Cache on-chain data to improve your DApp's performance
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
