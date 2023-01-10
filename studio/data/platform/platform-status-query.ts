@@ -22,10 +22,9 @@ export async function getPlatformStatus(signal?: AbortSignal) {
 export type PlatformStatusData = Awaited<ReturnType<typeof getPlatformStatus>>
 export type PlatformStatusError = unknown
 
-export const usePlatformStatusQuery = <TData = PlatformStatusData>({
-  enabled = true,
-  ...options
-}: UseQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}) =>
+export const usePlatformStatusQuery = <TData = PlatformStatusData>(
+  options: UseQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
+) =>
   useQuery<PlatformStatusData, PlatformStatusError, TData>(
     platformKeys.status(),
     ({ signal }) => getPlatformStatus(signal),

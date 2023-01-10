@@ -4,13 +4,15 @@ import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
-import { useStore, useNotifications } from 'hooks'
+import { useStore } from 'hooks'
+import { notificationKeys } from 'data/notifications/keys'
 import { Project } from 'types'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 import NotificationActions from './NotificationActions'
 import { get, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Button, IconX } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   notification: Notification
@@ -28,7 +30,7 @@ const NotificationRow: FC<Props> = ({
   onSelectFinalizeMigration,
 }) => {
   const { app, ui } = useStore()
-  const { refresh } = useNotifications()
+  const queryClient = useQueryClient()
   const [dismissing, setDismissing] = useState(false)
   const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
 
@@ -36,7 +38,7 @@ const NotificationRow: FC<Props> = ({
   const changelogLink = (notification.data as any).changelog_link
   const availableActions = notification.meta?.actions_available ?? []
 
-  // [Joshen TODO] This should be removed after 5th November when the migration notifications
+  // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
   // Relevant PR: https://github.com/supabase/supabase/pull/9229
   const { data: ownerReassignStatus } = useSWR(
@@ -58,7 +60,7 @@ const NotificationRow: FC<Props> = ({
         duration: 4000,
       })
     } else {
-      refresh()
+      await queryClient.invalidateQueries(notificationKeys.list())
     }
     setDismissing(false)
   }
