@@ -1,18 +1,18 @@
-import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
 import { Button, Dropdown, IconKey } from 'ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { checkPermissions, useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { snakeToCamel } from 'lib/helpers'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 
 const PageContext = createContext(null)
 
@@ -67,35 +67,38 @@ const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 const DocView: FC<any> = observer(({}) => {
   const PageState: any = useContext(PageContext)
-  const router = useRouter()
+  const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error }: any = useSWR(`${API_URL}/props/project/${PageState.projectRef}/api`, get)
-  const API_KEY = data?.autoApiService?.defaultApiKey
+  const { data, error } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const apiKey = data?.autoApiService?.defaultApiKey
   const swaggerUrl = data?.autoApiService?.restUrl
-  const headers: any = { apikey: API_KEY }
 
   const canReadServiceKey = checkPermissions(
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )
 
-  if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
-
-  const { data: jsonSchema, error: jsonSchemaError } = useSWR(
-    () => swaggerUrl,
-    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
-  )
+  const {
+    data: jsonSchema,
+    error: jsonSchemaError,
+    refetch,
+  } = useProjectJsonSchemaQuery({
+    projectRef,
+    swaggerUrl,
+    apiKey,
+  })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
   }, [jsonSchema])
 
   const refreshDocs = async () => {
-    // A bit hacky calling coding this up twice - at some point we should move this function
-    // and the SWR into the store.
-    mutate(swaggerUrl)
+    await refetch()
   }
 
   if (error || jsonSchemaError)
@@ -122,8 +125,6 @@ const DocView: FC<any> = observer(({}) => {
       : `${PROJECT_ENDPOINT_PROTOCOL}://${data.autoApiService.endpoint}`,
   }
 
-  const { query } = router
-  const { page, resource, rpc } = query
   const { paths, definitions } = PageState.jsonSchema
 
   const PAGE_KEY: any = resource || rpc || page || 'index'
