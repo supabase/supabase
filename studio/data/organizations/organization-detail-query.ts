@@ -2,20 +2,11 @@ import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
+import { Member } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationDetailVariables = {
   slug?: string
-}
-
-export type Member = {
-  gotrue_id?: string
-  primary_email: string
-  role_ids: number[]
-  username: string
-  is_owner?: boolean
-  invited_at?: string
-  invited_id?: number
 }
 
 export type OrganizationDetailResponse = {
