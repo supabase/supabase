@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -10,6 +9,7 @@ import {
   IconCopy,
   IconEdit,
   IconLoader,
+  IconLock,
   IconRefreshCw,
   IconSearch,
   IconTrash,
@@ -23,7 +23,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useParams } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
@@ -44,11 +44,9 @@ const TableEditorMenu: FC<Props> = ({
   onDeleteTable = () => {},
   onDuplicateTable = () => {},
 }) => {
-  const { meta, ui } = useStore()
-  const router = useRouter()
-  const { id } = router.query
+  const { meta } = useStore()
+  const { id, ref } = useParams()
 
-  const projectRef = ui.selectedProject?.ref
   const schemas: PostgresSchema[] = meta.schemas.list()
   const tables: PostgresTable[] = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedSchema
@@ -67,15 +65,10 @@ const TableEditorMenu: FC<Props> = ({
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views
   useEffect(() => {
-    let cancel = false
     const fetchViews = async (selectedSchema: string) => {
       await meta.schemas.loadViews(selectedSchema)
     }
     if (selectedSchema) fetchViews(selectedSchema)
-
-    return () => {
-      cancel = true
-    }
   }, [selectedSchema])
 
   const refreshTables = async () => {
@@ -258,7 +251,7 @@ const TableEditorMenu: FC<Props> = ({
                 return (
                   <ProductMenuItem
                     key={table.name}
-                    url={`/project/${projectRef}/editor/${table.id}`}
+                    url={`/project/${ref}/editor/${table.id}`}
                     name={table.name}
                     hoverText={table.comment ? table.comment : table.name}
                     isActive={isActive}
@@ -284,6 +277,13 @@ const TableEditorMenu: FC<Props> = ({
                             >
                               Duplicate Table
                             </Dropdown.Item>,
+                            <Link href={`/project/${ref}/auth/policies?search=${table.id}`}>
+                              <a>
+                                <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
+                                  View Policies
+                                </Dropdown.Item>
+                              </a>
+                            </Link>,
                             <Dropdown.Separator key="separator" />,
                             <Dropdown.Item
                               key="delete-table"
@@ -324,7 +324,7 @@ const TableEditorMenu: FC<Props> = ({
               const viewId = Base64.encode(JSON.stringify(view))
               const isActive = id === viewId
               return (
-                <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
+                <Link key={viewId} href={`/project/${ref}/editor/${viewId}`}>
                   <a>
                     <Menu.Item key={viewId} rounded active={isActive}>
                       <div className="flex justify-between">
@@ -356,7 +356,7 @@ const TableEditorMenu: FC<Props> = ({
             {filteredForeignTables.map((table: Partial<PostgresTable>) => {
               const isActive = Number(id) === table.id
               return (
-                <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
+                <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
                   <a>
                     <Menu.Item key={table.id} rounded active={isActive}>
                       <div className="flex justify-between">

@@ -225,7 +225,6 @@ const TableEditor: FC<Props> = ({
                       withIcon
                       variant="warning"
                       className="!px-4 !py-3 mt-3"
-                      // @ts-ignore
                       title="Turning off RLS means that you are allowing anonymous access to your table"
                     >
                       As such, anyone with the anonymous key can modify or delete your data.
