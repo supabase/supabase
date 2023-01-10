@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import useSWR from 'swr'
 import { FC, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
@@ -12,7 +12,6 @@ import NotificationActions from './NotificationActions'
 import { get, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Button, IconX } from 'ui'
-import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   notification: Notification
@@ -41,11 +40,12 @@ const NotificationRow: FC<Props> = ({
   // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
   // Relevant PR: https://github.com/supabase/supabase/pull/9229
-  const { data: ownerReassignStatus } = useSWR(
-    (notification.data as any).upgrade_type === 'schema-migration'
-      ? `${API_URL}/database/${project.ref}/owner-reassign`
-      : null,
-    get
+  const { data: ownerReassignStatus } = useQuery(
+    ['projects', project.ref, 'owner-reassign'],
+    ({ signal }) => get(`${API_URL}/database/${project.ref}/owner-reassign`, { signal }),
+    {
+      enabled: (notification.data as any).upgrade_type === 'schema-migration',
+    }
   )
 
   const dismissNotification = async (notificationId: string) => {
