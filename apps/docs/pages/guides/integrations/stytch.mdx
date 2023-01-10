@@ -13,7 +13,7 @@ In this guide we will build a simple expense tracker web application using Stytc
 
 We will leverage Supabase to store and authorize access to user data. Supabase makes it simple to set up Row Level Security (RLS) policies which ensure users can only read and write data that they are authorized to do so. If you do not already have a Supabase account, you will need to create one.
 
-This guide will use [Next.js](https://nextjs.org/) which is a web application framework built on top of React. Stytch provides a [Node.js library](https://github.com/stytchauth/stytch-node) and a [React library](https://github.com/stytchauth/stytch-react) which makes building Next.js apps super easy.
+This guide will use [Next.js](https://nextjs.org/) which is a web application framework built on top of React. Stytch provides a [Node.js library](https://github.com/stytchauth/stytch-node) and a [React library](https://stytch.com/docs/sdks/javascript-sdk) which makes building Next.js apps super easy.
 
 > Note: You can find a completed version of this project on [Github](https://github.com/stytchauth/stytch-nextjs-supabase).
 
@@ -558,7 +558,7 @@ We now have a basic expense tracker application powered by Stytch, Supabase, and
 
 In this optional step, we will extend our application to allow users to login with Google One Tap in addition to Email magic links.
 
-You will need to follow the first four steps of [this guide](https://stytch.com/docs/one-tap-guide?utm_source=supabase&utm_medium=guide) to create a Google project, set up Google OAuth consent, and configure credentials and redirect URLs.
+You will need to follow the first four steps of [this guide](https://stytch.com/docs/oauth?utm_source=supabase&utm_medium=guide#guides_google-sdk) to create a Google project, set up Google OAuth consent, and configure credentials and redirect URLs.
 
 First, we will make some adjustments to the `StytchLogin` component. We will update the configuration, so that it uses both Google OAuth, and Email magic links.
 

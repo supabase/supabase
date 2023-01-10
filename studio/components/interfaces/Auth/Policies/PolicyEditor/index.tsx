@@ -37,7 +37,7 @@ const PolicyEditor: FC<Props> = ({
 
   return (
     <div className="">
-      <div className="max-h-[600px] space-y-8 overflow-y-auto py-8">
+      <div className="space-y-8 py-8">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}

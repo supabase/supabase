@@ -369,6 +369,9 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
+    // counts are adjusted
+    expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/))
+
     expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
@@ -387,6 +390,12 @@ test('filters alter generated query', async () => {
   userEvent.click(await screen.findByText(/Save/))
 
   await waitFor(() => {
+    // counts are adjusted
+    expect(get).not.toHaveBeenCalledWith(
+      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/)
+    )
+    expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+400.+499/))
+
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
     expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
@@ -412,7 +421,7 @@ test('filters accept filterOverride', async () => {
   })
 })
 
-describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
     useProjectSubscription.mockReturnValue({
       subscription: {

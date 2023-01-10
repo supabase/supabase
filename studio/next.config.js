@@ -76,6 +76,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/database/api-logs',
+        destination: '/project/:ref/logs/edge-logs',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database/postgres-logs',
         destination: '/project/:ref/logs/postgres-logs',
         permanent: true,
@@ -108,6 +113,11 @@ const nextConfig = {
       {
         source: '/project/:ref/logs-explorer',
         destination: '/project/:ref/logs/explorer',
+        permanent: true,
+      },
+      {
+        source: '/org/:slug/settings',
+        destination: '/org/:slug/general',
         permanent: true,
       },
     ]

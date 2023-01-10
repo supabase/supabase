@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, IconAlertCircle, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, Loading } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -8,6 +8,7 @@ import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { useRouter } from 'next/router'
 
 interface Props {
   projectRef?: string
@@ -16,13 +17,26 @@ interface Props {
 const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { usage, error, isLoading } = useProjectUsage(projectRef)
+  const router = useRouter()
+
+  const subscriptionTier = ui.selectedProject?.subscription_tier
 
   const projectHasNoLimits =
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.TEAM ||
+    subscriptionTier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
-  const showUsageExceedMessage =
-    ui.selectedProject?.subscription_tier !== undefined && !projectHasNoLimits
+  const showUsageExceedMessage = subscriptionTier !== undefined && !projectHasNoLimits
+
+  const planNames = {
+    [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
+    [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
+    [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
+  }
+
+  const planName = subscriptionTier ? planNames[subscriptionTier] || 'current' : 'current'
 
   useEffect(() => {
     if (error) {
@@ -57,6 +71,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   return featureUsage.usage / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
+
             return (
               <div
                 key={product.title}
@@ -104,6 +119,55 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
                         const isExceeded = showUsageExceedMessage && usageRatio >= 1
+                        const isAvailableInPlan = featureUsage.available_in_plan
+
+                        let usageElement
+                        if (!isAvailableInPlan) {
+                          usageElement = (
+                            <div className="flex justify-between items-center">
+                              <span>Not included in {planName} tier</span>
+                              <Button
+                                size="tiny"
+                                onClick={() =>
+                                  router.push(`/project/${projectRef}/settings/billing/update`)
+                                }
+                              >
+                                Upgrade to Pro
+                              </Button>
+                            </div>
+                          )
+                        } else if (showUsageExceedMessage) {
+                          usageElement = (
+                            <SparkBar
+                              type="horizontal"
+                              barClass={`${
+                                isExceeded
+                                  ? 'bg-red-900'
+                                  : isApproaching
+                                  ? 'bg-yellow-900'
+                                  : 'bg-brand-900'
+                              }`}
+                              value={usageValue}
+                              max={featureUsage.limit}
+                              labelBottom={
+                                feature.units === 'bytes'
+                                  ? formatBytes(usageValue)
+                                  : usageValue.toLocaleString()
+                              }
+                              labelTop={
+                                feature.units === 'bytes'
+                                  ? formatBytes(featureUsage.limit)
+                                  : featureUsage.limit.toLocaleString()
+                              }
+                            />
+                          )
+                        } else {
+                          usageElement = (
+                            <span>
+                              {feature.units === 'bytes' ? formatBytes(usageValue) : usageValue}
+                            </span>
+                          )
+                        }
 
                         return (
                           <tr
@@ -117,38 +181,15 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                               <>
                                 {showUsageExceedMessage && (
                                   <td className="hidden w-1/5 whitespace-nowrap p-3 text-sm text-scale-1200 lg:table-cell">
-                                    {(usageRatio * 100).toFixed(2)} %
+                                    {isAvailableInPlan ? (
+                                      <>{(usageRatio * 100).toFixed(2)} %</>
+                                    ) : (
+                                      <>-</>
+                                    )}
                                   </td>
                                 )}
                                 <td className="px-6 py-3 text-sm text-scale-1200">
-                                  {showUsageExceedMessage ? (
-                                    <SparkBar
-                                      type="horizontal"
-                                      barClass={`${
-                                        isExceeded
-                                          ? 'bg-red-900'
-                                          : isApproaching
-                                          ? 'bg-yellow-900'
-                                          : 'bg-brand-900'
-                                      }`}
-                                      value={usageValue}
-                                      max={featureUsage.limit}
-                                      labelBottom={
-                                        feature.units === 'bytes'
-                                          ? formatBytes(usageValue)
-                                          : usageValue.toLocaleString()
-                                      }
-                                      labelTop={
-                                        feature.units === 'bytes'
-                                          ? formatBytes(featureUsage.limit)
-                                          : featureUsage.limit.toLocaleString()
-                                      }
-                                    />
-                                  ) : (
-                                    <span>
-                                      {feature.units === 'bytes' ? formatBytes(usageValue) : ''}
-                                    </span>
-                                  )}
+                                  {usageElement}
                                 </td>
                               </>
                             )}

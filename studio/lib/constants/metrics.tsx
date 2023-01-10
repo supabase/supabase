@@ -144,6 +144,13 @@ export const METRICS = [
   //   provider: 'daily-stats',
   //   category: METRIC_CATEGORIES.API_AUTH,
   // },
+
+  {
+    key: 'total_auth_billing_period_mau',
+    label: 'Auth Monthly Active User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
   {
     key: 'total_auth_ingress',
     label: 'Auth Ingress',
@@ -199,6 +206,12 @@ export const METRICS = [
   {
     key: 'total_storage_egress',
     label: 'Storage Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+  {
+    key: 'total_storage_image_render_count',
+    label: 'Storage Images Transformed',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_STORAGE,
   },

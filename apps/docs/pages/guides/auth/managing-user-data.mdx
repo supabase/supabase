@@ -18,7 +18,7 @@ For example, a `public.profiles` table might look like this:
 
 ```sql
 create table public.profiles (
-  id uuid references auth.users not null,
+  id uuid not null references auth.users on delete cascade,
   first_name text,
   last_name text,
 
@@ -27,6 +27,16 @@ create table public.profiles (
 
 alter table public.profiles enable row level security;
 ```
+
+<Admonition type="note">
+
+Make sure to specify the `on delete cascade` clause when referencing `auth.users`. Omitting it may cause problems when deleting users.
+
+</Admonition>
+
+## Deleting Users
+
+You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do considering making use of a Row Level Security policy as described below.
 
 ## Public access
 

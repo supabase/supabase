@@ -44,6 +44,7 @@ const SignInSSOForm = () => {
         window.location.href = data.url
       }
     } else {
+      setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
       ui.setNotification({

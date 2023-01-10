@@ -1,17 +1,20 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import type { AppProps } from 'next/app'
-import { post } from 'lib/fetchWrappers'
-import { ThemeProvider } from '../components/Providers'
-import { SearchProvider } from '~/components/DocSearch'
 import { DefaultSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { AppPropsWithLayout } from 'types'
+import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
-import '../styles/main.scss?v=1.0.0'
-import '../styles/docsearch.scss'
+import { ThemeProvider } from 'common/Providers'
+import SiteLayout from '~/layouts/SiteLayout'
 import '../styles/algolia-search.scss'
+import '../styles/ch.scss'
+import '../styles/docsearch.scss'
+import '../styles/main.scss?v=1.0.0'
+import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
+import { post } from '~/lib/fetchWrappers'
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
 
   function telemetry(route: string) {
@@ -24,7 +27,22 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     function handleRouteChange(url: string) {
+      /*
+       * handle telemetry
+       */
       telemetry(url)
+      /*
+       * handle "scroll to top" behaviour on route change
+       */
+      if (document) {
+        // do not scroll to top for reference docs
+        if (!url.includes('reference/')) {
+          // scroll container div to top
+          const container = document.getElementById('docs-content-container')
+          // check container exists (only avail on new docs)
+          if (container) container.scrollTop = 0
+        }
+      }
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -65,7 +83,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       />
       <ThemeProvider>
         <SearchProvider>
-          <Component {...pageProps} />
+          <SiteLayout>
+            <Component {...pageProps} />
+          </SiteLayout>
         </SearchProvider>
       </ThemeProvider>
     </>
