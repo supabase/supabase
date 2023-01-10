@@ -1,17 +1,18 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
+import { FDW } from './fdws-query'
 
 export type FDWUpdateVariables = {
   projectRef?: string
   connectionString?: string
-  wrapper: Wrapper
-  wrapperMeta: Wrapper
+  wrapper: FDW
+  wrapperMeta: WrapperMeta
   formState: {
     [k: string]: string
   }
@@ -25,11 +26,7 @@ export const getUpdateFDWSql = ({
   tables,
 }: Pick<FDWUpdateVariables, 'wrapper' | 'wrapperMeta' | 'formState' | 'tables'>) => {
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
-  const createWrapperSql = getCreateFDWSql({
-    wrapper: wrapperMeta,
-    formState,
-    tables,
-  })
+  const createWrapperSql = getCreateFDWSql({ wrapperMeta, formState, tables })
 
   const sql = /* SQL */ `
     ${deleteWrapperSql}

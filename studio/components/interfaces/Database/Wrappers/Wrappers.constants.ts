@@ -1,6 +1,6 @@
-import { Wrapper } from './Wrappers.types'
+import { WrapperMeta } from './Wrappers.types'
 
-export const WRAPPERS: Wrapper[] = [
+export const WRAPPERS: WrapperMeta[] = [
   {
     name: 'stripe_wrapper',
     handlerName: 'stripe_fdw_handler',

@@ -1,15 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { FDW } from './fdws-query'
 
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string
-  wrapper: any
-  wrapperMeta: Wrapper
+  wrapper: FDW
+  wrapperMeta: WrapperMeta
 }
 
 export const getDeleteFDWSql = ({
