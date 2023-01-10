@@ -242,7 +242,7 @@ const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasP
                     </p>
                     <p className="text-sm">
                       This is also known as Row-Level Security (RLS). Each policy is attached to a
-                      table, and the policy is executed everytime a time is accessed.
+                      table, and the policy is executed each time its accessed.
                     </p>
                   </div>
                 }
