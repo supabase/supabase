@@ -1,7 +1,7 @@
 import { screen, getByText, fireEvent } from '@testing-library/react'
 import React, { useState } from 'react'
-import { SWRConfig } from 'swr'
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render as originalRender } from '@testing-library/react'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
@@ -49,16 +49,26 @@ export const clickDropdown = (elem: HTMLElement) => {
 const SwrTestConfig: React.FC = ({ children }) => {
   const [rootStore] = useState(() => new RootStore())
 
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+        logger: {
+          log: console.log,
+          warn: console.warn,
+          // ✅ no more errors on the console for tests
+          error: process.env.NODE_ENV === 'test' ? () => {} : console.error,
+        },
+      })
+  )
+
   return (
     <StoreProvider rootStore={rootStore}>
-      <SWRConfig
-        value={{
-          provider: () => new Map(),
-          shouldRetryOnError: false,
-        }}
-      >
-        {children}
-      </SWRConfig>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </StoreProvider>
   )
 }
