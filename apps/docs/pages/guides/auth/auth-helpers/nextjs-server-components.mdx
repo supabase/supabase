@@ -226,7 +226,7 @@ export default function SupabaseListener({ accessToken }) {
       }
     })
   
-    return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe()
   }, [accessToken])
 
   return null
