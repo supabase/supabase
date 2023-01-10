@@ -1,5 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { AvailableColumn, Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import {
+  AvailableColumn,
+  WrapperMeta,
+} from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
@@ -8,7 +11,7 @@ import { useStore } from 'hooks'
 export type FDWCreateVariables = {
   projectRef?: string
   connectionString?: string
-  wrapper: Wrapper
+  wrapperMeta: WrapperMeta
   formState: {
     [k: string]: string
   }
@@ -16,10 +19,10 @@ export type FDWCreateVariables = {
 }
 
 export function getCreateFDWSql({
-  wrapper,
+  wrapperMeta,
   formState,
   tables,
-}: Pick<FDWCreateVariables, 'wrapper' | 'formState' | 'tables'>) {
+}: Pick<FDWCreateVariables, 'wrapperMeta' | 'formState' | 'tables'>) {
   const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
@@ -27,12 +30,12 @@ export function getCreateFDWSql({
 
   const createWrapperSql = /* SQL */ `
     create foreign data wrapper ${formState.wrapper_name}
-    handler ${wrapper.handlerName}
-    validator ${wrapper.validatorName};
+    handler ${wrapperMeta.handlerName}
+    validator ${wrapperMeta.validatorName};
   `
 
-  const encryptedOptions = wrapper.server.options.filter((option) => option.encrypted)
-  const unencryptedOptions = wrapper.server.options.filter((option) => !option.encrypted)
+  const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+  const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
     const key = `${formState.wrapper_name}_${option.name}`
@@ -85,7 +88,7 @@ export function getCreateFDWSql({
 
   const createTablesSql = tables
     .map((newTable) => {
-      const table = wrapper.tables[newTable.index]
+      const table = wrapperMeta.tables[newTable.index]
 
       const columns: AvailableColumn[] = newTable.columns
         .map((name: string) => table.availableColumns.find((c) => c.name === name))
@@ -130,11 +133,11 @@ export function getCreateFDWSql({
 export async function createFDW({
   projectRef,
   connectionString,
-  wrapper,
+  wrapperMeta,
   formState,
   tables,
 }: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql({ wrapper, formState, tables }))
+  const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

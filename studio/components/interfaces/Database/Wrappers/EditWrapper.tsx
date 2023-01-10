@@ -148,7 +148,7 @@ const EditWrapper = () => {
       await updateFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        wrapper: wrapperMeta,
+        wrapper,
         wrapperMeta,
         formState: { ...values, server_name: `${wrapper_name}_server` },
         tables: wrapperTables,
@@ -206,7 +206,12 @@ const EditWrapper = () => {
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const [loadingSecrets, setLoadingSecrets] = useState(false)
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+
+            const initialTables = formatWrapperTables(wrapper?.tables ?? [])
+            const hasFormChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+            const hasTableChanges = JSON.stringify(initialTables) !== JSON.stringify(wrapperTables)
+            const hasChanges = hasFormChanges || hasTableChanges
+
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
             useEffect(() => {
@@ -249,7 +254,10 @@ const EditWrapper = () => {
                       form={formId}
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
-                      handleReset={handleReset}
+                      handleReset={() => {
+                        handleReset()
+                        setWrapperTables(initialTables)
+                      }}
                       helper={
                         !canCreateWrapper
                           ? 'You need additional permissions to create a foreign data wrapper'

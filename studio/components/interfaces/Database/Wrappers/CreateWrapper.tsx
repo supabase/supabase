@@ -99,7 +99,7 @@ const CreateWrapper = () => {
       await createFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        wrapper: wrapperMeta,
+        wrapperMeta,
         formState: { ...values, server_name: `${wrapper_name}_server` },
         tables: newTables,
       })

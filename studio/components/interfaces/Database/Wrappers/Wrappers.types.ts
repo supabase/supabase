@@ -1,4 +1,4 @@
-export type Wrapper = {
+export type WrapperMeta = {
   name: string
   handlerName: string
   validatorName: string

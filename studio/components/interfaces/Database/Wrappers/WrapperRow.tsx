@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import {
   Collapsible,
   IconChevronUp,
@@ -10,28 +10,28 @@ import {
   IconTrash,
   IconEdit,
 } from 'ui'
+import { partition } from 'lodash'
 
 import { useParams, useStore } from 'hooks'
-import { Wrapper } from './Wrappers.types'
+import { WrapperMeta } from './Wrappers.types'
+import { FDW } from 'data/fdw/fdws-query'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { partition } from 'lodash'
 
 interface Props {
-  wrapperMeta: Wrapper
-  wrappers: any[]
+  wrappers: FDW[]
+  wrapperMeta: WrapperMeta
   isOpen: boolean
   isLoading: boolean
   onOpen: (wrapper: string) => void
 }
 
-const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, onOpen }) => {
+const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, isLoading, onOpen }) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onDeleteWrapper = (wrapper: any) => {
     confirmAlert({
@@ -176,7 +176,6 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
                         <a>
                           <Button
                             type="default"
-                            loading={isSubmitting}
                             icon={<IconEdit strokeWidth={1.5} />}
                             className="py-2"
                           />
@@ -184,7 +183,6 @@ const WrapperRow: FC<Props> = ({ wrapperMeta, wrappers = [], isOpen, isLoading, 
                       </Link>
                       <Button
                         type="default"
-                        loading={isSubmitting}
                         icon={<IconTrash strokeWidth={1.5} />}
                         className="py-2"
                         onClick={() => onDeleteWrapper(wrapper)}
