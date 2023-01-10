@@ -1,12 +1,12 @@
 
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Blog - Supabase</title>
-      <link>https://supabase.com</link>
-      <description>Latest news from Supabase</description>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Paul Copplestone at Supabase</description>
       <language>en</language>
       <lastBuildDate>Mon, 27 Jun 2022 02:02:30 +0000</lastBuildDate>
-      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://supabase.com/planetpg-paul_copplestone-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/partial-postgresql-data-dumps-with-rls</guid>
   <title>Partial data dumps using Postgres Row Level Security</title>
