@@ -40,7 +40,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       isActive:
         router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
       label: organization.name,
-      href: `/org/${organization.slug}/settings`,
+      href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
