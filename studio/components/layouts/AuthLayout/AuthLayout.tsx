@@ -28,6 +28,7 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
       meta.policies.load()
       meta.tables.load()
       meta.roles.load()
+      meta.schemas.load()
     }
   }, [ui.selectedProject?.ref])
 

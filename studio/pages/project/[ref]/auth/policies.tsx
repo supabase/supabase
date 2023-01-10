@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Button, IconSearch, Input, IconExternalLink } from 'ui'
+import { partition } from 'lodash'
+import { Button, Listbox, IconSearch, Input, IconExternalLink, IconLock } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -48,15 +49,25 @@ const onFilterTables = (
 const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { search } = useParams()
-  const [policiesFilter, setPoliciesFilter] = useState<string>('')
+  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const [searchString, setSearchString] = useState<string>('')
 
   useEffect(() => {
-    if (search) setPoliciesFilter(search)
+    if (search) setSearchString(search)
   }, [search])
 
-  const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
+  const schemas = meta.schemas.list()
+  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
+    meta.excludedSchemas.includes(schema?.name ?? '')
+  )
+  // @ts-ignore
+  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
   const policies = meta.policies.list()
-  const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
+
+  const tables = meta.tables.list((table: { schema: string }) => table.schema === selectedSchema)
+  const filteredTables = onFilterTables(tables, policies, searchString)
 
   const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
 
@@ -66,29 +77,78 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {(publicTables || []).length > 0 && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between">
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-[230px]">
+              <Listbox
+                size="small"
+                value={selectedSchema}
+                onChange={(schema: string) => {
+                  setSelectedSchema(schema)
+                  setSearchString('')
+                }}
+                icon={isLocked && <IconLock size={14} strokeWidth={2} />}
+              >
+                <Listbox.Option
+                  disabled
+                  key="normal-schemas"
+                  value="normal-schemas"
+                  label="Schemas"
+                >
+                  <p className="text-sm">Schemas</p>
+                </Listbox.Option>
+                {/* @ts-ignore */}
+                {openSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+                <Listbox.Option
+                  disabled
+                  key="protected-schemas"
+                  value="protected-schemas"
+                  label="Protected schemas"
+                >
+                  <p className="text-sm">Protected schemas</p>
+                </Listbox.Option>
+                {protectedSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            </div>
             <Input
               size="small"
               placeholder="Filter tables and policies"
               className="block w-64 text-sm placeholder-gray-400"
-              value={policiesFilter}
-              onChange={(e) => setPoliciesFilter(e.target.value)}
+              value={searchString}
+              onChange={(e) => setSearchString(e.target.value)}
               icon={<IconSearch size="tiny" />}
             />
-            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-              <a
-                target="_blank"
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-              >
-                What is RLS?
-              </a>
-            </Button>
           </div>
+          <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <a
+              target="_blank"
+              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+            >
+              What is RLS?
+            </a>
+          </Button>
         </div>
-      )}
-      <Policies hasPublicTables={publicTables.length > 0} tables={filteredTables} />
+      </div>
+      <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
     </div>
   )
 }

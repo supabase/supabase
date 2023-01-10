@@ -67,7 +67,7 @@ const TableList: FC<Props> = ({
               size="small"
               value={selectedSchema}
               onChange={onSelectSchema}
-              icon={isLocked && <IconLock size={16} strokeWidth={2} />}
+              icon={isLocked && <IconLock size={14} strokeWidth={2} />}
             >
               <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
                 <p className="text-sm">Schemas</p>
