@@ -39,8 +39,13 @@ const PolicyTableRow: FC<Props> = ({
       }
     >
       {policies.length === 0 && (
-        <div className="p-4 px-6">
-          <p className="text-scale-900 text-sm">No policies created yet</p>
+        <div className="p-4 px-6 space-y-1">
+          <p className="text-scale-1100 text-sm">No policies created yet</p>
+          {table.rls_enabled && (
+            <p className="text-scale-1000 text-sm">
+              As RLS has been enabled, all normal access to this table must be allowed by a policy.
+            </p>
+          )}
         </div>
       )}
 
