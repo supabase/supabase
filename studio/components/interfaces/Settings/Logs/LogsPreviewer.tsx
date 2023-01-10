@@ -58,7 +58,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
-    { error, logData, params, newCount, filters, isLoading, eventChartData },
+    { error, logData, params, newCount, filters, isLoading, eventChartData, isLoadingOlder },
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
 
@@ -221,7 +221,13 @@ export const LogsPreviewer: React.FC<Props> = ({
         </LoadingOpacity>
         {!error && (
           <div className="flex flex-row justify-between p-2">
-            <Button onClick={loadOlder} icon={<IconRewind />} type="default">
+            <Button
+              onClick={loadOlder}
+              icon={<IconRewind />}
+              type="default"
+              loading={isLoadingOlder}
+              disabled={isLoadingOlder}
+            >
               Load older
             </Button>
             <div className="flex flex-row justify-end mt-2">
