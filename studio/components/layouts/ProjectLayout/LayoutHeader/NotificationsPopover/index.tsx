@@ -9,18 +9,19 @@ import {
 } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
-import { useNotifications, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import NotificationRow from './NotificationRow'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useNotificationsQuery } from 'data/notifications/notifications-query'
 
 interface Props {}
 
 const NotificationsPopover: FC<Props> = () => {
   const router = useRouter()
   const { app, meta, ui } = useStore()
-  const { notifications, refresh } = useNotifications()
+  const { data: notifications, refetch } = useNotificationsQuery()
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
@@ -36,6 +37,7 @@ const NotificationsPopover: FC<Props> = () => {
   )
 
   const onOpenChange = async (open: boolean) => {
+    // TODO(alaister): move this to a mutation
     if (!open) {
       // Mark notifications as seen
       const notificationIds = notifications
@@ -44,7 +46,7 @@ const NotificationsPopover: FC<Props> = () => {
       if (notificationIds.length > 0) {
         const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
         if (error) console.error('Failed to update notifications', error)
-        refresh()
+        refetch()
       }
     }
   }
