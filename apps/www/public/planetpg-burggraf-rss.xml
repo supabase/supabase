@@ -1,12 +1,12 @@
 
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Blog - Supabase</title>
-      <link>https://supabase.com</link>
-      <description>Latest news from Supabase</description>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Mark Burggraf at Supabase</description>
       <language>en</language>
       <lastBuildDate>Wed, 23 Nov 2022 03:03:30 +0000</lastBuildDate>
-      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://supabase.com/planetpg-burggraf-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</guid>
   <title>SQL or NoSQL? Why not use both (with PostgreSQL)?</title>

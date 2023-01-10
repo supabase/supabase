@@ -26,24 +26,13 @@ export async function getStaticProps() {
 
   // generate a series of rss feeds for each author (for PlanetPG)
   const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
+  const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
 
-  const authors = [
-    'alexander',
-    'michel',
-    'pavel',
-    'steve_chavez',
-    'angelico_de_los_reyes',
-    'oli_rice',
-    'burggraf',
-    'victor',
-    'paul_copplestone',
-    'ant_wilson',
-  ]
-
-  authors.forEach((author) => {
+  uniquePlanetPgAuthors.forEach((author) => {
     const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
     if (authorPosts.length > 0) {
-      const authorRss = generateRss(authorPosts)
+      const authorRss = generateRss(authorPosts, author)
       fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
     }
   })
