@@ -58,7 +58,7 @@ test('q= query param will populate the query input', async () => {
   render(<LogsExplorerPage />)
   // should populate editor with the query param
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'), expect.anything())
   })
 })
 
@@ -79,9 +79,13 @@ test('ite= and its= query param will populate the datepicker', async () => {
   // should populate editor with the query param
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(encodeURIComponent(start.toISOString()))
+      expect.stringContaining(encodeURIComponent(start.toISOString())),
+      expect.anything()
     )
-    expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent(end.toISOString())))
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(encodeURIComponent(end.toISOString())),
+      expect.anything()
+    )
   })
 })
 
@@ -118,14 +122,23 @@ test('custom sql querying', async () => {
   userEvent.type(editor, '\nlimit 123{ctrl}{enter}')
   await waitFor(
     () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end')) // should not have an end date
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      ) // should not have an end date
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'), expect.anything())
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('limit 123')),
+        expect.anything()
+      )
     },
     { timeout: 1000 }
   )

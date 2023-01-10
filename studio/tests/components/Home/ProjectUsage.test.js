@@ -100,7 +100,7 @@ test('dropdown options changes chart query', async () => {
   await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
   await waitFor(() => screen.getAllByRole('button', { name: '24 hours' }))
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'), expect.anything())
   })
   // find button that has radix id
   const [btn] = screen.getAllByRole('button', { name: '24 hours' }).filter((e) => e.id)
@@ -111,5 +111,5 @@ test('dropdown options changes chart query', async () => {
   // simulate changing of dropdown
   userEvent.click(screen.getByText(/60 minutes/))
   await waitFor(() => screen.getByText(/Statistics for past 60 minutes/))
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=minutely'))
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=minutely'), expect.anything())
 })
