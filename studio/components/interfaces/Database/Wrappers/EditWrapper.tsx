@@ -16,7 +16,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useImmutableValue, useParams, useStore } from 'hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 
@@ -50,15 +50,18 @@ const EditWrapper = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
   const wrappers = data?.result ?? []
-  const wrapper = wrappers.find((w) => Number(w.id) === Number(id))
+  const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
+  // this call to useImmutableValue should be removed if the redirect after update is also removed
+  const wrapper = useImmutableValue(foundWrapper)
+
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
-  const { mutateAsync: updateFDW } = useFDWUpdateMutation()
+  const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
@@ -142,7 +145,6 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    setIsSaving(true)
     setSubmitting(true)
     try {
       await updateFDW({
@@ -167,7 +169,6 @@ const EditWrapper = () => {
         message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
       })
     } finally {
-      setIsSaving(false)
       setSubmitting(false)
     }
   }
