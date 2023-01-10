@@ -61,7 +61,7 @@
       },
       {
         "text": "SOC2",
-        "url": "/legal/soc2"
+        "url": "https://forms.supabase.com/soc2"
       }
     ]
   },
@@ -73,10 +73,6 @@
         "url": "/docs"
       },
       {
-        "text": "API Reference",
-        "url": "/docs/reference"
-      },
-      {
         "text": "Changelog",
         "url": "/changelog"
       },
@@ -86,11 +82,11 @@
       },
       {
         "text": "Open Source",
-        "url": "/docs/oss"
+        "url": "/oss"
       },
       {
         "text": "SupaSquad",
-        "url": "/docs/handbook/supasquad"
+        "url": "/supasquad"
       },
       {
         "text": "DevTo",
@@ -111,7 +107,7 @@
       },
       {
         "text": "Careers",
-        "url": "https://about.supabase.com/careers"
+        "url": "/careers"
       },
       {
         "text": "Company",
@@ -119,19 +115,19 @@
       },
       {
         "text": "Terms of Service",
-        "url": "/docs/company/terms"
+        "url": "/terms"
       },
       {
         "text": "Privacy Policy",
-        "url": "/docs/company/privacy"
+        "url": "/privacy"
       },
       {
         "text": "Acceptable Use Policy",
-        "url": "/docs/company/aup"
+        "url": "/aup"
       },
       {
         "text": "Service Level Agreement",
-        "url": "/docs/company/sla"
+        "url": "/sla"
       },
       {
         "text": "Humans.txt",

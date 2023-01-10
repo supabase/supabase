@@ -173,14 +173,22 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  */
 export const maybeShowUpgradePrompt = (
   from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']["key"]
+  tierKey?: StripeSubscription['tier']['key']
 ) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
-  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
+  return (
+    (day > 1 && tierKey === 'FREE') ||
+    (day > 7 && tierKey === 'PRO') ||
+    (day > 28 && tierKey === 'TEAM') ||
+    (day > 90 && tierKey === 'ENTERPRISE')
+  )
 }
 
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
+export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
+  const where = _genWhereStatement(table, filters)
+  return `SELECT count(*) as count FROM ${table} ${where}`
+}
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
@@ -222,10 +230,11 @@ SELECT
 FROM
   ${table} t
   cross join unnest(t.metadata) as metadata
-  ${where
+  ${
+    where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
       : `where t.timestamp > '${startOffset.toISOString()}'`
-    }
+  }
 GROUP BY
 timestamp
 ORDER BY

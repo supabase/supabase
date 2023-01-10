@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { delete_ } from 'lib/common/fetch'
-import { getCustomDomains } from './custom-domains-query'
+import { API_ADMIN_URL } from 'lib/constants'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {
@@ -12,10 +12,7 @@ export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVaria
     throw new Error('projectRef is required')
   }
 
-  const response = await delete_(
-    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname`,
-    {}
-  )
+  const response = await delete_(`${API_ADMIN_URL}/projects/${projectRef}/custom-hostname`, {})
   if (response.error) {
     throw response.error
   }

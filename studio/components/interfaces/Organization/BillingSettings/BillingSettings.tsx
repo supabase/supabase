@@ -1,6 +1,8 @@
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
 
-import { useFlag, useStore, checkPermissions } from 'hooks'
+import { Project } from 'types'
+import { useParams, useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 
@@ -9,17 +11,14 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
 import BillingAddress from './BillingAddress/BillingAddress'
 import TaxID from './TaxID/TaxID'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import BillingEmail from './BillingEmail'
 
-interface Props {
-  organization: any
-  projects: any[]
-}
+const BillingSettings = () => {
+  const { app, ui } = useStore()
+  const { slug } = useParams()
 
-const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
-  const { ui } = useStore()
-  const { slug } = organization
+  const organization = ui.selectedOrganization
+  const projects = app.projects.list((x: Project) => x.organization_id == organization?.id) || []
 
   const [customer, setCustomer] = useState<any>(null)
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
@@ -38,14 +37,6 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
     isCredit && customerBalance !== 0
       ? customerBalance.toString().replace('-', '')
       : customerBalance
-
-  const enablePermissions = useFlag('enablePermissions')
-
-  const canUpdateOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
-
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
 
   useEffect(() => {
     getCustomerProfile()
@@ -131,4 +122,4 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   )
 }
 
-export default BillingSettings
+export default observer(BillingSettings)

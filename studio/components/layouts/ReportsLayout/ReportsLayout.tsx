@@ -12,9 +12,9 @@ interface ReportsLayoutProps {
 
 const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps>) => {
   const { ui } = useStore()
-  const project = ui.selectedProject
-
   const router = useRouter()
+
+  const project = ui.selectedProject
   const page = router.pathname.split('/')[4] || ''
 
   return (
