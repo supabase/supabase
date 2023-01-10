@@ -98,8 +98,6 @@ const PageLayout: NextPageWithLayout = () => {
     },
   ]
 
-  const API_SERVICE_ID = 1
-
   // Get the API service
   const anonKey = settings?.autoApiService.defaultApiKey
 
