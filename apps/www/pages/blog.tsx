@@ -30,6 +30,7 @@ export async function getStaticProps() {
   const authors = [
     'alexander',
     'michel',
+    'pavel',
     'steve_chavez',
     'angelico_de_los_reyes',
     'oli_rice',
