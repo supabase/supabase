@@ -52,10 +52,10 @@ const CreateWrapper = () => {
 
   if (wrapperMeta === undefined) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+      <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
         <div className="space-y-2 flex flex-col items-center w-[400px]">
           <p>Unsupported wrapper type</p>
-          <p className="text-sm text-scale-1000 text-center">
+          <p className="text-sm text-center text-scale-1000">
             The wrapper type {type} not supported by the dashboard. Head back to create a different
             wrapper.
           </p>
@@ -158,7 +158,7 @@ const CreateWrapper = () => {
               <FormPanel
                 disabled={!canCreateWrapper}
                 footer={
-                  <div className="flex py-4 px-8">
+                  <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
                       isSubmitting={isSubmitting}
@@ -267,7 +267,7 @@ const CreateWrapper = () => {
                       </div>
                     )}
                     {newTables.length === 0 && formErrors.tables && (
-                      <p className="text-sm text-red-900 text-right">{formErrors.tables}</p>
+                      <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
                     )}
                   </FormSectionContent>
                 </FormSection>

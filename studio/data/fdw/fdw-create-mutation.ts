@@ -158,7 +158,7 @@ export const useFDWCreateMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']), { refetchType: 'all' }),
         vault.load(),
       ])
 
