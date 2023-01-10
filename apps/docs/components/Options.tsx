@@ -70,7 +70,7 @@ const Option: FC<IOption> = (props) => {
         </span>
         <span className="text-scale-900 text-xs">{props.type ?? 'no type'}</span>
       </div>
-      <p className="text-sm text-scale-1000 m-0">{props.description ?? 'nodescription'}</p>
+      <p className="text-sm text-scale-1000 m-0">{props.description}</p>
       {props.children}
     </div>
   )
