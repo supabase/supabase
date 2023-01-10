@@ -5,20 +5,20 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { useParams, useStore } from 'hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import NoTableState from 'components/ui/States/NoTableState'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
-  tables: any[]
-  hasPublicTables: boolean
+  tables: PostgresTable[]
+  hasTables: boolean
+  isLocked: boolean
 }
 
-const Policies: FC<Props> = ({ tables, hasPublicTables }) => {
+const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -116,9 +116,6 @@ const Policies: FC<Props> = ({ tables, hasPublicTables }) => {
     closeConfirmModal()
   }
 
-  if (!hasPublicTables)
-    return <NoTableState message="Create a table first before writing a policy" />
-
   return (
     <>
       {tables.length > 0 ? (
@@ -126,6 +123,7 @@ const Policies: FC<Props> = ({ tables, hasPublicTables }) => {
           <section key={table.id}>
             <PolicyTableRow
               table={table}
+              isLocked={isLocked}
               onSelectToggleRLS={onSelectToggleRLS}
               onSelectCreatePolicy={onSelectCreatePolicy}
               onSelectEditPolicy={onSelectEditPolicy}
@@ -133,7 +131,7 @@ const Policies: FC<Props> = ({ tables, hasPublicTables }) => {
             />
           </section>
         ))
-      ) : hasPublicTables ? (
+      ) : hasTables ? (
         <NoSearchResults />
       ) : (
         <div className="flex-grow">
@@ -163,8 +161,8 @@ const Policies: FC<Props> = ({ tables, hasPublicTables }) => {
                 }
               />
               <p className="text-sm text-scale-1100">
-                A table within the public schema is required before you can create a Row-Level
-                Security policy.
+                A table within this schema is required before you can create a Row-Level Security
+                policy.
               </p>
             </div>
           </ProductEmptyState>
