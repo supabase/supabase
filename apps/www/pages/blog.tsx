@@ -26,7 +26,9 @@ export async function getStaticProps() {
   const planetPgAlexander = planetPgPosts.filter((post) => post.author.includes('alexander'))
   const planetPgMichel = planetPgPosts.filter((post) => post.author.includes('michel'))
   const planetPgSteve = planetPgPosts.filter((post) => post.author.includes('steve_chavez'))
-  const planetPgAngelico = planetPgPosts.filter((post) => post.author.includes('angelico_de_los_reyes'))
+  const planetPgAngelico = planetPgPosts.filter((post) =>
+    post.author.includes('angelico_de_los_reyes')
+  )
   const planetPgOli = planetPgPosts.filter((post) => post.author.includes('oli_rice'))
   const planetPgMark = planetPgPosts.filter((post) => post.author.includes('burggraf'))
   const planetPgVictor = planetPgPosts.filter((post) => post.author.includes('victor'))
