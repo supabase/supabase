@@ -634,7 +634,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     },
   }),
   authThirdPartyLogin: (endpoint, apiKey) => ({
-    title: '',
+    title: 'Third Party Login',
     bash: {
       language: 'bash',
       code: ``,
