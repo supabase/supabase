@@ -1,4 +1,3 @@
-import useSWR from 'swr'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
@@ -6,10 +5,10 @@ import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
+import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 import { ChartIntervals, NextPageWithLayout } from 'types'
-import { get } from 'lib/common/fetch'
-import { API_URL, DATE_FORMAT } from 'lib/constants'
+import { DATE_FORMAT } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 import NoPermission from 'components/ui/NoPermission'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
@@ -50,17 +49,17 @@ function calculateHighlightedValue(array: any, attribute: string, options?: { su
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref, id } = router.query
+  const { ref: projectRef, id } = useParams()
 
   const [interval, setInterval] = useState<string>('15min')
 
-  const url = `${API_URL}/projects/${ref}/analytics/endpoints/functions.inv-stats`
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
-  const { data, error }: any = useSWR(
-    `${url}?interval=${selectedInterval.key}&function_id=${id}`,
-    get
-  )
+  const { data, error } = useFunctionsInvStatsQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key,
+  })
 
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
@@ -81,9 +80,9 @@ const PageLayout: NextPageWithLayout = () => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/functions/${id}/logs?te=${paddedTimestamp}`)
+      router.push(`/project/${projectRef}/functions/${id}/logs?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/functions/${id}/logs?te=${timestamp}`)
+      router.push(`/project/${projectRef}/functions/${id}/logs?te=${timestamp}`)
     }
   }
 
