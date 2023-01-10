@@ -1,22 +1,14 @@
-import React, { useState, FC } from 'react'
-import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input, IconHelpCircle, IconExternalLink } from 'ui'
-import { useRouter } from 'next/router'
+import { useState, useEffect } from 'react'
+import { Button, IconSearch, Input, IconExternalLink } from 'ui'
 import { observer } from 'mobx-react-lite'
-import { checkPermissions, useStore } from 'hooks'
-import { AuthLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import { PostgresRole } from '@supabase/postgres-meta'
 import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
-
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import NoTableState from 'components/ui/States/NoTableState'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { NextPageWithLayout } from 'types'
+import { checkPermissions, useParams, useStore } from 'hooks'
+import { AuthLayout } from 'components/layouts'
+import { Policies } from 'components/interfaces/Auth/Policies'
 import NoPermission from 'components/ui/NoPermission'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import InformationBox from 'components/ui/InformationBox'
 
 /**
  * Filter tables by table name and policy name
@@ -39,13 +31,15 @@ const onFilterTables = (
     const findSearchString = (s: string) => s.toLowerCase().includes(filter)
     // @ts-ignore Type instantiation is excessively deep and possibly infinite
     const filteredPolicies = policies.filter((p: PostgresPolicy) => findSearchString(p.name))
+
     return tables
       .slice()
       .filter((x: PostgresTable) => {
-        const searchTableName = findSearchString(x.name)
-        if (searchTableName) return true
-        const searchPolicyName = filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
-        return searchPolicyName
+        return (
+          x.name.toLowerCase().includes(filter) ||
+          x.id.toString() === filter ||
+          filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
+        )
       })
       .sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
   }
@@ -53,8 +47,13 @@ const onFilterTables = (
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
+  const { search } = useParams()
+  const [policiesFilter, setPoliciesFilter] = useState<string>('')
 
-  const [policiesFilter, setPoliciesFilter] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (search) setPoliciesFilter(search)
+  }, [search])
+
   const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
   const policies = meta.policies.list()
   const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
@@ -89,7 +88,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </div>
         </div>
       )}
-      <AuthPoliciesTables hasPublicTables={publicTables.length > 0} tables={filteredTables} />
+      <Policies hasPublicTables={publicTables.length > 0} tables={filteredTables} />
     </div>
   )
 }
@@ -101,198 +100,3 @@ AuthPoliciesPage.getLayout = (page) => (
 )
 
 export default observer(AuthPoliciesPage)
-
-interface AuthPoliciesTablesProps {
-  hasPublicTables: boolean
-  tables: any[]
-}
-const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasPublicTables }) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { ui, meta } = useStore()
-  const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
-
-  const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
-  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
-  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
-
-  const closePolicyEditorModal = () => {
-    setSelectedPolicyToEdit({})
-    setSelectedSchemaAndTable({})
-  }
-
-  const closeConfirmModal = () => {
-    setSelectedPolicyToDelete({})
-    setSelectedTableToToggleRLS({})
-  }
-
-  const onSelectToggleRLS = (table: any) => {
-    setSelectedTableToToggleRLS(table)
-  }
-
-  const onSelectCreatePolicy = (table: any) => {
-    setSelectedSchemaAndTable({ schema: table.schema, table: table.name })
-  }
-
-  const onSelectEditPolicy = (policy: any) => {
-    setSelectedPolicyToEdit(policy)
-    setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
-  }
-
-  const onSelectDeletePolicy = (policy: any) => {
-    setSelectedPolicyToDelete(policy)
-  }
-
-  const onSavePolicySuccess = async () => {
-    ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
-    closePolicyEditorModal()
-  }
-
-  // Methods that involve some API
-  const onToggleRLS = async () => {
-    const payload = {
-      id: selectedTableToToggleRLS.id,
-      rls_enabled: !selectedTableToToggleRLS.rls_enabled,
-    }
-
-    const res: any = await meta.tables.update(payload.id, payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle RLS: ${res.error.message}`,
-      })
-    }
-    closeConfirmModal()
-  }
-
-  const onCreatePolicy = async (payload: any) => {
-    const res = await meta.policies.create(payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error adding policy: ${res.error.message}`,
-      })
-      return true
-    }
-    return false
-  }
-
-  const onUpdatePolicy = async (payload: any) => {
-    const res = await meta.policies.update(payload.id, payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error updating policy: ${res.error.message}`,
-      })
-      return true
-    }
-    return false
-  }
-
-  const onDeletePolicy = async () => {
-    const res = await meta.policies.del(selectedPolicyToDelete.id)
-    if (typeof res !== 'boolean' && res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error deleting policy: ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
-    }
-    closeConfirmModal()
-  }
-
-  return (
-    <>
-      {tables.length > 0 ? (
-        tables.map((table: any) => (
-          <section key={table.id}>
-            <PolicyTableRow
-              table={table}
-              onSelectToggleRLS={onSelectToggleRLS}
-              onSelectCreatePolicy={onSelectCreatePolicy}
-              onSelectEditPolicy={onSelectEditPolicy}
-              onSelectDeletePolicy={onSelectDeletePolicy}
-            />
-          </section>
-        ))
-      ) : hasPublicTables ? (
-        <NoSearchResults />
-      ) : (
-        <div className="flex-grow">
-          <ProductEmptyState
-            size="large"
-            title="Postgres Policies"
-            ctaButtonLabel="Create a table"
-            infoButtonLabel="What is RLS?"
-            infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-            onClickCta={() => router.push(`/project/${ref}/editor`)}
-          >
-            <div className="space-y-4">
-              <InformationBox
-                title="What are policies?"
-                icon={<IconHelpCircle strokeWidth={2} />}
-                description={
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Policies restrict, on a per-user basis, which rows can be returned by normal
-                      queries, or inserted, updated, or deleted by data modification commands.
-                    </p>
-                    <p className="text-sm">
-                      This is also known as Row-Level Security (RLS). Each policy is attached to a
-                      table, and the policy is executed each time its accessed.
-                    </p>
-                  </div>
-                }
-              />
-              <p className="text-sm text-scale-1100">
-                A table within the public schema is required before you can create a Row-Level
-                Security policy.
-              </p>
-            </div>
-          </ProductEmptyState>
-        </div>
-      )}
-
-      <PolicyEditorModal
-        visible={!isEmpty(selectedSchemaAndTable)}
-        roles={roles}
-        schema={selectedSchemaAndTable.schema}
-        table={selectedSchemaAndTable.table}
-        selectedPolicyToEdit={selectedPolicyToEdit}
-        onSelectCancel={closePolicyEditorModal}
-        // @ts-ignore
-        onCreatePolicy={onCreatePolicy}
-        // @ts-ignore
-        onUpdatePolicy={onUpdatePolicy}
-        onSaveSuccess={onSavePolicySuccess}
-      />
-
-      <ConfirmModal
-        danger
-        visible={!isEmpty(selectedPolicyToDelete)}
-        title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onDeletePolicy}
-      />
-
-      <ConfirmModal
-        danger={selectedTableToToggleRLS.rls_enabled}
-        visible={!isEmpty(selectedTableToToggleRLS)}
-        title={`Confirm to ${selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'} RLS`}
-        description={`Are you sure you want to ${
-          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
-        } row level security for the table "${selectedTableToToggleRLS.name}"?`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Saving"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
-      />
-    </>
-  )
-})
