@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
@@ -47,9 +47,8 @@ export function usePushNext() {
   )
 }
 
-function useAutoAuthRedirect() {
+function useAutoAuthRedirect(queryClient: QueryClient) {
   const pushNext = usePushNext()
-  const queryClient = useQueryClient()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
