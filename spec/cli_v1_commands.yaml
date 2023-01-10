@@ -528,6 +528,13 @@ commands:
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
+    examples:
+      - title: Basic usage
+        script: supabase login
+        output: |
+          You can generate an access token from https://app.supabase.com/account/tokens
+          Enter your access token: sbp_****************************************
+          Finished supabase login.
     tags:
       - local-dev
     links: []
@@ -537,6 +544,17 @@ commands:
   - id: supabase-link
     title: supabase link
     summary: Link to a Supabase project
+    examples:
+      - title: Basic usage
+        script: supabase link --project-ref ********************
+        output: |
+          Enter your database password:
+          Finished supabase link.
+      - title: Link without database password
+        script: supabase link --project-ref ******************** <<< ""
+        output: |
+          Enter your database password:
+          Finished supabase link.
     tags:
       - local-dev
     links: []
@@ -555,6 +573,13 @@ commands:
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
+    examples:
+      - title: Basic usage
+        script: supabase init
+        output: Finished supabase init.
+      - title: Initialise from an existing directory
+        script: supabase init --workdir .
+        output: Finished supabase init.
     tags:
       - local-dev
     links: []
