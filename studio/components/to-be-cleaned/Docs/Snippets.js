@@ -604,9 +604,10 @@ curl -X POST '${endpoint}/auth/v1/verify' \\
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.verifyOTP({
+let { data, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
-  token: '123456'
+  token: '123456',
+  type: 'sms'
 })
 `,
     },
