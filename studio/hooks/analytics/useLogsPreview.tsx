@@ -85,7 +85,7 @@ function useLogsPreview(
     {
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (lastPage.result.length === 0) {
+        if ((lastPage?.result?.length ?? 0) === 0) {
           return undefined
         }
         const len = lastPage.result.length
