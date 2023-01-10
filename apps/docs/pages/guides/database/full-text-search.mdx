@@ -108,8 +108,7 @@ const { data, error } = await supabase.from('books').select().eq('title', 'Harry
 final result = await client
   .from('books')
   .select()
-  .eq('title', 'Harry')
-  .execute();
+  .eq('title', 'Harry');
 ```
 
 </TabPanel>
@@ -146,8 +145,7 @@ const { data, error } = await supabase.from('books').select().textSearch('title'
 final result = await client
   .from('books')
   .select()
-  .textSearch('title', "'Harry'")
-  .execute();
+  .textSearch('title', "'Harry'");
 ```
 
 </TabPanel>
@@ -191,8 +189,7 @@ const { data, error } = await supabase.from('books').select().textSearch('descri
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big'")
-  .execute();
+  .textSearch('description', "'big'");
 ```
 
 </TabPanel>
@@ -278,8 +275,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' & 'big'")
-  .execute();
+  .textSearch('description', "'little' & 'big'");
 ```
 
 </TabPanel>
@@ -331,8 +327,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' | 'big'")
-  .execute();
+  .textSearch('description', "'little' | 'big'");
 ```
 
 </TabPanel>
@@ -430,8 +425,7 @@ const { data, error } = await supabase.from('books').select().textSearch('fts', 
 final result = await client
   .from('books')
   .select()
-  .textSearch('fts', "'little' & 'big'")
-  .execute();
+  .textSearch('fts', "'little' & 'big'");
 ```
 
 </TabPanel>
@@ -488,8 +482,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' <-> 'dreams'")
-  .execute();
+  .textSearch('description', "'big' <-> 'dreams'");
 ```
 
 </TabPanel>
@@ -531,8 +524,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'year' <2> 'school'")
-  .execute();
+  .textSearch('description', "'year' <2> 'school'");
 ```
 
 </TabPanel>
@@ -577,8 +569,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' & !'little'")
-  .execute();
+  .textSearch('description', "'big' & !'little'");
 ```
 
 </TabPanel>

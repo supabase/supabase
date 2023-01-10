@@ -95,9 +95,9 @@ You can insert geographical data through SQL or through our API.
 insert into public.restaurants
 (name, location)
 values
-  ('Supa Burger', st_point(-73.946823 40.807416)),
-  ('Supa Pizza', st_point(-73.94581 40.807475)),
-  ('Supa Taco', st_point(-73.945826 40.80629));
+  ('Supa Burger', st_point(-73.946823, 40.807416)),
+  ('Supa Pizza', st_point(-73.94581, 40.807475)),
+  ('Supa Taco', st_point(-73.945826, 40.80629));
 ```
 
 </TabPanel>
@@ -143,7 +143,7 @@ await supabase.from('restaurants').insert([
 </TabPanel>
 </Tabs>
 
-Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is that there is no comma between the two values, just a single space.
+Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
 
 At this point, if you go into your Supabase dashboard and look at the data, you will notice that the value of the `location` column looks something like this.
 
