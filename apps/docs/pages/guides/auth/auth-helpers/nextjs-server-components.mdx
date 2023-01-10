@@ -242,6 +242,16 @@ const Context = createContext()
 export default function SupabaseProvider({ children }) {
   const [supabase] = useState(() => createClient())
 
+  useEffect(() => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.access_token !== accessToken) {
+        router.refresh()
+      }
+    })
+  
+    return () => subscription.unsubscribe()
+  }, [accessToken])
+
   return (
     <Context.Provider value={{ supabase }}>
       <>{children}</>
