@@ -52,12 +52,12 @@ const Wrappers = () => {
               </Button>
             </a>
           </Link>
-          <WrappersDropdown />
+          {isWrappersEnabled && <WrappersDropdown />}
         </div>
       </div>
 
       {isLoadingExtensions ? (
-        <div className="border rounded border-scale-500 p-12 space-y-2">
+        <div className="p-12 space-y-2 border rounded border-scale-500">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
