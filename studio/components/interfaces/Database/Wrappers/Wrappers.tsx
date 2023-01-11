@@ -85,7 +85,6 @@ const Wrappers = () => {
                       key={i}
                       wrapperMeta={wrapper}
                       wrappers={createdWrappers}
-                      isLoading={isLoading}
                       isOpen={open === wrapper.name}
                       onOpen={(wrapperName) => {
                         if (open !== wrapperName) setOpen(wrapperName)
