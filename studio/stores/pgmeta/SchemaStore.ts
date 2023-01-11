@@ -45,4 +45,9 @@ export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
     this.views = views
     return views
   }
+
+  // loadBySchema is not supported in this store
+  async loadBySchema(schema: string) {
+    return []
+  }
 }
