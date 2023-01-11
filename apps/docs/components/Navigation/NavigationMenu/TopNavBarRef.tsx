@@ -2,19 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  IconCommand,
-  IconMenu,
-  IconMessageSquare,
-  IconMoon,
-  IconSearch,
-  IconSun,
-  Input,
-  Listbox,
-} from 'ui'
+import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 import { useTheme } from 'common/Providers'
@@ -54,6 +42,7 @@ const TopNavBarRef: FC = () => {
 
     const key = localStorage.getItem('supabaseDarkMode')
     document.documentElement.className = key === 'true' ? 'dark' : ''
+    document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
   }
 
   const onSelectVersion = (version: string) => {
@@ -134,7 +123,7 @@ const TopNavBarRef: FC = () => {
             target="_blank"
             rel="noreferrer noopener"
           >
-            Main site
+            Supabase.com
           </Button>
           <Button
             type="text"
@@ -146,6 +135,18 @@ const TopNavBarRef: FC = () => {
           >
             Dashboard
           </Button>
+          <ul className="flex items-center">
+            <Button
+              type="text"
+              as="a"
+              // @ts-ignore
+              href="https://github.com/supabase/supabase"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <IconGitHub size={16} />
+            </Button>
+          </ul>
           <ul className="flex items-center">
             <li className="px-4">
               <div className="cursor-pointer" onClick={toggleDarkMode}>

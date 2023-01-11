@@ -38,7 +38,7 @@ export const meta = {
 
 ### Tutorials
 
-<div className="grid grid-cols-12 gap-6 not-prose">
+<div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
       <Link href={`/${item.href}`} key={item.title} passHref>
@@ -150,13 +150,13 @@ export const resources = [
   {
     title: 'Features',
     hasLightIcon: true,
-    href: '/features',
+    href: '/guides/getting-started/features',
     description: 'A non-exhaustive list of features that Supabase provides for every project.',
   },
   {
     title: 'Architecture',
     hasLightIcon: true,
-    href: '/architecture',
+    href: '/guides/getting-started/architecture',
     description: "An overview of Supabase's architecture and product principles.",
   },
 ]

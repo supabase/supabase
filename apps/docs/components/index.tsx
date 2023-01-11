@@ -17,6 +17,8 @@ import Extensions from './Extensions'
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
+import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
@@ -26,6 +28,10 @@ import RefHeaderSection from './reference/RefHeaderSection'
 
 // Ref version specific
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
+
+import Options from '~/components/Options'
+import Param from '~/components/Params'
+import Image from 'next/image'
 
 const components = {
   Admonition,
@@ -38,6 +44,8 @@ const components = {
   JwtGenerator,
   QuickstartIntro,
   ProjectSetup,
+  SocialProviderSetup,
+  SocialProviderSettingsSupabase,
   Mermaid,
   Extensions,
   Alert: (props: any) => (
@@ -68,6 +76,15 @@ const components = {
   code: (props: any) => <CodeBlock {...props} />,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  Options,
+  Param,
+  img: (props: any) => {
+    return (
+      <span className={['next-image--dynamic-fill'].join(' ')}>
+        <Image {...props} className={['rounded-md border'].join(' ')} layout="fill" />
+      </span>
+    )
+  },
 }
 
 export default components

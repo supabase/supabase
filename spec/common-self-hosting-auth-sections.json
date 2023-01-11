@@ -128,12 +128,6 @@
         "slug": "verifies-a-sign-up",
         "title": "Verifies a sign up",
         "type": "operation"
-      },
-      {
-        "id": "verifies-a-sign-up",
-        "slug": "verifies-a-sign-up",
-        "title": "Verifies a sign up",
-        "type": "operation"
       }
     ]
   }

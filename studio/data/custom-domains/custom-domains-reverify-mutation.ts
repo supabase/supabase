@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainReverifyVariables = {
@@ -12,7 +13,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
   }
 
   const response = await post(
-    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname/reverify`,
+    `${API_ADMIN_URL}/projects/${projectRef}/custom-hostname/reverify`,
     {}
   )
   if (response.error) {

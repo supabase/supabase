@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { customDomainKeys } from './keys'
 
@@ -72,12 +73,9 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  const response = (await get(
-    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname`,
-    {
-      signal,
-    }
-  )) as {
+  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/custom-hostname`, {
+    signal,
+  })) as {
     data: {
       errors: any[]
       result: CustomDomainResponse

@@ -535,16 +535,20 @@ module.exports = [
     source: '/docs/reference/postgres/publications',
     destination: '/docs/guides/database/replication',
   },
-
   {
     permanent: true,
     source: '/docs/guides/hosting/platform',
     destination: '/docs/guides/platform',
   },
   {
-    permanent: false,
-    source: '/docs/guides/self-hosting',
-    destination: '/docs/guides/hosting/overview',
+    permanent: true,
+    source: '/docs/guides/hosting/platform/access-control',
+    destination: '/docs/guides/platform/access-control',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/self-hosting/overview',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
@@ -1215,22 +1219,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference/cli/supabase-db-reset',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-db-remote-commit',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-db-push',
     destination: '/docs/reference/cli/usage',
   },
   {
@@ -1619,88 +1608,98 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth-twilio',
+    source: '/docs/guides/auth/auth-twilio',
     destination: '/docs/guides/auth/phone-login/twilio',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-google',
-    destination: '/docs/guides/auth/social-login/with-google',
+    source: '/docs/guides/auth/auth-vonage',
+    destination: '/docs/guides/auth/phone-login/vonage',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-facebook',
-    destination: '/docs/guides/auth/social-login/with-facebook',
+    source: '/docs/guides/auth/auth-google',
+    destination: '/docs/guides/auth/social-login/auth-google',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-apple',
-    destination: '/docs/guides/auth/social-login/with-apple',
+    source: '/docs/guides/auth/auth-facebook',
+    destination: '/docs/guides/auth/social-login/auth-facebook',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-azure',
-    destination: '/docs/guides/auth/social-login/with-azure',
+    source: '/docs/guides/auth/auth-apple',
+    destination: '/docs/guides/auth/social-login/auth-apple',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-twitter',
-    destination: '/docs/guides/auth/social-login/with-twitter',
+    source: '/docs/guides/auth/auth-azure',
+    destination: '/docs/guides/auth/social-login/auth-azure',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-github',
-    destination: '/docs/guides/auth/social-login/with-github',
+    source: '/docs/guides/auth/auth-twitter',
+    destination: '/docs/guides/auth/social-login/auth-twitter',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-gitlab',
-    destination: '/docs/guides/auth/social-login/with-gitlab',
+    source: '/docs/guides/auth/auth-github',
+    destination: '/docs/guides/auth/social-login/auth-github',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-bitbucket',
-    destination: '/docs/guides/auth/social-login/with-bitbucket',
+    source: '/docs/guides/auth/auth-gitlab',
+    destination: '/docs/guides/auth/social-login/auth-gitlab',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-discord',
-    destination: '/docs/guides/auth/social-login/with-discord',
+    source: '/docs/guides/auth/auth-bitbucket',
+    destination: '/docs/guides/auth/social-login/auth-bitbucket',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-keycloak',
-    destination: '/docs/guides/auth/social-login/with-keycloak',
+    source: '/docs/guides/auth/auth-discord',
+    destination: '/docs/guides/auth/social-login/auth-discord',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-linkedin',
-    destination: '/docs/guides/auth/social-login/with-linkedin',
+    source: '/docs/guides/auth/auth-keycloak',
+    destination: '/docs/guides/auth/social-login/auth-keycloak',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-notion',
-    destination: '/docs/guides/auth/social-login/with-notion',
+    source: '/docs/guides/auth/auth-linkedin',
+    destination: '/docs/guides/auth/social-login/auth-linkedin',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-slack',
-    destination: '/docs/guides/auth/social-login/with-slack',
+    source: '/docs/guides/auth/auth-notion',
+    destination: '/docs/guides/auth/social-login/auth-notion',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-spotify',
-    destination: '/docs/guides/auth/social-login/with-spotify',
+    source: '/docs/guides/auth/auth-slack',
+    destination: '/docs/guides/auth/social-login/auth-slack',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-twitch',
-    destination: '/docs/guides/auth/social-login/with-twitch',
+    source: '/docs/guides/auth/auth-spotify',
+    destination: '/docs/guides/auth/social-login/auth-spotify',
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/with-workos',
-    destination: '/docs/guides/auth/social-login/with-workos',
+    source: '/docs/guides/auth/auth-twitch',
+    destination: '/docs/guides/auth/social-login/auth-twitch',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-workos',
+    destination: '/docs/guides/auth/social-login/auth-workos',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-zoom',
+    destination: '/docs/guides/auth/social-login/auth-zoom',
   },
   {
     permanent: true,
@@ -1784,23 +1783,23 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/hosting/overview',
-    destination: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: true,
     source: '/docs/guides/hosting/docker',
-    destination: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting',
+    destination: '/docs/guides/self-hosting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/self-hosting/docker',
+    destination: '/docs/guides/self-hosting/docker',
   },
   {
     permanent: true,
@@ -1819,8 +1818,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firebase-data',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-data',
+    source: '/docs/guides/migrations/firestore-data',
+    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
   },
   {
     permanent: true,
@@ -1876,5 +1875,15 @@ module.exports = [
     permanent: true,
     source: '/docs/handbook/supasquad',
     destination: '/supasquad',
+  },
+  {
+    permanent: true,
+    source: '/contact/enterprise',
+    destination: 'https://forms.supabase.com/enterprise',
+  },
+  {
+    permanent: true,
+    source: '/legal/soc2',
+    destination: 'https://forms.supabase.com/soc2',
   },
 ]

@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Badge, Button, Radio } from 'ui'
+import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
 import { useFlag, useParams } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
@@ -25,14 +25,23 @@ const ComputeSizeSelection: FC<Props> = ({
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="flex items-center space-x-2">
-          <h4 className="text-lg">Database add-ons</h4>
-          <Badge color="green">Optional</Badge>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center space-x-2">
+            <h4 className="text-lg">Compute add-ons</h4>
+            <Badge color="green">Optional</Badge>
+          </div>
+          <p className="text-sm text-scale-1100">
+            Choose the database instance size that best fits your needs
+          </p>
         </div>
-        <p className="text-sm text-scale-1100">
-          Choose the database instance size that best fits your needs
-        </p>
+        <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+          <a target="_blank">
+            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              About compute add-ons
+            </Button>
+          </a>
+        </Link>
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />

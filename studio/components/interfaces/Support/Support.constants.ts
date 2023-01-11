@@ -32,7 +32,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: 'Billing',
     label: 'Billing',
-    description: 'Issues with credit card charges | invoices | overcharing',
+    description: 'Issues with credit card charges | invoices | overcharging',
     query: undefined,
   },
   {

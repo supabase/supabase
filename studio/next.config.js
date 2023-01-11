@@ -115,6 +115,11 @@ const nextConfig = {
         destination: '/project/:ref/logs/explorer',
         permanent: true,
       },
+      {
+        source: '/org/:slug/settings',
+        destination: '/org/:slug/general',
+        permanent: true,
+      },
     ]
   },
   async headers() {

@@ -46,8 +46,8 @@ PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
 PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
-on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+Now that we have the API credentials in place, create a `src/lib/supabaseClient.ts` helper file to initialize the Supabase client.
+These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js title=src/lib/supabaseClient.ts
 import { createClient } from '@supabase/auth-helpers-sveltekit'
@@ -56,8 +56,7 @@ import { env } from '$env/dynamic/public'
 export const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
 ```
 
-And one optional step is to update the CSS file `public/global.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+Optionally, update `src/routes/style.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
 ### Supabase Auth Helpers
 
@@ -136,6 +135,7 @@ import '$lib/supabaseClient'
 ### Set up a Login component
 
 Let's set up a Svelte component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Create a new `Auth.svelte` component in the `src/routes` directory to handle this functionality.
 
 ```html title=src/routes/Auth.svelte
 <script lang="ts">
@@ -178,7 +178,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 ### Account component
 
 After a user is signed in, they need to be able to edit their profile details and manage their account.
-Create a new `Account.svelte` component to handle this functionality.
+Create a new `Account.svelte` component in the `src/routes` directory to handle this functionality.
 
 ```html title=src/routes/Account.svelte
 <script lang="ts">
@@ -328,7 +328,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component called `Avatar.svelte` in the `src/routes` directory:
 
 ```html title=src/routes/Avatar.svelte
 <script lang="ts">

@@ -142,8 +142,8 @@ const ColumnManagement: FC<Props> = ({
 
   return (
     <>
-      <div className="table-editor-columns w-full space-y-4">
-        <div className="flex w-full items-center justify-between">
+      <div className="w-full space-y-4 table-editor-columns">
+        <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           {isNewRecord && (
             <>
@@ -197,8 +197,29 @@ const ColumnManagement: FC<Props> = ({
           <div className="flex w-full px-3">
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
-            <div className="w-[25%]">
+            <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-scale-900">Name</h5>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <h5 className="text-xs text-scale-900">
+                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                  </h5>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                      'border border-scale-200 ', //border
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      Recommended to use lowercase and use an underscore to separate words e.g.
+                      column_name
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-scale-900">Type</h5>

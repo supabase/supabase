@@ -1,4 +1,4 @@
-export type Wrapper = {
+export type WrapperMeta = {
   name: string
   handlerName: string
   validatorName: string
@@ -16,11 +16,12 @@ export type ServerOption = {
   required: boolean
   encrypted: boolean
   hidden: boolean
+  isTextArea?: boolean
+  urlHelper?: string
   defaultValue?: string
 }
 
 export type Server = {
-  name: string
   options: ServerOption[]
 }
 

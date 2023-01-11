@@ -77,7 +77,7 @@ export const formSubscriptionUpdatePayload = (
     ...(tierPriceId && { tier: tierPriceId.id }),
     addons,
     proration_date,
-    payment_method: selectedPaymentMethod,
+    payment_method: selectedPaymentMethod
   }
 }
 

@@ -20,14 +20,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           key: 'triggers',
           url: `/project/${ref}/database/triggers`,
           items: [],
-          isPreview: false,
         },
         {
           name: 'Functions',
           key: 'functions',
           url: `/project/${ref}/database/functions`,
           items: [],
-          isPreview: false,
         },
         {
           name: 'Extensions',
@@ -35,16 +33,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/extensions`,
           items: [],
         },
-        ...(foreignDataWrappersEnabled
-          ? [
-              {
-                name: 'Wrappers',
-                key: 'wrappers',
-                url: `/project/${ref}/database/wrappers`,
-                items: [],
-              },
-            ]
-          : []),
         { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
         {
           name: 'Replication',
@@ -59,7 +47,18 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 key: 'hooks',
                 url: `/project/${ref}/database/hooks`,
                 items: [],
-                isPreview: true,
+                label: 'ALPHA',
+              },
+            ]
+          : []),
+        ...(foreignDataWrappersEnabled
+          ? [
+              {
+                name: 'Wrappers',
+                key: 'wrappers',
+                url: `/project/${ref}/database/wrappers`,
+                items: [],
+                label: 'ALPHA',
               },
             ]
           : []),

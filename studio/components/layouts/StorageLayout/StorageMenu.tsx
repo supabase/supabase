@@ -122,8 +122,10 @@ const BucketRow = ({
     <ProductMenuItem
       key={bucket.id}
       name={
-        <div className="flex items-center space-x-2">
-          <p>{bucket.name}</p>
+        <div className="flex items-center justify-between space-x-2 truncate w-full">
+          <p className="truncate" title={bucket.name}>
+            {bucket.name}
+          </p>
           {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
       }

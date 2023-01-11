@@ -17,7 +17,7 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -263,10 +263,6 @@ const Reports = () => {
     })
   }
 
-  // Filter out total_storage_image_render_count if feature flag is not enabled
-  const storageImageResizeEnabled = useFlag('storageImageResize')
-  let metrics = METRICS.filter(it => it.key !== 'total_storage_image_render_count' || storageImageResizeEnabled);
-
   const MetricOptions = () => {
     return (
       <>
@@ -277,7 +273,7 @@ const Reports = () => {
                 isNested
                 overlay={
                   <>
-                    {metrics.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                    {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
                       return (
                         <Dropdown.Checkbox
                           key={metric.key}

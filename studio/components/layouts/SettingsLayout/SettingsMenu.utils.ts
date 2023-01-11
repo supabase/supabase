@@ -58,6 +58,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
                 key: 'vault',
                 url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
                 items: [],
+                label: 'BETA',
               },
             ]
           : []),

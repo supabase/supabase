@@ -63,7 +63,14 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 */
 const channel = supabase
   .channel('schema-db-changes')
-  .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => console.log(payload))
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
   .subscribe()
 ```
 
@@ -74,8 +81,14 @@ To listen to changes on a table in the `public` schema:
 
 const channel = supabase
   .channel('table-db-changes')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
-    console.log(payload)
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+    },
+    (payload) => console.log(payload)
   )
   .subscribe()
 ```
@@ -109,11 +122,21 @@ const channel = supabase
   .channel('db-changes')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: 'messages', filter: 'body=eq.bye' },
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=eq.bye',
+    },
     (payload) => console.log(payload)
   )
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, (payload) =>
-    console.log(payload)
+  .on('postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'users',
+    },
+    (payload) => console.log(payload)
   )
   .subscribe()
 ```

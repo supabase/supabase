@@ -163,7 +163,7 @@ export function ColumnHeader<R>({
             </Tooltip.Root>
           )}
         </div>
-        <ColumnMenu column={column} />
+        <ColumnMenu column={column} isEncrypted={isEncrypted} />
       </div>
     </div>
   )

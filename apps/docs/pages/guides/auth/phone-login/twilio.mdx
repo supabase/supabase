@@ -141,7 +141,7 @@ You should present a form to the user so they can input the 6 digit pin, then se
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',
@@ -257,7 +257,7 @@ The second step is the same as the previous section, you need to collect the 6-d
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
   type: 'sms',

@@ -2,7 +2,6 @@ import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
 import { FC, useEffect, useState } from 'react'
 import components from '~/components'
-import Footer from '~/components/Footer'
 import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 

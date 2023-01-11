@@ -1,5 +1,11 @@
 Pricing Changelog
 
+### 09 Jan 2023
+----
+
+Database Compute Add ons
+- Clarified iops values to the latest instance types
+
 ### 02 Nov 2022
 ----
 

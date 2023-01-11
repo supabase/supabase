@@ -260,6 +260,7 @@ const { data, fetching, error } = result
 curl --request POST '<SUPABASE_URL>/graphql/v1' \
 -H 'apikey: <SUPABASE_ANON_KEY>' \
 -H 'Authorization: Bearer <SUPABASE_ANON_KEY>' \
+-H 'Content-Type: application/json' \
 -d '{ "query":"{ todos(first: 3) { edges { node { id } } } }" }'
 ```
 

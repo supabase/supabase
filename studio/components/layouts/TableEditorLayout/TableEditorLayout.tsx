@@ -46,6 +46,7 @@ const TableEditorLayout: FC<Props> = ({
       meta.policies.load()
       meta.publications.load()
       meta.extensions.load()
+      meta.foreignTables.load()
     }
   }, [ui.selectedProject?.ref])
 

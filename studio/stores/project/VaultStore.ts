@@ -21,7 +21,7 @@ export interface IVaultStore {
   updateSecret: (id: string, payload: Partial<VaultSecret>) => any
   deleteSecret: (id: string) => any
   fetchSecretValue: (id: string) => any
-  listEncryptedColumns: (table: string) => any
+  listEncryptedColumns: (schema: string, table: string) => any
 }
 
 interface EncryptionKey {
@@ -208,9 +208,10 @@ export default class VaultStore implements IVaultStore {
     return res[0].decrypted_secret
   }
 
-  async listEncryptedColumns(table: string) {
+  async listEncryptedColumns(schema: string, table: string) {
     if (!table) return []
 
+    await this.rootStore.meta.schemas.loadViews(schema)
     const decryptedView = this.rootStore.meta.schemas.views.find(
       (view) => view.name === `decrypted_${table}`
     )
