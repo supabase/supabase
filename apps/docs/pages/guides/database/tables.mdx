@@ -206,7 +206,7 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```sql
-final res = await supabase
+await supabase
   .from('movies')
   .insert([{
     name: 'The Empire Strikes Back',
@@ -214,7 +214,7 @@ final res = await supabase
   }, {
     name: 'Return of the Jedi',
     description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
-  }]).execute();
+  }]);
 ```
 
 </TabPanel>

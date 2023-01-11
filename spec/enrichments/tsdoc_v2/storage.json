@@ -5251,7 +5251,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Downloads a file."
+                    "shortText": "Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `getPublicUrl` instead."
                   },
                   "parameters": [
                     {

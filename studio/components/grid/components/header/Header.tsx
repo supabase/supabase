@@ -5,7 +5,6 @@ import { saveAs } from 'file-saver'
 import { useStore } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
-import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { Sort, Filter } from 'components/grid/types'
@@ -42,8 +41,8 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
         />
       )}
       <div className="sb-grid-header__inner">
+        <RefreshButton filters={filters} sorts={sorts} />
         {headerActions}
-        <StatusLabel />
       </div>
     </div>
   )
@@ -78,7 +77,6 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton filters={filters} sorts={sorts} />
         <FilterDropdown />
         <SortPopover />
       </div>

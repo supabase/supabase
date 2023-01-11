@@ -17,6 +17,8 @@ import Extensions from './Extensions'
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
+import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
@@ -42,6 +44,8 @@ const components = {
   JwtGenerator,
   QuickstartIntro,
   ProjectSetup,
+  SocialProviderSetup,
+  SocialProviderSettingsSupabase,
   Mermaid,
   Extensions,
   Alert: (props: any) => (
