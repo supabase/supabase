@@ -1219,22 +1219,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference/cli/supabase-db-reset',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-db-remote-commit',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-db-push',
     destination: '/docs/reference/cli/usage',
   },
   {

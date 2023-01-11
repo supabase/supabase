@@ -1,8 +1,6 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
-// [Joshen] Think twice - do we really need the columns here?
-// This query can just be specifically scoped to the FDW UI
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
     select
