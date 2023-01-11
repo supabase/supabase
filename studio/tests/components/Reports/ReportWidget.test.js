@@ -27,7 +27,8 @@ jest.mock('hooks')
 import { useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 
-import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'

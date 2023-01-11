@@ -1,7 +1,8 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import { render, waitFor, screen } from '@testing-library/react'
+import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
+import { render } from '../../helpers'
 
 test('can display log data', async () => {
   render(
@@ -117,7 +118,7 @@ test.each([
     queryType: 'auth',
     data: [
       {
-        event_message: JSON.stringify({msg: "some message", path: "/auth-path", level: "info"}),
+        event_message: JSON.stringify({ msg: 'some message', path: '/auth-path', level: 'info' }),
         timestamp: 1659545029083869,
         id: '4475cf6f-2929-4296-ab44-ce2c17069937',
       },

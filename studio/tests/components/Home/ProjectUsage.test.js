@@ -1,4 +1,5 @@
-import { render, waitFor, screen } from '@testing-library/react'
+import { waitFor, screen } from '@testing-library/react'
+import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
