@@ -4,69 +4,68 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { getCreateFDWSql } from './fdw-create-mutation'
+import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
 
-export type FDWDeleteVariables = {
+export type FDWUpdateVariables = {
   projectRef?: string
   connectionString?: string
   wrapper: FDW
   wrapperMeta: WrapperMeta
+  formState: {
+    [k: string]: string
+  }
+  tables: any[]
 }
 
-export const getDeleteFDWSql = ({
+export const getUpdateFDWSql = ({
   wrapper,
   wrapperMeta,
-}: Pick<FDWDeleteVariables, 'wrapper' | 'wrapperMeta'>) => {
-  const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
-
-  const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
-    const key = `${wrapper.name}_${option.name}`
-
-    return /* SQL */ `
-      delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = '${key}');
-
-      delete from pgsodium.key where name = '${key}';
-    `
-  })
-
-  const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
+  formState,
+  tables,
+}: Pick<FDWUpdateVariables, 'wrapper' | 'wrapperMeta' | 'formState' | 'tables'>) => {
+  const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
+  const createWrapperSql = getCreateFDWSql({ wrapperMeta, formState, tables })
 
   const sql = /* SQL */ `
-    drop foreign data wrapper if exists ${wrapper.name} cascade;
+    ${deleteWrapperSql}
 
-    ${deleteEncryptedSecretsSql}
+    ${createWrapperSql}
   `
 
   return sql
 }
 
-export async function deleteFDW({
+export async function updateFDW({
   projectRef,
   connectionString,
   wrapper,
   wrapperMeta,
-}: FDWDeleteVariables) {
+  formState,
+  tables,
+}: FDWUpdateVariables) {
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
 
-  const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
+  const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
   return result
 }
 
-type FDWDeleteData = Awaited<ReturnType<typeof deleteFDW>>
+type FDWUpdateData = Awaited<ReturnType<typeof updateFDW>>
 
-export const useFDWDeleteMutation = ({
+export const useFDWUpdateMutation = ({
   onSuccess,
   ...options
-}: Omit<UseMutationOptions<FDWDeleteData, unknown, FDWDeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<UseMutationOptions<FDWUpdateData, unknown, FDWUpdateVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
   const { vault } = useStore()
 
-  return useMutation<FDWDeleteData, unknown, FDWDeleteVariables>((vars) => deleteFDW(vars), {
+  return useMutation<FDWUpdateData, unknown, FDWUpdateVariables>((vars) => updateFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 

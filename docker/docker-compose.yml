@@ -105,7 +105,7 @@ services:
 
   realtime:
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.0.2
+    image: supabase/realtime:v2.1.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
