@@ -1,5 +1,4 @@
 import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -22,9 +21,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
-import Base64 from 'lib/base64'
 import { SchemaView } from 'types'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
 interface Props {
@@ -45,8 +43,7 @@ const TableEditorMenu: FC<Props> = ({
   onDuplicateTable = () => {},
 }) => {
   const { meta, ui } = useStore()
-  const router = useRouter()
-  const { id } = router.query
+  const { id } = useParams()
 
   const projectRef = ui.selectedProject?.ref
   const schemas: PostgresSchema[] = meta.schemas.list()
@@ -324,12 +321,11 @@ const TableEditorMenu: FC<Props> = ({
               />
 
               {filteredViews.map((view: SchemaView) => {
-                const viewId = Base64.encode(JSON.stringify(view))
-                const isActive = id === viewId
+                const isActive = Number(id) === view.id
                 return (
-                  <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
+                  <Link key={view.id} href={`/project/${projectRef}/editor/${view.id}?type=view`}>
                     <a>
-                      <Menu.Item key={viewId} rounded active={isActive}>
+                      <Menu.Item key={view.id} rounded active={isActive}>
                         <div className="flex justify-between">
                           <p className="truncate">{view.name}</p>
                         </div>
@@ -359,7 +355,10 @@ const TableEditorMenu: FC<Props> = ({
               {filteredForeignTables.map((table: Partial<PostgresTable>) => {
                 const isActive = Number(id) === table.id
                 return (
-                  <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
+                  <Link
+                    key={table.id}
+                    href={`/project/${projectRef}/editor/${table.id}?type=foreign`}
+                  >
                     <a>
                       <Menu.Item key={table.id} rounded active={isActive}>
                         <div className="flex justify-between">
