@@ -1,15 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { FC } from 'react'
-import {
-  Collapsible,
-  IconChevronUp,
-  Button,
-  IconExternalLink,
-  IconLoader,
-  IconTrash,
-  IconEdit,
-} from 'ui'
+import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
 import { partition } from 'lodash'
 
 import { useParams, useStore } from 'hooks'
@@ -23,11 +15,10 @@ interface Props {
   wrappers: FDW[]
   wrapperMeta: WrapperMeta
   isOpen: boolean
-  isLoading: boolean
   onOpen: (wrapper: string) => void
 }
 
-const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, isLoading, onOpen }) => {
+const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -99,101 +90,93 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, isLoading, 
               <span className="text-sm capitalize">{wrapperMeta.label}</span>
             </div>
             <div className="flex items-center gap-3">
-              {isLoading ? (
-                <div className="flex items-center gap-1 px-1 py-1 text-xs rounded-full">
-                  <IconLoader className="animate-spin" size={18} />
-                </div>
-              ) : (
-                <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-1200 dark:border-scale-700 dark:bg-scale-300">
-                  {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
-                </div>
-              )}
+              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-1200 dark:border-scale-700 dark:bg-scale-300">
+                {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
+              </div>
             </div>
           </button>
         </Collapsible.Trigger>
-        {!isLoading && (
-          <Collapsible.Content>
-            <div className="border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300 divide-y">
-              {wrappers.map((wrapper) => {
-                const serverOptions = Object.fromEntries(
-                  wrapper.server_options.map((option: any) => option.split('='))
-                )
-                const [encryptedMetadata, visibleMetadata] = partition(
-                  wrapperMeta.server.options,
-                  'hidden'
-                )
+        <Collapsible.Content>
+          <div className="border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300 divide-y">
+            {wrappers.map((wrapper) => {
+              const serverOptions = Object.fromEntries(
+                wrapper.server_options.map((option: any) => option.split('='))
+              )
+              const [encryptedMetadata, visibleMetadata] = partition(
+                wrapperMeta.server.options,
+                'hidden'
+              )
 
-                return (
-                  <div key={wrapper.id} className="px-6 py-4 flex items-center justify-between">
-                    <div className="space-y-1 w-3/4">
-                      <div className="flex items-center space-x-2">
-                        <p className="text-base">{wrapper.name}</p>
+              return (
+                <div key={wrapper.id} className="px-6 py-4 flex items-center justify-between">
+                  <div className="space-y-1 w-3/4">
+                    <div className="flex items-center space-x-2">
+                      <p className="text-base">{wrapper.name}</p>
+                    </div>
+                    {visibleMetadata.map((metadata) => (
+                      <div
+                        key={metadata.name}
+                        className="flex items-center space-x-2 text-sm text-scale-1000"
+                      >
+                        <p>{metadata.label}:</p>
+                        <p>{serverOptions[metadata.name]}</p>
                       </div>
-                      {visibleMetadata.map((metadata) => (
-                        <div
-                          key={metadata.name}
-                          className="flex items-center space-x-2 text-sm text-scale-1000"
+                    ))}
+                    {encryptedMetadata.map((metadata) => (
+                      <div key={metadata.name} className="flex items-center space-x-2 text-sm">
+                        <p className="text-scale-1000">{metadata.label}:</p>
+                        <Link
+                          href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <p>{metadata.label}:</p>
-                          <p>{serverOptions[metadata.name]}</p>
-                        </div>
-                      ))}
-                      {encryptedMetadata.map((metadata) => (
-                        <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-                          <p className="text-scale-1000">{metadata.label}:</p>
-                          <Link
-                            href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
-                          >
-                            <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
-                              <span>Encrypted in Vault</span>
-                              <IconExternalLink size={14} strokeWidth={1.5} />
+                          <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
+                            <span>Encrypted in Vault</span>
+                            <IconExternalLink size={14} strokeWidth={1.5} />
+                          </a>
+                        </Link>
+                      </div>
+                    ))}
+                    <div className="!mt-3 space-y-1">
+                      <p className="text-sm text-scale-1100">
+                        Foreign tables: ({wrapper.tables.length})
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {wrapper.tables.map((table: any) => (
+                          <Link href={`/project/${ref}/editor/${table.id}`}>
+                            <a>
+                              <div
+                                key={table.id}
+                                className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
+                              >
+                                {table.name}
+                              </div>
                             </a>
                           </Link>
-                        </div>
-                      ))}
-                      <div className="!mt-3 space-y-1">
-                        <p className="text-sm text-scale-1100">
-                          Foreign tables: ({wrapper.tables.length})
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {wrapper.tables.map((table: any) => (
-                            <Link href={`/project/${ref}/editor/${table.id}`}>
-                              <a>
-                                <div
-                                  key={table.id}
-                                  className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
-                                >
-                                  {table.name}
-                                </div>
-                              </a>
-                            </Link>
-                          ))}
-                        </div>
+                        ))}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
-                        <a>
-                          <Button
-                            type="default"
-                            icon={<IconEdit strokeWidth={1.5} />}
-                            className="py-2"
-                          />
-                        </a>
-                      </Link>
-                      <Button
-                        type="default"
-                        icon={<IconTrash strokeWidth={1.5} />}
-                        className="py-2"
-                        onClick={() => onDeleteWrapper(wrapper)}
-                      />
-                    </div>
                   </div>
-                )
-              })}
-            </div>
-          </Collapsible.Content>
-        )}
+                  <div className="flex items-center space-x-2">
+                    <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
+                      <a>
+                        <Button
+                          type="default"
+                          icon={<IconEdit strokeWidth={1.5} />}
+                          className="py-2"
+                        />
+                      </a>
+                    </Link>
+                    <Button
+                      type="default"
+                      icon={<IconTrash strokeWidth={1.5} />}
+                      className="py-2"
+                      onClick={() => onDeleteWrapper(wrapper)}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </Collapsible.Content>
       </Collapsible>
     </>
   )
