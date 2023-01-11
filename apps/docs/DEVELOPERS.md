@@ -62,11 +62,20 @@ Several pieces of information for this function come from a [common file](https:
 4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an auth function, its product is `auth`
 5. type — `updateUser()` is a function and marked as such, but we can also have sections of markdown interspersed with these function definitions.
 
+When a new function is added, this info would need to be manually added to the common file.
+
 #### Function Parameters
 
 The `updateUser()` function takes one parameter: `attributes`. The details for this parameter live in the GoTrue client library, referenced via a `$ref` property in the `supabase-js` [spec file](https://github.com/supabase/supabase/blob/cb04d85262db6a371539dda7df9b00ba5a901e87/spec/supabase_js_v2.yml#L357). Here, the `$ref` property is pointing to the [actual function definition](https://github.com/supabase/gotrue-js/blob/2d60e79073b96ae8c97a6ce18e2601ed1e2a2712/src/GoTrueClient.ts#L590) in the `gotrue-js` library. The accepted values for the `attributes` parameter come from the [type definition](https://github.com/supabase/gotrue-js/blob/16d3deb822097e8640a3a15b94a5690b3beaf11b/src/lib/types.ts#L233).
 
-These individual library spec files are fetched via this [Makefile](https://github.com/supabase/supabase/blob/master/spec/Makefile), and get [transformed](https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/supabase_dereferenced.json) to combine the information we need (params, types, etc). If you're working on docs, you likely won't need to touch this part of the setup, but we've included this detail here to point you in the right direction in case you do.
+These individual library spec files are fetched via this [Makefile](https://github.com/supabase/supabase/blob/master/spec/Makefile), and get [transformed](https://github.com/supabase/supabase/blob/master/spec/enrichments/tsdoc_v2/supabase_dereferenced.json) to combine the information we need (params, types, etc). Unless you're a library maintainer, you shouldn't need to worry about this part of the process.
+
+If you are a library maintainer, the last important note about these library files is that the [Makefile](https://github.com/supabase/supabase/blob/master/spec/Makefile) pulls from the `gh-pages` branch of the client library repo. Here's an example of the [`realtime-js` spec file](https://github.com/supabase/realtime-js/blob/gh-pages/v2/spec.json). Updating something like function params or returns, the process is:
+
+1. Get your changes merged to `master` in your library
+2. This will kick off an action that automatically updates the spec file in the library's `gh-pages` branch
+3. Run `make` in `/spec` of the `supabase/supabase` repo. This will regenerate all of the `tsdoc` files that the docs site uses
+4. You should now see the changes you've made in the docs site locally
 
 #### Function Examples
 
@@ -86,4 +95,4 @@ On the Next.JS side of things, these work almost exactly the same as the client 
 
 #### Search
 
-Search is handled through Algolia. When the site is built, a [script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/build-search.ts) runs through all of the types of content, generating search objects that are sent to Algolia to index.
+Search is handled through Algolia. When the site is built, a [search script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/build-search.ts) runs through all of the types of content, generating search objects that are sent to Algolia to index.
