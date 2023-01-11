@@ -89,7 +89,7 @@
     "items": [
       {
         "id": "supabase-db",
-        "title": "Manage local Postgres databases",
+        "title": "Manage local databases",
         "slug": "supabase-db",
         "type": "cli-command"
       },
