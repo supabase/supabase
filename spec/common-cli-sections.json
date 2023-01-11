@@ -14,71 +14,71 @@
     "type": "markdown"
   },
   {
-    "title": "general",
+    "title": "General",
     "items": [
       {
         "id": "supabase-init",
-        "title": "supabase init",
+        "title": "Initialize a local project",
         "slug": "supabase-init",
         "type": "cli-command"
       },
       {
         "id": "supabase-login",
-        "title": "supabase login",
+        "title": "Log in to a Supabase account",
         "slug": "supabase-login",
         "type": "cli-command"
       },
       {
         "id": "supabase-link",
-        "title": "supabase link",
+        "title": "Link to a Supabase project",
         "slug": "supabase-link",
         "type": "cli-command"
       },
       {
         "id": "supabase-start",
-        "title": "supabase start",
+        "title": "Start a container",
         "slug": "supabase-start",
         "type": "cli-command"
       },
       {
         "id": "supabase-stop",
-        "title": "supabase stop",
+        "title": "Stop all containers",
         "slug": "supabase-stop",
         "type": "cli-command"
       },
       {
         "id": "supabase-status",
-        "title": "supabase status",
+        "title": "Retrieve container status",
         "slug": "supabase-status",
         "type": "cli-command"
       },
       {
         "id": "supabase-test",
-        "title": "supabase test",
+        "title": "Run tests",
         "slug": "supabase-test",
         "type": "cli-command"
       },
       {
         "id": "supabase-test-db",
-        "title": "supabase test db",
+        "title": "Run tests (pgTAP)",
         "slug": "supabase-test-db",
         "type": "cli-command"
       },
       {
         "id": "supabase-gen",
-        "title": "supabase gen",
+        "title": "Run code generation tools",
         "slug": "supabase-gen",
         "type": "cli-command"
       },
       {
         "id": "supabase-gen-types",
-        "title": "supabase gen types",
+        "title": "Generate types (Postgres schema)",
         "slug": "supabase-gen-types",
         "type": "cli-command"
       },
       {
         "id": "supabase-gen-types-typescript",
-        "title": "supabase gen types typescript",
+        "title": "Generate types (TypeScript)",
         "slug": "supabase-gen-types-typescript",
         "type": "cli-command"
       }
@@ -87,115 +87,120 @@
   {
     "title": "Database",
     "items": [
-      { "id": "supabase-db", "title": "supabase db", "slug": "supabase-db", "type": "cli-command" },
+      {
+        "id": "supabase-db",
+        "title": "Manage local Postgres databases",
+        "slug": "supabase-db",
+        "type": "cli-command"
+      },
       {
         "id": "supabase-db-dump",
-        "title": "supabase db dump",
+        "title": "Dump schema from remote database",
         "slug": "supabase-db-dump",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-push",
-        "title": "supabase db push",
+        "title": "Push migration to remote database",
         "slug": "supabase-db-push",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-reset",
-        "title": "supabase db reset",
+        "title": "Reset local database",
         "slug": "supabase-db-reset",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-diff",
-        "title": "supabase db diff",
+        "title": "Diff local database",
         "slug": "supabase-db-diff",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-lint",
-        "title": "supabase db lint",
+        "title": "Lint local database",
         "slug": "supabase-db-lint",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-remote",
-        "title": "supabase db remote",
+        "title": "Manage remote databases",
         "slug": "supabase-db-remote",
         "type": "cli-command"
       },
       {
         "id": "supabase-db-remote-commit",
-        "title": "supabase db remote commit",
+        "title": "Commit remote database changes",
         "slug": "supabase-db-remote-commit",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "migrations",
+    "title": "Migrations",
     "items": [
       {
         "id": "supabase-migration",
-        "title": "supabase migration",
+        "title": "Manage database migrations",
         "slug": "supabase-migration",
         "type": "cli-command"
       },
       {
         "id": "supabase-migration-new",
-        "title": "supabase migration new",
+        "title": "Create a migration",
         "slug": "supabase-migration-new",
         "type": "cli-command"
       },
       {
         "id": "supabase-migration-list",
-        "title": "supabase migration list",
+        "title": "List all migrations",
         "slug": "supabase-migration-list",
         "type": "cli-command"
       },
       {
         "id": "supabase-migration-repair",
-        "title": "supabase migration repair",
+        "title": "Repair migration history table",
         "slug": "supabase-migration-repair",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "projects",
+    "title": "Projects",
     "items": [
       {
         "id": "supabase-projects",
-        "title": "supabase projects",
+        "title": "Manage projects",
         "slug": "supabase-projects",
         "type": "cli-command"
       },
       {
         "id": "supabase-projects-create",
-        "title": "supabase projects create",
+        "title": "Create a project",
         "slug": "supabase-projects-create",
         "type": "cli-command"
       },
       {
         "id": "supabase-projects-list",
-        "title": "supabase projects list",
+        "title": "List all projects",
         "slug": "supabase-projects-list",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "organizations",
+    "title": "Organizations",
     "items": [
       {
         "id": "supabase-orgs",
-        "title": "supabase orgs",
+        "title": "Manage organizations",
         "slug": "supabase-orgs",
         "type": "cli-command"
       },
       {
         "id": "supabase-orgs-list",
-        "title": "supabase orgs list",
+        "title": "List all organizations",
         "slug": "supabase-orgs-list",
         "type": "cli-command"
       }
@@ -206,101 +211,101 @@
     "items": [
       {
         "id": "supabase-functions",
-        "title": "supabase functions",
+        "title": "Manage edge functions",
         "slug": "supabase-functions",
         "type": "cli-command"
       },
       {
         "id": "supabase-functions-new",
-        "title": "supabase functions new",
+        "title": "Create a function",
         "slug": "supabase-functions-new",
         "type": "cli-command"
       },
       {
         "id": "supabase-functions-serve",
-        "title": "supabase functions serve",
+        "title": "Serve a function",
         "slug": "supabase-functions-serve",
         "type": "cli-command"
       },
       {
         "id": "supabase-functions-deploy",
-        "title": "supabase functions deploy",
+        "title": "Deploy a function",
         "slug": "supabase-functions-deploy",
         "type": "cli-command"
       },
       {
         "id": "supabase-functions-delete",
-        "title": "supabase functions delete",
+        "title": "Delete a function",
         "slug": "supabase-functions-delete",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "secrets",
+    "title": "Secrets",
     "items": [
       {
         "id": "supabase-secrets",
-        "title": "supabase secrets",
+        "title": "Manage secrets",
         "slug": "supabase-secrets",
         "type": "cli-command"
       },
       {
         "id": "supabase-secrets-set",
-        "title": "supabase secrets set",
+        "title": "Set a secret",
         "slug": "supabase-secrets-set",
         "type": "cli-command"
       },
       {
         "id": "supabase-secrets-list",
-        "title": "supabase secrets list",
+        "title": "List all secrets",
         "slug": "supabase-secrets-list",
         "type": "cli-command"
       },
       {
         "id": "supabase-secrets-unset",
-        "title": "supabase secrets unset",
+        "title": "Unset a secret",
         "slug": "supabase-secrets-unset",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "Domains",
+    "title": "Custom Domains",
     "items": [
       {
         "id": "supabase-domains",
-        "title": "supabase domains",
+        "title": "Manage custom domains",
         "slug": "supabase-domains",
         "type": "cli-command"
       },
       {
         "id": "supabase-domains-activate",
-        "title": "supabase domains activate",
+        "title": "Activate custom hostname",
         "slug": "supabase-domains-activate",
         "type": "cli-command"
       },
       {
         "id": "supabase-domains-create",
-        "title": "supabase domains create",
+        "title": "Create a custom hostname",
         "slug": "supabase-domains-create",
         "type": "cli-command"
       },
       {
         "id": "supabase-domains-get",
-        "title": "supabase domains get",
+        "title": "Retrieve custom hostname config",
         "slug": "supabase-domains-get",
         "type": "cli-command"
       },
       {
         "id": "supabase-domains-reverify",
-        "title": "supabase domains reverify",
+        "title": "Re-verify custom hostname config",
         "slug": "supabase-domains-reverify",
         "type": "cli-command"
       },
       {
         "id": "supabase-domains-delete",
-        "title": "supabase domains delete",
+        "title": "Delete custom hostname config",
         "slug": "supabase-domains-delete",
         "type": "cli-command"
       }
@@ -311,31 +316,31 @@
     "items": [
       {
         "id": "supabase-vanity-subdomains",
-        "title": "supabase vanity-subdomains",
+        "title": "Manage vanity subdomains",
         "slug": "supabase-vanity-subdomains",
         "type": "cli-command"
       },
       {
         "id": "supabase-vanity-subdomains-activate",
-        "title": "supabase vanity-subdomains activate",
+        "title": "Activate a vanity subdomain",
         "slug": "supabase-vanity-subdomains-activate",
         "type": "cli-command"
       },
       {
         "id": "supabase-vanity-subdomains-get",
-        "title": "supabase vanity-subdomains get",
+        "title": "Retrieve vanity subdomain",
         "slug": "supabase-vanity-subdomains-get",
         "type": "cli-command"
       },
       {
         "id": "supabase-vanity-subdomains-check-availability",
-        "title": "supabase vanity-subdomains check-availability",
+        "title": "Check subdomain availability",
         "slug": "supabase-vanity-subdomains-check-availability",
         "type": "cli-command"
       },
       {
         "id": "supabase-vanity-subdomains-delete",
-        "title": "supabase vanity-subdomains delete",
+        "title": "Delete vanity subdomain",
         "slug": "supabase-vanity-subdomains-delete",
         "type": "cli-command"
       }
@@ -346,19 +351,19 @@
     "items": [
       {
         "id": "supabase-network-bans",
-        "title": "supabase network-bans",
+        "title": "Manage network bans",
         "slug": "supabase-network-bans",
         "type": "cli-command"
       },
       {
         "id": "supabase-network-bans-get",
-        "title": "supabase network-bans get",
+        "title": "Retrieve network bans",
         "slug": "supabase-network-bans-get",
         "type": "cli-command"
       },
       {
         "id": "supabase-network-bans-remove",
-        "title": "supabase network-bans remove",
+        "title": "Remove a network ban",
         "slug": "supabase-network-bans-remove",
         "type": "cli-command"
       }
@@ -369,54 +374,54 @@
     "items": [
       {
         "id": "supabase-network-restrictions",
-        "title": "supabase network-restrictions",
+        "title": "Manage network restrictions",
         "slug": "supabase-network-restrictions",
         "type": "cli-command"
       },
       {
         "id": "supabase-network-restrictions-get",
-        "title": "supabase network-restrictions get",
+        "title": "Retrieve network restrictions",
         "slug": "supabase-network-restrictions-get",
         "type": "cli-command"
       },
       {
         "id": "supabase-network-restrictions-update",
-        "title": "supabase network-restrictions update",
+        "title": "Update network restrictions",
         "slug": "supabase-network-restrictions-update",
         "type": "cli-command"
       }
     ]
   },
   {
-    "title": "Completion",
+    "title": "Autocompletion Scripts",
     "items": [
       {
         "id": "supabase-completion",
-        "title": "supabase completion",
+        "title": "Generate autocompletion scripts",
         "slug": "supabase-completion",
         "type": "cli-command"
       },
       {
         "id": "supabase-completion-zsh",
-        "title": "supabase completion zsh",
+        "title": "Generate zsh script",
         "slug": "supabase-completion-zsh",
         "type": "cli-command"
       },
       {
         "id": "supabase-completion-powershell",
-        "title": "supabase completion powershell",
+        "title": "Generate powershell script",
         "slug": "supabase-completion-powershell",
         "type": "cli-command"
       },
       {
         "id": "supabase-completion-fish",
-        "title": "supabase completion fish",
+        "title": "Generate fish script",
         "slug": "supabase-completion-fish",
         "type": "cli-command"
       },
       {
         "id": "supabase-completion-bash",
-        "title": "supabase completion bash",
+        "title": "Generate bash script",
         "slug": "supabase-completion-bash",
         "type": "cli-command"
       }
