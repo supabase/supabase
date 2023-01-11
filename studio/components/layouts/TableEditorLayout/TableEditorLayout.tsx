@@ -41,7 +41,6 @@ const TableEditorLayout: FC<Props> = ({
   useEffect(() => {
     if (ui.selectedProject?.ref) {
       meta.schemas.load()
-      meta.tables.load()
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
@@ -49,6 +48,12 @@ const TableEditorLayout: FC<Props> = ({
       meta.foreignTables.load()
     }
   }, [ui.selectedProject?.ref])
+
+  useEffect(() => {
+    if (selectedSchema && ui.selectedProject?.ref) {
+      meta.tables.loadBySchema(selectedSchema)
+    }
+  }, [ui.selectedProject?.ref, selectedSchema])
 
   useEffect(() => {
     if (isEnabled) {
