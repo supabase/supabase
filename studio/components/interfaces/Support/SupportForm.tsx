@@ -59,6 +59,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
     [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
     [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
     [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
   }
 

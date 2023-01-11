@@ -34,6 +34,10 @@ Make sure to specify the `on delete cascade` clause when referencing `auth.users
 
 </Admonition>
 
+## Deleting Users
+
+You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do considering making use of a Row Level Security policy as described below.
+
 ## Public access
 
 Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies.
