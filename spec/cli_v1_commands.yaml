@@ -35,8 +35,8 @@ flags:
     default_value: ''
 commands:
   - id: supabase-vanity-subdomains
-    summary: supabase vanity-subdomains
-    title: Manage vanity subdomains for Supabase projects
+    title: supabase vanity-subdomains
+    summary: Manage vanity subdomains for Supabase projects
     description: |-
       Manage vanity subdomains for Supabase projects.
 
@@ -51,8 +51,8 @@ commands:
       - supabase-vanity-subdomains-get
     flags: []
   - id: supabase-vanity-subdomains-get
-    summary: supabase vanity-subdomains get
-    title: Get the current vanity subdomain
+    title: supabase vanity-subdomains get
+    summary: Get the current vanity subdomain
     tags: []
     links: []
     usage: supabase vanity-subdomains get
@@ -68,8 +68,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-vanity-subdomains-delete
-    summary: supabase vanity-subdomains delete
-    title: Deletes a project's vanity subdomain
+    title: supabase vanity-subdomains delete
+    summary: Deletes a project's vanity subdomain
     description: |
       Deletes the vanity subdomain for a project, and reverts to using the project ref for routing.
     tags: []
@@ -87,8 +87,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-vanity-subdomains-check-availability
-    summary: supabase vanity-subdomains check-availability
-    title: Checks if a desired subdomain is available for use
+    title: supabase vanity-subdomains check-availability
+    summary: Checks if a desired subdomain is available for use
     tags: []
     links: []
     usage: supabase vanity-subdomains check-availability [flags]
@@ -109,8 +109,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-vanity-subdomains-activate
-    summary: supabase vanity-subdomains activate
-    title: Activate a vanity subdomain
+    title: supabase vanity-subdomains activate
+    summary: Activate a vanity subdomain
     description: |
       Activate a vanity subdomain for your Supabase project.
 
@@ -136,8 +136,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-test
-    summary: supabase test
-    title: Run tests on local Supabase containers
+    title: supabase test
+    summary: Run tests on local Supabase containers
     tags:
       - local-dev
     links: []
@@ -145,16 +145,16 @@ commands:
       - supabase-test-db
     flags: []
   - id: supabase-test-db
-    summary: supabase test db
-    title: Tests local database with pgTAP
+    title: supabase test db
+    summary: Tests local database with pgTAP
     tags: []
     links: []
     usage: supabase test db
     subcommands: []
     flags: []
   - id: supabase-stop
-    summary: supabase stop
-    title: Stop all local Supabase containers
+    title: supabase stop
+    summary: Stop all local Supabase containers
     tags:
       - local-dev
     links: []
@@ -166,8 +166,8 @@ commands:
         description: Backs up the current database before stopping.
         default_value: 'false'
   - id: supabase-status
-    summary: supabase status
-    title: Show status of local Supabase containers
+    title: supabase status
+    summary: Show status of local Supabase containers
     tags:
       - local-dev
     links: []
@@ -199,8 +199,8 @@ commands:
         description: Override specific variable names.
         default_value: '[]'
   - id: supabase-start
-    summary: supabase start
-    title: Start containers for Supabase local development
+    title: supabase start
+    summary: Start containers for Supabase local development
     tags:
       - local-dev
     links: []
@@ -213,8 +213,8 @@ commands:
           Names of containers to not start. [gotrue, realtime, storage-api, imgproxy, kong, inbucket, postgrest, pgadmin-schema-diff, migra, postgres-meta, studio, deno-relay]
         default_value: '[]'
   - id: supabase-secrets
-    summary: supabase secrets
-    title: Manage Supabase secrets
+    title: supabase secrets
+    summary: Manage Supabase secrets
     tags:
       - management-api
     links: []
@@ -224,8 +224,8 @@ commands:
       - supabase-secrets-unset
     flags: []
   - id: supabase-secrets-unset
-    summary: supabase secrets unset
-    title: Unset a secret(s) on Supabase
+    title: supabase secrets unset
+    summary: Unset a secret(s) on Supabase
     description: Unset a secret(s) from the linked Supabase project.
     tags: []
     links: []
@@ -233,8 +233,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-secrets-set
-    summary: supabase secrets set
-    title: Set a secret(s) on Supabase
+    title: supabase secrets set
+    summary: Set a secret(s) on Supabase
     description: Set a secret(s) to the linked Supabase project.
     tags: []
     links: []
@@ -246,8 +246,8 @@ commands:
         description: Read secrets from a .env file.
         default_value: ''
   - id: supabase-secrets-list
-    summary: supabase secrets list
-    title: List all secrets on Supabase
+    title: supabase secrets list
+    summary: List all secrets on Supabase
     description: List all secrets in the linked project.
     tags: []
     links: []
@@ -255,8 +255,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-projects
-    summary: supabase projects
-    title: Manage Supabase projects
+    title: supabase projects
+    summary: Manage Supabase projects
     tags:
       - management-api
     links: []
@@ -265,8 +265,8 @@ commands:
       - supabase-projects-list
     flags: []
   - id: supabase-projects-list
-    summary: supabase projects list
-    title: List all Supabase projects
+    title: supabase projects list
+    summary: List all Supabase projects
     description: List all Supabase projects the logged-in user can access.
     tags: []
     links: []
@@ -274,8 +274,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-projects-create
-    summary: supabase projects create
-    title: Create a project on Supabase
+    title: supabase projects create
+    summary: Create a project on Supabase
     tags: []
     links: []
     usage: supabase projects create <project name> [flags]
@@ -349,8 +349,8 @@ commands:
             name: us-west-1
             type: string
   - id: supabase-orgs
-    summary: supabase orgs
-    title: Manage Supabase organizations
+    title: supabase orgs
+    summary: Manage Supabase organizations
     tags:
       - management-api
     links: []
@@ -358,8 +358,8 @@ commands:
       - supabase-orgs-list
     flags: []
   - id: supabase-orgs-list
-    summary: supabase orgs list
-    title: List all organizations
+    title: supabase orgs list
+    summary: List all organizations
     description: List all organizations the logged-in user belongs.
     tags: []
     links: []
@@ -367,8 +367,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-network-restrictions
-    summary: supabase network-restrictions
-    title: Manage network restrictions
+    title: supabase network-restrictions
+    summary: Manage network restrictions
     tags:
       - management-api
     links: []
@@ -377,8 +377,8 @@ commands:
       - supabase-network-restrictions-update
     flags: []
   - id: supabase-network-restrictions-update
-    summary: supabase network-restrictions update
-    title: Update network restrictions
+    title: supabase network-restrictions update
+    summary: Update network restrictions
     tags: []
     links: []
     usage: supabase network-restrictions update [flags]
@@ -402,8 +402,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-network-restrictions-get
-    summary: supabase network-restrictions get
-    title: Get the current network restrictions
+    title: supabase network-restrictions get
+    summary: Get the current network restrictions
     tags: []
     links: []
     usage: supabase network-restrictions get
@@ -419,8 +419,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-network-bans
-    summary: supabase network-bans
-    title: Manage network bans
+    title: supabase network-bans
+    summary: Manage network bans
     description: |-
       Network bans are IPs that get temporarily blocked if their traffic pattern looks abusive (e.g. multiple failed auth attempts).
 
@@ -433,8 +433,8 @@ commands:
       - supabase-network-bans-remove
     flags: []
   - id: supabase-network-bans-remove
-    summary: supabase network-bans remove
-    title: Remove a network ban
+    title: supabase network-bans remove
+    summary: Remove a network ban
     tags: []
     links: []
     usage: supabase network-bans remove [flags]
@@ -454,8 +454,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-network-bans-get
-    summary: supabase network-bans get
-    title: Get the current network bans
+    title: supabase network-bans get
+    summary: Get the current network bans
     tags: []
     links: []
     usage: supabase network-bans get
@@ -471,8 +471,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-migration
-    summary: supabase migration
-    title: Manage database migration scripts
+    title: supabase migration
+    summary: Manage database migration scripts
     tags:
       - local-dev
     links: []
@@ -482,8 +482,8 @@ commands:
       - supabase-migration-repair
     flags: []
   - id: supabase-migration-repair
-    summary: supabase migration repair
-    title: Repairs the migration history table
+    title: supabase migration repair
+    summary: Repairs the migration history table
     tags: []
     links: []
     usage: supabase migration repair <version> [flags]
@@ -506,16 +506,16 @@ commands:
             name: reverted
             type: '[ applied | reverted ]'
   - id: supabase-migration-new
-    summary: supabase migration new
-    title: Create an empty migration script
+    title: supabase migration new
+    summary: Create an empty migration script
     tags: []
     links: []
     usage: supabase migration new <migration name>
     subcommands: []
     flags: []
   - id: supabase-migration-list
-    summary: supabase migration list
-    title: List local and remote migrations
+    title: supabase migration list
+    summary: List local and remote migrations
     tags: []
     links: []
     usage: supabase migration list [flags]
@@ -526,8 +526,8 @@ commands:
         description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-login
-    summary: supabase login
-    title: Authenticate using an access token
+    title: supabase login
+    summary: Authenticate using an access token
     tags:
       - local-dev
     links: []
@@ -535,8 +535,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-link
-    summary: supabase link
-    title: Link to a Supabase project
+    title: supabase link
+    summary: Link to a Supabase project
     tags:
       - local-dev
     links: []
@@ -553,8 +553,8 @@ commands:
         required: true
         default_value: ''
   - id: supabase-init
-    summary: supabase init
-    title: Initialize a local project
+    title: supabase init
+    summary: Initialize a local project
     tags:
       - local-dev
     links: []
@@ -562,8 +562,8 @@ commands:
     subcommands: []
     flags: []
   - id: supabase-gen
-    summary: supabase gen
-    title: Run code generation tools
+    title: supabase gen
+    summary: Run code generation tools
     tags:
       - local-dev
     links: []
@@ -571,16 +571,16 @@ commands:
       - supabase-gen-types
     flags: []
   - id: supabase-gen-types
-    summary: supabase gen types
-    title: Generate types from Postgres schema
+    title: supabase gen types
+    summary: Generate types from Postgres schema
     tags: []
     links: []
     subcommands:
       - supabase-gen-types-typescript
     flags: []
   - id: supabase-gen-types-typescript
-    summary: supabase gen types typescript
-    title: Generate types for TypeScript
+    title: supabase gen types typescript
+    summary: Generate types for TypeScript
     description: |
       Generate types for TypeScript. Must specify one of --local, --linked, --project-id, or --db-url
     tags: []
@@ -609,8 +609,8 @@ commands:
         description: Schemas to generate types for.
         default_value: '[]'
   - id: supabase-functions
-    summary: supabase functions
-    title: Manage Supabase Edge functions
+    title: supabase functions
+    summary: Manage Supabase Edge functions
     tags:
       - management-api
     links: []
@@ -621,8 +621,8 @@ commands:
       - supabase-functions-serve
     flags: []
   - id: supabase-functions-serve
-    summary: supabase functions serve
-    title: Serve a Function locally
+    title: supabase functions serve
+    summary: Serve a Function locally
     tags: []
     links: []
     usage: supabase functions serve <Function name> [flags]
@@ -642,16 +642,16 @@ commands:
         description: Disable JWT verification for the Function.
         default_value: 'false'
   - id: supabase-functions-new
-    summary: supabase functions new
-    title: Create a new Function locally
+    title: supabase functions new
+    summary: Create a new Function locally
     tags: []
     links: []
     usage: supabase functions new <Function name>
     subcommands: []
     flags: []
   - id: supabase-functions-deploy
-    summary: supabase functions deploy
-    title: Deploy a Function to Supabase
+    title: supabase functions deploy
+    summary: Deploy a Function to Supabase
     description: Deploy a Function to the linked Supabase project.
     tags: []
     links: []
@@ -675,8 +675,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-functions-delete
-    summary: supabase functions delete
-    title: Delete a Function from Supabase
+    title: supabase functions delete
+    summary: Delete a Function from Supabase
     description: |
       Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
     tags: []
@@ -689,8 +689,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-domains
-    summary: supabase domains
-    title: Manage custom domain names for Supabase projects
+    title: supabase domains
+    summary: Manage custom domain names for Supabase projects
     description: |
       Manage custom domain names for Supabase projects.
 
@@ -706,8 +706,8 @@ commands:
       - supabase-domains-reverify
     flags: []
   - id: supabase-domains-reverify
-    summary: supabase domains reverify
-    title: Re-verify the custom hostname config for your project
+    title: supabase domains reverify
+    summary: Re-verify the custom hostname config for your project
     tags: []
     links: []
     usage: supabase domains reverify
@@ -722,8 +722,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-domains-get
-    summary: supabase domains get
-    title: Get the current custom hostname config
+    title: supabase domains get
+    summary: Get the current custom hostname config
     description: |
       Retrieve the custom hostname config for your project, as stored in the Supabase platform.
     tags: []
@@ -740,8 +740,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-domains-delete
-    summary: supabase domains delete
-    title: Deletes the custom hostname config for your project
+    title: supabase domains delete
+    summary: Deletes the custom hostname config for your project
     tags: []
     links: []
     usage: supabase domains delete
@@ -756,8 +756,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-domains-create
-    summary: supabase domains create
-    title: Create a custom hostname
+    title: supabase domains create
+    summary: Create a custom hostname
     description: |-
       Create a custom hostname for your Supabase project.
 
@@ -780,8 +780,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-domains-activate
-    summary: supabase domains activate
-    title: Activate the custom hostname for a project
+    title: supabase domains activate
+    summary: Activate the custom hostname for a project
     description: |-
       Activates the custom hostname configuration for a project.
 
@@ -801,8 +801,8 @@ commands:
         description: Project ref of the Supabase project.
         default_value: ''
   - id: supabase-db
-    summary: supabase db
-    title: Manage local Postgres databases
+    title: supabase db
+    summary: Manage local Postgres databases
     tags:
       - local-dev
     links: []
@@ -816,32 +816,32 @@ commands:
       - supabase-db-start
     flags: []
   - id: supabase-db-start
-    summary: supabase db start
-    title: Starts local Postgres database
+    title: supabase db start
+    summary: Starts local Postgres database
     tags: []
     links: []
     usage: supabase db start
     subcommands: []
     flags: []
   - id: supabase-db-reset
-    summary: supabase db reset
-    title: Resets the local database to current migrations
+    title: supabase db reset
+    summary: Resets the local database to current migrations
     tags: []
     links: []
     usage: supabase db reset
     subcommands: []
     flags: []
   - id: supabase-db-remote
-    summary: supabase db remote
-    title: Manage remote databases
+    title: supabase db remote
+    summary: Manage remote databases
     tags: []
     links: []
     subcommands:
       - supabase-db-remote-commit
     flags: []
   - id: supabase-db-remote-commit
-    summary: supabase db remote commit
-    title: Commit remote changes as a new migration
+    title: supabase db remote commit
+    summary: Commit remote changes as a new migration
     tags: []
     links: []
     usage: supabase db remote commit
@@ -852,8 +852,8 @@ commands:
         description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-db-push
-    summary: supabase db push
-    title: Push new migrations to the remote database
+    title: supabase db push
+    summary: Push new migrations to the remote database
     tags: []
     links: []
     usage: supabase db push [flags]
@@ -869,8 +869,8 @@ commands:
         description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-db-lint
-    summary: supabase db lint
-    title: Checks local database for typing error
+    title: supabase db lint
+    summary: Checks local database for typing error
     tags: []
     links: []
     usage: supabase db lint [flags]
@@ -892,8 +892,8 @@ commands:
         description: List of schema to include.
         default_value: '[public]'
   - id: supabase-db-dump
-    summary: supabase db dump
-    title: Dumps schemas from the remote database
+    title: supabase db dump
+    summary: Dumps schemas from the remote database
     tags: []
     links: []
     usage: supabase db dump [flags]
@@ -908,8 +908,8 @@ commands:
         description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-db-diff
-    summary: supabase db diff
-    title: Diffs the local database for schema changes
+    title: supabase db diff
+    summary: Diffs the local database for schema changes
     tags: []
     links: []
     usage: supabase db diff [flags]
@@ -932,8 +932,8 @@ commands:
         description: Use migra to generate schema diff.
         default_value: 'false'
   - id: supabase-completion
-    summary: supabase completion
-    title: Generate the autocompletion script for the specified shell
+    title: supabase completion
+    summary: Generate the autocompletion script for the specified shell
     description: |
       Generate the autocompletion script for supabase for the specified shell.
       See each sub-command's help for details on how to use the generated script.
@@ -947,8 +947,8 @@ commands:
       - supabase-completion-zsh
     flags: []
   - id: supabase-completion-zsh
-    summary: supabase completion zsh
-    title: Generate the autocompletion script for zsh
+    title: supabase completion zsh
+    summary: Generate the autocompletion script for zsh
     description: |
       Generate the autocompletion script for the zsh shell.
 
@@ -982,8 +982,8 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-powershell
-    summary: supabase completion powershell
-    title: Generate the autocompletion script for powershell
+    title: supabase completion powershell
+    summary: Generate the autocompletion script for powershell
     description: |
       Generate the autocompletion script for powershell.
 
@@ -1003,8 +1003,8 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-fish
-    summary: supabase completion fish
-    title: Generate the autocompletion script for fish
+    title: supabase completion fish
+    summary: Generate the autocompletion script for fish
     description: |
       Generate the autocompletion script for the fish shell.
 
@@ -1027,8 +1027,8 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-bash
-    summary: supabase completion bash
-    title: Generate the autocompletion script for bash
+    title: supabase completion bash
+    summary: Generate the autocompletion script for bash
     description: |
       Generate the autocompletion script for the bash shell.
 
