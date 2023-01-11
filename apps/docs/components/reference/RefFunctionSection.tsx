@@ -232,10 +232,10 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               label="Notes"
                               defaultOpen={false}
                             >
-                              <div className='bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2'>
-                              <ReactMarkdown className="text-sm">
-                                {example.description}
-                              </ReactMarkdown>
+                              <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                                <ReactMarkdown className="text-sm">
+                                  {example.description}
+                                </ReactMarkdown>
                               </div>
                             </RefDetailCollapse>
                           )}
