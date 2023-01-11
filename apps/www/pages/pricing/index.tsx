@@ -30,11 +30,14 @@ export default function IndexPage() {
   const tiers = [
     {
       name: 'Free',
-      costUnit: '/month per project',
+      nameBadge: '',
+      costUnit: 'per month per project',
       href: 'https://app.supabase.com/new/new-project',
+      priceLabel: 'Starting from',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
+      preface: 'Get started with...',
       features: [
         'Up to 500MB database & 1GB file storage',
         'Up to 2GB bandwidth',
@@ -51,9 +54,12 @@ export default function IndexPage() {
     },
     {
       name: 'Pro',
-      costUnit: '/month per project',
+      nameBadge: '',
+      costUnit: 'per month per project',
       href: 'https://app.supabase.com/new/new-project',
       from: true,
+      priceLabel: 'Starting from',
+      warning: '+ any additional usage',
       priceMonthly: 25,
       description: 'For production applications with the option to scale.',
       features: [
@@ -72,6 +78,34 @@ export default function IndexPage() {
       shutdown: '',
       preface: 'Everything below included in the base plan',
       additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
+      cta: 'Get Started',
+    },
+    {
+      name: 'Team',
+      nameBadge: 'New',
+      costUnit: 'per month per org',
+      href: 'https://app.supabase.com/new/new-project',
+      from: true,
+      priceLabel: 'Starting from',
+      priceMonthly: 25,
+      description: 'For scaling teams with permissions & access controls',
+      warning: '+ any additional usage',
+      features: [
+        'Usage-based pricing',
+        'Organization member roles (ABAC)',
+        'SOC2',
+        'Priority email support & SLAs',
+        '14 day backups',
+        '100,000 monthly active users included',
+        'Standardized Security Questionnaire',
+        'SSO for Supabase Dashboard',
+        '1 XS compute instance',
+        '28 day log retention',
+      ],
+      scale: '',
+      shutdown: '',
+      preface: 'The following features will apply to all projects within the organization:',
+      additional: '',
       cta: 'Get Started',
     },
     {
@@ -163,7 +197,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl flex-col">
+        <div className="mx-auto flex max-w-8xl flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -172,111 +206,131 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-5 lg:space-y-0">
+            <div className="mx-auto max-w-md lg:grid lg:max-w-7xl lg:grid-cols-4 lg:gap-5">
               {tiers.map((tier) => (
                 <div
-                  key={tier.name}
-                  className="
-                  flex
-                  flex-col
-                  overflow-hidden
-                  rounded
-                  border
-                  "
+                  className={[
+                    tier.name === 'Pro'
+                      ? 'bg-brand-800 border px-0.5 -mt-8 rounded-tr-xl rounded-tl-xl'
+                      : '',
+                  ].join(' ')}
                 >
-                  <div className="dark:bg-scale-300 h-[220px] bg-white px-8 pt-6">
-                    <div className="mb-2 flex items-center gap-2">
-                      <h3 className="text-scale-1200 text-xl font-medium">{tier.name}</h3>
-                      {tier.warning && (
-                        <div className="bg-scale-400 text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                          {tier.warning}
+                  {tier.name === 'Pro' && (
+                    <p className="text-xs text-center py-2 text-white">Most Popular</p>
+                  )}
+                  <div
+                    key={tier.name}
+                    className={[
+                      'flex flex-col overflow-hidden rounded-xl',
+                      tier.name === 'Pro' ? '' : 'border h-full',
+                    ].join(' ')}
+                  >
+                    <div className="dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-xl rounded-tl-xl">
+                      <div className="mb-2 flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium uppercase flex items-center gap-4">
+                            {tier.name}
+                          </h3>
+                          {tier.nameBadge && (
+                            <span className="bg-scale-300 text-scale-900 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-10 py-0.5 px-2 text-xs [background-image: none]">
+                              {tier.nameBadge}
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <p className="text-scale-1100 my-4 h-[40px] text-sm">{tier.description}</p>
-                    <div
-                      className="
+                      </div>
+                      <p className="text-scale-1100 my-4 h-[40px] text-sm">{tier.description}</p>
+                      <div
+                        className="
                       text-scale-1200 flex items-baseline
                       text-5xl
                       font-normal
                       lg:text-4xl
                       xl:text-4xl
-
+                      border-t
+                      border-b
+                      py-8
                       "
-                    >
-                      {tier.priceMonthly !== undefined ? (
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-end gap-2">
-                            <div>
-                              <span>
-                                {typeof tier.priceMonthly !== 'string' && '$'}
-                                {tier.priceMonthly}
-                              </span>
-                              <span className="text-scale-900 ml-1 text-xl font-normal">
-                                {tier.costUnit}
-                              </span>
+                      >
+                        {tier.priceMonthly !== undefined ? (
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-end gap-2">
+                              <div>
+                                <p className="text-scale-900 ml-1 text-xs font-normal">
+                                  {tier.priceLabel}
+                                </p>
+                                <p className="text-5xl mt-2 gradient-text-scale-500 dark:gradient-text-scale-100">
+                                  {typeof tier.priceMonthly !== 'string' && '$'}
+                                  {tier.priceMonthly}
+                                </p>
+                                {tier.costUnit && (
+                                  <p className="text-scale-900 mt-1 text-xs">{tier.costUnit}</p>
+                                )}
+
+                                {tier.warning && (
+                                  <div className="bg-brand-400 text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
+                                    {tier.warning}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          {tier.from && (
-                            <span className="text-scale-900 block text-sm">
-                              + any additional usage
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span>Contact Us</span>
-                      )}
+                        ) : (
+                          <span>Contact Us</span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div
-                    className="
-                    dark:border-scale-400 dark:bg-scale-300 flex h-full
+                    <div
+                      className="
+                    dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl mb-0.5
 
                     flex-1
                     flex-col
-                    justify-between
 
-                    space-y-6
-                    border-t
+                    space-y-4
 
                     bg-white
                     px-8
 
                     py-6
                   "
-                  >
-                    {tier.preface && <p className="text-scale-1100 text-sm">{tier.preface}</p>}
-                    {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                    <ul role="list" className="dark:divide-scale-400 divide-y">
-                      {tier.features.map((feature) => (
-                        <li key={feature} className="flex items-center py-2">
-                          {/* <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 dark:bg-brand-400 bg-opacity-30"> */}
-                          <IconCheck
-                            className="text-brand-900 h-4 w-4 "
-                            aria-hidden="true"
-                            strokeWidth={3}
-                          />
-                          {/* </div> */}
-                          <p className="text-scale-1100 dark:text-scale-1200 mb-0 ml-3 text-sm">
-                            {feature}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
+                    >
+                      {tier.preface && (
+                        <p className="text-scale-1100 text-xs mt-2">{tier.preface}</p>
+                      )}
+                      {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
+                      <ul
+                        role="list"
+                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000"
+                      >
+                        {tier.features.map((feature) => (
+                          <li key={feature} className="flex items-center py-2 first:mt-0">
+                            <IconCheck
+                              className="text-brand-900 h-4 w-4 "
+                              aria-hidden="true"
+                              strokeWidth={3}
+                            />
+                            {/* </div> */}
+                            <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
 
-                    <div className="flex flex-col gap-6">
-                      <div className="space-y-2">
-                        {tier.additional && (
-                          <p className="text-scale-1200 text-base">{tier.additional}</p>
-                        )}
-                        {tier.scale && <p className="text-scale-900 text-xs">{tier.scale}</p>}
-                        {tier.shutdown && <p className="text-scale-900 text-xs">{tier.shutdown}</p>}
+                      <div className="flex flex-col gap-6">
+                        <div className="space-y-2">
+                          {tier.additional && (
+                            <p className="text-scale-900 text-xs">{tier.additional}</p>
+                          )}
+                          {tier.scale && <p className="text-scale-900 text-xs">{tier.scale}</p>}
+                          {tier.shutdown && (
+                            <p className="text-scale-900 text-xs">{tier.shutdown}</p>
+                          )}
+                        </div>
+                        <a href={tier.href}>
+                          <Button block size="small" className="dark:text-white">
+                            {tier.cta}
+                          </Button>
+                        </a>
                       </div>
-                      <a href={tier.href}>
-                        <Button block size="large" className="dark:text-white">
-                          {tier.cta}
-                        </Button>
-                      </a>
                     </div>
                   </div>
                 </div>
