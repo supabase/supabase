@@ -1,31 +1,20 @@
+import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import {
-  find,
-  compact,
-  isEqual,
-  isNull,
-  isNil,
-  isUndefined,
-  has,
-  some,
-  chunk,
-  get,
-  uniq,
-} from 'lodash'
-import toast from 'react-hot-toast'
+import { find, compact, isEqual, isNil, has, some, chunk, get, uniq } from 'lodash'
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
-import { useStore } from 'hooks'
 
+import { useStore } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { copyToClipboard } from 'lib/helpers'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -50,7 +39,6 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-// const BATCH_SIZE = 10
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
@@ -288,8 +276,12 @@ class StorageExplorerStore {
     this.selectedItems = items
   }
 
-  clearSelectedItems = () => {
-    this.selectedItems = []
+  clearSelectedItems = (columnIndex) => {
+    if (columnIndex !== undefined) {
+      this.selectedItems = this.selectedItems.filter((item) => item.columnIndex !== columnIndex)
+    } else {
+      this.selectedItems = []
+    }
   }
 
   setSelectedItemsToDelete = (items) => {
@@ -319,10 +311,8 @@ class StorageExplorerStore {
   addNewFolder = async (folderName, columnIndex) => {
     const autofix = false
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
+    if (formattedName === null) return
 
-    if (isNull(formattedName)) {
-      return
-    }
     /**
      * todo: move this to a util file, as renameFolder() uses same logic
      */
@@ -374,7 +364,7 @@ class StorageExplorerStore {
 
       const fetchedAt = get(cachedPreview, ['fetchedAt'], null)
       const expiresIn = get(cachedPreview, ['expiresIn'], null)
-      const existsInCache = !isNull(fetchedAt) && !isNull(expiresIn)
+      const existsInCache = fetchedAt !== null && expiresIn !== null
       const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
 
       if (!isExpired) {
@@ -556,7 +546,10 @@ class StorageExplorerStore {
 
   // https://stackoverflow.com/a/53058574
   getFilesDataTransferItems = async (items) => {
-    const toastId = toast.loading('Retrieving items to upload...')
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: 'Retrieving items to upload...',
+    })
     const files = []
     const queue = []
     for (const item of items) {
@@ -566,7 +559,7 @@ class StorageExplorerStore {
       const entry = queue.shift() || {}
       if (entry.isFile) {
         const file = await this.getFile(entry)
-        if (!isUndefined(file)) {
+        if (file !== undefined) {
           file.path = entry.fullPath.slice(1)
           files.push(file)
         }
@@ -637,9 +630,9 @@ class StorageExplorerStore {
       return file
     })
 
-    const uploadedTopLevelFolders = []
     this.uploadProgress = 0
-    let numberOfFilesToUpload = formattedFilesToUpload.length
+    const uploadedTopLevelFolders = []
+    const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
     let numberOfFilesUploadedFail = 0
 
@@ -746,28 +739,34 @@ class StorageExplorerStore {
       if (numberOfFilesToUpload === 0) {
         toast.dismiss(toastId)
       } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
-        toast.error(
-          `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
-          { id: toastId }
-        )
+        this.ui.setNotification({
+          id: toastId,
+          category: 'error',
+          message: `Failed to upload ${numberOfFilesToUpload} file${
+            numberOfFilesToUpload > 1 ? 's' : ''
+          }!`,
+        })
       } else if (numberOfFilesUploadedSuccess === numberOfFilesToUpload) {
-        toast.success(
-          `Successfully uploaded ${numberOfFilesToUpload} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Successfully uploaded ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
-        )
+        })
       } else {
-        toast.success(
-          `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
+        this.ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
-        )
+        })
       }
     } catch (e) {
-      console.error(e)
       this.ui.setNotification({
+        id: toastId,
+        error: e,
         message: 'Failed to upload files',
         category: 'error',
       })
@@ -943,33 +942,153 @@ class StorageExplorerStore {
     }
   }
 
-  downloadSelectedFiles = async () => {
-    const showIndividualToast = false
-    const toastId = toast.loading(`Retrieving ${this.selectedItems.length} files...`, {
-      autoClose: false,
-      hideProgressBar: true,
+  downloadFolder = async (folder) => {
+    let progress = 0
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: 'Retrieving files from folder...',
     })
 
-    const res = await Promise.all(
-      this.selectedItems.map(async (item) => await this.downloadFile(item, showIndividualToast))
-    )
-
-    const numberOfSuccessfullyDownloadedFiles = res.filter((x) => x === true).length
-    toast.success(`Downloaded ${numberOfSuccessfullyDownloadedFiles} files`, {
+    const files = await this.getAllItemsAlongFolder(folder)
+    this.ui.setNotification({
       id: toastId,
+      category: 'loading',
+      message: `Downloading ${files.length} files...`,
+      description: STORAGE_PROGRESS_INFO_TEXT,
+      progress: 0,
+    })
+
+    const promises = files.map((file) => {
+      const fileMimeType = file.metadata?.mimetype ?? null
+      return () => {
+        return new Promise(async (resolve) => {
+          const { data, error } = await this.supabaseClient.storage
+            .from(this.selectedBucket.name)
+            .download(`${file.prefix}/${file.name}`)
+
+          progress = progress + 1 / files.length
+
+          if (!error) {
+            resolve({
+              name: file.name,
+              prefix: file.prefix,
+              blob: new Blob([data], { type: fileMimeType }),
+            })
+          } else {
+            resolve(false)
+          }
+        })
+      }
+    })
+
+    const batchedPromises = chunk(promises, 10)
+    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
+      const previousResults = await previousPromise
+      const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+      this.ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        progress: progress * 100,
+      })
+      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
+    }, Promise.resolve())
+
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    downloadedFiles.forEach((file) => {
+      zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+    })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `${folder.name}.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+
+    this.ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Successfully downloaded folder "${folder.name}"`,
     })
   }
 
-  downloadFile = async (file, showToast = true) => {
-    let toastId
+  downloadSelectedFiles = async (files) => {
+    const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
+
+    const formattedFilesWithPrefix = files.map((file) => {
+      const { name, columnIndex } = file
+      const pathToFile = this.openedFolders
+        .slice(lowestColumnIndex, columnIndex)
+        .map((folder) => folder.name)
+        .join('/')
+      const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${name}` : name
+      return { ...file, formattedPathToFile }
+    })
+
+    let progress = 0
+    const returnBlob = true
+    const showIndividualToast = false
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: `Downloading ${files.length} files...`,
+    })
+
+    const promises = formattedFilesWithPrefix.map((file) => {
+      return () => {
+        return new Promise(async (resolve) => {
+          const data = await this.downloadFile(file, showIndividualToast, returnBlob)
+          progress = progress + 1 / formattedFilesWithPrefix.length
+          resolve({ ...data, name: file.formattedPathToFile })
+        })
+      }
+    })
+
+    const batchedPromises = chunk(promises, 10)
+    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
+      const previousResults = await previousPromise
+      const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+      this.ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
+        description: STORAGE_PROGRESS_INFO_TEXT,
+        progress: progress * 100,
+      })
+      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
+    }, Promise.resolve())
+
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    downloadedFiles.forEach((file) => {
+      zipWriter.add(file.name, new BlobReader(file.blob))
+    })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `supabase-files.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+
+    this.ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Successfully downloaded ${downloadedFiles.length} files`,
+    })
+  }
+
+  downloadFile = async (file, showToast = true, returnBlob = false) => {
     const fileName = file.name
     const fileMimeType = get(file, ['metadata', 'mimetype'], null)
 
-    if (showToast) {
-      toastId = toast.loading(`Retrieving ${fileName}...`, {
-        autoClose: false,
-      })
-    }
+    const toastId = showToast
+      ? this.ui.setNotification({ category: 'loading', message: `Retrieving ${fileName}...` })
+      : undefined
 
     const pathToFile = this.openedFolders
       .slice(0, file.columnIndex)
@@ -984,8 +1103,10 @@ class StorageExplorerStore {
     if (!error) {
       const blob = data
       const newBlob = new Blob([blob], { type: fileMimeType })
-      const blobUrl = window.URL.createObjectURL(newBlob)
 
+      if (returnBlob) return { name: fileName, blob: newBlob }
+
+      const blobUrl = window.URL.createObjectURL(newBlob)
       const link = document.createElement('a')
       link.href = blobUrl
       link.setAttribute('download', `${fileName}`)
@@ -994,16 +1115,20 @@ class StorageExplorerStore {
       link.parentNode.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
-        toast.success(`Downloading ${fileName}`, {
+        this.ui.setNotification({
           id: toastId,
+          category: 'success',
+          message: `Downloading ${fileName}`,
         })
       }
       return true
     } else {
-      console.error('Failed to download:', fileName)
       if (toastId) {
-        toast.error(`Failed to download ${fileName}`, {
+        this.ui.setNotification({
+          error,
           id: toastId,
+          category: 'error',
+          message: `Failed to download ${fileName}`,
         })
       }
       return false
@@ -1333,7 +1458,7 @@ class StorageExplorerStore {
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
 
-    if (isUndefined(prefix)) {
+    if (prefix === undefined) {
       const pathToFolder = this.openedFolders
         .slice(0, columnIndex)
         .map((folder) => folder.name)
@@ -1361,8 +1486,8 @@ class StorageExplorerStore {
       }
     }
 
-    const subfolders = folderContents?.filter((item) => isNull(item.id)) ?? []
-    const folderItems = folderContents?.filter((item) => !isNull(item.id)) ?? []
+    const subfolders = folderContents?.filter((item) => item.id === null) ?? []
+    const folderItems = folderContents?.filter((item) => item.id !== null) ?? []
 
     folderItems.forEach((item) => items.push({ ...item, prefix: formattedPathToFolder }))
 

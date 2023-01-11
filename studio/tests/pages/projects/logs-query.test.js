@@ -151,7 +151,7 @@ test('query warnings', async () => {
   await screen.findByText('1 warning')
 })
 
-describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
     useProjectSubscription.mockReturnValue({
       subscription: {

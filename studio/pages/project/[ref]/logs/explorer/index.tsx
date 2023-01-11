@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -30,6 +29,8 @@ import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { ui } = useStore()
+
   const { ref, q, ite, its } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>('')
@@ -221,12 +222,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               if (error) throw error
               setSubmitting(false)
               setSaveModalOpen(false)
-              toast.success(`Saved "${values.name}" log query`)
+              ui.setNotification({
+                category: 'success',
+                message: `Saved "${values.name}" log query`,
+              })
             } catch (error: any) {
               console.error(error)
               setSubmitting(false)
               setSaveModalOpen(false)
-              toast.error(error.message)
+              ui.setNotification({
+                error,
+                category: 'error',
+                message: `Failed to save query: ${error.message}`,
+              })
             }
           }}
         >

@@ -148,7 +148,7 @@ const RenderLink = React.memo(function RenderLink(props: any) {
 
 const SideMenuTitle = ({ title }: { title: string }) => {
   return (
-    <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider mb-3">
+    <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
       {title}
     </span>
   )
@@ -245,7 +245,7 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
         <RevVersionDropdown />
       </div>
 
-      <ul className="function-link-list">
+      <ul className="function-link-list flex flex-col gap-1">
         {sections.map((fn: any, fnIndex) => {
           // run allow check
           if (isFuncNotInLibraryOrVersion(fn.id, fn.type, allowedKeys)) {

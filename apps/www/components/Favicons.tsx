@@ -24,8 +24,7 @@ const Favicons = () => {
       />
       <link rel="manifest" href={`${basePath}/favicon/site.webmanifest`} />
       {/* <link rel="mask-icon" href={`${basePath}/favicon/safari-pinned-tab.svg`} color="#333333" /> */}
-      {/* <link rel="shortcut icon" href={`${basePath}/favicon/favicon.ico`} /> */}
-      <link rel="shortcut icon" href={`${basePath}/favicon/favicon-lw.svg`} />
+      <link rel="shortcut icon" href={`${basePath}/favicon/favicon.ico`} />
       <meta name="msapplication-TileColor" content="#1E1E1E" />
       <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />
       <meta name="theme-color" content="#1E1E1E" />
