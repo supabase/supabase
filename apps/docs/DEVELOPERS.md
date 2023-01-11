@@ -34,7 +34,7 @@ Some things to note:
 
 1. The files need to import a Layout at the top
 2. The files need to export a `Page` at the bottom with the `<Layout>` component
-3. The files frontmatter is stored in `const meta = {}`. You should always include `id`, `title` and `description`.
+3. The files frontmatter is stored in `const meta = {}`. You should always include `title` and `description`.
 4. You can write Markdown as you normally would, but you can also write regular Javascript and JSX. Note the `examples` array that we iterate over.
 5. Any Javascript variables you use in these files need to be exported in order to be used (i.e., `export const examples = []`).
 
