@@ -8,7 +8,7 @@ info:
   bugs: https://github.com/supabase/cli/issues
   spec: https://github.com/supabase/supabase.tools/cli_spec/lib.yaml
   description: |
-    Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase Platform.
+    Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
   tags:
     - id: local-dev
       title: Local Development
