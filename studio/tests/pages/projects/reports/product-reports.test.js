@@ -5,6 +5,7 @@ dayjs.extend(utc)
 import { get, post } from 'lib/common/fetch'
 
 import { useRouter } from 'next/router'
+import { useParams } from 'hooks'
 import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api'
@@ -17,6 +18,7 @@ beforeEach(() => {
   useRouter.mockReturnValue({
     query: { ref: '123' },
   })
+  useParams.mockReturnValue({ ref: '123' })
   get.mockImplementation(async (url) => {
     return [{ data: [] }]
   })
