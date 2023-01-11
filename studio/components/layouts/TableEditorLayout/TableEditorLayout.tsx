@@ -52,6 +52,7 @@ const TableEditorLayout: FC<Props> = ({
   useEffect(() => {
     if (selectedSchema && ui.selectedProject?.ref) {
       meta.tables.loadBySchema(selectedSchema)
+      meta.views.loadBySchema(selectedSchema)
     }
   }, [ui.selectedProject?.ref, selectedSchema])
 

@@ -140,7 +140,7 @@ const TableEditorPage: NextPage = () => {
       })
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -171,7 +171,7 @@ const TableEditorPage: NextPage = () => {
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         error,

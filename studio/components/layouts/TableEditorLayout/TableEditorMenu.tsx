@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
@@ -23,8 +23,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
+import { SchemaView } from 'types'
 import { checkPermissions, useStore } from 'hooks'
-import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
 interface Props {
@@ -53,12 +53,13 @@ const TableEditorMenu: FC<Props> = ({
   const tables: PostgresTable[] = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedSchema
   )
+  const views: SchemaView[] = meta.views.list((view: SchemaView) => view.schema === selectedSchema)
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
+    (table: Partial<PostgresTable>) => table.schema === selectedSchema
   )
 
-  // @ts-ignore
   const isFetchingTables =
+    // @ts-ignore
     tables.filter((t) => t.schema === selectedSchema).length === 0 && meta.tables.isLoading
 
   const schema = schemas.find((schema) => schema.name === selectedSchema)
@@ -67,25 +68,11 @@ const TableEditorMenu: FC<Props> = ({
   const [searchText, setSearchText] = useState<string>('')
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
-  // We may need to shift this to the schema store and do something like meta.schema.loadViews()
-  // I don't need we need a separate store for views
-  useEffect(() => {
-    let cancel = false
-    const fetchViews = async (selectedSchema: string) => {
-      await meta.schemas.loadViews(selectedSchema)
-    }
-    if (selectedSchema) fetchViews(selectedSchema)
-
-    return () => {
-      cancel = true
-    }
-  }, [selectedSchema])
-
   const refreshTables = async () => {
     if (selectedSchema) {
       setIsRefreshing(true)
       await meta.tables.loadBySchema(selectedSchema)
-      await meta.schemas.loadViews(selectedSchema)
+      await meta.views.loadBySchema(selectedSchema)
       setIsRefreshing(false)
     }
   }
@@ -98,9 +85,9 @@ const TableEditorMenu: FC<Props> = ({
 
   const filteredViews =
     searchText.length === 0
-      ? meta.schemas.views || []
-      : (meta.schemas.views || []).filter((view) =>
-          view.name.toLowerCase().includes(searchText.toLowerCase())
+      ? views || []
+      : (views || []).filter((view: Partial<PostgresTable>) =>
+          (view?.name ?? '').toLowerCase().includes(searchText.toLowerCase())
         )
 
   const filteredForeignTables =

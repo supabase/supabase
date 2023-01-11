@@ -8,16 +8,17 @@ import {
   PostgresTable,
   PostgresRelationship,
   PostgresPrimaryKey,
+  PostgresSchema,
 } from '@supabase/postgres-meta'
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { timeout } from 'lib/helpers'
-import { ResponseError } from 'types'
+import { ResponseError, SchemaView } from 'types'
 
 import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
-import SchemaStore, { ISchemaStore } from './SchemaStore'
+import SchemaStore from './SchemaStore'
 import TableStore, { ITableStore } from './TableStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
@@ -41,6 +42,7 @@ import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
 import ForeignTableStore from './ForeignTableStore'
+import ViewStore from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -51,7 +53,8 @@ export interface IMetaStore {
   openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  schemas: ISchemaStore
+  schemas: IPostgresMetaInterface<PostgresSchema>
+  views: IPostgresMetaInterface<SchemaView>
   foreignTables: IPostgresMetaInterface<Partial<PostgresTable>>
 
   hooks: IPostgresMetaInterface<any>
@@ -132,6 +135,7 @@ export default class MetaStore implements IMetaStore {
   tables: TableStore
   columns: ColumnStore
   schemas: SchemaStore
+  views: ViewStore
   foreignTables: ForeignTableStore
 
   hooks: HooksStore
@@ -184,6 +188,7 @@ export default class MetaStore implements IMetaStore {
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
+    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
     this.foreignTables = new ForeignTableStore(
       this.rootStore,
       `${this.baseUrl}/foreign-tables`,
@@ -902,6 +907,9 @@ export default class MetaStore implements IMetaStore {
 
     this.schemas.setUrl(`${this.baseUrl}/schemas`)
     this.schemas.setHeaders(this.headers)
+
+    this.views.setUrl(`${this.baseUrl}/views`)
+    this.views.setHeaders(this.headers)
 
     this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
     this.foreignTables.setHeaders(this.headers)
