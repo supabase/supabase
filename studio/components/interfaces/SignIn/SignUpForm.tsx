@@ -72,9 +72,9 @@ const SignUpForm = () => {
           isSubmitted ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <Alert className="w-full" withIcon variant="success" title="Successfully signed up">
-          Please check your email to confirm your account before signing in to the Supabase
-          dashboard
+        <Alert className="w-full" withIcon variant="success" title="Check your email to confirm">
+          You've successfully signed up. Please check your email to confirm your account before
+          signing in to the Supabase dashboard
         </Alert>
       </div>
       <Form

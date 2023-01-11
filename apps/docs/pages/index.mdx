@@ -11,16 +11,15 @@ export const meta = {
 
 <h2 className="text-base max-w-xl m-0">
   Supabase is an open source Firebase alternative providing all the backend features you need to
-  build a product. [Learn more](/docs/guides/getting-started/architecture) about Supabase, start
-  with the [tutorials](/docs/guides/getting-started#tutorials), or dive straight into the different
-  products and APIs.
+  build a product. [Learn more](/docs/guides/getting-started/architecture) about Supabase, follow a
+  quickstart for an overview, or dive straight into the different products and APIs.
 </h2>
 
 {/* start container */}
 
 <div className="flex flex-col gap-12 my-12">
 
-<div className="space-y-8 hidden">
+<div className="space-y-8">
   <div className="
     border border-scale-400
     relative overflow-hidden
@@ -63,14 +62,19 @@ export const meta = {
           <Button size="small">Get started</Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-            <Link href={`/getting-started/quickstarts/reactjs`} passHref>
+            <Link href={`/guides/getting-started/quickstarts/reactjs`} passHref>
               <a className="no-underline">
                 <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
               </a>
             </Link>
-            <Link href={`/getting-started/quickstarts/nextjs`} passHref>
+            <Link href={`/guides/getting-started/quickstarts/nextjs`} passHref>
               <a className="no-underline">
             <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+            </a>
+            </Link>
+            <Link href={`/guides/getting-started/quickstarts/flutter`} passHref>
+              <a className="no-underline">
+            <IconPanel title="Flutter" icon="/docs/img/icons/flutter-icon" />
             </a>
             </Link>
           </div>
@@ -106,7 +110,7 @@ export const meta = {
       md:items-center md:gap-3
     ">
       <h2 className="text-sm lg:text-base text-scale-1200 m-0">Ready to make a fully working app?</h2>
-      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow the step-by-step <Link href="/guides/tutorials"><a className="m-0 text-scale-1200 underline">tutorials</a></Link>.</p>
+      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow the step-by-step <Link href="/guides/getting-started#tutorials"><a className="m-0 text-scale-1200 underline">tutorials</a></Link>.</p>
     </div>
 
   </div>

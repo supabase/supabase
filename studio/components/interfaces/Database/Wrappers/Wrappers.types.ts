@@ -1,4 +1,4 @@
-export type Wrapper = {
+export type WrapperMeta = {
   name: string
   handlerName: string
   validatorName: string
@@ -22,7 +22,6 @@ export type ServerOption = {
 }
 
 export type Server = {
-  name: string
   options: ServerOption[]
 }
 

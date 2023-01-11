@@ -59,7 +59,8 @@ export default class UiStore implements IUiStore {
       const found = this.rootStore.app.projects.find(
         (x: Project) => x.ref === this.selectedProjectRef
       )
-      return !!found?.connectionString ? found : undefined
+      // Self-hosted project details has connectionString set to empty string
+      return found?.connectionString !== undefined ? found : undefined
     }
     return undefined
   }

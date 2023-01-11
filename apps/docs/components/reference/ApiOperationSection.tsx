@@ -31,7 +31,7 @@ const ApiOperationSection = (props) => {
             >
               {operation.operation}
             </span>
-            {operation.fullPath}
+            {operation.path}
           </code>
         </div>
         <div className="prose dark:prose-dark py-4">

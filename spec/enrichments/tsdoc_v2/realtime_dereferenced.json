@@ -1680,7 +1680,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 218,
+                              "line": 228,
                               "character": 2
                             }
                           ],
@@ -1994,7 +1994,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 198,
+                              "line": 208,
                               "character": 2
                             }
                           ],
@@ -2088,7 +2088,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 162,
+                              "line": 165,
                               "character": 2
                             }
                           ],
@@ -2099,6 +2099,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Returns all created channels"
+                              },
                               "type": {
                                 "type": "array",
                                 "elementType": {
@@ -2119,7 +2122,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 214,
+                              "line": 224,
                               "character": 2
                             }
                           ],
@@ -2149,7 +2152,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 191,
+                              "line": 201,
                               "character": 2
                             }
                           ],
@@ -2217,7 +2220,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 236,
+                              "line": 246,
                               "character": 2
                             }
                           ],
@@ -2403,7 +2406,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 177,
+                              "line": 187,
                               "character": 2
                             }
                           ],
@@ -2414,6 +2417,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Unsubscribes and removes all channels"
+                              },
                               "type": {
                                 "type": "reference",
                                 "typeArguments": [
@@ -2442,7 +2448,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 166,
+                              "line": 173,
                               "character": 2
                             }
                           ],
@@ -2453,6 +2459,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Unsubscribes and removes a single channel"
+                              },
                               "parameters": [
                                 {
                                   "id": 354,
@@ -2460,6 +2469,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "A RealtimeChannel instance\n"
+                                  },
                                   "type": {
                                     "type": "reference",
                                     "id": 55,
@@ -2527,7 +2539,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 263,
+                              "line": 273,
                               "character": 2
                             }
                           ],
@@ -4581,7 +4593,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 218,
+                      "line": 228,
                       "character": 2
                     }
                   ],
@@ -4895,7 +4907,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 198,
+                      "line": 208,
                       "character": 2
                     }
                   ],
@@ -4989,7 +5001,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 162,
+                      "line": 165,
                       "character": 2
                     }
                   ],
@@ -5000,6 +5012,9 @@
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {},
+                      "comment": {
+                        "shortText": "Returns all created channels"
+                      },
                       "type": {
                         "type": "array",
                         "elementType": {
@@ -5020,7 +5035,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 214,
+                      "line": 224,
                       "character": 2
                     }
                   ],
@@ -5050,7 +5065,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 191,
+                      "line": 201,
                       "character": 2
                     }
                   ],
@@ -5118,7 +5133,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 236,
+                      "line": 246,
                       "character": 2
                     }
                   ],
@@ -5304,7 +5319,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 177,
+                      "line": 187,
                       "character": 2
                     }
                   ],
@@ -5315,6 +5330,9 @@
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {},
+                      "comment": {
+                        "shortText": "Unsubscribes and removes all channels"
+                      },
                       "type": {
                         "type": "reference",
                         "typeArguments": [
@@ -5343,7 +5361,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 166,
+                      "line": 173,
                       "character": 2
                     }
                   ],
@@ -5354,6 +5372,9 @@
                       "kind": 4096,
                       "kindString": "Call signature",
                       "flags": {},
+                      "comment": {
+                        "shortText": "Unsubscribes and removes a single channel"
+                      },
                       "parameters": [
                         {
                           "id": 354,
@@ -5361,6 +5382,9 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
+                          "comment": {
+                            "shortText": "A RealtimeChannel instance\n"
+                          },
                           "type": {
                             "type": "reference",
                             "id": 55,
@@ -5428,7 +5452,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeClient.ts",
-                      "line": 263,
+                      "line": 273,
                       "character": 2
                     }
                   ],
@@ -5564,7 +5588,7 @@
           "sources": [
             {
               "fileName": "RealtimeChannel.ts",
-              "line": 315,
+              "line": 327,
               "character": 2
             }
           ],
@@ -5576,7 +5600,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Listen to messages."
+                "shortText": "Creates an event handler that listens to changes"
               },
               "parameters": [
                 {
@@ -5585,6 +5609,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "Realtime feature (broadcast, presence, or postgres_changes)"
+                  },
                   "type": {
                     "type": "literal",
                     "value": "broadcast"
@@ -5596,6 +5623,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "Pre-defined and custom values specific to the Realtime feature"
+                  },
                   "type": {
                     "type": "reflection",
                     "declaration": {
@@ -5611,10 +5641,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Event to listen to. If listening to postgres_changes type\nthen this value is one of INSERT, UPDATE, DELETE, *"
+                          },
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 317,
+                              "line": 329,
                               "character": 14
                             }
                           ],
@@ -5640,6 +5673,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "Function to be invoked when event handler is triggered\n"
+                  },
                   "type": {
                     "type": "reflection",
                     "declaration": {
@@ -5680,7 +5716,7 @@
                                       "sources": [
                                         {
                                           "fileName": "RealtimeChannel.ts",
-                                          "line": 320,
+                                          "line": 332,
                                           "character": 6
                                         }
                                       ],
@@ -5698,7 +5734,7 @@
                                       "sources": [
                                         {
                                           "fileName": "RealtimeChannel.ts",
-                                          "line": 319,
+                                          "line": 331,
                                           "character": 6
                                         }
                                       ],
@@ -5800,7 +5836,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 326,
+                              "line": 338,
                               "character": 14
                             }
                           ],
@@ -5899,7 +5935,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 331,
+                              "line": 343,
                               "character": 14
                             }
                           ],
@@ -6012,7 +6048,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 336,
+                              "line": 348,
                               "character": 14
                             }
                           ],
@@ -7190,7 +7226,7 @@
           "sources": [
             {
               "fileName": "RealtimeChannel.ts",
-              "line": 367,
+              "line": 379,
               "character": 2
             }
           ],
@@ -7226,7 +7262,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 368,
+                              "line": 380,
                               "character": 15
                             }
                           ],
@@ -7577,7 +7613,7 @@
           "sources": [
             {
               "fileName": "RealtimeChannel.ts",
-              "line": 407,
+              "line": 419,
               "character": 2
             }
           ],
@@ -7722,7 +7758,7 @@
           "sources": [
             {
               "fileName": "RealtimeChannel.ts",
-              "line": 394,
+              "line": 406,
               "character": 2
             }
           ],
@@ -8827,7 +8863,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 218,
+              "line": 228,
               "character": 2
             }
           ],
@@ -9141,7 +9177,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 198,
+              "line": 208,
               "character": 2
             }
           ],
@@ -9235,7 +9271,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 162,
+              "line": 165,
               "character": 2
             }
           ],
@@ -9246,6 +9282,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Returns all created channels"
+              },
               "type": {
                 "type": "array",
                 "elementType": {
@@ -9266,7 +9305,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 214,
+              "line": 224,
               "character": 2
             }
           ],
@@ -9296,7 +9335,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 191,
+              "line": 201,
               "character": 2
             }
           ],
@@ -9364,7 +9403,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 236,
+              "line": 246,
               "character": 2
             }
           ],
@@ -9550,7 +9589,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 177,
+              "line": 187,
               "character": 2
             }
           ],
@@ -9561,6 +9600,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Unsubscribes and removes all channels"
+              },
               "type": {
                 "type": "reference",
                 "typeArguments": [
@@ -9589,7 +9631,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 166,
+              "line": 173,
               "character": 2
             }
           ],
@@ -9600,6 +9642,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Unsubscribes and removes a single channel"
+              },
               "parameters": [
                 {
                   "id": 354,
@@ -9607,6 +9652,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "shortText": "A RealtimeChannel instance\n"
+                  },
                   "type": {
                     "type": "reference",
                     "id": 55,
@@ -10933,7 +10981,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 315,
+                              "line": 327,
                               "character": 2
                             }
                           ],
@@ -10945,7 +10993,7 @@
                               "kindString": "Call signature",
                               "flags": {},
                               "comment": {
-                                "shortText": "Listen to messages."
+                                "shortText": "Creates an event handler that listens to changes"
                               },
                               "parameters": [
                                 {
@@ -10954,6 +11002,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Realtime feature (broadcast, presence, or postgres_changes)"
+                                  },
                                   "type": {
                                     "type": "literal",
                                     "value": "broadcast"
@@ -10965,6 +11016,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Pre-defined and custom values specific to the Realtime feature"
+                                  },
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
@@ -10980,10 +11034,13 @@
                                           "kind": 1024,
                                           "kindString": "Property",
                                           "flags": {},
+                                          "comment": {
+                                            "shortText": "Event to listen to. If listening to postgres_changes type\nthen this value is one of INSERT, UPDATE, DELETE, *"
+                                          },
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 317,
+                                              "line": 329,
                                               "character": 14
                                             }
                                           ],
@@ -11009,6 +11066,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Function to be invoked when event handler is triggered\n"
+                                  },
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
@@ -11049,7 +11109,7 @@
                                                       "sources": [
                                                         {
                                                           "fileName": "RealtimeChannel.ts",
-                                                          "line": 320,
+                                                          "line": 332,
                                                           "character": 6
                                                         }
                                                       ],
@@ -11067,7 +11127,7 @@
                                                       "sources": [
                                                         {
                                                           "fileName": "RealtimeChannel.ts",
-                                                          "line": 319,
+                                                          "line": 331,
                                                           "character": 6
                                                         }
                                                       ],
@@ -11169,7 +11229,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 326,
+                                              "line": 338,
                                               "character": 14
                                             }
                                           ],
@@ -11268,7 +11328,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 331,
+                                              "line": 343,
                                               "character": 14
                                             }
                                           ],
@@ -11381,7 +11441,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 336,
+                                              "line": 348,
                                               "character": 14
                                             }
                                           ],
@@ -12559,7 +12619,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 367,
+                              "line": 379,
                               "character": 2
                             }
                           ],
@@ -12595,7 +12655,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 368,
+                                              "line": 380,
                                               "character": 15
                                             }
                                           ],
@@ -12946,7 +13006,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 407,
+                              "line": 419,
                               "character": 2
                             }
                           ],
@@ -13091,7 +13151,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 394,
+                              "line": 406,
                               "character": 2
                             }
                           ],
@@ -13205,7 +13265,7 @@
           "sources": [
             {
               "fileName": "RealtimeClient.ts",
-              "line": 263,
+              "line": 273,
               "character": 2
             }
           ],
@@ -14641,7 +14701,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 218,
+                                              "line": 228,
                                               "character": 2
                                             }
                                           ],
@@ -14955,7 +15015,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 198,
+                                              "line": 208,
                                               "character": 2
                                             }
                                           ],
@@ -15049,7 +15109,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 162,
+                                              "line": 165,
                                               "character": 2
                                             }
                                           ],
@@ -15060,6 +15120,9 @@
                                               "kind": 4096,
                                               "kindString": "Call signature",
                                               "flags": {},
+                                              "comment": {
+                                                "shortText": "Returns all created channels"
+                                              },
                                               "type": {
                                                 "type": "array",
                                                 "elementType": {
@@ -15080,7 +15143,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 214,
+                                              "line": 224,
                                               "character": 2
                                             }
                                           ],
@@ -15110,7 +15173,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 191,
+                                              "line": 201,
                                               "character": 2
                                             }
                                           ],
@@ -15178,7 +15241,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 236,
+                                              "line": 246,
                                               "character": 2
                                             }
                                           ],
@@ -15364,7 +15427,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 177,
+                                              "line": 187,
                                               "character": 2
                                             }
                                           ],
@@ -15375,6 +15438,9 @@
                                               "kind": 4096,
                                               "kindString": "Call signature",
                                               "flags": {},
+                                              "comment": {
+                                                "shortText": "Unsubscribes and removes all channels"
+                                              },
                                               "type": {
                                                 "type": "reference",
                                                 "typeArguments": [
@@ -15403,7 +15469,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 166,
+                                              "line": 173,
                                               "character": 2
                                             }
                                           ],
@@ -15414,6 +15480,9 @@
                                               "kind": 4096,
                                               "kindString": "Call signature",
                                               "flags": {},
+                                              "comment": {
+                                                "shortText": "Unsubscribes and removes a single channel"
+                                              },
                                               "parameters": [
                                                 {
                                                   "id": 354,
@@ -15421,6 +15490,9 @@
                                                   "kind": 32768,
                                                   "kindString": "Parameter",
                                                   "flags": {},
+                                                  "comment": {
+                                                    "shortText": "A RealtimeChannel instance\n"
+                                                  },
                                                   "type": {
                                                     "type": "reference",
                                                     "id": 55,
@@ -15454,7 +15526,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeClient.ts",
-                                              "line": 263,
+                                              "line": 273,
                                               "character": 2
                                             }
                                           ],
@@ -17128,7 +17200,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 218,
+                                      "line": 228,
                                       "character": 2
                                     }
                                   ],
@@ -17442,7 +17514,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 198,
+                                      "line": 208,
                                       "character": 2
                                     }
                                   ],
@@ -17536,7 +17608,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 162,
+                                      "line": 165,
                                       "character": 2
                                     }
                                   ],
@@ -17547,6 +17619,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Returns all created channels"
+                                      },
                                       "type": {
                                         "type": "array",
                                         "elementType": {
@@ -17567,7 +17642,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 214,
+                                      "line": 224,
                                       "character": 2
                                     }
                                   ],
@@ -17597,7 +17672,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 191,
+                                      "line": 201,
                                       "character": 2
                                     }
                                   ],
@@ -17665,7 +17740,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 236,
+                                      "line": 246,
                                       "character": 2
                                     }
                                   ],
@@ -17851,7 +17926,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 177,
+                                      "line": 187,
                                       "character": 2
                                     }
                                   ],
@@ -17862,6 +17937,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Unsubscribes and removes all channels"
+                                      },
                                       "type": {
                                         "type": "reference",
                                         "typeArguments": [
@@ -17890,7 +17968,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 166,
+                                      "line": 173,
                                       "character": 2
                                     }
                                   ],
@@ -17901,6 +17979,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Unsubscribes and removes a single channel"
+                                      },
                                       "parameters": [
                                         {
                                           "id": 354,
@@ -17908,6 +17989,9 @@
                                           "kind": 32768,
                                           "kindString": "Parameter",
                                           "flags": {},
+                                          "comment": {
+                                            "shortText": "A RealtimeChannel instance\n"
+                                          },
                                           "type": {
                                             "type": "reference",
                                             "id": 55,
@@ -17941,7 +18025,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 263,
+                                      "line": 273,
                                       "character": 2
                                     }
                                   ],
@@ -18079,7 +18163,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 315,
+                              "line": 327,
                               "character": 2
                             }
                           ],
@@ -18091,7 +18175,7 @@
                               "kindString": "Call signature",
                               "flags": {},
                               "comment": {
-                                "shortText": "Listen to messages."
+                                "shortText": "Creates an event handler that listens to changes"
                               },
                               "parameters": [
                                 {
@@ -18100,6 +18184,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Realtime feature (broadcast, presence, or postgres_changes)"
+                                  },
                                   "type": {
                                     "type": "literal",
                                     "value": "broadcast"
@@ -18111,6 +18198,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Pre-defined and custom values specific to the Realtime feature"
+                                  },
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
@@ -18126,10 +18216,13 @@
                                           "kind": 1024,
                                           "kindString": "Property",
                                           "flags": {},
+                                          "comment": {
+                                            "shortText": "Event to listen to. If listening to postgres_changes type\nthen this value is one of INSERT, UPDATE, DELETE, *"
+                                          },
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 317,
+                                              "line": 329,
                                               "character": 14
                                             }
                                           ],
@@ -18155,6 +18248,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Function to be invoked when event handler is triggered\n"
+                                  },
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
@@ -18195,7 +18291,7 @@
                                                       "sources": [
                                                         {
                                                           "fileName": "RealtimeChannel.ts",
-                                                          "line": 320,
+                                                          "line": 332,
                                                           "character": 6
                                                         }
                                                       ],
@@ -18213,7 +18309,7 @@
                                                       "sources": [
                                                         {
                                                           "fileName": "RealtimeChannel.ts",
-                                                          "line": 319,
+                                                          "line": 331,
                                                           "character": 6
                                                         }
                                                       ],
@@ -18315,7 +18411,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 326,
+                                              "line": 338,
                                               "character": 14
                                             }
                                           ],
@@ -18414,7 +18510,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 331,
+                                              "line": 343,
                                               "character": 14
                                             }
                                           ],
@@ -18527,7 +18623,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 336,
+                                              "line": 348,
                                               "character": 14
                                             }
                                           ],
@@ -19705,7 +19801,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 367,
+                              "line": 379,
                               "character": 2
                             }
                           ],
@@ -19741,7 +19837,7 @@
                                           "sources": [
                                             {
                                               "fileName": "RealtimeChannel.ts",
-                                              "line": 368,
+                                              "line": 380,
                                               "character": 15
                                             }
                                           ],
@@ -20092,7 +20188,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 407,
+                              "line": 419,
                               "character": 2
                             }
                           ],
@@ -20237,7 +20333,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeChannel.ts",
-                              "line": 394,
+                              "line": 406,
                               "character": 2
                             }
                           ],
@@ -21786,7 +21882,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 218,
+                                      "line": 228,
                                       "character": 2
                                     }
                                   ],
@@ -22100,7 +22196,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 198,
+                                      "line": 208,
                                       "character": 2
                                     }
                                   ],
@@ -22194,7 +22290,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 162,
+                                      "line": 165,
                                       "character": 2
                                     }
                                   ],
@@ -22205,6 +22301,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Returns all created channels"
+                                      },
                                       "type": {
                                         "type": "array",
                                         "elementType": {
@@ -22225,7 +22324,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 214,
+                                      "line": 224,
                                       "character": 2
                                     }
                                   ],
@@ -22255,7 +22354,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 191,
+                                      "line": 201,
                                       "character": 2
                                     }
                                   ],
@@ -22323,7 +22422,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 236,
+                                      "line": 246,
                                       "character": 2
                                     }
                                   ],
@@ -22509,7 +22608,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 177,
+                                      "line": 187,
                                       "character": 2
                                     }
                                   ],
@@ -22520,6 +22619,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Unsubscribes and removes all channels"
+                                      },
                                       "type": {
                                         "type": "reference",
                                         "typeArguments": [
@@ -22548,7 +22650,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 166,
+                                      "line": 173,
                                       "character": 2
                                     }
                                   ],
@@ -22559,6 +22661,9 @@
                                       "kind": 4096,
                                       "kindString": "Call signature",
                                       "flags": {},
+                                      "comment": {
+                                        "shortText": "Unsubscribes and removes a single channel"
+                                      },
                                       "parameters": [
                                         {
                                           "id": 354,
@@ -22566,6 +22671,9 @@
                                           "kind": 32768,
                                           "kindString": "Parameter",
                                           "flags": {},
+                                          "comment": {
+                                            "shortText": "A RealtimeChannel instance\n"
+                                          },
                                           "type": {
                                             "type": "reference",
                                             "id": 55,
@@ -22599,7 +22707,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeClient.ts",
-                                      "line": 263,
+                                      "line": 273,
                                       "character": 2
                                     }
                                   ],
@@ -24273,7 +24381,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 218,
+                              "line": 228,
                               "character": 2
                             }
                           ],
@@ -24587,7 +24695,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 198,
+                              "line": 208,
                               "character": 2
                             }
                           ],
@@ -24681,7 +24789,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 162,
+                              "line": 165,
                               "character": 2
                             }
                           ],
@@ -24692,6 +24800,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Returns all created channels"
+                              },
                               "type": {
                                 "type": "array",
                                 "elementType": {
@@ -24712,7 +24823,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 214,
+                              "line": 224,
                               "character": 2
                             }
                           ],
@@ -24742,7 +24853,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 191,
+                              "line": 201,
                               "character": 2
                             }
                           ],
@@ -24810,7 +24921,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 236,
+                              "line": 246,
                               "character": 2
                             }
                           ],
@@ -24996,7 +25107,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 177,
+                              "line": 187,
                               "character": 2
                             }
                           ],
@@ -25007,6 +25118,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Unsubscribes and removes all channels"
+                              },
                               "type": {
                                 "type": "reference",
                                 "typeArguments": [
@@ -25035,7 +25149,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 166,
+                              "line": 173,
                               "character": 2
                             }
                           ],
@@ -25046,6 +25160,9 @@
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
+                              "comment": {
+                                "shortText": "Unsubscribes and removes a single channel"
+                              },
                               "parameters": [
                                 {
                                   "id": 354,
@@ -25053,6 +25170,9 @@
                                   "kind": 32768,
                                   "kindString": "Parameter",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "A RealtimeChannel instance\n"
+                                  },
                                   "type": {
                                     "type": "reference",
                                     "id": 55,
@@ -25086,7 +25206,7 @@
                           "sources": [
                             {
                               "fileName": "RealtimeClient.ts",
-                              "line": 263,
+                              "line": 273,
                               "character": 2
                             }
                           ],
@@ -25222,7 +25342,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeChannel.ts",
-                      "line": 315,
+                      "line": 327,
                       "character": 2
                     }
                   ],
@@ -25234,7 +25354,7 @@
                       "kindString": "Call signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "Listen to messages."
+                        "shortText": "Creates an event handler that listens to changes"
                       },
                       "parameters": [
                         {
@@ -25243,6 +25363,9 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Realtime feature (broadcast, presence, or postgres_changes)"
+                          },
                           "type": {
                             "type": "literal",
                             "value": "broadcast"
@@ -25254,6 +25377,9 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Pre-defined and custom values specific to the Realtime feature"
+                          },
                           "type": {
                             "type": "reflection",
                             "declaration": {
@@ -25269,10 +25395,13 @@
                                   "kind": 1024,
                                   "kindString": "Property",
                                   "flags": {},
+                                  "comment": {
+                                    "shortText": "Event to listen to. If listening to postgres_changes type\nthen this value is one of INSERT, UPDATE, DELETE, *"
+                                  },
                                   "sources": [
                                     {
                                       "fileName": "RealtimeChannel.ts",
-                                      "line": 317,
+                                      "line": 329,
                                       "character": 14
                                     }
                                   ],
@@ -25298,6 +25427,9 @@
                           "kind": 32768,
                           "kindString": "Parameter",
                           "flags": {},
+                          "comment": {
+                            "shortText": "Function to be invoked when event handler is triggered\n"
+                          },
                           "type": {
                             "type": "reflection",
                             "declaration": {
@@ -25338,7 +25470,7 @@
                                               "sources": [
                                                 {
                                                   "fileName": "RealtimeChannel.ts",
-                                                  "line": 320,
+                                                  "line": 332,
                                                   "character": 6
                                                 }
                                               ],
@@ -25356,7 +25488,7 @@
                                               "sources": [
                                                 {
                                                   "fileName": "RealtimeChannel.ts",
-                                                  "line": 319,
+                                                  "line": 331,
                                                   "character": 6
                                                 }
                                               ],
@@ -25458,7 +25590,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeChannel.ts",
-                                      "line": 326,
+                                      "line": 338,
                                       "character": 14
                                     }
                                   ],
@@ -25557,7 +25689,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeChannel.ts",
-                                      "line": 331,
+                                      "line": 343,
                                       "character": 14
                                     }
                                   ],
@@ -25670,7 +25802,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeChannel.ts",
-                                      "line": 336,
+                                      "line": 348,
                                       "character": 14
                                     }
                                   ],
@@ -26848,7 +26980,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeChannel.ts",
-                      "line": 367,
+                      "line": 379,
                       "character": 2
                     }
                   ],
@@ -26884,7 +27016,7 @@
                                   "sources": [
                                     {
                                       "fileName": "RealtimeChannel.ts",
-                                      "line": 368,
+                                      "line": 380,
                                       "character": 15
                                     }
                                   ],
@@ -27235,7 +27367,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeChannel.ts",
-                      "line": 407,
+                      "line": 419,
                       "character": 2
                     }
                   ],
@@ -27380,7 +27512,7 @@
                   "sources": [
                     {
                       "fileName": "RealtimeChannel.ts",
-                      "line": 394,
+                      "line": 406,
                       "character": 2
                     }
                   ],
