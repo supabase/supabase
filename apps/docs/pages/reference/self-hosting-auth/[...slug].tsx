@@ -12,11 +12,11 @@ const sections = flattenSections(selfHostingAuthCommonSections)
 const spec = gen_v3(authSpec, 'wat', { apiUrl: 'apiv0' })
 
 export default function JSReference(props) {
-  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} />
+  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="api" />
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/self-hosting-auth', '/self-hosting-auth')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/self-hosting-auth')
 }
 
 export function getStaticPaths() {
