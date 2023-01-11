@@ -1,6 +1,6 @@
 import { IconHelpCircle } from 'ui'
 import ProductIcon from 'components/ProductIcon'
-import React from 'react'
+import React, { useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 export const Check = () => (
@@ -50,7 +50,7 @@ export const PricingTableRowDesktop = (props: any) => {
   return (
     <>
       <tr
-        className="divide-scale-600 dark:divide-scale-400 bg-scale-200 divide-x"
+        className="divide-scale-600 dark:divide-scale-400 bg-scale-200 "
         style={{ borderTop: 'none' }}
       >
         <th
@@ -62,9 +62,9 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 ml-2">{category.title}</h4>
           </div>
         </th>
-        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
-        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
-        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5 free"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5 pro"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5 enterprise"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {
@@ -85,17 +85,28 @@ export const PricingTableRowDesktop = (props: any) => {
               )}
             </th>
 
-            {Object.values(feat.tiers).map((tier: any, i) => {
+            {Object.entries(feat.tiers).map((entry: any, i) => {
+              const tierName = entry[0]
+              const tierValue = entry[1]
+
               return (
-                <td key={i} className="px-6">
-                  {typeof tier === 'boolean' && tier === true ? (
-                    <IncludedCheck tier={tier} />
-                  ) : typeof tier === 'boolean' && tier === false ? (
+                <td
+                  key={i}
+                  className={`px-6 tier-${tierName}`}
+                  // onMouseEnter={handleTierMouseEnter}
+                  // onMouseLeave={handleTierMouseLeave}
+                  // data-tier={highlightedTier}
+                >
+                  {typeof tierValue === 'boolean' && tierValue === true ? (
+                    <IncludedCheck tier={tierValue} />
+                  ) : typeof tierValue === 'boolean' && tierValue === false ? (
                     <div className="text-scale-900">
-                      <Minus tier={tier} />
+                      <Minus tier={tierValue} />
                     </div>
                   ) : (
-                    <span className="text-scale-1200 block text-sm dark:text-white">{tier}</span>
+                    <span className="text-scale-1200 block text-sm dark:text-white">
+                      {tierValue}
+                    </span>
                   )}
                 </td>
               )
