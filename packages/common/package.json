@@ -5,8 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "dependencies": {
-    "@headlessui/react": "^1.5.0",
-    "@supabase/ui": "^0.37.0-alpha.50"
+    "@headlessui/react": "^1.5.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.37",
