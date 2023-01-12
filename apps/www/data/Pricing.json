@@ -194,6 +194,7 @@
       },
       {
         "title": "Asset transformations",
+        "tooltip": "Origin images are only relevant for image transformations. Images in the bucket which are not transformed do not count towards this limit.",
         "tiers": {
           "free": false,
           "pro": "Unlimited transformations for 100 origin images, then 5$ per 1000 origin images",
