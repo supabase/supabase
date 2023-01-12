@@ -1,0 +1,55 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'functions-testing-debugging',
+  title: 'Testing and Debugging Functions',
+  description: 'Test and debug functions locally and in production.',
+}
+
+You can debug your deployed Edge Functions using the "Functions" section of the Dashboard. There are two types debugging tools available:
+
+- Invocations: shows the Request and Response for each execution.
+- Logs: shows any platform events, including deployments and errors.
+
+![Function invocations.](/docs/img/guides/functions/function-logs.png)
+
+## Develop locally
+
+You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
+
+```bash
+supabase start # start the supabase stack
+supabase functions serve hello-world # start the Function watcher
+```
+
+The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
+
+### Invoke functions locally
+
+While serving your local Function, you can execute it using curl:
+
+```bash
+curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
+  --header 'Content-Type: application/json' \
+  --data '{ "name":"Functions" }'
+```
+
+You should see the response `{ "message":"Hello Functions!" }`.
+
+<details>
+<summary>Implementation details</summary>
+
+- Edge Functions don't serve HTML content (`GET` requests that return `text/html` are rewritten to `text/plain`).
+- The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
+- The Function is proxied through the local API (`http://localhost:54321`)
+
+</details>
+<br />
+
+If you execute Function with a different payload the response will change. <br />
+Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
