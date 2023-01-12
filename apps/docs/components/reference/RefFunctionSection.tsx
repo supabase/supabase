@@ -10,22 +10,7 @@ import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers
 
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
-
-interface ICommonFunc {
-  id: string
-  title: string
-  slug: string
-  product: string
-  libs: string
-  items: ICommonFunc[]
-}
-
-interface IRefFunctionSection {
-  funcData: any
-  commonFuncData: ICommonFunc
-  spec: any
-  typeSpec?: any
-}
+import { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
