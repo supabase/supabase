@@ -1886,4 +1886,14 @@ module.exports = [
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/api',
+    destination: '/docs/guides/database/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/database/api/generating-types',
+  },
 ]
