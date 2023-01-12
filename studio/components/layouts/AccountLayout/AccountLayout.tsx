@@ -103,7 +103,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
+          href: 'https://supabase.com/docs/guides/database/api',
           isExternal: true,
         },
       ],

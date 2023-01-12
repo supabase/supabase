@@ -178,8 +178,8 @@ export const menuItems: NavMenu = {
           name: 'Serverless APIs',
           url: undefined,
           items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+            { name: 'Overview', url: '/guides/database/api', items: [] },
+            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
           ],
         },
         {
