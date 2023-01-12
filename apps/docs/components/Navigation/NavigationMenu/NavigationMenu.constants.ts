@@ -421,14 +421,28 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
+    { name: 'Overview', url: '/guides/functions/overview', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
+    { name: 'CORS', url: '/guides/functions/cors', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
-    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
+    { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
+    { name: 'Testing & Debugging', url: '/guides/functions/testing-debugging', items: [] },
+    { name: 'Tips', url: '/guides/functions/tips', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
-      items: [{ name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] }],
+      items: [
+        {
+          name: 'Cloudflare Turnstile',
+          url: '/guides/functions/examples/cloudflare-turnstile',
+          items: [],
+        },
+        { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
+        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+        { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
+        { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
+        { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+      ],
     },
   ],
 }
