@@ -236,4 +236,6 @@ services:
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/realtime.sql
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
+      # Must be superuser to enable pg_net extension
+      - ./volumes/db/webhooks.sql:/etc/postgresql.schema.sql
       - ./volumes/db/data:/var/lib/postgresql/data

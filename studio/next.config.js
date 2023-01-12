@@ -166,6 +166,9 @@ const nextConfig = {
   images: {
     domains: ['github.com'],
   },
+  experimental: {
+    outputStandalone: true,
+  },
 }
 
 // Export all config
