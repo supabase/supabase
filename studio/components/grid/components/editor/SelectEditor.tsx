@@ -1,4 +1,4 @@
-import { Listbox } from '@supabase/ui'
+import { Listbox } from 'ui'
 import { EditorProps } from '@supabase/react-data-grid'
 
 import { useTrackedState } from 'components/grid/store'

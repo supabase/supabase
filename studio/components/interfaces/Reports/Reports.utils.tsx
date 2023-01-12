@@ -1,4 +1,4 @@
-import { IconRefreshCw } from '@supabase/ui'
+import { IconRefreshCw } from 'ui'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryData, LogsQueryHandlers } from 'hooks/analytics/useLogsQuery'
 import React from 'react'

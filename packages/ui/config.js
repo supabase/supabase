@@ -16,7 +16,7 @@ const windmillConfig = {
   darkMode: 'class',
   purge: {
     content: [
-      'node_modules/@supabase/ui/theme/defaultTheme.js',
+      //'node_modules/@supabase/ui/theme/defaultTheme.js',
       // 'node_modules/@supabase/ui/dist/index.js',
     ],
   },

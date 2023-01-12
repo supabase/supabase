@@ -14,7 +14,7 @@ import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
 import { checkPermissions, useStore } from 'hooks'
-import { IconBookOpen } from '@supabase/ui'
+import { IconBookOpen } from 'ui'
 
 interface Props {
   templates?: LogTemplate[]
