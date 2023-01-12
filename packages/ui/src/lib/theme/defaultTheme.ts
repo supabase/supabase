@@ -117,9 +117,9 @@ export default {
           flex flex-row
           gap-3
           items-center
-          w-full 
-          text-left 
-          cursor-pointer 
+          w-full
+          text-left
+          cursor-pointer
 
           outline-none
           focus-visible:ring-1
@@ -143,27 +143,27 @@ export default {
           group
           border
           border-scale-700
-          
+
           first:rounded-tl-md first:rounded-tr-md
           last:rounded-bl-md last:rounded-br-md
         `,
         trigger: `
           flex flex-row
           items-center
-          px-6 py-4 
-          w-full 
-          text-left 
-          cursor-pointer 
-          
-          font-medium 
-          text-base 
-          bg-transparent 
+          px-6 py-4
+          w-full
+          text-left
+          cursor-pointer
+
+          font-medium
+          text-base
+          bg-transparent
 
           outline-none
           focus-visible:ring-1
           focus-visible:z-50
           ring-scale-1100
-          
+
           transition-colors
           hover:bg-scale-200
 
@@ -235,7 +235,6 @@ export default {
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
       amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
       gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      bronze: `bg-bronze-200 text-bronze-1100 border border-bronze-700`,
       gray: `bg-gray-200 text-gray-1100 border border-gray-700`,
       mauve: `bg-mauve-200 text-mauve-1100 border border-mauve-700`,
       slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
@@ -252,8 +251,8 @@ export default {
 
   alert: {
     base: `
-      relative rounded border py-4 px-6 
-      flex space-x-4 items-start 
+      relative rounded border py-4 px-6
+      flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
     description: `text-xs`,
@@ -290,11 +289,11 @@ export default {
       },
     },
     close: `
-      absolute 
-      right-6 top-4 
-      p-0 m-0 
+      absolute
+      right-6 top-4
+      p-0 m-0
       text-scale-900
-      cursor-pointer transition ease-in-out 
+      cursor-pointer transition ease-in-out
       bg-transparent border-transparent focus:outline-none
       opacity-50 hover:opacity-100`,
   },
@@ -306,15 +305,15 @@ export default {
   card: {
     base: `
       bg-white dark:bg-scaleDark-700
-      
-      border
-      ${defaults.border.primary} 
 
-      flex flex-col 
+      border
+      ${defaults.border.primary}
+
+      flex flex-col
       rounded-md shadow-lg overflow-hidden relative
     `,
     hoverable: 'transition hover:-translate-y-1 hover:shadow-2xl',
-    head: `px-8 py-6 flex justify-between 
+    head: `px-8 py-6 flex justify-between
     border-b
       ${defaults.border.primary} `,
     content: 'p-8',
@@ -328,20 +327,20 @@ export default {
     base: `w-full justify-between space-y-4`,
     underlined: {
       list: `
-        flex items-center border-b 
+        flex items-center border-b
         ${defaults.border.secondary}
         `,
-      base: ` 
-        relative 
-        cursor-pointer 
-        text-scale-900 
-        flex 
-        items-center 
+      base: `
+        relative
+        cursor-pointer
+        text-scale-900
+        flex
+        items-center
         space-x-2
-        text-center 
+        text-center
         transition
-        focus:outline-none 
-        focus-visible:ring 
+        focus:outline-none
+        focus-visible:ring
         focus-visible:ring-scale-700
         focus-visible:border-scale-900
       `,
@@ -355,18 +354,18 @@ export default {
     },
     pills: {
       list: 'flex space-x-1',
-      base: ` 
-        relative 
-        cursor-pointer 
-        flex 
-        items-center 
+      base: `
+        relative
+        cursor-pointer
+        flex
+        items-center
         space-x-2
-        text-center 
+        text-center
         transition
         shadow-sm
         rounded
-        focus:outline-none 
-        focus-visible:ring 
+        focus:outline-none
+        focus-visible:ring
         focus-visible:ring-scale-700
         focus-visible:border-scale-900
         `,
@@ -378,23 +377,23 @@ export default {
       active: `
         bg-scale-1200
         text-scale-200
-        border-scale-1200 
+        border-scale-1200
       `,
     },
     'rounded-pills': {
       list: 'flex flex-wrap gap-2',
-      base: ` 
-        relative 
-        cursor-pointer 
-        flex 
-        items-center 
+      base: `
+        relative
+        cursor-pointer
+        flex
+        items-center
         space-x-2
-        text-center 
+        text-center
         transition
         shadow-sm
         rounded-full
-        focus:outline-none 
-        focus-visible:ring 
+        focus:outline-none
+        focus-visible:ring
         focus-visible:ring-scale-700
         focus-visible:border-scale-900
         `,
@@ -406,7 +405,7 @@ export default {
       active: `
         bg-scale-1200
         text-scale-200
-        border-scale-1200 
+        border-scale-1200
       `,
     },
     block: 'w-full flex items-center justify-center',
@@ -427,15 +426,15 @@ export default {
 
   button: {
     base: `
-      relative 
-      cursor-pointer 
-      inline-flex items-center space-x-2 
-      text-center 
+      relative
+      cursor-pointer
+      inline-flex items-center space-x-2
+      text-center
       font-regular
-      transition ease-out duration-200 
-      rounded 
+      transition ease-out duration-200
+      rounded
       ${defaults['focus-visible']}
-      
+
     `,
     label: `truncate`,
     container: 'inline-flex font-medium',
@@ -449,7 +448,7 @@ export default {
       secondary: `
         bg-scale-1200
         text-scale-100 hover:text-scale-800
-        focus-visible:text-scale-600 
+        focus-visible:text-scale-600
 
         bordershadow-scale-1100 hover:bordershadow-scale-900
 
@@ -462,7 +461,7 @@ export default {
         dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800
         dark:bg-scale-500 dark:hover:bg-scale-600
         focus-visible:outline-brand-600
-        
+
       `,
       alternative: `
         text-brand-1100
@@ -473,14 +472,14 @@ export default {
         focus-visible:outline-brand-600
       `,
       outline: `
-        text-scale-1200 
-        bg-transparent 
+        text-scale-1200
+        bg-transparent
         bordershadow-scale-600 hover:bordershadow-scale-700
         dark:bordershadow-scale-800 hover:dark:bordershadow-scale-900
         focus-visible:outline-scale-700
       `,
       dashed: `
-        text-scale-1200 
+        text-scale-1200
         border
         border-dashed
         border-scale-700 hover:border-scale-900
@@ -498,7 +497,7 @@ export default {
         focus-visible:outline-scale-700
       `,
       text: `
-        text-scale-1200 
+        text-scale-1200
         hover:bg-scale-500
         shadow-none
         focus-visible:outline-scale-700
@@ -538,13 +537,13 @@ export default {
 
   input: {
     base: `
-      block 
-      box-border 
-      w-full 
-      rounded-md 
-      shadow-sm 
+      block
+      box-border
+      w-full
+      rounded-md
+      shadow-sm
       transition-all
-      text-scale-1200  
+      text-scale-1200
       border
       focus:shadow-md
       ${defaults.focus}
@@ -559,7 +558,7 @@ export default {
         `,
       error: `
         bg-red-100
-        border border-red-700 
+        border border-red-700
         focus:ring-red-500
         placeholder:text-red-600
        `,
@@ -581,13 +580,13 @@ export default {
 
   select: {
     base: `
-      block 
-      box-border 
-      w-full 
-      rounded-md 
-      shadow-sm 
+      block
+      box-border
+      w-full
+      rounded-md
+      shadow-sm
       transition-all
-      text-scale-1200  
+      text-scale-1200
       border
       focus:shadow-md
       ${defaults.focus}
@@ -605,7 +604,7 @@ export default {
         `,
       error: `
         bg-red-100
-        border border-red-700 
+        border border-red-700
         focus:ring-red-500
         placeholder:text-red-600
        `,
@@ -628,12 +627,12 @@ export default {
   inputNumber: {
     base: `
       block
-      box-border 
-      w-full 
-      rounded-md 
-      shadow-sm 
+      box-border
+      w-full
+      rounded-md
+      shadow-sm
       transition-all
-      text-scale-1200  
+      text-scale-1200
       border
       focus:shadow-md
       ${defaults.focus}
@@ -651,7 +650,7 @@ export default {
       `,
       error: `
         bg-red-100
-        border border-red-700 
+        border border-red-700
         focus:ring-red-500
         placeholder:text-red-600
        `,
@@ -668,9 +667,9 @@ export default {
   /*
    *  Checkbox
    *
-   * 
+   *
    * This Checkbox requires a plugin in your config:
-  
+
     ```
     // tailwind.config.js
     module.exports = {
@@ -681,17 +680,17 @@ export default {
       ],
     }
     ```
-   * 
-   * 
+   *
+   *
   */
 
   checkbox: {
     base: `
-      bg-transparent 
+      bg-transparent
       ${defaults.focus}
       focus:ring-scale-400
-      text-brand-900 
-      border-scale-700 
+      text-brand-900
+      border-scale-700
       shadow-sm
       rounded
       cursor-pointer
@@ -727,9 +726,9 @@ export default {
   /*
    *  Radio
    *
-   * 
+   *
    * This Radio requires a plugin in your config:
-  
+
     ```
     // tailwind.config.js
     module.exports = {
@@ -740,8 +739,8 @@ export default {
       ],
     }
     ```
-   * 
-   * 
+   *
+   *
   */
 
   radio: {
@@ -750,7 +749,7 @@ export default {
       ${defaults.focus}
       focus:ring-brand-400
       border-scale-700
-      
+
       text-brand-900
       shadow-sm
       cursor-pointer
@@ -797,7 +796,7 @@ export default {
         `,
         active: `
           bg-scale-300 dark:bg-scale-600 z-10
-          border-scale-900 dark:border-scale-900 
+          border-scale-900 dark:border-scale-900
           border-1
         `,
         radio_offset: 'left-4',
@@ -816,7 +815,7 @@ export default {
           transition
           rounded-md
           border
-          shadow-sm 
+          shadow-sm
         `,
         size: {
           tiny: `px-5 py-3`,
@@ -833,7 +832,7 @@ export default {
         `,
         active: `
           bg-scale-300 dark:bg-scale-600 z-10
-          border-scale-900 dark:border-scale-900 
+          border-scale-900 dark:border-scale-900
           border-1
         `,
         radio_offset: 'left-4',
@@ -849,9 +848,9 @@ export default {
         },
         group: `flex flex-row gap-3`,
         base: `
-          transition 
+          transition
           border
-          rounded-lg 
+          rounded-lg
           grow
           items-center
           flex-wrap
@@ -888,10 +887,10 @@ export default {
         },
         group: `flex flex-row gap-3`,
         base: `
-          transition 
-          border border-scale-700 hover:border-scale-900 
+          transition
+          border border-scale-700 hover:border-scale-900
           shadow-sm
-          rounded-lg 
+          rounded-lg
           grow
         `,
         size: {
@@ -909,7 +908,7 @@ export default {
         `,
         active: `
           bg-scale-300 dark:bg-scale-600 z-10
-          border-scale-900 dark:border-scale-900 
+          border-scale-900 dark:border-scale-900
           border-1
         `,
         radio_offset: 'left-4',
@@ -969,21 +968,21 @@ export default {
   sidepanel: {
     base: `
       bg-scale-100 dark:bg-scale-300
-      flex flex-col 
-      fixed 
-      inset-y-0 
-      max-w-full 
+      flex flex-col
+      fixed
+      inset-y-0
+      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
     `,
     header: `
-      space-y-1 py-4 px-4 bg-overlay-bg sm:px-6 
+      space-y-1 py-4 px-4 bg-overlay-bg sm:px-6
       border-b border-overlay-border
     `,
     contents: `
-      relative 
-      flex-1 
+      relative
+      flex-1
       overflow-y-auto
     `,
     content: `
@@ -1002,12 +1001,12 @@ export default {
     align: {
       left: `
         left-0
-        data-open:animate-panel-slide-left-out 
+        data-open:animate-panel-slide-left-out
         data-closed:animate-panel-slide-left-in
       `,
       right: `
         right-0
-        data-open:animate-panel-slide-right-out 
+        data-open:animate-panel-slide-right-out
         data-closed:animate-panel-slide-right-in
       `,
     },
@@ -1023,9 +1022,9 @@ export default {
       dark:bg-scale-100
       h-full w-full
       left-0
-      top-0 
+      top-0
       opacity-75
-      data-closed:animate-fade-out-overlay-bg 
+      data-closed:animate-fade-out-overlay-bg
       data-open:animate-fade-in-overlay-bg
     `,
     // this is to reset the button
@@ -1041,10 +1040,10 @@ export default {
 
   toggle: {
     base: `
-      p-0 relative 
-      inline-flex flex-shrink-0 
-      border-2 border-transparent 
-      rounded-full 
+      p-0 relative
+      inline-flex flex-shrink-0
+      border-2 border-transparent
+      rounded-full
       cursor-pointer
       transition-colors ease-in-out duration-200
       ${defaults.focus}
@@ -1054,8 +1053,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      bg-brand-900    
-      hover:bg-brand-900    
+      bg-brand-900
+      hover:bg-brand-900
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1066,12 +1065,12 @@ export default {
     },
     handle: {
       base: `
-        inline-block h-5 w-5 
-        rounded-full 
+        inline-block h-5 w-5
+        rounded-full
         bg-scale-100
         dark:bg-scale-900
-        shadow ring-0 
-        transition 
+        shadow ring-0
+        transition
         ease-in-out duration-200
       `,
       tiny: 'h-3 w-3',
@@ -1159,7 +1158,7 @@ export default {
     },
     error: {
       base: `
-        text-red-900 
+        text-red-900
         transition-all
         data-show:mt-2
         data-show:animate-slide-down-normal
@@ -1187,7 +1186,7 @@ export default {
     trigger: `
       flex
 
-      border-none 
+      border-none
       rounded
       bg-transparent p-0
       outline-none
@@ -1279,8 +1278,8 @@ export default {
   popover: {
     trigger: `
       flex
-      border-none 
-  
+      border-none
+
       rounded
       bg-transparent
       p-0
@@ -1300,7 +1299,7 @@ export default {
       data-closed:animate-dropdown-content-hide
       min-w-fit
 
-      origin-popover 
+      origin-popover
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
     `,
@@ -1344,7 +1343,7 @@ export default {
         cursor-pointer
         flex space-x-3 items-center
         outline-none
-        focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 
+        focus-visible:ring-1 ring-scale-1200 focus-visible:z-10
         group
       `,
       content: {
@@ -1415,7 +1414,7 @@ export default {
     },
     group: {
       base: `
-        flex space-x-3 
+        flex space-x-3
         mb-2
         font-normal
       `,
@@ -1438,20 +1437,20 @@ export default {
       bg-scale-100 dark:bg-scale-300
       my-4
       border border-scale-300 dark:border-scale-500
-      rounded-md 
-      shadow-xl 
-      data-open:animate-overlay-show 
-      data-closed:animate-overlay-hide  
-      
+      rounded-md
+      shadow-xl
+      data-open:animate-overlay-show
+      data-closed:animate-overlay-hide
+
     `,
     header: `
       bg-scale-200 dark:bg-scale-400
-      space-y-1 py-3 px-4 sm:px-5 
+      space-y-1 py-3 px-4 sm:px-5
       border-b border-scale-300 dark:border-scale-500
     `,
     footer: `
       flex justify-end gap-2
-      py-3 px-5 
+      py-3 px-5
       border-t border-scale-300 dark:border-scale-500
     `,
     size: {
@@ -1469,9 +1468,9 @@ export default {
       dark:bg-scale-100
       h-full w-full
       left-0
-      top-0 
+      top-0
       opacity-75
-      data-closed:animate-fade-out-overlay-bg 
+      data-closed:animate-fade-out-overlay-bg
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
@@ -1480,7 +1479,7 @@ export default {
       grid
       place-items-center
       overflow-y-auto
-      data-open:animate-overlay-show data-closed:animate-overlay-hide  
+      data-open:animate-overlay-show data-closed:animate-overlay-hide
     `,
     separator: `
       w-full
@@ -1495,12 +1494,12 @@ export default {
 
   listbox: {
     base: `
-      block 
-      box-border 
-      w-full 
-      rounded-md 
-      shadow-sm 
-      text-scale-1200  
+      block
+      box-border
+      w-full
+      rounded-md
+      shadow-sm
+      text-scale-1200
       border
       focus:shadow-md
       ${defaults.focus}
@@ -1524,24 +1523,24 @@ export default {
         `,
       error: `
         bg-red-100
-        border border-red-700 
+        border border-red-700
         focus:ring-red-500
         placeholder:text-red-600
        `,
     },
     options_container_animate: `
       transition
-      data-open:animate-slide-down 
+      data-open:animate-slide-down
       data-open:opacity-1
       data-closed:animate-slide-up
       data-closed:opacity-0
     `,
     options_container: `
-      bg-scale-100 dark:bg-scale-300 
-      shadow-lg 
-      border border-solid 
-      border-gray-100 dark:border-gray-600 max-h-60 
-      rounded-md py-1 text-base 
+      bg-scale-100 dark:bg-scale-300
+      shadow-lg
+      border border-solid
+      border-gray-100 dark:border-gray-600 max-h-60
+      rounded-md py-1 text-base
       sm:text-sm z-10 overflow-hidden overflow-y-scroll
 
       origin-dropdown
@@ -1561,7 +1560,7 @@ export default {
     chevron: 'h-5 w-5 text-scale-600',
     option: `
       w-listbox
-      transition cursor-pointer select-none relative py-2 pl-3 pr-9 
+      transition cursor-pointer select-none relative py-2 pl-3 pr-9
       text-scale-900
       text-sm
       hover:bg-scale-300 dark:hover:bg-scale-500
@@ -1587,9 +1586,9 @@ export default {
 
   inputErrorIcon: {
     base: `
-      flex items-center 
-      right-3 pr-2 pl-2 
-      inset-y-0 
+      flex items-center
+      right-3 pr-2 pl-2
+      inset-y-0
       pointer-events-none
       text-red-900
     `,
@@ -1597,8 +1596,8 @@ export default {
 
   inputIconContainer: {
     base: `
-    absolute inset-y-0 
-    left-0 pl-3 flex 
+    absolute inset-y-0
+    left-0 pl-3 flex
     items-center pointer-events-none
     text-scale-1100
     `,
