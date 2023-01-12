@@ -51,7 +51,12 @@
         "title": "Retrieve container status",
         "slug": "supabase-status",
         "type": "cli-command"
-      },
+      }
+    ]
+  },
+  {
+    "title": "Testing",
+    "items": [
       {
         "id": "supabase-test",
         "title": "Run tests",
@@ -63,7 +68,12 @@
         "title": "Run tests (pgTAP)",
         "slug": "supabase-test-db",
         "type": "cli-command"
-      },
+      }
+    ]
+  },
+  {
+    "title": "Generate Types",
+    "items": [
       {
         "id": "supabase-gen",
         "title": "Run code generation tools",
