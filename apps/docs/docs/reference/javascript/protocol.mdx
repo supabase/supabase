@@ -11,53 +11,53 @@ The Realtime Protocal is a set of message formats that you send and receive from
 
 In the initial message, the client sends a message specifying the features that wants to use (Broadcase, Presence, Postgres Changes).
 
-```json
+```typescript
 {
    "event": "phx_join",
-   "topic": $TOPIC,
+   "topic": string,
    "payload": {
       "config": {
          "broadcast": {
-            "self": true
+            "self": boolean
          },
          "presence": {
-            "key": ""
+            "key": string
          },
          "postgres_changes": [
             {
-               "event": $EVENT,
-               "schema": $SCHEMA,
-               "table": $TABLE,
-               "filter": $FILTER
+               "event": "*" | "INSERT" | "UPDATE" | "DELETE",
+               "schema": string,
+               "table": string,
+               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" +  '.' + string
             }
          ]
       }
    },
-   "ref": $REF_NUMBER
+   "ref": string
 }
 ```
 
 In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.
 
-```json
+```typescript
 {
    "event": "phx_reply",
+   "topic": string,
    "payload": {
       "response": {
          "postgres_changes": [
             {
-               "id": 13399220,
-               "event": "*",
-               "filter": $FILTER,
-               "schema": $SCHEMA,
-               "table": $TABLE
+               "id": number,
+               "event": "*" | "INSERT" | "UPDATE" | "DELETE",
+               "schema": string,
+               "table": string,
+               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" +  '.' + string
             }
          ]
       },
-      "status": "ok"
+      "status": "ok" | "error"
    },
-   "ref": $REF_NUMBER,
-   "topic": $TOPIC
+   "ref": string
 }
 ```
 
@@ -66,17 +66,17 @@ In response, the server sends the Postgres configuration with a unique ID. With 
 System message are used to inform a client about the status of the Postgres subscription. The `payload.status` indicates if the subscription successful or not.
 The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscribing to PostgreSQL failed" with subscription params.
 
-```json
+```typescript
 {
    "event": "system",
+   "topic": string,   
    "payload":{
       "channel": "any",
       "extension": "postgres_changes",
-      "message": $MESSAGE,
+      "message": "Subscribed to PostgreSQL" | "Subscribing to PostgreSQL failed",
       "status": "ok" | "error"
    },
-   "ref":null,
-   "topic": $TOPIC
+   "ref": null,
 }
 ```
 
@@ -84,12 +84,12 @@ The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscrib
 
 The heartbeat message should be sent every 60 seconds to avoid a connection timeout.
 
-```json
+```typescript
 {
+   "event": "heartbeat",   
    "topic": "phoenix",
-   "event": "heartbeat",
    "payload": {},
-   "ref": $REF_NUMBER
+   "ref": string
 }
 ```
 
@@ -97,13 +97,56 @@ The heartbeat message should be sent every 60 seconds to avoid a connection time
 
 To update the access token, you need to send to the server a message specifying a new token in the `payload.access_token` value.
 
-```json
+
+```typescript
 {
-   "topic": $TOPIC,
-   "event": "access_token",
+   "event": "access_token",   
+   "topic": string,
    "payload":{
-      "access_token": $NEW_JWT_TOKEN
+      "access_token": string
    },
-   "ref": $REF_NUMBER
+   "ref": string
+}
+```
+
+## Postgres CDC message
+
+Realtime sends a message with the following structure
+
+```typescript
+{
+   "event": "postgres_changes",
+   "topic": string,   
+   "payload": {
+      "data": { 
+         "columns": Array<{name: string, type: string}>,
+         "commit_timestamp": string,
+         "errors": null | string,
+         "old_record": {"id": number | string}, 
+         "record": {[key: string]: boolean | number | string | null}, 
+         "type": "*" | "INSERT" | "UPDATE" | "DELETE",
+         "schema": string,
+         "table": string
+      },
+      "ids": Array<number>
+   },
+   "ref": null
+}
+```
+
+## Broadcast message
+
+Structure of the broadcast event
+
+```typescript
+{
+   "event": "broadcast",
+   "topic": string,
+   "payload": {
+      "event": string,
+      "payload": {[key: string]: boolean | number | string | null | undefined},
+      "type": "broadcast"
+   },
+   "ref": null
 }
 ```
