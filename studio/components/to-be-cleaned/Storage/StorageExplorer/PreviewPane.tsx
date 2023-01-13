@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash'
 import {
   Button,
   IconX,
@@ -11,13 +12,13 @@ import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
 import Link from 'next/link'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-const PreviewFile = ({ mimeType, previewUrl }) => {
+const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
   if (!mimeType || !previewUrl) {
     return (
       <SVG
         src={'/img/file-filled.svg'}
-        alt={'No preview'}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
         }
@@ -36,7 +37,6 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
           src={'/img/file-filled.svg'}
-          alt={'No preview'}
           preProcessor={(code) =>
             code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
           }
@@ -80,7 +80,6 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
   return (
     <SVG
       src={'/img/file-filled.svg'}
-      alt={'No preview'}
       preProcessor={(code) =>
         code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
       }
@@ -88,14 +87,17 @@ const PreviewFile = ({ mimeType, previewUrl }) => {
   )
 }
 
-const PreviewPane = ({
-  isOpen = false,
-  file = {},
-  width = 400,
-  onCopyFileURL = () => {},
-  onSelectFileDelete = () => {},
-  onClosePreviewPane = () => {},
-}) => {
+const PreviewPane = () => {
+  const storageExplorerStore = useStorageStore()
+  const {
+    selectedFilePreview: file,
+    copyFileURLToClipboard,
+    closeFilePreview,
+    setSelectedItemsToDelete,
+  } = storageExplorerStore
+
+  const width = 450
+  const isOpen = !isEmpty(file)
   const size = file.metadata ? formatBytes(file.metadata.size) : null
   const mimeType = file.metadata ? file.metadata.mimetype : null
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
@@ -123,7 +125,7 @@ const PreviewPane = ({
             className="cursor-pointer"
             size={14}
             strokeWidth={2}
-            onClick={onClosePreviewPane}
+            onClick={() => closeFilePreview()}
           />
         </div>
 
@@ -182,7 +184,7 @@ const PreviewPane = ({
             <Button
               type="outline"
               icon={<IconClipboard size={16} strokeWidth={2} />}
-              onClick={() => onCopyFileURL(file)}
+              onClick={async () => await copyFileURLToClipboard(file)}
               disabled={file.isCorrupted}
             >
               Copy URL
@@ -193,7 +195,7 @@ const PreviewPane = ({
             shadow={false}
             size="tiny"
             icon={<IconTrash2 size={16} strokeWidth={2} />}
-            onClick={() => onSelectFileDelete(file)}
+            onClick={() => setSelectedItemsToDelete([file])}
           >
             Delete file
           </Button>

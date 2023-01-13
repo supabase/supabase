@@ -29,13 +29,14 @@ export default function JSReference(props) {
         spec={spec}
         typeSpec={typeSpec}
         pageProps={props}
+        type="client-lib"
       />
     </>
   )
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/dart', '/dart')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/dart')
 }
 
 export function getStaticPaths() {
