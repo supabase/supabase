@@ -361,7 +361,7 @@ functions:
 
   - id: invoke
     title: invoke()
-    slug: auth-admin-invoke
+    slug: functions-invoke
     product: 'functions'
 
   - id: stream
