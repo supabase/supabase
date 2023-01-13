@@ -421,12 +421,13 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
-    { name: 'Overview', url: '/guides/functions/overview', items: [] },
+    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CORS', url: '/guides/functions/cors', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
+    { name: 'Debugging', url: '/guides/functions/debugging', items: [] },
+    { name: 'Local Development', url: '/guides/functions/local-development', items: [] },
     { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
-    { name: 'Testing & Debugging', url: '/guides/functions/testing-debugging', items: [] },
     { name: 'Tips', url: '/guides/functions/tips', items: [] },
     {
       name: 'Examples',
