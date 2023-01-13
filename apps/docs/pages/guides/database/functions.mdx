@@ -88,9 +88,8 @@ Reference: [rpc()](../../reference/javascript/rpc)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
-  .rpc('hello_world')
-  .execute();
+final data = await supabase
+  .rpc('hello_world');
 ```
 
 Reference: [rpc()](../../reference/dart/rpc)
@@ -199,10 +198,9 @@ const { data, error } = supabase.rpc('get_planets').eq('id', 1)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
+final data = await supabase
   .rpc('get_planets')
-  .eq('id', 1)
-  .execute();
+  .eq('id', 1);
 ```
 
 </TabPanel>
@@ -254,9 +252,8 @@ const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
-  .rpc('add_planet', params: { 'name': 'Jakku' })
-  .execute();
+final data = await supabase
+  .rpc('add_planet', params: { 'name': 'Jakku' });
 ```
 
 </TabPanel>
