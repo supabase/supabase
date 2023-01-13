@@ -112,7 +112,7 @@ const FeedbackWidget: FC<Props> = ({
   }
 
   return (
-    <div id="feedback-widget">
+    <div id="feedback-widget" className="text-area-text-sm">
       <Input.TextArea
         className="w-80 p-3"
         size="small"
