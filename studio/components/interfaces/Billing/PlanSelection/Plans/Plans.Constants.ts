@@ -55,7 +55,7 @@ export const PRICING_META = {
   [STRIPE_PRODUCT_IDS.TEAM]: {
     new: true,
     name: 'Team',
-    description: 'For collaborative teams with different permissions and access.',
+    description: 'Collaborate with different permissions and access patterns.',
     priceMonthly: 599,
     priceUnit: 'per month per organization',
     warning: '+ usage',
