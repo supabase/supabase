@@ -4,8 +4,7 @@ import { values, mapValues } from 'lodash'
 import { OpenAPIV3 } from 'openapi-types'
 import { flattenSections } from '../helpers'
 
-export function extractTsDocNode(nodeToFind: string, definition: any) {
-  const nodePath = nodeToFind.split('.')
+export function extractTsDocNode(nodePath: string[], definition: any) {
   let i = 0
   let previousNode = definition
   let currentNode = definition
@@ -22,7 +21,7 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
   return currentNode
 }
 
-export function generateParameters(tsDefinition: any) {
+export function generateParameters(tsDefinition: any, signatureIdx: number = -1) {
   let functionDeclaration = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
@@ -31,9 +30,10 @@ export function generateParameters(tsDefinition: any) {
   } else functionDeclaration = tsDefinition?.type?.declaration
   if (!functionDeclaration) return ''
 
-  // Functions can have multiple signatures - select the last one since that
+  // Functions can have multiple signatures - defaults to the last one since that
   // tends to be closer to primitive types (citation needed).
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1).parameters
+  const paramDefinitions: TsDoc.TypeDefinition[] =
+    functionDeclaration.signatures?.at(signatureIdx)?.parameters
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
