@@ -226,7 +226,8 @@ Replace the contents of `supabase/functions/notify/index.ts` with the following
 
 ```tsx
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import * as OneSignal from 'https://esm.sh/@onesignal/node-onesignal@1.0.0-beta7'
+export * from "https://esm.sh/v102/@onesignal/node-onesignal@1.0.0-beta7/deno/node-onesignal.js";
+export { default } from "https://esm.sh/v102/@onesignal/node-onesignal@1.0.0-beta7/deno/node-onesignal.js";
 
 const _OnesignalAppId_ = Deno.env.get('ONESIGNAL_APP_ID')!
 const _OnesignalUserAuthKey_ = Deno.env.get('USER_AUTH_KEY')!
