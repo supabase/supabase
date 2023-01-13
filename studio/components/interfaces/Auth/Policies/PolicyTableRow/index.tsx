@@ -41,9 +41,13 @@ const PolicyTableRow: FC<Props> = ({
       {policies.length === 0 && (
         <div className="p-4 px-6 space-y-1">
           <p className="text-scale-1100 text-sm">No policies created yet</p>
-          {table.rls_enabled && (
+          {table.rls_enabled ? (
             <p className="text-scale-1000 text-sm">
-              As RLS has been enabled, all normal access to this table must be allowed by a policy.
+              RLS is enabled - create a policy to allow access to this table.
+            </p>
+          ) : (
+            <p className="text-amber-900 text-sm opacity-50">
+              Warning: RLS is disabled - anonymous access is allowed to this table
             </p>
           )}
         </div>
