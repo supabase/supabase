@@ -137,7 +137,7 @@ const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
         <div className="flex-grow">
           <ProductEmptyState
             size="large"
-            title="Postgres Policies"
+            title="Row-Level Security (RLS) Policies"
             ctaButtonLabel="Create a table"
             infoButtonLabel="What is RLS?"
             infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
@@ -161,8 +161,7 @@ const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
                 }
               />
               <p className="text-sm text-scale-1100">
-                A table within this schema is required before you can create a Row-Level Security
-                policy.
+                Create a table in this schema first before creating a policy.
               </p>
             </div>
           </ProductEmptyState>
