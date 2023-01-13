@@ -177,6 +177,7 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
