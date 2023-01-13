@@ -75,6 +75,7 @@ const DocView: FC<any> = observer(({}) => {
   const API_KEY = data?.autoApiService?.defaultApiKey
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
+  const selectedSchema = data?.autoApiService?.app_config?.db_schema
 
   const canReadServiceKey = checkPermissions(
     PermissionAction.READ,
@@ -88,9 +89,18 @@ const DocView: FC<any> = observer(({}) => {
     (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
   )
 
+  const { meta } = useStore()
+
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
   }, [jsonSchema])
+
+  useEffect(() => {
+    const fetchViews = async (selectedSchema: string) => {
+      await meta.schemas.loadViews(selectedSchema)
+    }
+    if (selectedSchema) fetchViews(selectedSchema)
+  }, [selectedSchema])
 
   const refreshDocs = async () => {
     // A bit hacky calling coding this up twice - at some point we should move this function
@@ -127,6 +137,8 @@ const DocView: FC<any> = observer(({}) => {
   const { paths, definitions } = PageState.jsonSchema
 
   const PAGE_KEY: any = resource || rpc || page || 'index'
+
+  const resourceIsView = meta.schemas.views?.some((view) => view.name === resource)
 
   return (
     <div className="Docs h-full w-full overflow-y-auto" key={PAGE_KEY}>
@@ -216,6 +228,7 @@ const DocView: FC<any> = observer(({}) => {
               paths={paths}
               showApiKey={showApiKey.key}
               refreshDocs={refreshDocs}
+              isView={resourceIsView}
             />
           ) : rpc ? (
             <RpcContent
