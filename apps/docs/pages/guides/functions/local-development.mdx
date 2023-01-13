@@ -1,19 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'functions-testing-debugging',
-  title: 'Testing and Debugging Functions',
-  description: 'Test and debug functions locally and in production.',
+  id: 'functions-local-development',
+  title: 'Local Development',
+  description: 'Run your functions locally.',
 }
-
-You can debug your deployed Edge Functions using the "Functions" section of the Dashboard. There are two types debugging tools available:
-
-- Invocations: shows the Request and Response for each execution.
-- Logs: shows any platform events, including deployments and errors.
-
-![Function invocations.](/docs/img/guides/functions/function-logs.png)
-
-## Develop locally
 
 You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
 
@@ -26,7 +17,7 @@ The `functions serve` command has hot-reloading capabilities. It will watch for 
 
 ### Invoke functions locally
 
-While serving your local Function, you can execute it using curl:
+While serving your local Function, you can invoke it using curl:
 
 ```bash
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
@@ -35,20 +26,34 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
   --data '{ "name":"Functions" }'
 ```
 
+or using one of the [client libraries](/docs#reference-documentation), e.g. using [supabase-js](/docs/reference/javascript/functions-invoke):
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Use the credentials outputted in your terminal when running `supabase start`
+const supabase = createClient(
+  'http://localhost:54321',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+)
+
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+})
+```
+
 You should see the response `{ "message":"Hello Functions!" }`.
 
-<details>
-<summary>Implementation details</summary>
+If you execute Function with a different payload the response will change. <br />
+Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
+
+<Admonition type="note">
 
 - Edge Functions don't serve HTML content (`GET` requests that return `text/html` are rewritten to `text/plain`).
 - The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
 - The Function is proxied through the local API (`http://localhost:54321`)
 
-</details>
-<br />
-
-If you execute Function with a different payload the response will change. <br />
-Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
+</Admonition>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
