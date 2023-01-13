@@ -1,8 +1,8 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import { SchemaView } from 'types'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
 
-export default class ForeignTableStore extends PostgresMetaInterface<Partial<PostgresTable>> {
+export default class ViewStore extends PostgresMetaInterface<SchemaView> {
   constructor(
     rootStore: IRootStore,
     dataUrl: string,
@@ -12,10 +12,5 @@ export default class ForeignTableStore extends PostgresMetaInterface<Partial<Pos
     options?: { identifier: string }
   ) {
     super(rootStore, dataUrl, headers, options)
-  }
-
-  // loadBySchema is not supported in this store
-  async loadBySchema(schema: string) {
-    return []
   }
 }

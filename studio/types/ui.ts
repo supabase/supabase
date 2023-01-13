@@ -1,3 +1,5 @@
+import { PostgresColumn } from '@supabase/postgres-meta'
+
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'
   message: string // Readable message for users to understand
@@ -33,6 +35,10 @@ export interface VaultSecret {
 }
 
 export interface SchemaView {
+  id: number
   name: string
   schema: string
+  is_updatable: boolean
+  comment?: string
+  columns: PostgresColumn[]
 }
