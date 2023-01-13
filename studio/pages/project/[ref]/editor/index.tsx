@@ -55,7 +55,7 @@ const Editor: NextPage = () => {
         category: 'success',
         message: `Successfully deleted ${selectedTableToDelete!.name}`,
       })
-      await meta.schemas.loadViews(selectedSchema)
+      await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
