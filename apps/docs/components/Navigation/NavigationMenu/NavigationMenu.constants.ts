@@ -423,12 +423,12 @@ export const functions = {
   items: [
     { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
-    { name: 'CORS', url: '/guides/functions/cors', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
+    { name: 'CORS', url: '/guides/functions/cors', items: [] },
     { name: 'Debugging', url: '/guides/functions/debugging', items: [] },
+    { name: 'Import Maps', url: '/guides/functions/import-maps', items: [] },
     { name: 'Local Development', url: '/guides/functions/local-development', items: [] },
     { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
-    { name: 'Tips', url: '/guides/functions/tips', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
