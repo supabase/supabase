@@ -1,12 +1,18 @@
 import { isEmpty } from 'lodash'
+import { useState } from 'react'
 import {
   Button,
+  Dropdown,
+  Form,
   IconX,
   IconLoader,
   IconClipboard,
   IconDownload,
   IconTrash2,
   IconAlertCircle,
+  IconChevronDown,
+  Modal,
+  Input,
 } from 'ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
@@ -90,11 +96,14 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
 const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
+    selectedBucket,
     selectedFilePreview: file,
     copyFileURLToClipboard,
     closeFilePreview,
     setSelectedItemsToDelete,
   } = storageExplorerStore
+
+  const [showExpiryInput, setShowExpiryInput] = useState(false)
 
   const width = 450
   const isOpen = !isEmpty(file)
@@ -104,104 +113,200 @@ const PreviewPane = () => {
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
   return (
-    <Transition
-      show={isOpen}
-      enter="transition ease-out duration-150"
-      enterFrom="transform opacity-0"
-      enterTo="transform opacity-100"
-      leave="transition ease-in duration-100"
-      leaveFrom="transform opacity-100"
-      leaveTo="transform opacity-0"
-    >
-      <div
-        className="
+    <>
+      <Transition
+        show={isOpen}
+        enter="transition ease-out duration-150"
+        enterFrom="transform opacity-0"
+        enterTo="transform opacity-100"
+        leave="transition ease-in duration-100"
+        leaveFrom="transform opacity-100"
+        leaveTo="transform opacity-0"
+      >
+        <div
+          className="
         h-full border-l
         border-panel-border-light bg-panel-header-light p-4 dark:border-panel-border-dark dark:bg-panel-header-dark"
-        style={{ width }}
-      >
-        {/* Preview Header */}
-        <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
-          <IconX
-            className="cursor-pointer"
-            size={14}
-            strokeWidth={2}
-            onClick={() => closeFilePreview()}
-          />
-        </div>
-
-        {/* Preview Thumbnail*/}
-        <div className="my-4 border border-panel-border-light dark:border-panel-border-dark">
-          <div className="flex h-56 w-full items-center 2xl:h-72">
-            <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
+          style={{ width }}
+        >
+          {/* Preview Header */}
+          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
+            <IconX
+              className="cursor-pointer"
+              size={14}
+              strokeWidth={2}
+              onClick={() => closeFilePreview()}
+            />
           </div>
-        </div>
 
-        <div className="w-full space-y-6">
-          {/* Preview Information */}
-          <div className="space-y-1">
-            <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
-            {file.isCorrupted && (
-              <div className="flex items-center space-x-2">
-                <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
+          {/* Preview Thumbnail*/}
+          <div className="my-4 border border-panel-border-light dark:border-panel-border-dark">
+            <div className="flex h-56 w-full items-center 2xl:h-72">
+              <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
+            </div>
+          </div>
+
+          <div className="w-full space-y-6">
+            {/* Preview Information */}
+            <div className="space-y-1">
+              <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
+              {file.isCorrupted && (
+                <div className="flex items-center space-x-2">
+                  <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
+                  <p className="text-sm text-scale-1100">
+                    File is corrupted, please delete and reupload this file again
+                  </p>
+                </div>
+              )}
+              {mimeType && (
                 <p className="text-sm text-scale-1100">
-                  File is corrupted, please delete and reupload this file again
+                  {mimeType}
+                  {size && <span> - {size}</span>}
                 </p>
+              )}
+            </div>
+
+            {/* Preview Metadata */}
+            <div className="space-y-2">
+              <div>
+                <label className="mb-1 text-xs text-scale-900">Added on</label>
+                <p className="text-sm text-scale-1100">{createdAt}</p>
               </div>
-            )}
-            {mimeType && (
-              <p className="text-sm text-scale-1100">
-                {mimeType}
-                {size && <span> - {size}</span>}
-              </p>
-            )}
-          </div>
-
-          {/* Preview Metadata */}
-          <div className="space-y-2">
-            <div>
-              <label className="mb-1 text-xs text-scale-900">Added on</label>
-              <p className="text-sm text-scale-1100">{createdAt}</p>
+              <div>
+                <label className="mb-1 text-xs text-scale-900">Last modified</label>
+                <p className="text-sm text-scale-1100">{updatedAt}</p>
+              </div>
             </div>
-            <div>
-              <label className="mb-1 text-xs text-scale-900">Last modified</label>
-              <p className="text-sm text-scale-1100">{updatedAt}</p>
-            </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
-            <Link href={`${file.previewUrl}&download`}>
-              <a>
+            {/* Actions */}
+            <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
+              <Link href={`${file.previewUrl}&download`}>
+                <a>
+                  <Button
+                    type="default"
+                    icon={<IconDownload size={16} strokeWidth={2} />}
+                    disabled={file.isCorrupted}
+                  >
+                    Download
+                  </Button>
+                </a>
+              </Link>
+              {selectedBucket.public ? (
                 <Button
-                  type="default"
-                  icon={<IconDownload size={16} strokeWidth={2} />}
+                  type="outline"
+                  icon={<IconClipboard size={16} strokeWidth={2} />}
+                  onClick={async () => await copyFileURLToClipboard(file)}
                   disabled={file.isCorrupted}
                 >
-                  Download
+                  Copy URL
                 </Button>
-              </a>
-            </Link>
+              ) : (
+                <Dropdown
+                  side="bottom"
+                  align="center"
+                  overlay={[
+                    <Dropdown.Item
+                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 7)}
+                    >
+                      Expire in 1 week
+                    </Dropdown.Item>,
+                    <Dropdown.Item
+                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 30)}
+                    >
+                      Expire in 1 month
+                    </Dropdown.Item>,
+                    <Dropdown.Item
+                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 365)}
+                    >
+                      Expire in 1 year
+                    </Dropdown.Item>,
+                    <Dropdown.Item onClick={() => setShowExpiryInput(true)}>
+                      Custom expiry
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    type="outline"
+                    icon={<IconClipboard size={16} strokeWidth={2} />}
+                    iconRight={<IconChevronDown />}
+                    disabled={file.isCorrupted}
+                  >
+                    Get Signed URL
+                  </Button>
+                </Dropdown>
+              )}
+            </div>
             <Button
               type="outline"
-              icon={<IconClipboard size={16} strokeWidth={2} />}
-              onClick={async () => await copyFileURLToClipboard(file)}
-              disabled={file.isCorrupted}
+              shadow={false}
+              size="tiny"
+              icon={<IconTrash2 size={16} strokeWidth={2} />}
+              onClick={() => setSelectedItemsToDelete([file])}
             >
-              Copy URL
+              Delete file
             </Button>
           </div>
-          <Button
-            type="outline"
-            shadow={false}
-            size="tiny"
-            icon={<IconTrash2 size={16} strokeWidth={2} />}
-            onClick={() => setSelectedItemsToDelete([file])}
-          >
-            Delete file
-          </Button>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+      <Modal
+        hideFooter
+        size="small"
+        header="Custom expiry for signed URL"
+        visible={showExpiryInput}
+        alignFooter="right"
+        confirmText="Get signed URL"
+        onCancel={() => setShowExpiryInput(false)}
+      >
+        <Form
+          validateOnBlur
+          initialValues={{ expiresIn: '' }}
+          onSubmit={async (values: any, { setSubmitting }: any) => {
+            setSubmitting(true)
+            await copyFileURLToClipboard(file, values.expiresIn)
+            setSubmitting(false)
+            setShowExpiryInput(false)
+          }}
+          validate={(values: any) => {
+            const errors: any = {}
+            if (values.expiresIn !== '' && values.expiresIn <= 0)
+              errors.expiresIn = 'Expiry duration cannot be less than 0'
+            return errors
+          }}
+        >
+          {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
+            <>
+              <div className="py-6">
+                <Modal.Content>
+                  <Input
+                    disabled={isSubmitting}
+                    type="number"
+                    id="expiresIn"
+                    label="Enter the duration for which the URL will be valid for"
+                    actions={<p className="text-sm text-scale-1000 mr-2">seconds</p>}
+                  />
+                </Modal.Content>
+              </div>
+              <Modal.Separator />
+              <Modal.Content>
+                <div className="flex items-center justify-end space-x-2 pt-1 pb-3">
+                  <Button type="default" onClick={() => setShowExpiryInput(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={values.expiresIn === '' || isSubmitting}
+                    loading={isSubmitting}
+                    htmlType="submit"
+                    type="primary"
+                  >
+                    Get signed URL
+                  </Button>
+                </div>
+              </Modal.Content>
+            </>
+          )}
+        </Form>
+      </Modal>
+    </>
   )
 }
 
