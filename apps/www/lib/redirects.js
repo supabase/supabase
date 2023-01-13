@@ -1556,6 +1556,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/best-practices',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },

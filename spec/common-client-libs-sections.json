@@ -650,7 +650,7 @@
       {
         "id": "invoke",
         "title": "Invoke a function",
-        "slug": "auth-admin-invoke",
+        "slug": "functions-invoke",
         "product": "functions",
         "type": "function"
       }
