@@ -1,0 +1,19 @@
+name: Check Code with Prettier
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run TypeScript type check
+        run: npx turbo run type-check

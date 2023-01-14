@@ -7,6 +7,7 @@
     "build": "npm run generate:all && next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "postbuild": "ts-node ./scripts/build-search.ts && node ./internals/generate-sitemap.mjs",
     "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2 gen:realtime",
