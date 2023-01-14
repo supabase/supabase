@@ -763,13 +763,13 @@ export const reference_javascript_v2 = {
 
 export const reference_dart_v0 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
