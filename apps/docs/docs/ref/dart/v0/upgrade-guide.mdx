@@ -4,22 +4,34 @@ title: Upgrade to supabase-flutter v1
 description: 'Learn how to upgrade to supabase-flutter v1.'
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-
-supabase-flutter focuses on improving the developer experience and making it easier to use. This guide will help you upgrade from supabase-flutter v0 to v1.
+supabase-flutter focuses on improving the developer experience and making it easier to use. This guide demonstrates how to upgrade from supabase-flutter v0 to v1.
 
 ## Upgrade the client library
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 Update the package in your pubspec.yaml file.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 ```yaml
 supabase_flutter: ^1.0.0
 ```
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ## Error handling
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 The way supabase-flutter throws error has changed in v1. In v0, errors were returned as a response. In v1, errors are thrown as exceptions. This makes it more intuitive as a Flutter developer to handle errors.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -52,11 +64,20 @@ try {
 </TabPanel>
 </Tabs>
 
-## Auth classes / methods
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Auth classes and methods
 
 ### Usage of `SupabaseAuthState` and `SupabaseAuthRequiredState` classes
 
-In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `SupabaseAuthState` and `SupabaseAuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](/docs/reference/dart/upgrade-guide#listening-to-auth-state-change) can be used to action on auth state change.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `SupabaseAuthState` and `SupabaseAuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](#listening-to-auth-state-change) can be used to action on auth state change.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -97,9 +118,18 @@ await Supabase.initialize(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ### Listening to auth state change
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 `onAuthStateChange` now returns a `Stream`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -135,9 +165,18 @@ authSubscription.cancel();
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ### Sign in with email and password
 
-The signIn() method has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+`signIn()` has been deprecated in favor of more explicit method signatures to help with type hinting. Previously it was difficult for developers to know what they were missing (e.g., a lot of developers didn't realize they could use passwordless magic links).
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -161,7 +200,16 @@ await supabase.auth.signInWithPassword(email: email, password: password);
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Sign in with magic link
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -185,7 +233,16 @@ await supabase.auth.signInWithOtp(email: email);
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Sign in with a third-party OAuth provider
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -218,7 +275,16 @@ await supabase.auth.signInWithOAuth(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Sign in with phone
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -248,7 +314,16 @@ await supabase.auth.signInWithPassword(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Sign in with phone using OTP
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -281,7 +356,16 @@ await supabase.auth.verifyOTP(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Reset password for email
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -312,7 +396,16 @@ await supabase.auth.resetPasswordForEmail(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Get the user's current session
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -336,7 +429,16 @@ final Session? session = supabase.auth.currentSession;
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Get the logged-in user
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -360,7 +462,16 @@ final User? user = supabase.auth.currentUser;
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Update user data for a logged-in user
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -390,15 +501,22 @@ await supabase.updateUser(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ## Data methods
 
-`.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default.
+`.insert()` / `.upsert()` / `.update()` / `.delete()` no longer return rows by default. Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
 
-Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
+Also, calling `.execute()` at the end of the query was a requirement in v0, but deprecated in v1.
 
-Also, calling `.execute()` at the end of the query was a requirement in v0, but in v1 `.execute` is deperecated.
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
 ### Insert without returning inserted data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -426,7 +544,16 @@ await supabase.from('my_table').insert(data);
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Insert with returning inserted data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -453,11 +580,20 @@ final insertedData = await supabase.from('my_table').insert(data).select();
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ## Realtime methods
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
 
 ### Stream
 
 `.stream()` no longer needs the `.execute()` at the end. Also, filtering by `eq` is a lot easier now. `primaryKey` is now a named parameter to make it more obvious what to pass.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -486,7 +622,16 @@ supabase.from('my_table')
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Subscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -522,7 +667,16 @@ channel.on(
 </TabPanel>
 </Tabs>
 
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
 ### Unsubscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
 
 <Tabs
   scrollable
@@ -545,3 +699,6 @@ await supabase.removeChannel(channel);
 
 </TabPanel>
 </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
