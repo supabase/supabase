@@ -215,8 +215,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
-        with:
-          version: 1.0.0
 
       - name: Start Supabase local development setup
         run: supabase start
@@ -256,8 +254,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
-        with:
-          version: 1.0.0
 
       - run: |
           supabase link --project-ref $STAGING_PROJECT_ID
@@ -289,8 +285,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
-        with:
-          version: 1.0.0
 
       - run: |
           supabase link --project-ref $PRODUCTION_PROJECT_ID
