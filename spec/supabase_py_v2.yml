@@ -170,7 +170,7 @@ functions:
           loop.close()
           ```
 
-  - id: list_buckets()
+  - id: list-buckets
     title: 'list_buckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
@@ -245,7 +245,7 @@ functions:
           res = supabase.storage().delete_bucket(name)
           ```
 
-  - id: storage.from_.upload()
+  - id: from-upload
     title: 'from_.upload()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
@@ -256,11 +256,11 @@ functions:
     examples:
       - name: Upload file using filepath
         code: |
-          ```python3
+          ```
           with open(source, 'rb+') as f:
             res = supabase.storage().from_('bucket').upload(destination, os.path.abspath(source))
           ```
-  - id: storage.from_.move()
+  - id: from-move
     title: 'from_.move()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
@@ -271,7 +271,7 @@ functions:
     examples:
       - name: Move file
         code: |
-          ```py
+          ```
           res = supabase.storage().from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
           ```
 
@@ -306,7 +306,7 @@ functions:
           res = supabase.storage().from_(bucket_name).get_public_url('test/avatar1.jpg')
           ```
 
-  - id: storage.from_.download()
+  - id: from-download
     title: 'from_.download()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
@@ -323,7 +323,7 @@ functions:
             f.write(res)
           ```
 
-  - id: storage.from_.remove()
+  - id: from-remove
     title: 'from_.remove()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
@@ -337,7 +337,6 @@ functions:
           ```
           res = supabase.storage().from_('test').remove('test.jpg')
           ```
-
   - id: from-list
     title: 'from_.list()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
@@ -352,3 +351,8 @@ functions:
           ```
           res = supabase.storage().from_('test').list()
           ```
+  - id: subscribe
+    title: on().subscribe()
+    $ref: '@supabase/realtime-js.RealtimeChannel.on'
+    notes: |
+      - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community) repository.
