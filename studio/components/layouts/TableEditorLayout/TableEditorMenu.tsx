@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -9,6 +9,7 @@ import {
   IconCopy,
   IconEdit,
   IconLoader,
+  IconLock,
   IconRefreshCw,
   IconSearch,
   IconTrash,
@@ -22,7 +23,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import { SchemaView } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore, useParams } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
 interface Props {
@@ -43,9 +44,8 @@ const TableEditorMenu: FC<Props> = ({
   onDuplicateTable = () => {},
 }) => {
   const { meta, ui } = useStore()
-  const { id } = useParams()
+  const { id, ref } = useParams()
 
-  const projectRef = ui.selectedProject?.ref
   const schemas: PostgresSchema[] = meta.schemas.list()
   const tables: PostgresTable[] = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedSchema
@@ -258,7 +258,7 @@ const TableEditorMenu: FC<Props> = ({
                   return (
                     <ProductMenuItem
                       key={table.name}
-                      url={`/project/${projectRef}/editor/${table.id}`}
+                      url={`/project/${ref}/editor/${table.id}`}
                       name={table.name}
                       hoverText={table.comment ? table.comment : table.name}
                       isActive={isActive}
@@ -284,6 +284,13 @@ const TableEditorMenu: FC<Props> = ({
                               >
                                 Duplicate Table
                               </Dropdown.Item>,
+                              <Link href={`/project/${ref}/auth/policies?search=${table.id}`}>
+                                <a>
+                                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
+                                    View Policies
+                                  </Dropdown.Item>
+                                </a>
+                              </Link>,
                               <Dropdown.Separator key="separator" />,
                               <Dropdown.Item
                                 key="delete-table"
@@ -323,7 +330,7 @@ const TableEditorMenu: FC<Props> = ({
               {filteredViews.map((view: SchemaView) => {
                 const isActive = Number(id) === view.id
                 return (
-                  <Link key={view.id} href={`/project/${projectRef}/editor/${view.id}?type=view`}>
+                  <Link key={view.id} href={`/project/${ref}/editor/${view.id}?type=view`}>
                     <a>
                       <Menu.Item key={view.id} rounded active={isActive}>
                         <div className="flex justify-between">
@@ -355,10 +362,7 @@ const TableEditorMenu: FC<Props> = ({
               {filteredForeignTables.map((table: Partial<PostgresTable>) => {
                 const isActive = Number(id) === table.id
                 return (
-                  <Link
-                    key={table.id}
-                    href={`/project/${projectRef}/editor/${table.id}?type=foreign`}
-                  >
+                  <Link key={table.id} href={`/project/${ref}/editor/${table.id}?type=foreign`}>
                     <a>
                       <Menu.Item key={table.id} rounded active={isActive}>
                         <div className="flex justify-between">
