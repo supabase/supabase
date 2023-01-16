@@ -122,6 +122,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                         ? 'ts'
                         : example?.code?.startsWith('```dart')
                         ? 'dart'
+                        : example?.code?.startsWith('```c#')
+                        ? 'c#'
                         : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
