@@ -665,7 +665,7 @@ launch week
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-@variants dark {
+@layer utilities {
   .gradient-text-brand-100 {
     background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
   }
