@@ -1,22 +1,35 @@
 import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, Modal } from 'ui'
-import { useFlag } from 'hooks'
+import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
 import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface Props {}
 
 const RolesHelperModal: FC<Props> = ({}) => {
   const [showModal, setShowModal] = useState(false)
-  const enableBillingOnlyReadOnlyRoles = useFlag('enableBillingOnlyReadOnlyRoles')
 
-  const permissionColumnClassName = [
-    `${enableBillingOnlyReadOnlyRoles ? 'w-[40%]' : 'w-[49%]'}`,
-    'text-sm pl-4 font-bold',
-  ].join(' ')
-  const roleColumnClassName = [
-    `${enableBillingOnlyReadOnlyRoles ? 'w-[12%]' : 'w-[17%]'}`,
-    'text-sm h-8 flex items-center justify-center border-l border-scale-600 font-bold',
-  ].join(' ')
+  const permissionColumnClassName = 'w-[40%] text-sm pl-4 font-bold'
+  const roleColumnClassName =
+    'w-[12%] text-sm h-8 flex items-center justify-center border-l border-scale-600 font-bold'
+
+  const accessTooltip = (
+    <Tooltip.Root delayDuration={0}>
+      <Tooltip.Trigger>
+        <IconInfo size={14} strokeWidth={2} />
+      </Tooltip.Trigger>
+      <Tooltip.Content side="top">
+        <Tooltip.Arrow className="radix-tooltip-arrow" />
+        <div
+          className={[
+            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+            'border border-scale-200 ', //border
+          ].join(' ')}
+        >
+          <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+        </div>
+      </Tooltip.Content>
+    </Tooltip.Root>
+  )
 
   return (
     <>
@@ -30,7 +43,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
         closable
         hideFooter
         visible={showModal}
-        size={enableBillingOnlyReadOnlyRoles ? 'xxlarge' : 'xlarge'}
+        size={'xxlarge'}
         header="Permissions for each role"
         onCancel={() => setShowModal(!showModal)}
       >
@@ -48,12 +61,8 @@ const RolesHelperModal: FC<Props> = ({}) => {
                 <div className={roleColumnClassName}>Owner</div>
                 <div className={roleColumnClassName}>Adminstrator</div>
                 <div className={roleColumnClassName}>Developer</div>
-                {enableBillingOnlyReadOnlyRoles && (
-                  <div className={roleColumnClassName}>Read-only</div>
-                )}
-                {enableBillingOnlyReadOnlyRoles && (
-                  <div className={roleColumnClassName}>Billing-only</div>
-                )}
+                <div className={roleColumnClassName}>Read-only&nbsp;{accessTooltip}</div>
+                <div className={roleColumnClassName}>Billing-only&nbsp;{accessTooltip}</div>
               </div>
 
               <div className="max-h-[425px] overflow-y-auto">
@@ -77,20 +86,14 @@ const RolesHelperModal: FC<Props> = ({}) => {
                         <div className={roleColumnClassName}>
                           {action.permissions.developer && <IconCheck size={14} strokeWidth={2} />}
                         </div>
-                        {enableBillingOnlyReadOnlyRoles && (
-                          <div className={roleColumnClassName}>
-                            {action.permissions.read_only && (
-                              <IconCheck size={14} strokeWidth={2} />
-                            )}
-                          </div>
-                        )}
-                        {enableBillingOnlyReadOnlyRoles && (
-                          <div className={roleColumnClassName}>
-                            {action.permissions.billing_only && (
-                              <IconCheck size={14} strokeWidth={2} />
-                            )}
-                          </div>
-                        )}
+                        <div className={roleColumnClassName}>
+                          {action.permissions.read_only && <IconCheck size={14} strokeWidth={2} />}
+                        </div>
+                        <div className={roleColumnClassName}>
+                          {action.permissions.billing_only && (
+                            <IconCheck size={14} strokeWidth={2} />
+                          )}
+                        </div>
                       </div>
                     ))}
                   </Fragment>

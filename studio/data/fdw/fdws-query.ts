@@ -5,11 +5,14 @@ export const getFDWsSql = () => {
   const sql = /* SQL */ `
     select
       s.oid as "id",
-      s.srvname as "name",
+      w.fdwname as "name",
+      s.srvname as "server_name",
+      s.srvoptions as "server_options",
+      c.proname as "handler",
       (
         select jsonb_agg(
           jsonb_build_object(
-            'id', c.oid,
+            'id', c.oid::bigint,
             'schema', relnamespace::regnamespace::text,
             'name', c.relname,
             'columns', (
@@ -21,13 +24,17 @@ export const getFDWsSql = () => {
               )
               from pg_catalog.pg_attribute a
               where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-            )
+            ),
+            'options', t.ftoptions
           )
         )
         from pg_catalog.pg_class c
+        join pg_catalog.pg_foreign_table t on c.oid = t.ftrelid
         where c.oid = any (select t.ftrelid from pg_catalog.pg_foreign_table t where t.ftserver = s.oid)
       ) as "tables"
-    from pg_catalog.pg_foreign_server s;
+    from pg_catalog.pg_foreign_server s
+    join pg_catalog.pg_foreign_data_wrapper w on s.srvfdw = w.oid
+    join pg_catalog.pg_proc c on w.fdwhandler = c.oid;
   `
 
   return sql
@@ -41,12 +48,17 @@ export type FDWColumn = {
 export type FDWTable = {
   id: string
   name: string
+  schema: string
   columns: FDWColumn[]
+  options: string[]
 }
 
 export type FDW = {
-  id: string
+  id: number
   name: string
+  handler: string
+  server_name: string
+  server_options: string[]
   tables: FDWTable[]
 }
 
