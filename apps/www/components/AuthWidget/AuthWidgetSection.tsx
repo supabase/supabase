@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { useTheme } from '../Providers'
+import { useTheme } from 'common/Providers'
 
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',

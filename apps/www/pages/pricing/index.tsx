@@ -11,12 +11,15 @@ import DefaultLayout from '~/components/Layouts/Default'
 import PricingAddOnTable from '~/components/PricingAddOnTable'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
 import pricing from '~/data/Pricing.json'
-import pricingAddOn from '~/data/PricingAddOn.json'
+import pricingAddOn from '~/data/PricingAddOnTable.json'
 import pricingFaq from '~/data/PricingFAQ.json'
+import { useTheme } from 'common/Providers'
 
 export default function IndexPage() {
   const router = useRouter()
-
+  const { basePath } = useRouter()
+  const { isDarkMode } = useTheme()
+  console.log('isDarkMode', isDarkMode)
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
@@ -48,7 +51,7 @@ export default function IndexPage() {
         '1-day log retention',
         'Community support',
       ],
-      additional: 'Free projects are paused after 1 week of inactivity.',
+      scale: 'Free projects are paused after 1 week of inactivity.',
 
       cta: 'Get Started',
     },
@@ -125,6 +128,55 @@ export default function IndexPage() {
       scale: '',
       shutdown: '',
       cta: 'Contact Us',
+    },
+  ]
+
+  const addons = [
+    {
+      name: 'Optimized Compute',
+      heroImg: 'hero',
+      icon: 'compute-upgrade',
+      price: 'Starts from $5',
+      description: 'Increase the captability of your database only for what you need.',
+      leftCtaText: 'Documentation',
+      leftCtaLink: 'http://.....',
+      rightCtaText: 'See Pricing breakdown',
+      rightCtaLink: '#open-modal',
+    },
+    {
+      name: 'Dedicated Support',
+      heroImg: 'hero',
+      icon: 'support-upgrade',
+      price: 'Starts from $5',
+      description:
+        'Your own team who can help you with your account and any technical issues you might come across.',
+      leftCtaText: 'Documentation',
+      leftCtaLink: 'http://.....',
+      rightCtaText: 'Contact Sales',
+      rightCtaLink: 'http://',
+    },
+    {
+      name: 'Custom Domain',
+      heroImg: 'hero',
+      icon: 'custom-domain-upgrade',
+      price: 'Flat fee $10',
+      description:
+        'Use your own domain for your Supabase project to present a more polished product to your users.',
+      leftCtaText: 'Documentation',
+      leftCtaLink: 'http://.....',
+      rightCtaText: 'See more',
+      rightCtaLink: 'http://',
+    },
+    {
+      name: 'Point in time recovery',
+      heroImg: 'hero',
+      icon: 'icon',
+      price: 'Starts from $5',
+      description: 'Roll back to any specific point in time and ensure that data is not lost.',
+      leftCtaText: 'Documentation',
+      leftCtaLink: 'http://.....',
+      rightCtaText: 'See Pricing breakdown',
+      rightCtaLink: 'http://',
     },
   ]
 
@@ -210,9 +262,7 @@ export default function IndexPage() {
               {tiers.map((tier) => (
                 <div
                   className={[
-                    tier.name === 'Pro'
-                      ? 'bg-brand-800 border px-0.5 -mt-8 rounded-tr-xl rounded-tl-xl'
-                      : '',
+                    tier.name === 'Pro' ? 'bg-brand-800 border px-0.5 -mt-8 rounded-xl' : '',
                   ].join(' ')}
                 >
                   {tier.name === 'Pro' && (
@@ -286,8 +336,6 @@ export default function IndexPage() {
                     flex-1
                     flex-col
 
-                    space-y-4
-
                     bg-white
                     px-8
 
@@ -300,7 +348,7 @@ export default function IndexPage() {
                       {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                       <ul
                         role="list"
-                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000"
+                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000 mt-4"
                       >
                         {tier.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
@@ -315,14 +363,14 @@ export default function IndexPage() {
                         ))}
                       </ul>
 
-                      <div className="flex flex-col gap-6">
-                        <div className="space-y-2">
+                      <div className="flex flex-col gap-6 mt-auto">
+                        <div className="space-y-2 mt-12">
                           {tier.additional && (
-                            <p className="text-scale-900 text-xs">{tier.additional}</p>
+                            <p className="text-scale-1200 text-sm">{tier.additional}</p>
                           )}
-                          {tier.scale && <p className="text-scale-900 text-xs">{tier.scale}</p>}
+                          {tier.scale && <p className="text-scale-800 text-xs">{tier.scale}</p>}
                           {tier.shutdown && (
-                            <p className="text-scale-900 text-xs">{tier.shutdown}</p>
+                            <p className="text-scale-1000 text-xs">{tier.shutdown}</p>
                           )}
                         </div>
                         <a href={tier.href}>
@@ -341,12 +389,32 @@ export default function IndexPage() {
       </div>
 
       <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-16 lg:py-24 xl:px-20">
-        <div className="text-center">
-          <h2 className="text-scale-1200 text-3xl">Add-Ons</h2>
-          <p className="text-scale-1100 mb-16 text-lg">
-            Level up your Supabase experience with add-ons.
-          </p>
+        <div>
+          <div className="text-center">
+            <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
+            <p className="text-scale-1100 mb-16 text-lg">
+              Level up your Supabase experience with add-ons.
+            </p>
+          </div>
+          <div className="flex gap-4 mb-16">
+            {addons.map((addon) => (
+              <div className="bg-scale-1 rounded-lg">
+                <img
+                  src={`${basePath}/images/pricing/${addon.icon}${isDarkMode ? '' : '-light'}.svg`}
+                  className="file:"
+                  alt="Compute"
+                />
+                <div className="flex items-center gap-4 px-8">
+                  {addon.icon}
+                  <span className="text-sm">{addon.name}</span>
+                  <span className="text-xs text-scale-900">{addon.price}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <div className="space-y-8"></div>
 
         <div className="space-y-8">
           <PricingAddOnTable

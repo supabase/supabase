@@ -8,7 +8,7 @@ import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 
@@ -321,7 +321,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div
                         className={`${
                           Styles[`contributors-${i}`]
-                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10 
+                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10
                           transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
                         `}
                         key={i}
