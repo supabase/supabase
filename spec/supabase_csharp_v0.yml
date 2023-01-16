@@ -304,7 +304,7 @@ functions:
           ```c#
           var result = await supabase
             .From<Movie>()
-            .Select("name, createdAt")
+            .Select(x => new object[] {x.Name, x.CreatedAt})
             .Get();
           ```
       - id: query-foreign-tables
@@ -339,7 +339,7 @@ functions:
           ```c#
           var count = await supabase
             .From<Movie>()
-            .Select("name")
+            .Select(x => new object[] { x.Name })
             .Count(CountType.Exact);
           ```
       - id: querying-json-data
@@ -431,14 +431,24 @@ functions:
     notes: |
       - `Update()` is typically called using a model as an argument or from a hydrated model.
     examples:
-      - id: updating-your-data
+      - id: updating-your-data-with-filter
         name: Update your data
         isSpotlight: true
         code: |
           ```c#
+          var update = await supabase
+            .From<City>()
+            .Where(x => x.Name == "Auckland")
+            .Set(x => new KeyValuePair<object, object>(x.Name, "Middle Earth"))
+            .Update();
+          ```
+      - id: updating-your-data
+        name: Update your data
+        code: |
+          ```c#
           var model = await supabase
             .From<City>()
-            .Filter("name", Operator.Equals, "Auckland")
+            .Where(x => x.Name == "Auckland")
             .Single();
 
           model.Name = "Middle Earth";
@@ -484,7 +494,8 @@ functions:
 
           await supabase
             .From<City>()
-            .Upsert(model, new QueryOptions { OnConflict = "name" });
+            .OnConflict(x => x.Name)
+            .Upsert(model);
           ```
       - id: return-the-exact-number-of-rows
         name: Return the exact number of rows
@@ -517,7 +528,7 @@ functions:
           ```c#
           await supabase
             .From<City>()
-            .Filter("id", Operator.Equals, 342)
+            .Where(x => x.Id == 342)
             .Delete();
           ```
 
