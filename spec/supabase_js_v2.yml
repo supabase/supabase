@@ -404,7 +404,7 @@ functions:
             const { data, error } = supabase.auth.setSession({
               access_token,
               refresh_token
-            )
+            })
           ```
   - id: refresh-session
     title: 'refreshSession()'
@@ -565,7 +565,6 @@ functions:
           ```js
           const { data, error } = await supabase.auth.mfa.challengeAndVerify({
             factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             code: '123456'
           })
           ```
@@ -644,7 +643,7 @@ functions:
       - Defaults to return 50 users per page.
     examples:
       - id: get-a-full-list-of-users
-        name: Get a full list of users
+        name: Get a page of users
         isSpotlight: true
         code: |
           ```js
@@ -1063,7 +1062,7 @@ functions:
           If you're in a situation where your tables are **NOT** directly
           related, but instead are joined by a _join table_, you can still use
           the `select()` method to query the related data. The join table needs
-          to have the foreign keys as part of its composite primary key.              
+          to have the foreign keys as part of its composite primary key.
         hideCodeBlock: true
       - id: query-the-same-foreign-table-multiple-times
         name: Query the same foreign table multiple times
@@ -1565,7 +1564,7 @@ functions:
           ```ts
           const { data, error } = await supabase
             .from('users')
-            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' })
+            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' }, { onConflict: 'handle' })
             .select()
           ```
         data:

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input } from 'ui'
+import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
 import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -17,6 +17,7 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   table?: PostgresTable
@@ -212,15 +213,30 @@ const TableEditor: FC<Props> = ({
               // @ts-ignore
               description={
                 <>
-                  Restrict access to your table by enabling RLS and writing Postgres policies.
-                  <br />
-                  If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                  <p>
+                    Restrict access to your table by enabling RLS and writing Postgres policies.
+                  </p>
+                  <p>
+                    RLS is secure by default - all normal access to this table must be allowed by a
+                    policy.
+                  </p>
+                  {!tableFields.isRLSEnabled && (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      className="!px-4 !py-3 mt-3"
+                      title="Turning off RLS means that you are allowing anonymous access to your table"
+                    >
+                      As such, anyone with the anonymous key can modify or delete your data.
+                    </Alert>
+                  )}
                 </>
               }
               checked={tableFields.isRLSEnabled}
               onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
               size="medium"
             />
+
             <Checkbox
               id="enable-realtime"
               label="Enable Realtime"
