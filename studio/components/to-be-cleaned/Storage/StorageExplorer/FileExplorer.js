@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react'
-import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
 
+import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
 import ItemContextMenu from './ItemContextMenu'
 import FolderContextMenu from './FolderContextMenu'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const FileExplorer = ({
   view = STORAGE_VIEWS.COLUMNS,
@@ -12,18 +13,7 @@ const FileExplorer = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
-  onCheckItem = () => {},
-  onSelectItemDelete = () => {},
-  onSelectItemRename = () => {},
-  onSelectItemMove = () => {},
-  onSelectFile = () => {},
-  onRenameFile = () => {},
   onFilesUpload = () => {},
-  onCopyFileURL = () => {},
-  onDownloadFile = () => {},
-  onSelectFolder = () => {},
-  onRenameFolder = () => {},
-  onCreateFolder = () => {},
   onSelectAllItemsInColumn = () => {},
   onSelectColumnEmptySpace = () => {},
   onSelectCreateFolder = () => {},
@@ -33,6 +23,15 @@ const FileExplorer = ({
   onColumnLoadMore = () => {},
 }) => {
   const fileExplorerRef = useRef(null)
+  const storageExplorerStore = useStorageStore()
+
+  const {
+    downloadFile,
+    setSelectedItemsToDelete,
+    setSelectedItemToRename,
+    setSelectedItemsToMove,
+    copyFileURLToClipboard,
+  } = storageExplorerStore
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -58,16 +57,16 @@ const FileExplorer = ({
       />
       <ItemContextMenu
         id={CONTEXT_MENU_KEYS.STORAGE_ITEM}
-        onCopyFileURL={onCopyFileURL}
-        onSelectItemRename={onSelectItemRename}
-        onSelectItemMove={onSelectItemMove}
-        onDownloadFile={onDownloadFile}
-        onSelectItemDelete={onSelectItemDelete}
+        onSelectItemRename={(file) => setSelectedItemToRename(file)}
+        onSelectItemMove={(file) => setSelectedItemsToMove([file])}
+        onSelectItemDelete={(file) => setSelectedItemsToDelete([file])}
+        onCopyFileURL={async (file) => await copyFileURLToClipboard(file)}
+        onDownloadFile={async (file) => await downloadFile(file)}
       />
       <FolderContextMenu
         id={CONTEXT_MENU_KEYS.STORAGE_FOLDER}
-        onRenameFolder={onSelectItemRename}
-        onDeleteFolder={onSelectItemDelete}
+        onRenameFolder={(folder) => setSelectedItemToRename(folder)}
+        onDeleteFolder={(folder) => setSelectedItemsToDelete([folder])}
       />
       {view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
@@ -80,18 +79,7 @@ const FileExplorer = ({
               openedFolders={openedFolders}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
-              onCheckItem={onCheckItem}
-              onSelectFile={onSelectFile}
-              onRenameFile={onRenameFile}
-              onCopyFileURL={onCopyFileURL}
               onFilesUpload={onFilesUpload}
-              onDownloadFile={onDownloadFile}
-              onSelectFolder={onSelectFolder}
-              onRenameFolder={onRenameFolder}
-              onCreateFolder={onCreateFolder}
-              onSelectItemDelete={onSelectItemDelete}
-              onSelectItemRename={onSelectItemRename}
-              onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
@@ -108,18 +96,7 @@ const FileExplorer = ({
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
-              onCheckItem={onCheckItem}
-              onSelectFile={onSelectFile}
-              onRenameFile={onRenameFile}
-              onCopyFileURL={onCopyFileURL}
               onFilesUpload={onFilesUpload}
-              onDownloadFile={onDownloadFile}
-              onSelectFolder={onSelectFolder}
-              onRenameFolder={onRenameFolder}
-              onCreateFolder={onCreateFolder}
-              onSelectItemDelete={onSelectItemDelete}
-              onSelectItemRename={onSelectItemRename}
-              onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
