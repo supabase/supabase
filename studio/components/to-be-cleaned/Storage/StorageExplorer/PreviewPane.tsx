@@ -198,7 +198,7 @@ const PreviewPane = () => {
                   onClick={async () => await copyFileURLToClipboard(file)}
                   disabled={file.isCorrupted}
                 >
-                  Copy URL
+                  Get URL
                 </Button>
               ) : (
                 <Dropdown
@@ -231,7 +231,7 @@ const PreviewPane = () => {
                     iconRight={<IconChevronDown />}
                     disabled={file.isCorrupted}
                   >
-                    Get Signed URL
+                    Get URL
                   </Button>
                 </Dropdown>
               )}
@@ -254,7 +254,7 @@ const PreviewPane = () => {
         header="Custom expiry for signed URL"
         visible={showExpiryInput}
         alignFooter="right"
-        confirmText="Get signed URL"
+        confirmText="Get URL"
         onCancel={() => setShowExpiryInput(false)}
       >
         <Form

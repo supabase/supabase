@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { FC, useState, useRef, useEffect } from 'react'
 import { find, has, isEmpty, isEqual } from 'lodash'
 import {
   Checkbox,
@@ -11,10 +11,10 @@ import {
   IconFile,
   IconAlertCircle,
   IconDownload,
-  IconTrash,
-  IconCopy,
   IconEdit,
   IconMove,
+  IconClipboard,
+  IconTrash2,
 } from 'ui'
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -24,11 +24,11 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_ROW_STATUS,
   CONTEXT_MENU_KEYS,
-} from '../Storage.constants.ts'
+} from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-const RowIcon = ({ view, status, fileType, mimeType }) => {
+const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
     return <IconLoader size={16} strokeWidth={2} className="animate-spin" />
   }
@@ -43,7 +43,6 @@ const RowIcon = ({ view, status, fileType, mimeType }) => {
     return (
       <SVG
         src={iconSrc}
-        alt={fileType}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
         }
@@ -66,28 +65,43 @@ const RowIcon = ({ view, status, fileType, mimeType }) => {
   return <IconFile size={16} strokeWidth={2} />
 }
 
-const FileExplorerRow = ({
+interface Props {
+  item: any
+  view: string
+  columnIndex: number
+  selectedItems: any[]
+  openedFolders: any[]
+  selectedFilePreview: any
+}
+
+const FileExplorerRow: FC<Props> = ({
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
-
-  onCheckItem = () => {},
-  onSelectFile = () => {},
-  onRenameFile = () => {},
-  onCopyFileURL = () => {},
-  onDownloadFile = () => {},
-  onSelectFolder = () => {},
-  onRenameFolder = () => {},
-  onCreateFolder = () => {},
-  onSelectItemDelete = () => {},
-  onSelectItemRename = () => {},
-  onSelectItemMove = () => {},
 }) => {
   const storageExplorerStore = useStorageStore()
-  const { downloadFolder } = storageExplorerStore
+  const {
+    popColumnAtIndex,
+    pushOpenedFolderAtIndex,
+    popOpenedFoldersAtIndex,
+    setFilePreview,
+    closeFilePreview,
+    clearSelectedItems,
+    addNewFolder,
+    renameFolder,
+    renameFile,
+    setSelectedItems,
+    setSelectedItemsToDelete,
+    setSelectedItemToRename,
+    setSelectedItemsToMove,
+    fetchFolderContents,
+    downloadFile,
+    downloadFolder,
+    copyFileURLToClipboard,
+  } = storageExplorerStore
 
   const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = find(selectedItems, item) !== undefined
@@ -95,25 +109,47 @@ const FileExplorerRow = ({
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
 
+  const onSelectFile = async (columnIndex: number, file: any) => {
+    popColumnAtIndex(columnIndex)
+    popOpenedFoldersAtIndex(columnIndex - 1)
+    setFilePreview(file)
+    clearSelectedItems()
+  }
+
+  const onSelectFolder = async (columnIndex: number, folder: any) => {
+    closeFilePreview()
+    clearSelectedItems(columnIndex + 1)
+    popOpenedFoldersAtIndex(columnIndex - 1)
+    pushOpenedFolderAtIndex(folder, columnIndex)
+    await fetchFolderContents(folder.id, folder.name, columnIndex)
+  }
+
+  const onCheckItem = (item: any) => {
+    if (find(selectedItems, item) === undefined) {
+      setSelectedItems(selectedItems.concat([item]))
+    } else {
+      setSelectedItems(selectedItems.filter((selectedItem: any) => item.id !== selectedItem.id))
+    }
+    closeFilePreview()
+  }
+
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    const inputRef = useRef(null)
+    const inputRef = useRef<any>(null)
     const [itemName, setItemName] = useState(item.name)
 
     useEffect(() => {
-      if (inputRef.current) {
-        inputRef.current.select()
-      }
+      if (inputRef.current) inputRef.current.select()
     }, [])
 
-    const onSetItemName = (event) => {
+    const onSetItemName = async (event: any) => {
       event.preventDefault()
       event.stopPropagation()
       if (item.type === STORAGE_ROW_TYPES.FILE) {
-        onRenameFile(item, itemName, columnIndex)
+        await renameFile(item, itemName, columnIndex)
       } else if (has(item, 'id')) {
-        onRenameFolder(itemWithColumnIndex, itemName, columnIndex)
+        renameFolder(itemWithColumnIndex, itemName, columnIndex)
       } else {
-        onCreateFolder(itemName, columnIndex)
+        addNewFolder(itemName, columnIndex)
       }
     }
 
@@ -146,57 +182,55 @@ const FileExplorerRow = ({
   }
 
   const rowOptions =
-    item.type === STORAGE_ROW_TYPES.BUCKET
-      ? [{ name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) }]
-      : item.type === STORAGE_ROW_TYPES.FOLDER
+    item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
           {
             name: 'Rename',
             icon: <IconEdit size="tiny" />,
-            onClick: () => onSelectItemRename(itemWithColumnIndex),
+            onClick: () => setSelectedItemToRename(itemWithColumnIndex),
           },
           {
             name: 'Download',
             icon: <IconDownload size="tiny" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
-          { name: 'Separator' },
+          { name: 'Separator', icon: undefined, onClick: undefined },
           {
             name: 'Delete',
-            icon: <IconTrash size="tiny" />,
-            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+            icon: <IconTrash2 size="tiny" />,
+            onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
           },
         ]
       : [
           ...(!item.isCorrupted
             ? [
                 {
-                  name: 'Copy URL',
-                  icon: <IconCopy size="tiny" />,
-                  onClick: () => onCopyFileURL(itemWithColumnIndex),
+                  name: 'Get URL',
+                  icon: <IconClipboard size="tiny" />,
+                  onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
                 },
                 {
                   name: 'Rename',
                   icon: <IconEdit size="tiny" />,
-                  onClick: () => onSelectItemRename(itemWithColumnIndex),
+                  onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
                 {
                   name: 'Move',
                   icon: <IconMove size="tiny" />,
-                  onClick: () => onSelectItemMove(itemWithColumnIndex),
+                  onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                 },
                 {
                   name: 'Download',
                   icon: <IconDownload size="tiny" />,
-                  onClick: () => onDownloadFile(itemWithColumnIndex),
+                  onClick: async () => await downloadFile(itemWithColumnIndex),
                 },
-                { name: 'Separator' },
+                { name: 'Separator', icon: undefined, onClick: undefined },
               ]
             : []),
           {
             name: 'Delete',
-            icon: <IconTrash size="tiny" />,
-            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+            icon: <IconTrash2 size="tiny" />,
+            onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
           },
         ]
 
@@ -206,7 +240,7 @@ const FileExplorerRow = ({
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
   const { show } = useContextMenu()
-  const displayMenu = (event, rowType) => {
+  const displayMenu = (event: any, rowType: any) => {
     show(event, {
       id:
         rowType === STORAGE_ROW_TYPES.FILE
