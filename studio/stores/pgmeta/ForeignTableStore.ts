@@ -13,4 +13,9 @@ export default class ForeignTableStore extends PostgresMetaInterface<Partial<Pos
   ) {
     super(rootStore, dataUrl, headers, options)
   }
+
+  // loadBySchema is not supported in this store
+  async loadBySchema(schema: string) {
+    return []
+  }
 }

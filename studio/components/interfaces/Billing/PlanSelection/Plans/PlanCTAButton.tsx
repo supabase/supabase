@@ -16,10 +16,18 @@ interface Props {
 const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const getButtonType = (plan: any) => {
-    if (plan.name === 'Enterprise' || plan.id === STRIPE_PRODUCT_IDS.FREE) {
+  const getButtonType = (plan: any, currentPlan: any) => {
+    if (['Enterprise', 'Free tier'].includes(plan.name)) {
+      // Enterprise/Free are always default
+      return 'default'
+    } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
+      // If the current plan is free, other plans are primary
+      return 'primary'
+    } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM && plan.name !== 'Team tier') {
+      // Non-free plans are default (pro), when team tier is selected
       return 'default'
     }
+
     return 'primary'
   }
 
@@ -37,11 +45,27 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
     if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
       if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
         return 'Upgrade to Pro'
+      } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM) {
+        return 'Downgrade to Pro'
       } else if (
         currentPlan.prod_id === STRIPE_PRODUCT_IDS.PRO ||
         currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG
       ) {
         return 'Edit plan configuration'
+      } else {
+        return 'Contact sales'
+      }
+    }
+
+    if (plan.id === STRIPE_PRODUCT_IDS.TEAM) {
+      if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM) {
+        return 'Edit plan configuration'
+      } else if (
+        [STRIPE_PRODUCT_IDS.FREE, STRIPE_PRODUCT_IDS.PRO, STRIPE_PRODUCT_IDS.PAYG].includes(
+          currentPlan.prod_id
+        )
+      ) {
+        return 'Upgrade to Team'
       } else {
         return 'Contact sales'
       }
@@ -57,7 +81,7 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
       </div>
     )
 
-  const type = getButtonType(plan)
+  const type = getButtonType(plan, currentPlan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
     plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE

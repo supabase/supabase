@@ -36,19 +36,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 ![notion.so](/docs/img/guides/auth-notion/notion-redirect-uri.png)
 
-You can retrieve the redirect uri with the following steps:
-
-- Go to your [Supabase Project Dashboard](https://app.supabase.com).
-- Click on the `Settings` icon at the bottom of the left sidebar.
-- Click on `API` in the list.
-- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
-- Add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
-
-Your redirect uri should look like the following: `https://<project-ref>.supabase.co/auth/v1/callback`
-
-<video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
-</video>
+<SocialProviderSetup provider="Notion" />
 
 ## Add your Notion credentials into your Supabase Project
 
@@ -56,12 +44,7 @@ Your redirect uri should look like the following: `https://<project-ref>.supabas
 
 ![notion.so](/docs/img/guides/auth-notion/notion-creds.png)
 
-- Go to your [Supabase Project Dashboard](https://app.supabase.com)
-- In the left sidebar, click the `Authentication` icon (near the top)
-- Click `Settings` from the list to go to the `Authentication Settings` page
-- Under `External OAuth Providers` turn `Notion Enabled` to ON
-- Enter the "OAuth client ID" and "OAuth client secret" obtained in the `client id` and `client secret` fields.
-- Click `Save`
+<SocialProviderSettingsSupabase provider="Notion" />
 
 ## Add login code to your client app
 

@@ -48,13 +48,14 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features', items: [] },
     { name: 'Architecture', url: '/guides/getting-started/architecture', items: [] },
-    // {
-    //   name: 'Quickstarts',
-    //   items: [
-    //     { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
-    //     { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
-    //   ],
-    // },
+    {
+      name: 'Framework Quickstarts',
+      items: [
+        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
+        { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
+      ],
+    },
     {
       name: 'Web app tutorials',
       items: [
@@ -395,6 +396,11 @@ export const database = {
           url: '/guides/database/extensions/pgnet',
           items: [],
         },
+        {
+          name: 'PostGIS: Geo queries',
+          url: '/guides/database/extensions/postgis',
+          items: [],
+        },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
         {
           name: 'uuid-ossp: Unique Identifiers',
@@ -421,14 +427,29 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
+    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
-    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
+    { name: 'CORS', url: '/guides/functions/cors', items: [] },
+    { name: 'Debugging', url: '/guides/functions/debugging', items: [] },
+    { name: 'Import Maps', url: '/guides/functions/import-maps', items: [] },
+    { name: 'Local Development', url: '/guides/functions/local-development', items: [] },
+    { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
-      items: [{ name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] }],
+      items: [
+        {
+          name: 'Cloudflare Turnstile',
+          url: '/guides/functions/examples/cloudflare-turnstile',
+          items: [],
+        },
+        { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
+        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+        { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
+        { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
+        { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+      ],
     },
   ],
 }
@@ -762,14 +783,14 @@ export const reference_javascript_v2 = {
 
 export const reference_dart_v0 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
 export const reference_dart_v1 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
