@@ -77,7 +77,7 @@ export const PricingTableRowDesktop = (props: any) => {
               <span>{feat.title}</span>
               {feat.tooltip && (
                 <span
-                  className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-color"
+                  className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-colors"
                   data-tip={feat.tooltip}
                 >
                   <IconHelpCircle size={14} strokeWidth={2} />
