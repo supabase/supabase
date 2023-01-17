@@ -19,7 +19,7 @@ export default function IndexPage() {
   const router = useRouter()
   const { basePath } = useRouter()
   const { isDarkMode } = useTheme()
-  console.log('isDarkMode', isDarkMode)
+
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
@@ -258,7 +258,7 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md lg:grid lg:max-w-7xl lg:grid-cols-4 lg:gap-5">
+            <div className="mx-auto max-w-md lg:grid lg:max-w-8xl lg:grid-cols-4 lg:gap-5">
               {tiers.map((tier) => (
                 <div
                   className={[
@@ -398,14 +398,13 @@ export default function IndexPage() {
           </div>
           <div className="flex gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-scale-1 rounded-lg">
+              <div className="bg-scale-100 rounded-lg">
                 <img
                   src={`${basePath}/images/pricing/${addon.icon}${isDarkMode ? '' : '-light'}.svg`}
                   className="file:"
                   alt="Compute"
                 />
-                <div className="flex items-center gap-4 px-8">
-                  {addon.icon}
+                <div className="flex items-center gap-4 px-4">
                   <span className="text-sm">{addon.name}</span>
                   <span className="text-xs text-scale-900">{addon.price}</span>
                 </div>
