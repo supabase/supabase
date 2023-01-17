@@ -429,6 +429,7 @@ export const functions = {
     { name: 'Import Maps', url: '/guides/functions/import-maps', items: [] },
     { name: 'Local Development', url: '/guides/functions/local-development', items: [] },
     { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
+    { name: 'Schedule Functions', url: '/guides/functions/schedule-functions', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
