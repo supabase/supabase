@@ -1,9 +1,8 @@
+import Link from 'next/link'
 import { isEmpty } from 'lodash'
-import { useState } from 'react'
 import {
   Button,
   Dropdown,
-  Form,
   IconX,
   IconLoader,
   IconClipboard,
@@ -11,13 +10,11 @@ import {
   IconTrash2,
   IconAlertCircle,
   IconChevronDown,
-  Modal,
-  Input,
 } from 'ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
-import Link from 'next/link'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
@@ -205,17 +202,23 @@ const PreviewPane = () => {
                   align="center"
                   overlay={[
                     <Dropdown.Item
-                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 7)}
+                      onClick={async () =>
+                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.WEEK)
+                      }
                     >
                       Expire in 1 week
                     </Dropdown.Item>,
                     <Dropdown.Item
-                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 30)}
+                      onClick={async () =>
+                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.MONTH)
+                      }
                     >
                       Expire in 1 month
                     </Dropdown.Item>,
                     <Dropdown.Item
-                      onClick={async () => await copyFileURLToClipboard(file, 60 * 60 * 24 * 365)}
+                      onClick={async () =>
+                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.YEAR)
+                      }
                     >
                       Expire in 1 year
                     </Dropdown.Item>,

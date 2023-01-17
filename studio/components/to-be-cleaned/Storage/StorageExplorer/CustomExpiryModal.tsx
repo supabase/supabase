@@ -13,8 +13,6 @@ const CustomExpiryModal: FC<Props> = () => {
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
 
-  console.log(selectedFileCustomExpiry)
-
   return (
     <Modal
       hideFooter

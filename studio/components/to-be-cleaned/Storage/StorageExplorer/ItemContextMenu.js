@@ -1,8 +1,10 @@
+import { observer } from 'mobx-react-lite'
 import { Menu, Item, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
+
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { observer } from 'mobx-react-lite'
 
 const ItemContextMenu = ({ id = '' }) => {
   const storageExplorerStore = useStorageStore()
@@ -39,25 +41,31 @@ const ItemContextMenu = ({ id = '' }) => {
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
           <IconClipboard size="tiny" />
-          <span className="ml-2 text-xs">Copy URL</span>
+          <span className="ml-2 text-xs">Get URL</span>
         </Item>
       ) : (
         <Submenu
           label={
             <div className="flex items-center space-x-2">
               <IconClipboard size="tiny" />
-              <span className="text-xs">Copy URL</span>
+              <span className="text-xs">Get URL</span>
             </div>
           }
           arrow={<IconChevronRight size="tiny" />}
         >
-          <Item onClick={({ props }) => onHandleClick('copy', props.item, 60 * 60 * 24 * 7)}>
+          <Item
+            onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.WEEK)}
+          >
             <span className="ml-2 text-xs">Expire in 1 week</span>
           </Item>
-          <Item onClick={({ props }) => onHandleClick('copy', props.item, 60 * 60 * 24 * 30)}>
+          <Item
+            onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.MONTH)}
+          >
             <span className="ml-2 text-xs">Expire in 1 month</span>
           </Item>
-          <Item onClick={({ props }) => onHandleClick('copy', props.item, 60 * 60 * 24 * 365)}>
+          <Item
+            onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.YEAR)}
+          >
             <span className="ml-2 text-xs">Expire in 1 year</span>
           </Item>
           <Item onClick={({ props }) => onHandleClick('copy', props.item, -1)}>
