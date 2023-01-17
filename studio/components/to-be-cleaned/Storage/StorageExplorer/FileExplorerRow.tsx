@@ -15,6 +15,7 @@ import {
   IconMove,
   IconClipboard,
   IconTrash2,
+  IconChevronRight,
 } from 'ui'
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -24,6 +25,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_ROW_STATUS,
   CONTEXT_MENU_KEYS,
+  URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -97,6 +99,7 @@ const FileExplorerRow: FC<Props> = ({
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
+    setSelectedFileCustomExpiry,
     fetchFolderContents,
     downloadFile,
     downloadFolder,
@@ -207,12 +210,29 @@ const FileExplorerRow: FC<Props> = ({
                 {
                   name: 'Get URL',
                   icon: <IconClipboard size="tiny" />,
-                  onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
                   children: [
-                    { name: 'Expire in 1 week' },
-                    { name: 'Expire in 1 month' },
-                    { name: 'Expire in 1 year' },
-                    { name: 'Custom expiry' },
+                    {
+                      name: 'Expire in 1 week',
+                      onClick: async () =>
+                        await copyFileURLToClipboard(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK),
+                    },
+                    {
+                      name: 'Expire in 1 month',
+                      onClick: async () =>
+                        await copyFileURLToClipboard(
+                          itemWithColumnIndex,
+                          URL_EXPIRY_DURATION.MONTH
+                        ),
+                    },
+                    {
+                      name: 'Expire in 1 year',
+                      onClick: async () =>
+                        await copyFileURLToClipboard(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR),
+                    },
+                    {
+                      name: 'Custom expiry',
+                      onClick: async () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                    },
                   ],
                 },
                 {
@@ -382,7 +402,36 @@ const FileExplorerRow: FC<Props> = ({
               align="end"
               overlay={[
                 rowOptions.map((option) => {
-                  if (option.name === 'Separator') {
+                  if ((option?.children ?? []).length > 0) {
+                    return (
+                      <Dropdown
+                        isNested
+                        key={option.name}
+                        side="right"
+                        align="start"
+                        overlay={(option?.children ?? [])?.map((child) => {
+                          return (
+                            <Dropdown.Item key={child.name} onClick={child.onClick}>
+                              {child.name}
+                            </Dropdown.Item>
+                          )
+                        })}
+                      >
+                        <div
+                          className={[
+                            'flex items-center justify-between px-4 py-1.5 text-xs text-scale-1100',
+                            'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200',
+                          ].join(' ')}
+                        >
+                          <div className="flex items-center space-x-2">
+                            {option.icon}
+                            <p>{option.name}</p>
+                          </div>
+                          <IconChevronRight size="tiny" />
+                        </div>
+                      </Dropdown>
+                    )
+                  } else if (option.name === 'Separator') {
                     return <Dropdown.Separator key="row-separator" />
                   } else {
                     return (
