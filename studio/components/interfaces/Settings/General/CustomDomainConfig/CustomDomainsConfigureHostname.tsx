@@ -48,8 +48,7 @@ const CustomDomainsConfigureHostname = () => {
     if (!cnameVerified) {
       return ui.setNotification({
         category: 'error',
-        duration: 4000,
-        message: `Your CNAME record for ${values.domain} has yet to be verified - please check back again in a bit.`,
+        message: `Your CNAME record for ${values.domain} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
       })
     }
 
