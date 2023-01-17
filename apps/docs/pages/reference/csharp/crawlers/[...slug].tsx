@@ -1,7 +1,7 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-expect-error
-import spec from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_csharp_v0.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -29,13 +29,14 @@ export default function JSReference(props) {
         spec={spec}
         typeSpec={typeSpec}
         pageProps={props}
+        type="client-lib"
       />
     </>
   )
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/dart', '/dart')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/csharp')
 }
 
 export function getStaticPaths() {
