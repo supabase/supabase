@@ -21,13 +21,15 @@
     "title": "Typescript Support",
     "id": "typescript-support",
     "slug": "typescript-support",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": ["reference_javascript_v1", "reference_python_v2"]
   },
   {
     "title": "Upgrade guide",
     "id": "upgrade-guide",
     "slug": "upgrade-guide",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": ["reference_javascript_v1", "reference_python_v2"]
   },
   {
     "title": "Database",
