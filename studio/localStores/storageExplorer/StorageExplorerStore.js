@@ -58,6 +58,7 @@ class StorageExplorerStore {
   selectedItemsToDelete = []
   selectedItemsToMove = []
   selectedFilePreview = {}
+  selectedFileCustomExpiry = undefined
 
   DEFAULT_OPTIONS = {
     limit: LIMIT,
@@ -298,6 +299,10 @@ class StorageExplorerStore {
 
   clearSelectedItemsToMove = () => {
     this.selectedItemsToMove = []
+  }
+
+  setSelectedFileCustomExpiry = (item) => {
+    this.selectedFileCustomExpiry = item
   }
 
   addNewFolderPlaceholder = (columnIndex) => {

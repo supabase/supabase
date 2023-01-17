@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { observer } from 'mobx-react-lite'
 
 import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
 import ItemContextMenu from './ItemContextMenu'
@@ -25,13 +26,7 @@ const FileExplorer = ({
   const fileExplorerRef = useRef(null)
   const storageExplorerStore = useStorageStore()
 
-  const {
-    downloadFile,
-    setSelectedItemsToDelete,
-    setSelectedItemToRename,
-    setSelectedItemsToMove,
-    copyFileURLToClipboard,
-  } = storageExplorerStore
+  const { setSelectedItemToRename } = storageExplorerStore
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -55,14 +50,7 @@ const FileExplorer = ({
         onSelectSort={onChangeSortBy}
         onSelectSortByOrder={onChangeSortByOrder}
       />
-      <ItemContextMenu
-        id={CONTEXT_MENU_KEYS.STORAGE_ITEM}
-        onSelectItemRename={(file) => setSelectedItemToRename(file)}
-        onSelectItemMove={(file) => setSelectedItemsToMove([file])}
-        onSelectItemDelete={(file) => setSelectedItemsToDelete([file])}
-        onCopyFileURL={async (file) => await copyFileURLToClipboard(file)}
-        onDownloadFile={async (file) => await downloadFile(file)}
-      />
+      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu
         id={CONTEXT_MENU_KEYS.STORAGE_FOLDER}
         onRenameFolder={(folder) => setSelectedItemToRename(folder)}
@@ -110,4 +98,4 @@ const FileExplorer = ({
   )
 }
 
-export default FileExplorer
+export default observer(FileExplorer)

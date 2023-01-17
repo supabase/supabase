@@ -208,6 +208,12 @@ const FileExplorerRow: FC<Props> = ({
                   name: 'Get URL',
                   icon: <IconClipboard size="tiny" />,
                   onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
+                  children: [
+                    { name: 'Expire in 1 week' },
+                    { name: 'Expire in 1 month' },
+                    { name: 'Expire in 1 year' },
+                    { name: 'Custom expiry' },
+                  ],
                 },
                 {
                   name: 'Rename',

@@ -101,9 +101,8 @@ const PreviewPane = () => {
     copyFileURLToClipboard,
     closeFilePreview,
     setSelectedItemsToDelete,
+    setSelectedFileCustomExpiry,
   } = storageExplorerStore
-
-  const [showExpiryInput, setShowExpiryInput] = useState(false)
 
   const width = 450
   const isOpen = !isEmpty(file)
@@ -220,7 +219,7 @@ const PreviewPane = () => {
                     >
                       Expire in 1 year
                     </Dropdown.Item>,
-                    <Dropdown.Item onClick={() => setShowExpiryInput(true)}>
+                    <Dropdown.Item onClick={() => setSelectedFileCustomExpiry(file)}>
                       Custom expiry
                     </Dropdown.Item>,
                   ]}
@@ -248,64 +247,6 @@ const PreviewPane = () => {
           </div>
         </div>
       </Transition>
-      <Modal
-        hideFooter
-        size="small"
-        header="Custom expiry for signed URL"
-        visible={showExpiryInput}
-        alignFooter="right"
-        confirmText="Get URL"
-        onCancel={() => setShowExpiryInput(false)}
-      >
-        <Form
-          validateOnBlur
-          initialValues={{ expiresIn: '' }}
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
-            await copyFileURLToClipboard(file, values.expiresIn)
-            setSubmitting(false)
-            setShowExpiryInput(false)
-          }}
-          validate={(values: any) => {
-            const errors: any = {}
-            if (values.expiresIn !== '' && values.expiresIn <= 0)
-              errors.expiresIn = 'Expiry duration cannot be less than 0'
-            return errors
-          }}
-        >
-          {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
-            <>
-              <div className="py-6">
-                <Modal.Content>
-                  <Input
-                    disabled={isSubmitting}
-                    type="number"
-                    id="expiresIn"
-                    label="Enter the duration for which the URL will be valid for"
-                    actions={<p className="text-sm text-scale-1000 mr-2">seconds</p>}
-                  />
-                </Modal.Content>
-              </div>
-              <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2 pt-1 pb-3">
-                  <Button type="default" onClick={() => setShowExpiryInput(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={values.expiresIn === '' || isSubmitting}
-                    loading={isSubmitting}
-                    htmlType="submit"
-                    type="primary"
-                  >
-                    Get signed URL
-                  </Button>
-                </div>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
     </>
   )
 }
