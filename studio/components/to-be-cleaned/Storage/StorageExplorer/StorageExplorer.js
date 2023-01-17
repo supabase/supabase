@@ -11,6 +11,7 @@ import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
+import CustomExpiryModal from './CustomExpiryModal'
 
 const StorageExplorer = observer(({ bucket }) => {
   const storageExplorerStore = useStorageStore()
@@ -213,6 +214,7 @@ const StorageExplorer = observer(({ bucket }) => {
         onSelectCancel={clearSelectedItemsToMove}
         onSelectMove={onMoveSelectedFiles}
       />
+      <CustomExpiryModal />
     </div>
   )
 })
