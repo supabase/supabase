@@ -169,6 +169,7 @@ const TeamUpgrade: FC<Props> = ({
         message: 'Team Plan is not enabled yet.',
       })
     }
+    setIsSubmitting(true)
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,

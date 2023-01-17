@@ -158,18 +158,6 @@ const EnterpriseUpdate: FC<Props> = ({
   // Last todo to support enterprise billing on dashboard + E2E test
   const onConfirmPayment = async () => {
     setIsSubmitting(true)
-    let token = captchaToken
-
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-      }
-    } catch (error) {
-      setIsSubmitting(false)
-      return
-    }
-
     const payload = {
       ...formSubscriptionUpdatePayload(
         currentSubscription,
