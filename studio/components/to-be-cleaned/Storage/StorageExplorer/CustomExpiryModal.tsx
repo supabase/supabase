@@ -47,7 +47,7 @@ const CustomExpiryModal: FC<Props> = () => {
                   disabled={isSubmitting}
                   type="number"
                   id="expiresIn"
-                  label="Enter the duration for which the URL will be valid for"
+                  label="Enter the duration for which the URL will be valid:"
                   actions={<p className="text-sm text-scale-1000 mr-2">seconds</p>}
                 />
               </Modal.Content>
