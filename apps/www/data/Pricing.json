@@ -22,6 +22,7 @@
       },
       {
         "title": "Database space",
+        "tooltip": "Billing is based on the average database size in GB throughout the billing period.",
         "tiers": {
           "free": "Up to 500 MB",
           "pro": "8 GB included, then $0.125 per GB",
@@ -56,7 +57,7 @@
       },
       {
         "title": "Database egress",
-        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tooltip": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period.",
         "tiers": {
           "free": "Up to 2GB",
           "pro": "50GB included per month, then $0.09 per GB",
@@ -80,7 +81,7 @@
       },
       {
         "title": "MAUs",
-        "tooltip": "Monthly Active Users; a user that has made an API request in the last month.",
+        "tooltip": "Distinct users requesting your API throughout the billing period.",
         "tiers": {
           "free": "Up to 50,000 MAUs",
           "pro": "100,000 included, then $0.00325 per MAU",
@@ -160,6 +161,7 @@
     "features": [
       {
         "title": "Storage",
+        "tooltip": "The sum of all objects' size in your storage buckets.",
         "tiers": {
           "free": "Up to 1 GB",
           "pro": "100 GB included, then $0.021 per GB",
@@ -168,7 +170,7 @@
       },
       {
         "title": "Storage egress",
-        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tooltip": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted.",
         "tiers": {
           "free": "Up to 2 GB",
           "pro": "200 GB included, then $0.09 per GB",
@@ -194,7 +196,7 @@
       },
       {
         "title": "Asset transformations",
-        "tooltip": "Origin images are only relevant for image transformations. Images in the bucket which are not transformed do not count towards this limit.",
+        "tooltip": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
         "tiers": {
           "free": false,
           "pro": "Unlimited transformations for 100 origin images, then 5$ per 1000 origin images",
@@ -209,6 +211,7 @@
     "features": [
       {
         "title": "Invocations",
+        "tooltip": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
         "tiers": {
           "free": "500K per month",
           "pro": "2 Million per month, then $2 per 1 million invocations",
@@ -225,6 +228,7 @@
       },
       {
         "title": "Number of functions",
+        "tooltip": "Billing is based on the maximum amount of functions at any point in time throughout your billing period.",
         "tiers": {
           "free": "10",
           "pro": "100, then $10 per additional 100 functions",
