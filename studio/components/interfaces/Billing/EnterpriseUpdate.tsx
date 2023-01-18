@@ -2,7 +2,7 @@ import { FC, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Transition } from '@headlessui/react'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -43,8 +43,6 @@ const EnterpriseUpdate: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const isCustomDomainsEnabled = useFlag('customDomains')
-  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -247,28 +245,20 @@ const EnterpriseUpdate: FC<Props> = ({
                         <SupportPlan currentOption={currentAddons.supportPlan} />
                       </>
                     )}
-                    {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <CustomDomainSelection
-                          options={customDomainOptions}
-                          currentOption={currentAddons.customDomains}
-                          selectedOption={selectedAddons.customDomains}
-                          onSelectOption={setSelectedCustomDomainOption}
-                        />
-                      </>
-                    )}
-                    {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                      <>
-                        <Divider light />
-                        <PITRDurationSelection
-                          pitrDurationOptions={pitrDurationOptions}
-                          currentPitrDuration={currentAddons.pitrDuration}
-                          selectedPitrDuration={selectedAddons.pitrDuration}
-                          onSelectOption={setSelectedPITRDuration}
-                        />
-                      </>
-                    )}
+                    <Divider light />
+                    <CustomDomainSelection
+                      options={customDomainOptions}
+                      currentOption={currentAddons.customDomains}
+                      selectedOption={selectedAddons.customDomains}
+                      onSelectOption={setSelectedCustomDomainOption}
+                    />
+                    <Divider light />
+                    <PITRDurationSelection
+                      pitrDurationOptions={pitrDurationOptions}
+                      currentPitrDuration={currentAddons.pitrDuration}
+                      selectedPitrDuration={selectedAddons.pitrDuration}
+                      onSelectOption={setSelectedPITRDuration}
+                    />
                     <Divider light />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
