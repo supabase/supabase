@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -50,8 +50,6 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const isCustomDomainsEnabled = useFlag('customDomains')
-  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -290,32 +288,24 @@ const ProUpgrade: FC<Props> = ({
                       <SupportPlan currentOption={currentAddons.supportPlan} />
                     </>
                   )}
-                  {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <CustomDomainSelection
-                        options={customDomainOptions}
-                        currentOption={
-                          isManagingProSubscription ? currentAddons.customDomains : undefined
-                        }
-                        selectedOption={selectedAddons.customDomains}
-                        onSelectOption={setSelectedCustomDomainOption}
-                      />
-                    </>
-                  )}
-                  {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <PITRDurationSelection
-                        pitrDurationOptions={pitrDurationOptions}
-                        currentPitrDuration={
-                          isManagingProSubscription ? currentAddons.pitrDuration : undefined
-                        }
-                        selectedPitrDuration={selectedAddons.pitrDuration}
-                        onSelectOption={setSelectedPITRDuration}
-                      />
-                    </>
-                  )}
+                  <Divider light />
+                  <CustomDomainSelection
+                    options={customDomainOptions}
+                    currentOption={
+                      isManagingProSubscription ? currentAddons.customDomains : undefined
+                    }
+                    selectedOption={selectedAddons.customDomains}
+                    onSelectOption={setSelectedCustomDomainOption}
+                  />
+                  <Divider light />
+                  <PITRDurationSelection
+                    pitrDurationOptions={pitrDurationOptions}
+                    currentPitrDuration={
+                      isManagingProSubscription ? currentAddons.pitrDuration : undefined
+                    }
+                    selectedPitrDuration={selectedAddons.pitrDuration}
+                    onSelectOption={setSelectedPITRDuration}
+                  />
                   <Divider light />
                   <ComputeSizeSelection
                     computeSizes={computeSizes || []}
