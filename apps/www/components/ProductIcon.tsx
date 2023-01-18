@@ -1,10 +1,17 @@
 interface ProductIcon {
   icon: string
+  color?: 'black' | 'green'
 }
 
-function ProductIcon({ icon }: ProductIcon) {
+function ProductIcon({ icon, color }: ProductIcon) {
   return (
-    <div className="bg-scale-1200 text-scale-100 inline-flex h-8 w-8 items-center justify-center rounded-md">
+    <div
+      className={[
+        'inline-flex h-8 w-8 items-center justify-center rounded-md',
+        !color || color === 'black' ? 'bg-scale-1200 text-scale-100' : '',
+        color && color === 'green' ? 'bg-brand-800 text-brand-100' : '',
+      ].join(' ')}
+    >
       <svg
         className="h-5 w-5 stroke-white dark:stroke-black"
         xmlns="http://www.w3.org/2000/svg"
