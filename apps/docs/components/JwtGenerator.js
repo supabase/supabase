@@ -56,10 +56,7 @@ export default function JwtGenerator({}) {
       </div>
       <div className="grid mb-8">
         <label for="service">Preconfigured Payload:</label>
-        <Select
-          id="service"
-          onChange={handleKeySelection}
-        >
+        <Select id="service" onChange={handleKeySelection}>
           <Select.Option value="anon">ANON_KEY</Select.Option>
           <Select.Option value="service">SERVICE_KEY</Select.Option>
         </Select>
