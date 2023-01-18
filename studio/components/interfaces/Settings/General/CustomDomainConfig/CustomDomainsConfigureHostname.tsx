@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useProjectSettings, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import {
   FormActions,
   FormPanel,
@@ -12,6 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 
 const schema = yup.object({
@@ -22,14 +23,10 @@ const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
-  const { services } = useProjectSettings(ref as string | undefined)
-
-  // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = services ? services.find((x: any) => x.app.id == API_SERVICE_ID) : {}
-  const endpoint = apiService?.app_config?.endpoint
+  const { data: settings } = useProjectSettingsQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? undefined
   const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
@@ -125,8 +122,13 @@ const CustomDomainsConfigureHostname = () => {
                   ) : (
                     'your custom domain'
                   )}
-                  , resolving to <code className="text-xs">{endpoint}</code>, with as low a TTL as
-                  possible.
+                  , resolving to{' '}
+                  {endpoint !== undefined ? (
+                    <code className="text-xs">{endpoint}</code>
+                  ) : (
+                    "your project's API URL"
+                  )}
+                  , with as low a TTL as possible.
                 </p>
               </FormSection>
             </FormPanel>
