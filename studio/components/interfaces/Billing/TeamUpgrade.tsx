@@ -48,7 +48,11 @@ const TeamUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const teamTierEnabled = useFlag('teamTier')
+
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier =
+    currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -158,11 +162,6 @@ const TeamUpgrade: FC<Props> = ({
     setIsSubmitting(false)
     return true
   }
-
-  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
-  const userIsOnTeamTier =
-    currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
 
   const onConfirmPayment = async () => {
     if (!teamTierEnabled) {
