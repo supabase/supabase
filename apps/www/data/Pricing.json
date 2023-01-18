@@ -259,7 +259,7 @@
       },
       {
         "title": "Messages Per Month",
-        "tooltip": "Billing is based on the total sum of real-time messages throughout your billing period.",
+        "tooltip": "Billing is based on the total sum of Realtime messages throughout your billing period.",
         "tiers": {
           "free": "2 Million (including database)",
           "pro": "5 Million, then $2.50 per million",
