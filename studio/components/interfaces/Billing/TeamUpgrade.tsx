@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { useStore, useFlag } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import Divider from 'components/ui/Divider'
 import {
@@ -158,6 +158,11 @@ const TeamUpgrade: FC<Props> = ({
     setIsSubmitting(false)
     return true
   }
+
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier =
+    currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
 
   const onConfirmPayment = async () => {
     if (!teamTierEnabled) {
