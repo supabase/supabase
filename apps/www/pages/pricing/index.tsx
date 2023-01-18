@@ -4,21 +4,23 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import PricingAddOnTable from '~/components/PricingAddOnTable'
-import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
+import PricingAddOnTable from '~/components/Pricing/PricingAddOnTable'
+import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import pricing from '~/data/Pricing.json'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'common/Providers'
+import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 
 export default function IndexPage() {
   const router = useRouter()
   const { basePath } = useRouter()
   const { isDarkMode } = useTheme()
+  const [showComputeModal, setShowComputeModal] = useState(false)
 
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
@@ -37,7 +39,7 @@ export default function IndexPage() {
       costUnit: 'per month per project',
       href: 'https://app.supabase.com/new/new-project',
       priceLabel: 'Starting from',
-      priceMonthly: 0,
+      priceMonthly: '0',
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
       preface: 'Get started with...',
@@ -90,7 +92,7 @@ export default function IndexPage() {
       href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceLabel: 'Starting from',
-      priceMonthly: 25,
+      priceMonthly: 599,
       description: 'For scaling teams with permissions & access controls',
       warning: '+ any additional usage',
       features: [
@@ -134,7 +136,7 @@ export default function IndexPage() {
   const addons = [
     {
       name: 'Optimized Compute',
-      heroImg: 'hero',
+      heroImg: 'addons-compute-hero',
       icon: 'compute-upgrade',
       price: 'Starts from $5',
       description: 'Increase the captability of your database only for what you need.',
@@ -145,7 +147,7 @@ export default function IndexPage() {
     },
     {
       name: 'Dedicated Support',
-      heroImg: 'hero',
+      heroImg: 'addons-support',
       icon: 'support-upgrade',
       price: 'Starts from $5',
       description:
@@ -157,7 +159,7 @@ export default function IndexPage() {
     },
     {
       name: 'Custom Domain',
-      heroImg: 'hero',
+      heroImg: 'addons-custom-domain-hero',
       icon: 'custom-domain-upgrade',
       price: 'Flat fee $10',
       description:
@@ -169,8 +171,8 @@ export default function IndexPage() {
     },
     {
       name: 'Point in time recovery',
-      heroImg: 'hero',
-      icon: 'icon',
+      heroImg: 'addons-pitr',
+      icon: 'pitr-upgrade',
       price: 'Starts from $5',
       description: 'Roll back to any specific point in time and ensure that data is not lost.',
       leftCtaText: 'Documentation',
@@ -249,7 +251,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-8xl flex-col">
+        <div className="mx-auto flex max-w-7xl flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -258,7 +260,7 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md lg:grid lg:max-w-8xl lg:grid-cols-4 lg:gap-5">
+            <div className="mx-auto max-w-md lg:grid lg:max-w-7xl lg:grid-cols-4 lg:gap-5">
               {tiers.map((tier) => (
                 <div
                   className={[
@@ -388,7 +390,7 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-16 lg:py-24 xl:px-20">
+      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:py-24">
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
@@ -396,24 +398,73 @@ export default function IndexPage() {
               Level up your Supabase experience with add-ons.
             </p>
           </div>
-          <div className="flex gap-4 mb-16">
+
+          <div className="grid grid-cols-4 gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-scale-100 rounded-lg">
-                <img
-                  src={`${basePath}/images/pricing/${addon.icon}${isDarkMode ? '' : '-light'}.svg`}
-                  className="file:"
-                  alt="Compute"
-                />
-                <div className="flex items-center gap-4 px-4">
-                  <span className="text-sm">{addon.name}</span>
-                  <span className="text-xs text-scale-900">{addon.price}</span>
+              <div className="bg-white dark:bg-scale-300 rounded-lg">
+                <div className="overflow-hidden">
+                  <img
+                    src={`${basePath}/images/pricing/${addon.heroImg}${
+                      isDarkMode ? '' : '-light'
+                    }.svg`}
+                  />
+                </div>
+                <div className="px-4">
+                  <p className="text-xs text-scale-900">{addon.price}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <img
+                      src={`${basePath}/images/pricing/${addon.icon}${
+                        isDarkMode ? '' : '-light'
+                      }.svg`}
+                      className="file:"
+                      alt="Compute"
+                    />
+                    <span className="text-sm text-scale-1200">{addon.name}</span>
+                  </div>
+                  <p className="mt-2 text-scale-900 text-xs min-h-[40px] lg:min-h-[60px]">
+                    {addon.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-4 mb-8">
+                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
+                      <a>
+                        <Button size="tiny" type="default">
+                          {addon.leftCtaText}
+                        </Button>
+                      </a>
+                    </Link>
+                    {addon.name === 'Optimized Compute' ? (
+                      <button
+                        className="text-brand-1000 text-xs hover:underline "
+                        onClick={() => setShowComputeModal(true)}
+                      >
+                        {addon.rightCtaText}
+                      </button>
+                    ) : (
+                      ''
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="space-y-8"></div>
+        <div className="flex gap-12">
+          <div>
+            <span className="bg-brand-400 inline-block text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
+              Available for Pro plan
+            </span>
+            <h2 className="text-scale-1200 text-4xl mt-4">Flexible Spend Cap</h2>
+            <p className="mt-3">
+              Ensure you have the flexibility to scale your business without the restrictions of Pro
+              usage limits. Turn off the usage cap to let your project scale and only pay for what
+              you use.{' '}
+            </p>
+          </div>
+          <div>
+            <div className="border border-red-600 p-24">right</div>
+          </div>
+        </div>
 
         <div className="space-y-8">
           <PricingAddOnTable
@@ -594,117 +645,99 @@ export default function IndexPage() {
             <div className="hidden lg:block">
               <table className="h-px w-full table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead className="border-scale-700 dark:border-scale-400 bg-scale-200 dark:bg-scale-300 sticky top-[62px] z-10 border-b">
+                <thead className="bg-scale-200 dark:bg-scale-300 sticky top-[62px] z-10">
                   <tr>
                     <th
-                      className="text-scale-1200 relative px-6 py-4 text-left text-sm font-normal"
+                      className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
-                      <span>Plans</span>
                       <div
                         className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
-                    <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal"
-                      scope="col"
-                    >
-                      <span>Free</span>
-                      <div
-                        className="h-0.25 absolute bottom-0 left-0 w-full"
-                        style={{ height: '1px' }}
-                      ></div>
-                    </th>
-
-                    <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
-                      scope="col"
-                    >
-                      <span>Pro</span>
-                      <div
-                        className="h-0.25 absolute bottom-0 left-0 w-full"
-                        style={{ height: '1px' }}
-                      ></div>
-                    </th>
-
-                    <th
-                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
-                      scope="col"
-                    >
-                      <span>Enterprise</span>
-                      <div
-                        className="h-0.25 absolute bottom-0 left-0 w-full"
-                        style={{ height: '1px' }}
-                      ></div>
-                    </th>
+                    {tiers.map((tier) => (
+                      <th
+                        className="text-scale-1200 w-1/5 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                        scope="col"
+                      >
+                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium uppercase flex items-center gap-4">
+                          {tier.name}
+                        </h3>
+                        <div
+                          className="h-0.25 absolute bottom-0 left-0 w-full"
+                          style={{ height: '1px' }}
+                        ></div>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
+                <tr className="descriptions">
+                  <th
+                    className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                    scope="col"
+                  ></th>
+
+                  {tiers.map((tier) => (
+                    <th
+                      className="text-scale-1200 w-1/5 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      scope="col"
+                    >
+                      <p className="p text-sm border-b border-scale-700 pb-4">{tier.description}</p>
+                      <div
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
+                        style={{ height: '1px' }}
+                      ></div>
+                    </th>
+                  ))}
+                </tr>
                 <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
-                  <tr className="divide-scale-700 dark:divide-scale-400 divide-x">
+                  <tr className="">
                     <th
                       className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
                       scope="row"
-                    >
-                      Pricing
-                    </th>
+                    ></th>
 
-                    <td className="h-full px-6 py-8 align-top">
-                      <div className="relative table h-full">
-                        <span className="h1 text-scale-1200">$0</span>
-                        <p className="p">/project/month</p>
+                    {tiers.map((tier) => (
+                      <td className="h-full px-6 py-2 align-top">
+                        <div className="relative table h-full w-full">
+                          <div className="flex flex-col justify-between h-full">
+                            {tier.priceMonthly && (
+                              <>
+                                <span className="text-5xl text-scale-1200">
+                                  ${tier.priceMonthly}
+                                </span>
+                                <p className="p text-xs mt-1">per project per month</p>
+                              </>
+                            )}
 
-                        <p className="p text-sm">Perfect for hobby projects and experiments</p>
+                            {tier.warning && (
+                              <p className="-mt-2">
+                                <span className="bg-brand-400 text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
+                                  {tier.warning}
+                                </span>
+                              </p>
+                            )}
 
-                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
-                          <a>
-                            <Button size="medium" type="default">
-                              Get Started
-                            </Button>
-                          </a>
-                        </Link>
-                      </div>
-                    </td>
-
-                    <td className="h-full px-6 py-8 align-top">
-                      <div className="relative table h-full">
-                        <span className="h1 text-scale-1200">$25</span>
-                        <p className="p">/project/month + usage costs</p>
-
-                        <p className="p text-sm">
-                          Everything you need to scale your project into production
-                        </p>
-
-                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
-                          <a>
-                            <Button size="medium" type="default">
-                              Get Started
-                            </Button>
-                          </a>
-                        </Link>
-                      </div>
-                    </td>
-
-                    <td className="h-full px-6 py-8 align-top">
-                      <div className="relative table h-full">
-                        <span className="h1 text-scale-1200">Contact Us</span>
-                        <p className="p">for a quote</p>
-
-                        <p className="p text-sm">
-                          Designated support team, account manager and technical specialist
-                        </p>
-
-                        <Link href="https://forms.supabase.com/enterprise">
-                          <a>
-                            <Button size="medium" type="default">
-                              Contact Us
-                            </Button>
-                          </a>
-                        </Link>
-                      </div>
-                    </td>
+                            <div className={tier.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
+                              <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                                <a>
+                                  <Button
+                                    size="tiny"
+                                    type={tier.name === 'Enterprise' ? 'secondary' : 'primary'}
+                                    block
+                                  >
+                                    Get Started
+                                  </Button>
+                                </a>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    ))}
                   </tr>
 
                   <PricingTableRowDesktop
@@ -831,6 +864,10 @@ export default function IndexPage() {
         </div>
       </div>
       <CTABanner />
+      <ComputePricingModal
+        showComputeModal={showComputeModal}
+        setShowComputeModal={setShowComputeModal}
+      />
     </DefaultLayout>
   )
 }

@@ -10,11 +10,12 @@
     "rows": [
       {
         "columns": [
-          { "key": "plan", "title": "Plan", "value": "Free (Included)" },
+          { "key": "plan", "title": "Plan", "value": "Starter" },
           { "key": "pricing", "title": "Pricing", "value": "$0" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
+          { "key": "maxDiskIO", "title": "Disk IO Bandwidth up to", "value": "2,606 Mbps" },
           {
             "key": "baseDiskIO",
             "title": "Baseline Disk IO Bandwidth",
@@ -22,12 +23,12 @@
           },
           {
             "key": "directConnections",
-            "title": "Connections: Direct (recommended)",
+            "title": "Connections: Direct",
             "value": "10"
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Pooler",
             "value": "50"
           }
         ]
@@ -36,7 +37,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Small" },
           { "key": "pricing", "title": "Pricing", "value": "$5" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
           {
@@ -60,7 +62,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Medium" },
           { "key": "pricing", "title": "Pricing", "value": "$50" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM (shared)" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
           {
@@ -84,7 +87,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Large" },
           { "key": "pricing", "title": "Pricing", "value": "$100" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "8 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
           {
@@ -108,7 +112,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "XL" },
           { "key": "pricing", "title": "Pricing", "value": "$200" },
-          { "key": "cpu", "title": "CPU", "value": "4-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "4-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "16 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
           {
@@ -132,7 +137,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "2XL" },
           { "key": "pricing", "title": "Pricing", "value": "$400" },
-          { "key": "cpu", "title": "CPU", "value": "8-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "8-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "32 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
           {
@@ -156,7 +162,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "4XL" },
           { "key": "pricing", "title": "Pricing", "value": "$950" },
-          { "key": "cpu", "title": "CPU", "value": "16-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "16-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "64 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
           {
@@ -180,7 +187,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "8XL" },
           { "key": "pricing", "title": "Pricing", "value": "$1,860" },
-          { "key": "cpu", "title": "CPU", "value": "32-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "32-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "128 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "9,500 Mbps" },
           {
@@ -204,7 +212,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "12XL" },
           { "key": "pricing", "title": "Pricing", "value": "$2,790" },
-          { "key": "cpu", "title": "CPU", "value": "48-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "48-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "192 GB" },
           {
             "key": "maxDiskIO",
@@ -232,7 +241,8 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "16XL" },
           { "key": "pricing", "title": "Pricing", "value": "$3,720" },
-          { "key": "cpu", "title": "CPU", "value": "64-core ARM (dedicated)" },
+          { "key": "cpu", "title": "CPU", "value": "64-core ARM" },
+          { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "256 GB" },
           {
             "key": "maxDiskIO",
@@ -253,30 +263,6 @@
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
             "value": "11,600"
-          }
-        ]
-      },
-      {
-        "columns": [
-          { "key": "plan", "title": "Plan", "value": "Custom (need more?)" },
-          { "key": "pricing", "title": "Pricing", "value": "Contact Us" },
-          { "key": "cpu", "title": "CPU", "value": "Contact Us" },
-          { "key": "memory", "title": "Memory", "value": "Contact Us" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "Contact Us" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "Contact Us"
-          },
-          {
-            "key": "directConnections",
-            "title": "Connections: Direct (recommended)",
-            "value": "Contact Us"
-          },
-          {
-            "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
-            "value": "Contact Us"
           }
         ]
       }
