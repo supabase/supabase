@@ -25,7 +25,8 @@ functions:
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
     examples:
-      - name: create_client()
+      - id: create-client
+        name: create_client()
         code: |
           ```
           import os
@@ -35,7 +36,8 @@ functions:
           key: str = os.environ.get("SUPABASE_KEY")
           supabase: Client = create_client(url, key)
           ```
-      - name: With timeout option
+      - id: with-timeout-option
+        name: With timeout option
         code: |
           ```
           import os
@@ -60,7 +62,8 @@ functions:
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
-      - name: Sign up
+      - id: signup
+        name: Sign up
         code: |
           ```
           res = supabase.auth.signUp({
@@ -68,7 +71,8 @@ functions:
             password: 'example-password',
           })
           ```
-      - name: Sign up with additional user metadata
+      - id: sign-up-with-additional-user-metadata
+        name: Sign up with additional user metadata
         code: |
           ```
           res = supabase.auth.signUp({
@@ -88,7 +92,8 @@ functions:
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
-      - name: Sign out
+      - id: sign-out
+        name: Sign out
         code: |
           ```
           res = supabase.auth.sign_out()
@@ -100,7 +105,8 @@ functions:
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
     examples:
-      - name: Verify SMS One-Time Password (OTP)
+      - id: verify-sms-one-time-password
+        name: Verify SMS One-Time Password (OTP)
         code: |
           ```
           res = supabase.auth.verify_otp(phone, token)
@@ -110,7 +116,8 @@ functions:
     title: 'get_session_from_url'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
-      - name: Get the session data from URL
+      - id: get-session
+        name: Get the session data from URL
         code: |
           ```
           res = supabase.auth.get_session_from_url(url)
@@ -126,9 +133,9 @@ functions:
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
       - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
     examples:
-      - name: Refresh the session
+      - id: set-session
+        name: Refresh the session
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
-        isSpotlight: true
         code: |
           ```
           res = supabase.auth.set_session(refresh_token)
@@ -140,8 +147,8 @@ functions:
       - This method will refresh the session whether the current one is expired or not.
       - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
     examples:
-      - name: Refresh session using the current session
-        isSpotlight: true
+      - id: refresh-session
+        name: Refresh session using the current session
         code: |
           ```
           res = supabase.auth.refresh_session()
@@ -155,7 +162,8 @@ functions:
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
     examples:
-      - name: Basic invocation
+      - id: invoke-function
+        name: Basic invocation
         description:
         code: |
           ```
@@ -179,7 +187,8 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: List buckets
+      - id: list-buckets
+        name: List buckets
         code: |
           ```
           res = supabase.storage().list_buckets()
@@ -194,8 +203,8 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Get bucket
-        isSpotlight: true
+      - id: get-bucket
+        name: Get bucket
         code: |
           ```
           res = supabase.storage().get_bucket(name)
@@ -210,7 +219,8 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Create bucket
+      - id: create-bucket
+        name: Create bucket
         code: |
           ```
           res = supabase.storage().create_bucket(name)
@@ -225,7 +235,8 @@ functions:
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Empty bucket
+      - id: empty-bucket
+        name: Empty bucket
         code: |
           ```
           res = supabase.storage().empty_bucket(name)
@@ -239,7 +250,8 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Delete bucket
+      - id: delete-bucket
+        name: Delete bucket
         code: |
           ```
           res = supabase.storage().delete_bucket(name)
@@ -254,7 +266,8 @@ functions:
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Upload file using filepath
+      - id: upload-file
+        name: Upload file using filepath
         code: |
           ```
           with open(source, 'rb+') as f:
@@ -269,7 +282,8 @@ functions:
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Move file
+      - id: move-file
+        name: Move file
         code: |
           ```
           res = supabase.storage().from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
@@ -284,7 +298,8 @@ functions:
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Create Signed URL
+      - id: create-signed-url
+        name: Create Signed URL
         code: |
           ```
           res = supabase.storage().from_(bucket_name).create_signed_url(filepath, expiry_duration)
@@ -300,7 +315,8 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Returns the URL for an asset in a public bucket
+      - id: get-public-url
+        name: Returns the URL for an asset in a public bucket
         code: |
           ```
           res = supabase.storage().from_(bucket_name).get_public_url('test/avatar1.jpg')
@@ -315,7 +331,8 @@ functions:
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Download file
+      - id: download-file
+        name: Download file
         code: |
           ```
           with open(destination, 'wb+') as f:
@@ -332,7 +349,8 @@ functions:
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: Delete file
+      - id: delete-file
+        name: Delete file
         code: |
           ```
           res = supabase.storage().from_('test').remove('test.jpg')
@@ -346,7 +364,8 @@ functions:
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - name: List files in a bucket
+      - id: list-files
+        name: List files in a bucket
         code: |
           ```
           res = supabase.storage().from_('test').list()
