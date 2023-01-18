@@ -535,6 +535,11 @@ export const platform = {
       url: undefined,
       items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] }],
     },
+    {
+      name: 'Troubleshooting',
+      url: undefined,
+      items: [{ name: 'Troubleshooting', url: '/guides/platform/troubleshooting/troubleshooting', items: [] }],
+    },
   ],
 }
 
