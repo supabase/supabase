@@ -73,7 +73,7 @@ As a result, this will lower the bandwidth that you send to your users and your 
 **Disabling automatic optimisation:**
 
 In case you'd like to return the original format of the image and **opt-out** from the automatic image optimization detection, you can pass the `format=origin` parameter when requesting a transformed image,
-this is also supported in the SDK starting from v2.2.0
+this is also supported in the JavaScript SDK starting from v2.2.0
 
 ```ts
 await storage.from('bucket').download('image.jpeg', {
@@ -95,7 +95,7 @@ To get started, create a `supabase-image-loader.js` file in your NextJS project 
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, height, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/${src}?width=${width}&height=${
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&height=${
     height || 0
   }&quality=${quality || 75}`
 }
