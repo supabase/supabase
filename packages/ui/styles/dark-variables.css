@@ -1,0 +1,343 @@
+/* [data-theme="dark"] { */
+.dark-ui {
+  --ui-variables-form-input-error-bg: #1f1315;
+  --ui-variables-form-input-error-border: #822025;
+  --ui-variables-form-input-bg: var(--ui-colors-gray-dark-alpha-2, #ffffff08);
+  --ui-variables-form-input-border: var(--ui-colors-gray-dark-7, #3e3e3e);
+  --ui-variables-form-input-disabled-bg: var(--ui-colors-gray-dark-alpha-4, #ffffff14);
+  --ui-variables-form-input-icon: var(--ui-colors-gray-light-9, #8f8f8f);
+  --ui-variables-form-label: var(--ui-colors-gray-dark-12, #ededed);
+  --ui-variables-form-label-secondary: var(--ui-colors-gray-dark-9, #707070);
+  --ui-variables-text-body: var(--ui-colors-gray-dark-12, #ededed);
+  --ui-variables-text-secondary: $colors.Gray.Dark.11;
+  --ui-variables-text-light: $colors.Gray.Dark.9;
+  --ui-variables-text-link: $variables.colors.brand.primary;
+  --ui-variables-text-gradient: linear-gradient(
+    90deg,
+    rgba($colors.Gray.Light.1, 1) 0%,
+    rgba($colors.Gray.Light.1, 0.5) 100%
+  );
+  --ui-variables-text-green-gradient: linear-gradient(45deg, #34b97d 0%, #3ecf8e 100%);
+  --ui-variables-panel-bg: var(--ui-colors-gray-dark-3, #232323);
+  --ui-variables-panel-border: var(--ui-colors-gray-dark-4, #282828);
+  --ui-variables-panel-bg-alt: var(--ui-colors-gray-dark-4, #282828);
+  --ui-variables-panel-border-alt: $colors.Gray.Dark.5;
+  --ui-variables-panel-bg-accent: #262626;
+  --ui-variables-panel-divider: linear-gradient(
+    90deg,
+    rgba($colors.Gray.Dark.1, 0.5) 0%,
+    rgba($colors.Gray.Dark.8, 1) 100%
+  );
+  --ui-variables-panel-warning-bg: #ffb224;
+  --ui-variables-panel-warning-text: #271700;
+  --ui-variables-panel-warning-text-secondary: #824e00;
+  --ui-variables-panel-danger-bg: #e5484d;
+  --ui-variables-panel-danger-text: #fffcfc;
+  --ui-variables-panel-danger-text-secondary: #f9c6c6;
+  --ui-variables-background-primary: var(--ui-colors-gray-dark-2, #1c1c1c);
+  --ui-variables-background-border: $colors.Gray.Dark.4;
+  --ui-variables-background-alt: $colors.Gray.Dark.1;
+  --ui-variables-button-danger-bg: #e5484d;
+  --ui-variables-button-danger-border: #822025;
+  --ui-variables-button-danger-text: var(--ui-variables-text-body, #ededed);
+  --ui-variables-button-warning-bg: #3f2200;
+  --ui-variables-button-warning-border: #693f05;
+  --ui-variables-button-warning-text: #ffb224;
+  --ui-variables-button-default-bg: var(--ui-colors-gray-dark-5, #2e2e2e);
+  --ui-variables-button-default-border: var(--ui-colors-gray-dark-7, #3e3e3e);
+  --ui-variables-button-default-text: var(--ui-variables-text-body, #ededed);
+  --ui-variables-button-outline-border: var(--ui-colors-gray-dark-6, #343434);
+  --ui-variables-datatable-input-default: var(--ui-colors-gray-dark-12, #ededed);
+  --ui-variables-datatable-header-label: var(--ui-colors-gray-dark-11, #a0a0a0);
+  --ui-variables-datatable-header-bg: var(--ui-colors-gray-dark-4, #282828);
+  --ui-variables-datatable-header-icon: var(--ui-colors-gray-dark-9, #707070);
+  --ui-variables-datatable-row-bg: var(--ui-colors-gray-dark-3, #232323);
+  --ui-variables-datatable-separator: var(--ui-colors-gray-dark-5, #2e2e2e);
+  --ui-variables-illustration-background: var(--ui-colors-gray-dark-3, #232323);
+  --ui-variables-illustration-background-lighter: var(--ui-colors-gray-dark-6, #343434);
+  --ui-variables-illustration-background-lighter-low-opacity: var(--ui-colors-gray-dark-6, #343434);
+  --ui-variables-illustration-border: var(--ui-colors-gray-dark-7, #3e3e3e);
+  --ui-variables-illustration-text: var(--ui-colors-slate-dark-12, #ecedee);
+  --ui-variables-illustration-text-gray: var(--ui-colors-gray-dark-11, #a0a0a0);
+  --ui-variables-illustration-dialog-box-light: var(--ui-colors-gray-dark-4, #282828);
+  --ui-variables-illustration-dialog-box-2: var(--ui-colors-gray-dark-4, #282828);
+  --ui-variables-illustration-dialog-box-1: var(--ui-colors-gray-dark-5, #2e2e2e);
+  --ui-variables-illustration-gradient-line: linear-gradient(
+    90deg,
+    $variables.illustration.background 0%,
+    $variables.illustration.text 100%
+  );
+  --ui-variables-icon-background: var(--ui-colors-gray-dark-3, #232323);
+  --ui-variables-icon-outline: var(--ui-colors-gray-dark-9, #707070);
+  --ui-variables-icon-fill-1: var(--ui-colors-gray-dark-2, #1c1c1c);
+  --ui-variables-icon-fill-2: var(--ui-colors-gray-dark-5, #2e2e2e);
+  --ui-variables-icon-outline-green: #4cc38a;
+  --ui-variables-icon-fill-1-green: #133929;
+  --ui-variables-icon-fill-2-green: #1b543a;
+  --ui-variables-icon-negative-icons: linear-gradient(
+    45deg,
+    rgba($colors.Gray.Dark.12, 0.5) 0%,
+    rgba($colors.Gray.Dark.Alpha.5, 1) 100%
+  );
+  --ui-variables-code-highlight1: #98c1fe;
+  --ui-variables-code-highlight2: #f2afe3;
+  --ui-variables-code-highlight3: $variables.colors.brand.primary;
+  --ui-variables-code-highlight4: #d4d4d4;
+  --ui-variables-charts-primary: #cbf5ff;
+  --ui-variables-charts-warning: #ffa600db;
+  --ui-variables-charts-danger: #e5484d;
+  --ui-variables-charts-multi-1: #7ff4f0;
+  --ui-variables-charts-multi-2: #cb77fd;
+  --ui-variables-badge-text: #4cc38a;
+  --ui-variables-badge-background: #113123;
+  --ui-variables-badge-secondary-background: var(--ui-colors-gray-dark-5, #2e2e2e);
+  --ui-variables-badge-secondary-text: var(--ui-colors-gray-dark-9, #707070);
+  --ui-variables-card-alt-background: #121212;
+  --ui-variables-card-border: linear-gradient(
+    30deg,
+    rgba($colors.Gray.Dark.5, 1) 0%,
+    rgba($colors.Gray.Dark.3, 1) 100%
+  );
+  --ui-variables-card-border-active: linear-gradient(
+    30deg,
+    rgba($colors.Gray.Dark.7, 1) 0%,
+    rgba($colors.Gray.Dark.3, 1) 100%
+  );
+  --ui-variables-card-background-active: var(--ui-colors-gray-dark-3, #232323);
+  --ui-variables-card-text: linear-gradient(45deg, #ffffff 0%, #ccebd7 100%);
+  --ui-variables-card-pill-label: linear-gradient(
+    90deg,
+    rgba(#343232, 0.1) 0%,
+    rgba(#d0d0d0, 0.1) 100%
+  );
+  --ui-variables-card-pill-label-border: linear-gradient(
+    90deg,
+    rgba(#343232, 0.1) 0%,
+    rgba(#ffffff, 0) 100%
+  );
+  --ui-variables-card-lw6-illustration-dark-fill: linear-gradient(
+    60deg,
+    rgba(#121212, 1) 0%,
+    rgba(#232323, 1) 100%
+  );
+  --ui-variables-card-lw6-illustration-border-highlight: linear-gradient(
+    45deg,
+    rgba(#232323, 1) 50%,
+    rgba(#3fcfb5, 0, 5) 100%
+  );
+  --ui-variables-card-lw6-illustration-teal-fill: linear-gradient(
+    45deg,
+    rgba(#121212, 0) 0%,
+    rgba(#08b8b2, 0.3) 100%
+  );
+  --ui-variables-card-lw6-illustration-accent-color: #4da08b;
+  --ui-variables-colors-brand-primary: #3ecf8e;
+  --ui-variables-colors-brand-accent: #34b97d;
+  --ui-164430: #164430;
+  --ui-button-default-shadow: var(--ui-colors-gray-dark-6, [object Object]);
+  --ui-button-primary-shadow: [object Object];
+  --ui-spacing-scale: 2;
+  --ui-spacing-xs: 4;
+  --ui-spacing-sm: var(--ui-spacing-xs, 4 * 2);
+  --ui-spacing-md: var(--ui-spacing-sm, 4 * 2 * 2);
+  --ui-spacing-lg: var(--ui-spacing-md, 4 * 2 * 2 * 2);
+  --ui-spacing-xl: var(--ui-spacing-lg, 4 * 2 * 2 * 2 * 2);
+  --ui-sizing-scale: 1.5;
+  --ui-sizing-xs: 4;
+  --ui-sizing-sm: var(--ui-sizing-xs, 4 * 1.5);
+  --ui-sizing-md: var(--ui-sizing-sm, 4 * 1.5 * 1.5);
+  --ui-sizing-lg: var(--ui-sizing-md, 4 * 1.5 * 1.5 * 1.5);
+  --ui-sizing-xl: var(--ui-sizing-lg, 4 * 1.5 * 1.5 * 1.5 * 1.5);
+  --ui-border-radius-sm: 4;
+  --ui-border-radius-lg: 8;
+  --ui-border-radius-xl: 16;
+  --ui-border-radius-xs: 2;
+  --ui-border-radius-table-header: var(--ui-border-radius-sm, 4);
+  --ui-border-width-none: 0;
+  --ui-border-width-xs: 1;
+  --ui-border-width-sm: 2;
+  --ui-border-width-md: 4;
+  --ui-border-width-lg: 8;
+  --ui-colors-black: #000000;
+  --ui-colors-white: #ffffff;
+  --ui-colors-gray-dark-1: #161616;
+  --ui-colors-gray-dark-2: #1c1c1c;
+  --ui-colors-gray-dark-3: #232323;
+  --ui-colors-gray-dark-4: #282828;
+  --ui-colors-gray-dark-5: #2e2e2e;
+  --ui-colors-gray-dark-6: #343434;
+  --ui-colors-gray-dark-7: #3e3e3e;
+  --ui-colors-gray-dark-8: #505050;
+  --ui-colors-gray-dark-9: #707070;
+  --ui-colors-gray-dark-10: #7e7e7e;
+  --ui-colors-gray-dark-11: #a0a0a0;
+  --ui-colors-gray-dark-12: #ededed;
+  --ui-colors-gray-dark-alpha-1: #00000000;
+  --ui-colors-gray-dark-alpha-2: #ffffff08;
+  --ui-colors-gray-dark-alpha-3: #ffffff0f;
+  --ui-colors-gray-dark-alpha-4: #ffffff14;
+  --ui-colors-gray-dark-alpha-5: #ffffff1a;
+  --ui-colors-gray-dark-alpha-6: #ffffff21;
+  --ui-colors-gray-dark-alpha-7: #ffffff2b;
+  --ui-colors-gray-dark-alpha-8: #ffffff40;
+  --ui-colors-gray-dark-alpha-9: #ffffff63;
+  --ui-colors-gray-dark-alpha-10: #ffffff73;
+  --ui-colors-gray-dark-alpha-11: #ffffff96;
+  --ui-colors-gray-dark-alpha-12: #ffffffeb;
+  --ui-colors-gray-light-1: #fcfcfc;
+  --ui-colors-gray-light-2: #f8f8f8;
+  --ui-colors-gray-light-3: #f3f3f3;
+  --ui-colors-gray-light-4: #ededed;
+  --ui-colors-gray-light-5: #e8e8e8;
+  --ui-colors-gray-light-6: #e2e2e2;
+  --ui-colors-gray-light-7: #dbdbdb;
+  --ui-colors-gray-light-8: #c7c7c7;
+  --ui-colors-gray-light-9: #8f8f8f;
+  --ui-colors-gray-light-10: #858585;
+  --ui-colors-gray-light-11: #6f6f6f;
+  --ui-colors-gray-light-12: #171717;
+  --ui-colors-gray-light-alpha-1: #00000003;
+  --ui-colors-gray-light-alpha-2: #00000008;
+  --ui-colors-gray-light-alpha-3: #0000000d;
+  --ui-colors-gray-light-alpha-4: #00000012;
+  --ui-colors-gray-light-alpha-5: #00000017;
+  --ui-colors-gray-light-alpha-6: #0000001c;
+  --ui-colors-gray-light-alpha-7: #00000024;
+  --ui-colors-gray-light-alpha-8: #00000038;
+  --ui-colors-gray-light-alpha-9: #00000070;
+  --ui-colors-gray-light-alpha-10: #0000007a;
+  --ui-colors-gray-light-alpha-11: #0000008f;
+  --ui-colors-gray-light-alpha-12: #000000e8;
+  --ui-colors-slate-dark-1: #151718;
+  --ui-colors-slate-dark-2: #1a1d1e;
+  --ui-colors-slate-dark-3: #202425;
+  --ui-colors-slate-dark-4: #26292b;
+  --ui-colors-slate-dark-5: #2b2f31;
+  --ui-colors-slate-dark-6: #313538;
+  --ui-colors-slate-dark-7: #3a3f42;
+  --ui-colors-slate-dark-8: #4c5155;
+  --ui-colors-slate-dark-9: #697177;
+  --ui-colors-slate-dark-10: #787f85;
+  --ui-colors-slate-dark-11: #9ba1a6;
+  --ui-colors-slate-dark-12: #ecedee;
+  --ui-colors-slate-dark-alpha-1: #00000000;
+  --ui-colors-slate-dark-alpha-2: #d5feff08;
+  --ui-colors-slate-dark-alpha-3: #d6fbfc0f;
+  --ui-colors-slate-dark-alpha-4: #e2f0fd14;
+  --ui-colors-slate-dark-alpha-5: #dff3fd1c;
+  --ui-colors-slate-dark-alpha-6: #dfeffe24;
+  --ui-colors-slate-dark-alpha-7: #e0f3ff2e;
+  --ui-colors-slate-dark-alpha-8: #e5f2fe42;
+  --ui-colors-slate-dark-alpha-9: #e1f1ff69;
+  --ui-colors-slate-dark-alpha-10: #e7f3ff78;
+  --ui-colors-slate-dark-alpha-11: #eff7ff9e;
+  --ui-colors-slate-dark-alpha-12: #fdfeffed;
+  --ui-colors-slate-light-1: #fbfcfd;
+  --ui-colors-slate-light-2: #f8f9fa;
+  --ui-colors-slate-light-3: #f1f3f5;
+  --ui-colors-slate-light-4: #eceef0;
+  --ui-colors-slate-light-5: #e6e8eb;
+  --ui-colors-slate-light-6: #dfe3e6;
+  --ui-colors-slate-light-7: #d7dbdf;
+  --ui-colors-slate-light-8: #c1c8cd;
+  --ui-colors-slate-light-9: #889096;
+  --ui-colors-slate-light-10: #7e868c;
+  --ui-colors-slate-light-11: #687076;
+  --ui-colors-slate-light-12: #11181c;
+  --ui-colors-slate-light-alpha-1: #05448205;
+  --ui-colors-slate-light-alpha-2: #05294d08;
+  --ui-colors-slate-light-alpha-3: #0025490d;
+  --ui-colors-slate-light-alpha-4: #021c3714;
+  --ui-colors-slate-light-alpha-5: #0217351a;
+  --ui-colors-slate-light-alpha-6: #01213921;
+  --ui-colors-slate-light-alpha-7: #001a3329;
+  --ui-colors-slate-light-alpha-8: #011e323d;
+  --ui-colors-slate-light-alpha-9: #00111e78;
+  --ui-colors-slate-light-alpha-10: #00101b82;
+  --ui-colors-slate-light-alpha-11: #000e1896;
+  --ui-colors-slate-light-alpha-12: #00080ced;
+  --ui-opacity-low: 10%;
+  --ui-opacity-md: 50%;
+  --ui-opacity-high: 90%;
+  --ui-font-families-heading: Inter;
+  --ui-font-families-body: Circular Std;
+  --ui-font-families-roboto: Roboto;
+  --ui-font-families-body2: Circular Std;
+  --ui-font-families-mono: Office Code Pro;
+  --ui-line-heights-0: 110%;
+  --ui-line-heights-heading: 110%;
+  --ui-line-heights-base: $base * 1.5;
+  --ui-line-heights-xs: $base * 1;
+  --ui-line-heights-sm: $base * 1.25;
+  --ui-line-heights-lg: $base * 1.75;
+  --ui-line-heights-xl: $base * 1.75;
+  --ui-line-heights-2xl: $base * 2;
+  --ui-line-heights-3xl: $base * 2.25;
+  --ui-line-heights-4xl: $base * 2.5;
+  --ui-line-heights-5xl: $base * 3;
+  --ui-line-heights-6xl: $base * 3.75;
+  --ui-line-heights-7xl: $base * 4.5;
+  --ui-line-heights-8xl: $base * 6;
+  --ui-line-heights-9xl: $base * 8;
+  --ui-letter-spacing-0: 0%;
+  --ui-letter-spacing-1: -2%;
+  --ui-letter-spacing-default: 0;
+  --ui-letter-spacing-increased: 10%;
+  --ui-letter-spacing-decreased: -5%;
+  --ui-letter-spacing-8: +8%;
+  --ui-paragraph-spacing-0: 26;
+  --ui-paragraph-spacing-1: 32;
+  --ui-paragraph-spacing-h1: 32;
+  --ui-paragraph-spacing-h2: 26;
+  --ui-font-weights-heading-regular: Regular;
+  --ui-font-weights-heading-bold: Bold;
+  --ui-font-weights-body-regular: Regular;
+  --ui-font-weights-body-bold: Bold;
+  --ui-font-weights-roboto-0: Regular;
+  --ui-font-weights-inter-1: Medium;
+  --ui-font-weights-inter-2: Book;
+  --ui-font-weights-heading-mono: Medium;
+  --ui-font-sizes-5xl: $base * 3;
+  --ui-font-sizes-4xl: $base * 2.25;
+  --ui-font-sizes-3xl: $base * 1.875;
+  --ui-font-sizes-2xl: $base * 1.5;
+  --ui-font-sizes-xl: $base * 1.25;
+  --ui-font-sizes-lg: $base * 1.125;
+  --ui-font-sizes-base: var(--ui-base, 16 * 1);
+  --ui-font-sizes-sm: var(--ui-base, 16 * 0.875);
+  --ui-font-sizes-xs: var(--ui-base, 16 * 0.75);
+  --ui-font-sizes-6xl: $base * 3.75;
+  --ui-font-sizes-7xl: $base * 4.5;
+  --ui-font-sizes-8xl: $base * 6;
+  --ui-font-sizes-9xl: $base * 8;
+  --ui-inner-shadow-label-copy: [object Object];
+  --ui-inner-shadow-text-new: [object Object];
+  --ui-font-size-0: 14;
+  --ui-font-size-1: 39.0629997253418;
+  --ui-font-size-2: 48.82899856567383;
+  --ui-text-case-none: none;
+  --ui-text-case-uppercase: uppercase;
+  --ui-text-decoration-none: none;
+  --ui-icon-xs: 12;
+  --ui-icon-sm: 16;
+  --ui-icon-md: 18;
+  --ui-icon-bg: 0.15;
+  --ui-icon-width-default: 1;
+  --ui-form-input-disabled: 33%;
+  --ui-modal-drop-shadow: [object Object];
+  --ui-panel: var(--ui-border-radius-xs, 2);
+  --ui-datatable-headericon: var(--ui-icon-sm, 16);
+  --ui-datatable-rowheight: 28;
+  --ui-options-icon: var(--ui-icon-md, 18);
+  --ui-input-sm-height: 28;
+  --ui-panel2: var(--ui-border-radius-sm, 4);
+  --ui-base: 16;
+  --ui-xxl: var(--ui-spacing-xl, 4 * 2 * 2 * 2 * 2 * 2);
+  --ui-action-bar-vertical: 21;
+  --ui-action-bar-horizontal: 32;
+  --ui-table-header-horizontal: 32;
+  --ui-tabs-horizontal: var(--ui-spacing-md, 4 * 2 * 2);
+  --ui-content-vertical: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
+  --ui-content-horizontal: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
+  --ui-controller-vertical: var(--ui-spacing-md, 4 * 2 * 2);
+}
