@@ -182,16 +182,17 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                   <Tooltip.Trigger>
                                     <IconInfo className="ml-2" size={14} strokeWidth={2} />
                                   </Tooltip.Trigger>
-                                  <Tooltip.Content side="top">
+                                  <Tooltip.Content side="bottom">
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
                                         'max-w-md', // size
+                                        'flex items-center justify-center',
                                         'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200 ', //border
+                                        'border border-scale-200', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-center text-scale-1200">
                                         {feature.tooltip}
                                       </span>
                                     </div>
