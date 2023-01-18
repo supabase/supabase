@@ -198,7 +198,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
-          ['Performance', 'Problem', 'Best-practice'].includes(values.category)
+          ['Performance', 'Problem'].includes(values.category)
 
         useEffect(() => {
           if (selectedProject && !selectedProject.subscription_tier) {
@@ -326,13 +326,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                 <Divider light />
               </>
             )} */}
-
-            {values.category === 'Best_practices' && (
-              <>
-                <BestPracticesGuidance />
-                <Divider light />
-              </>
-            )}
 
             {!isDisabled ? (
               <>
@@ -526,7 +519,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                   </div>
                 </div>
               </>
-            ) : ['Problem', 'Best_practices', 'Performance'].includes(values.category) ? (
+            ) : ['Problem', 'Performance'].includes(values.category) ? (
               <DisabledStateForFreeTier
                 category={selectedCategory?.label ?? ''}
                 projectRef={values.projectRef}
