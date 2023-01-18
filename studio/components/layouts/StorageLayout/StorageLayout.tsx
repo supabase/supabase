@@ -42,6 +42,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   const { services, isLoading } = useProjectSettings(ref as string | undefined)
   const apiService = find(services ?? [], (service) => service.app.id === 1)
   const projectUrl = apiService?.app_config?.endpoint ?? ''
+  const urlProtocol = apiService?.app_config?.protocol
   const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
   const canAccessStorage = !isLoading && services && serviceKey
 
@@ -52,7 +53,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   const initializeStorageStore = async () => {
     if (projectUrl) {
       if (serviceKey) {
-        storageExplorerStore.initStore(ref, projectUrl, serviceKey.api_key)
+        storageExplorerStore.initStore(ref, projectUrl, serviceKey.api_key, urlProtocol)
         await storageExplorerStore.fetchBuckets()
       }
     } else {
