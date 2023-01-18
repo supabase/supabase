@@ -28,7 +28,7 @@ const Header = () => {
 }
 
 const GenericOrganizationPage: NextPage = () => {
-  const { app, ui } = useStore()
+  const { app } = useStore()
   const router = useRouter()
   const { organizations } = app
   const { isLoading } = organizations
@@ -43,7 +43,7 @@ const GenericOrganizationPage: NextPage = () => {
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (orgSlug: string) => {
       if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}/general`
+        return `/org/${orgSlug}/general?${queryString}`
       } else {
         const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
         return `/org/${orgSlug}/${slugPath}?${queryString}`
