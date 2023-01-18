@@ -27,8 +27,6 @@ services:
 
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
-      # Kept for backwards compatibility with studio:0.22.08
-      SUPABASE_REST_URL: ${API_EXTERNAL_URL}/rest/v1/
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
