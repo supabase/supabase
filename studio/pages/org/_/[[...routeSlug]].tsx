@@ -43,7 +43,7 @@ const GenericOrganizationPage: NextPage = () => {
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (orgSlug: string) => {
       if (!Array.isArray(slug)) {
-        return `/org/${orgSlug}?${queryString}`
+        return `/org/${orgSlug}/general`
       } else {
         const slugPath = slug.reduce((a: string, b: string) => `${a}/${b}`, '').slice(1)
         return `/org/${orgSlug}/${slugPath}?${queryString}`
