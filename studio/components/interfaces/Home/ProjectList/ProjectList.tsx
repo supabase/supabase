@@ -1,6 +1,6 @@
+import Link from 'next/link'
 import { FC } from 'react'
 import { Button, IconPlus } from 'ui'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { IS_PLATFORM } from 'lib/constants'
@@ -16,7 +16,6 @@ interface Props {
 }
 
 const ProjectList: FC<Props> = ({ rewriteHref }) => {
-  const router = useRouter()
   const { app, ui } = useStore()
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
@@ -61,9 +60,11 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                       </p>
                     </div>
                     <div>
-                      <Button onClick={() => router.push(`/new/${slug}`)} icon={<IconPlus />}>
-                        New Project
-                      </Button>
+                      <Link href={`/new/${slug}`}>
+                        <a>
+                          <Button icon={<IconPlus />}>New Project</Button>
+                        </a>
+                      </Link>
                     </div>
                   </div>
                 ) : (
