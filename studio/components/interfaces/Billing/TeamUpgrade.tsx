@@ -48,8 +48,7 @@ const TeamUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const isCustomDomainsEnabled = useFlag('customDomains')
-  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
+  const teamTierEnabled = useFlag('teamTier')
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -160,8 +159,6 @@ const TeamUpgrade: FC<Props> = ({
     return true
   }
 
-  const teamTierEnabled = useFlag('teamTier')
-
   const onConfirmPayment = async () => {
     if (!teamTierEnabled) {
       return ui.setNotification({
@@ -260,32 +257,24 @@ const TeamUpgrade: FC<Props> = ({
                       <SupportPlan currentOption={currentAddons.supportPlan} />
                     </>
                   )}
-                  {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <CustomDomainSelection
-                        options={customDomainOptions}
-                        currentOption={
-                          isManagingTeamSubscription ? currentAddons.customDomains : undefined
-                        }
-                        selectedOption={selectedAddons.customDomains}
-                        onSelectOption={setSelectedCustomDomainOption}
-                      />
-                    </>
-                  )}
-                  {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <PITRDurationSelection
-                        pitrDurationOptions={pitrDurationOptions}
-                        currentPitrDuration={
-                          isManagingTeamSubscription ? currentAddons.pitrDuration : undefined
-                        }
-                        selectedPitrDuration={selectedAddons.pitrDuration}
-                        onSelectOption={setSelectedPITRDuration}
-                      />
-                    </>
-                  )}
+                  <Divider light />
+                  <CustomDomainSelection
+                    options={customDomainOptions}
+                    currentOption={
+                      isManagingTeamSubscription ? currentAddons.customDomains : undefined
+                    }
+                    selectedOption={selectedAddons.customDomains}
+                    onSelectOption={setSelectedCustomDomainOption}
+                  />
+                  <Divider light />
+                  <PITRDurationSelection
+                    pitrDurationOptions={pitrDurationOptions}
+                    currentPitrDuration={
+                      isManagingTeamSubscription ? currentAddons.pitrDuration : undefined
+                    }
+                    selectedPitrDuration={selectedAddons.pitrDuration}
+                    onSelectOption={setSelectedPITRDuration}
+                  />
                   <Divider light />
                   <ComputeSizeSelection
                     computeSizes={computeSizes || []}
