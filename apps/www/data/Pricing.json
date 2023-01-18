@@ -258,10 +258,11 @@
         }
       },
       {
-        "title": "Max Messages Per Month",
+        "title": "Messages Per Month",
+        "tooltip": "Billing is based on the total sum of real-time messages throughout your billing period.",
         "tiers": {
           "free": "2 Million (including database)",
-          "pro": "5 Million",
+          "pro": "5 Million, then $2.50 per million",
           "enterprise": "Volume discounts on messages"
         }
       },
