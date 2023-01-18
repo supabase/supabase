@@ -8,7 +8,6 @@ import { createClient } from '@supabase/supabase-js'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
@@ -97,17 +96,16 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey) {
+  initStore(projectRef, url, serviceKey, protocol = "http") {
     this.projectRef = projectRef
-    this.initializeSupabaseClient(serviceKey, url)
+    this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    console.debug(serviceEndpoint)
+  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
     this.supabaseClient = createClient(
-      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
       {
         auth: {
