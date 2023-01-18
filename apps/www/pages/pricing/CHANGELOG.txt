@@ -3,7 +3,7 @@ Pricing Changelog
 ### 18 Jan 2023
 
 - Clarified over-usage of real-time messages per month
-    - On the PAYG tier, $2.50 per million after incldued 5 million messages
+    - On the Pro tier, $2.50 per million after incldued 5 million messages
 
 ### 09 Jan 2023
 ----
