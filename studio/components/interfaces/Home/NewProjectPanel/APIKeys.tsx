@@ -7,7 +7,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import Panel from 'components/ui/Panel'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
@@ -46,7 +45,7 @@ const APIKeys = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${apiConfig.endpoint}`
+  const apiUrl = `${IS_PLATFORM ? 'https' : apiConfig.protocol}://${apiConfig.endpoint}`
   const anonKey = apiKeys.find((key: any) => key.tags === 'anon')
 
   const clientInitSnippet: any = Snippets.init(apiUrl)
