@@ -477,7 +477,6 @@ baseFiles.map(function (file) {
 
 themeFiles.map(function (theme) {
   const SD = StyleDictionary.extend(getStyleDictionaryConfig(theme))
-
   SD.buildAllPlatforms()
 })
 
