@@ -146,18 +146,6 @@ export default function IndexPage() {
       rightCtaLink: '#open-modal',
     },
     {
-      name: 'Dedicated Support',
-      heroImg: 'addons-support',
-      icon: 'support-upgrade',
-      price: 'Starts from $5',
-      description:
-        'Your own team who can help you with your account and any technical issues you might come across.',
-      leftCtaText: 'Documentation',
-      leftCtaLink: 'http://.....',
-      rightCtaText: 'Contact Sales',
-      rightCtaLink: 'http://',
-    },
-    {
       name: 'Custom Domain',
       heroImg: 'addons-custom-domain-hero',
       icon: 'custom-domain-upgrade',
@@ -263,6 +251,7 @@ export default function IndexPage() {
             <div className="mx-auto max-w-md lg:grid lg:max-w-7xl lg:grid-cols-4 lg:gap-5">
               {tiers.map((tier) => (
                 <div
+                  key={`row-${tier.name}`}
                   className={[
                     tier.name === 'Pro' ? 'bg-brand-800 border px-0.5 -mt-8 rounded-xl' : '',
                   ].join(' ')}
@@ -399,11 +388,12 @@ export default function IndexPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-4 mb-16">
+          <div className="grid grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-white dark:bg-scale-300 rounded-lg">
+              <div className="bg-white dark:bg-scale-300 rounded-lg" key={addon.name}>
                 <div className="overflow-hidden">
                   <img
+                    className="w-full"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       isDarkMode ? '' : '-light'
                     }.svg`}
@@ -449,24 +439,26 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="flex gap-12">
+        <div className="flex gap-12 items-center">
           <div>
             <span className="bg-brand-400 inline-block text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Flexible Spend Cap</h2>
-            <p className="mt-3">
+            <p className="mt-3 prose">
               Ensure you have the flexibility to scale your business without the restrictions of Pro
               usage limits. Turn off the usage cap to let your project scale and only pay for what
-              you use.{' '}
+              you use.
             </p>
           </div>
           <div>
-            <div className="border border-red-600 p-24">right</div>
+            <div className="">
+              <img className="w-full" src={`${basePath}/images/pricing/spend-cap.svg`} />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-8">
+        {/* <div className="space-y-8">
           <PricingAddOnTable
             icon={<ServerIcon className="h-8 w-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.database}
@@ -475,7 +467,7 @@ export default function IndexPage() {
             icon={<SupportIcon className="h-8 w-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.support}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-scale-200">
@@ -660,8 +652,9 @@ export default function IndexPage() {
 
                     {tiers.map((tier) => (
                       <th
-                        className="text-scale-1200 w-1/5 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                        className="text-scale-1200 w-1/5 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
                         scope="col"
+                        key={tier.name}
                       >
                         <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium uppercase flex items-center gap-4">
                           {tier.name}
@@ -684,6 +677,7 @@ export default function IndexPage() {
                     <th
                       className="text-scale-1200 w-1/5 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
+                      key={`th-${tier.name}`}
                     >
                       <p className="p text-sm border-b border-scale-700 pb-4">{tier.description}</p>
                       <div
@@ -701,7 +695,7 @@ export default function IndexPage() {
                     ></th>
 
                     {tiers.map((tier) => (
-                      <td className="h-full px-6 py-2 align-top">
+                      <td className="h-full px-6 py-2 align-top" key={`price-${tier.name}`}>
                         <div className="relative table h-full w-full">
                           <div className="flex flex-col justify-between h-full">
                             {tier.priceMonthly && (

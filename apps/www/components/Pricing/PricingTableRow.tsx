@@ -1,6 +1,6 @@
 import { IconHelpCircle, IconInfo, IconX, IconXCircle, Modal } from 'ui'
 import ProductIcon from 'components/ProductIcon'
-import React, { useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 export const Check = () => (
@@ -70,17 +70,17 @@ export const PricingTableRowDesktop = (props: any) => {
 
       {category.features.map((feat: any, i: number) => {
         return (
-          <>
+          <Fragment key={feat.title}>
             <tr className="divide-scale-600 dark:divide-scale-400" key={i}>
               <th
                 className={`text-scale-1200 flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
                 scope="row"
               >
                 <span>{feat.title}</span>
-                {feat.tooltip && !feat.tooltipPosition && (
+                {feat.tooltips?.main && (
                   <span
                     className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-colors"
-                    data-tip={feat.tooltip}
+                    data-tip={feat.tooltips.main}
                   >
                     <IconHelpCircle size={14} strokeWidth={2} />
                   </span>
@@ -107,15 +107,14 @@ export const PricingTableRowDesktop = (props: any) => {
                       </div>
                     ) : (
                       <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
-                        {feat.tooltip && feat.tooltipPosition === tierName && (
+                        {feat.tooltips?.[tierName] && (
                           <span
                             className="shrink-0 bg-scale-900 text-scale-200 rounded-full hover:text-scale-300 cursor-pointer transition-colors"
-                            data-tip={feat.tooltip}
+                            data-tip={feat.tooltips[tierName]}
                           >
-                            <IconInfo size={14} strokeWidth={2} />
+                            <IconInfo size={16} strokeWidth={2} />
                           </span>
                         )}
-
                         {tierValue}
                       </span>
                     )}
@@ -126,7 +125,7 @@ export const PricingTableRowDesktop = (props: any) => {
             {i === category.features.length - 1 && (
               <div className="my-16 bg-green-400 border-none"></div>
             )}
-          </>
+          </Fragment>
         )
       })}
       <ReactTooltip effect={'solid'} />

@@ -16,11 +16,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
           { "key": "maxDiskIO", "title": "Disk IO Bandwidth up to", "value": "2,606 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "87 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct",
@@ -41,11 +37,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "174 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -66,11 +58,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "347 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -91,11 +79,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "8 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "630 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -116,11 +100,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "16 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "1,188 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -141,11 +121,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "32 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "2,375 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -166,11 +142,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "64 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "4,750 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -191,11 +163,7 @@
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "128 GB" },
           { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "9,500 Mbps" },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "9,500 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -220,11 +188,7 @@
             "title": "Maximum Disk IO Bandwidth",
             "value": "14,250 Mbps"
           },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "14,250 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
@@ -249,11 +213,7 @@
             "title": "Maximum Disk IO Bandwidth",
             "value": "19,000 Mbps"
           },
-          {
-            "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
-            "value": "19,000 Mbps"
-          },
+
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
