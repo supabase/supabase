@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.27.0
+  version: 1.33.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -155,6 +155,18 @@ commands:
   - id: supabase-stop
     title: supabase stop
     summary: Stop all local Supabase containers
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase stop
+        response: |
+          Stopped supabase local development setup.
+      - id: with-backup
+        name: Backup local database before stopping
+        code: supabase stop --backup
+        response: |
+          Database exported to supabase/.branches/main
+          Stopped supabase local development setup.
     tags:
       - local-dev
     links: []
@@ -168,6 +180,40 @@ commands:
   - id: supabase-status
     title: supabase status
     summary: Show status of local Supabase containers
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase status
+        response: |
+          supabase local development setup is running.
+
+                  API URL: http://localhost:54321
+                    DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+                Studio URL: http://localhost:54323
+              Inbucket URL: http://localhost:54324
+                JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
+                  anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+          service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+      - id: output-env
+        name: Format status as environment variables
+        code: supabase status -o env
+        response: |
+          ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+          API_URL="http://localhost:54321"
+          DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          INBUCKET_URL="http://localhost:54324"
+          JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
+          SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
+          STUDIO_URL="http://localhost:54323"
+      - id: output-custom-name
+        name: Customise the names of exported variables
+        code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
+        response: |
+          Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
+          SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+          DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
+          SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     tags:
       - local-dev
     links: []
@@ -201,6 +247,21 @@ commands:
   - id: supabase-start
     title: supabase start
     summary: Start containers for Supabase local development
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase start
+        response: |
+          Applying migration 20220810154536_employee.sql...
+          Seeding data supabase/seed.sql...
+          Started supabase local development setup.
+      - id: without-studio
+        name: Start containers without studio
+        code: supabase start -x studio
+        response: |
+          Excluding container: supabase/studio:20221214-4eecc99
+          Seeding data supabase/seed.sql...
+          Started supabase local development setup.
     tags:
       - local-dev
     links: []
@@ -529,9 +590,10 @@ commands:
     title: supabase login
     summary: Authenticate using an access token
     examples:
-      - title: Basic usage
-        script: supabase login
-        output: |
+      - id: basic-usage
+        name: Basic usage
+        code: supabase login
+        response: |
           You can generate an access token from https://app.supabase.com/account/tokens
           Enter your access token: sbp_****************************************
           Finished supabase login.
@@ -545,14 +607,16 @@ commands:
     title: supabase link
     summary: Link to a Supabase project
     examples:
-      - title: Basic usage
-        script: supabase link --project-ref ********************
-        output: |
-          Enter your database password:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase link --project-ref ********************
+        response: |
+          Enter your database password: ********
           Finished supabase link.
-      - title: Link without database password
-        script: supabase link --project-ref ******************** <<< ""
-        output: |
+      - id: without-password
+        name: Link without database password
+        code: supabase link --project-ref ******************** <<< ""
+        response: |
           Enter your database password:
           Finished supabase link.
     tags:
@@ -574,12 +638,14 @@ commands:
     title: supabase init
     summary: Initialize a local project
     examples:
-      - title: Basic usage
-        script: supabase init
-        output: Finished supabase init.
-      - title: Initialise from an existing directory
-        script: supabase init --workdir .
-        output: Finished supabase init.
+      - id: basic-usage
+        name: Basic usage
+        code: supabase init
+        response: Finished supabase init.
+      - id: from-workdir
+        name: Initialise from an existing directory
+        code: supabase init --workdir .
+        response: Finished supabase init.
     tags:
       - local-dev
     links: []
@@ -876,6 +942,10 @@ commands:
         name: -p, --password <string>
         description: Password to your remote Postgres database.
         default_value: ''
+      - id: schema
+        name: -s, --schema <strings>
+        description: List of schema to include.
+        default_value: all
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
@@ -915,7 +985,7 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
-        default_value: '[public]'
+        default_value: all
   - id: supabase-db-dump
     title: supabase db dump
     summary: Dumps schemas from the remote database
@@ -951,10 +1021,14 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
-        default_value: '[public]'
+        default_value: all
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
+        default_value: 'true'
+      - id: use-pgadmin
+        name: --use-pgadmin
+        description: Use pgAdmin to generate schema diff.
         default_value: 'false'
   - id: supabase-completion
     title: supabase completion
