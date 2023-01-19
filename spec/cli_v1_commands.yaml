@@ -247,6 +247,12 @@ commands:
   - id: supabase-start
     title: supabase start
     summary: Start containers for Supabase local development
+    description: |-
+      Starts the Supabase local development stack.
+
+      Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
+
+      All service containers are started by default. You can exclude those not needed by passing in `-x` flag.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -589,6 +595,14 @@ commands:
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
+    description: |-
+      Connect Supabase CLI to your Supabase account by logging in with your [personal access token](https://app.supabase.com/account/tokens).
+
+      Your access token will be stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
+
+      > If this behaviour is not desired, such as in a CI environment, you may skip login by specifying `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
+
+      Supabase CLI uses the stored token to access Management APIs, such as projects, functions, secrets, etc.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -606,6 +620,14 @@ commands:
   - id: supabase-link
     title: supabase link
     summary: Link to a Supabase project
+    description: |-
+      Link your local development project to a hosted Supabase project.
+
+      PostgREST configurations will be fetched from Supabase platform and validated against your local configuration file.
+
+      Optionally, database settings can be validated if you provide a password. Your database password will be saved in native credentials storage if available.
+
+      Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -637,6 +659,14 @@ commands:
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
+    description: |-
+      Initialise configurations for Supabase local development.
+
+      A `supabase/config.toml` file will be created in your current working directory. This configuration is specific to each local project.
+
+      > You may override the directory path withby specifying `SUPABASE_WORKDIR` environment variable.
+
+      In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
     examples:
       - id: basic-usage
         name: Basic usage
