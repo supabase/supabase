@@ -538,7 +538,13 @@ export const platform = {
     {
       name: 'Troubleshooting',
       url: undefined,
-      items: [{ name: 'Troubleshooting', url: '/guides/platform/troubleshooting/troubleshooting', items: [] }],
+      items: [
+        {
+          name: 'HTTP and Project Issues',
+          url: '/guides/platform/troubleshooting',
+          items: [],
+        },
+      ],
     },
   ],
 }
