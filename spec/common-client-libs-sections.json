@@ -9,7 +9,8 @@
     "title": "Installing",
     "id": "installing",
     "slug": "installing",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": ["reference_javascript_v1", "reference_dart_v0", "reference_python_v2"]
   },
   {
     "title": "Initializing",
@@ -22,14 +23,19 @@
     "id": "typescript-support",
     "slug": "typescript-support",
     "type": "markdown",
-    "excludes": ["reference_javascript_v1", "reference_python_v2"]
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_dart_v0",
+      "reference_dart_v1",
+      "reference_python_v2"
+    ]
   },
   {
     "title": "Upgrade guide",
     "id": "upgrade-guide",
     "slug": "upgrade-guide",
     "type": "markdown",
-    "excludes": ["reference_javascript_v1", "reference_python_v2"]
+    "excludes": ["reference_javascript_v2", "reference_dart_v1", "reference_python_v2"]
   },
   {
     "title": "Database",
