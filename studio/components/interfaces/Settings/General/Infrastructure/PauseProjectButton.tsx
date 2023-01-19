@@ -24,6 +24,7 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
+  const isPaused = ui?.selectedProject?.status === PROJECT_STATUS.INACTIVE
   const canPauseProject = checkPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
@@ -66,12 +67,24 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
             icon={<IconPause />}
             onClick={openModal}
             loading={loading}
-            disabled={!canPauseProject}
+            disabled={isPaused || !canPauseProject}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {!canPauseProject && (
+        {isPaused ? (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                'border border-scale-200 ', //border
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200">Your project is already paused</span>
+            </div>
+          </Tooltip.Content>
+        ) : !canPauseProject ? (
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
@@ -85,6 +98,8 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
               </span>
             </div>
           </Tooltip.Content>
+        ) : (
+          <></>
         )}
       </Tooltip.Root>
       <ConfirmModal
