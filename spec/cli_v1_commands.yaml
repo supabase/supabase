@@ -206,7 +206,7 @@ commands:
           SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
           STUDIO_URL="http://localhost:54323"
       - id: output-custom-name
-        name: Customise the names of exported variables
+        name: Customize the names of exported variables
         code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
         response: |
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
@@ -596,13 +596,13 @@ commands:
     title: supabase login
     summary: Authenticate using an access token
     description: |-
-      Connect Supabase CLI to your Supabase account by logging in with your [personal access token](https://app.supabase.com/account/tokens).
+      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://app.supabase.com/account/tokens).
 
-      Your access token will be stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
+      Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 
-      > If this behaviour is not desired, such as in a CI environment, you may skip login by specifying `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
+      > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
 
-      Supabase CLI uses the stored token to access Management APIs, such as projects, functions, secrets, etc.
+      The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -623,11 +623,11 @@ commands:
     description: |-
       Link your local development project to a hosted Supabase project.
 
-      PostgREST configurations will be fetched from Supabase platform and validated against your local configuration file.
+      PostgREST configurations are fetched from the Supabase platform and validated against your local configuration file.
 
-      Optionally, database settings can be validated if you provide a password. Your database password will be saved in native credentials storage if available.
+      Optionally, database settings can be validated if you provide a password. Your database password is saved in native credentials storage if available.
 
-      Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked.
+      Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked first.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -660,11 +660,11 @@ commands:
     title: supabase init
     summary: Initialize a local project
     description: |-
-      Initialise configurations for Supabase local development.
+      Initialize configurations for Supabase local development.
 
-      A `supabase/config.toml` file will be created in your current working directory. This configuration is specific to each local project.
+      A `supabase/config.toml` file is created in your current working directory. This configuration is specific to each local project.
 
-      > You may override the directory path withby specifying `SUPABASE_WORKDIR` environment variable.
+      > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable.
 
       In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
     examples:
@@ -673,7 +673,7 @@ commands:
         code: supabase init
         response: Finished supabase init.
       - id: from-workdir
-        name: Initialise from an existing directory
+        name: Initialize from an existing directory
         code: supabase init --workdir .
         response: Finished supabase init.
     tags:
