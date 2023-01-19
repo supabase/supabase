@@ -23,13 +23,13 @@ const Index = ({}: Props) => {
           <div className="m-3">
             <div
               className="
-              bg-panel-bg 
+              bg-UI-panel-bg 
               w-32
               rounded
               border
-              border-panel-border 
+              border-UI-panel-border 
               p-3
-              text-text-body
+              text-UI-text-body
               "
             >
               panel
