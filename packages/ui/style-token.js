@@ -4,9 +4,7 @@ const global = require('./styles/tokens/global.json')
 const light = require('./styles/tokens/light.json')
 const dark = require('./styles/tokens/dark.json')
 
-const supportedTokenTypeList = [
-  'color',
-]
+const supportedTokenTypeList = ['color']
 
 const formatValue = (tokenType, value) => {
   let formattedValue
@@ -49,17 +47,13 @@ StyleDictionaryPackage.registerFormat({
   name: 'tw/css-variables',
   formatter({ dictionary }) {
     return (
-      'module.exports = '
-      + `{\n${
-        dictionary.allProperties
-          .map((token) => {
-            const value = formatValue(token.type, token.value)
-            return `  "${token.path
-              .slice(1)
-              .join('-')}": "var(--${token.name}, ${value});"`
-          })
-          .join(',\n')
-         }\n}`
+      'module.exports = ' +
+      `{\n${dictionary.allProperties
+        .map((token) => {
+          const value = formatValue(token.type, token.value)
+          return `  "${token.path.slice(1).join('-')}": "var(--${token.name}, ${value});"`
+        })
+        .join(',\n')}\n}`
     )
   },
 })
@@ -87,9 +81,7 @@ function getStyleDictionaryConfig(tokensConfig = {}) {
   let configTailwindFilesByType = []
 
   if (buildTailwindFiles) {
-    configTailwindFilesByType = getConfigTailwindFilesByType(
-      supportedTokenTypeList,
-    )
+    configTailwindFilesByType = getConfigTailwindFilesByType(supportedTokenTypeList)
   }
 
   return {
@@ -125,13 +117,15 @@ const configs = [
   {
     brand: 'dark',
     buildTailwindFiles: false,
-    selectorName: '[data-theme="dark"]',
+    // selectorName: '[data-theme="dark"]',
+    selectorName: '.dark',
     tokens: dark,
   },
   {
     brand: 'light',
     buildTailwindFiles: true,
-    selectorName: '[data-theme="light"]',
+    // selectorName: '[data-theme="light"]',
+    selectorName: ':root',
     tokens: light,
   },
 ]
@@ -140,9 +134,7 @@ configs.map((config) => {
   console.log('\n==============================================')
   console.log(`\nProcessing:  [Web] [${config.brand}]`)
 
-  const StyleDictionary = StyleDictionaryPackage.extend(
-    getStyleDictionaryConfig(config),
-  )
+  const StyleDictionary = StyleDictionaryPackage.extend(getStyleDictionaryConfig(config))
 
   StyleDictionary.buildPlatform('web')
 

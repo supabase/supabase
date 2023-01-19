@@ -6,12 +6,13 @@
   "license": "MIT",
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
-    "build-transform-global": "npx token-transformer tokens.json styles/tokens/global.json global",
-    "build-transform-light": "npx token-transformer tokens.json styles/tokens/light.json global,light,theme --resolveReferences=false",
-    "build-transform-dark": "npx token-transformer tokens.json styles/tokens/dark.json global,dark,theme  --resolveReferences=false",
+    "build-transform-global": "npx token-transformer https://raw.githubusercontent.com/MildTomato/figma-tokens-supabase/main/tokens.json styles/tokens/global.json global",
+    "build-transform-light": "npx token-transformer https://raw.githubusercontent.com/MildTomato/figma-tokens-supabase/main/tokens.json styles/tokens/light.json global,light,theme --resolveReferences=false",
+    "build-transform-dark": "npx token-transformer https://raw.githubusercontent.com/MildTomato/figma-tokens-supabase/main/tokens.json styles/tokens/dark.json global,dark,theme  --resolveReferences=false",
     "build-transform": "npm run build-transform-global && npm run build-transform-light && npm run build-transform-dark",
     "build-tailwind": "node style-token.js",
-    "build-styles": "npm run build-transform && node style-token.js"
+    "copy-tokens": "node copy-tokens.js",
+    "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -38,9 +39,10 @@
     "tailwindcss-radix": "^1.6.0"
   },
   "devDependencies": {
-    "style-dictionary": "^3.7.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "style-dictionary": "^3.7.1",
+    "copyfiles": "^2.4.1",
     "typescript": "4.3.4"
   }
 }
