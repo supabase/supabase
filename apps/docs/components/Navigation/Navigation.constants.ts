@@ -275,6 +275,7 @@ export const menuItems: NavMenu = {
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },
     {
