@@ -1,6 +1,5 @@
-/* [data-theme="light"] { */
 :root {
-  --ui-variables-form-input-error-bg: #fffcfc;
+        --ui-variables-form-input-error-bg: #FFFCFC;
   --ui-variables-form-input-error-border: #f3aeaf;
   --ui-variables-form-input-bg: var(--ui-colors-slate-light-1, #fbfcfd);
   --ui-variables-form-input-border: var(--ui-colors-slate-light-7, #d7dbdf);
@@ -12,27 +11,19 @@
   --ui-variables-text-secondary: $colors.Slate.Light.10;
   --ui-variables-text-light: $colors.Slate.Light.9;
   --ui-variables-text-link: #4cc38a;
-  --ui-variables-text-gradient: linear-gradient(
-    90deg,
-    rgba($colors.Gray.Dark.1, 1) 0%,
-    rgba($colors.Gray.Dark.1, 0.5) 100%
-  );
+  --ui-variables-text-gradient: linear-gradient(90deg, rgba($colors.Gray.Dark.1, 1)  0%, rgba($colors.Gray.Dark.1, 0.5) 100%);
   --ui-variables-text-green-gradient: linear-gradient(45deg, #3cb179 0%, #62ffb3bd 100%);
   --ui-variables-panel-bg: var(--ui-colors-slate-light-1, #fbfcfd);
   --ui-variables-panel-border: var(--ui-colors-slate-light-4, #eceef0);
   --ui-variables-panel-bg-alt: $colors.Gray.Light.2;
   --ui-variables-panel-border-alt: $colors.Slate.Light.6;
-  --ui-variables-panel-divider: linear-gradient(
-    90deg,
-    rgba($colors.Gray.Dark.12, 0.5) 0%,
-    rgba($colors.Gray.Dark.3, 1) 100%
-  );
+  --ui-variables-panel-divider: linear-gradient(90deg, rgba($colors.Gray.Dark.12, 0.5)  0%, rgba($colors.Gray.Dark.3, 1) 100%);
   --ui-variables-panel-warning-bg: #ffb224;
   --ui-variables-panel-warning-text: #4e2009;
   --ui-variables-panel-warning-bg-alt: #ffecbc;
   --ui-variables-panel-danger-bg: #dc3d43;
   --ui-variables-panel-danger-bg-alt: #eb9091;
-  --ui-variables-panel-danger-text: #fffcfc;
+  --ui-variables-panel-danger-text: #FFFCFC;
   --ui-variables-background-primary: var(--ui-colors-slate-light-2, #f8f9fa);
   --ui-variables-background-border: $colors.Slate.Light.5;
   --ui-variables-background-alt: var(--ui-colors-white, #ffffff);
@@ -68,36 +59,16 @@
   --ui-variables-icon-outline-green: #299764;
   --ui-variables-icon-fill-1-green: #92ceac;
   --ui-variables-icon-fill-2-green: #92ceac;
-  --ui-variables-icon-negative-icons: linear-gradient(
-    45deg,
-    rgba($colors.Gray.Light.12, 0.5) 0%,
-    rgba($colors.Gray.Light.Alpha.5, 1) 100%
-  );
+  --ui-variables-icon-negative-icons: linear-gradient(45deg, rgba($colors.Gray.Light.12, 0.5) 0%, rgba($colors.Gray.Light.Alpha.5, 1) 100%);
   --ui-variables-badge-text: #4cc38a;
   --ui-variables-badge-background: #ddf3e4;
   --ui-variables-card-alt-background: var(--ui-colors-white, #ffffff);
-  --ui-variables-card-pill-label: linear-gradient(
-    90deg,
-    rgba(#343232, 0.1) 0%,
-    rgba(#d0d0d0, 0.1) 100%
-  );
-  --ui-variables-card-text: linear-gradient(45deg, #000000 0%, #82978d 100%);
-  --ui-variables-card-lw6-illustration-dark-fill: linear-gradient(
-    60deg,
-    rgba(#ffffff, 0.1) 0%,
-    rgba(#08b8b2, 0.3) 100%
-  );
-  --ui-variables-card-lw6-illustration-border-highlight: linear-gradient(
-    45deg,
-    rgba(#404040, 0.1) 50%,
-    rgba(#3fcfb5, 1) 100%
-  );
-  --ui-variables-card-lw6-illustration-teal-fill: linear-gradient(
-    45deg,
-    rgba(#ffffff, 0.5) 0%,
-    rgba(#08b8b2, 0.3) 100%
-  );
-  --ui-variables-card-lw6-illustration-accent-color: #249c95;
+  --ui-variables-card-pill-label: linear-gradient(90deg, rgba(#343232, 0.1) 0%, rgba(#D0D0D0, 0.1) 100%);
+  --ui-variables-card-text: linear-gradient(45deg, #000000 0%, #82978D 100%);
+  --ui-variables-card-lw6-illustration-dark-fill: linear-gradient(60deg, rgba(#ffffff, 0.1) 0%, rgba(#08B8B2, 0.3) 100%);
+  --ui-variables-card-lw6-illustration-border-highlight: linear-gradient(45deg, rgba(#404040, 0.1) 50%, rgba(#3FCFB5, 1) 100%);
+  --ui-variables-card-lw6-illustration-teal-fill: linear-gradient(45deg, rgba(#ffffff, 0.5) 0%, rgba(#08B8B2, 0.3) 100%);
+  --ui-variables-card-lw6-illustration-accent-color: #249C95;
   --ui-variables-colors-brand-primary: #3ecf8e;
   --ui-variables-colors-brand-accent: #34b97d;
   --ui-button-default-shadow: var(--ui-colors-slate-dark-6, [object Object]);
@@ -238,7 +209,7 @@
   --ui-line-heights-lg: $base * 1.75;
   --ui-line-heights-xl: $base * 1.75;
   --ui-line-heights-2xl: $base * 2;
-  --ui-line-heights-3xl: $base * 2.25;
+  --ui-line-heights-3xl: $base *2.25;
   --ui-line-heights-4xl: $base * 2.5;
   --ui-line-heights-5xl: $base * 3;
   --ui-line-heights-6xl: $base * 3.75;
@@ -298,7 +269,7 @@
   --ui-input-sm-height: 28;
   --ui-panel2: var(--ui-border-radius-sm, 4);
   --ui-base: 16;
-  --ui-xxl: var(--ui-spacing-xl, 4 * 2 * 2 * 2 * 2 * 2);
+  --ui-xxl: var(--ui-spacing-xl, 4 * 2 * 2 * 2 * 2*2);
   --ui-action-bar-vertical: 21;
   --ui-action-bar-horizontal: 32;
   --ui-table-header-horizontal: 32;
@@ -306,4 +277,4 @@
   --ui-content-vertical: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
   --ui-content-horizontal: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
   --ui-controller-vertical: var(--ui-spacing-md, 4 * 2 * 2);
-}
+    }

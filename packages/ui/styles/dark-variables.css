@@ -1,6 +1,5 @@
-/* [data-theme="dark"] { */
-.dark-ui {
-  --ui-variables-form-input-error-bg: #1f1315;
+.dark {
+        --ui-variables-form-input-error-bg: #1f1315;
   --ui-variables-form-input-error-border: #822025;
   --ui-variables-form-input-bg: var(--ui-colors-gray-dark-alpha-2, #ffffff08);
   --ui-variables-form-input-border: var(--ui-colors-gray-dark-7, #3e3e3e);
@@ -12,27 +11,19 @@
   --ui-variables-text-secondary: $colors.Gray.Dark.11;
   --ui-variables-text-light: $colors.Gray.Dark.9;
   --ui-variables-text-link: $variables.colors.brand.primary;
-  --ui-variables-text-gradient: linear-gradient(
-    90deg,
-    rgba($colors.Gray.Light.1, 1) 0%,
-    rgba($colors.Gray.Light.1, 0.5) 100%
-  );
-  --ui-variables-text-green-gradient: linear-gradient(45deg, #34b97d 0%, #3ecf8e 100%);
+  --ui-variables-text-gradient: linear-gradient(90deg, rgba($colors.Gray.Light.1, 1)  0%, rgba($colors.Gray.Light.1, 0.5) 100%);
+  --ui-variables-text-green-gradient: linear-gradient(45deg, #34B97D 0%, #3ECF8E 100%);
   --ui-variables-panel-bg: var(--ui-colors-gray-dark-3, #232323);
   --ui-variables-panel-border: var(--ui-colors-gray-dark-4, #282828);
   --ui-variables-panel-bg-alt: var(--ui-colors-gray-dark-4, #282828);
   --ui-variables-panel-border-alt: $colors.Gray.Dark.5;
   --ui-variables-panel-bg-accent: #262626;
-  --ui-variables-panel-divider: linear-gradient(
-    90deg,
-    rgba($colors.Gray.Dark.1, 0.5) 0%,
-    rgba($colors.Gray.Dark.8, 1) 100%
-  );
+  --ui-variables-panel-divider: linear-gradient(90deg, rgba($colors.Gray.Dark.1, 0.5)  0%, rgba($colors.Gray.Dark.8, 1) 100%);
   --ui-variables-panel-warning-bg: #ffb224;
   --ui-variables-panel-warning-text: #271700;
   --ui-variables-panel-warning-text-secondary: #824e00;
   --ui-variables-panel-danger-bg: #e5484d;
-  --ui-variables-panel-danger-text: #fffcfc;
+  --ui-variables-panel-danger-text: #FFFCFC;
   --ui-variables-panel-danger-text-secondary: #f9c6c6;
   --ui-variables-background-primary: var(--ui-colors-gray-dark-2, #1c1c1c);
   --ui-variables-background-border: $colors.Gray.Dark.4;
@@ -62,11 +53,7 @@
   --ui-variables-illustration-dialog-box-light: var(--ui-colors-gray-dark-4, #282828);
   --ui-variables-illustration-dialog-box-2: var(--ui-colors-gray-dark-4, #282828);
   --ui-variables-illustration-dialog-box-1: var(--ui-colors-gray-dark-5, #2e2e2e);
-  --ui-variables-illustration-gradient-line: linear-gradient(
-    90deg,
-    $variables.illustration.background 0%,
-    $variables.illustration.text 100%
-  );
+  --ui-variables-illustration-gradient-line: linear-gradient(90deg, $variables.illustration.background 0%, $variables.illustration.text 100%);
   --ui-variables-icon-background: var(--ui-colors-gray-dark-3, #232323);
   --ui-variables-icon-outline: var(--ui-colors-gray-dark-9, #707070);
   --ui-variables-icon-fill-1: var(--ui-colors-gray-dark-2, #1c1c1c);
@@ -74,15 +61,11 @@
   --ui-variables-icon-outline-green: #4cc38a;
   --ui-variables-icon-fill-1-green: #133929;
   --ui-variables-icon-fill-2-green: #1b543a;
-  --ui-variables-icon-negative-icons: linear-gradient(
-    45deg,
-    rgba($colors.Gray.Dark.12, 0.5) 0%,
-    rgba($colors.Gray.Dark.Alpha.5, 1) 100%
-  );
-  --ui-variables-code-highlight1: #98c1fe;
-  --ui-variables-code-highlight2: #f2afe3;
+  --ui-variables-icon-negative-icons: linear-gradient(45deg, rgba($colors.Gray.Dark.12, 0.5) 0%, rgba($colors.Gray.Dark.Alpha.5, 1) 100%);
+  --ui-variables-code-highlight1: #98C1FE;
+  --ui-variables-code-highlight2: #F2AFE3;
   --ui-variables-code-highlight3: $variables.colors.brand.primary;
-  --ui-variables-code-highlight4: #d4d4d4;
+  --ui-variables-code-highlight4: #D4D4D4;
   --ui-variables-charts-primary: #cbf5ff;
   --ui-variables-charts-warning: #ffa600db;
   --ui-variables-charts-danger: #e5484d;
@@ -93,44 +76,16 @@
   --ui-variables-badge-secondary-background: var(--ui-colors-gray-dark-5, #2e2e2e);
   --ui-variables-badge-secondary-text: var(--ui-colors-gray-dark-9, #707070);
   --ui-variables-card-alt-background: #121212;
-  --ui-variables-card-border: linear-gradient(
-    30deg,
-    rgba($colors.Gray.Dark.5, 1) 0%,
-    rgba($colors.Gray.Dark.3, 1) 100%
-  );
-  --ui-variables-card-border-active: linear-gradient(
-    30deg,
-    rgba($colors.Gray.Dark.7, 1) 0%,
-    rgba($colors.Gray.Dark.3, 1) 100%
-  );
+  --ui-variables-card-border: linear-gradient(30deg, rgba($colors.Gray.Dark.5, 1)  0%, rgba($colors.Gray.Dark.3, 1) 100%);
+  --ui-variables-card-border-active: linear-gradient(30deg, rgba($colors.Gray.Dark.7, 1)  0%, rgba($colors.Gray.Dark.3, 1) 100%);
   --ui-variables-card-background-active: var(--ui-colors-gray-dark-3, #232323);
-  --ui-variables-card-text: linear-gradient(45deg, #ffffff 0%, #ccebd7 100%);
-  --ui-variables-card-pill-label: linear-gradient(
-    90deg,
-    rgba(#343232, 0.1) 0%,
-    rgba(#d0d0d0, 0.1) 100%
-  );
-  --ui-variables-card-pill-label-border: linear-gradient(
-    90deg,
-    rgba(#343232, 0.1) 0%,
-    rgba(#ffffff, 0) 100%
-  );
-  --ui-variables-card-lw6-illustration-dark-fill: linear-gradient(
-    60deg,
-    rgba(#121212, 1) 0%,
-    rgba(#232323, 1) 100%
-  );
-  --ui-variables-card-lw6-illustration-border-highlight: linear-gradient(
-    45deg,
-    rgba(#232323, 1) 50%,
-    rgba(#3fcfb5, 0, 5) 100%
-  );
-  --ui-variables-card-lw6-illustration-teal-fill: linear-gradient(
-    45deg,
-    rgba(#121212, 0) 0%,
-    rgba(#08b8b2, 0.3) 100%
-  );
-  --ui-variables-card-lw6-illustration-accent-color: #4da08b;
+  --ui-variables-card-text: linear-gradient(45deg, #ffffff 0%, #CCEBD7 100%);
+  --ui-variables-card-pill-label: linear-gradient(90deg, rgba(#343232, 0.1) 0%, rgba(#D0D0D0, 0.1) 100%);
+  --ui-variables-card-pill-label-border: linear-gradient(90deg, rgba(#343232, 0.1) 0%, rgba(#ffffff, 0) 100%);
+  --ui-variables-card-lw6-illustration-dark-fill: linear-gradient(60deg, rgba(#121212, 1) 0%, rgba(#232323, 1) 100%);
+  --ui-variables-card-lw6-illustration-border-highlight: linear-gradient(45deg, rgba(#232323, 1) 50%, rgba(#3FCFB5, 0,5) 100%);
+  --ui-variables-card-lw6-illustration-teal-fill: linear-gradient(45deg, rgba(#121212, 0) 0%, rgba(#08B8B2, 0.3) 100%);
+  --ui-variables-card-lw6-illustration-accent-color: #4DA08B;
   --ui-variables-colors-brand-primary: #3ecf8e;
   --ui-variables-colors-brand-accent: #34b97d;
   --ui-164430: #164430;
@@ -272,7 +227,7 @@
   --ui-line-heights-lg: $base * 1.75;
   --ui-line-heights-xl: $base * 1.75;
   --ui-line-heights-2xl: $base * 2;
-  --ui-line-heights-3xl: $base * 2.25;
+  --ui-line-heights-3xl: $base *2.25;
   --ui-line-heights-4xl: $base * 2.5;
   --ui-line-heights-5xl: $base * 3;
   --ui-line-heights-6xl: $base * 3.75;
@@ -332,7 +287,7 @@
   --ui-input-sm-height: 28;
   --ui-panel2: var(--ui-border-radius-sm, 4);
   --ui-base: 16;
-  --ui-xxl: var(--ui-spacing-xl, 4 * 2 * 2 * 2 * 2 * 2);
+  --ui-xxl: var(--ui-spacing-xl, 4 * 2 * 2 * 2 * 2*2);
   --ui-action-bar-vertical: 21;
   --ui-action-bar-horizontal: 32;
   --ui-table-header-horizontal: 32;
@@ -340,4 +295,4 @@
   --ui-content-vertical: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
   --ui-content-horizontal: var(--ui-spacing-lg, 4 * 2 * 2 * 2);
   --ui-controller-vertical: var(--ui-spacing-md, 4 * 2 * 2);
-}
+    }
