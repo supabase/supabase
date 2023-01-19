@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 const StyleDictionaryPackage = require('style-dictionary')
 const global = require('./styles/tokens/global.json')
+const typography = require('./styles/tokens/typography.json')
 const light = require('./styles/tokens/light.json')
 const dark = require('./styles/tokens/dark.json')
 
-const supportedTokenTypeList = ['color']
+const supportedTokenTypeList = ['color', 'typography']
 
 const formatValue = (tokenType, value) => {
   let formattedValue
@@ -51,7 +52,7 @@ StyleDictionaryPackage.registerFormat({
       `{\n${dictionary.allProperties
         .map((token) => {
           const value = formatValue(token.type, token.value)
-          return `  "${token.path.slice(1).join('-')}": "var(--${token.name}, ${value});"`
+          return `  "UI-${token.path.slice(1).join('-')}": "var(--${token.name}, ${value});"`
         })
         .join(',\n')}\n}`
     )
@@ -63,6 +64,7 @@ StyleDictionaryPackage.registerFormat({
  * for generating seperated tailwind files.
  */
 function getConfigTailwindFilesByType(typeList) {
+  console.log('typeList', typeList)
   return typeList.map((typeName) => {
     return {
       destination: `tw-extend/${typeName}.js`,
@@ -115,15 +117,21 @@ const configs = [
     tokens: global,
   },
   {
+    brand: 'typography',
+    buildTailwindFiles: true,
+    selectorName: ':root',
+    tokens: typography,
+  },
+  {
     brand: 'dark',
-    buildTailwindFiles: false,
+    buildTailwindFiles: true,
     // selectorName: '[data-theme="dark"]',
     selectorName: '.dark',
     tokens: dark,
   },
   {
     brand: 'light',
-    buildTailwindFiles: true,
+    buildTailwindFiles: false,
     // selectorName: '[data-theme="light"]',
     selectorName: ':root',
     tokens: light,
