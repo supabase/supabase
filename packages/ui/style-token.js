@@ -8,7 +8,7 @@ const { Parser } = require('expr-eval')
 const { parseToRgba } = require('color2k')
 const fs = require('fs')
 
-const basePath = 'styles-v2/'
+const basePath = 'styles/'
 
 console.log('Build started...')
 console.log('\n==============================================')
