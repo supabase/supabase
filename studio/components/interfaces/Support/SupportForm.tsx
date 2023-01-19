@@ -26,7 +26,6 @@ import MultiSelect from 'components/ui/MultiSelect'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
-import BestPracticesGuidance from './BestPracticesGuidance'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
 
