@@ -1,14 +1,15 @@
 import React, { Fragment, useMemo } from 'react'
-
+import { useRouter } from 'next/router'
+import { useTheme } from 'common/Providers'
 import { IconCheckCircle, IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
-
 interface Props {
   showComputeModal: boolean
   setShowComputeModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export default function ComputePricingModal({ showComputeModal, setShowComputeModal }: Props) {
+  const { basePath } = useRouter()
   const columnNames = useMemo(
     () =>
       pricingAddOn.database.rows.map((row) =>
@@ -36,13 +37,25 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
       <div className="z-10">
         <div>
           <div className="p-5">
-            <h2>Choose best compute setup for you</h2>
-            <p>
-              Every project on the Supabase Platform comes with its own dedicated Postgres instance
-              running inside a virtual machine (VM). The following table describes the base instance
-              with additional compute add-ons available if you need extra performance when scaling
-              up Supabase.
-            </p>
+            <div className="flex gap-8">
+              <div className="">
+                <div className="bg-brand-1000 rounded-xl w-12 h-12 flex justify-center items-center">
+                  <img
+                    className="w-6"
+                    src={`${basePath}/images/pricing/compute-upgrade-green.svg`}
+                  />
+                </div>
+              </div>
+              <div className="max-w-4xl">
+                <h2 className="text-2xl">Choose best compute setup for you</h2>
+                <p className="mt-4">
+                  Every project on the Supabase Platform comes with its own dedicated Postgres
+                  instance running inside a virtual machine (VM). The following table describes the
+                  base instance with additional compute add-ons available if you need extra
+                  performance when scaling up Supabase.
+                </p>
+              </div>
+            </div>
           </div>
           <div className="p-5">
             <table className="text-scale-1200 m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
@@ -57,7 +70,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               </thead>
               <tbody>
                 {pricingAddOn.database.rows.map((row, i) => (
-                  <>
+                  <Fragment key={`row-${i}`}>
                     {i === 0 && (
                       <tr className="">
                         <td className="pb-1 rounded-tr-lg bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
@@ -86,7 +99,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                         </td>
                       ))}
                     </tr>
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

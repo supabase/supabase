@@ -5,7 +5,9 @@
     "features": [
       {
         "title": "Dedicated Postgres Database",
-        "tooltip": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats.",
+        "tooltips": {
+          "main": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats."
+        },
         "tiers": {
           "free": true,
           "pro": true,
@@ -24,20 +26,25 @@
       },
       {
         "title": "Database space",
+        "tooltips": {
+          "pro": "8 GB included, then $0.125 per GB"
+        },
         "tiers": {
-          "free": "Up to 500 MB",
-          "pro": "8 GB included, then $0.125 per GB",
+          "free": "500 MB",
+          "pro": "8 GB",
           "team": "text",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Automatic backups",
-        "tooltip": "Backups are entire copies of your database that can be restored in the future.",
-        "tooltipPosition": "pro",
+        "tooltips": {
+          "main": "Backups are entire copies of your database that can be restored in the future.",
+          "pro": "7 days of backup (if > 1TB, contact for Enterprise pricing)"
+        },
         "tiers": {
           "free": false,
-          "pro": "7 days of backup* (* if > 1TB, contact enterprise)",
+          "pro": "7 days",
           "team": "text",
           "enterprise": "Custom"
         }
@@ -53,9 +60,11 @@
       },
       {
         "title": "Pausing",
-        "tooltip": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard",
+        "tooltips": {
+          "main": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard"
+        },
         "tiers": {
-          "free": "Paused after 1 week inactivity",
+          "free": "After 1 inactive week",
           "pro": "Never",
           "team": "text",
           "enterprise": "Never"
@@ -63,10 +72,13 @@
       },
       {
         "title": "Database egress",
-        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tooltips": {
+          "main": "Good news, only download operations are counted towards the limit",
+          "pro": "50GB included per month, then $0.09 per GB"
+        },
         "tiers": {
-          "free": "Up to 2GB",
-          "pro": "50GB included per month, then $0.09 per GB",
+          "free": "2GB",
+          "pro": "50GB",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -79,7 +91,7 @@
     "features": [
       {
         "title": "Total Users",
-        "tooltip": "The maximum number of users your project can have",
+        "tooltips": { "main": "The maximum number of users your project can have" },
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
@@ -89,10 +101,13 @@
       },
       {
         "title": "MAUs",
-        "tooltip": "Monthly Active Users; a user that has made an API request in the last month.",
+        "tooltips": {
+          "main": "Monthly Active Users; a user that has made an API request in the last month.",
+          "pro": "100,000 included, then $0.00325 per MAU"
+        },
         "tiers": {
-          "free": "Up to 50,000 MAUs",
-          "pro": "100,000 included, then $0.00325 per MAU",
+          "free": "50,000",
+          "pro": "100,000",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -153,7 +168,7 @@
       },
       {
         "title": "Supabase Auth emails",
-        "tooltip": "Rate limits do not apply to Custom SMTP",
+        "tooltips": { "main": "Rate limits do not apply to Custom SMTP" },
         "tiers": {
           "free": "30 / hour",
           "pro": "100 / hour",
@@ -175,22 +190,27 @@
   "storage": {
     "title": "Storage",
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+
     "features": [
       {
         "title": "Storage",
+        "tooltips": { "pro": "100 GB included, then $0.021 per GB" },
         "tiers": {
-          "free": "Up to 1 GB",
-          "pro": "100 GB included, then $0.021 per GB",
+          "free": "1 GB",
+          "pro": "100 GB",
           "team": "text",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Storage egress",
-        "tooltip": "Good news, only download operations are counted towards the limit",
+        "tooltips": {
+          "main": "Good news, only download operations are counted towards the limit",
+          "pro": "200 GB included, then $0.09 per GB"
+        },
         "tiers": {
-          "free": "Up to 2 GB",
-          "pro": "200 GB included, then $0.09 per GB",
+          "free": "2 GB",
+          "pro": "200 GB",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -205,19 +225,20 @@
       },
       {
         "title": "Max file upload size",
-        "tooltip": "You can change the upload size in the dashboard",
+        "tooltips": { "main": "You can change the upload size in the dashboard" },
         "tiers": {
-          "free": "Up to 50MB",
-          "pro": "Up to 5GB",
+          "free": "50MB",
+          "pro": "5GB",
           "team": "text",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Asset transformations",
+        "tooltips": { "pro": "5$ per 1000 origin images after the first 100" },
         "tiers": {
           "free": false,
-          "pro": "Unlimited transformations for 100 origin images, then 5$ per 1000 origin images",
+          "pro": "Unlimited for 100 origin images",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -230,9 +251,12 @@
     "features": [
       {
         "title": "Invocations",
+        "tooltips": {
+          "pro": "2 Million per month, then $2 per 1 million invocations"
+        },
         "tiers": {
-          "free": "500K per month",
-          "pro": "2 Million per month, then $2 per 1 million invocations",
+          "free": "500K/month",
+          "pro": "2 Million/month",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -240,17 +264,20 @@
       {
         "title": "Script size",
         "tiers": {
-          "free": "2 mb",
-          "pro": "10 mb",
+          "free": "2 MB",
+          "pro": "10 MB",
           "team": "text",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Number of functions",
+        "tooltips": {
+          "pro": "100, then $10 per additional 100 functions"
+        },
         "tiers": {
           "free": "10",
-          "pro": "100, then $10 per additional 100 functions",
+          "pro": "100",
           "team": "text",
           "enterprise": "Unlimited"
         }
@@ -272,17 +299,23 @@
       },
       {
         "title": "Concurrent Peak Connections",
+        "tooltips": {
+          "pro": "Up to 500, then $10 per 1000"
+        },
         "tiers": {
-          "free": "Up to 200",
-          "pro": "Up to 500, then $10 per 1000",
+          "free": "200",
+          "pro": "500",
           "team": "text",
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
       {
         "title": "Max Messages Per Month",
+        "tooltips": {
+          "free": "2 Million (including database)"
+        },
         "tiers": {
-          "free": "2 Million (including database)",
+          "free": "2 Million",
           "pro": "5 Million",
           "team": "text",
           "enterprise": "Volume discounts on messages"
@@ -291,8 +324,8 @@
       {
         "title": "Max Message Size",
         "tiers": {
-          "free": "250 Kb",
-          "pro": "3 Mb",
+          "free": "250 KB",
+          "pro": "3 MB",
           "team": "text",
           "enterprise": "Custom"
         }
@@ -419,12 +452,15 @@
       },
       {
         "title": "Custom Domains",
-        "tooltip": "Contact us to access this feature",
+        "tooltips": {
+          "main": "Contact us to access this feature",
+          "enterprise": "Volume discounts available."
+        },
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
           "team": "text",
-          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available."
+          "enterprise": "1 included, additional $10/domain/month"
         }
       }
     ]
