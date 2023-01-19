@@ -340,6 +340,7 @@ export const menuItems: NavMenu = {
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
             { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+            { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
           ],
         },
       ],

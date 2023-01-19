@@ -699,6 +699,7 @@ export const integrations = {
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+        { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
     },
     {
