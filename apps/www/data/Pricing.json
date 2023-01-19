@@ -43,7 +43,7 @@
         "tooltip": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
         "tiers": {
           "free": false,
-          "pro": "$100 per 7 day rollback period (if > 28 days contact enterprise)",
+          "pro": "$100 per 7 day rollback period (if > 28 days, contact enterprise)",
           "enterprise": true
         }
       },
