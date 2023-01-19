@@ -66,9 +66,15 @@ const CliCommandSection = (props) => {
                 ' mb-16',
               ].join(' ')}
             >
-              <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
-                {command.summary}
-              </p>
+              {command.description ? (
+                <div className="prose">
+                  <ReactMarkdown>{command.description}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
+                  {command.summary}
+                </p>
+              )}
             </header>
 
             {command.subcommands.length > 0 && (
