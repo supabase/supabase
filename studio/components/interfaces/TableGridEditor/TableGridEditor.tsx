@@ -1,7 +1,7 @@
-import { FC, useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { find, isUndefined } from 'lodash'
+import { find, isUndefined, noop } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -12,7 +12,7 @@ import SidePanelEditor from './SidePanelEditor'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
 
-interface Props {
+export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
@@ -36,7 +36,7 @@ interface Props {
   onClosePanel: () => void
 }
 
-const TableGridEditor: FC<Props> = ({
+const TableGridEditor = ({
   theme = 'dark',
 
   selectedSchema,
@@ -47,13 +47,13 @@ const TableGridEditor: FC<Props> = ({
   selectedColumnToEdit,
   selectedTableToEdit,
 
-  onAddRow = () => {},
-  onEditRow = () => {},
-  onAddColumn = () => {},
-  onEditColumn = () => {},
-  onDeleteColumn = () => {},
-  onClosePanel = () => {},
-}) => {
+  onAddRow = noop,
+  onEditRow = noop,
+  onAddColumn = noop,
+  onEditColumn = noop,
+  onDeleteColumn = noop,
+  onClosePanel = noop,
+}: TableGridEditorProps) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const gridRef = useRef<SupabaseGridRef>(null)

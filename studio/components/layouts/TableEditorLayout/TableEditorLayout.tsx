@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState, useEffect } from 'react'
-import { isUndefined } from 'lodash'
+import { isUndefined, noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -22,17 +22,15 @@ interface Props {
 
 const TableEditorLayout: FC<Props> = ({
   selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onDuplicateTable = () => {},
+  onSelectSchema = noop,
+  onAddTable = noop,
+  onEditTable = noop,
+  onDeleteTable = noop,
+  onDuplicateTable = noop,
   children,
 }) => {
   const { vault, meta, ui } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
@@ -56,35 +54,18 @@ const TableEditorLayout: FC<Props> = ({
     }
   }, [ui.selectedProject?.ref, isEnabled])
 
-  useEffect(() => {
-    let cancel = false
-    if (!isLoading && !loaded) {
-      if (!cancel) setLoaded(true)
-    }
-    return () => {
-      cancel = true
-    }
-  }, [isLoading])
-
   if (!canReadTables) {
     return (
-      <ProjectLayout>
+      <ProjectLayout showGlobalSpinner={false} isLoading={false}>
         <NoPermission isFullPage resourceText="view tables from this project" />
-      </ProjectLayout>
-    )
-  }
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
       </ProjectLayout>
     )
   }
 
   return (
     <ProjectLayout
-      isLoading={!loaded || isUndefined(selectedSchema)}
+      showGlobalSpinner={false}
+      isLoading={false}
       product="Table editor"
       productMenu={
         <TableEditorMenu

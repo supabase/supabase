@@ -22,6 +22,7 @@ interface Props {
   productMenu?: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
+  showGlobalSpinner?: boolean
 }
 
 const ProjectLayout = ({
@@ -32,6 +33,7 @@ const ProjectLayout = ({
   children,
   hideHeader = false,
   hideIconBar = false,
+  showGlobalSpinner = true,
 }: PropsWithChildren<Props>) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
@@ -52,16 +54,16 @@ const ProjectLayout = ({
         {!hideIconBar && <NavigationBar />}
 
         {/* Product menu bar */}
-        <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
-          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        </MenuBarWrapper>
+        {productMenu && <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>}
 
         <main
           className="flex flex-col flex-1 w-full overflow-x-hidden"
           style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
-          <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+          <ContentWrapper isLoading={isLoading} showGlobalSpinner={showGlobalSpinner}>
+            {children}
+          </ContentWrapper>
         </main>
       </div>
     </ProjectContextProvider>
@@ -72,18 +74,9 @@ export const ProjectLayoutWithAuth = withAuth(observer(ProjectLayout))
 
 export default ProjectLayout
 
-interface MenuBarWrapperProps {
-  isLoading: boolean
-  productMenu?: ReactNode
-}
-
-const MenuBarWrapper: FC<MenuBarWrapperProps> = observer(({ isLoading, productMenu, children }) => {
-  const { ui } = useStore()
-  return <>{!isLoading && productMenu && ui.selectedProject !== undefined ? children : null}</>
-})
-
 interface ContentWrapperProps {
   isLoading: boolean
+  showGlobalSpinner?: boolean
 }
 
 /**
@@ -98,45 +91,47 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
-  const { ui } = useStore()
-  const router = useRouter()
+const ContentWrapper: FC<ContentWrapperProps> = observer(
+  ({ isLoading, showGlobalSpinner = true, children }) => {
+    const { ui } = useStore()
+    const router = useRouter()
 
-  const routesToIgnorePostgrestConnection = [
-    '/project/[ref]/reports',
-    '/project/[ref]/settings/general',
-    '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing/subscription',
-    '/project/[ref]/settings/billing/update',
-    '/project/[ref]/settings/billing/update/free',
-    '/project/[ref]/settings/billing/update/pro',
-  ]
+    const routesToIgnorePostgrestConnection = [
+      '/project/[ref]/reports',
+      '/project/[ref]/settings/general',
+      '/project/[ref]/settings/database',
+      '/project/[ref]/settings/billing/subscription',
+      '/project/[ref]/settings/billing/update',
+      '/project/[ref]/settings/billing/update/free',
+      '/project/[ref]/settings/billing/update/pro',
+    ]
 
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+    const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+    const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
 
-  const isProjectRestoring = ui.selectedProject?.status === PROJECT_STATUS.RESTORING
-  const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
-    ui.selectedProject?.status ?? ''
-  )
-  const isProjectPausing = ui.selectedProject?.status === PROJECT_STATUS.GOING_DOWN
-  const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
+    const isProjectRestoring = ui.selectedProject?.status === PROJECT_STATUS.RESTORING
+    const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
+      ui.selectedProject?.status ?? ''
+    )
+    const isProjectPausing = ui.selectedProject?.status === PROJECT_STATUS.GOING_DOWN
+    const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
-  return (
-    <>
-      {isLoading || ui.selectedProject === undefined ? (
-        <Connecting />
-      ) : isProjectPausing ? (
-        <PausingState project={ui.selectedProject} />
-      ) : requiresPostgrestConnection && isProjectOffline ? (
-        <ConnectingState project={ui.selectedProject} />
-      ) : requiresDbConnection && isProjectRestoring ? (
-        <RestoringState />
-      ) : requiresDbConnection && isProjectBuilding ? (
-        <BuildingState project={ui.selectedProject} />
-      ) : (
-        <Fragment key={ui.selectedProject.ref}>{children}</Fragment>
-      )}
-    </>
-  )
-})
+    return (
+      <>
+        {showGlobalSpinner && (isLoading || ui.selectedProject === undefined) ? (
+          <Connecting />
+        ) : isProjectPausing ? (
+          <PausingState project={ui.selectedProject!} />
+        ) : requiresPostgrestConnection && isProjectOffline ? (
+          <ConnectingState project={ui.selectedProject!} />
+        ) : requiresDbConnection && isProjectRestoring ? (
+          <RestoringState />
+        ) : requiresDbConnection && isProjectBuilding ? (
+          <BuildingState project={ui.selectedProject!} />
+        ) : (
+          <Fragment key={ui.selectedProject?.ref}>{children}</Fragment>
+        )}
+      </>
+    )
+  }
+)

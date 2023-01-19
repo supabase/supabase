@@ -1,16 +1,17 @@
 import { useState } from 'react'
-import { NextPage } from 'next'
 import router from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore, withAuth } from 'hooks'
+import { NextPageWithLayout } from 'types'
 import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 
-const Editor: NextPage = () => {
+const Editor: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
   const projectRef = ui.selectedProject?.ref
   const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table'>()
@@ -98,5 +99,9 @@ const Editor: NextPage = () => {
     </TableEditorLayout>
   )
 }
+
+Editor.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
+)
 
 export default withAuth(observer(Editor))

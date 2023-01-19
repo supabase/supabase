@@ -1,8 +1,6 @@
-import { FC, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useState } from 'react'
 import Link from 'next/link'
-import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { groupBy, noop, partition } from 'lodash'
 import {
   Button,
   Dropdown,
@@ -20,93 +18,91 @@ import {
 } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { Table } from 'data/tables/table-query'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useSchemasQuery } from 'data/tables/schemas-query'
+import { SYSTEM_SCHEMAS } from 'lib/constants'
 
-interface Props {
+export type TableEditorMenuProps = {
   selectedSchema?: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
-  onEditTable: (table: PostgresTable) => void
-  onDeleteTable: (table: PostgresTable) => void
-  onDuplicateTable: (table: PostgresTable) => void
+  onEditTable: (table: Table) => void
+  onDeleteTable: (table: Table) => void
+  onDuplicateTable: (table: Table) => void
 }
 
-const TableEditorMenu: FC<Props> = ({
+const TableEditorMenu = ({
   selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onDuplicateTable = () => {},
-}) => {
-  const { meta, ui } = useStore()
-  const router = useRouter()
-  const { id } = router.query
+  onSelectSchema = noop,
+  onAddTable = noop,
+  onEditTable = noop,
+  onDeleteTable = noop,
+  onDuplicateTable = noop,
+}: TableEditorMenuProps) => {
+  const { ref: projectRef, id } = useParams()
+  const { project } = useProjectContext()
 
-  const projectRef = ui.selectedProject?.ref
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const tables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
-  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
+  const [searchText, setSearchText] = useState<string>('')
 
-  // @ts-ignore
+  const {
+    data: tablesData,
+    isLoading: isLoadingTables,
+    refetch: refetchTables,
+    isRefetching: isRefetchingTables,
+    isSuccess: isSuccessTables,
+    isError,
+    error,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedSchema,
+  })
+
+  const objects = tablesData?.result ?? []
+  const filteredObjects =
+    searchText.trim().length > 0
+      ? objects.filter((o) => o.name.toLowerCase().includes(searchText.toLowerCase()))
+      : objects
+  const {
+    table: tables = [],
+    foreign_table: foreignTables = [],
+    view: views = [],
+    materialized_view: materializedViews = [],
+    partitioned_table: partitionedTables = [],
+  } = groupBy(filteredObjects, 'type')
+
+  const allTables = [...tables, ...partitionedTables]
+  const allViews = [...views, ...materializedViews]
+
+  const {
+    data: schemasData,
+    isLoading: isLoadingSchemas,
+    refetch: refetchSchemas,
+    isRefetching: isRefetchingSchemas,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const schemas = schemasData?.result ?? []
+
   const schema = schemas.find((schema) => schema.name === selectedSchema)
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const [searchText, setSearchText] = useState<string>('')
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-
-  // We may need to shift this to the schema store and do something like meta.schema.loadViews()
-  // I don't need we need a separate store for views
-  useEffect(() => {
-    let cancel = false
-    const fetchViews = async (selectedSchema: string) => {
-      await meta.schemas.loadViews(selectedSchema)
-    }
-    if (selectedSchema) fetchViews(selectedSchema)
-
-    return () => {
-      cancel = true
-    }
-  }, [selectedSchema])
-
   const refreshTables = async () => {
-    setIsRefreshing(true)
-    await meta.tables.load()
-    if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
-    setIsRefreshing(false)
+    await Promise.allSettled([refetchTables(), refetchSchemas()])
   }
 
-  const filteredTables =
-    searchText.length === 0
-      ? tables
-      : // @ts-ignore
-        tables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
-
-  const filteredViews =
-    searchText.length === 0
-      ? meta.schemas.views || []
-      : (meta.schemas.views || []).filter((view) =>
-          view.name.toLowerCase().includes(searchText.toLowerCase())
-        )
-
-  const filteredForeignTables =
-    searchText.length === 0
-      ? foreignTables
-      : foreignTables.filter((table) =>
-          (table?.name ?? '').toLowerCase().includes(searchText.toLowerCase())
-        )
-
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    SYSTEM_SCHEMAS.includes(schema.name)
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
@@ -117,16 +113,17 @@ const TableEditorMenu: FC<Props> = ({
     >
       {/* Schema selection dropdown */}
       <div className="px-3 mx-4">
-        {!meta.schemas.isInitialized ? (
+        {isLoadingSchemas && (
           <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
-        ) : (
+        )}
+
+        {isSuccessSchemas && (
           <Listbox
             size="tiny"
             value={selectedSchema}
-            // @ts-ignore
             onChange={(name: string) => {
               setSearchText('')
               onSelectSchema(name)
@@ -135,7 +132,6 @@ const TableEditorMenu: FC<Props> = ({
             <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
               <p className="text-xs text-scale-1100">Schemas</p>
             </Listbox.Option>
-            {/* @ts-ignore */}
             {openSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
@@ -231,7 +227,7 @@ const TableEditorMenu: FC<Props> = ({
 
       <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
         {/* List of tables belonging to selected schema */}
-        {filteredTables.length > 0 && (
+        {allTables.length > 0 && (
           <Menu type="pills">
             <Menu.Group
               // @ts-ignore
@@ -240,12 +236,13 @@ const TableEditorMenu: FC<Props> = ({
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center space-x-1">
                       <p>Tables</p>
-                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>
-                        ({filteredTables.length})
-                      </p>
+                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allTables.length})</p>
                     </div>
                     <button className="cursor-pointer" onClick={refreshTables}>
-                      <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
+                      <IconRefreshCw
+                        className={isRefetchingTables || isRefetchingSchemas ? 'animate-spin' : ''}
+                        size={14}
+                      />
                     </button>
                   </div>
                 </>
@@ -253,7 +250,7 @@ const TableEditorMenu: FC<Props> = ({
             />
 
             <div>
-              {filteredTables.map((table) => {
+              {allTables.map((table) => {
                 const isActive = Number(id) === table.id
                 return (
                   <ProductMenuItem
@@ -308,19 +305,19 @@ const TableEditorMenu: FC<Props> = ({
         )}
 
         {/* List of views belonging to selected schema */}
-        {filteredViews.length > 0 && (
+        {allViews.length > 0 && (
           <Menu type="pills">
             <Menu.Group
               // @ts-ignore
               title={
                 <div className="flex w-full items-center space-x-1">
                   <p>Views</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({filteredViews.length})</p>
+                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allViews.length})</p>
                 </div>
               }
             />
 
-            {filteredViews.map((view: SchemaView) => {
+            {allViews.map((view: SchemaView) => {
               const viewId = Base64.encode(JSON.stringify(view))
               const isActive = id === viewId
               return (
@@ -339,21 +336,19 @@ const TableEditorMenu: FC<Props> = ({
         )}
 
         {/* List of foreign tables belonging to selected schema */}
-        {filteredForeignTables.length > 0 && (
+        {foreignTables.length > 0 && (
           <Menu type="pills">
             <Menu.Group
               // @ts-ignore
               title={
                 <div className="flex w-full items-center space-x-1">
                   <p>Foreign Tables</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    ({filteredForeignTables.length})
-                  </p>
+                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({foreignTables.length})</p>
                 </div>
               }
             />
 
-            {filteredForeignTables.map((table: Partial<PostgresTable>) => {
+            {foreignTables.map((table) => {
               const isActive = Number(id) === table.id
               return (
                 <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
@@ -371,7 +366,14 @@ const TableEditorMenu: FC<Props> = ({
         )}
       </div>
 
-      {searchText.length > 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
+      {isLoadingTables && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
+          <span className="text-sm text-scale-900">Loading tables...</span>
+        </div>
+      )}
+
+      {isSuccessTables && searchText.length > 0 && filteredObjects.length <= 0 && (
         <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No results found</p>
           <p className="text-xs text-scale-1100">
@@ -380,7 +382,7 @@ const TableEditorMenu: FC<Props> = ({
         </div>
       )}
 
-      {searchText.length === 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
+      {isSuccessTables && searchText.length <= 0 && objects.length <= 0 && (
         <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No tables available</p>
           <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
@@ -390,4 +392,4 @@ const TableEditorMenu: FC<Props> = ({
   )
 }
 
-export default observer(TableEditorMenu)
+export default TableEditorMenu

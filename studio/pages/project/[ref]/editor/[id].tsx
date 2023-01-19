@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -7,17 +6,23 @@ import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
+import { NextPageWithLayout } from 'types'
 import Base64 from 'lib/base64'
 import { tryParseJson } from 'lib/helpers'
-import { useStore, withAuth, useUrlState } from 'hooks'
+import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { useTableQuery } from 'data/tables/table-query'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 
-const TableEditorPage: NextPage = () => {
+const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { id }: any = router.query
+  const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { meta, ui } = useStore()
@@ -35,16 +40,14 @@ const TableEditorPage: NextPage = () => {
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
 
-  const projectRef = ui.selectedProject?.ref
-  const tables: PostgresTable[] = meta.tables.list()
-  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
+  const { project } = useProjectContext()
+  const { data } = useTableQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
-  const selectedTable = !isNaN(Number(id))
-    ? // @ts-ignore
-      tables.concat(foreignTables).find((table) => table.id === Number(id))
-    : id !== undefined
-    ? tryParseJson(Base64.decode(id))
-    : undefined
+  const selectedTable = data?.result
 
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
@@ -308,5 +311,9 @@ const TableEditorPage: NextPage = () => {
     </TableEditorLayout>
   )
 }
+
+TableEditorPage.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
+)
 
 export default withAuth(observer(TableEditorPage))

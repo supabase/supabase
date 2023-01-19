@@ -84,3 +84,19 @@ export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
 
 export const USAGE_APPROACHING_THRESHOLD = 0.75
+
+export const SYSTEM_SCHEMAS = [
+  'auth',
+  'extensions',
+  'information_schema',
+  'net',
+  'pgsodium',
+  'pgsodium_masks',
+  'pgbouncer',
+  'realtime',
+  'storage',
+  'supabase_functions',
+  'vault',
+  'graphql',
+  'graphql_public',
+]
