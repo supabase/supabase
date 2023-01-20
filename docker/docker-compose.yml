@@ -137,6 +137,8 @@ services:
         condition: service_healthy
       rest:
         condition: service_started
+      imgproxy:
+        condition: service_started
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
