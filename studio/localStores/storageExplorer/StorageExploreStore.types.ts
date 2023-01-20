@@ -23,6 +23,10 @@ export interface ExplorerItem {
   created_at?: string
 }
 
+export interface ColumnExplorerItem extends ExplorerItem {
+  columnIndex: number
+}
+
 export interface ItemMetadata {
   cacheControl: string
   mimetype: string
