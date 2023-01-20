@@ -111,7 +111,9 @@ const BillingUpdate: NextPageWithLayout = () => {
     )
   }
 
-  const teamTierEnabled = useFlag('teamTier')
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
 
   const productTiers = (products?.tiers ?? []).filter(
     (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM

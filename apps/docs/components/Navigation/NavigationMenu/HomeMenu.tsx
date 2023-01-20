@@ -95,6 +95,12 @@ const home = [
       level: 'reference_dart',
     },
     {
+      label: 'Python',
+      icon: '/img/icons/menu/reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+    },
+    {
       label: 'Tools Reference',
     },
     {
