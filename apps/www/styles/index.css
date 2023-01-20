@@ -674,7 +674,7 @@ launch week
   }
 
   .gradient-text-scale-100 {
-    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green4) 100%);
+    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
   }
 
   .gradient-text-scale-500 {

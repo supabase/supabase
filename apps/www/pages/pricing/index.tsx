@@ -39,7 +39,7 @@ export default function IndexPage() {
       costUnit: 'per month per project',
       href: 'https://app.supabase.com/new/new-project',
       priceLabel: 'Starting from',
-      priceMonthly: '0',
+      priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
       preface: 'Get started with...',
@@ -85,34 +85,34 @@ export default function IndexPage() {
       additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
-    {
-      name: 'Team',
-      nameBadge: 'New',
-      costUnit: 'per month per org',
-      href: 'https://app.supabase.com/new/new-project',
-      from: true,
-      priceLabel: 'Starting from',
-      priceMonthly: 599,
-      description: 'For scaling teams with permissions & access controls',
-      warning: '+ any additional usage',
-      features: [
-        'Usage-based pricing',
-        'Organization member roles (ABAC)',
-        'SOC2',
-        'Priority email support & SLAs',
-        '14 day backups',
-        '100,000 monthly active users included',
-        'Standardized Security Questionnaire',
-        'SSO for Supabase Dashboard',
-        '1 XS compute instance',
-        '28 day log retention',
-      ],
-      scale: '',
-      shutdown: '',
-      preface: 'The following features will apply to all projects within the organization:',
-      additional: '',
-      cta: 'Get Started',
-    },
+    // {
+    //   name: 'Team',
+    //   nameBadge: 'New',
+    //   costUnit: 'per month per org',
+    //   href: 'https://app.supabase.com/new/new-project',
+    //   from: true,
+    //   priceLabel: 'Starting from',
+    //   priceMonthly: 599,
+    //   description: 'For scaling teams with permissions & access controls',
+    //   warning: '+ any additional usage',
+    //   features: [
+    //     'Usage-based pricing',
+    //     'Organization member roles (ABAC)',
+    //     'SOC2',
+    //     'Priority email support & SLAs',
+    //     '14 day backups',
+    //     '100,000 monthly active users included',
+    //     'Standardized Security Questionnaire',
+    //     'SSO for Supabase Dashboard',
+    //     '1 XS compute instance',
+    //     '28 day log retention',
+    //   ],
+    //   scale: '',
+    //   shutdown: '',
+    //   preface: 'The following features will apply to all projects within the organization:',
+    //   additional: '',
+    //   cta: 'Get Started',
+    // },
     {
       name: 'Enterprise',
       href: 'https://forms.supabase.com/enterprise',
@@ -188,13 +188,17 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4">
-        <h2 className="text-scale-1200 text-base font-normal">{tier}</h2>
+        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase">
+          {tier}
+        </h2>
         <div className="flex items-baseline gap-2">
           {from && <span className="text-scale-1200 text-base">From</span>}
-          <span className="h1">
-            {showDollarSign && '$'}
-            {price}
-          </span>
+          {showDollarSign ? (
+            <span className="h1">${price}</span>
+          ) : (
+            <span className="text-scale-1100">{price}</span>
+          )}
+
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
@@ -248,12 +252,14 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md lg:grid lg:max-w-7xl lg:grid-cols-4 lg:gap-5">
+            <div className="mx-auto max-w-md grid lg:max-w-6xl lg:grid-cols-3 gap-24 lg:gap-5">
               {tiers.map((tier) => (
                 <div
                   key={`row-${tier.name}`}
                   className={[
-                    tier.name === 'Pro' ? 'bg-brand-800 border px-0.5 -mt-8 rounded-xl' : '',
+                    tier.name === 'Pro'
+                      ? 'bg-brand-800 dark:bg-brand-900 border px-0.5 -mt-8 rounded-xl'
+                      : '',
                   ].join(' ')}
                 >
                   {tier.name === 'Pro' && (
@@ -279,20 +285,22 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 h-[40px] text-sm">{tier.description}</p>
-                      <div
-                        className="
+                      <p className="text-scale-1100 my-4 h-[65px] text-sm  border-b pb-4">
+                        {tier.description}
+                      </p>
+
+                      {tier.name !== 'Enterprise' && (
+                        <div
+                          className="
                       text-scale-1200 flex items-baseline
                       text-5xl
                       font-normal
                       lg:text-4xl
                       xl:text-4xl
-                      border-t
                       border-b
                       py-8
                       "
-                      >
-                        {tier.priceMonthly !== undefined ? (
+                        >
                           <div className="flex flex-col gap-1">
                             <div className="flex items-end gap-2">
                               <div>
@@ -300,8 +308,7 @@ export default function IndexPage() {
                                   {tier.priceLabel}
                                 </p>
                                 <p className="text-5xl mt-2 gradient-text-scale-500 dark:gradient-text-scale-100">
-                                  {typeof tier.priceMonthly !== 'string' && '$'}
-                                  {tier.priceMonthly}
+                                  ${tier.priceMonthly}
                                 </p>
                                 {tier.costUnit && (
                                   <p className="text-scale-900 mt-1 text-xs">{tier.costUnit}</p>
@@ -315,31 +322,21 @@ export default function IndexPage() {
                               </div>
                             </div>
                           </div>
-                        ) : (
-                          <span>Contact Us</span>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                     <div
-                      className="
-                    dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl mb-0.5
-
-                    flex-1
-                    flex-col
-
-                    bg-white
-                    px-8
-
-                    py-6
-                  "
+                      className={`dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl mb-0.5 flex-1 flex-col bg-white px-8 py-6 ${
+                        tier.name === 'Enterprise' ? 'pt-0' : ''
+                      }`}
                     >
                       {tier.preface && (
-                        <p className="text-scale-1100 text-xs mt-2">{tier.preface}</p>
+                        <p className="text-scale-1100 text-xs mt-2 mb-4">{tier.preface}</p>
                       )}
                       {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                       <ul
                         role="list"
-                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000 mt-4"
+                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000"
                       >
                         {tier.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
@@ -388,7 +385,7 @@ export default function IndexPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-16">
+          <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-lg" key={addon.name}>
                 <div className="overflow-hidden">
@@ -399,7 +396,7 @@ export default function IndexPage() {
                     }.svg`}
                   />
                 </div>
-                <div className="px-4">
+                <div className="px-4  ">
                   <p className="text-xs text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <img
@@ -414,7 +411,7 @@ export default function IndexPage() {
                   <p className="mt-2 text-scale-900 text-xs min-h-[40px] lg:min-h-[60px]">
                     {addon.description}
                   </p>
-                  <div className="flex items-center justify-between mt-4 mb-8">
+                  <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
                     <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
                       <a>
                         <Button size="tiny" type="default">
@@ -439,21 +436,24 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="flex gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="bg-brand-400 inline-block text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
             </span>
-            <h2 className="text-scale-1200 text-4xl mt-4">Flexible Spend Cap</h2>
+            <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose">
-              Ensure you have the flexibility to scale your business without the restrictions of Pro
-              usage limits. Turn off the usage cap to let your project scale and only pay for what
-              you use.
+              The Pro tier has a usage quota included and a spend cap turned on by default. If you
+              need to go beyond the inclusive limits, simply switch off your spend cap to pay for
+              additional usage.
             </p>
           </div>
           <div>
             <div className="">
-              <img className="w-full" src={`${basePath}/images/pricing/spend-cap.svg`} />
+              <img
+                className="w-full"
+                src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.svg`}
+              />
             </div>
           </div>
         </div>
@@ -637,10 +637,10 @@ export default function IndexPage() {
             <div className="hidden lg:block">
               <table className="h-px w-full table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead className="bg-scale-200 dark:bg-scale-300 sticky top-[62px] z-10">
+                <thead className="bg-scale-200 dark:bg-scale-200 sticky top-[62px] z-10">
                   <tr>
                     <th
-                      className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
@@ -652,7 +652,7 @@ export default function IndexPage() {
 
                     {tiers.map((tier) => (
                       <th
-                        className="text-scale-1200 w-1/5 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
+                        className="text-scale-1200 w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
                         scope="col"
                         key={tier.name}
                       >
@@ -669,13 +669,13 @@ export default function IndexPage() {
                 </thead>
                 <tr className="descriptions">
                   <th
-                    className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                    className="text-scale-1200 w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
                     scope="col"
                   ></th>
 
                   {tiers.map((tier) => (
                     <th
-                      className="text-scale-1200 w-1/5 px-6 pt-2 pb-2 text-left text-sm font-normal"
+                      className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
                       key={`th-${tier.name}`}
                     >
@@ -698,7 +698,7 @@ export default function IndexPage() {
                       <td className="h-full px-6 py-2 align-top" key={`price-${tier.name}`}>
                         <div className="relative table h-full w-full">
                           <div className="flex flex-col justify-between h-full">
-                            {tier.priceMonthly && (
+                            {tier.name !== 'Enterprise' && (
                               <>
                                 <span className="text-5xl text-scale-1200">
                                   ${tier.priceMonthly}
