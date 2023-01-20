@@ -16,7 +16,7 @@ const ORG_KIND_TYPES = {
   STARTUP: 'Startup',
   AGENCY: 'Agency',
   COMPANY: 'Company',
-  UNDISCLOSED: 'Don’t know',
+  UNDISCLOSED: 'N/A',
 }
 const ORG_KIND_DEFAULT = 'PERSONAL'
 
