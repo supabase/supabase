@@ -106,7 +106,7 @@ services:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "printf", "\\0", ">", "/dev/tcp/localhost/4000" ]
+      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/3000" ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -125,7 +125,7 @@ services:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "printf", "\\0", ">", "/dev/tcp/localhost/4000" ]
+      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
       timeout: 5s
       interval: 5s
       retries: 3
