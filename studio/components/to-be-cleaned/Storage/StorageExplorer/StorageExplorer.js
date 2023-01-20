@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { compact, isEmpty, uniqBy, get } from 'lodash'
+import { compact, isEmpty, uniqBy, get, findIndex } from 'lodash'
 
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
@@ -114,6 +114,44 @@ const StorageExplorer = observer(({ bucket }) => {
     }
   }
 
+  const onSelectRangeItemsInColumn = (columnIndex, selectItemIndex, selectItem) => {
+    const columnFiles = columns[columnIndex].items
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => {
+        return { ...item, columnIndex }
+      })
+
+    const columnFilesId = compact(columnFiles.map((item) => item.id))
+    const selectedItemsFromColumnIds = selectedItems
+      .filter((item) => columnFilesId.includes(item.id))
+      .map((item) => item.id)
+    const lastSelectedItemId = selectedItemsFromColumnIds[selectedItemsFromColumnIds.length - 1]
+    const lastSelectedItemIndex = findIndex(columnFiles, { id: lastSelectedItemId })
+
+    // Get the start and end index of the range to select
+    const start = Math.min(selectItemIndex, lastSelectedItemIndex)
+    const end = Math.max(selectItemIndex, lastSelectedItemIndex)
+
+    // Get the range to select and reverse the order if necessary
+    const rangeToSelect = columnFiles.slice(start, end + 1)
+    if (selectItemIndex < lastSelectedItemIndex) {
+      rangeToSelect.reverse()
+    }
+
+    if (selectedItemsFromColumnIds.includes(selectItem.id)) {
+      const rangeToDeselectIds = rangeToSelect.map((item) => item.id)
+      // Deselect all items within the selection range
+      setSelectedItems(
+        selectedItems.filter(
+          (item) => !rangeToDeselectIds.includes(item.id) || item.id === selectItem.id
+        )
+      )
+    } else {
+      // Select items within the range
+      setSelectedItems(uniqBy(selectedItems.concat(rangeToSelect), 'id'))
+    }
+  }
+
   /** File manipulation methods */
 
   const onSelectCreateFolder = (columnIndex = -1) => {
@@ -190,6 +228,7 @@ const StorageExplorer = observer(({ bucket }) => {
           selectedFilePreview={selectedFilePreview}
           onFilesUpload={onFilesUpload}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+          onSelectRangeItemsInColumn={onSelectRangeItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
           onSelectCreateFolder={onSelectCreateFolder}
           onChangeView={onChangeView}
