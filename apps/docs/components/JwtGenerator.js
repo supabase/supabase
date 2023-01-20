@@ -64,8 +64,7 @@ export default function JwtGenerator({}) {
 
       <div className="grid mb-8">
         <label for="token">Payload:</label>
-        <textarea
-          className="form-textarea"
+        <Input.TextArea
           id="token"
           type="text"
           rows="5"

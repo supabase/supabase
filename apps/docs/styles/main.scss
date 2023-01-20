@@ -272,19 +272,3 @@ div[role='tablist'] {
   position: relative !important;
   height: unset !important;
 }
-
-.form-textarea {
-  border: 1px solid #3e3e3e;
-  padding: 8px;
-  font-family: 'Open Sans', sans-serif;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: none;
-  background-color: rgba(35, 35, 34, 1);
-  border-radius: 6px;
-  color: #fafafa;
-}
-
-.form-textarea:focus {
-  border-color: var(--colors-brand9);
-}
