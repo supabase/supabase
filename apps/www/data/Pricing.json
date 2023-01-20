@@ -25,6 +25,7 @@
       {
         "title": "Database space",
         "tooltips": {
+          "main": "Billing is based on the average database size in GB throughout the billing period.",
           "pro": "8 GB included, then $0.125 per GB"
         },
         "tiers": {
@@ -48,11 +49,12 @@
       {
         "title": "Point in time recovery",
         "tooltips": {
-          "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied."
+          "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
+          "pro": "If > 28 day rollback period, contact enterprise"
         },
         "tiers": {
           "free": false,
-          "pro": "$100 per 7 day rollback period (if > 28 days, contact enterprise)",
+          "pro": "$100 per 7 days",
           "enterprise": true
         }
       },
@@ -70,7 +72,7 @@
       {
         "title": "Database egress",
         "tooltips": {
-          "main": "Good news, only download operations are counted towards the limit",
+          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit",
           "pro": "50GB included per month, then $0.09 per GB"
         },
         "tiers": {
@@ -97,7 +99,7 @@
       {
         "title": "MAUs",
         "tooltips": {
-          "main": "Monthly Active Users; a user that has made an API request in the last month.",
+          "main": "Distinct users requesting your API throughout the billing period.",
           "pro": "100,000 included, then $0.00325 per MAU"
         },
         "tiers": {
@@ -147,14 +149,6 @@
         }
       },
       {
-        "title": "Custom SMTP",
-        "tiers": {
-          "free": true,
-          "pro": true,
-          "enterprise": true
-        }
-      },
-      {
         "title": "Supabase Auth emails",
         "tooltips": { "main": "Rate limits do not apply to Custom SMTP" },
         "tiers": {
@@ -180,7 +174,10 @@
     "features": [
       {
         "title": "Storage",
-        "tooltips": { "pro": "100 GB included, then $0.021 per GB" },
+        "tooltips": {
+          "pro": "100 GB included, then $0.021 per GB",
+          "main": "The sum of all objects' size in your storage buckets."
+        },
         "tiers": {
           "free": "1 GB",
           "pro": "100 GB",
@@ -190,7 +187,7 @@
       {
         "title": "Storage egress",
         "tooltips": {
-          "main": "Good news, only download operations are counted towards the limit",
+          "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted.",
           "pro": "200 GB included, then $0.09 per GB"
         },
         "tiers": {
@@ -218,11 +215,13 @@
       },
       {
         "title": "Asset transformations",
-        "tooltips": { "pro": "5$ per 1000 origin images after the first 100" },
+        "tooltips": {
+          "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
+          "pro": "5$ per 1000 origin images after the first 100"
+        },
         "tiers": {
           "free": false,
-          "pro": "Unlimited for 100 origin images",
-          "enterprise": "Unlimited"
+          "pro": "Unlimited for 100 origin images"
         }
       }
     ]
@@ -234,8 +233,10 @@
       {
         "title": "Invocations",
         "tooltips": {
+          "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
           "pro": "2 Million per month, then $2 per 1 million invocations"
         },
+        "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
         "tiers": {
           "free": "500K/month",
           "pro": "2 Million/month",
@@ -253,6 +254,7 @@
       {
         "title": "Number of functions",
         "tooltips": {
+          "main": "Billing is based on the maximum amount of functions at any point in time throughout your billing period.",
           "pro": "100, then $10 per additional 100 functions"
         },
         "tiers": {
@@ -278,6 +280,7 @@
       {
         "title": "Concurrent Peak Connections",
         "tooltips": {
+          "main": "We only charge for successful connections - not connection attempts!",
           "pro": "Up to 500, then $10 per 1000"
         },
         "tiers": {
@@ -287,8 +290,9 @@
         }
       },
       {
-        "title": "Max Messages Per Month",
+        "title": "Messages Per Month",
         "tooltips": {
+          "main": "Billing is based on the total sum of Realtime messages throughout your billing period.",
           "free": "2 Million (including database)"
         },
         "tiers": {
