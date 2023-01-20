@@ -29,6 +29,7 @@ import {
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { ColumnExplorerItem } from 'localStores/storageExplorer/StorageExploreStore.types'
 
 const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
@@ -68,21 +69,32 @@ const RowIcon = ({ view, status, fileType, mimeType }: any) => {
 }
 
 interface Props {
+  index: number
   item: any
   view: string
   columnIndex: number
   selectedItems: any[]
   openedFolders: any[]
   selectedFilePreview: any
+  onSelectRangeItemsInColumn: (
+    columnIndex: number,
+    selectItemIndex: number,
+    selectItem: ColumnExplorerItem
+  ) => void
 }
 
+type ExtendKeyboardEvent = React.ChangeEvent<HTMLInputElement> &
+  React.KeyboardEvent<HTMLInputElement>
+
 const FileExplorerRow: FC<Props> = ({
+  index: itemIndex,
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
+  onSelectRangeItemsInColumn = () => {},
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
@@ -127,7 +139,12 @@ const FileExplorerRow: FC<Props> = ({
     await fetchFolderContents(folder.id, folder.name, columnIndex)
   }
 
-  const onCheckItem = (item: any) => {
+  const onCheckItem = (item: ColumnExplorerItem, isShiftKeyHeld: boolean, itemIndex: number) => {
+    // Select a range if shift is held down
+    if (isShiftKeyHeld && selectedItems.length !== 0) {
+      onSelectRangeItemsInColumn(item.columnIndex, itemIndex, item)
+      return
+    }
     if (find(selectedItems, item) === undefined) {
       setSelectedItems(selectedItems.concat([item]))
     } else {
@@ -341,9 +358,9 @@ const FileExplorerRow: FC<Props> = ({
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={(event) => {
+              onChange={(event: ExtendKeyboardEvent) => {
                 event.stopPropagation()
-                onCheckItem(itemWithColumnIndex)
+                onCheckItem(itemWithColumnIndex, event.nativeEvent.shiftKey, itemIndex)
               }}
             />
           </div>
