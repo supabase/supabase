@@ -788,6 +788,13 @@ export const reference_dart_v1 = {
   parent: '/reference',
 }
 
+export const reference_python_v2 = {
+  icon: 'reference-python',
+  title: 'Python',
+  url: '/guides/reference/python',
+  parent: '/reference',
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',

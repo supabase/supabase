@@ -11,6 +11,9 @@ import spec_js_v1 from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
 import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
 // @ts-expect-error
 import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml' }
+
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
 import cliCommonSections from '~/../../spec/common-cli-sections.json'
@@ -47,6 +50,7 @@ export type RefIdOptions =
   | 'reference_javascript_v2'
   | 'reference_dart_v0'
   | 'reference_dart_v1'
+  | 'reference_python_v2'
   | 'reference_cli'
   | 'reference_api'
   | 'reference_self_hosting_auth'
@@ -56,6 +60,7 @@ export type RefIdOptions =
 export type RefKeyOptions =
   | 'javascript'
   | 'dart'
+  | 'python'
   | 'cli'
   | 'api'
   | 'self-hosting-auth'
@@ -64,16 +69,6 @@ export type RefKeyOptions =
 
 const NavigationMenu = () => {
   const router = useRouter()
-
-  let version = ''
-
-  if (router.asPath.includes('v1')) {
-    version = '_v1'
-  }
-
-  if (router.asPath.includes('v0')) {
-    version = '_v0'
-  }
 
   function handleRouteChange(url: string) {
     switch (url) {
@@ -126,6 +121,10 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/dart`) && url:
         menuState.setMenuLevelId('reference_dart_v1')
         break
+      // puthon v2 (latest)
+      case url.includes(`/docs/reference/python`) && url:
+        menuState.setMenuLevelId('reference_python_v2')
+        break
       case url.includes(`/docs/reference/cli`) && url:
         menuState.setMenuLevelId('reference_cli')
         break
@@ -175,6 +174,7 @@ const NavigationMenu = () => {
   const isReference_Javascript_V2 = 'reference_javascript_v2' === level
   const isReference_Dart_V0 = 'reference_dart_v0' === level
   const isReference_Dart_V1 = 'reference_dart_v1' === level
+  const isReference_Python_V2 = 'reference_python_v2' === level
   const isReference_Cli = 'reference_cli' === level
   const isReference_Api = 'reference_api' === level
   const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
@@ -228,6 +228,14 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="dart"
         spec={spec_dart_v1}
+      />
+      <NavigationMenuRefList
+        key={'reference-python-menu-v2'}
+        id={'reference_python_v2'}
+        active={isReference_Python_V2}
+        commonSections={libCommonSections}
+        lib="python"
+        spec={spec_python_v2}
       />
       {/* // Tools */}
       <NavigationMenuRefList
