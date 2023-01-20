@@ -11,7 +11,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -20,7 +19,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -32,7 +30,6 @@
         "tiers": {
           "free": "500 MB",
           "pro": "8 GB",
-
           "enterprise": "Unlimited"
         }
       },
@@ -45,16 +42,17 @@
         "tiers": {
           "free": false,
           "pro": "7 days",
-
           "enterprise": "Custom"
         }
       },
       {
         "title": "Point in time recovery",
+        "tooltips": {
+          "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied."
+        },
         "tiers": {
           "free": false,
-          "pro": false,
-
+          "pro": "$100 per 7 day rollback period (if > 28 days, contact enterprise)",
           "enterprise": true
         }
       },
@@ -66,7 +64,6 @@
         "tiers": {
           "free": "After 1 inactive week",
           "pro": "Never",
-
           "enterprise": "Never"
         }
       },
@@ -79,7 +76,6 @@
         "tiers": {
           "free": "2GB",
           "pro": "50GB",
-
           "enterprise": "Unlimited"
         }
       }
@@ -95,7 +91,6 @@
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
-
           "enterprise": "Unlimited"
         }
       },
@@ -108,7 +103,6 @@
         "tiers": {
           "free": "50,000",
           "pro": "100,000",
-
           "enterprise": "Unlimited"
         }
       },
@@ -117,7 +111,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -126,7 +119,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -135,7 +127,6 @@
         "tiers": {
           "free": false,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -144,7 +135,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -153,7 +143,6 @@
         "tiers": {
           "free": "1 hour",
           "pro": "7 days",
-
           "enterprise": true
         }
       },
@@ -162,7 +151,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -172,7 +160,6 @@
         "tiers": {
           "free": "30 / hour",
           "pro": "100 / hour",
-
           "enterprise": "Contact Us"
         }
       },
@@ -181,7 +168,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": "Contact Us"
         }
       }
@@ -198,7 +184,6 @@
         "tiers": {
           "free": "1 GB",
           "pro": "100 GB",
-
           "enterprise": "Unlimited"
         }
       },
@@ -211,7 +196,6 @@
         "tiers": {
           "free": "2 GB",
           "pro": "200 GB",
-
           "enterprise": "Unlimited"
         }
       },
@@ -229,7 +213,6 @@
         "tiers": {
           "free": "50MB",
           "pro": "5GB",
-
           "enterprise": "Unlimited"
         }
       },
@@ -239,7 +222,6 @@
         "tiers": {
           "free": false,
           "pro": "Unlimited for 100 origin images",
-
           "enterprise": "Unlimited"
         }
       }
@@ -257,7 +239,6 @@
         "tiers": {
           "free": "500K/month",
           "pro": "2 Million/month",
-
           "enterprise": "Unlimited"
         }
       },
@@ -266,7 +247,6 @@
         "tiers": {
           "free": "2 MB",
           "pro": "10 MB",
-
           "enterprise": "Unlimited"
         }
       },
@@ -278,7 +258,6 @@
         "tiers": {
           "free": "10",
           "pro": "100",
-
           "enterprise": "Unlimited"
         }
       }
@@ -293,7 +272,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -305,7 +283,6 @@
         "tiers": {
           "free": "200",
           "pro": "500",
-
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
@@ -317,7 +294,6 @@
         "tiers": {
           "free": "2 Million",
           "pro": "5 Million",
-
           "enterprise": "Volume discounts on messages"
         }
       },
@@ -326,7 +302,6 @@
         "tiers": {
           "free": "250 KB",
           "pro": "3 MB",
-
           "enterprise": "Custom"
         }
       }
@@ -341,7 +316,6 @@
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
-
           "enterprise": "Unlimited"
         }
       },
@@ -350,7 +324,6 @@
         "tiers": {
           "free": "Coming soon",
           "pro": "Coming soon",
-
           "enterprise": true
         }
       },
@@ -359,7 +332,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       }
@@ -374,7 +346,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -383,7 +354,6 @@
         "tiers": {
           "free": "1 day",
           "pro": "7 days",
-
           "enterprise": "90 days"
         }
       },
@@ -392,7 +362,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": "Coming soon"
         }
       },
@@ -401,7 +370,6 @@
         "tiers": {
           "free": false,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -410,7 +378,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -419,7 +386,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": "Contact Us"
         }
       },
@@ -428,7 +394,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -437,7 +402,6 @@
         "tiers": {
           "free": "Owner, Developer",
           "pro": "Owner, Developer",
-
           "enterprise": "Additional owner(s), admin, read-only, billing admin, custom"
         }
       },
@@ -446,7 +410,6 @@
         "tiers": {
           "free": false,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -459,7 +422,6 @@
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
-
           "enterprise": "1 included, additional $10/domain/month"
         }
       }
@@ -474,7 +436,6 @@
         "tiers": {
           "free": true,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -483,7 +444,6 @@
         "tiers": {
           "free": false,
           "pro": true,
-
           "enterprise": true
         }
       },
@@ -492,7 +452,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -501,7 +460,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -518,7 +476,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       },
@@ -527,7 +484,6 @@
         "tiers": {
           "free": false,
           "pro": false,
-
           "enterprise": true
         }
       }
