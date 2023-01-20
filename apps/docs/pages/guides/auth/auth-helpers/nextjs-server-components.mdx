@@ -144,8 +144,9 @@ Create a new `/app/middleware.js` file and populate with the following:
 
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
 
-import type { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import type { Database } from '../lib/database.types'
 
 export async function middleware(req: NextRequest) {
@@ -221,8 +222,6 @@ export const createClient = () => createBrowserSupabaseClient<Database>()
 </TabPanel>
 </Tabs>
 
-Next, we need to create a single instance of Supabase to use client-side. Let's create a new Provider for Supabase.
-
 <Tabs
   scrollable
   size="small"
@@ -230,6 +229,8 @@ Next, we need to create a single instance of Supabase to use client-side. Let's 
   defaultActiveId="js"
 >
 <TabPanel id="js" label="JavaScript">
+
+Next, we need to create a single instance of Supabase to use client-side. Let's create a new Provider for Supabase at `/components/supabase-provider.jsx` and populate with the following:
 
 ```jsx title=components/supabase-provider.jsx
 'use client'
@@ -248,7 +249,7 @@ export default function SupabaseProvider({ children }) {
         router.refresh()
       }
     })
-  
+
     return () => subscription.unsubscribe()
   }, [accessToken])
 
@@ -265,6 +266,8 @@ export const useSupabase = () => useContext(Context)
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
+Next, we need to create a single instance of Supabase to use client-side. Let's create a new Provider for Supabase at `/components/supabase-provider.tsx` and populate with the following:
 
 ```tsx title=components/supabase-provider.tsx
 'use client'
