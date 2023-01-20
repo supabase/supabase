@@ -700,6 +700,7 @@ export const integrations = {
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+        { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
     },
     {
@@ -784,6 +785,13 @@ export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
+  parent: '/reference',
+}
+
+export const reference_python_v2 = {
+  icon: 'reference-python',
+  title: 'Python',
+  url: '/guides/reference/python',
   parent: '/reference',
 }
 

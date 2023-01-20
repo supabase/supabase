@@ -57,13 +57,13 @@ WITH CHECK (true);`.trim(),
 CREATE POLICY "policy_name"
 ON ${schema}.${table}
 FOR UPDATE USING (
-  auth.email() = email
+  auth.jwt() ->> 'email' = email
 ) WITH CHECK (
-  auth.email() = email
+  auth.jwt() ->> 'email' = email
 );`.trim(),
     name: 'Enable update for users based on email',
-    definition: 'auth.email() = email',
-    check: 'auth.email() = email',
+    definition: `auth.jwt() ->> 'email' = email`,
+    check: `auth.jwt() ->> 'email' = email`,
     command: 'UPDATE',
     roles: [],
   },
