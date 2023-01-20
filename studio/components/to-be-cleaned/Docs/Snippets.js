@@ -680,7 +680,7 @@ const { data: { user } } = await supabase.auth.getUser()
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
+let { data, error } = await supabase.auth.resetPasswordForEmail(email)
 `,
     },
   }),
