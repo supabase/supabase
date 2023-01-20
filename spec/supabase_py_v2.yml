@@ -153,6 +153,30 @@ functions:
           ```
           res = supabase.auth.refresh_session()
           ```
+  - id: select
+    title: 'Fetch data: select()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
+    notes: |
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    examples:
+      - id: getting-your-data
+        name: Getting your data
+        code: |
+          ```
+          r = supabase
+          .from('countries')
+          .select("*")
+          ```
+      - id: selecting-specific-columns
+        name: Selecting specific columns
+        code: |
+          ```
+          r = await supabase
+          .from('countries')
+          .select('name')
+          ```
+
   - id: invoke
     title: 'invoke()'
     description: |
