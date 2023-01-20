@@ -92,7 +92,7 @@ DELETE FROM user WHERE id = "{{input2.value}}";
 
 ### Step 4: Show data on components
 
-Configure the properties of components with {{ . For example:
+Configure the properties of components with `{{` . For example:
 
 ![Show Supabase data on ILLA components](/docs/img/guides/integrations/illa/supabase-illa-show-data.png)
 
@@ -104,6 +104,4 @@ Configure the properties of components with {{ . For example:
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-export default Pag
-
-e
+export default Page
