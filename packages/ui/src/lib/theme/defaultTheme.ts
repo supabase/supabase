@@ -441,9 +441,9 @@ export default {
     container: 'inline-flex font-medium',
     type: {
       primary: `
-        bg-brand-fixed-800 hover:bg-brand-fixed-900
+        bg-brand-fixed-1100 hover:bg-brand-fixed-1000
         text-white
-        bordershadow-brand-fixed-800 hover:bordershadow-brand-fixed-1000
+        bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000
         focus-visible:outline-brand-600
       `,
       secondary: `
