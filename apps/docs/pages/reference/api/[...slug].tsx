@@ -15,8 +15,8 @@ export default function Config(props) {
   return <RefSectionHandler sections={sections} spec={generatedSpec} pageProps={props} type="api" />
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/api', '/api')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/api')
 }
 
 export function getStaticPaths() {

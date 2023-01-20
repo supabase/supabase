@@ -1,6 +1,6 @@
+import Link from 'next/link'
 import { FC } from 'react'
 import { Button, IconPlus } from 'ui'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { IS_PLATFORM } from 'lib/constants'
@@ -16,7 +16,6 @@ interface Props {
 }
 
 const ProjectList: FC<Props> = ({ rewriteHref }) => {
-  const router = useRouter()
   const { app, ui } = useStore()
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
@@ -44,7 +43,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
             ) : (
               <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {!canReadProjects ? (
-                  <div className="col-span-4 max-w-4xl space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
+                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
                     <div className="space-y-1">
                       <p>You need additional permissions to view projects from this organization</p>
                       <p className="text-sm text-scale-1100">
@@ -53,7 +52,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                     </div>
                   </div>
                 ) : isEmpty ? (
-                  <div className="col-span-4 max-w-4xl space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
                       <p className="text-sm text-scale-1100">
@@ -61,9 +60,11 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                       </p>
                     </div>
                     <div>
-                      <Button onClick={() => router.push(`/new/${slug}`)} icon={<IconPlus />}>
-                        New Project
-                      </Button>
+                      <Link href={`/new/${slug}`}>
+                        <a>
+                          <Button icon={<IconPlus />}>New Project</Button>
+                        </a>
+                      </Link>
                     </div>
                   </div>
                 ) : (
