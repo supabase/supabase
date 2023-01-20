@@ -10,6 +10,7 @@ interface Props {
 
 export default function ComputePricingModal({ showComputeModal, setShowComputeModal }: Props) {
   const { basePath } = useRouter()
+  const { isDarkMode } = useTheme()
   const columnNames = useMemo(
     () =>
       pricingAddOn.database.rows.map((row) =>
@@ -42,7 +43,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 <div className="bg-brand-1000 rounded-xl w-12 h-12 flex justify-center items-center">
                   <img
                     className="w-6"
-                    src={`${basePath}/images/pricing/compute-upgrade-green.svg`}
+                    src={`${basePath}/images/pricing/compute-upgrade${
+                      isDarkMode ? '-green' : ''
+                    }.svg`}
                   />
                 </div>
               </div>

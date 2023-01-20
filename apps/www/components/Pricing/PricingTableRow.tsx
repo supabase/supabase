@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip'
 
 export const Check = () => (
   <svg
-    className={`h-5 w-5 text-brand-800`}
+    className={`h-5 w-5 text-brand-900`}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 20 20"
     fill="currentColor"
@@ -54,7 +54,7 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
       >
         <th
-          className="border-b-2 border-scale-700 bg-scale-200 bg-scale-50 dark:bg-scale-300 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="border-b-2 border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -62,10 +62,10 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 text-base font-normal">{category.title}</h4>
           </div>
         </th>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-300 px-6 py-5 free"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-300 px-6 py-5 pro"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-300 px-6 py-5 team"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-300 px-6 py-5 enterprise"></td>
+        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 free"></td>
+        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 pro"></td>
+        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 team"></td>
+        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 enterprise"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {
