@@ -4,7 +4,7 @@ import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'
 
 // Parameters are grouped on the page by tag
-const TAGS = ['general', 'auth', 'api', 'database', 'dashboard', 'local']
+const TAGS = ['general', 'auth', 'api', 'database', 'dashboard', 'local', 'edge-functions']
 
 export default function Config() {
   return (
