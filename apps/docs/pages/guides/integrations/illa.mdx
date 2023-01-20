@@ -1,10 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-    id: 'illa',
-    title: 'ILLA',
-    description:
-        'Get started with Supabase and ILLA, a low-code platform for developers that enables the rapid development and deployment of internal tools.',
+  id: 'illa',
+  title: 'ILLA',
+  description:
+    'Get started with Supabase and ILLA, a low-code platform for developers that enables the rapid development and deployment of internal tools.',
 }
 
 This tutorial outlines the process of creating an Admin Panel using ILLA Builder and Supabase in a few simple steps. ILLA is a low-code platform for developers that enables the rapid development and deployment of internal tools. It allows for creating pages by dragging and dropping UI components, connecting to any database or API, and writing JavaScript. To learn more about ILLA and give it a try, visit their website at [https://www.illacloud.com/](https://www.illacloud.com/). Let's begin!
@@ -57,7 +57,7 @@ Click `Create Action` to create an action with the Supabase resource and config 
 
 ![Select Supabase resource in ILLA](/docs/img/guides/integrations/illa/supabase-illa-select.png)
 
-Use {{ to get the front-end input data. The following is an example of the User Management page in the Admin Panel.
+Use `{{` to get the front-end input data. The following is an example of the User Management page in the Admin Panel.
 
 Search for a user by the name inputted in input1
 
@@ -91,6 +91,7 @@ DELETE FROM user WHERE id = "{{input2.value}}";
 ```
 
 ### Step 4: Show data on components
+
 Configure the properties of components with {{ . For example:
 
 ![Show Supabase data on ILLA components](/docs/img/guides/integrations/illa/supabase-illa-show-data.png)
@@ -103,4 +104,6 @@ Configure the properties of components with {{ . For example:
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
-export default Page
+export default Pag
+
+e
