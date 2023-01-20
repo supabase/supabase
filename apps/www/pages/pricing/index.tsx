@@ -536,7 +536,7 @@ export default function IndexPage() {
               {/* Pro - Mobile  */}
               <MobileHeaders
                 tier="Pro"
-                from={true}
+                from={false}
                 price={'25'}
                 priceDescription={'/mo + additional use'}
                 description={'Everything you need to scale your project into production'}
