@@ -1,10 +1,10 @@
-import { Select } from '@supabase/ui'
+import { Select } from 'ui'
 import { EditorProps } from '@supabase/react-data-grid'
 
 import { useTrackedState } from 'components/grid/store'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
-  options: { label: string; value: string }[]
+  options: { label: string; _value: string }[]
 }
 
 export function SelectEditor<TRow, TSummaryRow = unknown>({
@@ -45,8 +45,8 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
       onBlur={onBlur}
     >
       <Select.Option value="">NULL</Select.Option>
-      {options.map(({ label, value }) => (
-        <Select.Option key={value} value={value}>
+      {options.map(({ label, _value }) => (
+        <Select.Option key={_value} value={_value} selected={_value === value}>
           {label}
         </Select.Option>
       ))}
