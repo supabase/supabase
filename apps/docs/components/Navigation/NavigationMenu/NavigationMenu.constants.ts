@@ -45,7 +45,7 @@ export const gettingstarted = {
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
       ],
@@ -54,7 +54,7 @@ export const gettingstarted = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'Next.js',
+          name: 'NextJS',
           url: '/guides/getting-started/tutorials/with-nextjs',
           items: [],
         },
