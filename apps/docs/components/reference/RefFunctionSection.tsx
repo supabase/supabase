@@ -18,18 +18,12 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   // gracefully return nothing if function does not exist
   if (!item) return <></>
 
-  const tsRefPath = item['$ref']?.split('.')
-  let signatureIdx = parseInt(tsRefPath?.at(-1))
+  const hasTsRef = item['$ref'] || null
 
-  if (isNaN(signatureIdx)) {
-    signatureIdx = -1
-  } else {
-    tsRefPath?.pop()
-  }
-
-  const tsDefinition = tsRefPath && props.typeSpec && extractTsDocNode(tsRefPath, props.typeSpec)
-  const parameters = tsDefinition && generateParameters(tsDefinition, signatureIdx)
-  const shortText = tsDefinition?.signatures?.at(signatureIdx)?.comment?.shortText
+  const tsDefinition =
+    hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
+  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : ''
+  const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment.shortText : ''
 
   return (
     <>
