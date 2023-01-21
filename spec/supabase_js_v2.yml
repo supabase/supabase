@@ -3980,42 +3980,111 @@ functions:
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
       - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
     examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('any')
+            .on('broadcast', { event: 'cursor-pos' }, payload => {
+              console.log('Cursor position received!', payload)
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'sync' }, () => {
+              console.log('Synced presence state: ', channel.presenceState())
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+              }
+            })
+          ```
+      - id: listen-to-presence-join
+        name: Listen to presence join
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'join' }, ({ newPresences }) => {
+              console.log('Newly joined presences: ', newPresences)
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+              }
+            })
+          ```
+      - id: listen-to-presence-leave
+        name: Listen to presence leave
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+              console.log('Newly left presences: ', leftPresences)
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+                await channel.untrack()
+              }
+            })
+          ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         isSpotlight: true
         code: |
           ```js
           supabase
-            .channel('*')
+            .channel('any')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-inserts
-        name: Listening to inserts
+      - id: listen-to-inserts
+        name: Listen to inserts
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-updates
-        name: Listening to updates
+      - id: listen-to-updates
+        name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening to:
@@ -4026,14 +4095,14 @@ functions:
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-deletes
-        name: Listening to deletes
+      - id: listen-to-deletes
+        name: Listen to deletes
         description: |
           By default, Supabase does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
@@ -4044,32 +4113,32 @@ functions:
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
           ```
       - id: listening-to-row-level-changes
-        name: Listening to row level changes
+        name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```js
           supabase
-            .channel('public:countries:id=eq.200')
+            .channel('any')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```

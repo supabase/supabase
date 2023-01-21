@@ -677,7 +677,7 @@
       },
       {
         "id": "subscribe",
-        "title": "Subscribe to database changes",
+        "title": "Subscribe to channel",
         "slug": "subscribe",
         "product": "realtime",
         "type": "function"
