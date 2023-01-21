@@ -1,17 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Alert, Button, Form, IconArrowRight, IconMoon, IconSun, Input, Listbox, Modal } from 'ui'
 
 import { Session } from '@supabase/supabase-js'
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
 import { useProfile, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { auth } from 'lib/gotrue'
 import { NextPageWithLayout } from 'types'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -102,6 +103,10 @@ const ProfileCard = observer(() => {
       <section>
         <ThemeSettings />
       </section>
+
+      <section>
+        <DeleteAccount />
+      </section>
     </article>
   )
 })
@@ -188,5 +193,105 @@ const ThemeSettings = observer(() => {
         </Listbox>
       </Panel.Content>
     </Panel>
+  )
+})
+
+const DeleteAccount = observer(() => {
+  const { ui } = useStore()
+
+  return (
+    <Panel title={<p key="panel-title">Delete Account</p>}>
+      <Panel.Content>
+        <Alert
+          withIcon
+          variant="danger"
+          // @ts-ignore
+          title={
+            <span className="text-red-900">Deleting this user will also remove its projects</span>
+          }
+        >
+          <p className="text-red-900">
+            Make sure you have made a backup if you want to keep your data
+          </p>
+          <DeleteUserButton />
+        </Alert>
+      </Panel.Content>
+    </Panel>
+  )
+})
+
+const DeleteUserButton = observer(() => {
+  const router = useRouter()
+  const { ui } = useStore()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const onConfirmDelete = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true)
+    const response = await delete_(`${API_URL}/profile`)
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: response.error.message,
+      })
+      setSubmitting(false)
+    } else {
+      setSubmitting(false)
+
+      // logout the user to clear local storage
+      await auth.signOut()
+      router.push('/')
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted your account`,
+      })
+    }
+  }
+  return (
+    <>
+      <div className="mt-2">
+        <Button onClick={() => setIsOpen(true)} type="danger">
+          Delete User
+        </Button>
+      </div>{' '}
+      <Modal
+        closable
+        hideFooter
+        size="small"
+        visible={isOpen}
+        onCancel={() => setIsOpen(false)}
+        header={
+          <div className="flex items-baseline gap-2">
+            <h5 className="text-sm text-scale-1200">Delete my account</h5>
+            <span className="text-xs text-scale-900">Are you sure?</span>
+          </div>
+        }
+      >
+        <Form validateOnBlur initialValues={{ orgName: '' }} onSubmit={onConfirmDelete}>
+          {({ isSubmitting }: { isSubmitting: boolean }) => (
+            <div className="space-y-4 py-3">
+              <Modal.Content>
+                <p className="text-sm text-scale-900">
+                  This action <span className="text-scale-1200">cannot</span> be undone. This will
+                  action will permanently delete the user.
+                </p>
+              </Modal.Content>
+              <Modal.Separator />
+              <Modal.Content>
+                <Button
+                  block
+                  danger
+                  size="small"
+                  type="danger"
+                  htmlType="submit"
+                  loading={isSubmitting}
+                >
+                  I understand, delete my account.
+                </Button>
+              </Modal.Content>
+            </div>
+          )}
+        </Form>
+      </Modal>
+    </>
   )
 })
