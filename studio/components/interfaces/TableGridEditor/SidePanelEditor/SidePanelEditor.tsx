@@ -65,10 +65,16 @@ const SidePanelEditor: FC<Props> = ({
       })
       .map((column) => column.name)
 
+    const geometryColumns = selectedTable.columns
+      .filter((column) => {
+        return column.data_type.toLowerCase() === 'geometry'
+      })
+      .map((column) => column.name)
+
     if (isNewRecord) {
       const insertQuery = new Query()
         .from(selectedTable.name, selectedTable.schema)
-        .insert([payload], { returning: true, enumArrayColumns })
+        .insert([payload], { returning: true, enumArrayColumns, geometryColumns })
         .toSql()
 
       const res: any = await meta.query(insertQuery)
@@ -84,7 +90,7 @@ const SidePanelEditor: FC<Props> = ({
         if (selectedTable.primary_keys.length > 0) {
           const updateQuery = new Query()
             .from(selectedTable.name, selectedTable.schema)
-            .update(payload, { returning: true, enumArrayColumns })
+            .update(payload, { returning: true, enumArrayColumns, geometryColumns })
             .match(configuration.identifiers)
             .toSql()
 

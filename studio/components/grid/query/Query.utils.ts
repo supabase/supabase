@@ -30,12 +30,31 @@ export function truncateQuery(
   return query + ';'
 }
 
+function generateReturning(options?: {
+  returning?: boolean
+  enumArrayColumns?: string[]
+  geometryColumns?: string[]
+}) {
+  if (options?.returning) {
+    return [
+      'returning *',
+      options?.enumArrayColumns?.map((x) => `"${x}"::text[]`).join(','),
+      options?.geometryColumns?.map((x) => `st_asgeojson("${x}") as "${x}"`).join(','),
+    ]
+      .filter((x) => x)
+      .join(',')
+  }
+
+  return ''
+}
+
 export function deleteQuery(
   table: QueryTable,
   filters?: Filter[],
   options?: {
     returning?: boolean
     enumArrayColumns?: string[]
+    geometryColumns?: string[]
   }
 ) {
   if (!filters || filters.length === 0) {
@@ -46,12 +65,7 @@ export function deleteQuery(
   if (filters) {
     query = applyFilters(query, filters)
   }
-  if (returning) {
-    query +=
-      enumArrayColumns === undefined || enumArrayColumns.length === 0
-        ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
-  }
+  query += generateReturning(options)
   return query + ';'
 }
 
@@ -61,12 +75,12 @@ export function insertQuery(
   options?: {
     returning?: boolean
     enumArrayColumns?: string[]
+    geometryColumns?: string[]
   }
 ) {
   if (!values || values.length === 0) {
     throw { message: 'no value to insert' }
   }
-  const { returning, enumArrayColumns } = options ?? {}
   const queryColumns = Object.keys(values[0])
     .map((x) => ident(x))
     .join(',')
@@ -85,12 +99,7 @@ export function insertQuery(
       literal(JSON.stringify(values))
     )
   }
-  if (returning) {
-    query +=
-      enumArrayColumns === undefined || enumArrayColumns.length === 0
-        ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
-  }
+  query += generateReturning(options)
   return query + ';'
 }
 
@@ -128,9 +137,10 @@ export function updateQuery(
     filters?: Filter[]
     returning?: boolean
     enumArrayColumns?: string[]
+    geometryColumns?: string[]
   }
 ) {
-  const { filters, returning, enumArrayColumns } = options ?? {}
+  const { filters } = options ?? {}
   if (!filters || filters.length === 0) {
     throw { message: 'no filters for this update query' }
   }
@@ -146,13 +156,7 @@ export function updateQuery(
   if (filters) {
     query = applyFilters(query, filters)
   }
-  if (returning) {
-    query +=
-      enumArrayColumns === undefined || enumArrayColumns.length === 0
-        ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
-  }
-
+  query += generateReturning(options)
   return query + ';'
 }
 

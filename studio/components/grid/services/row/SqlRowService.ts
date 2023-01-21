@@ -85,12 +85,23 @@ export class SqlRowService implements IRowService {
       })
       .map((column) => column.name)
 
-    let queryChains =
-      enumArrayColumns.length > 0
-        ? this.query
-            .from(this.table.name, this.table.schema ?? undefined)
-            .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
-        : this.query.from(this.table.name, this.table.schema ?? undefined).select()
+    const geometryColumns = this.table.columns
+      .filter((column) => {
+        return column.dataType.toLowerCase() === 'geometry'
+      })
+      .map((column) => column.name)
+
+    const selectColumns = [
+      '*',
+      enumArrayColumns.map((x) => `"${x}"::text[]`).join(','),
+      geometryColumns.map((x) => `st_asgeojson("${x}")::text as "${x}"`).join(','),
+    ]
+      .filter((x) => x)
+      .join(',')
+
+    let queryChains = this.query
+      .from(this.table.name, this.table.schema ?? undefined)
+      .select(selectColumns)
 
     filters
       .filter((x) => x.value && x.value != '')
@@ -185,11 +196,19 @@ export class SqlRowService implements IRowService {
       // remove primary key from updated value object
       delete value[key]
     })
+
     const enumArrayColumns = this.table.columns
       .filter((column) => {
         return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
       })
       .map((column) => column.name)
+
+    const geometryColumns = this.table.columns
+      .filter((column) => {
+        return column.dataType.toLowerCase() === 'geometry'
+      })
+      .map((column) => column.name)
+
     const query = this.query
       .from(this.table.name, this.table.schema ?? undefined)
       .update(
@@ -198,7 +217,7 @@ export class SqlRowService implements IRowService {
               [changedColumn]: value[changedColumn],
             }
           : value,
-        { returning: true, enumArrayColumns }
+        { returning: true, enumArrayColumns, geometryColumns }
       )
       .match(matchValues)
       .toSql()

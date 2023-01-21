@@ -21,7 +21,12 @@ export class QueryModifier implements IQueryModifier {
     protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected options?: {
       actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[]
-      actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: string[] }
+      actionOptions?: {
+        returning?: boolean
+        cascade?: boolean
+        enumArrayColumns?: string[]
+        geometryColumns?: string[]
+      }
       filters?: Filter[]
       sorts?: Sort[]
     }
@@ -52,12 +57,14 @@ export class QueryModifier implements IQueryModifier {
           return deleteQuery(this.table, filters, {
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
+            geometryColumns: actionOptions?.geometryColumns,
           })
         }
         case 'insert': {
           return insertQuery(this.table, actionValue as Dictionary<any>[], {
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
+            geometryColumns: actionOptions?.geometryColumns,
           })
         }
         case 'select': {
@@ -72,6 +79,7 @@ export class QueryModifier implements IQueryModifier {
             filters,
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
+            geometryColumns: actionOptions?.geometryColumns,
           })
         }
         case 'truncate': {

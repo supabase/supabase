@@ -25,7 +25,11 @@ export class QueryAction implements IQueryAction {
    *
    * @param options.returning  If `true`, return the deleted row(s) in the response.
    */
-  delete(options?: { returning: boolean; enumArrayColumns?: string[] }) {
+  delete(options?: {
+    returning: boolean
+    enumArrayColumns?: string[]
+    geometryColumns?: string[]
+  }) {
     return new QueryFilter(this.table, 'delete', undefined, options)
   }
 
@@ -35,7 +39,10 @@ export class QueryAction implements IQueryAction {
    * @param values             The values to insert.
    * @param options.returning  If `true`, return the inserted row(s) in the response.
    */
-  insert(values: Dictionary<any>[], options?: { returning: boolean; enumArrayColumns?: string[] }) {
+  insert(
+    values: Dictionary<any>[],
+    options?: { returning: boolean; enumArrayColumns?: string[]; geometryColumns?: string[] }
+  ) {
     return new QueryFilter(this.table, 'insert', values, options)
   }
 
@@ -54,14 +61,21 @@ export class QueryAction implements IQueryAction {
    * @param value  The value to update.
    * @param options.returning  If `true`, return the updated row(s) in the response.
    */
-  update(value: Dictionary<any>, options?: { returning: boolean; enumArrayColumns?: string[] }) {
+  update(
+    value: Dictionary<any>,
+    options?: { returning: boolean; enumArrayColumns?: string[]; geometryColumns?: string[] }
+  ) {
     return new QueryFilter(this.table, 'update', value, options)
   }
 
   /**
    * Performs a TRUNCATE on the table
    */
-  truncate(options?: { returning: boolean; enumArrayColumns?: string[] }) {
+  truncate(options?: {
+    returning: boolean
+    enumArrayColumns?: string[]
+    geometryColumns?: string[]
+  }) {
     return new QueryFilter(this.table, 'truncate', undefined, options)
   }
 }
