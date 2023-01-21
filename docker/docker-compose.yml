@@ -105,11 +105,6 @@ services:
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/3000" ]
-      timeout: 5s
-      interval: 5s
-      retries: 3
     restart: unless-stopped
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
