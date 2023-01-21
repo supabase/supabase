@@ -485,6 +485,16 @@ export const storage = {
   ],
 }
 
+export const storage2 = {
+  icon: 'reference-cli',
+  title: 'Supabase CLI',
+  url: '/reference/cli/overview',
+  items: [
+    { name: 'Commands', url: '/reference/cli/introduction', items: [] },
+    { name: 'Config', url: '/reference/cli/config', items: [] },
+  ],
+}
+
 export const platform = {
   icon: 'platform',
   label: 'Platform',

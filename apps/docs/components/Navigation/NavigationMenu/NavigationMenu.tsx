@@ -125,6 +125,9 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/python`) && url:
         menuState.setMenuLevelId('reference_python_v2')
         break
+      case url.includes(`/docs/reference/cli/overview`) && url:
+        menuState.setMenuLevelId('storage2')
+        break
       case url.includes(`/docs/reference/cli`) && url:
         menuState.setMenuLevelId('reference_cli')
         break
@@ -164,6 +167,7 @@ const NavigationMenu = () => {
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
   const isStorageActive = 'storage' === level
+  const isStorage2Active = 'storage2' === level
   const isPlatformActive = 'platform' === level
   const isResourcesActive = 'resources' === level
   const isSelfHosting = 'self_hosting' === level
@@ -191,6 +195,7 @@ const NavigationMenu = () => {
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
       <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
+      <NavigationMenuGuideList id={'storage2'} active={isStorage2Active} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
       <NavigationMenuGuideList id={'resources'} active={isResourcesActive} />
       <NavigationMenuGuideList id={'self_hosting'} active={isSelfHosting} />
