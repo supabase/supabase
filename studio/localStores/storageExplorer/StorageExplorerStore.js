@@ -96,7 +96,7 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey, protocol = "http") {
+  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
     this.projectRef = projectRef
     this.initializeSupabaseClient(serviceKey, url, protocol)
   }

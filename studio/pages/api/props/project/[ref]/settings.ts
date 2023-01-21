@@ -59,6 +59,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
           db_schema: 'public',
           endpoint: PROJECT_ENDPOINT,
           realtime_enabled: true,
+          // TODO: update platform api to return this field
           protocol: PROJECT_ENDPOINT_PROTOCOL
         },
       },
