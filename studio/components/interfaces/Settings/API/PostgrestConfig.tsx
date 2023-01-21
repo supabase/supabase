@@ -36,6 +36,8 @@ const PostgrestConfig: FC<Props> = ({}) => {
     db_schema: '',
     max_rows: '',
     db_extra_search_path: '',
+    db_plan_enabled: false,
+    pre_request: null,
   }
 
   const canUpdatePostgrestConfig = checkPermissions(
@@ -91,6 +93,8 @@ const PostgrestConfig: FC<Props> = ({}) => {
               db_schema: config.db_schema,
               max_rows: config.max_rows,
               db_extra_search_path: config.db_extra_search_path ?? '',
+              db_plan_enabled: config.db_plan_enabled,
+              pre_request: config.pre_request ?? '',
             }
             resetForm({ values, initialValues: values })
           }
@@ -182,6 +186,27 @@ const PostgrestConfig: FC<Props> = ({}) => {
                         size="small"
                         disabled={!canUpdatePostgrestConfig}
                         descriptionText="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection header={<FormSectionLabel>Enable execution plan</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      {/* TODO */}
+                      <Input
+                        id="db_plan_enabled"
+                        size="small"
+                        disabled={!canUpdatePostgrestConfig}
+                        descriptionText="When this is set to true, the execution plan of a request can be retrieved by using the explain() method."
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection header={<FormSectionLabel>Pre-request function</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="pre_request"
+                        size="small"
+                        disabled={!canUpdatePostgrestConfig}
+                        descriptionText="A schema-qualified Postgres function name to call right after switching roles for a client request. This provides an opportunity to modify SQL variables or raise an exception to prevent the request from completing."
                       />
                     </FormSectionContent>
                   </FormSection>
