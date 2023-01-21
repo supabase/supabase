@@ -700,8 +700,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         code: |
           ```dart
           final mySubscription = supabase
@@ -711,8 +711,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-inserts
-        name: Listening to inserts
+      - id: listen-to-inserts
+        name: Listen to inserts
         code: |
           ```dart
           final mySubscription = supabase
@@ -722,8 +722,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-updates
-        name: Listening to updates
+      - id: listen-to-updates
+        name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening too:
@@ -740,8 +740,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-deletes
-        name: Listening to deletes
+      - id: listen-to-deletes
+        name: Listen to deletes
         description: |
           By default, Supabase does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
@@ -758,8 +758,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```dart
@@ -770,7 +770,7 @@ functions:
             .subscribe();
           ```
       - id: listening-to-row-level-changes
-        name: Listening to row level changes
+        name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
           ```dart
@@ -816,8 +816,8 @@ functions:
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
       - Takes a list of primary key columns as its argument.
     examples:
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         isSpotlight: true
         code: |
           ```dart

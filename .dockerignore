@@ -5,3 +5,4 @@ node_modules/
 .env.production
 .env.dev
 .env.*
+.git
