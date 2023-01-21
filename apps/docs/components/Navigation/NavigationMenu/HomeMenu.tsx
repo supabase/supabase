@@ -112,7 +112,7 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/reference/cli/overview',
       level: 'reference_javascript',
     },
   ],
