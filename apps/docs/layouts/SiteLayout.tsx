@@ -39,7 +39,7 @@ const levelsData = {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
   },
-  storage2: {
+  reference_cli_overview: {
     icon: '/docs/img/icons/menu/reference-cli',
     name: 'Supabase CLI',
   },

@@ -485,7 +485,7 @@ export const storage = {
   ],
 }
 
-export const storage2 = {
+export const reference_cli_overview = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
   url: '/reference/cli/overview',
