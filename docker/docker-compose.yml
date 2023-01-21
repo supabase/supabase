@@ -11,6 +11,11 @@ services:
     container_name: supabase-studio
     image: supabase/studio:20221214-4eecc99
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
@@ -51,6 +56,11 @@ services:
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
@@ -109,6 +119,11 @@ services:
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       PORT: 4000
@@ -139,6 +154,11 @@ services:
         condition: service_started
       imgproxy:
         condition: service_started
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
@@ -161,6 +181,11 @@ services:
   imgproxy:
     container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.11
+    healthcheck:
+      test: [ "CMD", "imgproxy", "health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
