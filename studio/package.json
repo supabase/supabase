@@ -26,7 +26,7 @@
     "@sentry/nextjs": "^6.17.4",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
-    "@supabase/postgres-meta": "^0.26.1",
+    "@supabase/postgres-meta": "^0.60.0",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.29",
     "@supabase/supabase-js": "^2.1.1",
