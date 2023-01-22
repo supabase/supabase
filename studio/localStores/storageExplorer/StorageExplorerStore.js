@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
