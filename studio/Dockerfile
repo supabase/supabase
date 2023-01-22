@@ -10,6 +10,10 @@ FROM node:16-slim as base
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
+    # Added ca-certificates and git to build libpg-query if prebuilt binaries not available
+    # git required here https://github.com/pyramation/libpg-query-node/blob/8bf1d4b04ea003f1c5c6aa034fd28cfbab3cc308/script/buildAddon.sh#L11
+    ca-certificates \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as builder
