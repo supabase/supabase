@@ -4213,7 +4213,7 @@ functions:
         name: List buckets
         isSpotlight: true
         code: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .storage
             .listBuckets()
