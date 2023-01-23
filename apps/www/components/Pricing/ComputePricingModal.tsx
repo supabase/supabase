@@ -39,7 +39,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div>
           <div className="p-5">
             <div className="flex gap-8">
-              <div className="">
+              <div className="prose">
                 <div className="bg-brand-1000 rounded-xl w-12 h-12 flex justify-center items-center">
                   <img
                     className="w-6"
