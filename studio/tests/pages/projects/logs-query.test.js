@@ -22,7 +22,11 @@ beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
   useRouter.mockReset()
-  useRouter.mockReturnValue(defaultRouterMock())
+  const routerReturnValue = defaultRouterMock()
+  useRouter.mockReturnValue(routerReturnValue)
+
+  useParams.mockReset()
+  useParams.mockReturnValue(routerReturnValue.query)
 })
 test('can display log data', async () => {
   get.mockResolvedValue({

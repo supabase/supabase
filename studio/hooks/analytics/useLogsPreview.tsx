@@ -63,6 +63,8 @@ function useLogsPreview(
     refresh()
   }, [JSON.stringify(filters)])
 
+  const queryParamsKey = genQueryParams(params as any)
+
   const {
     data,
     isLoading,
@@ -72,7 +74,7 @@ function useLogsPreview(
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery(
-    ['projects', projectRef, 'logs', params],
+    ['projects', projectRef, 'logs', queryParamsKey],
     ({ signal, pageParam }) => {
       return get<Logs>(
         `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
