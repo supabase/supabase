@@ -20,7 +20,8 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   const value = row[column.key as keyof TRow] as unknown as string
 
   function onChange(event: any) {
-    if (!event || event == '') {
+    debugger
+    if (!event.target.vaue || event.target.value == '') {
       onRowChange({ ...row, [column.key]: null }, true)
     } else {
       onRowChange({ ...row, [column.key]: event.target.value }, true)
