@@ -64,7 +64,7 @@ export default function IndexPage() {
       href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceLabel: 'Starting from',
-      warning: '+ any additional usage',
+      warning: '+ usage',
       priceMonthly: 25,
       description: 'For production applications with the option to scale.',
       features: [
@@ -147,7 +147,7 @@ export default function IndexPage() {
     },
     {
       name: 'Custom Domain',
-      heroImg: 'addons-custom-domain-hero',
+      heroImg: 'addons-domains-hero',
       icon: 'custom-domain-upgrade',
       price: 'Flat fee $10',
       description:
@@ -159,7 +159,7 @@ export default function IndexPage() {
     },
     {
       name: 'Point in time recovery',
-      heroImg: 'addons-pitr',
+      heroImg: 'addons-pitr-hero',
       icon: 'pitr-upgrade',
       price: 'Starts from $5',
       description: 'Roll back to any specific point in time and ensure that data is not lost.',
@@ -288,7 +288,7 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 h-[65px] text-sm  border-b pb-4">
+                      <p className="text-scale-1100 my-4 h-[55px] text-sm  border-b dark:border-scale-500 pb-4 lg:pr-20">
                         {tier.description}
                       </p>
 
@@ -301,7 +301,9 @@ export default function IndexPage() {
                       lg:text-4xl
                       xl:text-4xl
                       border-b
-                      py-8
+                      dark:border-scale-500
+                      pt-4
+                      pb-8
                       "
                         >
                           <div className="flex flex-col gap-1">
@@ -318,9 +320,11 @@ export default function IndexPage() {
                                 )}
 
                                 {tier.warning && (
-                                  <div className="bg-brand-400 text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
-                                    {tier.warning}
-                                  </div>
+                                  <p className="-mt-2">
+                                    <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
+                                      {tier.warning}
+                                    </span>
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -388,15 +392,15 @@ export default function IndexPage() {
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
               <div className="bg-white dark:bg-scale-300 rounded-lg" key={addon.name}>
-                <div className="overflow-hidden">
+                <div className="overflow-hidden rounded-lg">
                   <img
                     className="w-full"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
                       isDarkMode ? '' : '-light'
-                    }.svg`}
+                    }.png`}
                   />
                 </div>
-                <div className="px-4  ">
+                <div className="px-8 -mt-1">
                   <p className="text-xs text-scale-900">{addon.price}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <img
@@ -408,7 +412,7 @@ export default function IndexPage() {
                     />
                     <span className="text-sm text-scale-1200">{addon.name}</span>
                   </div>
-                  <p className="mt-2 text-scale-900 text-xs min-h-[40px] lg:min-h-[60px]">
+                  <p className="mt-2 text-scale-900 text-xs min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
@@ -434,11 +438,18 @@ export default function IndexPage() {
               </div>
             ))}
           </div>
+          <div className="text-center">
+            <a href="#compare-plans">
+              <Button size="tiny" type="default">
+                Compare Plans
+              </Button>
+            </a>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="bg-brand-400 inline-block text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs mt-2">
+            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
@@ -457,23 +468,14 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
-
-        {/* <div className="space-y-8">
-          <PricingAddOnTable
-            icon={<ServerIcon className="h-8 w-8" strokeWidth={1.5} />}
-            pricing={pricingAddOn.database}
-          />
-          <PricingAddOnTable
-            icon={<SupportIcon className="h-8 w-8" strokeWidth={1.5} />}
-            pricing={pricingAddOn.support}
-          />
-        </div> */}
       </div>
 
       <div className="bg-scale-200">
         <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl">Compare Plans</h2>
+            <h2 className="text-scale-1200 text-3xl scroll-m-20" id="compare-plans">
+              Compare Plans
+            </h2>
             <p className="text-scale-1100 mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
@@ -656,7 +658,7 @@ export default function IndexPage() {
                         scope="col"
                         key={tier.name}
                       >
-                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium uppercase flex items-center gap-4">
+                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-semibold uppercase flex items-center gap-4">
                           {tier.name}
                         </h3>
                         <div

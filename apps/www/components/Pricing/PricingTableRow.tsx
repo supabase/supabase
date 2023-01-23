@@ -4,16 +4,12 @@ import React, { Fragment, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 export const Check = () => (
-  <svg
-    className={`-ml-0.5 h-5 w-5 text-brand-900`}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
+  <svg className="-ml-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="none">
     <path
-      fillRule="evenodd"
-      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-      clipRule="evenodd"
+      fill="#3ECF8E"
+      fill-rule="evenodd"
+      d="M12 21.212a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-.708-6.414 4.463-4.463-.707-.708-4.11 4.11-1.986-1.986-.707.707 2.34 2.34h.707Z"
+      clip-rule="evenodd"
     />
   </svg>
 )
@@ -28,19 +24,40 @@ const IncludedCheck = (props: any) => (
 const Minus = (props: any) => (
   <>
     <svg
-      className="text-scale-200 h-4 w-4 bg-scale-600 rounded-full"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      aria-hidden="true"
+      width="18"
+      height="18"
+      fill="none"
+      className="text-scale-700"
     >
       <path
-        fillRule="evenodd"
-        d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-        clipRule="evenodd"
+        fill="currentColor"
+        fill-rule="evenodd"
+        d="M9 18A9 9 0 1 0 9 0a9 9 0 0 0 0 18ZM5.534 9.534h6.804v-1H5.534v1Z"
+        clip-rule="evenodd"
       />
     </svg>
     <span className="sr-only">Not included in {props.tier}</span>
+  </>
+)
+
+const InfoIcon = () => (
+  <>
+    <svg
+      className="text-scale-900 -ml-0.5"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+    >
+      <path
+        fill="currentColor"
+        fill-rule="evenodd"
+        d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm.724-11.97c0 .463-.328.764-.774.764-.436 0-.773-.3-.773-.764s.337-.783.774-.783c.445 0 .773.319.773.783Zm1.455 6.194H9.877v-.855h1.628v-2.956H9.877v-.828h2.674v3.784h1.628v.855Z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span className="sr-only">Info</span>
   </>
 )
 
@@ -109,10 +126,10 @@ export const PricingTableRowDesktop = (props: any) => {
                       <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
                         {feat.tooltips?.[tierName] && (
                           <span
-                            className="shrink-0 bg-scale-900 text-scale-200 rounded-full hover:text-scale-300 cursor-pointer transition-colors"
+                            className="shrink-0 hover:text-scale-300 cursor-pointer transition-colors"
                             data-tip={feat.tooltips[tierName]}
                           >
-                            <IconInfo size={16} strokeWidth={2} />
+                            <InfoIcon />
                           </span>
                         )}
                         {tierValue}
