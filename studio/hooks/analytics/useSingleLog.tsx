@@ -31,6 +31,9 @@ function useSingleLog(
   const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
     params as any
   )}`
+
+  const enabled = Boolean(id && table)
+
   const {
     data,
     error: rcError,
@@ -41,7 +44,7 @@ function useSingleLog(
     ['projects', projectRef, 'log', id],
     ({ signal }) => get(endpointUrl, { signal }) as Promise<Logs>,
     {
-      enabled: Boolean(id && table),
+      enabled,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
@@ -52,7 +55,7 @@ function useSingleLog(
   return [
     {
       logData: data?.result ? data.result[0] : undefined,
-      isLoading: isLoading || isRefetching,
+      isLoading: (enabled && isLoading) || isRefetching,
       error,
     },
     {

@@ -47,7 +47,7 @@ const useLogsQuery = (
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', projectRef, 'logs', params],
+    ['projects', projectRef, 'logs', queryParams],
     ({ signal }) =>
       get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
         signal,
