@@ -156,7 +156,7 @@ functions:
             password: 'example-password',
           })
           ```
-      - id: sign-up-with-additional-user-metadata.
+      - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         isSpotlight: false
         code: |
@@ -185,7 +185,7 @@ functions:
               email: 'example@email.com',
               password: 'example-password',
               options: {
-                redirectTo: 'https://example.com/welcome'
+                emailRedirectTo: 'https://example.com/welcome'
               }
             }
           )
