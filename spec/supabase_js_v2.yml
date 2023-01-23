@@ -174,9 +174,8 @@ functions:
             }
           )
           ```
-      - id: sign-up-with-redirect.
-        name: Sign up with a redirect
-        isSpotlight: false
+      - id: sign-up-with-redirect
+        name: Sign up with a redirect URL
         description: |         
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
