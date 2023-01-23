@@ -82,7 +82,7 @@ export default function IndexPage() {
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
       preface: 'Everything below included in the base plan',
-      additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
+      additional: 'Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
     // {
@@ -188,7 +188,7 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4">
-        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase">
+        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
           {tier}
         </h2>
         <div className="flex items-baseline gap-2">
@@ -228,7 +228,7 @@ export default function IndexPage() {
         }}
       />
 
-      <div className="">
+      <div>
         <div className="relative z-10 py-16 shadow-sm lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
@@ -258,7 +258,7 @@ export default function IndexPage() {
                   key={`row-${tier.name}`}
                   className={[
                     tier.name === 'Pro'
-                      ? 'bg-brand-800 dark:bg-brand-900 border px-0.5 -mt-8 rounded-xl'
+                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-xl'
                       : '',
                   ].join(' ')}
                 >
@@ -269,13 +269,16 @@ export default function IndexPage() {
                     key={tier.name}
                     className={[
                       'flex flex-col overflow-hidden rounded-xl',
-                      tier.name === 'Pro' ? '' : 'border h-full',
+                      tier.name === 'Pro' ? '' : 'border h-full rounded-xl',
                     ].join(' ')}
                   >
                     <div className="dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-xl rounded-tl-xl">
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
-                          <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium uppercase flex items-center gap-4">
+                          <h3
+                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-semibold
+                           uppercase flex items-center gap-4 font-mono"
+                          >
                             {tier.name}
                           </h3>
                           {tier.nameBadge && (
@@ -326,18 +329,17 @@ export default function IndexPage() {
                       )}
                     </div>
                     <div
-                      className={`dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl mb-0.5 flex-1 flex-col bg-white px-8 py-6 ${
-                        tier.name === 'Enterprise' ? 'pt-0' : ''
-                      }`}
+                      className={[
+                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl flex-1 flex-col bg-white px-8 py-6`,
+                        tier.name === 'Enterprise' ? 'pt-0' : '',
+                        tier.name === 'Pro' ? 'mb-0.5' : '',
+                      ].join(' ')}
                     >
                       {tier.preface && (
                         <p className="text-scale-1100 text-xs mt-2 mb-4">{tier.preface}</p>
                       )}
                       {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                      <ul
-                        role="list"
-                        className="dark:divide-scale-400 divide-y text-xs text-scale-1000"
-                      >
+                      <ul role="list" className="text-xs text-scale-1000">
                         {tier.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
@@ -351,12 +353,10 @@ export default function IndexPage() {
                         ))}
                       </ul>
 
-                      <div className="flex flex-col gap-6 mt-auto">
+                      <div className="flex flex-col gap-6 mt-auto prose">
                         <div className="space-y-2 mt-12">
-                          {tier.additional && (
-                            <p className="text-scale-1200 text-sm">{tier.additional}</p>
-                          )}
-                          {tier.scale && <p className="text-scale-800 text-xs">{tier.scale}</p>}
+                          {tier.additional && <p className="text-sm">{tier.additional}</p>}
+                          {tier.scale && <p className="text-xs">{tier.scale}</p>}
                           {tier.shutdown && (
                             <p className="text-scale-1000 text-xs">{tier.shutdown}</p>
                           )}
@@ -376,7 +376,7 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:py-24">
+      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:py-32">
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
