@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, IconInfo, Loading } from 'ui'
 
 import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -10,6 +10,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useRouter } from 'next/router'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface Props {
   projectRef?: string
@@ -177,6 +178,28 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           >
                             <td className="px-6 py-3 text-sm whitespace-nowrap text-scale-1200">
                               {feature.title}
+                              {feature.tooltip && (
+                                <Tooltip.Root delayDuration={0}>
+                                  <Tooltip.Trigger>
+                                    <IconInfo className="ml-2" size={14} strokeWidth={2} />
+                                  </Tooltip.Trigger>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'max-w-md', // size
+                                        'flex items-center justify-center',
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                        'border border-scale-200', //border
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-center text-scale-1200">
+                                        {feature.tooltip}
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Root>
+                              )}
                             </td>
                             {ui.selectedProject?.subscription_tier !== undefined && (
                               <>

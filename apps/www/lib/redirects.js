@@ -1556,6 +1556,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/best-practices',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://app.supabase.com/projects',
   },
@@ -1885,5 +1890,15 @@ module.exports = [
     permanent: true,
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/upgrade-guide',
+    destination: '/docs/reference/javascript/v1/upgrade-guide',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart/upgrade-guide',
+    destination: '/docs/reference/dart/v0/upgrade-guide',
   },
 ]
