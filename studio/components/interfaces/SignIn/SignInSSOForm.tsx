@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
-import { auth } from 'lib/gotrue'
+import { auth, getReturnToPath } from 'lib/gotrue'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
@@ -31,7 +31,14 @@ const SignInSSOForm = () => {
 
     const { data, error } = await auth.signInWithSSO({
       domain: email.split('@')[1],
-      options: { captchaToken: token ?? undefined },
+      options: {
+        captchaToken: token ?? undefined,
+        redirectTo: `${
+          process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+            ? process.env.NEXT_PUBLIC_VERCEL_URL
+            : process.env.NEXT_PUBLIC_SITE_URL
+        }${getReturnToPath()}`,
+      },
     })
 
     if (!error) {

@@ -28,4 +28,9 @@ export default class RolesStore extends PostgresMetaInterface<any> {
     'pg_read_all_data',
     'pg_write_all_data',
   ]
+
+  // loadBySchema is not supported in this store
+  async loadBySchema(schema: string) {
+    return []
+  }
 }

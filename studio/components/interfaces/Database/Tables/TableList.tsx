@@ -10,6 +10,7 @@ import {
   IconColumns,
   Listbox,
   IconLock,
+  IconCheck,
 } from 'ui'
 
 import { partition } from 'lodash'
@@ -54,6 +55,10 @@ const TableList: FC<Props> = ({
       : // @ts-ignore
         allTables.filter((table: PostgresTable) => table.name.includes(filterString))
 
+  const publications = meta.publications.list()
+  const realtimePublication = publications.find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
   // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
@@ -67,7 +72,7 @@ const TableList: FC<Props> = ({
               size="small"
               value={selectedSchema}
               onChange={onSelectSchema}
-              icon={isLocked && <IconLock size={16} strokeWidth={2} />}
+              icon={isLocked && <IconLock size={14} strokeWidth={2} />}
             >
               <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
                 <p className="text-sm">Schemas</p>
@@ -137,6 +142,9 @@ const TableList: FC<Props> = ({
               <Table.th key="size" className="hidden xl:table-cell">
                 Size (Estimated)
               </Table.th>,
+              <Table.th key="realtime" className="hidden xl:table-cell text-center">
+                Realtime Enabled
+              </Table.th>,
               <Table.th key="buttons"></Table.th>,
             ]}
             body={tables.map((x: any, i: any) => (
@@ -156,6 +164,13 @@ const TableList: FC<Props> = ({
                 </Table.td>
                 <Table.td className="hidden xl:table-cell">
                   <code className="text-sm">{x.size}</code>
+                </Table.td>
+                <Table.td className="hidden xl:table-cell text-center">
+                  {realtimePublication.tables.find((table: any) => table.id === x.id) && (
+                    <div className="flex justify-center">
+                      <IconCheck strokeWidth={2} />
+                    </div>
+                  )}
                 </Table.td>
                 <Table.td>
                   <div className="flex justify-end gap-2">

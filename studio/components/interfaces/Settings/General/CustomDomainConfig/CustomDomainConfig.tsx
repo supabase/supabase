@@ -37,7 +37,7 @@ const CustomDomainConfig = () => {
     <section>
       <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
       {data?.status === '0_no_hostname_configured' ? (
-        <CustomDomainsConfigureHostname projectRef={ref} />
+        <CustomDomainsConfigureHostname />
       ) : (
         <Panel>
           {isLoading && (
