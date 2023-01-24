@@ -18,7 +18,7 @@ Once created, the pipeline backfills all your historical data from Firestore and
 
 Before you begin, you'll need:
 
-- An Estuary account. [Head to the web app to start for free.](https://dashboard.estuary.dev).
+- An Estuary account. [Head to the web app to start for free](https://dashboard.estuary.dev).
 
 - For your Firestore database:
 
@@ -43,22 +43,23 @@ You'll start by creating a **capture**, a task in Flow that connects to your dat
 
 4. Fill out the required properties for Firestore.
 
-   - **Database**: Flow can autodetect the database name, but you may optionally specify it here. This is helpful if the service account used has access to multiple Firebase projects. Your database name usually follows the format `projects/$PROJECTID/databases/(default)`.
-   - **Credentials**: The JSON service account key created per the prerequisites.
+   **Database**: Flow can autodetect the database name, but you may optionally specify it here. This is helpful if the service account used has access to multiple Firebase projects. Your database name usually follows the format `projects/$PROJECTID/databases/(default)`.
+   
+   **Credentials**: The JSON service account key created per the prerequisites.
 
 5. Click **Next**.
 
-Flow uses the provided configuration to initiate a connection with Firestore. It maps each collection in the Firestore database to a Flow collection. 
+   Flow uses the provided configuration to initiate a connection with Firestore. It maps each collection in the Firestore database to a Flow collection. 
 
 6. Optionally, use the **Collection Selector** to remove any collections you don't need to migrate to Supabase.
 
 7. Click **Save and Publish**.
 
-You'll see a notification when the capture publishes successfully.
+   You'll see a notification when the capture publishes successfully.
 
-The data currently in your Firestore database has been captured to Flow, and future updates to it will be captured continuously.
+   The data currently in your Firestore database has been captured to Flow, and future updates to it will be captured continuously.
 
-Click **Materialize Collections** to continue.
+   Click **Materialize Collections** to continue.
 
 ## Step 2: Materialize your collections to Postgres
 
@@ -72,17 +73,19 @@ A form appears with the properties required for a Postgres materialization.
 
 3. Fill out the required properties for Postgres. You can find most of these in Supabase by going to the **Settings** section and clicking **Database**.
 
-   - **Address**: Format at `<host>:<port>`.
-   - **User**: Usually, this is `postgres`.
-   - **Password**: The password you set when you created your Supabase project.
+   **Address**: Format at `<host>:<port>`.
+   
+   **User**: Usually, this is `postgres`.
+   
+   **Password**: The password you set when you created your Supabase project.
 
 4. Click **Next**. 
 
-Flow initiates a connection with the database, and the **Collection Selector** expands. 
-It's populated with your collections from Firestore, each mapped to a Postgres table.
+   Flow initiates a connection with the database and the **Collection Selector** expands. 
+   It's populated with your collections from Firestore, each mapped to a Postgres table.
 
 5. For each collection, apply a stricter JSON schema. 
-This ensure that the less-structured Firestore data will be written to a Postgres table in the correct shape.
+   This ensure that the less-structured Firestore data will be written to a Postgres table in the correct shape.
 
   - In the Collection Selector, choose a collection and click its **Specification** tab.
   - Click **Schema Inference**. Flow scans the data in your collection and infers a new schema to use for materialization. 
@@ -90,7 +93,7 @@ This ensure that the less-structured Firestore data will be written to a Postgre
 
 6. Click **Save and Publish**. You'll see a notification when the materialization publishes successfully.
 
-Your Firestore collections are copied to tables in Supabase. As long as you leave the capture and materialation running, any changes to the Firestore data will be reflected in Supabase in milliseconds.
+   Your Firestore collections are copied to tables in Supabase. As long as you leave the capture and materialation running, any changes to the Firestore data will be reflected in Supabase in milliseconds.
 
 ## Resources
 
