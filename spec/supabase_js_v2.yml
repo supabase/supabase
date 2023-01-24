@@ -156,7 +156,7 @@ functions:
             password: 'example-password',
           })
           ```
-      - id: sign-up-with-additional-user-metadata.
+      - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         isSpotlight: false
         code: |
@@ -170,6 +170,22 @@ functions:
                   first_name: 'John',
                   age: 27,
                 }
+              }
+            }
+          )
+          ```
+      - id: sign-up-with-redirect
+        name: Sign up with a redirect URL
+        description: |         
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp(
+            {
+              email: 'example@email.com',
+              password: 'example-password',
+              options: {
+                emailRedirectTo: 'https://example.com/welcome'
               }
             }
           )
@@ -217,6 +233,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -4196,7 +4213,7 @@ functions:
         name: List buckets
         isSpotlight: true
         code: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .storage
             .listBuckets()
