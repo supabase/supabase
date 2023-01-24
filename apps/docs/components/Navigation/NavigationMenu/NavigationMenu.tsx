@@ -128,6 +128,9 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/python`) && url:
         menuState.setMenuLevelId('reference_python_v2')
         break
+      case url.includes(`/docs/reference/cli/config`) && url:
+        menuState.setMenuLevelId('supabase_cli')
+        break
       case url.includes(`/docs/reference/cli`) && url:
         menuState.setMenuLevelId('reference_cli')
         break
