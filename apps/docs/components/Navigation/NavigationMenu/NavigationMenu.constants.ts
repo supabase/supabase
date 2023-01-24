@@ -48,6 +48,7 @@ export const gettingstarted = {
         { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
+        { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
       ],
     },
     {
