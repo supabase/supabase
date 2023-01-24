@@ -1,4 +1,4 @@
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { FC } from 'react'
 import { IconCheck } from 'ui'
 
@@ -13,7 +13,8 @@ interface Props {
 }
 
 const PlanCard: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
-  const teamTierEnabled = useFlag('teamTier')
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const teamTierEnabled = currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM || useFlag('teamTier')
 
   const planMeta = PRICING_META[plan.id]
   const isEnterprise = plan.id === 'Enterprise'
