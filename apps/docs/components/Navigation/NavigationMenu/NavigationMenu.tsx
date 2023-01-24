@@ -105,7 +105,7 @@ const NavigationMenu = () => {
       case url.includes(`/docs/guides/integrations`) && url:
         menuState.setMenuLevelId('integrations')
         break
-      case url.includes(`/docs/guides/supabase-cli`) && url:
+      case url.includes(`/docs/guides/cli`) && url:
         menuState.setMenuLevelId('supabase_cli')
         break
       // JS v1

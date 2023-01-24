@@ -488,11 +488,11 @@ export const storage = {
 export const supabase_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
-  url: '/guides/supabase-cli',
+  url: '/guides/cli',
   items: [
-    { name: 'Overview', url: '/guides/supabase-cli', items: [] },
-    { name: 'Local Development', url: '/guides/supabase-cli/local-development', items: [] },
-    { name: 'Managing Environments', url: '/guides/supabase-cli/managing-environments', items: [] },
+    { name: 'Overview', url: '/guides/cli', items: [] },
+    { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
+    { name: 'Managing Environments', url: '/guides/cli/managing-environments', items: [] },
     {
       name: 'Reference',
       url: undefined,

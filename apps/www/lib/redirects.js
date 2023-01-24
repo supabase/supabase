@@ -1211,7 +1211,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/local-development',
-    destination: '/docs/guides/supabase-cli/local-development',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
@@ -1388,7 +1388,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/cicd-workflows',
-    destination: '/docs/guides/supabase-cli/managing-environments',
+    destination: '/docs/guides/cli/managing-environments',
   },
 
   // supabase-flutter v0 to v1 redirects
@@ -1734,33 +1734,18 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/cli',
-    destination: '/docs/guides/supabase-cli',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/resources/supabase-cli',
-    destination: '/docs/guides/supabase-cli',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/supabase-cli/local-development',
+    destination: '/docs/guides/cli',
   },
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/local-development',
-    destination: '/docs/guides/supabase-cli/local-development',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/managing-environments',
-    destination: '/docs/guides/supabase-cli/managing-environments',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/managing-environments',
-    destination: '/docs/guides/supabase-cli/managing-environments',
+    destination: '/docs/guides/cli/managing-environments',
   },
   {
     permanent: true,
