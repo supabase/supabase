@@ -378,6 +378,13 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
+        <div className="text-center mt-24">
+          <a href="#compare-plans">
+            <Button size="tiny" type="default">
+              Compare Plans
+            </Button>
+          </a>
+        </div>
       </div>
 
       <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:py-32">
@@ -438,13 +445,6 @@ export default function IndexPage() {
               </div>
             ))}
           </div>
-          <div className="text-center">
-            <a href="#compare-plans">
-              <Button size="tiny" type="default">
-                Compare Plans
-              </Button>
-            </a>
-          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -463,7 +463,7 @@ export default function IndexPage() {
             <div className="">
               <img
                 className="w-full"
-                src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.svg`}
+                src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
               />
             </div>
           </div>
