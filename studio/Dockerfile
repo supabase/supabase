@@ -61,4 +61,5 @@ COPY --from=turbo /app/out/full/studio /app/studio
 COPY --from=productionprep /app/studio/.next /app/studio/.next
 WORKDIR /app/studio
 EXPOSE 3000
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 CMD ["npm", "run", "start"]
