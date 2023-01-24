@@ -1,4 +1,4 @@
-name: Deploy Function
+name: Deploy OG Images
 
 on:
   push:
