@@ -105,6 +105,9 @@ const NavigationMenu = () => {
       case url.includes(`/docs/guides/integrations`) && url:
         menuState.setMenuLevelId('integrations')
         break
+      case url.includes(`/docs/guides/supabase-cli`) && url:
+        menuState.setMenuLevelId('supabase_cli')
+        break
       // JS v1
       case url.includes(`/docs/reference/javascript/v1`) && url:
         menuState.setMenuLevelId('reference_javascript_v1')
@@ -124,9 +127,6 @@ const NavigationMenu = () => {
       // puthon v2 (latest)
       case url.includes(`/docs/reference/python`) && url:
         menuState.setMenuLevelId('reference_python_v2')
-        break
-      case url.includes(`/docs/reference/cli/overview`) && url:
-        menuState.setMenuLevelId('reference_cli_overview')
         break
       case url.includes(`/docs/reference/cli`) && url:
         menuState.setMenuLevelId('reference_cli')
@@ -167,7 +167,7 @@ const NavigationMenu = () => {
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
   const isStorageActive = 'storage' === level
-  const isreference_cli_overviewActive = 'reference_cli_overview' === level
+  const issupabase_cliActive = 'supabase_cli' === level
   const isPlatformActive = 'platform' === level
   const isResourcesActive = 'resources' === level
   const isSelfHosting = 'self_hosting' === level
@@ -195,10 +195,7 @@ const NavigationMenu = () => {
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
       <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
-      <NavigationMenuGuideList
-        id={'reference_cli_overview'}
-        active={isreference_cli_overviewActive}
-      />
+      <NavigationMenuGuideList id={'supabase_cli'} active={issupabase_cliActive} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
       <NavigationMenuGuideList id={'resources'} active={isResourcesActive} />
       <NavigationMenuGuideList id={'self_hosting'} active={isSelfHosting} />
