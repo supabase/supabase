@@ -387,7 +387,7 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:py-32">
+      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12">
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
