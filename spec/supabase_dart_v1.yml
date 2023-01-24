@@ -16,6 +16,41 @@ info:
       version: '0.0.1'
 
 functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize Supabase with the static `initialize()` method of `Supabase` class.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: flutter-initialize
+        name: For Flutter
+        code: |
+          ```dart
+          Future<void> main() async {
+            await Supabase.initialize(
+              url: 'https://xyzcompany.supabase.co',
+              anonKey: 'public-anon-key',
+            );
+
+            runApp(MyApp());
+          }
+
+          // Get a reference your Supabase client 
+          final supabase = Supabase.instance.client;
+          ```
+      - id: for-other-dart-projects
+        name: For other Dart projects
+        code: |
+          ```dart
+          final supabase = SupabaseClient(
+            'https://xyzcompany.supabase.co',
+            'public-anon-key',
+          );
+          ```
   - id: sign-up
     title: 'signUp()'
     description: |
