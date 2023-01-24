@@ -613,10 +613,8 @@ values
     sql: `
 --
 -- For use with:
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list
+-- https://github.com/supabase/examples-archive/tree/main/supabase-js-v1/todo-list
 --
 
 create table todos (
