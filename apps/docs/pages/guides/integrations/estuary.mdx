@@ -87,9 +87,11 @@ A form appears with the properties required for a Postgres materialization.
 5. For each collection, apply a stricter JSON schema. 
    This ensure that the less-structured Firestore data will be written to a Postgres table in the correct shape.
 
-  - In the Collection Selector, choose a collection and click its **Specification** tab.
-  - Click **Schema Inference**. Flow scans the data in your collection and infers a new schema to use for materialization. 
-  - Review the new schema and click **Apply Inferred Schema**.
+  In the Collection Selector, choose a collection and click its **Specification** tab.
+  
+  Click **Schema Inference**. Flow scans the data in your collection and infers a new schema to use for materialization. 
+  
+  Review the new schema and click **Apply Inferred Schema**.
 
 6. Click **Save and Publish**. You'll see a notification when the materialization publishes successfully.
 
