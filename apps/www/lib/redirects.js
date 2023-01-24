@@ -1155,7 +1155,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/about',
-    destination: '/docs/reference/cli',
+    destination: '/docs/reference/cli/introduction',
   },
   {
     permanent: true,
@@ -1165,118 +1165,44 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-help',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-login',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-link',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-init',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-start',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/cli/global-flags',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-delete',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-deploy',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-new',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-serve',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-migration-new',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-orgs-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-projects-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-projects-create',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-set',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-unset',
-    destination: '/docs/reference/cli/usage',
-  },
+
   {
     permanent: true,
     source: '/docs/reference/tools/reference-auth',
@@ -1713,6 +1639,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/getting-started',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
     source: '/docs/architecture',
     destination: '/docs/guides/getting-started/architecture',
   },
@@ -1788,6 +1719,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/tutorials',
+    destination: '/docs/guides/getting-started#tutorials',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/overview',
     destination: '/docs/guides/self-hosting',
   },
@@ -1808,18 +1744,18 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/cli',
-    destination: '/docs/guides/resources/supabase-cli',
+    source: '/docs/guides/resources/supabase-cli',
+    destination: '/docs/guides/cli',
   },
   {
     permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/resources/supabase-cli/local-development',
+    source: '/docs/guides/resources/supabase-cli/local-development',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
-    source: '/docs/guides/cli/managing-environments',
-    destination: '/docs/guides/resources/supabase-cli/managing-environments',
+    source: '/docs/guides/resources/supabase-cli/managing-environments',
+    destination: '/docs/guides/cli/managing-environments',
   },
   {
     permanent: true,
