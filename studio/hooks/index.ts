@@ -1,6 +1,7 @@
 export * from './misc/useStore'
 export * from './misc/withAuth'
 export * from './misc/useOptimisticSqlSnippetCreate'
+export * from './misc/useImmutableValue'
 export * from './misc/useNotifications'
 export * from './misc/usePlatformStatus'
 export * from './misc/useParams'

@@ -48,22 +48,12 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
     type: 'number',
   },
   {
-    name: 'json',
-    description: 'Textual JSON data',
-    type: 'json',
-  },
-  {
     name: 'jsonb',
     description: 'Binary JSON data, decomposed',
     type: 'json',
   },
   {
     name: 'text',
-    description: 'Variable-length character string',
-    type: 'text',
-  },
-  {
-    name: 'varchar',
     description: 'Variable-length character string',
     type: 'text',
   },
@@ -80,16 +70,6 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'time',
     description: 'Time of day (no time zone)',
-    type: 'time',
-  },
-  {
-    name: 'timetz',
-    description: 'Time of day, including time zone',
-    type: 'time',
-  },
-  {
-    name: 'timestamp',
-    description: 'Date and time (no time zone)',
     type: 'time',
   },
   {

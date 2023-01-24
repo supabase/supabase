@@ -9,12 +9,14 @@ import { checkPermissions } from 'hooks'
 
 interface Props {
   table: PostgresTable
+  isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
   onSelectCreatePolicy: (table: PostgresTable) => void
 }
 
 const PolicyTableRowHeader: FC<Props> = ({
   table,
+  isLocked,
   onSelectToggleRLS = () => {},
   onSelectCreatePolicy = () => {},
 }) => {
@@ -35,63 +37,65 @@ const PolicyTableRowHeader: FC<Props> = ({
           {table.rls_enabled ? 'RLS enabled' : 'RLS disabled'}
         </Badge>
       </div>
-      <div className="flex-1">
-        <div className="flex flex-row-reverse">
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button
-                type="outline"
-                disabled={!canCreatePolicies}
-                className="ml-2"
-                onClick={() => onSelectCreatePolicy(table)}
-              >
-                New Policy
-              </Button>
-            </Tooltip.Trigger>
-            {!canCreatePolicies && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+      {!isLocked && (
+        <div className="flex-1">
+          <div className="flex flex-row-reverse">
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="outline"
+                  disabled={!canCreatePolicies}
+                  className="ml-2"
+                  onClick={() => onSelectCreatePolicy(table)}
                 >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to create RLS policies
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button
-                type="default"
-                disabled={!canToggleRLS}
-                onClick={() => onSelectToggleRLS(table)}
-              >
-                {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
-              </Button>
-            </Tooltip.Trigger>
-            {!canToggleRLS && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+                  New Policy
+                </Button>
+              </Tooltip.Trigger>
+              {!canCreatePolicies && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to create RLS policies
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="default"
+                  disabled={!canToggleRLS}
+                  onClick={() => onSelectToggleRLS(table)}
                 >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to toggle RLS
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
+                  {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
+                </Button>
+              </Tooltip.Trigger>
+              {!canToggleRLS && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to toggle RLS
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

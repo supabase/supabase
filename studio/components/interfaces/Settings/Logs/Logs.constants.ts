@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
+export const LOGS_EXPLORER_DOCS_URL = "https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer"
+
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
 export const TEMPLATES: LogTemplate[] = [
@@ -248,6 +250,7 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.log': `metadata.level = 'log'`,
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
+    'severity.warn': `metadata.level = 'warn'`,
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
@@ -471,22 +474,27 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'error',
           label: 'Error',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "error" severity',
+        },
+        {
+          key: 'warn',
+          label: 'Warning',
+          description: 'Show all events that are "warn" severity',
         },
         {
           key: 'info',
           label: 'Info',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "info" severity',
         },
         {
           key: 'debug',
           label: 'Debug',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "debug" severity',
         },
         {
           key: 'log',
           label: 'Log',
-          description: 'Show all events that are log severity',
+          description: 'Show all events that are "log" severity',
         },
       ],
     },
@@ -631,5 +639,6 @@ export const TIER_QUERY_LIMITS: {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }

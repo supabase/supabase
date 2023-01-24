@@ -26,7 +26,6 @@ import MultiSelect from 'components/ui/MultiSelect'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
-import BestPracticesGuidance from './BestPracticesGuidance'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
 
@@ -59,6 +58,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
     [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
     [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
+    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
     [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
   }
 
@@ -197,7 +197,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
-          ['Performance', 'Problem', 'Best-practice'].includes(values.category)
+          ['Performance', 'Problem'].includes(values.category)
 
         useEffect(() => {
           if (selectedProject && !selectedProject.subscription_tier) {
@@ -325,13 +325,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                 <Divider light />
               </>
             )} */}
-
-            {values.category === 'Best_practices' && (
-              <>
-                <BestPracticesGuidance />
-                <Divider light />
-              </>
-            )}
 
             {!isDisabled ? (
               <>
@@ -525,7 +518,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                   </div>
                 </div>
               </>
-            ) : ['Problem', 'Best_practices', 'Performance'].includes(values.category) ? (
+            ) : ['Problem', 'Performance'].includes(values.category) ? (
               <DisabledStateForFreeTier
                 category={selectedCategory?.label ?? ''}
                 projectRef={values.projectRef}
