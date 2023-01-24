@@ -9,7 +9,8 @@
     "title": "Installing",
     "id": "installing",
     "slug": "installing",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": ["reference_javascript_v1", "reference_dart_v0", "reference_python_v2"]
   },
   {
     "title": "Initializing",
@@ -22,13 +23,20 @@
     "title": "Typescript Support",
     "id": "typescript-support",
     "slug": "typescript-support",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_dart_v0",
+      "reference_dart_v1",
+      "reference_python_v2"
+    ]
   },
   {
     "title": "Upgrade guide",
     "id": "upgrade-guide",
     "slug": "upgrade-guide",
-    "type": "markdown"
+    "type": "markdown",
+    "excludes": ["reference_javascript_v2", "reference_dart_v1", "reference_python_v2"]
   },
   {
     "title": "Database",
@@ -664,7 +672,7 @@
       },
       {
         "id": "subscribe",
-        "title": "Subscribe to database changes",
+        "title": "Subscribe to channel",
         "slug": "subscribe",
         "product": "realtime",
         "type": "function"
@@ -833,6 +841,7 @@
   },
   {
     "title": "Misc",
+    "excludes": ["reference_dart_v1", "reference_dart_v0"],
 
     "items": [
       {
