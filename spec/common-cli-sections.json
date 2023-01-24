@@ -232,6 +232,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-functions-download",
+        "title": "Download a function",
+        "slug": "supabase-functions-download",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-functions-serve",
         "title": "Serve a function",
         "slug": "supabase-functions-serve",
@@ -247,12 +253,6 @@
         "id": "supabase-functions-delete",
         "title": "Delete a function",
         "slug": "supabase-functions-delete",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-functions-download",
-        "title": "supabase functions download",
-        "slug": "supabase-functions-download",
         "type": "cli-command"
       }
     ]
