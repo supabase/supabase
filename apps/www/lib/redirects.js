@@ -1713,6 +1713,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/getting-started',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
     source: '/docs/architecture',
     destination: '/docs/guides/getting-started/architecture',
   },
@@ -1785,6 +1790,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/with-ionic-angular',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-angular',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/tutorials',
+    destination: '/docs/guides/getting-started#tutorials',
   },
   {
     permanent: true,
