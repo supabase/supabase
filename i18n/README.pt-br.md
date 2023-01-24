@@ -27,7 +27,7 @@
 
 Para documentação completa, visite [supabase.com/docs](https://supabase.com/docs)
 
-Para ver como Contribuir, visite [Primeiros Passos](./DEVELOPERS.md)
+Para ver como Contribuir, visite [Primeiros Passos](../DEVELOPERS.md)
 
 ## Comunidade & Suporte
 
@@ -142,7 +142,7 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
     <td>-</td>
   </tr>
   <tr>
