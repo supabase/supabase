@@ -486,6 +486,25 @@ export const storage = {
   ],
 }
 
+export const supabase_cli = {
+  icon: 'reference-cli',
+  title: 'Supabase CLI',
+  url: '/guides/cli',
+  items: [
+    { name: 'Overview', url: '/guides/cli', items: [] },
+    { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
+    { name: 'Managing Environments', url: '/guides/cli/managing-environments', items: [] },
+    {
+      name: 'Reference',
+      url: undefined,
+      items: [
+        { name: 'Commands', url: '/reference/cli/introduction', items: [] },
+        { name: 'Configuration', url: '/reference/cli/config', items: [] },
+      ],
+    },
+  ],
+}
+
 export const platform = {
   icon: 'platform',
   label: 'Platform',
@@ -586,26 +605,6 @@ export const resources = {
         {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Supabase CLI',
-      items: [
-        {
-          name: 'Overview',
-          url: '/guides/resources/supabase-cli',
-          items: [],
-        },
-        {
-          name: 'Local Development',
-          url: '/guides/resources/supabase-cli/local-development',
-          items: [],
-        },
-        {
-          name: 'Managing Environments',
-          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
