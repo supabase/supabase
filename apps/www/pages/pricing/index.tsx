@@ -258,7 +258,7 @@ export default function IndexPage() {
                   key={`row-${tier.name}`}
                   className={[
                     tier.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-xl'
+                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[14px]'
                       : '',
                   ].join(' ')}
                 >
