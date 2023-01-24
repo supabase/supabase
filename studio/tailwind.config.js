@@ -1,3 +1,4 @@
+const { repeat } = require('lodash')
 const ui = require('./../packages/config/ui.config.js')
 
 const blueGray = {
@@ -119,6 +120,9 @@ module.exports = ui({
       }),
       fontSize: {
         grid: '13px',
+      },
+      gridTemplateColumns: {
+        billingWithTeam: 'repeat(3, minmax(0, 1fr)) 0.9fr',
       },
       colors: {
         // gray: { ...gray },
