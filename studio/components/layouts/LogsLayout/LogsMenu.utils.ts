@@ -1,13 +1,9 @@
 import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
-import { useFlag } from 'hooks'
 
 export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-
-  const logsPostgrest = useFlag('logsPostgrest')
-  const logsPgbouncer = useFlag('logsPgbouncer')
 
   return [
     ...(IS_PLATFORM
@@ -40,26 +36,18 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/logs/postgres-logs`,
                 items: [],
               },
-              ...(logsPostgrest
-                ? [
-                    {
-                      name: 'PostgREST',
-                      key: 'postgrest-logs',
-                      url: `/project/${ref}/logs/postgrest-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(logsPgbouncer
-                ? [
-                    {
-                      name: 'PgBouncer',
-                      key: 'pgbouncer-logs',
-                      url: `/project/${ref}/logs/pgbouncer-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
+              {
+                name: 'PostgREST',
+                key: 'postgrest-logs',
+                url: `/project/${ref}/logs/postgrest-logs`,
+                items: [],
+              },
+              {
+                name: 'PgBouncer',
+                key: 'pgbouncer-logs',
+                url: `/project/${ref}/logs/pgbouncer-logs`,
+                items: [],
+              },
               {
                 name: 'Auth',
                 key: 'auth-logs',

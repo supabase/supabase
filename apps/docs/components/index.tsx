@@ -1,4 +1,5 @@
-import { Button, Tabs, Alert } from 'ui'
+import { Button, Tabs, Alert, GlassPanel } from 'ui'
+import Link from 'next/link'
 
 // Common components
 import Admonition from './Admonition'
@@ -38,6 +39,8 @@ const components = {
   Button,
   ButtonCard,
   CodeBlock,
+  GlassPanel,
+  Link,
   Frameworks,
   AuthProviders,
   FunctionsExamples,
