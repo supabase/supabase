@@ -453,7 +453,7 @@ export default function IndexPage() {
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
-            <p className="mt-3 prose">
+            <p className="mt-3 prose lg:max-w-lg">
               The Pro tier has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
               additional usage.
@@ -711,7 +711,7 @@ export default function IndexPage() {
 
                             {tier.warning && (
                               <p className="-mt-2">
-                                <span className="bg-brand-400 text-brand-1000 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
+                                <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
                                   {tier.warning}
                                 </span>
                               </p>

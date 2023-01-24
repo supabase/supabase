@@ -71,7 +71,7 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
       >
         <th
-          className="border-b-2 border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="border-b border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
