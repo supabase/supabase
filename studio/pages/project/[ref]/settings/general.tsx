@@ -1,8 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
-import { General, Infrastructure, DeleteProjectPanel } from 'components/interfaces/Settings/General'
-import CustomDomainConfig from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
+import {
+  General,
+  Infrastructure,
+  CustomDomainConfig,
+  NetworkRestrictions,
+  DeleteProjectPanel,
+} from 'components/interfaces/Settings/General'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
@@ -10,6 +15,7 @@ const ProjectSettings: NextPageWithLayout = () => {
       <General />
       <Infrastructure />
       <CustomDomainConfig />
+      <NetworkRestrictions />
       <DeleteProjectPanel />
     </div>
   )
