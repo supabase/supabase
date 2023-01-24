@@ -14,7 +14,7 @@ jobs:
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PROJECT_ID: {{ secrets.PROJECT_ID }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
