@@ -66,7 +66,7 @@ export default defineNuxtConfig({
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html title=/components/Auth.vue
+```vue title=/components/Auth.vue
 <template>
   <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
@@ -116,7 +116,7 @@ To access the user information, use the composable [useSupabaseUser](https://sup
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.vue`.
 
-```html title=components/Account.vue
+```vue title=components/Account.vue
 <template>
   <form class="form-widget" @submit.prevent="updateProfile">
     <div>
@@ -211,7 +211,7 @@ Let's create a new component for that called `Account.vue`.
 
 Now that we have all the components in place, let's update `app.vue`:
 
-```html title=app.vue
+```vue title=app.vue
 <template>
   <div class="container" style="padding: 50px 0 100px 0">
     <Account v-if="user" />
@@ -242,7 +242,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```html title=components/Avatar.vue
+```vue title=components/Avatar.vue
 <template>
   <div>
     <img
@@ -327,7 +327,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 And then we can add the widget to the Account page:
 
-```html title=components/Account.vue
+```vue title=components/Account.vue
 <template>
   <form class="form-widget" @submit.prevent="updateProfile">
     <Avatar v-model:path="avatar_path" @upload="updateProfile" />
