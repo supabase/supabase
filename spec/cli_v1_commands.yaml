@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.33.0
+  version: 1.34.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -206,7 +206,7 @@ commands:
           SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
           STUDIO_URL="http://localhost:54323"
       - id: output-custom-name
-        name: Customise the names of exported variables
+        name: Customize the names of exported variables
         code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
         response: |
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
@@ -690,7 +690,7 @@ commands:
         code: supabase init
         response: Finished supabase init.
       - id: from-workdir
-        name: Initialise from an existing directory
+        name: Initialize from an existing directory
         code: supabase init --workdir .
         response: Finished supabase init.
     tags:
@@ -792,7 +792,7 @@ commands:
     title: supabase functions download
     summary: Download a Function from Supabase
     description: |
-      Download source code of a Function from the linked Supabase project.
+      Download the source code for a Function from the linked Supabase project.
     tags: []
     links: []
     usage: supabase functions download <Function name> [flags]
