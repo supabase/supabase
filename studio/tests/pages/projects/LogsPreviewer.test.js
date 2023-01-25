@@ -273,29 +273,25 @@ test('te= query param will populate the timestamp to input', async () => {
       expect.anything()
     )
   })
-  userEvent.click(await screen.findByTitle('Custom'))
 })
-// TODO(alaister): fix this test
-// test('ts= query param will populate the timestamp from input', async () => {
-//   // get time 20 mins before
-//   const newDate = new Date()
-//   newDate.setMinutes(new Date().getMinutes() - 20)
-//   const iso = newDate.toISOString()
-//   const router = defaultRouterMock()
-//   router.query = { ...router.query, its: iso }
-//   useRouter.mockReturnValue(router)
-//   useParams.mockReturnValue(router.query)
-//   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+test('ts= query param will populate the timestamp from input', async () => {
+  // get time 20 mins before
+  const newDate = new Date()
+  newDate.setMinutes(new Date().getMinutes() - 20)
+  const iso = newDate.toISOString()
+  const router = defaultRouterMock()
+  router.query = { ...router.query, its: iso }
+  useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
-//   await waitFor(() => {
-//     expect(get).toHaveBeenCalledWith(
-//       expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`),
-//       expect.anything()
-//     )
-//   })
-//   userEvent.click(await screen.findByTitle('Custom'))
-//   await screen.findByText(new RegExp(newDate.getFullYear()))
-// })
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`),
+      expect.anything()
+    )
+  })
+})
 
 test('load older btn will fetch older logs', async () => {
   get.mockImplementation((url) => {

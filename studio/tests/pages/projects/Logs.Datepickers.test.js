@@ -17,4 +17,5 @@ test('renders warning', async () => {
   )
   userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(/memory errors/)
+  await screen.findByText(RegExp(from.format('MMMM YYYY')))
 })
