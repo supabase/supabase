@@ -6,6 +6,7 @@ import { useStore } from 'hooks'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
 import Panel from 'components/ui/Panel'
+import { Alert } from 'ui'
 
 interface Props {
   table: PostgresTable
@@ -46,9 +47,14 @@ const PolicyTableRow: FC<Props> = ({
               RLS is enabled - create a policy to allow access to this table.
             </p>
           ) : (
-            <p className="text-amber-900 text-sm opacity-50">
-              Warning: RLS is disabled - anonymous access is allowed to this table
-            </p>
+            <Alert
+              withIcon
+              variant="warning"
+              className="!px-4 !py-3 !mt-3"
+              title="Warning: RLS is disabled"
+            >
+              Anonymous access is allowed to this table
+            </Alert>
           )}
         </div>
       )}
