@@ -10,10 +10,12 @@ import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api'
 import { AuthReport } from 'pages/project/[ref]/reports/auth'
+import userEvent from '@testing-library/user-event'
 
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
+  post.mockReset()
   useRouter.mockReset()
   useRouter.mockReturnValue({
     query: { ref: '123' },
@@ -22,6 +24,7 @@ beforeEach(() => {
   get.mockImplementation(async (url) => {
     return [{ data: [] }]
   })
+  get.mockResolvedValue([])
   post.mockResolvedValue([])
 })
 
@@ -41,16 +44,4 @@ describe.each([
     await screen.findByText(/Last 7 days/)
     await screen.findAllByText(/Refresh/)
   })
-
-  // TODO(alaister): fix this test
-  // test('changing date range triggers query refresh', async () => {
-  //   render(<Page />)
-  //   await waitFor(() => expect(get).toBeCalled())
-  //   get.mockReset()
-  //   const refresh = await screen.findByText(/Refresh/)
-  //   fireEvent.click(refresh)
-
-  //   const calls = get.mock.calls.concat(post.mock.calls)
-  //   expect(calls.length).toBeGreaterThan(0)
-  // })
 })
