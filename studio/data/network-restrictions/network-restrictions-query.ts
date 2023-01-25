@@ -30,7 +30,7 @@ export async function getNetworkRestrictions(
       (response.error as any)?.code === 400 &&
       (response.error as any)?.message?.includes('to be updated')
 
-    if (isNowAllowedError) {
+    if (isNotAllowedError) {
       return {}
     } else {
       throw response.error
