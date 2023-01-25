@@ -128,7 +128,7 @@ const Wizard: NextPageWithLayout = () => {
       </Panel.Content>
       <Panel.Content className="Form section-block--body has-inputs-centered">
         <Listbox
-          label="Kind"
+          label="Type of organization"
           layout="horizontal"
           value={orgKind}
           onChange={onOrgKindChange}
@@ -146,7 +146,7 @@ const Wizard: NextPageWithLayout = () => {
       {orgKind == 'COMPANY' ? (
         <Panel.Content className="Form section-block--body has-inputs-centered">
           <Listbox
-            label="Size"
+            label="Company size"
             layout="horizontal"
             value={orgSize}
             onChange={onOrgSizeChange}
