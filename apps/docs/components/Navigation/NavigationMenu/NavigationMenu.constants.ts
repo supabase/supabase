@@ -610,6 +610,38 @@ export const resources = {
         },
       ],
     },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        { name: 'Basics', url: '/guides/resources/postgres' },
+        { name: 'Managing Postgres Databases', url: '/' },
+        { name: 'RLS Policies', url: '/' },
+        { name: '...', url: '/' },
+        {
+          name: 'Child 1',
+          url: '/guides/resources/postgres/child1',
+          items: [
+            {
+              name: 'grandchild1',
+              url: '/guides/resources/postgres/child1/grandchild1',
+              items: [],
+            },
+          ],
+        },
+        {
+          name: 'Child 2',
+          url: '/guides/resources/postgres/child2',
+          items: [
+            {
+              name: 'grandchild2',
+              url: '/guides/resources/postgres/child2/grandchild2',
+              items: [],
+            },
+          ],
+        },
+      ],
+    },
   ],
 }
 
