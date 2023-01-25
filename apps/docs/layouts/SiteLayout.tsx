@@ -39,6 +39,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
   },
+  supabase_cli: {
+    icon: '/docs/img/icons/menu/reference-cli',
+    name: 'Supabase CLI',
+  },
   platform: {
     icon: '/docs/img/icons/menu/platform',
     name: 'Platform',
