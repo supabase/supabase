@@ -589,26 +589,6 @@ export const resources = {
         },
       ],
     },
-    {
-      name: 'Supabase CLI',
-      items: [
-        {
-          name: 'Overview',
-          url: '/guides/resources/supabase-cli',
-          items: [],
-        },
-        {
-          name: 'Local Development',
-          url: '/guides/resources/supabase-cli/local-development',
-          items: [],
-        },
-        {
-          name: 'Managing Environments',
-          url: '/guides/resources/supabase-cli/managing-environments',
-          items: [],
-        },
-      ],
-    },
   ],
 }
 
