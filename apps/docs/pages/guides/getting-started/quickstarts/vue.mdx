@@ -2,9 +2,9 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with SvelteKit',
+  title: 'Use Supabase with Vue',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
@@ -21,17 +21,17 @@ export const meta = {
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
-     -- Create the table
-     CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
-     );
-     -- Insert some sample data into the table
-     INSERT INTO countries (name) VALUES ('United States');
-     INSERT INTO countries (name) VALUES ('Canada');
-     INSERT INTO countries (name) VALUES ('Mexico');
-     ````
+      ```sql SQL_EDITOR
+        -- Create the table
+        CREATE TABLE countries (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL
+        );
+        -- Insert some sample data into the table
+        INSERT INTO countries (name) VALUES ('United States');
+        INSERT INTO countries (name) VALUES ('Canada');
+        INSERT INTO countries (name) VALUES ('Mexico');
+      ````
 
     </StepHikeCompact.Code>
 
@@ -39,16 +39,16 @@ export const meta = {
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a SvelteKit app">
+    <StepHikeCompact.Details title="Create a Vue app">
 
-    Create a SvelteKit app using the `npm create` command.
+    Create a Vue app using the `npm init` command.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      npm create svelte@latest myapp
+      ```sh Terminal
+      npm init vue@latest my-app
       ```
 
     </StepHikeCompact.Code>
@@ -58,9 +58,9 @@ export const meta = {
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a SvelteKit app.
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Vue app.
 
-    Navigate to the SvelteKit app and install `supabase-js`.
+    Navigate to the Vue app and install `supabase-js`.
 
     </StepHikeCompact.Details>
 
@@ -77,7 +77,7 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create the Supabase client">
 
-    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
@@ -96,47 +96,34 @@ export const meta = {
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    Use `load` method to fetch the data server-side and display the query results as a simple list.
-
-    Create `+page.server.js` file in the `routes` directory with the following code.
+    Replace the existing content in your `App.vue` file with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
-      ```js src/routes/+page.server.js
-        import { supabase } from "$lib/supabaseClient";
+      ```vue src/App.vue
+        <script setup>
+        import { ref, onMounted } from 'vue'
+        import { supabase } from './lib/supabaseClient'
 
-        export async function load() {
-          const { data } = await supabase.from("countries").select();
-          return {
-            countries: data ?? [],
-          };
+        const countries = ref([])
+
+        async function getCountries() {
+          const { data } = await supabase.from('countries').select()
+          countries.value = data
         }
-      ```
 
-    </StepHikeCompact.Code>
-
-    <StepHikeCompact.Details title="">
-
-    Replace the existing content in your `+page.svelte` file in the `routes` directory with the following code.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-
-      ```svelte src/routes/+page.svelte
-        <script>
-          export let data;
-          let { countries } = data;
-          $: ({ countries } = data);
+        onMounted(() => {
+          getCountries()
+        })
         </script>
 
-        <ul>
-          {#each countries as country}
-            <li>{country.name}</li>
-          {/each}
-        </ul>
+        <template>
+          <ul>
+            <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+          </ul>
+        </template>
       ```
 
     </StepHikeCompact.Code>
