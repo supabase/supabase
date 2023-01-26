@@ -5,8 +5,7 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { API_URL } from 'lib/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
@@ -117,9 +116,7 @@ const DocView: FC<any> = observer(({}) => {
   // Data Loaded
   const autoApiService = {
     ...data.autoApiService,
-    endpoint: IS_PLATFORM
-      ? `https://${data?.autoApiService?.endpoint}`
-      : `${PROJECT_ENDPOINT_PROTOCOL}://${data.autoApiService.endpoint}`,
+    endpoint: `${data.apiService.protocol ?? 'https'}://${data.apiService.endpoint ?? '-'}`,
   }
 
   const { query } = router

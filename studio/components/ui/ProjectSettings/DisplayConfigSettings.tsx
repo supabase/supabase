@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Input, IconAlertCircle, IconLoader } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 
 const DisplayConfigSettings = () => {
@@ -27,6 +27,7 @@ const DisplayConfigSettings = () => {
   const jwtSecret = project?.jwt_secret ?? ''
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
   const apiConfig = apiService?.app_config ?? {}
+  const apiUrl = `${apiConfig.protocol ?? 'https'}://${apiConfig.endpoint ?? '-'}`
 
   return (
     <ConfigContentWrapper>
@@ -55,7 +56,7 @@ const DisplayConfigSettings = () => {
               copy
               disabled
               className="input-mono"
-              value={`${IS_PLATFORM ? 'https' : apiConfig.protocol}://${apiConfig.endpoint}`}
+              value={apiUrl}
               descriptionText="A RESTful endpoint for querying and managing your database."
               layout="horizontal"
             />
