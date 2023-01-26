@@ -1112,7 +1112,7 @@ export default {
       },
     },
 
-    responsive: 'md:grid md:grid-cols-12 md:gap-x-4',
+    responsive: 'md:grid md:grid-cols-12',
     non_responsive: 'grid grid-cols-12 gap-2',
 
     labels_horizontal_layout: 'flex flex-row space-x-2 justify-between col-span-12',
