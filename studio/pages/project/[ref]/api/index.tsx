@@ -5,13 +5,13 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { API_URL } from 'lib/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 const PageContext = createContext(null)
 
@@ -64,14 +64,14 @@ export default observer(PageConfig)
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-const DocView: FC<any> = observer(({}) => {
+const DocView: FC<any> = observer(({ }) => {
   const PageState: any = useContext(PageContext)
   const router = useRouter()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error }: any = useSWR(`${API_URL}/props/project/${PageState.projectRef}/api`, get)
-  const API_KEY = data?.autoApiService?.defaultApiKey
+  const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
+  const API_KEY = data?.autoApiService?.defaultApiKey ?? "-"
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
 
@@ -116,7 +116,7 @@ const DocView: FC<any> = observer(({}) => {
   // Data Loaded
   const autoApiService = {
     ...data.autoApiService,
-    endpoint: `${data.apiService.protocol ?? 'https'}://${data.apiService.endpoint ?? '-'}`,
+    endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
 
   const { query } = router
@@ -134,22 +134,20 @@ const DocView: FC<any> = observer(({}) => {
               <button
                 type="button"
                 onClick={() => setSelectedLang('js')}
-                className={`${
-                  selectedLang == 'js'
-                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+                className={`${selectedLang == 'js'
+                  ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                  : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                  } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 JavaScript
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedLang('bash')}
-                className={`${
-                  selectedLang == 'bash'
-                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+                className={`${selectedLang == 'bash'
+                  ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                  : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                  } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 Bash
               </button>
