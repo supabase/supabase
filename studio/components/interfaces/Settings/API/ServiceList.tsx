@@ -3,18 +3,15 @@ import { useRouter } from 'next/router'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { IconAlertCircle, Input } from 'ui'
 
-import {
-  useStore,
-  useProjectSettings,
-  useProjectPostgrestConfig,
-  useJwtSecretUpdateStatus,
-} from 'hooks'
+import { configKeys } from 'data/config/keys'
+import { useQueryClient } from '@tanstack/react-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useStore, useProjectPostgrestConfig, useJwtSecretUpdateStatus } from 'hooks'
 
 import Panel from 'components/ui/Panel'
 import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
 
@@ -26,8 +23,9 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
+  const queryClient = useQueryClient()
 
-  const { services, isError, mutateSettings } = useProjectSettings(ref as string | undefined)
+  const { data: settings, isError } = useProjectSettingsQuery({ projectRef: ref as string })
   const { mutateConfig } = useProjectPostgrestConfig(ref as string | undefined)
   const { jwtSecretUpdateError, jwtSecretUpdateStatus }: any = useJwtSecretUpdateStatus(ref)
 
@@ -41,7 +39,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
       switch (jwtSecretUpdateStatus) {
         case Updated:
           mutateConfig()
-          mutateSettings()
+          queryClient.invalidateQueries({ queryKey: configKeys.settings(projectRef) })
           ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
           break
         case Failed:
@@ -57,9 +55,8 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   }, [jwtSecretUpdateStatus])
 
   // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = services ? services.find((x: any) => x.app.id == API_SERVICE_ID) : {}
-  const apiConfig = apiService?.app_config
+  const apiService = settings?.autoApiService
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
 
   return (
     <div>
@@ -79,9 +76,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                 readOnly
                 disabled
                 className="input-mono"
-                value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
-                  apiConfig?.endpoint ?? '-'
-                }`}
+                value={apiUrl}
                 descriptionText="A RESTful endpoint for querying and managing your database."
                 layout="horizontal"
               />
