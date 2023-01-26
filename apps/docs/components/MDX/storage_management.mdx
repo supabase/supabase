@@ -1,15 +1,14 @@
-If you repeatedly upload profile photos, you will observe that all uploads will accumulate
+If you upload additional profile photos, they'll accumulate
 in the `avatars` bucket because of their random names with only the latest being referenced
-from `public.profiles` and the others getting orphaned.
+from `public.profiles` and the older versions getting orphaned.
 
-In order to automatically remove obsolete storage objects, we can extend the database
-triggers. It is important to note that it is not sufficient to delete the objects from the
+To automatically remove obsolete storage objects, extend the database
+triggers. Note that it is not sufficient to delete the objects from the
 `storage.objects` table because that would orphan and leak the actual storage objects in
-the S3 backend. Instead, we'll need to invoke the storage API itself from within Postgres
-via the `http` extension. So, enable that for the `extensions` schema in the
-Database/Extensions dashboard.
+the S3 backend. Instead, invoke the storage API within Postgres via the `http` extension. 
 
-Then, define the following SQL functions in the SQL Editor which allow to easily delete
+Enable the [http extension for the `extensions` schema](https://app.supabase.com/project/_/database/extensions) in the Dashboard.
+Then, define the following SQL functions in the SQL Editor to delete
 storage objects via the API:
 
 ```SQL
@@ -50,7 +49,7 @@ $$;
 
 ```
 
-The next step is to add a trigger that removes any obsolete avatar whenever the
+Next, add a trigger that removes any obsolete avatar whenever the
 profile is updated or deleted:
 
 ```SQL
@@ -86,9 +85,9 @@ create trigger before_profile_changes
 
 ```
 
-The final step is to delete the `public.profile` row ahead of time when a user
-is deleted. If this step is omitted, you won't be able to delete users without
-first manually deleting the avatar image owned by them.
+Finally, delete the `public.profile` row before a user is deleted.
+If this step is omitted, you won't be able to delete users without
+first manually deleting their avatar image.
 
 ```SQL
 create or replace function delete_old_profile()
