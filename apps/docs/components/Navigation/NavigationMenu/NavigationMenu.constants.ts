@@ -48,6 +48,9 @@ export const gettingstarted = {
         { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
+        { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
+        { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs', items: [] },
+        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue', items: [] },
       ],
     },
     {
@@ -320,6 +323,11 @@ export const auth = {
         { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
         { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+        {
+          name: 'Next.js Server Components',
+          url: '/guides/auth/auth-helpers/nextjs-server-components',
+          items: [],
+        },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix', items: [] },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit', items: [] },
       ],
@@ -421,14 +429,30 @@ export const functions = {
   label: 'Edge Functions',
   url: '/guides/functions',
   items: [
+    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
     { name: 'Auth', url: '/guides/functions/auth', items: [] },
     { name: 'CI/CD Workflow', url: '/guides/functions/cicd-workflow', items: [] },
-    { name: 'Best Practices', url: '/guides/functions/best-practices', items: [] },
-    { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
+    { name: 'CORS', url: '/guides/functions/cors', items: [] },
+    { name: 'Debugging', url: '/guides/functions/debugging', items: [] },
+    { name: 'Import Maps', url: '/guides/functions/import-maps', items: [] },
+    { name: 'Local Development', url: '/guides/functions/local-development', items: [] },
+    { name: 'Managing Secrets', url: '/guides/functions/secrets', items: [] },
+    { name: 'Schedule Functions', url: '/guides/functions/schedule-functions', items: [] },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
-      items: [{ name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] }],
+      items: [
+        {
+          name: 'Cloudflare Turnstile',
+          url: '/guides/functions/examples/cloudflare-turnstile',
+          items: [],
+        },
+        { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
+        { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+        { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
+        { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
+        { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+      ],
     },
   ],
 }
@@ -464,6 +488,25 @@ export const storage = {
   ],
 }
 
+export const supabase_cli = {
+  icon: 'reference-cli',
+  title: 'Supabase CLI',
+  url: '/guides/cli',
+  items: [
+    { name: 'Overview', url: '/guides/cli', items: [] },
+    { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
+    { name: 'Managing Environments', url: '/guides/cli/managing-environments', items: [] },
+    {
+      name: 'Reference',
+      url: undefined,
+      items: [
+        { name: 'Commands', url: '/reference/cli/introduction', items: [] },
+        { name: 'Configuration', url: '/reference/cli/config', items: [] },
+      ],
+    },
+  ],
+}
+
 export const platform = {
   icon: 'platform',
   label: 'Platform',
@@ -484,6 +527,7 @@ export const platform = {
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
@@ -519,6 +563,17 @@ export const platform = {
       url: undefined,
       items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] }],
     },
+    {
+      name: 'Troubleshooting',
+      url: undefined,
+      items: [
+        {
+          name: 'HTTP and Project Issues',
+          url: '/guides/platform/troubleshooting',
+          items: [],
+        },
+      ],
+    },
   ],
 }
 
@@ -552,26 +607,6 @@ export const resources = {
         {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Supabase CLI',
-      items: [
-        {
-          name: 'Overview',
-          url: '/guides/resources/supabase-cli',
-          items: [],
-        },
-        {
-          name: 'Local Development',
-          url: '/guides/resources/supabase-cli/local-development',
-          items: [],
-        },
-        {
-          name: 'Managing Environments',
-          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
@@ -672,6 +707,7 @@ export const integrations = {
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
+        { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
     },
     {
@@ -748,14 +784,21 @@ export const reference_javascript_v2 = {
 
 export const reference_dart_v0 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 export const reference_dart_v1 = {
   icon: 'reference-dart',
-  title: 'dart',
+  title: 'Flutter',
   url: '/guides/reference/dart',
+  parent: '/reference',
+}
+
+export const reference_python_v2 = {
+  icon: 'reference-python',
+  title: 'Python',
+  url: '/guides/reference/python',
   parent: '/reference',
 }
 

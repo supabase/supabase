@@ -250,6 +250,7 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.log': `metadata.level = 'log'`,
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
+    'severity.warn': `metadata.level = 'warn'`,
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
@@ -473,22 +474,27 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'error',
           label: 'Error',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "error" severity',
+        },
+        {
+          key: 'warn',
+          label: 'Warning',
+          description: 'Show all events that are "warn" severity',
         },
         {
           key: 'info',
           label: 'Info',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "info" severity',
         },
         {
           key: 'debug',
           label: 'Debug',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "debug" severity',
         },
         {
           key: 'log',
           label: 'Log',
-          description: 'Show all events that are log severity',
+          description: 'Show all events that are "log" severity',
         },
       ],
     },

@@ -95,7 +95,13 @@ const home = [
       level: 'reference_dart',
     },
     {
-      label: 'Tools Reference',
+      label: 'Python',
+      icon: '/img/icons/menu/reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+    },
+    {
+      label: 'Tools',
     },
     {
       label: 'Management API',
@@ -106,7 +112,7 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],

@@ -25,6 +25,10 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   active,
   spec,
 }) => {
+  const filteredSections = commonSections.filter((section) => {
+    return !section.excludes?.includes(id)
+  })
+
   return (
     <div
       className={[
@@ -38,7 +42,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
-      <NavigationMenuRefListItems id={id} lib={lib} commonSections={commonSections} spec={spec} />
+      <NavigationMenuRefListItems id={id} lib={lib} commonSections={filteredSections} spec={spec} />
     </div>
   )
 }

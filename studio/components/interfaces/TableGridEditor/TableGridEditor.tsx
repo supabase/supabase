@@ -5,11 +5,11 @@ import { find, isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { SchemaView } from 'types'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
 
 interface Props {
@@ -81,7 +81,7 @@ const TableGridEditor: FC<Props> = ({
 
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
-  const isViewSelected = Object.keys(selectedTable).length === 2
+  const isViewSelected = !Object.keys(selectedTable).includes('rls_enabled')
   const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
   const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
