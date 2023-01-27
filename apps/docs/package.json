@@ -63,6 +63,7 @@
     "next-plugin-yaml": "^1.0.1",
     "next-seo": "^5.14.1",
     "next-transpile-modules": "^9.0.0",
+    "openai": "^3.1.0",
     "react": "17.0.2",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "17.0.2",
@@ -80,10 +81,10 @@
     "valtio": "^1.7.6"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
     "config": "*",
+    "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "eslint": "8.9.0",
     "globby": "^12.0.2",
