@@ -37,6 +37,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   // Tracking submitting state separately outside of form component cause of
   // the additional dynamic confirmation modal that we're doing
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmittingDowngradeModal, setIsSubmittingDowngradeModal] = useState(false)
+
   const [isSuccessful, setIsSuccessful] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
@@ -123,6 +125,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
 
     try {
       setIsSubmitting(true)
+      setIsSubmittingDowngradeModal(true)
 
       // Trigger subscription downgrade
       const tier = freeTier.prices[0].id
@@ -175,6 +178,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
     } finally {
       setIsSubmitting(false)
+      setIsSubmittingDowngradeModal(false)
     }
   }
 
@@ -320,8 +324,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
               <Button
                 block
                 htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
+                loading={isSubmittingDowngradeModal}
+                disabled={isSubmittingDowngradeModal}
                 onClick={() => downgradeProject()}
               >
                 Confirm
