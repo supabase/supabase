@@ -8,10 +8,12 @@ on:
     branches: [master]
     paths:
       - 'studio/**'
+      - 'package-lock.json'
   pull_request:
     branches: [master]
     paths:
       - 'studio/**'
+      - 'package-lock.json'
 jobs:
   build:
     runs-on: ubuntu-latest
