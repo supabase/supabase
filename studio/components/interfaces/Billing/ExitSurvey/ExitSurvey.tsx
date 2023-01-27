@@ -297,7 +297,10 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         visible={showConfirmModal}
         size="large"
         header="Downgrading project to free"
-        onCancel={() => setShowConfirmModal(false)}
+        onCancel={() => {
+          setShowConfirmModal(false)
+          setIsSubmittingDowngradeModal(false)
+        }}
       >
         <div className="space-y-4 py-4">
           <Modal.Content>
