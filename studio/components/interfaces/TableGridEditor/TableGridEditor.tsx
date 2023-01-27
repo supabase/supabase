@@ -92,7 +92,7 @@ const TableGridEditor: FC<Props> = ({
       ? parseSupaTable(
           {
             table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns!,
+            columns: (selectedTable as PostgresTable).columns ?? [],
             primaryKeys: (selectedTable as PostgresTable).primary_keys,
             relationships: (selectedTable as PostgresTable).relationships,
           },

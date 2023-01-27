@@ -71,7 +71,7 @@ const ForeignKeySelector: FC<Props> = ({
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
-        column: table.columns!.length > 0 ? table.columns![0].name : undefined,
+        column: table.columns?.length ? table.columns[0].name : undefined,
       })
     }
   }

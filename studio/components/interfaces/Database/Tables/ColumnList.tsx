@@ -27,9 +27,9 @@ const ColumnList: FC<Props> = ({
   const columns =
     (filterString.length === 0
       ? selectedTable.columns
-      : selectedTable.columns!.filter((column: any) => column.name.includes(filterString))) ?? []
+      : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable?.schema ?? '')
+  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
 
   return (
     <>
