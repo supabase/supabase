@@ -1,0 +1,20 @@
+name: reviewdog
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  misspell:
+    name: runner / misspell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v1
+      - name: misspell
+        uses: reviewdog/action-misspell@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          locale: "US"
+          reporter: github-pr-review
+          level: error
+          exclude: "*.css"

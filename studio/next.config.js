@@ -132,6 +132,19 @@ const nextConfig = {
             value: 'DENY',
           },
           {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: `
+            frame-ancestors 'none';
+            upgrade-insecure-requests;
+            `
+              .replace(/\s{2,}/g, ' ')
+              .trim(),
+          },
+          {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
