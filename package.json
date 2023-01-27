@@ -57,7 +57,6 @@
     "auth"
   ],
   "dependencies": {
-    "mermaid": "^9.2.2",
     "mini-svg-data-uri": "^1.4.4"
   },
   "overrides": {
