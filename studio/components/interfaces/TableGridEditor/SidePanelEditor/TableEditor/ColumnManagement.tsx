@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
 import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
 
-import {
+import type {
   PostgresTable,
   PostgresColumn,
   PostgresRelationship,

@@ -107,7 +107,7 @@ const home = [
       level: 'reference_python',
     },
     {
-      label: 'Tools Reference',
+      label: 'Tools',
     },
     {
       label: 'Management API',
@@ -118,7 +118,7 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],
