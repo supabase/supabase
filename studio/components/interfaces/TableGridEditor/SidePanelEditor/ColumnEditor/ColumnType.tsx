@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from 'ui'
-import { PostgresType } from '@supabase/postgres-meta'
+import type { PostgresType } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
 
