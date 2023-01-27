@@ -25,7 +25,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   // Get the API service
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
-    ? apiService?.defaultApiKey
+    ? apiService.defaultApiKey
     : undefined
 
   const endpoint = apiService?.endpoint ?? ''

@@ -99,9 +99,8 @@ const PageLayout: NextPageWithLayout = () => {
   // Get the API service
   const { data: settings } = useProjectSettingsQuery({ projectRef: ref as string })
   const apiService = settings?.autoApiService
-  const apiKeys = apiService?.service_api_keys ?? []
-  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')
-    ? apiService?.defaultApiKey
+  const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
+    ? apiService.defaultApiKey
     : undefined
 
   const endpoint = apiService?.endpoint ?? ''
