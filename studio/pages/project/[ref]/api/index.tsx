@@ -64,15 +64,17 @@ export default observer(PageConfig)
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-const DocView: FC<any> = observer(({ }) => {
+const DocView: FC<any> = observer(({}) => {
   const PageState: any = useContext(PageContext)
   const router = useRouter()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
   const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
-  const API_KEY = data?.autoApiService?.defaultApiKey
-  const swaggerUrl = data?.autoApiService?.restUrl
+  const API_KEY = data?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
+    ? data?.autoApiService.defaultApiKey
+    : undefined
+  const swaggerUrl = data?.autoApiService.restUrl
   const headers: any = { apikey: API_KEY }
 
   const canReadServiceKey = checkPermissions(
@@ -80,7 +82,7 @@ const DocView: FC<any> = observer(({ }) => {
     'service_api_keys.service_role_key'
   )
 
-  if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
+  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
 
   const { data: jsonSchema, error: jsonSchemaError } = useSWR(
     () => swaggerUrl,
@@ -134,20 +136,22 @@ const DocView: FC<any> = observer(({ }) => {
               <button
                 type="button"
                 onClick={() => setSelectedLang('js')}
-                className={`${selectedLang == 'js'
-                  ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                  : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                  } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+                className={`${
+                  selectedLang == 'js'
+                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 JavaScript
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedLang('bash')}
-                className={`${selectedLang == 'bash'
-                  ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                  : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                  } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+                className={`${
+                  selectedLang == 'bash'
+                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
               >
                 Bash
               </button>
