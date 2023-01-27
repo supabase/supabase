@@ -72,7 +72,7 @@ const DocView: FC<any> = observer(({}) => {
 
   const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
   const API_KEY = data?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
-    ? data?.autoApiService.defaultApiKey
+    ? data.autoApiService.defaultApiKey
     : undefined
   const swaggerUrl = data?.autoApiService.restUrl
   const headers: any = { apikey: API_KEY }
@@ -174,7 +174,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: autoApiService?.defaultApiKey,
+                              key: API_KEY,
                               name: 'anon (public)',
                             })
                           }
@@ -186,7 +186,7 @@ const DocView: FC<any> = observer(({}) => {
                             key="service"
                             onClick={() =>
                               setShowApiKey({
-                                key: autoApiService?.serviceApiKey,
+                                key: autoApiService.serviceApiKey,
                                 name: 'service_role (secret)',
                               })
                             }
