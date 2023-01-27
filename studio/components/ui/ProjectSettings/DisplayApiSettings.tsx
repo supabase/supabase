@@ -3,8 +3,8 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { checkPermissions, useJwtSecretUpdateStatus } from 'hooks'
 import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {
@@ -12,11 +12,10 @@ const DisplayApiSettings = () => {
   const { ref } = router.query
 
   const {
-    services,
-    error: projectSettingsError,
+    data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettings(ref as string | undefined)
+  } = useProjectSettingsQuery({ projectRef: ref as string })
   const {
     jwtSecretUpdateStatus,
     isError: isJwtSecretUpdateStatusError,
@@ -28,8 +27,7 @@ const DisplayApiSettings = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service
-  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
-  const apiKeys = apiService?.service_api_keys ?? []
+  const apiKeys = settings?.autoApiService.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
