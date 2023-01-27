@@ -71,7 +71,7 @@ const DocView: FC<any> = observer(({ }) => {
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
   const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
-  const API_KEY = data?.autoApiService?.defaultApiKey ?? "-"
+  const API_KEY = data?.autoApiService?.defaultApiKey
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
 
