@@ -19,15 +19,16 @@ This value is also reported in the [database settings page](https://app.supabase
 
 ## Database storage management
 
-Your project will be changed to read-only mode once it reaches 95% of your subscription quota, preventing further writes to your project.
+Supabase uses network-attached storage, which balances performance with scalability.
+
+Your project will be changed to read-only mode once it reaches 95% of your database storage subscription quota, preventing further writes to your project.
 In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
 
 Regular operation (read-write mode) is automatically re-enabled once database storage usage falls under 95%.
 
-If you are on Pro or Enterprise, database storage expands automatically, however you may also encounter this error if fill the database faster than it can expand.
+If you are on Pro or Enterprise plan, database storage expands automatically. However, you may also encounter this error if you fill the database faster than it can expand. For every automatic database storage expansion, it will not auto expand for another 6 hours. If you intend to write a lot to your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new).
 
-Supabase uses network-attached storage, which balances performance with scalability. Pro projects can store up to 1024TB.
-If you intend to grow beyond this, reach out to our team to learn more about our Enterprise tier.
+Pro projects can store up to 1024TB but if you intend to grow beyond this, [reach out to our team](https://app.supabase.com/support/new) to learn more about our Enterprise tier.
 
 ### Increasing available database storage
 
