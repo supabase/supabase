@@ -56,9 +56,6 @@
     "database",
     "auth"
   ],
-  "dependencies": {
-    "mini-svg-data-uri": "^1.4.4"
-  },
   "overrides": {
     "pgsql-parser": "13.4.0"
   }
