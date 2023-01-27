@@ -321,7 +321,14 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
+              <Button
+                block
+                type="default"
+                onClick={() => {
+                  setShowConfirmModal(false)
+                  setIsSubmitting(false)
+                }}
+              >
                 Cancel
               </Button>
               <Button
