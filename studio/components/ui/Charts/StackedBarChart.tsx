@@ -115,6 +115,8 @@ const StackedBarChart: React.FC<Props> = ({
                 ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
                 : undefined
             }
+            // currently recharts@2.3.0 is broken in formatter type
+            // @ts-ignore
             formatter={(value: number, name: string, props: any) => {
               const suffix = format || ''
               if (variant === 'percentages' && percentagesStackedData) {
