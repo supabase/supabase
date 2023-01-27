@@ -19,16 +19,11 @@ This value is also reported in the [database settings page](https://app.supabase
 
 ## Database storage management
 
-Supabase uses network-attached storage, which balances performance with scalability.
+Supabase uses network-attached storage to balance performance with scalability. For Pro and Enterprise projects, database storage expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the database storage quota. Automatic database storage expansion can only occur once every six hours. Pro projects can store up to 1024TB.
 
-Your project will be changed to read-only mode once it reaches 95% of your database storage subscription quota, preventing further writes to your project.
-In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+All projects enter read-only mode when you reach 95% of the database storage quota. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the database storage quota.
 
-Regular operation (read-write mode) is automatically re-enabled once database storage usage falls under 95%.
-
-If you are on Pro or Enterprise, database storage expands automatically. However, you may also encounter this error if you fill the database faster than it can expand. For every automatic database storage expansion, it will not auto expand for another 6 hours. If you intend to write a lot to your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new).
-
-Pro projects can store up to 1024TB but if you intend to grow beyond this, [reach out to our team](https://app.supabase.com/support/new) to learn more about our Enterprise tier.
+If you need more than 1024TB of database storage or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
 ### Increasing available database storage
 
