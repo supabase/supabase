@@ -1,27 +1,24 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { patch } from 'lib/common/fetch'
+import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
 import { networkRestrictionKeys } from './keys'
 
 export type NetworkRestrictionsApplyVariables = {
   projectRef: string
-  id: string
-  updatedParam: string
+  dbAllowedCidrs: string[]
 }
 
 export async function applyNetworkRestrictions({
   projectRef,
-  updatedParam,
+  dbAllowedCidrs,
 }: NetworkRestrictionsApplyVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await patch(
+  const response = await post(
     `${API_ADMIN_URL}/projects/${projectRef}/network-restrictions/apply`,
-    { updated_param: updatedParam }
+    { dbAllowedCidrs }
   )
-  if (response.error) {
-    throw response.error
-  }
+  if (response.error) throw response.error
 
   return response
 }

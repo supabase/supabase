@@ -9,8 +9,10 @@ export type NetworkRestrictionsVariables = { projectRef?: string }
 
 export type NetworkRestrictionsResponse = {
   entitlement: 'disallowed' | 'allowed'
-  status: 'stored' | 'applied'
-  config: any
+  status: '' | 'stored' | 'applied'
+  config: { dbAllowedCidrs: string[] }
+  old_config?: { dbAllowedCidrs: string[] }
+  error?: any
 }
 
 export async function getNetworkRestrictions(
@@ -19,25 +21,29 @@ export async function getNetworkRestrictions(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/network-restrictions`, {
+  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/network-restrictions`, {
     signal,
-  })
+  })) as NetworkRestrictionsResponse
 
   // Not allowed error is a valid response to denote if a project
   // has access to the network restrictions UI, so we'll handle it here
   if (response.error) {
     const isNotAllowedError =
       (response.error as any)?.code === 400 &&
-      (response.error as any)?.message?.includes('to be updated')
+      (response.error as any)?.message?.includes('not allowed to set up network restrictions')
 
     if (isNotAllowedError) {
-      return {}
+      return {
+        entitlement: 'disallowed',
+        config: { dbAllowedCidrs: [] },
+        status: '',
+      } as NetworkRestrictionsResponse
     } else {
       throw response.error
     }
   }
 
-  return response as NetworkRestrictionsResponse[]
+  return response
 }
 
 export type NetworkRestrictionsData = Awaited<ReturnType<typeof getNetworkRestrictions>>
