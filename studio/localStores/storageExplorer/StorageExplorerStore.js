@@ -37,7 +37,7 @@ export const useStorageExplorerStore = () => {
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 const LIMIT = 200
 const OFFSET = 0
-const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
+const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 10 years
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
@@ -58,6 +58,7 @@ class StorageExplorerStore {
   selectedItemsToDelete = []
   selectedItemsToMove = []
   selectedFilePreview = {}
+  selectedFileCustomExpiry = undefined
 
   DEFAULT_OPTIONS = {
     limit: LIMIT,
@@ -96,17 +97,16 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey) {
+  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
     this.projectRef = projectRef
-    this.initializeSupabaseClient(serviceKey, url)
+    this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    console.debug(serviceEndpoint)
+  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
     this.supabaseClient = createClient(
-      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
       {
         auth: {
@@ -300,6 +300,10 @@ class StorageExplorerStore {
     this.selectedItemsToMove = []
   }
 
+  setSelectedFileCustomExpiry = (item) => {
+    this.selectedFileCustomExpiry = item
+  }
+
   addNewFolderPlaceholder = (columnIndex) => {
     const isPrepend = true
     const folderName = 'Untitled folder'
@@ -397,9 +401,9 @@ class StorageExplorerStore {
     this.selectedFilePreview = {}
   }
 
-  copyFileURLToClipboard = async (file) => {
+  copyFileURLToClipboard = async (file, expiresIn = 0) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
-    if (filePreview) {
+    if (filePreview && expiresIn === 0) {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
         this.ui.setNotification({
@@ -410,7 +414,7 @@ class StorageExplorerStore {
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
-      const signedUrl = await this.fetchFilePreview(file.name)
+      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
 
       try {
         let formattedUrl = new URL(signedUrl)
@@ -840,7 +844,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName) => {
+  fetchFilePreview = async (fileName, expiresIn = 0) => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
@@ -857,7 +861,7 @@ class StorageExplorerStore {
 
     const { data, error } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
-      .createSignedUrl(formattedPathToFile, DEFAULT_EXPIRY)
+      .createSignedUrl(formattedPathToFile, expiresIn || DEFAULT_EXPIRY)
 
     if (!error) {
       return data.signedUrl

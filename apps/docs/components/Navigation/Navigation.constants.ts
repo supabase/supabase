@@ -264,6 +264,7 @@ export const menuItems: NavMenu = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
@@ -275,6 +276,7 @@ export const menuItems: NavMenu = {
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },
     {
@@ -339,6 +341,7 @@ export const menuItems: NavMenu = {
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
             { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+            { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
           ],
         },
       ],

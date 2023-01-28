@@ -27,7 +27,7 @@
 
 Katso täydelliset dokumentaatiot osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
+Katso ohjeet osallistumiseen vierailemalla [Aloitus](../DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 
