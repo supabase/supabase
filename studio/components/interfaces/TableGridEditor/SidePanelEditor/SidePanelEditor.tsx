@@ -2,7 +2,7 @@ import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
 import { Modal } from 'ui'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
@@ -144,8 +144,8 @@ const SidePanelEditor: FC<Props> = ({
       closePanel()
     }
 
-    if (configuration.isEncrypted) {
-      await meta.schemas.loadViews(selectedTable?.schema ?? '')
+    if (configuration.isEncrypted && selectedTable?.schema) {
+      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
