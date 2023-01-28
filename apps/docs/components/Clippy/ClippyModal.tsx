@@ -1,6 +1,8 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { FC, useCallback, useState } from 'react'
-import { Input } from '~/../../packages/ui'
+import ReactMarkdown from 'react-markdown'
+import { Input, Loading } from '~/../../packages/ui'
+import components from '~/components'
 
 type Props = {
   onClose?: () => void
@@ -35,14 +37,14 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
       onClick={onClose}
     >
       <div
-        className={`mx-auto flex flex-col gap-6 rounded-lg p-6 w-full max-w-2xl shadow-2xl overflow-hidden border text-left border-scale-500 dark:bg-scale-300 cursor-auto`}
+        className={`prose dark:prose-dar mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 dark:bg-scale-300 cursor-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <Input
           className="w-full"
           size="xlarge"
           autoFocus
-          placeholder="What can I help you with?"
+          placeholder="Ask me anything about Supabase"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
@@ -55,8 +57,31 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             }
           }}
         />
-        {isLoading && 'Loading'}
-        {answer && <div>{answer}</div>}
+        {isLoading && (
+          <div className="p-6">
+            <Loading active>{}</Loading>
+          </div>
+        )}
+        {answer && (
+          <div className="px-8 py-4 dark dark:bg-scale-200 rounded-lg overflow-y-scroll">
+            <ReactMarkdown
+              linkTarget="_blank"
+              transformLinkUri={(href) => {
+                const supabaseUrl = new URL('https://supabase.com')
+                const linkUrl = new URL(href, 'https://supabase.com')
+
+                if (linkUrl.origin === supabaseUrl.origin) {
+                  return linkUrl.toString()
+                }
+
+                return href
+              }}
+              components={components}
+            >
+              {answer}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>
     </div>
   )
