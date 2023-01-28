@@ -4,7 +4,7 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
-  "scripts: {
+  "scripts": {
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
