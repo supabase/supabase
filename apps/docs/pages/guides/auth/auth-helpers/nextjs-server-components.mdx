@@ -399,6 +399,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 </TabPanel>
 </Tabs>
 
+> Remember: With this RootLayout, you will get problems when using static site generation (SSG) somewhere in your project because in "dev" mode, NextJS will complain about the usage of header/cookie methods in the supebase client creation.
+
+  
 And now create our Supabase listener component that uses the singleton Supabase instance to listen for auth changes.
 
 <Tabs
