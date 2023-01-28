@@ -1,6 +1,7 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { FC, useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Input, Loading } from '~/../../packages/ui'
 import components from '~/components'
 
@@ -66,6 +67,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="px-8 py-4 dark dark:bg-scale-200 rounded-lg overflow-y-scroll">
             <ReactMarkdown
               linkTarget="_blank"
+              remarkPlugins={[remarkGfm]}
               transformLinkUri={(href) => {
                 const supabaseUrl = new URL('https://supabase.com')
                 const linkUrl = new URL(href, 'https://supabase.com')
