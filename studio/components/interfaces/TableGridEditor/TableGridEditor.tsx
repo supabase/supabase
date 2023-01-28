@@ -2,7 +2,7 @@ import { FC, useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { SchemaView } from 'types'
@@ -92,7 +92,7 @@ const TableGridEditor: FC<Props> = ({
       ? parseSupaTable(
           {
             table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns,
+            columns: (selectedTable as PostgresTable).columns ?? [],
             primaryKeys: (selectedTable as PostgresTable).primary_keys,
             relationships: (selectedTable as PostgresTable).relationships,
           },

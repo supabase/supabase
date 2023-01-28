@@ -117,10 +117,8 @@ using ( bucket_id = 'public' );
 -- 1. Allow logged-in access to any files in the "restricted" bucket
 create policy "Restricted Access"
 on storage.objects for select
-using (
-  bucket_id = 'restricted'
-  and auth.role() = 'authenticated'
-);
+to authenticated
+using ( bucket_id = 'restricted' );
 ```
 
 ### Allow individual access to a file

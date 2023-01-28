@@ -37,6 +37,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   // Tracking submitting state separately outside of form component cause of
   // the additional dynamic confirmation modal that we're doing
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmittingDowngradeModal, setIsSubmittingDowngradeModal] = useState(false)
+
   const [isSuccessful, setIsSuccessful] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
@@ -123,6 +125,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
 
     try {
       setIsSubmitting(true)
+      setIsSubmittingDowngradeModal(true)
 
       // Trigger subscription downgrade
       const tier = freeTier.prices[0].id
@@ -175,6 +178,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
     } finally {
       setIsSubmitting(false)
+      setIsSubmittingDowngradeModal(false)
     }
   }
 
@@ -293,7 +297,10 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         visible={showConfirmModal}
         size="large"
         header="Downgrading project to free"
-        onCancel={() => setShowConfirmModal(false)}
+        onCancel={() => {
+          setShowConfirmModal(false)
+          setIsSubmitting(false)
+        }}
       >
         <div className="space-y-4 py-4">
           <Modal.Content>
@@ -314,14 +321,21 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
+              <Button
+                block
+                type="default"
+                onClick={() => {
+                  setShowConfirmModal(false)
+                  setIsSubmitting(false)
+                }}
+              >
                 Cancel
               </Button>
               <Button
                 block
                 htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
+                loading={isSubmittingDowngradeModal}
+                disabled={isSubmittingDowngradeModal}
                 onClick={() => downgradeProject()}
               >
                 Confirm

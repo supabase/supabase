@@ -18,7 +18,7 @@ import { partition } from 'lodash'
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
 
 interface Props {
   selectedSchema: string
