@@ -170,17 +170,17 @@ We're opting to expose the function over HTTP through PostgREST but you could al
 When it comes to APIs, performance counts. Here are some figures from [Apache Bench](https://www.tutorialspoint.com/apache_bench/apache_bench_quick_guide.htm) showing 2,205 requests/second on a 4 core machine with 16 GB of memory.
 
 ```markdown hideCopy
-Concurrency Level: 8
-Time taken for tests: 3.628 seconds
-Complete requests: 8000
-Failed requests: 0
-Total transferred: 1768000 bytes
-Total body sent: 1928000
-HTML transferred: 368000 bytes
-Requests per second: 2205.21 [#/sec] (mean)
-Time per request: 3.628 [ms] (mean)
-Time per request: 0.453 [ms] (mean, across all concurrent requests)
-Transfer rate: 475.93 [Kbytes/sec] received
+Concurrency Level:      8
+Time taken for tests:   3.628 seconds
+Complete requests:      8000
+Failed requests:        0
+Total transferred:      1768000 bytes
+Total body sent:        1928000
+HTML transferred:       368000 bytes
+Requests per second:    2205.21 [#/sec] (mean)
+Time per request:       3.628 [ms] (mean)
+Time per request:       0.453 [ms] (mean, across all concurrent requests)
+Transfer rate:          475.93 [Kbytes/sec] received
 ```
 
 Full steps to reproduce this output are available in [the docs](https://supabase.github.io/pg_graphql).
