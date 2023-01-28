@@ -677,7 +677,7 @@
       },
       {
         "id": "subscribe",
-        "title": "Subscribe to database changes",
+        "title": "Subscribe to channel",
         "slug": "subscribe",
         "product": "realtime",
         "type": "function"
@@ -847,6 +847,7 @@
   },
   {
     "title": "Misc",
+    "excludes": ["reference_dart_v1", "reference_dart_v0"],
 
     "items": [
       {

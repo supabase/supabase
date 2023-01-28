@@ -17,7 +17,6 @@ info:
 
 functions:
   - id: initializing
-    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `create_client()` method.
 
@@ -50,7 +49,6 @@ functions:
 
   - id: sign-up
     title: 'sign_up()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -88,7 +86,6 @@ functions:
           ```
   - id: sign-out
     title: 'sign_out()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
@@ -100,7 +97,6 @@ functions:
           ```
   - id: verify-otp
     title: 'verify_otp()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
@@ -114,7 +110,6 @@ functions:
 
   - id: get-session
     title: 'get_session_from_url'
-    $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
       - id: get-session
         name: Get the session data from URL
@@ -125,7 +120,6 @@ functions:
 
   - id: set-session
     title: 'set_session()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
@@ -142,7 +136,6 @@ functions:
           ```
   - id: refresh-session
     title: 'refresh_ession()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
       - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
@@ -155,7 +148,6 @@ functions:
           ```
   - id: select
     title: 'Fetch data: select()'
-    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
       - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
@@ -181,7 +173,6 @@ functions:
     title: 'invoke()'
     description: |
       Invoke a Supabase Function.
-    $ref: '@supabase/functions-js.F'
     notes: |
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
@@ -204,7 +195,6 @@ functions:
 
   - id: list-buckets
     title: 'list_buckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -220,7 +210,6 @@ functions:
 
   - id: get-bucket
     title: 'get_bucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -236,7 +225,6 @@ functions:
 
   - id: create-bucket
     title: 'create_bucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
@@ -252,7 +240,6 @@ functions:
 
   - id: empty-bucket
     title: 'empty_bucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -267,7 +254,6 @@ functions:
           ```
   - id: delete-bucket
     title: 'delete_bucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
@@ -283,7 +269,6 @@ functions:
 
   - id: from-upload
     title: 'from_.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -299,7 +284,6 @@ functions:
           ```
   - id: from-move
     title: 'from_.move()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -315,7 +299,6 @@ functions:
 
   - id: from-create-signed-url
     title: 'from_.create_signed_url()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -331,7 +314,6 @@ functions:
 
   - id: from-get-public-url
     title: 'from_.get_public_url()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
@@ -348,7 +330,6 @@ functions:
 
   - id: from-download
     title: 'from_.download()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -366,7 +347,6 @@ functions:
 
   - id: from-remove
     title: 'from_.remove()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -381,7 +361,6 @@ functions:
           ```
   - id: from-list
     title: 'from_.list()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -396,6 +375,5 @@ functions:
           ```
   - id: subscribe
     title: on().subscribe()
-    $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community) repository.
