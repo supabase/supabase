@@ -135,7 +135,7 @@ Let's set up an Angular component to manage logins and sign ups. We'll use Magic
 Create an **AuthComponent** with `ng g c auth` Angular CLI command.
 
 ```ts title=src/app/auth/auth.component.ts
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -144,7 +144,7 @@ import { SupabaseService } from '../supabase.service'
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent {
   loading = false
 
   signInForm = this.formBuilder.group({
@@ -155,8 +155,6 @@ export class AuthComponent implements OnInit {
     private readonly supabase: SupabaseService,
     private readonly formBuilder: FormBuilder
   ) {}
-
-  ngOnInit(): void {}
 
   async onSubmit(): Promise<void> {
     try {
@@ -175,6 +173,7 @@ export class AuthComponent implements OnInit {
     }
   }
 }
+
 ```
 
 ```html title=src/app/auth/auth.component.html
