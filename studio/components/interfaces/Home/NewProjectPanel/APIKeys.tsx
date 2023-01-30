@@ -47,7 +47,7 @@ const APIKeys = () => {
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
-  const anonKey = apiKeys.find((key: any) => key.tags === 'anon')
+  const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
   const clientInitSnippet: any = Snippets.init(apiUrl)
   const selectedLanguageSnippet =

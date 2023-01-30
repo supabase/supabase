@@ -99,9 +99,12 @@ const PageLayout: NextPageWithLayout = () => {
   ]
 
   // Get the API service
-  const anonKey = settings?.autoApiService.defaultApiKey
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
 
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
+  const endpoint = apiService?.app_config.endpoint ?? ''
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),

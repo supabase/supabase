@@ -23,8 +23,10 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   const { data: settings } = useProjectApiQuery({
     projectRef,
   })
-
-  const anonKey = settings?.autoApiService.defaultApiKey
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
   const endpointSections = endpoint.split('.')
