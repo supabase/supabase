@@ -13,6 +13,7 @@ import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml
 import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
 // @ts-expect-error
 import spec_csharp_v0 from '~/../../spec/supabase_csharp_v0.yml' assert { type: 'yml' }
+// @ts-expect-error
 import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
