@@ -116,8 +116,9 @@ const NetworkRestrictions = ({}) => {
                       accessed externally
                     </p>
                     <p className="text-scale-1000 text-sm w-3/5">
-                      Only your local machine is able to access your project's database as all IP
-                      addresses have been disallowed.
+                      Only IP addresses within the range of{' '}
+                      <code className="text-xs">127.0.0.1/32</code> can access your project's
+                      database as all IP addresses have been disallowed.
                     </p>
                   </div>
                 </div>
@@ -137,6 +138,10 @@ const NetworkRestrictions = ({}) => {
                     <p className="text-scale-1000 text-sm">
                       You may remove all of them to allow all IP addresses to have access to your
                       database
+                    </p>
+                    <p className="text-scale-1000 text-sm">
+                      Note: Restrictions only apply to your database, and not to APIs offered over
+                      HTTPS
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
