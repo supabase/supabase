@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
+    "build:embeddings": "tsx scripts/generate-embeddings.ts",
     "postbuild": "ts-node ./scripts/build-search.ts && node ./internals/generate-sitemap.mjs",
     "generate:all": "npm-run-all --parallel gen:api gen:cli gen:gotrue gen:storage gen:supabase-dart:v0 gen:supabase-dart:v1 gen:supabase-js:v1 gen:supabase-js:v2 gen:realtime",
     "gen:api": "npm-run-all gen:api:usage",
@@ -98,6 +99,7 @@
     "sass": "^1.55.0",
     "ts-node": "^10.9.1",
     "tsconfig": "*",
+    "tsx": "^3.12.2",
     "typescript": "^4.5.3"
   }
 }
