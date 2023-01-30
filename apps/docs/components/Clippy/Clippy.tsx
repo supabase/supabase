@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import clippyImage from '../../public/img/clippy.png'
 import ClippyBubble from './ClippyBubble'
 import ClippyModal from './ClippyModal'
 
@@ -23,7 +25,14 @@ const Clippy: FC = () => {
 
   return (
     <>
-      {!isModalOpen && <ClippyBubble onClick={onOpen} />}
+      {!isModalOpen && (
+        <div className="flex flex-col items-end gap-4">
+          <ClippyBubble onClick={onOpen} />
+          <div className="w-[150px]">
+            <Image src={clippyImage} alt="Clippy" />
+          </div>
+        </div>
+      )}
       {isModalOpen && createPortal(<ClippyModal onClose={onClose} />, document.body)}
     </>
   )
