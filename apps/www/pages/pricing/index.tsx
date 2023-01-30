@@ -83,7 +83,7 @@ export default function IndexPage() {
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
       preface: 'Everything below included in the base plan',
-      additional: 'Turn off your spend cap to Pay As You Grow ',
+      additional: '',
       cta: 'Get Started',
     },
     // {
@@ -446,9 +446,22 @@ export default function IndexPage() {
               </div>
             ))}
           </div>
+          <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
+            <span className="prose">Got something you'd like to see here?</span>
+            <Link
+              href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+              as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+            >
+              <a target="_blank">
+                <Button size="tiny" type="default">
+                  Request a feature
+                </Button>
+              </a>
+            </Link>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center mt-12 lg:mt-8">
           <div>
             <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
