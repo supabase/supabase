@@ -1,12 +1,12 @@
 import { FC } from 'react'
 import { Address4 } from 'ip-address'
-import ipaddr from 'ipaddr.js'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore, useParams } from 'hooks'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import InformationBox from 'components/ui/InformationBox'
+import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
+import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
 interface Props {
   restrictedIps: string[]
@@ -26,57 +26,24 @@ const AddRestrictionModal: FC<Props> = ({
   const { ref } = useParams()
   const { mutateAsync: applyNetworkRestrictions } = useNetworkRestrictionsApplyMutation()
 
-  const getAddressEndRange = (cidr: string) => {
-    try {
-      const address = new Address4(cidr)
-      return { start: address.startAddress().address, end: address.endAddress().address }
-    } catch (error: any) {
-      return undefined
-    }
-  }
-
   const validate = (values: any) => {
     const errors: any = {}
     const { ipAddress, cidrBlockSize } = values
 
-    if (cidrBlockSize < 0 || cidrBlockSize > 32) {
-      errors.cidrBlockSize = 'Size has to be between 0 to 32'
-    }
+    // Validate CIDR block size
+    const isOutOfCidrSizeRange = cidrBlockSize < 0 || cidrBlockSize > 32
+    if (isOutOfCidrSizeRange) errors.cidrBlockSize = 'Size has to be between 0 to 32'
 
-    try {
-      const address = ipaddr.parse(ipAddress)
-      const isIpv6 = address.kind() === 'ipv6'
-      const isPrivate = address.range() === 'private'
-
-      if (isIpv6) errors.ipAddress = 'Only IPv4 addresses are supported at the moment'
-      else if (isPrivate) errors.ipAddress = 'Private IP addresses are not supported'
-    } catch (error: any) {
+    // Validate IP address
+    const isValid = Address4.isValid(ipAddress)
+    if (!isValid) {
       errors.ipAddress = 'Please enter a valid IP address'
+      return errors
     }
 
-    // try {
-    //   // Check if already exists
-    //   const alreadyExists = restrictedIps.includes(values.address)
-    //   if (alreadyExists) {
-    //     errors.address = 'This restriction already exists'
-    //     return errors
-    //   }
-    //   // Check if valid IP address
-    //   const [address, range] = ipaddr.IPv4.parseCIDR(values.address)
-    //   // Check if private range
-    //   const isPrivate = ipaddr.parse(address.octets.join('.')).range() === 'private'
-    //   if (isPrivate) errors.address = 'Private IP addresses are not supported'
-    // } catch (error: any) {
-    //   if (error.message.includes('string is not formatted like an IPv4 CIDR range')) {
-    //     try {
-    //       // Check if IPv6 format
-    //       ipaddr.IPv6.parseCIDR(values.address)
-    //       errors.address = 'Only IPv4 addresses are supported at the moment'
-    //     } catch (error: any) {
-    //       errors.address = 'Please enter a valid address in CIDR notation'
-    //     }
-    //   }
-    // }
+    const isPrivate = checkIfPrivate(ipAddress)
+    if (isPrivate) errors.ipAddress = 'Private IP addresses are not supported'
+
     return errors
   }
 
@@ -129,7 +96,7 @@ const AddRestrictionModal: FC<Props> = ({
                 <div className="py-6 space-y-4">
                   <p className="text-sm text-scale-1100">
                     This will add an IP address range to a list of allowed ranges that can access
-                    your project's database.
+                    your database. Only IPv4 addresses are supported at the moment.
                   </p>
                   <InformationBox
                     defaultVisibility
