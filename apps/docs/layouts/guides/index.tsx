@@ -65,7 +65,7 @@ const Layout: FC<Props> = (props) => {
   return (
     <>
       <NextSeo
-        title={`${props.meta?.title} | Supabase docs`}
+        title={`${props.meta?.title} | Supabase Docs`}
         description={props.meta?.description ? props.meta?.description : props.meta?.title}
         canonical={`https://supabase.com/docs${asPath}`}
         openGraph={{
