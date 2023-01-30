@@ -75,6 +75,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-dart',
     name: 'Dart Reference v0.0',
   },
+  reference_csharp_v0: {
+    icon: '/docs/img/icons/menu/reference-csharp',
+    name: 'C# Reference v0.0',
+  },
   reference_python_v2: {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
