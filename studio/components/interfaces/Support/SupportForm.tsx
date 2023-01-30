@@ -53,12 +53,8 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
   const isInitialized = app.projects.isInitialized
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
-  const orgDefaults: Partial<Organization>[] = [
-    { slug: 'no-organization', name: 'No specific organization' },
-  ]
 
   const projects = [...sortedProjects, ...projectDefaults]
-  const organizations = [...sortedOrganizations, ...orgDefaults]
 
   const planNames = {
     [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
@@ -103,7 +99,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
           const project = sortedProjects.find((project) => project.ref === initialProjectRef)
           return org.id === project?.organization_id
         })?.slug
-      : 'no-organization'
+      : sortedOrganizations[0]?.slug
   const initialValues = {
     category: selectedCategory !== undefined ? selectedCategory.value : CATEGORY_OPTIONS[0].value,
     severity: 'Low',
@@ -143,14 +139,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   }
 
   const onValidate = (values: any) => {
-    console.log('onValidate', values)
     const errors: any = {}
     if (!values.subject) errors.subject = 'Please add a subject heading'
     if (!values.message) errors.message = "Please add a message about the issue that you're facing"
     if (values.category === 'Problem' && values.library === 'no-library')
       errors.library = "Please select the library that you're facing issues with"
-    if (values.projectRef === 'no-project' && values.organizationSlug === 'no-organization')
-      errors.organizationSlug = 'Please select an organization'
     return errors
   }
 
@@ -220,13 +213,13 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
         useEffect(() => {
           if (values.projectRef === 'no-project') {
-            const updatedValues = { ...values, organizationSlug: sortedOrganizations[0].slug }
+            const updatedValues = { ...values, organizationSlug: sortedOrganizations[0]?.slug }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           } else if (selectedProject) {
             if (!selectedProject.subscription_tier) {
               app.projects.fetchSubscriptionTier(selectedProject as Project)
             }
-            const organization = organizations.find(
+            const organization = sortedOrganizations.find(
               (org) => org.id === selectedProject.organization_id
             )
             if (organization) {
@@ -315,14 +308,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               )}
             </div>
 
-            {values.projectRef === 'no-project' && (
+            {values.projectRef === 'no-project' && sortedOrganizations.length > 0 && (
               <div className="px-6">
                 <Listbox
                   id="organizationSlug"
                   layout="vertical"
                   label="Which organization is affected?"
                 >
-                  {organizations.map((option) => {
+                  {sortedOrganizations.map((option) => {
                     return (
                       <Listbox.Option
                         key={`option-${option.slug}`}
