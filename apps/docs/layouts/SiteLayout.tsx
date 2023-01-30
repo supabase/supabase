@@ -29,7 +29,7 @@ const levelsData = {
   },
   functions: {
     icon: '/docs/img/icons/menu/functions',
-    name: 'Functions',
+    name: 'Edge Functions',
   },
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
