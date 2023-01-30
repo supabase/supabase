@@ -35,6 +35,7 @@ export type Service = {
 }
 
 export type AppConfig = {
+  protocol: 'https' | 'http'
   endpoint: string
   db_schema: string
   realtime_multitenant_enabled: boolean

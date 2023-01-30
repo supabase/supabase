@@ -232,6 +232,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-functions-download",
+        "title": "Download a function",
+        "slug": "supabase-functions-download",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-functions-serve",
         "title": "Serve a function",
         "slug": "supabase-functions-serve",

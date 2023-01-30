@@ -4,6 +4,7 @@ import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useParams, useStore, withAuth } from 'hooks'
+import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
 import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
@@ -13,7 +14,6 @@ import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModa
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
 import NoPermission from 'components/ui/NoPermission'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface Props {
   title: string
@@ -40,22 +40,24 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     buckets,
   } = storageExplorerStore || {}
 
-  const { data: settings, isLoading } = useProjectApiQuery({
-    projectRef,
-  })
-
-  const projectUrl = settings?.autoApiService.app_config.endpoint ?? ''
-  const serviceKey = settings?.autoApiService.serviceApiKey
-  const canAccessStorage = !isLoading && settings && serviceKey
+  const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
+  const apiService = settings?.autoApiService
+  const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
+  const canAccessStorage = !isLoading && apiService && serviceKey
 
   useEffect(() => {
-    if (!isLoading && settings) initializeStorageStore()
+    if (!isLoading && apiService) initializeStorageStore(apiService)
   }, [isLoading])
 
-  const initializeStorageStore = async () => {
-    if (projectUrl) {
+  const initializeStorageStore = async (apiService: AutoApiService) => {
+    if (apiService.endpoint) {
       if (serviceKey) {
-        storageExplorerStore.initStore(projectRef, projectUrl, serviceKey)
+        storageExplorerStore.initStore(
+          projectRef,
+          apiService.endpoint,
+          apiService.serviceApiKey,
+          apiService.protocol
+        )
         await storageExplorerStore.fetchBuckets()
       }
     } else {

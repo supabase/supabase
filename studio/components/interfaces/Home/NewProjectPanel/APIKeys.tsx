@@ -4,14 +4,12 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { IconAlertCircle, IconLoader, Input } from 'ui'
 
-import Snippets from 'components/to-be-cleaned/Docs/Snippets'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { checkPermissions, useParams } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { checkPermissions, useParams } from 'hooks'
+import Snippets from 'components/to-be-cleaned/Docs/Snippets'
+import Panel from 'components/ui/Panel'
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
 const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -26,7 +24,7 @@ const APIKeys = () => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsQuery({
+  } = useProjectApiQuery({
     projectRef,
   })
 
@@ -40,10 +38,7 @@ const APIKeys = () => {
   const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
 
   // Get the API service
-  const apiService = (settings?.services ?? []).find(
-    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiConfig = apiService?.app_config
+  const apiService = settings?.autoApiService
   const apiKeys = apiService?.service_api_keys ?? []
 
   // API keys should not be empty. However it can be populated with a delay on project creation
@@ -51,9 +46,7 @@ const APIKeys = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
-    apiConfig?.endpoint ?? '-'
-  }`
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
   const anonKey = apiKeys.find((key: any) => key.tags === 'anon')
 
   const clientInitSnippet: any = Snippets.init(apiUrl)
@@ -117,8 +110,8 @@ const APIKeys = () => {
               label={
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
-                  <div className="flex items-center -ml-1 space-x-1">
-                    {anonKey?.tags.split(',').map((x: any, i: number) => (
+                  <div className="flex items-center space-x-1 -ml-1">
+                    {anonKey?.tags?.split(',').map((x: any, i: number) => (
                       <code key={`${x}${i}`} className="text-xs">
                         {x}
                       </code>
@@ -136,7 +129,7 @@ const APIKeys = () => {
                   ? 'JWT secret update failed, new API key may have issues'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                   ? 'Updating JWT secret...'
-                  : anonKey?.api_key ?? '-'
+                  : apiService?.defaultApiKey
               }
               onChange={() => {}}
               descriptionText={

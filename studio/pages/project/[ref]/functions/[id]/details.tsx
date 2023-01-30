@@ -6,10 +6,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useParams, useStore } from 'hooks'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import NoPermission from 'components/ui/NoPermission'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref: projectRef, id } = useParams()
