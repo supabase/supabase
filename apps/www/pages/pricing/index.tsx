@@ -230,7 +230,7 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-16 shadow-sm lg:py-28">
+        <div className="relative z-10 py-16 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
