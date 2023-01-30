@@ -1,5 +1,5 @@
 import { ServerIcon, SupportIcon } from '@heroicons/react/outline'
-import { Accordion, Button, IconCheck } from 'ui'
+import { Accordion, Button, IconCheck, Select } from 'ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -21,6 +21,7 @@ export default function IndexPage() {
   const { basePath } = useRouter()
   const { isDarkMode } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
+  const [activeMobileTier, setActiveMobileTier] = useState('Free')
 
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
@@ -170,7 +171,7 @@ export default function IndexPage() {
     },
   ]
 
-  const MobileHeaders = ({
+  const MobileHeader = ({
     // title,
     description,
     priceDescription,
@@ -187,7 +188,7 @@ export default function IndexPage() {
     from?: boolean
   }) => {
     return (
-      <div className="mt-8 px-4">
+      <div className="mt-8 px-4 mobile-header">
         <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
           {tier}
         </h2>
@@ -391,7 +392,7 @@ export default function IndexPage() {
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
-            <p className="text-scale-1100 mb-16 text-lg">
+            <p className="text-scale-1100 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
           </div>
@@ -476,7 +477,7 @@ export default function IndexPage() {
             <h2 className="text-scale-1200 text-3xl scroll-m-20" id="compare-plans">
               Compare Plans
             </h2>
-            <p className="text-scale-1100 mb-16 text-lg">
+            <p className="text-scale-1100 mb-8 lg:mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
@@ -486,153 +487,179 @@ export default function IndexPage() {
 
             <div className="lg:hidden">
               {/* Free - Mobile  */}
+              <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
+                <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
+                  <label className="text-scale-1000">Change plan</label>
+                  <Select
+                    id="change-plan"
+                    name="Change plan"
+                    layout="vertical"
+                    value={activeMobileTier}
+                    className="min-w-[120px] bg-slate-400 text-red-500"
+                    onChange={(e) => setActiveMobileTier(e.target.value)}
+                  >
+                    <Select.Option value="Free">Free</Select.Option>
+                    <Select.Option value="Pro">Pro</Select.Option>
+                    <Select.Option value="Enterprise">Enterprise</Select.Option>
+                  </Select>
+                </div>
+              </div>
+              {activeMobileTier === 'Free' && (
+                <>
+                  <MobileHeader
+                    tier="Free"
+                    price={'0'}
+                    priceDescription={'/mo'}
+                    description={'Perfect for hobby projects and experiments'}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.database}
+                    tier={'free'}
+                    icon={Solutions['database'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.auth}
+                    tier={'free'}
+                    icon={Solutions['authentication'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.storage}
+                    tier={'free'}
+                    icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.realtime}
+                    tier={'free'}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing['edge-functions']}
+                    tier={'free'}
+                    icon={Solutions['edge-functions'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.dashboard}
+                    tier={'free'}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.security}
+                    tier={'free'}
+                    icon={pricing.security.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.support}
+                    tier={'free'}
+                    icon={pricing.support.icon}
+                  />
+                </>
+              )}
 
-              <MobileHeaders
-                tier="Free"
-                price={'0'}
-                priceDescription={'/mo'}
-                description={'Perfect for hobby projects and experiments'}
-              />
+              {activeMobileTier === 'Pro' && (
+                <>
+                  <MobileHeader
+                    tier="Pro"
+                    from={false}
+                    price={'25'}
+                    priceDescription={'/mo + additional use'}
+                    description={'Everything you need to scale your project into production'}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.database}
+                    tier={'pro'}
+                    icon={Solutions['database'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.auth}
+                    tier={'pro'}
+                    icon={Solutions['authentication'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.storage}
+                    tier={'pro'}
+                    icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.realtime}
+                    tier={'pro'}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing['edge-functions']}
+                    tier={'pro'}
+                    icon={Solutions['edge-functions'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.dashboard}
+                    tier={'pro'}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.security}
+                    tier={'pro'}
+                    icon={pricing.security.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.support}
+                    tier={'pro'}
+                    icon={pricing.support.icon}
+                  />
+                </>
+              )}
 
-              <PricingTableRowMobile
-                category={pricing.database}
-                tier={'free'}
-                icon={Solutions['database'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.auth}
-                tier={'free'}
-                icon={Solutions['authentication'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.storage}
-                tier={'free'}
-                icon={Solutions['storage'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.realtime}
-                tier={'free'}
-                icon={Solutions['realtime'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing['edge-functions']}
-                tier={'free'}
-                icon={Solutions['edge-functions'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.dashboard}
-                tier={'free'}
-                icon={pricing.dashboard.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.security}
-                tier={'free'}
-                icon={pricing.security.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.support}
-                tier={'free'}
-                icon={pricing.support.icon}
-              />
-
-              {/* Pro - Mobile  */}
-              <MobileHeaders
-                tier="Pro"
-                from={false}
-                price={'25'}
-                priceDescription={'/mo + additional use'}
-                description={'Everything you need to scale your project into production'}
-              />
-              <PricingTableRowMobile
-                category={pricing.database}
-                tier={'pro'}
-                icon={Solutions['database'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.auth}
-                tier={'pro'}
-                icon={Solutions['authentication'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.storage}
-                tier={'pro'}
-                icon={Solutions['storage'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.realtime}
-                tier={'pro'}
-                icon={Solutions['realtime'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing['edge-functions']}
-                tier={'pro'}
-                icon={Solutions['edge-functions'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.dashboard}
-                tier={'pro'}
-                icon={pricing.dashboard.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.security}
-                tier={'pro'}
-                icon={pricing.security.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.support}
-                tier={'pro'}
-                icon={pricing.support.icon}
-              />
-
-              {/* Enterprise - Mobile  */}
-              <MobileHeaders
-                tier="Enterprise"
-                price={'Contact Us'}
-                priceDescription={'for a quote'}
-                description={'Designated support team, account manager and technical specialist'}
-                showDollarSign={false}
-              />
-
-              <PricingTableRowMobile
-                category={pricing.database}
-                tier={'enterprise'}
-                icon={Solutions['database'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.auth}
-                tier={'enterprise'}
-                icon={Solutions['authentication'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.storage}
-                tier={'enterprise'}
-                icon={Solutions['storage'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.realtime}
-                tier={'enterprise'}
-                icon={Solutions['realtime'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing['edge-functions']}
-                tier={'enterprise'}
-                icon={Solutions['edge-functions'].icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.dashboard}
-                tier={'enterprise'}
-                icon={pricing.dashboard.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.security}
-                tier={'enterprise'}
-                icon={pricing.security.icon}
-              />
-              <PricingTableRowMobile
-                category={pricing.support}
-                tier={'enterprise'}
-                icon={pricing.support.icon}
-              />
+              {activeMobileTier === 'Enterprise' && (
+                <>
+                  <MobileHeader
+                    tier="Enterprise"
+                    price={'Contact Us'}
+                    priceDescription={'for a quote'}
+                    description={
+                      'Designated support team, account manager and technical specialist'
+                    }
+                    showDollarSign={false}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.database}
+                    tier={'enterprise'}
+                    icon={Solutions['database'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.auth}
+                    tier={'enterprise'}
+                    icon={Solutions['authentication'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.storage}
+                    tier={'enterprise'}
+                    icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.realtime}
+                    tier={'enterprise'}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing['edge-functions']}
+                    tier={'enterprise'}
+                    icon={Solutions['edge-functions'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.dashboard}
+                    tier={'enterprise'}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.security}
+                    tier={'enterprise'}
+                    icon={pricing.security.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.support}
+                    tier={'enterprise'}
+                    icon={pricing.support.icon}
+                  />
+                </>
+              )}
             </div>
 
             {/* <!-- lg+ --> */}
