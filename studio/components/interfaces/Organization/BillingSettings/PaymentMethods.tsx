@@ -107,7 +107,7 @@ const PaymentMethods: FC<Props> = ({
           <p className="text-sm opacity-50">
             When adding a new payment method, either remove the old one or go to your projects'
             subscription to explicitly update the payment method. Marking a payment method as
-            "default" is only relevant for new projects or if there is no other payment method on
+            "default" is only relevant for new projects or if there are no other payment methods on
             your account.
           </p>
         </div>
