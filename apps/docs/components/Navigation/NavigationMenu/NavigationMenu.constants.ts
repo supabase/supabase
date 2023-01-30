@@ -22,6 +22,12 @@ export const REFERENCES: References = {
     versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/flutter-icon.svg',
   },
+  csharp: {
+    name: 'C#',
+    library: 'supabase-csharp',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/c-sharp-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -739,6 +745,20 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-dart',
         },
+        {
+          name: 'supabase-csharp',
+          url: '/reference/csharp/start',
+          level: 'reference_csharp',
+          items: [],
+          icon: '/img/icons/menu/reference-csharp',
+        },
+        {
+          name: 'supbase-python',
+          url: '/reference/python/start',
+          level: 'reference_python',
+          items: [],
+          icon: 'docs/img/icons/javascript.svg',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -788,10 +808,19 @@ export const reference_dart_v0 = {
   url: '/guides/reference/dart',
   parent: '/reference',
 }
+
 export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
+  parent: '/reference',
+}
+
+ 
+export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'c#',
+  url: 'guides/reference/csharp',
   parent: '/reference',
 }
 
@@ -894,6 +923,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/dart-icon.svg',
         url: '/reference/dart/start',
+      },
+      {
+        label: 'supabase-csharp',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/c-sharp-icon.svg',
+        url: '/reference/csharp/start',
       },
     ],
   },
