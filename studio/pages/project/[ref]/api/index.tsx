@@ -73,7 +73,10 @@ const DocView: FC<any> = observer(({}) => {
     projectRef,
   })
 
-  const apiKey = data?.autoApiService?.defaultApiKey
+  const apiService = data?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
   const swaggerUrl = data?.autoApiService?.restUrl
 
   const canReadServiceKey = checkPermissions(
@@ -88,7 +91,7 @@ const DocView: FC<any> = observer(({}) => {
   } = useProjectJsonSchemaQuery({
     projectRef,
     swaggerUrl,
-    apiKey,
+    apiKey: anonKey,
   })
 
   useEffect(() => {
@@ -172,7 +175,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: apiKey,
+                              key: anonKey,
                               name: 'anon (public)',
                             })
                           }
