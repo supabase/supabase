@@ -185,18 +185,18 @@ async function walk(dir: string): Promise<string[]> {
 
 async function generateEmbeddings() {
   if (
-    !process.env.DOCS_SEARCH_SUPABASE_URL ||
-    !process.env.DOCS_SEARCH_SUPABASE_SERVICE_KEY ||
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.META_SUPABASE_SERVICE_KEY ||
     !process.env.OPENAI_KEY
   ) {
     return console.log(
-      'Environment variables DOCS_SEARCH_SUPABASE_URL, DOCS_SEARCH_SUPABASE_SERVICE_KEY, and OPENAI_KEY are required: skipping embeddings generation'
+      'Environment variables NEXT_PUBLIC_SUPABASE_URL, META_SUPABASE_SERVICE_KEY, and OPENAI_KEY are required: skipping embeddings generation'
     )
   }
 
   const supabaseClient = createClient(
-    process.env.DOCS_SEARCH_SUPABASE_URL,
-    process.env.DOCS_SEARCH_SUPABASE_SERVICE_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.META_SUPABASE_SERVICE_KEY
   )
 
   const markdownFiles = (await walk('pages'))
