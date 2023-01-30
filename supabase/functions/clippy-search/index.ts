@@ -5,8 +5,8 @@ import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
-const supabaseUrl = Deno.env.get('DOCS_SEARCH_SUPABASE_URL')
-const supabaseServiceKey = Deno.env.get('DOCS_SEARCH_SUPABASE_SERVICE_KEY')
+const supabaseUrl = Deno.env.get('META_SUPABASE_URL')
+const supabaseServiceKey = Deno.env.get('META_SUPABASE_SERVICE_KEY')
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,7 +34,7 @@ serve(async (req) => {
   if (!supabaseUrl) {
     return new Response(
       JSON.stringify({
-        error: 'Missing environment variable DOCS_SEARCH_SUPABASE_URL',
+        error: 'Missing environment variable META_SUPABASE_URL',
       }),
       {
         status: 400,
@@ -46,7 +46,7 @@ serve(async (req) => {
   if (!supabaseServiceKey) {
     return new Response(
       JSON.stringify({
-        error: 'Missing environment variable DOCS_SEARCH_SUPABASE_SERVICE_KEY',
+        error: 'Missing environment variable META_SUPABASE_SERVICE_KEY',
       }),
       {
         status: 400,
@@ -71,9 +71,7 @@ serve(async (req) => {
 
   const { query } = requestData
 
-  console.log(supabaseUrl, supabaseServiceKey)
-
-  const supabaseClient = createClient('http://supabase_kong_docs:8000', supabaseServiceKey)
+  const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
   const configuration = new Configuration({ apiKey: openAiKey })
   const openai = new OpenAIApi(configuration)
