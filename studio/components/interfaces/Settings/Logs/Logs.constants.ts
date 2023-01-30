@@ -257,7 +257,7 @@ export const SQL_FILTER_TEMPLATES: any = {
     "severity.error": `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
     "severity.warning": `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
     "severity.info": `REGEXP_CONTAINS(event_message, "level.{3}info")`,
-    "status_code.server_error": `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}`,
+    "status_code.server_error": `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}")`,
     "status_code.client_error": `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
     "status_code.redirection": `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
     "status_code.success": `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
