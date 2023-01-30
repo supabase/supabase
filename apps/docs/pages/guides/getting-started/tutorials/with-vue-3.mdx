@@ -50,7 +50,7 @@ VITE_SUPABASE_URL=YOUR_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
+With the API credentials in place, create an `src/supabase.js` helper file to initialize the Supabase client. These variables are exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js title=src/supabase.js
@@ -66,7 +66,7 @@ Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/su
 
 ### Set up a Login component
 
-Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up an `src/components/Auth.vue` component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords. 
 
 ```html title=/src/components/Auth.vue
 <script setup>
@@ -118,7 +118,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Account.vue`.
+Create a new `src/components/Account.vue` component to handle this.
 
 ```html title=src/components/Account.vue
 <script setup>
@@ -277,7 +277,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+Create a new `src/components/Avatar.vue` component that allows users to upload profile photos:
 
 ```html title=src/components/Avatar.vue
 <script setup>
@@ -361,7 +361,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ### Add the new widget
 
-And then we can add the widget to the Account page:
+And then we can add the widget to the Account page in `src/components/Account.vue`:
 
 ```html title=src/components/Account.vue
 <script>
