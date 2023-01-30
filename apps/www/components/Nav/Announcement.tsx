@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import _announcement from '~/data/Announcement.json'
-import { IconChevronRight, IconX } from '@supabase/ui'
+import { IconChevronRight, IconX } from 'ui'
 import { useRouter } from 'next/router'
 
 interface AnnouncementProps {
@@ -52,33 +52,32 @@ const Announcement = () => {
       <div
         onClick={handleLink}
         className="
-          launch-week-gradientBg--anouncement-bar
+          launch-week-gradientBg--announcement-bar
           to-green-1000
           hover:from-green-1000
           hover:to-green-1100 relative flex
-          cursor-pointer flex-row        
-          space-x-3 
-          overflow-hidden bg-gradient-to-r from-green-900
+          cursor-pointer flex-row
+          space-x-3
+          overflow-hidden
           text-white
         "
       >
         <div
           className="
-            mx-auto flex items-center justify-center divide-white p-3 text-sm font-medium lg:container lg:divide-x 
+            mx-auto flex items-center gap-6 justify-center p-3 text-sm font-medium lg:container
             lg:px-16 xl:px-20
           "
         >
-          <span className="item-center flex gap-2 px-3">
+          <span>{announcement.text}</span>
+          <span className="item-center flex gap-2 pr-8 sm:px-3">
             {announcement.badge && (
-              <div className="bg-brand-400 text-brand-900 py-0.25 rounded px-1.5">
+              <div className="bg-[#2E2E2E] text-white py-0.25 rounded-2xl px-3 py-1 border border-gray-1100	whitespace-nowrap">
                 {announcement.badge}
               </div>
             )}
-            <span>{announcement.text}</span>
           </span>
           <span className="hidden items-center space-x-2 px-3 lg:flex">
             <span>{announcement.cta}</span>
-            <IconChevronRight size={14} />
           </span>
         </div>
         <div

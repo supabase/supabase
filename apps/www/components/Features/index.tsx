@@ -1,4 +1,4 @@
-import { Button, Badge, IconArrowRight } from '@supabase/ui'
+import { Button, Badge, IconArrowRight } from 'ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 import Link from 'next/link'
@@ -9,6 +9,7 @@ import TextLink from '../TextLink'
 const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
+    if (solution.name === 'Realtime') return null
     return (
       <div key={name} className="mb-10 space-y-4 md:mb-0">
         <div className="flex items-center">

@@ -10,7 +10,6 @@ import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { Badge } from 'ui'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -24,7 +23,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
   const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
@@ -63,20 +63,22 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 </span>
                 {/* Project Dropdown */}
                 <ProjectDropdown />
-                {showOverUsageBadge && (
+
+                {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
+                {/* {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${ref}/settings/billing`}>
+                    <Link href={`/project/${ref}/settings/billing/subscription`}>
                       <a>
                         <Badge color="red">Project has exceeded usage limits </Badge>
                       </a>
                     </Link>
                   </div>
-                )}
+                )} */}
               </>
             )}
           </>
         ) : (
-          <Link href="/">
+          <Link href="/projects">
             <a
               className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
             >

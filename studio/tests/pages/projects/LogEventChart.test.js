@@ -34,5 +34,5 @@ test('renders chart', async () => {
   // )
   // userEvent.click(paths[0])
   // expect(mock).toBeCalledTimes(1)
-  await screen.findByText('Events')
+  await screen.findByText(/Logs \/ Time/)
 })

@@ -1,5 +1,5 @@
 import Router, { useRouter } from 'next/router'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, PropsWithChildren } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -25,7 +25,6 @@ import {
   useStore,
   useFlag,
   withAuth,
-  useSubscriptionStats,
   checkPermissions,
   useFreeProjectLimitCheck,
 } from 'hooks'
@@ -45,10 +44,8 @@ const Wizard: NextPageWithLayout = () => {
   const { slug } = router.query
   const { app, ui } = useStore()
 
-  const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const subscriptionStats = useSubscriptionStats()
   const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheck(slug as string)
 
@@ -66,13 +63,8 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const isOrganizationOwner = ui.selectedOrganization?.is_owner
   const availableRegions = getAvailableRegions()
-
-  const isAdmin = enablePermissions
-    ? checkPermissions(PermissionAction.CREATE, 'projects')
-    : isOrganizationOwner
-
+  const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
@@ -80,10 +72,7 @@ const Wizard: NextPageWithLayout = () => {
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const canCreateProject =
-    isAdmin &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
     projectName !== '' &&
@@ -210,7 +199,6 @@ const Wizard: NextPageWithLayout = () => {
       hideHeaderStyling
       loading={
         !app.organizations.isInitialized ||
-        subscriptionStats.isLoading ||
         isLoadingFreeProjectLimitCheck
       }
       title={
@@ -220,7 +208,7 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => Router.push('/')}>
+          <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">
@@ -415,7 +403,7 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 const PageLayout = withAuth(
-  observer(({ children }) => {
+  observer<PropsWithChildren<{}>>(({ children }) => {
     const router = useRouter()
     const { slug } = router.query
 

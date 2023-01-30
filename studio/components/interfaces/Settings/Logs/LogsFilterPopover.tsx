@@ -61,7 +61,7 @@ const LogsFilterPopover: React.FC<Props> = ({
                       size="medium"
                       defaultChecked={(filters?.[options.key] as Filters)?.[x.key] as boolean}
                     />
-                    {i !== options.options.length - 1 && <Popover.Seperator />}
+                    {i !== options.options.length - 1 && <Popover.Separator />}
                   </React.Fragment>
                 ))}
               </div>

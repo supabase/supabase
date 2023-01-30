@@ -1811,7 +1811,7 @@
                     "isExported": true
                   },
                   "comment": {
-                    "shortText": "Retuns `true` is the connection is open."
+                    "shortText": "Returns `true` is the connection is open."
                   },
                   "type": {
                     "type": "intrinsic",
@@ -1895,7 +1895,7 @@
                   },
                   "comment": {
                     "shortText": "Logs the message.",
-                    "text": "For customized logging, `this.logger` can be overriden.\n"
+                    "text": "For customized logging, `this.logger` can be overridden.\n"
                   },
                   "parameters": [
                     {
@@ -6924,7 +6924,7 @@
                                     "isExported": true
                                   },
                                   "comment": {
-                                    "shortText": "Retuns `true` is the connection is open."
+                                    "shortText": "Returns `true` is the connection is open."
                                   },
                                   "type": {
                                     "type": "intrinsic",
@@ -7008,7 +7008,7 @@
                                   },
                                   "comment": {
                                     "shortText": "Logs the message.",
-                                    "text": "For customized logging, `this.logger` can be overriden.\n"
+                                    "text": "For customized logging, `this.logger` can be overridden.\n"
                                   },
                                   "parameters": [
                                     {
@@ -11979,7 +11979,7 @@
                                                     "isExported": true
                                                   },
                                                   "comment": {
-                                                    "shortText": "Retuns `true` is the connection is open."
+                                                    "shortText": "Returns `true` is the connection is open."
                                                   },
                                                   "type": {
                                                     "type": "intrinsic",
@@ -12063,7 +12063,7 @@
                                                   },
                                                   "comment": {
                                                     "shortText": "Logs the message.",
-                                                    "text": "For customized logging, `this.logger` can be overriden.\n"
+                                                    "text": "For customized logging, `this.logger` can be overridden.\n"
                                                   },
                                                   "parameters": [
                                                     {

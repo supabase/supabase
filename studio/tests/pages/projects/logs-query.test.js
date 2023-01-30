@@ -1,6 +1,6 @@
 import { get } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
-import { LogsExplorerPage } from 'pages/project/[ref]/logs-explorer/index'
+import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { render } from 'tests/helpers'
 import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -8,7 +8,6 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscription } from 'hooks'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -152,7 +151,7 @@ test('query warnings', async () => {
   await screen.findByText('1 warning')
 })
 
-describe.each(['FREE', 'PRO', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
     useProjectSubscription.mockReturnValue({
       subscription: {

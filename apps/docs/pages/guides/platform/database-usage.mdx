@@ -1,0 +1,59 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'database-usage',
+  title: 'Database usage',
+  description: 'Understanding how database usage applies to your subscription.',
+}
+
+Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
+
+For an instantaneous live view of the DB storage usage, you can execute in Postgres:
+
+```sql
+select sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+from pg_database;
+```
+
+This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
+
+## Database storage management
+
+Supabase uses network-attached storage to balance performance with scalability. For Pro and Enterprise projects, database storage expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the database storage quota. Automatic database storage expansion can only occur once every six hours. Pro projects can store up to 1024TB.
+
+All projects enter read-only mode when you reach 95% of the database storage quota. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the database storage quota.
+
+If you need more than 1024TB of database storage or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+
+### Increasing available database storage
+
+1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your storage quota.
+
+2. Delete data from your project's database to lower its disk usage. If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
+
+   ```sql
+   SET default_transaction_read_only = 'off';
+   ```
+
+   This allows you to delete data from within the session.
+
+## Vacuum operations
+
+Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed.
+As a result, deleting data from your database may not immediately reduce the reported disk usage.
+
+<Admonition type="note">
+
+Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
+
+</Admonition>
+
+Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
+However, it can be necessary to either [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
+the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
+or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+For example, running a manual vacuum after deleting large amounts of data from your DB could help reduce the reported disk usage by Postgres.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

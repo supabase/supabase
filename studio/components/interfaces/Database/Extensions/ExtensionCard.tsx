@@ -18,7 +18,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtentions = checkPermissions(
+  const canUpdateExtensions = checkPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -84,7 +84,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
             <Toggle
               size="tiny"
               checked={isOn}
-              disabled={!canUpdateExtentions}
+              disabled={!canUpdateExtensions}
               onChange={() => (isOn ? disableExtension() : enableExtension())}
             />
           )}
@@ -96,9 +96,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           ].join(' ')}
         >
           <div className="p-4 px-6">
-            <p className="text-sm text-scale-1100">
-              <span className="flex-grow capitalize">{extension.comment}</span>
-            </p>
+            <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">

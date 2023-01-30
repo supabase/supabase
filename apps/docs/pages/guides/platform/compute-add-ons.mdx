@@ -1,0 +1,42 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'compute-add-ons',
+  title: 'Compute Add-ons',
+  description: "Learn about your project's instance and additional add-ons.",
+}
+
+Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
+
+| Plan            | Pricing | CPU                     | Memory | Maximum Disk IO Bandwidth | Baseline Disk IO Bandwidth | Connections: Direct (recommended) | Connections: Pooler (recommended) |
+| --------------- | ------- | ----------------------- | ------ | ------------------------- | -------------------------- | --------------------------------- | --------------------------------- |
+| Free (Included) | $0      | 2-core ARM (shared)     | 1 GB   | 2,606 Mbps                | 87 Mbps                    | 10                                | 50                                |
+| Small           | $5      | 2-core ARM (shared)     | 2 GB   | 2,606 Mbps                | 174 Mbps                   | 30                                | 75                                |
+| Medium          | $50     | 2-core ARM (shared)     | 4 GB   | 2,606 Mbps                | 347 Mbps                   | 50                                | 150                               |
+| Large           | $100    | 2-core ARM (dedicated)  | 8 GB   | 4,750 Mbps                | 630 Mbps                   | 100                               | 300                               |
+| XL              | $200    | 4-core ARM (dedicated)  | 16 GB  | 4,750 Mbps                | 1,188 Mbps                 | 200                               | 600                               |
+| 2XL             | $400    | 8-core ARM (dedicated)  | 32 GB  | 4,750 Mbps                | 2,375 Mbps                 | 350                               | 1200                              |
+| 4XL             | $950    | 16-core ARM (dedicated) | 64 GB  | 4,750 Mbps                | 4,750 Mbps                 | 420                               | 2800                              |
+| 8XL             | $1,860  | 32-core ARM (dedicated) | 128 GB | 9,500 Mbps                | 9,500 Mbps                 | 450                               | 5600                              |
+| 12XL            | $2,790  | 48-core ARM (dedicated) | 192 GB | 14,250 Mbps               | 14,250 Mbps                | 480                               | 8600                              |
+| 16XL            | $3,720  | 64-core ARM (dedicated) | 256 GB | 19,000 Mbps               | 19,000 Mbps                | 500                               | 11,600                            |
+
+[Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
+
+## Dedicated vs. shared CPU
+
+All Postgres instances on Supabase are dedicated applications running inside dedicated virtual machines. However, the underlying hardware resources, for example the physical CPU, may be shared between multiple VMs, but appear to the OS as if it is a dedicated hardware CPU. This is commonly referred to as a vCPU (virtual CPU). Cloud providers use these shared hardware resources to save cost—you can upgrade to a larger compute add-on to guarantee a dedicated physical CPU for your instance.
+
+## Compute upgrades [#upgrades]
+
+When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://app.supabase.com/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade later as needed
+
+## Disk IO bandwidth
+
+SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection. Smaller compute instances can burst up to the maximum disk IO bandwidth for 30 minutes in a day. Beyond that, the performance reverts to the baseline disk IO bandwidth. For example, the free tier can burst up to 2,606 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. If you need consistent disk performance, choose the 4XL or larger compute add-on which has the same baseline and maximum disk IO bandwidth.
+
+If you're unsure of how many IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). If the `Daily Disk IO Budget % Remaining` stat is less than 100%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric drops to zero, the workload has used up all the burst IO throughput minutes during the day and is running at the baseline performance. These projects are good candidates for upgrading to a larger compute add with higher baseline throughput.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

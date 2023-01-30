@@ -42,14 +42,18 @@ const HelpPopover: FC<Props> = () => {
                 </Button>
               </Link>
               <Link passHref href="https://supabase.com/docs/">
-                <Button type="text" size="tiny" icon={<IconBookOpen />} as="a">
-                  Docs
-                </Button>
+                <a target="_blank" rel="noreferrer">
+                  <Button type="text" size="tiny" icon={<IconBookOpen />}>
+                    Docs
+                  </Button>
+                </a>
               </Link>
               <Link passHref href="https://status.supabase.com/">
-                <Button type="text" size="tiny" icon={<IconActivity />} as="a">
-                  Supabase Status
-                </Button>
+                <a target="_blank" rel="noreferrer">
+                  <Button type="text" size="tiny" icon={<IconActivity />}>
+                    Supabase Status
+                  </Button>
+                </a>
               </Link>
             </div>
             <p className="text-sm text-scale-900">
@@ -57,7 +61,7 @@ const HelpPopover: FC<Props> = () => {
               prioritised.
             </p>
           </div>
-          <Popover.Seperator />
+          <Popover.Separator />
           <div className="mb-4 space-y-2">
             <div className="mb-4 px-5">
               <h5 className={'mb-2'}>Reach out to the community</h5>

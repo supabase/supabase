@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
 import Link from 'next/link'
-import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from '@supabase/ui'
+import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
 
 import Examples from '../../data/Examples.json'
 import ExampleCard from '../ExampleCard'
@@ -31,19 +31,15 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
+            <Link href="/docs/guides/auth/overview" passHref>
               <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
                 View guides
-              </Button>
-            </Link>
-            <Link href="/docs/guides/examples" as="/docs/guides/examples">
-              <Button size="small" as="a" type="default">
-                View all examples
               </Button>
             </Link>
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
+              passHref
             >
               <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
                 Official GitHub library

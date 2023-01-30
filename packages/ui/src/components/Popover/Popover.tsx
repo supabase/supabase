@@ -1,10 +1,8 @@
-import React from 'react'
-
+import * as React from 'react'
 import * as RadixPopover from '@radix-ui/react-popover'
 import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
 
 import { IconX } from '../Icon/icons/IconX'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface RootProps {
@@ -101,12 +99,12 @@ function Close() {
   )
 }
 
-function Seperator() {
+function Separator() {
   const __styles = styleHandler('popover')
 
-  return <div className={__styles.seperator}></div>
+  return <div className={__styles.separator}></div>
 }
 
-Popover.Seperator = Seperator
+Popover.Separator = Separator
 Popover.Close = Close
 export default Popover

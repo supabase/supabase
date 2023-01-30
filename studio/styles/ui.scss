@@ -236,8 +236,12 @@
     //   @apply text-green-500;
     // }
 
+    a {
+      @apply transition;
+    }
+    
     a:hover {
-      @apply text-green-600;
+      @apply text-brand-1000;
     }
 
     p:last-child {

@@ -29,6 +29,7 @@ export function useProfile(returning?: 'minimal') {
     profile: anyError ? undefined : data,
     isLoading: !anyError && !data,
     isError: !!anyError,
+    error: anyError,
     mutateProfile,
   }
 }

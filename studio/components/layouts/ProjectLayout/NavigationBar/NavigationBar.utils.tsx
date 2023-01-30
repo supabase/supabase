@@ -14,7 +14,7 @@ import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
 
@@ -37,34 +37,6 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
         (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
     },
     {
-      key: 'auth',
-      label: 'Authentication',
-      icon: <IconUsers size={18} strokeWidth={2} />,
-      link:
-        ref &&
-        (isProjectPaused
-          ? homeUrl
-          : isProjectBuilding
-          ? buildingUrl
-          : `/project/${ref}/auth/users`),
-    },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'storage',
-            label: 'Storage',
-            icon: <IconArchive size={18} strokeWidth={2} />,
-            link:
-              ref &&
-              (isProjectPaused
-                ? homeUrl
-                : isProjectBuilding
-                ? buildingUrl
-                : `/project/${ref}/storage/buckets`),
-          },
-        ]
-      : []),
-    {
       key: 'sql',
       label: 'SQL Editor',
       icon: (
@@ -78,6 +50,16 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
         ref &&
         (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
+  ]
+}
+export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
+  const buildingUrl = `/project/${ref}/building`
+
+  return [
     {
       key: 'database',
       label: 'Database',
@@ -89,6 +71,30 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
           : isProjectBuilding
           ? buildingUrl
           : `/project/${ref}/database/tables`),
+    },
+    {
+      key: 'auth',
+      label: 'Authentication',
+      icon: <IconUsers size={18} strokeWidth={2} />,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/auth/users`),
+    },
+    {
+      key: 'storage',
+      label: 'Storage',
+      icon: <IconArchive size={18} strokeWidth={2} />,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/storage/buckets`),
     },
     ...(IS_PLATFORM
       ? [
@@ -120,22 +126,6 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
     ...(IS_PLATFORM
       ? [
           {
-            key: 'logs-explorer',
-            label: 'Logs Explorer',
-            icon: <IconList size={18} strokeWidth={2} />,
-            link:
-              ref &&
-              (isProjectPaused
-                ? homeUrl
-                : isProjectBuilding
-                ? buildingUrl
-                : `/project/${ref}/logs-explorer`),
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
             key: 'reports',
             label: 'Reports',
             icon: <IconBarChart size={18} strokeWidth={2} />,
@@ -149,9 +139,25 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
           },
         ]
       : []),
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'logs',
+            label: 'Logs',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/logs/explorer`),
+          },
+        ]
+      : []),
     {
       key: 'api',
-      label: 'API',
+      label: 'API Docs',
       icon: <IconFileText size={18} strokeWidth={2} />,
       link:
         ref &&
@@ -161,7 +167,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
       ? [
           {
             key: 'settings',
-            label: 'Settings',
+            label: 'Project Settings',
             icon: <IconSettings size={18} strokeWidth={2} />,
             link: ref && `/project/${ref}/settings/general`,
           },

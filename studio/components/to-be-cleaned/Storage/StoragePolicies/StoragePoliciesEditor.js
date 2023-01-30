@@ -117,14 +117,14 @@ const StoragePoliciesEditor = ({
             onUpdatePolicyName={onUpdatePolicyName}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyRoles
             roles={roles}
@@ -132,7 +132,7 @@ const StoragePoliciesEditor = ({
             onUpdateSelectedRoles={onUpdatePolicyRoles}
           />
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <PolicyDefinition
             definition={definition}

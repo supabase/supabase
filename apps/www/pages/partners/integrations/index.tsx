@@ -1,4 +1,4 @@
-import { IconLoader, IconSearch, Input } from '@supabase/ui'
+import { IconLoader, IconSearch, Input } from 'ui'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'

@@ -8,11 +8,47 @@ import { IconAlertCircle, IconInfo } from 'ui'
 import dayjs from 'dayjs'
 import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import CopyButton from 'components/ui/CopyButton'
 
 export const RowLayout: React.FC = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
+// renders a timestamp (either unix microsecond or iso timestamp)
+export const SelectionDetailedTimestampRow = ({ value }: { value: string | number }) => (
+  <SelectionDetailedRow
+    label="Timestamp"
+    value={isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value)}
+  />
+)
+export const SelectionDetailedRow = ({
+  label,
+  value,
+  valueRender,
+}: {
+  label: string
+  value: string
+  valueRender?: React.ReactNode
+}) => {
+  return (
+    <div className="grid grid-cols-12 group">
+      <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
+        {valueRender ?? value}
+      </span>
+      <CopyButton
+        bounceIconOnCopy
+        text={value}
+        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        type="text"
+        title="Copy to clipboard"
+      >
+        {''}
+      </CopyButton>
+    </div>
+  )
+}
 
+// used for column renderers
 export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   value,
   className,

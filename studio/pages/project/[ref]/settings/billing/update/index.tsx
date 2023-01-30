@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from 'ui'
 
-import { useFreeProjectLimitCheck, useStore } from 'hooks'
+import { useFlag, useFreeProjectLimitCheck, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -85,6 +85,8 @@ const BillingUpdate: NextPageWithLayout = () => {
   const onSelectPlan = (plan: any) => {
     if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
       router.push(`/project/${projectRef}/settings/billing/update/pro`)
+    } else if (plan.id === STRIPE_PRODUCT_IDS.TEAM) {
+      router.push(`/project/${projectRef}/settings/billing/update/team`)
     } else if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
       setSelectedPlan(plan)
       setShowConfirmDowngrade(true)
@@ -109,12 +111,20 @@ const BillingUpdate: NextPageWithLayout = () => {
     )
   }
 
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
+
+  const productTiers = (products?.tiers ?? []).filter(
+    (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM
+  )
+
   return (
     <>
-      <div className="mx-auto my-10 max-w-6xl px-6">
+      <div className={`mx-auto my-10 ${teamTierEnabled ? 'max-w-[90vw]' : 'max-w-[80vw]'}`}>
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
-          tiers={products?.tiers ?? []}
+          tiers={productTiers}
           currentPlan={subscription?.tier}
           onSelectPlan={onSelectPlan}
         />
@@ -163,7 +173,7 @@ const BillingUpdate: NextPageWithLayout = () => {
               </p>
             </div>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
               <Button

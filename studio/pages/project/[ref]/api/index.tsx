@@ -5,13 +5,13 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 const PageContext = createContext(null)
 
@@ -70,9 +70,11 @@ const DocView: FC<any> = observer(({}) => {
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error }: any = useSWR(`${API_URL}/props/project/${PageState.projectRef}/api`, get)
-  const API_KEY = data?.autoApiService?.defaultApiKey
-  const swaggerUrl = data?.autoApiService?.restUrl
+  const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
+  const API_KEY = data?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
+    ? data.autoApiService.defaultApiKey
+    : undefined
+  const swaggerUrl = data?.autoApiService.restUrl
   const headers: any = { apikey: API_KEY }
 
   const canReadServiceKey = checkPermissions(
@@ -80,7 +82,7 @@ const DocView: FC<any> = observer(({}) => {
     'service_api_keys.service_role_key'
   )
 
-  if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
+  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
 
   const { data: jsonSchema, error: jsonSchemaError } = useSWR(
     () => swaggerUrl,
@@ -116,9 +118,7 @@ const DocView: FC<any> = observer(({}) => {
   // Data Loaded
   const autoApiService = {
     ...data.autoApiService,
-    endpoint: IS_PLATFORM
-      ? `https://${data?.autoApiService?.endpoint}`
-      : data.autoApiService.endpoint,
+    endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
 
   const { query } = router
@@ -174,7 +174,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: autoApiService?.defaultApiKey,
+                              key: API_KEY,
                               name: 'anon (public)',
                             })
                           }
@@ -186,7 +186,7 @@ const DocView: FC<any> = observer(({}) => {
                             key="service"
                             onClick={() =>
                               setShowApiKey({
-                                key: autoApiService?.serviceApiKey,
+                                key: autoApiService.serviceApiKey,
                                 name: 'service_role (secret)',
                               })
                             }

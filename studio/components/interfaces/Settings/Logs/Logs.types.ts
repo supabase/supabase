@@ -84,6 +84,8 @@ export type QueryType =
   | 'auth'
   | 'realtime'
   | 'storage'
+  | "pgbouncer"
+  | "postgrest"
 
 export type Mode = 'simple' | 'custom'
 

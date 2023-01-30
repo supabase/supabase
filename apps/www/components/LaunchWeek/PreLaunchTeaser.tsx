@@ -1,5 +1,5 @@
 import { NewspaperIcon } from '@heroicons/react/outline'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -47,7 +47,7 @@ export function PreLaunchTeaser() {
             md:grid-cols-2
             md:gap-16
 
-            lg:col-span-4 
+            lg:col-span-4
             lg:flex
             lg:flex-col
             lg:justify-between

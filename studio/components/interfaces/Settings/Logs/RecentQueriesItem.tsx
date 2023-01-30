@@ -24,7 +24,7 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
           type="alternative"
           iconRight={<IconPlay size={10} />}
           onClick={() =>
-            router.push(`/project/${ref}/logs-explorer?q=${encodeURIComponent(item.sql)}`)
+            router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.sql)}`)
           }
         >
           Run

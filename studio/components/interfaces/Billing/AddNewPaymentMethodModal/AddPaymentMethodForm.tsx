@@ -61,13 +61,13 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
           <PaymentElement />
         </div>
       </Modal.Content>
-      <Modal.Seperator />
+      <Modal.Separator />
       <Modal.Content>
         <div className="flex items-center space-x-2 pt-2">
-          <Button block htmlType="submit" type="primary" loading={isSaving}>
+          <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
             Save
           </Button>
-          <Button htmlType="button" type="default" onClick={onCancel} block>
+          <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
             Cancel
           </Button>
         </div>

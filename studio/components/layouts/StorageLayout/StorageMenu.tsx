@@ -2,38 +2,24 @@ import { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  Menu,
-  IconLoader,
-  IconMoreVertical,
-  Alert,
-  IconEdit,
-  IconTrash,
-} from 'ui'
+import { useParams } from 'hooks'
+import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
 
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
+import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
-  const { ref, bucketId } = router.query
+  const { ref, bucketId } = useParams()
+
   const page = router.pathname.split('/')[4] as
     | undefined
     | 'policies'
     | 'settings'
     | 'usage'
     | 'logs'
-
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
 
   const storageExplorerStore = useStorageStore()
   const {
@@ -96,26 +82,14 @@ const StorageMenu: FC<Props> = () => {
             )}
           </div>
         </div>
-
+        <div className="h-px w-full bg-scale-500"></div>
         <div className="">
           <Menu.Group title="Configuration" />
-          <Link href={`/project/${projectRef}/storage/settings`}>
-            <Menu.Item rounded active={page === 'settings'}>
-              <p className="truncate">Settings</p>
-            </Menu.Item>
-          </Link>
-          <Link href={`/project/${projectRef}/storage/policies`}>
+          <Link href={`/project/${ref}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Flag name="logsStorage">
-            <Link href={`/project/${projectRef}/storage/logs`}>
-              <Menu.Item rounded active={page === 'logs'}>
-                <p className="truncate">Logs</p>
-              </Menu.Item>
-            </Link>
-          </Flag>
         </div>
       </div>
     </Menu>
@@ -123,59 +97,3 @@ const StorageMenu: FC<Props> = () => {
 }
 
 export default observer(StorageMenu)
-
-const BucketRow = ({
-  bucket = {},
-  projectRef = '',
-  isSelected = false,
-  onSelectDeleteBucket = () => {},
-  onSelectToggleBucketPublic = () => {},
-}: any) => {
-  return (
-    <ProductMenuItem
-      key={bucket.id}
-      name={
-        <div className="flex items-center space-x-2">
-          <p>{bucket.name}</p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
-        </div>
-      }
-      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
-      isActive={isSelected}
-      action={
-        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
-          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="toggle-private"
-                onClick={() => onSelectToggleBucketPublic(bucket)}
-              >
-                {bucket.public ? 'Make private' : 'Make public'}
-              </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
-              <Dropdown.Item
-                icon={<IconTrash size="tiny" />}
-                key="delete-bucket"
-                onClick={() => onSelectDeleteBucket(bucket)}
-              >
-                Delete bucket
-              </Dropdown.Item>,
-            ]}
-          >
-            <IconMoreVertical
-              className="opacity-0 group-hover:opacity-100"
-              size="tiny"
-              strokeWidth={2}
-            />
-          </Dropdown>
-        ) : (
-          <div />
-        )
-      }
-    />
-  )
-}

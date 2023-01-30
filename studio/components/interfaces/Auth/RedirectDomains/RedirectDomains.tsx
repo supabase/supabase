@@ -88,12 +88,12 @@ const RedirectDomains = () => {
       <div className="flex items-center justify-between">
         <FormHeader
           title="Redirect URLs"
-          description="URLs that auth providers are permitted to redirect to post authentication"
+          description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-              Add domain
+              Add URL
             </Button>
           </Tooltip.Trigger>
           {!canUpdateConfig && (

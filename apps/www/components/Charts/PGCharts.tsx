@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'
@@ -66,7 +66,7 @@ const Chart = () => {
 
       {selection !== 'raw_data' ? (
         <ResponsiveContainer height={720} minHeight={720} width="100%">
-          {/* // 
+          {/* //
         @ts-ignore */}
           <BarChart data={data[selection]} layout="vertical">
             <XAxis

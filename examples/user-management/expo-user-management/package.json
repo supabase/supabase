@@ -11,7 +11,7 @@
   "dependencies": {
     "@expo/webpack-config": "^0.17.0",
     "@react-native-async-storage/async-storage": "^1.17.9",
-    "@supabase/supabase-js": "^2.0.0-rc.9",
+    "@supabase/supabase-js": "^2.0.4",
     "expo": "~46.0.9",
     "expo-splash-screen": "~0.16.2",
     "expo-status-bar": "~1.4.0",

@@ -1,4 +1,4 @@
-import { IconTwitter } from '@supabase/ui'
+import { IconTwitter } from 'ui'
 import Image from 'next/image'
 
 interface TweetCard {
@@ -11,13 +11,13 @@ function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-      
+
       dark:bg-scale-300 border-scale-300 dark:border-scale-400
-    
+
       rounded-md border bg-white p-6
       drop-shadow-sm
 
-    
+
     "
     >
       <div className="relative">

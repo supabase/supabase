@@ -420,19 +420,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [
-                                        83,
-                                        91,
-                                        86,
-                                        89,
-                                        82,
-                                        87,
-                                        84,
-                                        85,
-                                        88,
-                                        81,
-                                        90
-                                      ]
+                                      "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
                                     }
                                   ],
                                   "sources": [
@@ -1001,9 +989,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    175
-                                  ]
+                                  "children": [175]
                                 }
                               ]
                             }
@@ -1542,19 +1528,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [
-                                        83,
-                                        91,
-                                        86,
-                                        89,
-                                        82,
-                                        87,
-                                        84,
-                                        85,
-                                        88,
-                                        81,
-                                        90
-                                      ]
+                                      "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
                                     }
                                   ],
                                   "sources": [
@@ -1738,9 +1712,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    180
-                                  ]
+                                  "children": [180]
                                 }
                               ]
                             }
@@ -1939,9 +1911,7 @@
                                           {
                                             "title": "Properties",
                                             "kind": 1024,
-                                            "children": [
-                                              161
-                                            ]
+                                            "children": [161]
                                           }
                                         ]
                                       }
@@ -1981,10 +1951,7 @@
                                   {
                                     "title": "Properties",
                                     "kind": 1024,
-                                    "children": [
-                                      159,
-                                      162
-                                    ]
+                                    "children": [159, 162]
                                   }
                                 ]
                               }
@@ -2096,9 +2063,7 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [
-                                            169
-                                          ]
+                                          "children": [169]
                                         }
                                       ]
                                     }
@@ -2138,10 +2103,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    167,
-                                    170
-                                  ]
+                                  "children": [167, 170]
                                 }
                               ]
                             }
@@ -2298,10 +2260,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    155,
-                                    154
-                                  ]
+                                  "children": [155, 154]
                                 }
                               ]
                             }
@@ -2330,58 +2289,24 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    112
-                  ]
+                  "children": [112]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    117,
-                    121,
-                    131,
-                    126,
-                    123,
-                    133,
-                    125,
-                    124,
-                    120,
-                    119,
-                    118,
-                    132,
-                    122,
-                    138,
-                    137
+                    117, 121, 131, 126, 123, 133, 125, 124, 120, 119, 118, 132, 122, 138, 137
                   ]
                 },
                 {
                   "title": "Accessors",
                   "kind": 262144,
-                  "children": [
-                    139,
-                    141
-                  ]
+                  "children": [139, 141]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    171,
-                    191,
-                    197,
-                    189,
-                    186,
-                    183,
-                    195,
-                    193,
-                    176,
-                    143,
-                    181,
-                    156,
-                    163,
-                    147
-                  ]
+                  "children": [171, 191, 197, 189, 186, 183, 195, 193, 176, 143, 181, 156, 163, 147]
                 }
               ],
               "sources": [
@@ -2750,19 +2675,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    83,
-                                    91,
-                                    86,
-                                    89,
-                                    82,
-                                    87,
-                                    84,
-                                    85,
-                                    88,
-                                    81,
-                                    90
-                                  ]
+                                  "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
                                 }
                               ],
                               "sources": [
@@ -2791,24 +2704,17 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                202,
-                203
-              ]
+              "children": [202, 203]
             },
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                111
-              ]
+              "children": [111]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                106
-              ]
+              "children": [106]
             }
           ],
           "sources": [
@@ -3081,14 +2987,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    13,
-                                    9,
-                                    11,
-                                    10,
-                                    18,
-                                    12
-                                  ]
+                                  "children": [13, 9, 11, 10, 18, 12]
                                 }
                               ]
                             }
@@ -3374,27 +3273,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    3
-                  ]
+                  "children": [3]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    21,
-                    20,
-                    22,
-                    19,
-                    23
-                  ]
+                  "children": [21, 20, 22, 19, 23]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    24
-                  ]
+                  "children": [24]
                 }
               ],
               "sources": [
@@ -3434,9 +3323,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                2
-              ]
+              "children": [2]
             }
           ],
           "sources": [
@@ -3711,10 +3598,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                45,
-                                47
-                              ]
+                              "children": [45, 47]
                             }
                           ]
                         }
@@ -3911,25 +3795,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    34
-                  ]
+                  "children": [34]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    40
-                  ]
+                  "children": [40]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    41,
-                    49,
-                    56
-                  ]
+                  "children": [41, 49, 56]
                 }
               ],
               "sources": [
@@ -3945,9 +3821,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                33
-              ]
+              "children": [33]
             }
           ],
           "sources": [
@@ -4013,9 +3887,7 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [
-                        62
-                      ]
+                      "children": [62]
                     }
                   ]
                 }
@@ -4048,10 +3920,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                60,
-                63
-              ]
+              "children": [60, 63]
             }
           ],
           "sources": [
@@ -4168,11 +4037,7 @@
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                70,
-                67,
-                65
-              ]
+              "children": [70, 67, 65]
             }
           ],
           "sources": [
@@ -4588,19 +4453,7 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [
-                        83,
-                        91,
-                        86,
-                        89,
-                        82,
-                        87,
-                        84,
-                        85,
-                        88,
-                        81,
-                        90
-                      ]
+                      "children": [83, 91, 86, 89, 82, 87, 84, 85, 88, 81, 90]
                     }
                   ],
                   "sources": [
@@ -4843,15 +4696,7 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [
-                        94,
-                        100,
-                        95,
-                        98,
-                        99,
-                        96,
-                        97
-                      ]
+                      "children": [94, 100, 95, 98, 99, 96, 97]
                     }
                   ],
                   "sources": [
@@ -4869,20 +4714,12 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                73
-              ]
+              "children": [73]
             },
             {
               "title": "Type Aliases",
               "kind": 4194304,
-              "children": [
-                78,
-                74,
-                79,
-                102,
-                92
-              ]
+              "children": [78, 74, 79, 102, 92]
             }
           ],
           "sources": [
@@ -4926,9 +4763,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                104
-              ]
+              "children": [104]
             }
           ],
           "sources": [
@@ -4944,15 +4779,7 @@
         {
           "title": "Modules",
           "kind": 2,
-          "children": [
-            105,
-            1,
-            32,
-            59,
-            64,
-            72,
-            103
-          ]
+          "children": [105, 1, 32, 59, 64, 72, 103]
         }
       ]
     },
@@ -5190,12 +5017,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                11,
-                                12,
-                                7,
-                                6
-                              ]
+                              "children": [11, 12, 7, 6]
                             }
                           ]
                         }
@@ -5759,17 +5581,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                541,
-                                548,
-                                544,
-                                547,
-                                542,
-                                546,
-                                545,
-                                543,
-                                540
-                              ]
+                              "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
                             }
                           ],
                           "sources": [
@@ -5865,11 +5677,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    201,
-                                    202,
-                                    200
-                                  ]
+                                  "children": [201, 202, 200]
                                 }
                               ]
                             }
@@ -5944,11 +5752,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    205,
-                                    206,
-                                    204
-                                  ]
+                                  "children": [205, 206, 204]
                                 }
                               ]
                             }
@@ -6059,9 +5863,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                179
-                              ]
+                              "children": [179]
                             }
                           ]
                         }
@@ -6216,11 +6018,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                246,
-                                247,
-                                245
-                              ]
+                              "children": [246, 247, 245]
                             }
                           ]
                         }
@@ -6390,11 +6188,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                191,
-                                190,
-                                192
-                              ]
+                              "children": [191, 190, 192]
                             }
                           ]
                         }
@@ -6480,10 +6274,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                194,
-                                195
-                              ]
+                              "children": [194, 195]
                             }
                           ]
                         }
@@ -6791,11 +6582,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                41,
-                                39,
-                                40
-                              ]
+                              "children": [41, 39, 40]
                             }
                           ]
                         }
@@ -6950,11 +6737,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                253,
-                                254,
-                                252
-                              ]
+                              "children": [253, 254, 252]
                             }
                           ]
                         }
@@ -7144,12 +6927,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                231,
-                                232,
-                                229,
-                                230
-                              ]
+                              "children": [231, 232, 229, 230]
                             }
                           ]
                         }
@@ -7258,10 +7036,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    219,
-                                    220
-                                  ]
+                                  "children": [219, 220]
                                 }
                               ]
                             }
@@ -7317,10 +7092,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    222,
-                                    223
-                                  ]
+                                  "children": [222, 223]
                                 }
                               ]
                             }
@@ -7433,10 +7205,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                148,
-                                147
-                              ]
+                              "children": [148, 147]
                             }
                           ]
                         }
@@ -7517,10 +7286,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                150,
-                                151
-                              ]
+                              "children": [150, 151]
                             }
                           ]
                         }
@@ -7614,10 +7380,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    210,
-                                    211
-                                  ]
+                                  "children": [210, 211]
                                 }
                               ]
                             }
@@ -7676,10 +7439,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    213,
-                                    214
-                                  ]
+                                  "children": [213, 214]
                                 }
                               ]
                             }
@@ -7806,10 +7566,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                167,
-                                168
-                              ]
+                              "children": [167, 168]
                             }
                           ]
                         }
@@ -7920,10 +7677,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                158,
-                                157
-                              ]
+                              "children": [158, 157]
                             }
                           ]
                         }
@@ -8009,10 +7763,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                160,
-                                162
-                              ]
+                              "children": [160, 162]
                             }
                           ]
                         }
@@ -8143,11 +7894,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                102,
-                                101,
-                                100
-                              ]
+                              "children": [102, 101, 100]
                             }
                           ]
                         }
@@ -8233,10 +7980,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                104,
-                                106
-                              ]
+                              "children": [104, 106]
                             }
                           ]
                         }
@@ -8347,10 +8091,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                113,
-                                112
-                              ]
+                              "children": [113, 112]
                             }
                           ]
                         }
@@ -8436,10 +8177,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                115,
-                                117
-                              ]
+                              "children": [115, 117]
                             }
                           ]
                         }
@@ -8624,10 +8362,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                64,
-                                63
-                              ]
+                              "children": [64, 63]
                             }
                           ]
                         }
@@ -8708,10 +8443,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                66,
-                                67
-                              ]
+                              "children": [66, 67]
                             }
                           ]
                         }
@@ -8867,13 +8599,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                587,
-                                584,
-                                588,
-                                585,
-                                586
-                              ]
+                              "children": [587, 584, 588, 585, 586]
                             }
                           ],
                           "sources": [
@@ -8960,10 +8686,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                93,
-                                94
-                              ]
+                              "children": [93, 94]
                             }
                           ]
                         }
@@ -9068,9 +8791,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                85
-                              ]
+                              "children": [85]
                             }
                           ]
                         }
@@ -9151,10 +8872,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                87,
-                                88
-                              ]
+                              "children": [87, 88]
                             }
                           ]
                         }
@@ -9251,9 +8969,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                122
-                              ]
+                              "children": [122]
                             }
                           ]
                         }
@@ -9399,11 +9115,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                53,
-                                52,
-                                51
-                              ]
+                              "children": [53, 52, 51]
                             }
                           ]
                         }
@@ -9489,10 +9201,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                55,
-                                56
-                              ]
+                              "children": [55, 56]
                             }
                           ]
                         }
@@ -9617,10 +9326,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                75,
-                                74
-                              ]
+                              "children": [75, 74]
                             }
                           ]
                         }
@@ -9706,10 +9412,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                77,
-                                78
-                              ]
+                              "children": [77, 78]
                             }
                           ]
                         }
@@ -9900,13 +9603,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                538,
-                                534,
-                                537,
-                                536,
-                                535
-                              ]
+                              "children": [538, 534, 537, 536, 535]
                             }
                           ],
                           "sources": [
@@ -10028,11 +9725,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                261,
-                                262,
-                                260
-                              ]
+                              "children": [261, 262, 260]
                             }
                           ]
                         }
@@ -10341,17 +10034,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                541,
-                                548,
-                                544,
-                                547,
-                                542,
-                                546,
-                                545,
-                                543,
-                                540
-                              ]
+                              "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
                             }
                           ],
                           "sources": [
@@ -10473,11 +10156,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                239,
-                                240,
-                                238
-                              ]
+                              "children": [239, 240, 238]
                             }
                           ]
                         }
@@ -10587,9 +10266,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                129
-                              ]
+                              "children": [129]
                             }
                           ]
                         }
@@ -10675,10 +10352,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                131,
-                                132
-                              ]
+                              "children": [131, 132]
                             }
                           ]
                         }
@@ -10796,9 +10470,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                138
-                              ]
+                              "children": [138]
                             }
                           ]
                         }
@@ -10884,10 +10556,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                140,
-                                141
-                              ]
+                              "children": [140, 141]
                             }
                           ]
                         }
@@ -10905,52 +10574,19 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [
-                2
-              ]
+              "children": [2]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                22,
-                23,
-                18,
-                17
-              ]
+              "children": [22, 23, 18, 17]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                28,
-                32,
-                196,
-                173,
-                241,
-                184,
-                180,
-                34,
-                248,
-                224,
-                215,
-                142,
-                207,
-                163,
-                152,
-                95,
-                107,
-                169,
-                57,
-                89,
-                79,
-                118,
-                45,
-                68,
-                255,
-                233,
-                123,
-                133
+                28, 32, 196, 173, 241, 184, 180, 34, 248, 224, 215, 142, 207, 163, 152, 95, 107,
+                169, 57, 89, 79, 118, 45, 68, 255, 233, 123, 133
               ]
             }
           ],
@@ -11351,17 +10987,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                274,
-                                278,
-                                273,
-                                279,
-                                269,
-                                276,
-                                277,
-                                275,
-                                268
-                              ]
+                              "children": [274, 278, 273, 279, 269, 276, 277, 275, 268]
                             }
                           ]
                         }
@@ -11751,10 +11377,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    458,
-                                    459
-                                  ]
+                                  "children": [458, 459]
                                 }
                               ]
                             }
@@ -11812,10 +11435,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    461,
-                                    462
-                                  ]
+                                  "children": [461, 462]
                                 }
                               ]
                             }
@@ -11935,10 +11555,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                390,
-                                389
-                              ]
+                              "children": [390, 389]
                             }
                           ]
                         }
@@ -12044,12 +11661,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    392,
-                                    395,
-                                    394,
-                                    393
-                                  ]
+                                  "children": [392, 395, 394, 393]
                                 }
                               ]
                             }
@@ -12148,12 +11760,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    397,
-                                    400,
-                                    399,
-                                    398
-                                  ]
+                                  "children": [397, 400, 399, 398]
                                 }
                               ]
                             }
@@ -12310,13 +11917,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                587,
-                                584,
-                                588,
-                                585,
-                                586
-                              ]
+                              "children": [587, 584, 588, 585, 586]
                             }
                           ],
                           "sources": [
@@ -12431,11 +12032,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                449,
-                                447,
-                                448
-                              ]
+                              "children": [449, 447, 448]
                             }
                           ]
                         }
@@ -12533,9 +12130,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                407
-                              ]
+                              "children": [407]
                             }
                           ]
                         }
@@ -12641,12 +12236,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    409,
-                                    412,
-                                    411,
-                                    410
-                                  ]
+                                  "children": [409, 412, 411, 410]
                                 }
                               ]
                             }
@@ -12745,12 +12335,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    414,
-                                    417,
-                                    416,
-                                    415
-                                  ]
+                                  "children": [414, 417, 416, 415]
                                 }
                               ]
                             }
@@ -12992,11 +12577,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                425,
-                                423,
-                                424
-                              ]
+                              "children": [425, 423, 424]
                             }
                           ]
                         }
@@ -13120,14 +12701,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                432,
-                                435,
-                                430,
-                                433,
-                                431,
-                                434
-                              ]
+                              "children": [432, 435, 430, 433, 431, 434]
                             }
                           ]
                         }
@@ -13245,14 +12819,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                437,
-                                440,
-                                441,
-                                439,
-                                442,
-                                438
-                              ]
+                              "children": [437, 440, 441, 439, 442, 438]
                             }
                           ]
                         }
@@ -13631,15 +13198,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                488,
-                                490,
-                                489,
-                                487,
-                                491,
-                                492,
-                                493
-                              ]
+                              "children": [488, 490, 489, 487, 491, 492, 493]
                             }
                           ],
                           "sources": [
@@ -13994,15 +13553,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                488,
-                                490,
-                                489,
-                                487,
-                                491,
-                                492,
-                                493
-                              ]
+                              "children": [488, 490, 489, 487, 491, 492, 493]
                             }
                           ],
                           "sources": [
@@ -14140,9 +13691,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                365
-                              ]
+                              "children": [365]
                             }
                           ]
                         }
@@ -14222,10 +13771,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                367,
-                                368
-                              ]
+                              "children": [367, 368]
                             }
                           ]
                         }
@@ -14399,10 +13945,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            381,
-                            382
-                          ]
+                          "children": [381, 382]
                         }
                       ]
                     }
@@ -14534,11 +14077,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                342,
-                                344,
-                                343
-                              ]
+                              "children": [342, 344, 343]
                             }
                           ]
                         }
@@ -14750,10 +14289,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                357,
-                                356
-                              ]
+                              "children": [357, 356]
                             }
                           ]
                         }
@@ -14934,14 +14470,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                564,
-                                569,
-                                566,
-                                565,
-                                568,
-                                567
-                              ]
+                              "children": [564, 569, 566, 565, 568, 567]
                             }
                           ],
                           "sources": [
@@ -15103,13 +14632,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                314,
-                                315,
-                                311,
-                                313,
-                                312
-                              ]
+                              "children": [314, 315, 311, 313, 312]
                             }
                           ]
                         }
@@ -15268,13 +14791,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                324,
-                                322,
-                                320,
-                                323,
-                                321
-                              ]
+                              "children": [324, 322, 320, 323, 321]
                             }
                           ]
                         }
@@ -15356,9 +14873,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                372
-                              ]
+                              "children": [372]
                             }
                           ]
                         }
@@ -15539,14 +15054,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                564,
-                                569,
-                                566,
-                                565,
-                                568,
-                                567
-                              ]
+                              "children": [564, 569, 566, 565, 568, 567]
                             }
                           ],
                           "sources": [
@@ -15639,11 +15147,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                301,
-                                300,
-                                299
-                              ]
+                              "children": [301, 300, 299]
                             }
                           ]
                         }
@@ -15752,11 +15256,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                305,
-                                304,
-                                303
-                              ]
+                              "children": [305, 304, 303]
                             }
                           ]
                         }
@@ -15930,13 +15430,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                538,
-                                534,
-                                537,
-                                536,
-                                535
-                              ]
+                              "children": [538, 534, 537, 536, 535]
                             }
                           ],
                           "sources": [
@@ -16058,11 +15552,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                349,
-                                351,
-                                350
-                              ]
+                              "children": [349, 351, 350]
                             }
                           ]
                         }
@@ -16221,9 +15711,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                330
-                              ]
+                              "children": [330]
                             }
                           ]
                         }
@@ -16332,11 +15820,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                334,
-                                333,
-                                332
-                              ]
+                              "children": [334, 333, 332]
                             }
                           ]
                         }
@@ -16354,56 +15838,19 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [
-                264
-              ]
+              "children": [264]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                284,
-                287,
-                286,
-                285,
-                289,
-                290,
-                293,
-                288,
-                292,
-                291
-              ]
+              "children": [284, 287, 286, 285, 289, 290, 293, 288, 292, 291]
             },
             {
               "title": "Methods",
               "kind": 2048,
               "children": [
-                454,
-                383,
-                443,
-                401,
-                418,
-                479,
-                477,
-                463,
-                469,
-                452,
-                450,
-                472,
-                466,
-                474,
-                361,
-                373,
-                339,
-                337,
-                358,
-                352,
-                306,
-                369,
-                294,
-                345,
-                335,
-                325
+                454, 383, 443, 401, 418, 479, 477, 463, 469, 452, 450, 472, 466, 474, 361, 373, 339,
+                337, 358, 352, 306, 369, 294, 345, 335, 325
               ]
             }
           ],
@@ -16663,17 +16110,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                541,
-                548,
-                544,
-                547,
-                542,
-                546,
-                545,
-                543,
-                540
-              ]
+              "children": [541, 548, 544, 547, 542, 546, 545, 543, 540]
             }
           ],
           "sources": [
@@ -16739,10 +16176,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                484,
-                485
-              ]
+              "children": [484, 485]
             }
           ],
           "sources": [
@@ -16865,13 +16299,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                560,
-                559,
-                558,
-                561,
-                562
-              ]
+              "children": [560, 559, 558, 561, 562]
             }
           ],
           "sources": [
@@ -16991,13 +16419,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                587,
-                584,
-                588,
-                585,
-                586
-              ]
+              "children": [587, 584, 588, 585, 586]
             }
           ],
           "sources": [
@@ -17179,15 +16601,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                488,
-                490,
-                489,
-                487,
-                491,
-                492,
-                493
-              ]
+              "children": [488, 490, 489, 487, 491, 492, 493]
             }
           ],
           "sources": [
@@ -17369,17 +16783,12 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                550
-              ]
+              "children": [550]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [
-                551,
-                555
-              ]
+              "children": [551, 555]
             }
           ],
           "sources": [
@@ -17464,9 +16873,7 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [
-                        509
-                      ]
+                      "children": [509]
                     }
                   ],
                   "indexSignature": {
@@ -17886,26 +17293,8 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                522,
-                507,
-                516,
-                517,
-                526,
-                525,
-                523,
-                519,
-                527,
-                506,
-                532,
-                521,
-                529,
-                520,
-                524,
-                528,
-                518,
-                530,
-                531,
-                512
+                522, 507, 516, 517, 526, 525, 523, 519, 527, 506, 532, 521, 529, 520, 524, 528, 518,
+                530, 531, 512
               ]
             }
           ],
@@ -18044,13 +17433,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                538,
-                534,
-                537,
-                536,
-                535
-              ]
+              "children": [538, 534, 537, 536, 535]
             }
           ],
           "sources": [
@@ -18202,14 +17585,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                564,
-                569,
-                566,
-                565,
-                568,
-                567
-              ]
+              "children": [564, 569, 566, 565, 568, 567]
             }
           ],
           "sources": [
@@ -18389,15 +17765,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                502,
-                495,
-                497,
-                503,
-                501,
-                504,
-                496
-              ]
+              "children": [502, 495, 497, 503, 501, 504, 496]
             }
           ],
           "sources": [
@@ -18495,12 +17863,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                577,
-                578,
-                579,
-                580
-              ]
+              "children": [577, 578, 579, 580]
             }
           ],
           "sources": [
@@ -18600,12 +17963,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                572,
-                573,
-                574,
-                575
-              ]
+              "children": [572, 573, 574, 575]
             }
           ],
           "sources": [
@@ -18893,40 +18251,17 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [
-            1,
-            263
-          ]
+          "children": [1, 263]
         },
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [
-            539,
-            483,
-            557,
-            583,
-            486,
-            549,
-            505,
-            533,
-            563,
-            494,
-            576,
-            571
-          ]
+          "children": [539, 483, 557, 583, 486, 549, 505, 533, 563, 494, 576, 571]
         },
         {
           "title": "Type Aliases",
           "kind": 4194304,
-          "children": [
-            482,
-            582,
-            581,
-            481,
-            589,
-            570
-          ]
+          "children": [482, 582, 581, 481, 589, 570]
         }
       ],
       "sources": [
@@ -19184,12 +18519,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    522,
-                                    517,
-                                    521,
-                                    523
-                                  ]
+                                  "children": [522, 517, 521, 523]
                                 }
                               ],
                               "sources": [
@@ -19680,10 +19010,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    539,
-                                    538
-                                  ]
+                                  "children": [539, 538]
                                 }
                               ],
                               "sources": [
@@ -19728,29 +19055,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    512
-                  ]
+                  "children": [512]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    510,
-                    505,
-                    509,
-                    511,
-                    504
-                  ]
+                  "children": [510, 505, 509, 511, 504]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    524,
-                    527,
-                    531
-                  ]
+                  "children": [524, 527, 531]
                 }
               ],
               "sources": [
@@ -19766,9 +19081,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                503
-              ]
+              "children": [503]
             }
           ],
           "sources": [
@@ -20590,32 +19903,17 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    41
-                                  ]
+                                  "children": [41]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    40,
-                                    36,
-                                    39,
-                                    31,
-                                    29,
-                                    35,
-                                    37,
-                                    38,
-                                    30
-                                  ]
+                                  "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
-                                  "children": [
-                                    47,
-                                    44
-                                  ]
+                                  "children": [47, 44]
                                 }
                               ],
                               "sources": [
@@ -21830,13 +21128,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    326,
-                                    329,
-                                    328,
-                                    327,
-                                    330
-                                  ]
+                                  "children": [326, 329, 328, 327, 330]
                                 }
                               ],
                               "sources": [
@@ -22305,9 +21597,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    257
-                                  ]
+                                  "children": [257]
                                 }
                               ],
                               "sources": [
@@ -22974,9 +22264,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    303
-                                  ]
+                                  "children": [303]
                                 }
                               ],
                               "sources": [
@@ -23764,9 +23052,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    162
-                                  ]
+                                  "children": [162]
                                 }
                               ],
                               "sources": [
@@ -23941,11 +23227,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    295,
-                                    297,
-                                    296
-                                  ]
+                                  "children": [295, 297, 296]
                                 }
                               ],
                               "sources": [
@@ -24199,9 +23481,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    271
-                                  ]
+                                  "children": [271]
                                 }
                               ],
                               "sources": [
@@ -24350,9 +23630,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    264
-                                  ]
+                                  "children": [264]
                                 }
                               ],
                               "sources": [
@@ -24491,9 +23769,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    310
-                                  ]
+                                  "children": [310]
                                 }
                               ],
                               "sources": [
@@ -25167,10 +24443,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    249,
-                                    250
-                                  ]
+                                  "children": [249, 250]
                                 }
                               ],
                               "sources": [
@@ -25694,9 +24967,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    278
-                                  ]
+                                  "children": [278]
                                 }
                               ],
                               "sources": [
@@ -25730,30 +25001,13 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    343
-                  ]
+                  "children": [343]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    237,
-                    342,
-                    338,
-                    212,
-                    207,
-                    341,
-                    333,
-                    331,
-                    227,
-                    232,
-                    242,
-                    337,
-                    339,
-                    340,
-                    217,
-                    222,
+                    237, 342, 338, 212, 207, 341, 333, 331, 227, 232, 242, 337, 339, 340, 217, 222,
                     332
                   ]
                 },
@@ -25761,45 +25015,9 @@
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    311,
-                    208,
-                    203,
-                    318,
-                    163,
-                    322,
-                    279,
-                    251,
-                    320,
-                    171,
-                    175,
-                    191,
-                    199,
-                    195,
-                    187,
-                    298,
-                    179,
-                    183,
-                    284,
-                    316,
-                    167,
-                    152,
-                    157,
-                    290,
-                    238,
-                    265,
-                    258,
-                    304,
-                    233,
-                    218,
-                    223,
-                    213,
-                    228,
-                    287,
-                    314,
-                    243,
-                    349,
-                    346,
-                    272
+                    311, 208, 203, 318, 163, 322, 279, 251, 320, 171, 175, 191, 199, 195, 187, 298,
+                    179, 183, 284, 316, 167, 152, 157, 290, 238, 265, 258, 304, 233, 218, 223, 213,
+                    228, 287, 314, 243, 349, 346, 272
                   ]
                 }
               ],
@@ -26046,16 +25264,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                150
-              ]
+              "children": [150]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                361
-              ]
+              "children": [361]
             }
           ],
           "sources": [
@@ -26302,12 +25516,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    375,
-                                    370,
-                                    374,
-                                    376
-                                  ]
+                                  "children": [375, 370, 374, 376]
                                 }
                               ],
                               "sources": [
@@ -26804,10 +26013,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    420,
-                                    419
-                                  ]
+                                  "children": [420, 419]
                                 }
                               ],
                               "sources": [
@@ -27004,10 +26210,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        390,
-                                        389
-                                      ]
+                                      "children": [390, 389]
                                     }
                                   ]
                                 }
@@ -27246,12 +26449,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        398,
-                                        396,
-                                        397,
-                                        395
-                                      ]
+                                      "children": [398, 396, 397, 395]
                                     }
                                   ]
                                 }
@@ -27419,10 +26617,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    383,
-                                    382
-                                  ]
+                                  "children": [383, 382]
                                 }
                               ],
                               "sources": [
@@ -27975,10 +27170,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    414,
-                                    413
-                                  ]
+                                  "children": [414, 413]
                                 }
                               ],
                               "sources": [
@@ -28230,12 +27422,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    406,
-                                    407,
-                                    404,
-                                    405
-                                  ]
+                                  "children": [406, 407, 404, 405]
                                 }
                               ],
                               "sources": [
@@ -28276,37 +27463,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    365
-                  ]
+                  "children": [365]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    432,
-                    428,
-                    431,
-                    423,
-                    421,
-                    427,
-                    429,
-                    430,
-                    422
-                  ]
+                  "children": [432, 428, 431, 423, 421, 427, 429, 430, 422]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    415,
-                    384,
-                    377,
-                    436,
-                    433,
-                    408,
-                    399
-                  ]
+                  "children": [415, 384, 377, 436, 433, 408, 399]
                 }
               ],
               "sources": [
@@ -28354,9 +27521,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                363
-              ]
+              "children": [363]
             }
           ],
           "sources": [
@@ -28603,12 +27768,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    461,
-                                    456,
-                                    460,
-                                    462
-                                  ]
+                                  "children": [461, 456, 460, 462]
                                 }
                               ],
                               "sources": [
@@ -29113,10 +28273,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    469,
-                                    468
-                                  ]
+                                  "children": [469, 468]
                                 }
                               ],
                               "sources": [
@@ -29532,33 +28689,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    451
-                  ]
+                  "children": [451]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    481,
-                    477,
-                    480,
-                    472,
-                    470,
-                    476,
-                    478,
-                    479,
-                    471
-                  ]
+                  "children": [481, 477, 480, 472, 470, 476, 478, 479, 471]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    463,
-                    485,
-                    482
-                  ]
+                  "children": [463, 485, 482]
                 }
               ],
               "sources": [
@@ -29606,9 +28747,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                449
-              ]
+              "children": [449]
             }
           ],
           "sources": [
@@ -30416,32 +29555,17 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    41
-                                  ]
+                                  "children": [41]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    40,
-                                    36,
-                                    39,
-                                    31,
-                                    29,
-                                    35,
-                                    37,
-                                    38,
-                                    30
-                                  ]
+                                  "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
-                                  "children": [
-                                    47,
-                                    44
-                                  ]
+                                  "children": [47, 44]
                                 }
                               ],
                               "sources": [
@@ -31115,13 +30239,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    114,
-                                    117,
-                                    116,
-                                    115,
-                                    118
-                                  ]
+                                  "children": [114, 117, 116, 115, 118]
                                 }
                               ],
                               "sources": [
@@ -31324,9 +30442,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    91
-                                  ]
+                                  "children": [91]
                                 }
                               ],
                               "sources": [
@@ -31548,11 +30664,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    83,
-                                    85,
-                                    84
-                                  ]
+                                  "children": [83, 85, 84]
                                 }
                               ],
                               "sources": [
@@ -31691,9 +30803,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    98
-                                  ]
+                                  "children": [98]
                                 }
                               ],
                               "sources": [
@@ -32202,42 +31312,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    131
-                  ]
+                  "children": [131]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    130,
-                    126,
-                    129,
-                    121,
-                    119,
-                    125,
-                    127,
-                    128,
-                    120
-                  ]
+                  "children": [130, 126, 129, 121, 119, 125, 127, 128, 120]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    99,
-                    106,
-                    110,
-                    108,
-                    86,
-                    104,
-                    78,
-                    92,
-                    75,
-                    102,
-                    137,
-                    134
-                  ]
+                  "children": [99, 106, 110, 108, 86, 104, 78, 92, 75, 102, 137, 134]
                 }
               ],
               "sources": [
@@ -32292,9 +31377,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                73
-              ]
+              "children": [73]
             }
           ],
           "sources": [
@@ -32351,9 +31434,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    501
-                  ]
+                  "children": [501]
                 }
               ],
               "sources": [
@@ -32373,9 +31454,7 @@
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                500
-              ]
+              "children": [500]
             }
           ],
           "sources": [
@@ -32478,32 +31557,17 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    41
-                                  ]
+                                  "children": [41]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    40,
-                                    36,
-                                    39,
-                                    31,
-                                    29,
-                                    35,
-                                    37,
-                                    38,
-                                    30
-                                  ]
+                                  "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
-                                  "children": [
-                                    47,
-                                    44
-                                  ]
+                                  "children": [47, 44]
                                 }
                               ],
                               "sources": [
@@ -33220,32 +32284,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    41
-                  ]
+                  "children": [41]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    40,
-                    36,
-                    39,
-                    31,
-                    29,
-                    35,
-                    37,
-                    38,
-                    30
-                  ]
+                  "children": [40, 36, 39, 31, 29, 35, 37, 38, 30]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    47,
-                    44
-                  ]
+                  "children": [47, 44]
                 }
               ],
               "sources": [
@@ -33344,10 +32393,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    3,
-                    4
-                  ]
+                  "children": [3, 4]
                 }
               ],
               "sources": [
@@ -33506,14 +32552,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    16,
-                    17,
-                    15,
-                    14,
-                    18,
-                    19
-                  ]
+                  "children": [16, 17, 15, 14, 18, 19]
                 }
               ],
               "sources": [
@@ -33685,14 +32724,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    9,
-                    10,
-                    8,
-                    7,
-                    11,
-                    12
-                  ]
+                  "children": [9, 10, 8, 7, 11, 12]
                 }
               ],
               "sources": [
@@ -33831,13 +32863,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    24,
-                    23,
-                    22,
-                    25,
-                    26
-                  ]
+                  "children": [24, 23, 22, 25, 26]
                 }
               ],
               "sources": [
@@ -33994,12 +33020,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        65,
-                        63,
-                        64,
-                        62
-                      ]
+                      "children": [65, 63, 64, 62]
                     }
                   ],
                   "sources": [
@@ -34160,30 +33181,17 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                27
-              ]
+              "children": [27]
             },
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                2,
-                13,
-                5,
-                20
-              ]
+              "children": [2, 13, 5, 20]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                59,
-                60,
-                70,
-                66,
-                68
-              ]
+              "children": [59, 60, 70, 66, 68]
             }
           ],
           "sources": [
@@ -34231,9 +33239,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                498
-              ]
+              "children": [498]
             }
           ],
           "sources": [
@@ -34249,17 +33255,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            502,
-            540,
-            149,
-            362,
-            448,
-            72,
-            499,
-            1,
-            497
-          ]
+          "children": [502, 540, 149, 362, 448, 72, 499, 1, 497]
         }
       ]
     },
@@ -34704,18 +33700,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        348,
-                                        347,
-                                        350,
-                                        344,
-                                        346,
-                                        345,
-                                        354,
-                                        349,
-                                        343,
-                                        342
-                                      ]
+                                      "children": [348, 347, 350, 344, 346, 345, 354, 349, 343, 342]
                                     }
                                   ],
                                   "sources": [
@@ -35767,9 +34752,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        366
-                                      ]
+                                      "children": [366]
                                     }
                                   ],
                                   "sources": [
@@ -36012,10 +34995,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    272,
-                                    271
-                                  ]
+                                  "children": [272, 271]
                                 }
                               ],
                               "sources": [
@@ -36388,9 +35368,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    308
-                                  ]
+                                  "children": [308]
                                 }
                               ],
                               "sources": [
@@ -36725,12 +35703,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        361,
-                                        362,
-                                        363,
-                                        360
-                                      ]
+                                      "children": [361, 362, 363, 360]
                                     }
                                   ],
                                   "sources": [
@@ -36920,72 +35893,30 @@
                                                 {
                                                   "title": "Constructors",
                                                   "kind": 512,
-                                                  "children": [
-                                                    260
-                                                  ]
+                                                  "children": [260]
                                                 },
                                                 {
                                                   "title": "Properties",
                                                   "kind": 1024,
                                                   "children": [
-                                                    229,
-                                                    230,
-                                                    252,
-                                                    250,
-                                                    249,
-                                                    231,
-                                                    232,
-                                                    242,
-                                                    244,
-                                                    248,
-                                                    243,
-                                                    236,
-                                                    245,
-                                                    251,
-                                                    247,
-                                                    246,
-                                                    253,
-                                                    254,
-                                                    240,
-                                                    241
+                                                    229, 230, 252, 250, 249, 231, 232, 242, 244,
+                                                    248, 243, 236, 245, 251, 247, 246, 253, 254,
+                                                    240, 241
                                                   ]
                                                 },
                                                 {
                                                   "title": "Methods",
                                                   "kind": 2048,
                                                   "children": [
-                                                    329,
-                                                    336,
-                                                    321,
-                                                    324,
-                                                    319,
-                                                    338,
-                                                    327,
-                                                    297,
-                                                    264,
-                                                    290,
-                                                    266,
-                                                    309,
-                                                    292,
-                                                    316,
-                                                    273,
-                                                    311,
-                                                    281,
-                                                    304,
-                                                    284,
-                                                    287,
-                                                    278,
-                                                    301,
-                                                    294,
-                                                    313
+                                                    329, 336, 321, 324, 319, 338, 327, 297, 264,
+                                                    290, 266, 309, 292, 316, 273, 311, 281, 304,
+                                                    284, 287, 278, 301, 294, 313
                                                   ]
                                                 },
                                                 {
                                                   "title": "Object literals",
                                                   "kind": 2097152,
-                                                  "children": [
-                                                    255
-                                                  ]
+                                                  "children": [255]
                                                 }
                                               ],
                                               "sources": [
@@ -37972,14 +36903,7 @@
                                                 {
                                                   "title": "Enumeration members",
                                                   "kind": 16,
-                                                  "children": [
-                                                    21,
-                                                    16,
-                                                    17,
-                                                    18,
-                                                    20,
-                                                    19
-                                                  ]
+                                                  "children": [21, 16, 17, 18, 20, 19]
                                                 }
                                               ],
                                               "sources": [
@@ -38438,51 +37362,19 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    148
-                                  ]
+                                  "children": [148]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    141,
-                                    145,
-                                    144,
-                                    150,
-                                    147,
-                                    146,
-                                    154,
-                                    143,
-                                    142,
-                                    149
-                                  ]
+                                  "children": [141, 145, 144, 150, 147, 146, 154, 143, 142, 149]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
                                   "children": [
-                                    180,
-                                    217,
-                                    219,
-                                    221,
-                                    223,
-                                    225,
-                                    201,
-                                    204,
-                                    177,
-                                    173,
-                                    167,
-                                    170,
-                                    196,
-                                    182,
-                                    206,
-                                    162,
-                                    214,
-                                    164,
-                                    209,
-                                    193,
-                                    187
+                                    180, 217, 219, 221, 223, 225, 201, 204, 177, 173, 167, 170, 196,
+                                    182, 206, 162, 214, 164, 209, 193, 187
                                   ]
                                 }
                               ],
@@ -38682,12 +37574,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        257,
-                        258,
-                        259,
-                        256
-                      ]
+                      "children": [257, 258, 259, 256]
                     }
                   ],
                   "sources": [
@@ -38707,72 +37594,28 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    260
-                  ]
+                  "children": [260]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
                   "children": [
-                    229,
-                    230,
-                    252,
-                    250,
-                    249,
-                    231,
-                    232,
-                    242,
-                    244,
-                    248,
-                    243,
-                    236,
-                    245,
-                    251,
-                    247,
-                    246,
-                    253,
-                    254,
-                    240,
-                    241
+                    229, 230, 252, 250, 249, 231, 232, 242, 244, 248, 243, 236, 245, 251, 247, 246,
+                    253, 254, 240, 241
                   ]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    329,
-                    336,
-                    321,
-                    324,
-                    319,
-                    338,
-                    327,
-                    297,
-                    264,
-                    290,
-                    266,
-                    309,
-                    292,
-                    316,
-                    273,
-                    311,
-                    281,
-                    304,
-                    284,
-                    287,
-                    278,
-                    301,
-                    294,
-                    313
+                    329, 336, 321, 324, 319, 338, 327, 297, 264, 290, 266, 309, 292, 316, 273, 311,
+                    281, 304, 284, 287, 278, 301, 294, 313
                   ]
                 },
                 {
                   "title": "Object literals",
                   "kind": 2097152,
-                  "children": [
-                    255
-                  ]
+                  "children": [255]
                 }
               ],
               "sources": [
@@ -38869,9 +37712,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        366
-                      ]
+                      "children": [366]
                     }
                   ],
                   "sources": [
@@ -38983,12 +37824,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        361,
-                        362,
-                        363,
-                        360
-                      ]
+                      "children": [361, 362, 363, 360]
                     }
                   ],
                   "sources": [
@@ -39363,18 +38199,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        348,
-                        347,
-                        350,
-                        344,
-                        346,
-                        345,
-                        354,
-                        349,
-                        343,
-                        342
-                      ]
+                      "children": [348, 347, 350, 344, 346, 345, 354, 349, 343, 342]
                     }
                   ],
                   "sources": [
@@ -39421,25 +38246,17 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                228
-              ]
+              "children": [228]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                364,
-                358,
-                340
-              ]
+              "children": [364, 358, 340]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                369
-              ]
+              "children": [369]
             }
           ],
           "sources": [
@@ -39996,15 +38813,7 @@
                                                       "title": "Variables",
                                                       "kind": 32,
                                                       "children": [
-                                                        348,
-                                                        347,
-                                                        350,
-                                                        344,
-                                                        346,
-                                                        345,
-                                                        354,
-                                                        349,
-                                                        343,
+                                                        348, 347, 350, 344, 346, 345, 354, 349, 343,
                                                         342
                                                       ]
                                                     }
@@ -41058,9 +39867,7 @@
                                                     {
                                                       "title": "Variables",
                                                       "kind": 32,
-                                                      "children": [
-                                                        366
-                                                      ]
+                                                      "children": [366]
                                                     }
                                                   ],
                                                   "sources": [
@@ -41303,10 +40110,7 @@
                                                 {
                                                   "title": "Variables",
                                                   "kind": 32,
-                                                  "children": [
-                                                    272,
-                                                    271
-                                                  ]
+                                                  "children": [272, 271]
                                                 }
                                               ],
                                               "sources": [
@@ -41679,9 +40483,7 @@
                                                 {
                                                   "title": "Variables",
                                                   "kind": 32,
-                                                  "children": [
-                                                    308
-                                                  ]
+                                                  "children": [308]
                                                 }
                                               ],
                                               "sources": [
@@ -42016,12 +40818,7 @@
                                                     {
                                                       "title": "Variables",
                                                       "kind": 32,
-                                                      "children": [
-                                                        361,
-                                                        362,
-                                                        363,
-                                                        360
-                                                      ]
+                                                      "children": [361, 362, 363, 360]
                                                     }
                                                   ],
                                                   "sources": [
@@ -42100,51 +40897,22 @@
                                                 {
                                                   "title": "Constructors",
                                                   "kind": 512,
-                                                  "children": [
-                                                    148
-                                                  ]
+                                                  "children": [148]
                                                 },
                                                 {
                                                   "title": "Properties",
                                                   "kind": 1024,
                                                   "children": [
-                                                    141,
-                                                    145,
-                                                    144,
-                                                    150,
-                                                    147,
-                                                    146,
-                                                    154,
-                                                    143,
-                                                    142,
-                                                    149
+                                                    141, 145, 144, 150, 147, 146, 154, 143, 142, 149
                                                   ]
                                                 },
                                                 {
                                                   "title": "Methods",
                                                   "kind": 2048,
                                                   "children": [
-                                                    180,
-                                                    217,
-                                                    219,
-                                                    221,
-                                                    223,
-                                                    225,
-                                                    201,
-                                                    204,
-                                                    177,
-                                                    173,
-                                                    167,
-                                                    170,
-                                                    196,
-                                                    182,
-                                                    206,
-                                                    162,
-                                                    214,
-                                                    164,
-                                                    209,
-                                                    193,
-                                                    187
+                                                    180, 217, 219, 221, 223, 225, 201, 204, 177,
+                                                    173, 167, 170, 196, 182, 206, 162, 214, 164,
+                                                    209, 193, 187
                                                   ]
                                                 }
                                               ],
@@ -42344,12 +41112,7 @@
                                     {
                                       "title": "Variables",
                                       "kind": 32,
-                                      "children": [
-                                        257,
-                                        258,
-                                        259,
-                                        256
-                                      ]
+                                      "children": [257, 258, 259, 256]
                                     }
                                   ],
                                   "sources": [
@@ -42369,72 +41132,28 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    260
-                                  ]
+                                  "children": [260]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
                                   "children": [
-                                    229,
-                                    230,
-                                    252,
-                                    250,
-                                    249,
-                                    231,
-                                    232,
-                                    242,
-                                    244,
-                                    248,
-                                    243,
-                                    236,
-                                    245,
-                                    251,
-                                    247,
-                                    246,
-                                    253,
-                                    254,
-                                    240,
-                                    241
+                                    229, 230, 252, 250, 249, 231, 232, 242, 244, 248, 243, 236, 245,
+                                    251, 247, 246, 253, 254, 240, 241
                                   ]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
                                   "children": [
-                                    329,
-                                    336,
-                                    321,
-                                    324,
-                                    319,
-                                    338,
-                                    327,
-                                    297,
-                                    264,
-                                    290,
-                                    266,
-                                    309,
-                                    292,
-                                    316,
-                                    273,
-                                    311,
-                                    281,
-                                    304,
-                                    284,
-                                    287,
-                                    278,
-                                    301,
-                                    294,
-                                    313
+                                    329, 336, 321, 324, 319, 338, 327, 297, 264, 290, 266, 309, 292,
+                                    316, 273, 311, 281, 304, 284, 287, 278, 301, 294, 313
                                   ]
                                 },
                                 {
                                   "title": "Object literals",
                                   "kind": 2097152,
-                                  "children": [
-                                    255
-                                  ]
+                                  "children": [255]
                                 }
                               ],
                               "sources": [
@@ -43421,14 +42140,7 @@
                                 {
                                   "title": "Enumeration members",
                                   "kind": 16,
-                                  "children": [
-                                    21,
-                                    16,
-                                    17,
-                                    18,
-                                    20,
-                                    19
-                                  ]
+                                  "children": [21, 16, 17, 18, 20, 19]
                                 }
                               ],
                               "sources": [
@@ -43887,51 +42599,19 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    148
-                  ]
+                  "children": [148]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    141,
-                    145,
-                    144,
-                    150,
-                    147,
-                    146,
-                    154,
-                    143,
-                    142,
-                    149
-                  ]
+                  "children": [141, 145, 144, 150, 147, 146, 154, 143, 142, 149]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
                   "children": [
-                    180,
-                    217,
-                    219,
-                    221,
-                    223,
-                    225,
-                    201,
-                    204,
-                    177,
-                    173,
-                    167,
-                    170,
-                    196,
-                    182,
-                    206,
-                    162,
-                    214,
-                    164,
-                    209,
-                    193,
-                    187
+                    180, 217, 219, 221, 223, 225, 201, 204, 177, 173, 167, 170, 196, 182, 206, 162,
+                    214, 164, 209, 193, 187
                   ]
                 }
               ],
@@ -43948,9 +42628,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                140
-              ]
+              "children": [140]
             }
           ],
           "sources": [
@@ -44104,14 +42782,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    21,
-                    16,
-                    17,
-                    18,
-                    20,
-                    19
-                  ]
+                  "children": [21, 16, 17, 18, 20, 19]
                 }
               ],
               "sources": [
@@ -44221,13 +42892,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    10,
-                    11,
-                    12,
-                    13,
-                    14
-                  ]
+                  "children": [10, 11, 12, 13, 14]
                 }
               ],
               "sources": [
@@ -44320,12 +42985,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    28,
-                    27,
-                    25,
-                    26
-                  ]
+                  "children": [28, 27, 25, 26]
                 }
               ],
               "sources": [
@@ -44418,12 +43078,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    8,
-                    7,
-                    5,
-                    6
-                  ]
+                  "children": [8, 7, 5, 6]
                 }
               ],
               "sources": [
@@ -44465,9 +43120,7 @@
                 {
                   "title": "Enumeration members",
                   "kind": 16,
-                  "children": [
-                    23
-                  ]
+                  "children": [23]
                 }
               ],
               "sources": [
@@ -44580,9 +43233,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    30
-                  ]
+                  "children": [30]
                 }
               ],
               "sources": [
@@ -44602,29 +43253,17 @@
             {
               "title": "Enumerations",
               "kind": 4,
-              "children": [
-                15,
-                9,
-                24,
-                4,
-                22
-              ]
+              "children": [15, 9, 24, 4, 22]
             },
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                32,
-                31,
-                33
-              ]
+              "children": [32, 31, 33]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                29
-              ]
+              "children": [29]
             }
           ],
           "sources": [
@@ -45229,16 +43868,8 @@
                                                                       "title": "Variables",
                                                                       "kind": 32,
                                                                       "children": [
-                                                                        348,
-                                                                        347,
-                                                                        350,
-                                                                        344,
-                                                                        346,
-                                                                        345,
-                                                                        354,
-                                                                        349,
-                                                                        343,
-                                                                        342
+                                                                        348, 347, 350, 344, 346,
+                                                                        345, 354, 349, 343, 342
                                                                       ]
                                                                     }
                                                                   ],
@@ -46291,9 +44922,7 @@
                                                                     {
                                                                       "title": "Variables",
                                                                       "kind": 32,
-                                                                      "children": [
-                                                                        366
-                                                                      ]
+                                                                      "children": [366]
                                                                     }
                                                                   ],
                                                                   "sources": [
@@ -46536,10 +45165,7 @@
                                                                 {
                                                                   "title": "Variables",
                                                                   "kind": 32,
-                                                                  "children": [
-                                                                    272,
-                                                                    271
-                                                                  ]
+                                                                  "children": [272, 271]
                                                                 }
                                                               ],
                                                               "sources": [
@@ -46912,9 +45538,7 @@
                                                                 {
                                                                   "title": "Variables",
                                                                   "kind": 32,
-                                                                  "children": [
-                                                                    308
-                                                                  ]
+                                                                  "children": [308]
                                                                 }
                                                               ],
                                                               "sources": [
@@ -47250,10 +45874,7 @@
                                                                       "title": "Variables",
                                                                       "kind": 32,
                                                                       "children": [
-                                                                        361,
-                                                                        362,
-                                                                        363,
-                                                                        360
+                                                                        361, 362, 363, 360
                                                                       ]
                                                                     }
                                                                   ],
@@ -47509,12 +46130,7 @@
                                                     {
                                                       "title": "Variables",
                                                       "kind": 32,
-                                                      "children": [
-                                                        257,
-                                                        258,
-                                                        259,
-                                                        256
-                                                      ]
+                                                      "children": [257, 258, 259, 256]
                                                     }
                                                   ],
                                                   "sources": [
@@ -47534,72 +46150,30 @@
                                                 {
                                                   "title": "Constructors",
                                                   "kind": 512,
-                                                  "children": [
-                                                    260
-                                                  ]
+                                                  "children": [260]
                                                 },
                                                 {
                                                   "title": "Properties",
                                                   "kind": 1024,
                                                   "children": [
-                                                    229,
-                                                    230,
-                                                    252,
-                                                    250,
-                                                    249,
-                                                    231,
-                                                    232,
-                                                    242,
-                                                    244,
-                                                    248,
-                                                    243,
-                                                    236,
-                                                    245,
-                                                    251,
-                                                    247,
-                                                    246,
-                                                    253,
-                                                    254,
-                                                    240,
-                                                    241
+                                                    229, 230, 252, 250, 249, 231, 232, 242, 244,
+                                                    248, 243, 236, 245, 251, 247, 246, 253, 254,
+                                                    240, 241
                                                   ]
                                                 },
                                                 {
                                                   "title": "Methods",
                                                   "kind": 2048,
                                                   "children": [
-                                                    329,
-                                                    336,
-                                                    321,
-                                                    324,
-                                                    319,
-                                                    338,
-                                                    327,
-                                                    297,
-                                                    264,
-                                                    290,
-                                                    266,
-                                                    309,
-                                                    292,
-                                                    316,
-                                                    273,
-                                                    311,
-                                                    281,
-                                                    304,
-                                                    284,
-                                                    287,
-                                                    278,
-                                                    301,
-                                                    294,
-                                                    313
+                                                    329, 336, 321, 324, 319, 338, 327, 297, 264,
+                                                    290, 266, 309, 292, 316, 273, 311, 281, 304,
+                                                    284, 287, 278, 301, 294, 313
                                                   ]
                                                 },
                                                 {
                                                   "title": "Object literals",
                                                   "kind": 2097152,
-                                                  "children": [
-                                                    255
-                                                  ]
+                                                  "children": [255]
                                                 }
                                               ],
                                               "sources": [
@@ -48586,14 +47160,7 @@
                                                 {
                                                   "title": "Enumeration members",
                                                   "kind": 16,
-                                                  "children": [
-                                                    21,
-                                                    16,
-                                                    17,
-                                                    18,
-                                                    20,
-                                                    19
-                                                  ]
+                                                  "children": [21, 16, 17, 18, 20, 19]
                                                 }
                                               ],
                                               "sources": [
@@ -49052,51 +47619,19 @@
                                 {
                                   "title": "Constructors",
                                   "kind": 512,
-                                  "children": [
-                                    148
-                                  ]
+                                  "children": [148]
                                 },
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    141,
-                                    145,
-                                    144,
-                                    150,
-                                    147,
-                                    146,
-                                    154,
-                                    143,
-                                    142,
-                                    149
-                                  ]
+                                  "children": [141, 145, 144, 150, 147, 146, 154, 143, 142, 149]
                                 },
                                 {
                                   "title": "Methods",
                                   "kind": 2048,
                                   "children": [
-                                    180,
-                                    217,
-                                    219,
-                                    221,
-                                    223,
-                                    225,
-                                    201,
-                                    204,
-                                    177,
-                                    173,
-                                    167,
-                                    170,
-                                    196,
-                                    182,
-                                    206,
-                                    162,
-                                    214,
-                                    164,
-                                    209,
-                                    193,
-                                    187
+                                    180, 217, 219, 221, 223, 225, 201, 204, 177, 173, 167, 170, 196,
+                                    182, 206, 162, 214, 164, 209, 193, 187
                                   ]
                                 }
                               ],
@@ -49415,10 +47950,7 @@
                           {
                             "title": "Variables",
                             "kind": 32,
-                            "children": [
-                              85,
-                              84
-                            ]
+                            "children": [85, 84]
                           }
                         ],
                         "sources": [
@@ -49507,10 +48039,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                81,
-                                80
-                              ]
+                              "children": [81, 80]
                             }
                           ],
                           "sources": [
@@ -49865,10 +48394,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    135,
-                                    134
-                                  ]
+                                  "children": [135, 134]
                                 }
                               ],
                               "sources": [
@@ -50249,42 +48775,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    87
-                  ]
+                  "children": [87]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    88,
-                    89,
-                    90,
-                    82,
-                    78,
-                    77,
-                    86,
-                    75,
-                    94,
-                    76
-                  ]
+                  "children": [88, 89, 90, 82, 78, 77, 86, 75, 94, 76]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    126,
-                    128,
-                    136,
-                    130,
-                    124,
-                    114,
-                    103,
-                    106,
-                    118,
-                    120,
-                    108
-                  ]
+                  "children": [126, 128, 136, 130, 124, 114, 103, 106, 118, 120, 108]
                 }
               ],
               "sources": [
@@ -50300,9 +48801,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                74
-              ]
+              "children": [74]
             }
           ],
           "sources": [
@@ -50482,12 +48981,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                61,
-                                62,
-                                59,
-                                60
-                              ]
+                              "children": [61, 62, 59, 60]
                             }
                           ]
                         }
@@ -50657,12 +49151,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                71,
-                                72,
-                                69,
-                                70
-                              ]
+                              "children": [71, 72, 69, 70]
                             }
                           ],
                           "sources": [
@@ -50757,18 +49246,12 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    50
-                  ]
+                  "children": [50]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    55,
-                    63,
-                    51
-                  ]
+                  "children": [55, 63, 51]
                 }
               ],
               "sources": [
@@ -50784,9 +49267,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                49
-              ]
+              "children": [49]
             }
           ],
           "sources": [
@@ -51047,27 +49528,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    38
-                  ]
+                  "children": [38]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    39,
-                    36,
-                    40,
-                    37
-                  ]
+                  "children": [39, 36, 40, 37]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    44,
-                    46
-                  ]
+                  "children": [44, 46]
                 }
               ],
               "sources": [
@@ -51083,9 +49554,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                35
-              ]
+              "children": [35]
             }
           ],
           "sources": [
@@ -51532,30 +50001,8 @@
                   "title": "Enumeration members",
                   "kind": 16,
                   "children": [
-                    373,
-                    374,
-                    375,
-                    376,
-                    377,
-                    378,
-                    379,
-                    380,
-                    381,
-                    382,
-                    383,
-                    384,
-                    385,
-                    386,
-                    387,
-                    388,
-                    389,
-                    390,
-                    391,
-                    392,
-                    393,
-                    394,
-                    395,
-                    396
+                    373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388,
+                    389, 390, 391, 392, 393, 394, 395, 396
                   ]
                 }
               ],
@@ -51719,12 +50166,7 @@
                       {
                         "title": "Variables",
                         "kind": 32,
-                        "children": [
-                          401,
-                          399,
-                          400,
-                          402
-                        ]
+                        "children": [401, 399, 400, 402]
                       }
                     ],
                     "sources": [
@@ -52125,12 +50567,7 @@
                                   {
                                     "title": "Variables",
                                     "kind": 32,
-                                    "children": [
-                                      401,
-                                      399,
-                                      400,
-                                      402
-                                    ]
+                                    "children": [401, 399, 400, 402]
                                   }
                                 ],
                                 "sources": [
@@ -52270,9 +50707,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                415
-                              ]
+                              "children": [415]
                             }
                           ],
                           "sources": [
@@ -52494,12 +50929,7 @@
                                   {
                                     "title": "Variables",
                                     "kind": 32,
-                                    "children": [
-                                      401,
-                                      399,
-                                      400,
-                                      402
-                                    ]
+                                    "children": [401, 399, 400, 402]
                                   }
                                 ],
                                 "sources": [
@@ -53176,34 +51606,17 @@
             {
               "title": "Enumerations",
               "kind": 4,
-              "children": [
-                372
-              ]
+              "children": [372]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                403,
-                397,
-                405,
-                404
-              ]
+              "children": [403, 397, 405, 404]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                422,
-                409,
-                416,
-                426,
-                438,
-                429,
-                435,
-                432,
-                442
-              ]
+              "children": [422, 409, 416, 426, 438, 429, 435, 432, 442]
             }
           ],
           "sources": [
@@ -53251,9 +51664,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                2
-              ]
+              "children": [2]
             }
           ],
           "sources": [
@@ -53269,17 +51680,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            227,
-            139,
-            445,
-            3,
-            73,
-            48,
-            34,
-            371,
-            1
-          ]
+          "children": [227, 139, 445, 3, 73, 48, 34, 371, 1]
         }
       ]
     },
@@ -53669,9 +52070,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    347
-                                  ]
+                                  "children": [347]
                                 }
                               ],
                               "sources": [
@@ -53763,10 +52162,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    349,
-                                    350
-                                  ]
+                                  "children": [349, 350]
                                 }
                               ],
                               "sources": [
@@ -53907,9 +52303,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                376
-                                              ]
+                                              "children": [376]
                                             }
                                           ],
                                           "sources": [
@@ -53962,10 +52356,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    374,
-                                    377
-                                  ]
+                                  "children": [374, 377]
                                 }
                               ],
                               "sources": [
@@ -54106,9 +52497,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                368
-                                              ]
+                                              "children": [368]
                                             }
                                           ],
                                           "sources": [
@@ -54161,10 +52550,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    366,
-                                    369
-                                  ]
+                                  "children": [366, 369]
                                 }
                               ],
                               "sources": [
@@ -54368,10 +52754,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    340,
-                                    341
-                                  ]
+                                  "children": [340, 341]
                                 }
                               ],
                               "sources": [
@@ -54507,10 +52890,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    334,
-                                    335
-                                  ]
+                                  "children": [334, 335]
                                 }
                               ],
                               "sources": [
@@ -54626,9 +53006,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    356
-                                  ]
+                                  "children": [356]
                                 }
                               ],
                               "sources": [
@@ -54710,9 +53088,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                360
-                                              ]
+                                              "children": [360]
                                             }
                                           ],
                                           "sources": [
@@ -54765,10 +53141,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    358,
-                                    361
-                                  ]
+                                  "children": [358, 361]
                                 }
                               ],
                               "sources": [
@@ -54808,31 +53181,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    314
-                  ]
+                  "children": [314]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    330,
-                    326,
-                    325
-                  ]
+                  "children": [330, 326, 325]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    342,
-                    370,
-                    362,
-                    322,
-                    336,
-                    331,
-                    351
-                  ]
+                  "children": [342, 370, 362, 322, 336, 331, 351]
                 }
               ],
               "sources": [
@@ -54855,9 +53214,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                313
-              ]
+              "children": [313]
             }
           ],
           "sources": [
@@ -54963,16 +53320,7 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                381,
-                382,
-                384,
-                386,
-                385,
-                383,
-                379,
-                380
-              ]
+              "children": [381, 382, 384, 386, 385, 383, 379, 380]
             }
           ],
           "sources": [
@@ -55337,9 +53685,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    138
-                                  ]
+                                  "children": [138]
                                 }
                               ],
                               "sources": [
@@ -55431,10 +53777,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    140,
-                                    141
-                                  ]
+                                  "children": [140, 141]
                                 }
                               ],
                               "sources": [
@@ -55565,9 +53908,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                167
-                                              ]
+                                              "children": [167]
                                             }
                                           ],
                                           "sources": [
@@ -55620,10 +53961,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    165,
-                                    168
-                                  ]
+                                  "children": [165, 168]
                                 }
                               ],
                               "sources": [
@@ -55754,9 +54092,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                159
-                                              ]
+                                              "children": [159]
                                             }
                                           ],
                                           "sources": [
@@ -55809,10 +54145,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    157,
-                                    160
-                                  ]
+                                  "children": [157, 160]
                                 }
                               ],
                               "sources": [
@@ -55953,10 +54286,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    131,
-                                    132
-                                  ]
+                                  "children": [131, 132]
                                 }
                               ],
                               "sources": [
@@ -56082,10 +54412,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    125,
-                                    126
-                                  ]
+                                  "children": [125, 126]
                                 }
                               ],
                               "sources": [
@@ -56191,9 +54518,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    147
-                                  ]
+                                  "children": [147]
                                 }
                               ],
                               "sources": [
@@ -56275,9 +54600,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                151
-                                              ]
+                                              "children": [151]
                                             }
                                           ],
                                           "sources": [
@@ -56330,10 +54653,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    149,
-                                    152
-                                  ]
+                                  "children": [149, 152]
                                 }
                               ],
                               "sources": [
@@ -56363,30 +54683,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    114
-                  ]
+                  "children": [114]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    113,
-                    109,
-                    108
-                  ]
+                  "children": [113, 109, 108]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    133,
-                    161,
-                    153,
-                    127,
-                    122,
-                    142
-                  ]
+                  "children": [133, 161, 153, 127, 122, 142]
                 }
               ],
               "sources": [
@@ -56409,9 +54716,7 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                107
-              ]
+              "children": [107]
             }
           ],
           "sources": [
@@ -56962,9 +55267,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                234
-                                              ]
+                                              "children": [234]
                                             }
                                           ],
                                           "sources": [
@@ -57017,10 +55320,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    232,
-                                    235
-                                  ]
+                                  "children": [232, 235]
                                 }
                               ],
                               "sources": [
@@ -57167,9 +55467,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                243
-                                              ]
+                                              "children": [243]
                                             }
                                           ],
                                           "sources": [
@@ -57251,11 +55549,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    241,
-                                    244,
-                                    245
-                                  ]
+                                  "children": [241, 244, 245]
                                 }
                               ],
                               "sources": [
@@ -57465,11 +55759,7 @@
                                               {
                                                 "title": "Variables",
                                                 "kind": 32,
-                                                "children": [
-                                                  253,
-                                                  254,
-                                                  255
-                                                ]
+                                                "children": [253, 254, 255]
                                               }
                                             ],
                                             "sources": [
@@ -57523,10 +55813,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    251,
-                                    256
-                                  ]
+                                  "children": [251, 256]
                                 }
                               ],
                               "sources": [
@@ -57666,10 +55953,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    261,
-                                    262
-                                  ]
+                                  "children": [261, 262]
                                 }
                               ],
                               "sources": [
@@ -57797,9 +56081,7 @@
                                         {
                                           "title": "Variables",
                                           "kind": 32,
-                                          "children": [
-                                            269
-                                          ]
+                                          "children": [269]
                                         }
                                       ],
                                       "sources": [
@@ -57881,11 +56163,7 @@
                             {
                               "title": "Variables",
                               "kind": 32,
-                              "children": [
-                                267,
-                                270,
-                                271
-                              ]
+                              "children": [267, 270, 271]
                             }
                           ],
                           "sources": [
@@ -58108,12 +56386,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    100,
-                                    101,
-                                    103,
-                                    102
-                                  ]
+                                  "children": [100, 101, 103, 102]
                                 }
                               ],
                               "sources": [
@@ -58177,9 +56450,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    14
-                                  ]
+                                  "children": [14]
                                 }
                               ],
                               "sources": [
@@ -58274,10 +56545,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    284,
-                                    285
-                                  ]
+                                  "children": [284, 285]
                                 }
                               ],
                               "sources": [
@@ -58424,9 +56692,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                225
-                                              ]
+                                              "children": [225]
                                             }
                                           ],
                                           "sources": [
@@ -58479,10 +56745,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    223,
-                                    226
-                                  ]
+                                  "children": [223, 226]
                                 }
                               ],
                               "sources": [
@@ -58629,10 +56892,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    276,
-                                    277
-                                  ]
+                                  "children": [276, 277]
                                 }
                               ],
                               "sources": [
@@ -58881,11 +57141,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    96,
-                                    97,
-                                    98
-                                  ]
+                                  "children": [96, 97, 98]
                                 }
                               ],
                               "sources": [
@@ -58967,9 +57223,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                216
-                                              ]
+                                              "children": [216]
                                             }
                                           ],
                                           "sources": [
@@ -59022,10 +57276,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    214,
-                                    217
-                                  ]
+                                  "children": [214, 217]
                                 }
                               ],
                               "sources": [
@@ -59274,11 +57525,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    96,
-                                    97,
-                                    98
-                                  ]
+                                  "children": [96, 97, 98]
                                 }
                               ],
                               "sources": [
@@ -59360,9 +57607,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                206
-                                              ]
+                                              "children": [206]
                                             }
                                           ],
                                           "sources": [
@@ -59415,10 +57660,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    204,
-                                    207
-                                  ]
+                                  "children": [204, 207]
                                 }
                               ],
                               "sources": [
@@ -59693,11 +57935,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    96,
-                                    97,
-                                    98
-                                  ]
+                                  "children": [96, 97, 98]
                                 }
                               ],
                               "sources": [
@@ -59779,9 +58017,7 @@
                                             {
                                               "title": "Variables",
                                               "kind": 32,
-                                              "children": [
-                                                196
-                                              ]
+                                              "children": [196]
                                             }
                                           ],
                                           "sources": [
@@ -59834,10 +58070,7 @@
                                 {
                                   "title": "Variables",
                                   "kind": 32,
-                                  "children": [
-                                    194,
-                                    197
-                                  ]
+                                  "children": [194, 197]
                                 }
                               ],
                               "sources": [
@@ -59867,38 +58100,17 @@
                 {
                   "title": "Constructors",
                   "kind": 512,
-                  "children": [
-                    178
-                  ]
+                  "children": [178]
                 },
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    176,
-                    177,
-                    172,
-                    171
-                  ]
+                  "children": [176, 177, 172, 171]
                 },
                 {
                   "title": "Methods",
                   "kind": 2048,
-                  "children": [
-                    286,
-                    289,
-                    227,
-                    236,
-                    246,
-                    257,
-                    263,
-                    278,
-                    218,
-                    272,
-                    208,
-                    198,
-                    187
-                  ]
+                  "children": [286, 289, 227, 236, 246, 257, 263, 278, 218, 272, 208, 198, 187]
                 }
               ],
               "sources": [
@@ -59980,11 +58192,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    299,
-                    300,
-                    301
-                  ]
+                  "children": [299, 300, 301]
                 }
               ],
               "sources": [
@@ -60096,10 +58304,7 @@
                     {
                       "title": "Variables",
                       "kind": 32,
-                      "children": [
-                        296,
-                        297
-                      ]
+                      "children": [296, 297]
                     }
                   ],
                   "sources": [
@@ -60119,17 +58324,12 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    293,
-                    294
-                  ]
+                  "children": [293, 294]
                 },
                 {
                   "title": "Object literals",
                   "kind": 2097152,
-                  "children": [
-                    295
-                  ]
+                  "children": [295]
                 }
               ],
               "sources": [
@@ -60149,17 +58349,12 @@
             {
               "title": "Classes",
               "kind": 128,
-              "children": [
-                170
-              ]
+              "children": [170]
             },
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                298,
-                292
-              ]
+              "children": [298, 292]
             }
           ],
           "sources": [
@@ -60216,9 +58411,7 @@
                 {
                   "title": "Variables",
                   "kind": 32,
-                  "children": [
-                    5
-                  ]
+                  "children": [5]
                 }
               ],
               "sources": [
@@ -60238,9 +58431,7 @@
             {
               "title": "Object literals",
               "kind": 2097152,
-              "children": [
-                4
-              ]
+              "children": [4]
             }
           ],
           "sources": [
@@ -60377,10 +58568,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    8,
-                    12
-                  ]
+                  "children": [8, 12]
                 }
               ],
               "sources": [
@@ -60426,9 +58614,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    14
-                  ]
+                  "children": [14]
                 }
               ],
               "sources": [
@@ -60734,10 +58920,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -60797,9 +58980,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -61118,10 +59299,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -61181,9 +59359,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -61436,10 +59612,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -61500,9 +59673,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -61799,10 +59970,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -61863,9 +60031,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -62109,10 +60275,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -62173,9 +60336,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -62419,10 +60580,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                12
-                              ]
+                              "children": [8, 12]
                             }
                           ],
                           "sources": [
@@ -62483,9 +60641,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                14
-                              ]
+                              "children": [14]
                             }
                           ],
                           "sources": [
@@ -62524,32 +60680,17 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                7,
-                13
-              ]
+              "children": [7, 13]
             },
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                15,
-                16
-              ]
+              "children": [15, 16]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                17,
-                24,
-                33,
-                41,
-                20,
-                47,
-                54,
-                61
-              ]
+              "children": [17, 24, 33, 41, 20, 47, 54, 61]
             }
           ],
           "sources": [
@@ -62667,16 +60808,12 @@
             {
               "title": "Type aliases",
               "kind": 4194304,
-              "children": [
-                69
-              ]
+              "children": [69]
             },
             {
               "title": "Functions",
               "kind": 64,
-              "children": [
-                70
-              ]
+              "children": [70]
             }
           ],
           "sources": [
@@ -62792,17 +60929,7 @@
             {
               "title": "References",
               "kind": 16777216,
-              "children": [
-                305,
-                311,
-                306,
-                308,
-                310,
-                309,
-                307,
-                303,
-                304
-              ]
+              "children": [305, 311, 306, 308, 310, 309, 307, 303, 304]
             }
           ],
           "sources": [
@@ -62957,14 +61084,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    78,
-                    75,
-                    76,
-                    77,
-                    80,
-                    79
-                  ]
+                  "children": [78, 75, 76, 77, 80, 79]
                 }
               ],
               "sources": [
@@ -63185,17 +61305,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    83,
-                    91,
-                    87,
-                    85,
-                    88,
-                    89,
-                    82,
-                    84,
-                    86
-                  ]
+                  "children": [83, 91, 87, 85, 88, 89, 82, 84, 86]
                 }
               ],
               "sources": [
@@ -63314,11 +61424,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    96,
-                    97,
-                    98
-                  ]
+                  "children": [96, 97, 98]
                 }
               ],
               "sources": [
@@ -63363,9 +61469,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    105
-                  ]
+                  "children": [105]
                 }
               ],
               "sources": [
@@ -63514,12 +61618,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    100,
-                    101,
-                    103,
-                    102
-                  ]
+                  "children": [100, 101, 103, 102]
                 }
               ],
               "sources": [
@@ -63604,10 +61703,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [
-                    93,
-                    94
-                  ]
+                  "children": [93, 94]
                 }
               ],
               "sources": [
@@ -63623,14 +61719,7 @@
             {
               "title": "Interfaces",
               "kind": 256,
-              "children": [
-                74,
-                81,
-                95,
-                104,
-                99,
-                92
-              ]
+              "children": [74, 81, 95, 104, 99, 92]
             }
           ],
           "sources": [
@@ -63678,9 +61767,7 @@
             {
               "title": "Variables",
               "kind": 32,
-              "children": [
-                2
-              ]
+              "children": [2]
             }
           ],
           "sources": [
@@ -63696,18 +61783,7 @@
         {
           "title": "Modules",
           "kind": 1,
-          "children": [
-            312,
-            378,
-            106,
-            169,
-            3,
-            6,
-            68,
-            302,
-            73,
-            1
-          ]
+          "children": [312, 378, 106, 169, 3, 6, 68, 302, 73, 1]
         }
       ]
     },
@@ -63889,10 +61965,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                8,
-                                7
-                              ]
+                              "children": [8, 7]
                             }
                           ]
                         }
@@ -64164,10 +62237,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    29,
-                                    30
-                                  ]
+                                  "children": [29, 30]
                                 }
                               ]
                             }
@@ -64224,10 +62294,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [
-                                    32,
-                                    33
-                                  ]
+                                  "children": [32, 33]
                                 }
                               ]
                             }
@@ -64296,26 +62363,17 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [
-                2
-              ]
+              "children": [2]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                15,
-                14,
-                13
-              ]
+              "children": [15, 14, 13]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [
-                23,
-                20
-              ]
+              "children": [23, 20]
             }
           ],
           "sources": [
@@ -64331,9 +62389,7 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [
-            1
-          ]
+          "children": [1]
         }
       ],
       "sources": [

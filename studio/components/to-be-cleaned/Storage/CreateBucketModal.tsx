@@ -87,7 +87,7 @@ const CreateBucketModal: FC<Props> = ({
             />
           </div>
         </Modal.Content>
-        <Modal.Seperator />
+        <Modal.Separator />
         <Modal.Content>
           <div className="space-y-4">
             <Toggle

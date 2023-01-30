@@ -1,11 +1,12 @@
 import Split from 'react-split'
 import Editor from '@monaco-editor/react'
 import DataGrid from '@supabase/react-data-grid'
+import classNames from 'classnames'
 import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -245,6 +246,16 @@ const ResultsDropdown = observer(() => {
     }
   }
 
+  const formatDataForCSV = (data = []) => {
+    return data.map((row) => {
+      const formattedRow = { ...row }
+      Object.keys(row).forEach((key) => {
+        if (typeof row[key] === 'object') formattedRow[key] = JSON.stringify(row[key])
+      })
+      return formattedRow
+    })
+  }
+
   return (
     <Dropdown
       side="bottom"
@@ -262,7 +273,7 @@ const ResultsDropdown = observer(() => {
       <CSVLink
         ref={csvRef}
         className="hidden"
-        data={sqlEditorStore.activeTab?.csvData || ''}
+        data={formatDataForCSV(sqlEditorStore.activeTab?.csvData || '')}
         filename={`supabase_${sqlEditorStore.projectRef}_${sqlEditorStore.activeTab.name}`}
       />
     </Dropdown>
@@ -306,20 +317,37 @@ const UtilityTabResults = observer(() => {
 
 const Results = ({ results }) => {
   const [cellPosition, setCellPosition] = useState(undefined)
+  const [copiedCell, setCopiedCell] = useState(undefined)
 
   useKeyboardShortcuts(
     {
       'Command+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
       'Control+c': (event) => {
         event.stopPropagation()
-        onCopyCell()
+        onCopySelectedCell()
       },
     },
     ['INPUT', 'TEXTAREA']
   )
+
+  useEffect(() => {
+    let timeoutId = 0
+
+    if (copiedCell) {
+      timeoutId = setTimeout(() => {
+        setCopiedCell(undefined)
+      }, 1000)
+    }
+
+    return () => {
+      // we need to clear previous timeout to prevent checkmark flickering
+      // when clicking `Copy` button multiple times in a short time
+      timeoutId && clearTimeout(timeoutId)
+    }
+  }, [copiedCell])
 
   if (results?.error) {
     return (
@@ -336,8 +364,33 @@ const Results = ({ results }) => {
     )
   }
 
-  const formatter = (column, row) => {
-    return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
+  const handleCopyClick = (column, row, rowIndex) => {
+    copyToClipboard(formatClipboardValue(row[column]), () => {
+      setCopiedCell(`${column},${rowIndex}`)
+    })
+  }
+
+  const formatter = (column, row, rowIndex) => {
+    const isCopied = copiedCell === `${column},${rowIndex}`
+
+    return (
+      <div className="group sb-grid-select-cell__formatter overflow-hidden">
+        <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
+
+        {row[column] && (
+          <Button
+            type="outline"
+            icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}
+            onClick={() => handleCopyClick(column, row, rowIndex)}
+            className={classNames(
+              'mx-1 group-hover:block group-hover:opacity-50 hover:opacity-100',
+              !isCopied && 'hidden'
+            )}
+            title="Copy"
+          />
+        )}
+      </div>
+    )
   }
   const columnRender = (name) => {
     return <div className="flex h-full items-center justify-center font-mono">{name}</div>
@@ -345,7 +398,7 @@ const Results = ({ results }) => {
   const columns = Object.keys(results[0]).map((key) => ({
     key,
     name: key,
-    formatter: ({ row }) => formatter(key, row),
+    formatter: ({ row }) => formatter(key, row, results.indexOf(row)),
     headerRenderer: () => columnRender(key),
     resizable: true,
     width: 120,
@@ -355,7 +408,7 @@ const Results = ({ results }) => {
     setCellPosition(position)
   }
 
-  function onCopyCell() {
+  function onCopySelectedCell() {
     if (columns && cellPosition) {
       const { idx, rowIdx } = cellPosition
       const column = columns[idx]

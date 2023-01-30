@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from '@supabase/ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
@@ -223,20 +223,17 @@ import { Customer } from 'types'
 
 serve(async (req) => {
   try {
-    // create a supabase client
+    // create a supabase client with Auth context of the user that called the function
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
     // create a stripe client
     const stripe = Stripe(Deno.env.get('STRIPE_SECRET_KEY'))
 
-    // Get the authorization header from the request.
-    const authHeader = req.headers.get('Authorization').replace("Bearer ","")
-    // Client now respects auth policies for this user
-    supabaseClient.auth.setAuth(authHeader)
-    // set the user profile
-    const user = supabase.auth.user()
+    // get the current logged in user
+    const {data: { user },} = supabase.auth.getUser()
 
     // Retrieve user metadata that only the user is allowed to select
     const { data, error } = await supabaseClient

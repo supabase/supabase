@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
-import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from '@supabase/ui'
+import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from 'ui'
 
 import Examples from '../../data/tweets/Tweets.json'
 import TweetCard from '../TweetCard'

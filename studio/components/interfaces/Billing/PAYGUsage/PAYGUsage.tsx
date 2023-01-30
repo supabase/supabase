@@ -52,7 +52,6 @@ const PAYGUsage: FC<Props> = ({ dateRange }) => {
                       startDate={startDate}
                       endDate={endDate}
                       interval="1d"
-                      highlight="maximum"
                       defaultChartStyle="bar"
                       customDateFormat={'MMM D, YYYY'}
                     />

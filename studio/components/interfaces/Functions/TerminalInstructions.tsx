@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { Button, IconTerminal, IconMaximize2, IconMinimize2, IconBookOpen, IconCode } from 'ui'
-import { useProjectSettings } from 'hooks'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
@@ -18,17 +18,17 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   const { ui } = useStore()
 
   const { tokens } = useAccessTokens()
-  const { services } = useProjectSettings(ref as string | undefined)
+  const { data: settings } = useProjectSettingsQuery({ projectRef: ref as string })
 
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
-  const apiKeys = apiService?.service_api_keys ?? []
-  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
 
-  const endpoint = apiService?.app_config.endpoint ?? ''
+  const endpoint = apiService?.endpoint ?? ''
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),
@@ -133,17 +133,21 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
           </div>
           <div className="flex gap-2">
             <Link passHref href="https://supabase.com/docs/guides/functions">
-              <Button as="a" type="default" iconRight={<IconBookOpen />}>
-                Documentation
-              </Button>
+              <a target="_blank" rel="noreferrer">
+                <Button type="default" iconRight={<IconBookOpen />}>
+                  Documentation
+                </Button>
+              </a>
             </Link>
             <Link
               passHref
-              href="https://github.com/supabase/supabase/tree/chore/stripe-issue/examples/edge-functions/supabase/functions"
+              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
             >
-              <Button as="a" type="default" iconRight={<IconCode />}>
-                Examples
-              </Button>
+              <a target="_blank" rel="noreferrer">
+                <Button as="a" type="default" iconRight={<IconCode />}>
+                  Examples
+                </Button>
+              </a>
             </Link>
           </div>
         </div>

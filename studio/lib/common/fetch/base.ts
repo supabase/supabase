@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
-  const message = e?.message ? `An error has occured: ${e.message}` : 'An error has occured'
+  const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }
   return { error } as unknown as SupaResponse<T>
 }
@@ -77,7 +77,7 @@ export async function handleResponseError<T = unknown>(
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
   } else {
-    const message = resTxt ?? `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occurred: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }

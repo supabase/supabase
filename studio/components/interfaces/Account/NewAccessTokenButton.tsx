@@ -77,7 +77,7 @@ const NewAccessTokenButton = observer(() => {
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <Button htmlType="submit" loading={isSubmitting} size="small" block danger>
                   Generate Token

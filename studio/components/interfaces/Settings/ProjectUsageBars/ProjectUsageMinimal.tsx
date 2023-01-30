@@ -12,13 +12,16 @@ interface ProjectUsageMinimalProps {
   filter: string
 }
 
+// [Joshen] This is currently not being used anywhere as of 011122
+
 const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
   const { usage, error: usageError, isLoading } = useProjectUsage(projectRef)
   const { subscription, error: subscriptionError } = useProjectSubscription(projectRef)
 
   if (
     subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM 
   ) {
     return <></>
   }

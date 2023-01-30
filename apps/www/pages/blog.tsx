@@ -11,7 +11,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
@@ -23,6 +23,19 @@ export async function getStaticProps() {
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
+
+  // generate a series of rss feeds for each author (for PlanetPG)
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
+  const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
+
+  uniquePlanetPgAuthors.forEach((author) => {
+    const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
+    if (authorPosts.length > 0) {
+      const authorRss = generateRss(authorPosts, author)
+      fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
+    }
+  })
 
   return {
     props: {
@@ -39,7 +52,7 @@ function Blog(props: any) {
   const router = useRouter()
 
   useEffect(() => {
-    // contruct an array of blog posts
+    // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
@@ -87,6 +100,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
         <div className="overflow-hidden py-12">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">

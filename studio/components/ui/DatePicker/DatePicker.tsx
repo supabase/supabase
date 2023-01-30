@@ -211,7 +211,7 @@ function _DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Seperator />
+          <Popover.Separator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             <Button type="default" onClick={() => handleClear()}>
               Clear

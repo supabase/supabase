@@ -37,7 +37,7 @@ export default function Divider({
   return (
     <div
       // className={classes.join(' ')}
-      role="seperator"
+      role="separator"
       style={style}
     >
       {children && (

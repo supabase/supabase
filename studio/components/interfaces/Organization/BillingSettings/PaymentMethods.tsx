@@ -14,7 +14,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { getURL } from 'lib/helpers'
 import { API_URL } from 'lib/constants'
@@ -39,22 +39,20 @@ const PaymentMethods: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
-  const isOwner = ui.selectedOrganization?.is_owner
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
 
-  const enablePermissions = useFlag('enablePermissions')
-
   const canReadPaymentMethods = checkPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  const canUpdatePaymentMethods = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
-    : isOwner
+  const canUpdatePaymentMethods = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
 
   const onConfirmMakeDefaultPaymentMethod = async () => {
     try {
@@ -120,9 +118,7 @@ const PaymentMethods: FC<Props> = ({
                 <div className="flex w-full justify-between">
                   {!canUpdatePaymentMethods ? (
                     <p className="text-sm text-scale-1000">
-                      {enablePermissions
-                        ? "You need additional permissions to manage this organization's payment methods"
-                        : 'Only organization owners can update payment methods'}
+                      You need additional permissions to manage this organization's payment methods
                     </p>
                   ) : (
                     <div />
@@ -247,7 +243,7 @@ const PaymentMethods: FC<Props> = ({
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${orgSlug}/settings`}
+        returnUrl={`${getURL()}/org/${orgSlug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
       />
 

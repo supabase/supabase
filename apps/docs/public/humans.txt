@@ -1,0 +1,80 @@
+TEAM
+
+Supabase is 100% remote.
+
+Alaister Young
+Amy Q
+Andrew Smith
+Angelico de los Reyes
+Ant Wilson
+Ariuna K
+Beng Eu
+Bo Lu
+Bobbie Soedirgo
+Chase Granberry
+Chris Copplestone
+Danny Ng
+Dave Wilson
+Div Arora
+Egor Romanov
+Fabrizio Fenoglio
+Francisco Mazzoni
+Haydn Maley
+Hieu Pham
+Inian P
+Isaiah Hamilton
+Jess Shears
+Joel Lee
+Jon M
+Jonny Summers-Muir
+Joshen Lim
+Kang Ming Tay
+Karlo Ison
+Kevin Brolly
+Kevin Grüneberg
+Lakshmipathi G
+Laura C
+Leo T
+Long Hoang
+Margarita Sandomirskaia
+Marijana Šimag
+Mark Burggraf
+Michel Pelletier
+Monica El Khoury
+Nikita Kotlyarov
+Oli R
+Paul Cioanca
+Paul Copplestone
+Pavel Borisov
+Qiao Han
+Ramiro Nuñez Dosio
+Rodrigo Martins Mansueli
+Rory Wilding
+Stanislav M
+Steve Chavez
+Stojan Dimitrovski
+Terry Sutton
+Thor Schaeff
+Tyler Shukert
+TzeYiing L
+Wen Bo Xie
+____________
+
+JOBS
+
+If you are interested in working with us check out the open roles here: https://supabase.com/careers
+
+___________
+
+
+TECHNOLOGIES
+
+Supabase would not be possible without the work of some other amazing open source contributors.
+
+- Postgres - https://www.postgresql.org/docs/devel/git.html
+- PostgREST - https://github.com/PostgREST
+- Kong - https://github.com/kong/
+- Next.js - https://nextjs.org/
+- Tailwind CSS - https://tailwindcss.com/
+- Phoenix - https://www.phoenixframework.org/
+- GoTrue - https://github.com/netlify/gotrue

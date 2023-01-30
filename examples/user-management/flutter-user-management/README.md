@@ -7,7 +7,7 @@ This repo will demonstrate how to:
 - store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
 - store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
 
-<img height="500px" src="https://raw.githubusercontent.com/supabase/examples/main/supabase-flutter-v1/user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />
+<img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
 ## Getting Started
 

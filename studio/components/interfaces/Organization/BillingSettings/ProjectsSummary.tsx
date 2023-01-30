@@ -46,10 +46,10 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
             <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
           <div className="flex w-[15%] items-center justify-end">
-            <Link href={`/project/${project.ref}/settings/billing`}>
+            <Link href={`/project/${project.ref}/settings/billing/subscription`}>
               <a className="group flex items-center space-x-2">
-                <p className="text-sm opacity-0 transition group-hover:opacity-100">View details</p>
-                <IconChevronRight />
+                <p className="text-xs opacity-0 transition group-hover:opacity-100">View details</p>
+                <IconChevronRight strokeWidth={1.5} />
               </a>
             </Link>
           </div>

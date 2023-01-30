@@ -27,6 +27,7 @@ const DisplayConfigSettings = () => {
   const jwtSecret = project?.jwt_secret ?? ''
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
   const apiConfig = apiService?.app_config ?? {}
+  const apiUrl = `${apiConfig.protocol ?? 'https'}://${apiConfig.endpoint ?? '-'}`
 
   return (
     <ConfigContentWrapper>
@@ -55,7 +56,7 @@ const DisplayConfigSettings = () => {
               copy
               disabled
               className="input-mono"
-              value={`https://${apiConfig.endpoint}`}
+              value={apiUrl}
               descriptionText="A RESTful endpoint for querying and managing your database."
               layout="horizontal"
             />

@@ -1,4 +1,4 @@
-import { Button } from 'ui'
+import { Button, IconExternalLink } from 'ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -60,7 +60,7 @@ const ProductEmptyState: FC<Props> = ({
                   </Tooltip.Root>
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default">
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
                     <a target="_blank" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

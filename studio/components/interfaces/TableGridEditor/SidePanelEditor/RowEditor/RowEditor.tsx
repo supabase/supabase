@@ -3,7 +3,7 @@ import { isUndefined, partition, isEmpty } from 'lodash'
 import { SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
 import { Query } from 'components/grid/query/Query'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
@@ -184,7 +184,7 @@ const RowEditor: FC<Props> = ({
             </SidePanel.Content>
             {optionalFields.length > 0 && (
               <>
-                <SidePanel.Seperator />
+                <SidePanel.Separator />
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>

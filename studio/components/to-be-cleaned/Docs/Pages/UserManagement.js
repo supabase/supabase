@@ -157,18 +157,18 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="text ">
           <p>
             Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
-            must first enable each of these in the{' '}
+            must first enable each of these in the Auth Providers settings{' '}
             <span className="text-green-500">
-              <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/settings`}>
-                Auth Settings
+              <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/providers`}>
+                here
               </Link>
             </span>{' '}
-            tab.
+            .
           </p>
           <p>
             View all the available{' '}
             <a href="https://supabase.com/docs/guides/auth#providers" target="_blank">
-              Third Part OAuth providers
+              Third Party OAuth providers
             </a>
           </p>
           <p>
