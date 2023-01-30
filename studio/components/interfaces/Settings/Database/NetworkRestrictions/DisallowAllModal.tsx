@@ -3,6 +3,7 @@ import { Modal, Button } from 'ui'
 
 import { useStore, useParams } from 'hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   visible: boolean
@@ -36,7 +37,7 @@ const DisallowAllModal: FC<Props> = ({ visible, onClose }) => {
     <Modal
       closable
       hideFooter
-      size="small"
+      size="medium"
       visible={visible}
       onCancel={onClose}
       header="Restrict access from all IP addresses"
@@ -47,6 +48,12 @@ const DisallowAllModal: FC<Props> = ({ visible, onClose }) => {
             This will prevent any IP address other than your local machine from accessing your
             project's database. Are you sure?
           </p>
+          <InformationBox
+            defaultVisibility
+            hideCollapse
+            title="Note: Restrictions only apply to your database and PgBouncer"
+            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+          />
         </div>
       </Modal.Content>
       <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">

@@ -4,6 +4,7 @@ import { Alert, Button, Form, Input, Modal } from 'ui'
 
 import { useStore, useParams } from 'hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   restrictedIps: string[]
@@ -77,7 +78,7 @@ const AddRestrictionModal: FC<Props> = ({
     <Modal
       closable
       hideFooter
-      size="small"
+      size="medium"
       visible={visible}
       onCancel={onClose}
       header="Add a new restriction"
@@ -90,7 +91,7 @@ const AddRestrictionModal: FC<Props> = ({
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }: any) => {
+        {({ isSubmitting }: { isSubmitting: boolean }) => {
           return (
             <>
               <Modal.Content>
@@ -99,6 +100,12 @@ const AddRestrictionModal: FC<Props> = ({
                     This will add an IP address range to a list of allowed ranges that can access
                     your project's database.
                   </p>
+                  <InformationBox
+                    defaultVisibility
+                    hideCollapse
+                    title="Note: Restrictions only apply to your database and PgBouncer"
+                    description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+                  />
                   <Input
                     label="IPv4 address in CIDR notation"
                     id="address"
