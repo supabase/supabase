@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
@@ -5,16 +6,13 @@ import { IconAlertCircle, Input } from 'ui'
 import { useParams, useStore } from 'hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
-import Panel from 'components/ui/Panel'
-import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { configKeys } from 'data/config/keys'
+import Panel from 'components/ui/Panel'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
-import { useQueryClient } from '@tanstack/react-query'
 
 const ServiceList = () => {
   const { ui } = useStore()
@@ -38,6 +36,7 @@ const ServiceList = () => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
         case Updated:
+          client.invalidateQueries(configKeys.api(projectRef))
           client.invalidateQueries(configKeys.settings(projectRef))
           client.invalidateQueries(configKeys.postgrest(projectRef))
 
@@ -55,7 +54,9 @@ const ServiceList = () => {
     previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
   }, [jwtSecretUpdateStatus])
 
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? '-'
+  // Get the API service
+  const apiService = settings?.autoApiService
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
 
   return (
     <div>
@@ -75,7 +76,7 @@ const ServiceList = () => {
                 readOnly
                 disabled
                 className="input-mono"
-                value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${endpoint}`}
+                value={apiUrl}
                 descriptionText="A RESTful endpoint for querying and managing your database."
                 layout="horizontal"
               />

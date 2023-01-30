@@ -4,8 +4,6 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { checkPermissions, useParams, useStore } from 'hooks'
 import { snakeToCamel } from 'lib/helpers'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -120,9 +118,7 @@ const DocView: FC<any> = observer(({}) => {
   // Data Loaded
   const autoApiService = {
     ...data.autoApiService,
-    endpoint: IS_PLATFORM
-      ? `https://${data?.autoApiService?.endpoint}`
-      : `${PROJECT_ENDPOINT_PROTOCOL}://${data.autoApiService.endpoint}`,
+    endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
 
   const { paths, definitions } = PageState.jsonSchema
@@ -176,7 +172,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: autoApiService?.defaultApiKey,
+                              key: apiKey,
                               name: 'anon (public)',
                             })
                           }
@@ -188,7 +184,7 @@ const DocView: FC<any> = observer(({}) => {
                             key="service"
                             onClick={() =>
                               setShowApiKey({
-                                key: autoApiService?.serviceApiKey,
+                                key: autoApiService.serviceApiKey,
                                 name: 'service_role (secret)',
                               })
                             }
