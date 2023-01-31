@@ -55,7 +55,7 @@ const CodeBlock: FC<Props> = ({
   const singleString = typeof singleChild === 'string' ? singleChild : undefined
 
   let codeValue = value ?? singleString ?? children
-  codeValue = codeValue.trimEnd?.() ?? codeValue
+  codeValue = codeValue?.trimEnd?.() ?? codeValue
 
   // check the length of the string inside the <code> tag
   // if it's fewer than 70 characters, add a white-space: pre so it doesn't wrap
@@ -136,7 +136,7 @@ const CodeBlock: FC<Props> = ({
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
-              {/* // 
+              {/* //
               @ts-ignore */}
               <CopyToClipboard text={value || children}>
                 <Button
