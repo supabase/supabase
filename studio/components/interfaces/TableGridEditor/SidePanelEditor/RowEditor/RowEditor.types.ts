@@ -1,4 +1,4 @@
-import { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PostgresRelationship } from '@supabase/postgres-meta'
 
 export interface JsonEditValue {
   column: string

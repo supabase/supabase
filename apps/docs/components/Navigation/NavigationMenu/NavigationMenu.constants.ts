@@ -22,6 +22,12 @@ export const REFERENCES: References = {
     versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/flutter-icon.svg',
   },
+  csharp: {
+    name: 'C#',
+    library: 'supabase-csharp',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/c-sharp-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -49,6 +55,8 @@ export const gettingstarted = {
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
+        { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs', items: [] },
+        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue', items: [] },
       ],
     },
     {
@@ -486,6 +494,25 @@ export const storage = {
   ],
 }
 
+export const supabase_cli = {
+  icon: 'reference-cli',
+  title: 'Supabase CLI',
+  url: '/guides/cli',
+  items: [
+    { name: 'Overview', url: '/guides/cli', items: [] },
+    { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
+    { name: 'Managing Environments', url: '/guides/cli/managing-environments', items: [] },
+    {
+      name: 'Reference',
+      url: undefined,
+      items: [
+        { name: 'Commands', url: '/reference/cli/introduction', items: [] },
+        { name: 'Configuration', url: '/reference/cli/config', items: [] },
+      ],
+    },
+  ],
+}
+
 export const platform = {
   icon: 'platform',
   label: 'Platform',
@@ -586,26 +613,6 @@ export const resources = {
         {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
-          items: [],
-        },
-      ],
-    },
-    {
-      name: 'Supabase CLI',
-      items: [
-        {
-          name: 'Overview',
-          url: '/guides/resources/supabase-cli',
-          items: [],
-        },
-        {
-          name: 'Local Development',
-          url: '/guides/resources/supabase-cli/local-development',
-          items: [],
-        },
-        {
-          name: 'Managing Environments',
-          url: '/guides/resources/supabase-cli/managing-environments',
           items: [],
         },
       ],
@@ -738,6 +745,20 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-dart',
         },
+        {
+          name: 'supabase-csharp',
+          url: '/reference/csharp/start',
+          level: 'reference_csharp',
+          items: [],
+          icon: '/img/icons/menu/reference-csharp',
+        },
+        {
+          name: 'supbase-python',
+          url: '/reference/python/start',
+          level: 'reference_python',
+          items: [],
+          icon: 'docs/img/icons/javascript.svg',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -787,10 +808,19 @@ export const reference_dart_v0 = {
   url: '/guides/reference/dart',
   parent: '/reference',
 }
+
 export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
+  parent: '/reference',
+}
+
+ 
+export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'c#',
+  url: 'guides/reference/csharp',
   parent: '/reference',
 }
 
@@ -893,6 +923,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/dart-icon.svg',
         url: '/reference/dart/start',
+      },
+      {
+        label: 'supabase-csharp',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/c-sharp-icon.svg',
+        url: '/reference/csharp/start',
       },
     ],
   },

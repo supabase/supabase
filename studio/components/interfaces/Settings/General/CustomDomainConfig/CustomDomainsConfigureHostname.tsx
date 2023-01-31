@@ -26,7 +26,7 @@ const CustomDomainsConfigureHostname = () => {
   const { data: settings } = useProjectSettingsQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? undefined
+  const endpoint = settings?.autoApiService.endpoint
   const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
@@ -123,7 +123,7 @@ const CustomDomainsConfigureHostname = () => {
                     'your custom domain'
                   )}
                   , resolving to{' '}
-                  {endpoint !== undefined ? (
+                  {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
