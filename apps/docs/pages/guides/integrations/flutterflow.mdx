@@ -95,14 +95,14 @@ Go to your project page on FlutterFlow and follow the steps below to define the 
 
 1. Select the Widget (e.g., Button) on which you want to define the action.
 2. Select Actions from the Properties panel (the right menu), and click Open. This will open an Action flow Editor in a new popup window.
-    1. Click on + Add Action.
-    2. On the right side, search and select the Supabase -> Delete Row action.
-    3. Set the Table to your table name (e.g., assignments).
-    4. Optional: Later, if you want to know which rows were deleted from a table, enable the Return Matching Rows option.
-    5. Now, you must set the row you want to delete. Usually, this is done by finding a row in a table that matches the current row ID. To do so, click + Add Filter button inside the Matching Rows section.
-        1. Set the Field Name to the field that contains the IDs. Typically, this is the id column.
-        2. Set the Relation to Equal To because you want to find a row with the exact id.
-        3. Into the Value Source, you can select the From Variable and provide the id of the row you want to delete.
+   1. Click on + Add Action.
+   2. On the right side, search and select the Supabase -> Delete Row action.
+   3. Set the Table to your table name (e.g., assignments).
+   4. Optional: Later, if you want to know which rows were deleted from a table, enable the Return Matching Rows option.
+   5. Now, you must set the row you want to delete. Usually, this is done by finding a row in a table that matches the current row ID. To do so, click + Add Filter button inside the Matching Rows section.
+      1. Set the Field Name to the field that contains the IDs. Typically, this is the id column.
+      2. Set the Relation to Equal To because you want to find a row with the exact id.
+      3. Into the Value Source, you can select the From Variable and provide the id of the row you want to delete.
 
 ![Delete data from Supabase](/docs/img/guides/integrations/flutterflow/delete.gif)
 
