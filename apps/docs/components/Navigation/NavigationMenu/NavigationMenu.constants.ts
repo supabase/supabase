@@ -494,7 +494,7 @@ export const supabase_cli = {
       name: 'Reference',
       url: undefined,
       items: [
-        { name: 'Commands', url: '/reference/cli/introduction', items: [] },
+        { name: 'Commands', url: '/reference/cli/start', items: [] },
         { name: 'Configuration', url: '/reference/cli/config', items: [] },
       ],
     },
@@ -618,21 +618,21 @@ export const self_hosting = {
     {
       name: 'Auth Server',
       items: [
-        { name: 'Reference', url: '/reference/self-hosting-auth/introduction', items: [] },
+        { name: 'Reference', url: '/reference/self-hosting-auth/start', items: [] },
         { name: 'Configuration', url: '/guides/self-hosting/auth/config', items: [] },
       ],
     },
     {
       name: 'Storage Server',
       items: [
-        { name: 'Reference', url: '/reference/self-hosting-storage/introduction', items: [] },
+        { name: 'Reference', url: '/reference/self-hosting-storage/start', items: [] },
         { name: 'Configuration', url: '/guides/self-hosting/storage/config', items: [] },
       ],
     },
     {
       name: 'Realtime Server',
       items: [
-        { name: 'Reference', url: '/reference/self-hosting-realtime/introduction', items: [] },
+        { name: 'Reference', url: '/reference/self-hosting-realtime/start', items: [] },
         { name: 'Configuration', url: '/guides/self-hosting/realtime/config', items: [] },
       ],
     },
