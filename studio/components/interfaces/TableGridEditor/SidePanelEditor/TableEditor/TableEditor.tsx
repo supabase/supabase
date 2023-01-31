@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
-import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'

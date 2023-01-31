@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'functions-local-development',
   title: 'Local Development',
-  description: 'Run your Edge Functions locally.',
+  description: 'Run your functions locally.',
 }
 
 You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
@@ -15,9 +15,9 @@ supabase functions serve hello-world # start the Function watcher
 
 The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
 
-### Invoking Edge Functions locally
+### Invoking functions locally
 
-While serving your local Edge Function, you can invoke it using curl:
+While serving your local Function, you can invoke it using curl:
 
 ```bash
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
@@ -44,7 +44,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 You should see the response `{ "message":"Hello Functions!" }`.
 
-If you execute the function with a different payload the response will change. <br />
+If you execute Function with a different payload the response will change. <br />
 Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
 
 <Admonition type="note">

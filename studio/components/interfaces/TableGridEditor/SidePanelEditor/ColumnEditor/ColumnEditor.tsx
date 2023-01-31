@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
-import type {
+import {
   PostgresColumn,
   PostgresExtension,
   PostgresRelationship,

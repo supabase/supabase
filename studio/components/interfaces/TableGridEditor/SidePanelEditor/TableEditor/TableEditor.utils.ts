@@ -1,5 +1,5 @@
 import { some } from 'lodash'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import { ImportContent, TableField } from './TableEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
