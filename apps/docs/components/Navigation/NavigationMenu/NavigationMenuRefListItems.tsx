@@ -179,7 +179,6 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
   if (!sections) console.error('no common sections imported')
 
   const menu = NavItems[id]
-  //console.log(menu)
   const databaseFunctions = find(sections, { title: 'Database' })
     ? find(sections, { title: 'Database' }).items
     : []
