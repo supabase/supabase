@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { SidePanel, Input, Listbox, IconHelpCircle } from 'ui'
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
@@ -71,7 +71,7 @@ const ForeignKeySelector: FC<Props> = ({
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
-        column: table.columns?.length ? table.columns[0].name : undefined,
+        column: table.columns.length > 0 ? table.columns[0].name : undefined,
       })
     }
   }

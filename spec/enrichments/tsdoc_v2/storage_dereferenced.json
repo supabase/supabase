@@ -13,14 +13,14 @@
       "flags": {},
       "children": [
         {
-          "id": 403,
+          "id": 402,
           "name": "StorageApiError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 404,
+              "id": 403,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -34,14 +34,14 @@
               ],
               "signatures": [
                 {
-                  "id": 405,
+                  "id": 404,
                   "name": "new StorageApiError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 406,
+                      "id": 405,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -52,7 +52,7 @@
                       }
                     },
                     {
-                      "id": 407,
+                      "id": 406,
                       "name": "status",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -65,24 +65,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 403,
+                    "id": 402,
                     "name": "StorageApiError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 400,
+                    "id": 399,
                     "name": "StorageError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 399,
+                "id": 398,
                 "name": "StorageError.constructor"
               }
             },
             {
-              "id": 408,
+              "id": 407,
               "name": "status",
               "kind": 1024,
               "kindString": "Property",
@@ -100,7 +100,7 @@
               }
             },
             {
-              "id": 409,
+              "id": 408,
               "name": "toJSON",
               "kind": 2048,
               "kindString": "Method",
@@ -114,7 +114,7 @@
               ],
               "signatures": [
                 {
-                  "id": 410,
+                  "id": 409,
                   "name": "toJSON",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -122,14 +122,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 411,
+                      "id": 410,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 413,
+                          "id": 412,
                           "name": "message",
                           "kind": 1024,
                           "kindString": "Property",
@@ -148,7 +148,7 @@
                           "defaultValue": "..."
                         },
                         {
-                          "id": 412,
+                          "id": 411,
                           "name": "name",
                           "kind": 1024,
                           "kindString": "Property",
@@ -167,7 +167,7 @@
                           "defaultValue": "..."
                         },
                         {
-                          "id": 414,
+                          "id": 413,
                           "name": "status",
                           "kind": 1024,
                           "kindString": "Property",
@@ -190,7 +190,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [413, 412, 414]
+                          "children": [412, 411, 413]
                         }
                       ]
                     }
@@ -203,17 +203,17 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [404]
+              "children": [403]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [408]
+              "children": [407]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [409]
+              "children": [408]
             }
           ],
           "sources": [
@@ -226,7 +226,7 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 398,
+              "id": 397,
               "name": "StorageError"
             }
           ]
@@ -606,7 +606,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -815,7 +815,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1024,7 +1024,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1248,7 +1248,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1412,7 +1412,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1668,7 +1668,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1731,14 +1731,14 @@
           ]
         },
         {
-          "id": 398,
+          "id": 397,
           "name": "StorageError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 399,
+              "id": 398,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -1752,14 +1752,14 @@
               ],
               "signatures": [
                 {
-                  "id": 400,
+                  "id": 399,
                   "name": "new StorageError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 401,
+                      "id": 400,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1772,7 +1772,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 398,
+                    "id": 397,
                     "name": "StorageError"
                   },
                   "overwrites": {
@@ -1791,7 +1791,7 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [399]
+              "children": [398]
             }
           ],
           "sources": [
@@ -1812,25 +1812,25 @@
           "extendedBy": [
             {
               "type": "reference",
-              "id": 403,
+              "id": 402,
               "name": "StorageApiError"
             },
             {
               "type": "reference",
-              "id": 416,
+              "id": 415,
               "name": "StorageUnknownError"
             }
           ]
         },
         {
-          "id": 416,
+          "id": 415,
           "name": "StorageUnknownError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 417,
+              "id": 416,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -1844,14 +1844,14 @@
               ],
               "signatures": [
                 {
-                  "id": 418,
+                  "id": 417,
                   "name": "new StorageUnknownError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 419,
+                      "id": 418,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1862,7 +1862,7 @@
                       }
                     },
                     {
-                      "id": 420,
+                      "id": 419,
                       "name": "originalError",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1875,24 +1875,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 416,
+                    "id": 415,
                     "name": "StorageUnknownError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 400,
+                    "id": 399,
                     "name": "StorageError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 399,
+                "id": 398,
                 "name": "StorageError.constructor"
               }
             },
             {
-              "id": 421,
+              "id": 420,
               "name": "originalError",
               "kind": 1024,
               "kindString": "Property",
@@ -1914,12 +1914,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [417]
+              "children": [416]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [421]
+              "children": [420]
             }
           ],
           "sources": [
@@ -1932,7 +1932,7 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 398,
+              "id": 397,
               "name": "StorageError"
             }
           ]
@@ -2828,30 +2828,6 @@
           "flags": {},
           "children": [
             {
-              "id": 394,
-              "name": "format",
-              "kind": 1024,
-              "kindString": "Property",
-              "flags": {
-                "isOptional": true
-              },
-              "comment": {
-                "shortText": "Specify the format of the image requested.",
-                "text": "When using 'origin' we force the format to be the same as the original image,\nbypassing automatic browser optimisation such as webp conversion\n"
-              },
-              "sources": [
-                {
-                  "fileName": "src/lib/types.ts",
-                  "line": 98,
-                  "character": 2
-                }
-              ],
-              "type": {
-                "type": "literal",
-                "value": "origin"
-              }
-            },
-            {
               "id": 392,
               "name": "height",
               "kind": 1024,
@@ -2938,7 +2914,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [394, 392, 393, 391]
+              "children": [392, 393, 391]
             }
           ],
           "sources": [
@@ -2950,7 +2926,7 @@
           ]
         },
         {
-          "id": 395,
+          "id": 394,
           "name": "isStorageError",
           "kind": 64,
           "kindString": "Function",
@@ -2964,14 +2940,14 @@
           ],
           "signatures": [
             {
-              "id": 396,
+              "id": 395,
               "name": "isStorageError",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 397,
+                  "id": 396,
                   "name": "error",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2988,7 +2964,7 @@
                 "asserts": false,
                 "targetType": {
                   "type": "reference",
-                  "id": 398,
+                  "id": 397,
                   "name": "StorageError"
                 }
               }
@@ -3000,7 +2976,7 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [403, 266, 398, 416]
+          "children": [402, 266, 397, 415]
         },
         {
           "title": "Interfaces",
@@ -3010,7 +2986,7 @@
         {
           "title": "Functions",
           "kind": 64,
-          "children": [395]
+          "children": [394]
         }
       ],
       "sources": [
@@ -3393,7 +3369,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3592,7 +3568,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3791,7 +3767,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3958,7 +3934,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4112,7 +4088,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4358,7 +4334,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4796,7 +4772,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4951,30 +4927,6 @@
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 394,
-                                      "name": "format",
-                                      "kind": 1024,
-                                      "kindString": "Property",
-                                      "flags": {
-                                        "isOptional": true
-                                      },
-                                      "comment": {
-                                        "shortText": "Specify the format of the image requested.",
-                                        "text": "When using 'origin' we force the format to be the same as the original image,\nbypassing automatic browser optimisation such as webp conversion\n"
-                                      },
-                                      "sources": [
-                                        {
-                                          "fileName": "src/lib/types.ts",
-                                          "line": 98,
-                                          "character": 2
-                                        }
-                                      ],
-                                      "type": {
-                                        "type": "literal",
-                                        "value": "origin"
-                                      }
-                                    },
-                                    {
                                       "id": 392,
                                       "name": "height",
                                       "kind": 1024,
@@ -5061,7 +5013,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [394, 392, 393, 391]
+                                      "children": [392, 393, 391]
                                     }
                                   ],
                                   "sources": [
@@ -5222,7 +5174,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5553,7 +5505,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5662,30 +5614,6 @@
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 394,
-                                      "name": "format",
-                                      "kind": 1024,
-                                      "kindString": "Property",
-                                      "flags": {
-                                        "isOptional": true
-                                      },
-                                      "comment": {
-                                        "shortText": "Specify the format of the image requested.",
-                                        "text": "When using 'origin' we force the format to be the same as the original image,\nbypassing automatic browser optimisation such as webp conversion\n"
-                                      },
-                                      "sources": [
-                                        {
-                                          "fileName": "src/lib/types.ts",
-                                          "line": 98,
-                                          "character": 2
-                                        }
-                                      ],
-                                      "type": {
-                                        "type": "literal",
-                                        "value": "origin"
-                                      }
-                                    },
-                                    {
                                       "id": 392,
                                       "name": "height",
                                       "kind": 1024,
@@ -5772,7 +5700,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [394, 392, 393, 391]
+                                      "children": [392, 393, 391]
                                     }
                                   ],
                                   "sources": [
@@ -5902,7 +5830,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -6043,30 +5971,6 @@
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 394,
-                                      "name": "format",
-                                      "kind": 1024,
-                                      "kindString": "Property",
-                                      "flags": {
-                                        "isOptional": true
-                                      },
-                                      "comment": {
-                                        "shortText": "Specify the format of the image requested.",
-                                        "text": "When using 'origin' we force the format to be the same as the original image,\nbypassing automatic browser optimisation such as webp conversion\n"
-                                      },
-                                      "sources": [
-                                        {
-                                          "fileName": "src/lib/types.ts",
-                                          "line": 98,
-                                          "character": 2
-                                        }
-                                      ],
-                                      "type": {
-                                        "type": "literal",
-                                        "value": "origin"
-                                      }
-                                    },
-                                    {
                                       "id": 392,
                                       "name": "height",
                                       "kind": 1024,
@@ -6153,7 +6057,7 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [394, 392, 393, 391]
+                                      "children": [392, 393, 391]
                                     }
                                   ],
                                   "sources": [
@@ -6654,7 +6558,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -6867,7 +6771,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -7040,7 +6944,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -7426,7 +7330,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }
@@ -7812,7 +7716,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 398,
+                                    "id": 397,
                                     "name": "StorageError"
                                   }
                                 }

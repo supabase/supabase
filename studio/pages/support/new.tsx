@@ -27,7 +27,7 @@ const SupportPage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h1 className="m-0 text-lg">Supabase support</h1>
+              <h4 className="m-0 text-lg">Supabase support</h4>
             </div>
             <div className="flex items-center space-x-3">
               <Tooltip.Root delayDuration={0}>

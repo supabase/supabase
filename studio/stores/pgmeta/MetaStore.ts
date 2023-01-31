@@ -3,7 +3,7 @@ import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
 
-import type {
+import {
   PostgresColumn,
   PostgresTable,
   PostgresRelationship,

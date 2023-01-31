@@ -134,7 +134,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             <DNSRecord
               type="CNAME"
               name={customDomain.hostname}
-              value={settings?.autoApiService.endpoint ?? 'Loading...'}
+              value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
             />
           )}
 

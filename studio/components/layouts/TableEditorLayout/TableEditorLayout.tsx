@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState, useEffect } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams, useStore } from 'hooks'

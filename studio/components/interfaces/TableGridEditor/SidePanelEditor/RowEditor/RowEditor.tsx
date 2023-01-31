@@ -3,7 +3,7 @@ import { isUndefined, partition, isEmpty } from 'lodash'
 import { SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
 import { Query } from 'components/grid/query/Query'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
