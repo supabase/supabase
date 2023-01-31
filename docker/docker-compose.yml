@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230127-6bfd87b
+    image: supabase/studio:20221214-4eecc99
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
@@ -22,11 +22,13 @@ services:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-      DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
-      DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
+      DEFAULT_ORGANIZATION: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
 
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      # Kept for backwards compatibility with studio:0.22.08
+      SUPABASE_REST_URL: ${API_EXTERNAL_URL}/rest/v1/
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 

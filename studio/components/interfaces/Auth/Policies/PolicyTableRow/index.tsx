@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import type { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 

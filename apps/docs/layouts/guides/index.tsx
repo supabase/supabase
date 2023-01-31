@@ -65,19 +65,12 @@ const Layout: FC<Props> = (props) => {
   return (
     <>
       <NextSeo
-        title={`${props.meta?.title} | Supabase Docs`}
+        title={`${props.meta?.title} | Supabase`}
         description={props.meta?.description ? props.meta?.description : props.meta?.title}
-        canonical={`https://supabase.com/docs${asPath}`}
         openGraph={{
           title: props.meta?.title,
           description: props.meta?.description,
           url: `https://supabase.com/docs${asPath}`,
-          type: 'article',
-          article: {
-            publishedTime: new Date().toISOString(),
-            modifiedTime: new Date().toISOString(),
-            authors: ['Supabase'],
-          },
           images: [
             {
               url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
@@ -89,6 +82,7 @@ const Layout: FC<Props> = (props) => {
           ],
         }}
       />
+
       <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
         <div
           className={[

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from 'ui'
-import type { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
+import { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'

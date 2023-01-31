@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
 import { Dictionary } from 'components/grid'

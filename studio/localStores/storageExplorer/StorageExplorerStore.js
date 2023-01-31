@@ -97,16 +97,17 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
+  initStore(projectRef, url, serviceKey) {
     this.projectRef = projectRef
-    this.initializeSupabaseClient(serviceKey, url, protocol)
+    this.initializeSupabaseClient(serviceKey, url)
   }
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
+  initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
+    console.debug(serviceEndpoint)
     this.supabaseClient = createClient(
-      `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
+      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
       serviceKey,
       {
         auth: {

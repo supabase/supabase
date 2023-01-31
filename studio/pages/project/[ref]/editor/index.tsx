@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import router from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore, withAuth } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
