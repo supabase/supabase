@@ -128,6 +128,19 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             </div>
           </div>
 
+          {customDomain.ssl.validation_errors?.reduce(
+            (acc, error) => acc || error.message.includes('caa_error'),
+            false
+          ) && (
+            <div className="flex items-center justify-center space-x-2 py-8">
+              <IconAlertCircle size={16} strokeWidth={1.5} />
+              <p className="text-sm text-scale-1100">
+                CAA error: please add a CAA record allowing "digicert.com" to issue certificates for
+                "${customDomain.hostname}". Example record: `0 issue "digicert.com"`.
+              </p>
+            </div>
+          )}
+
           {customDomain.verification_errors?.includes(
             'custom hostname does not CNAME to this zone.'
           ) && (
