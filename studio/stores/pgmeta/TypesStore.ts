@@ -1,5 +1,5 @@
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import type { PostgresType } from '@supabase/postgres-meta'
+import { PostgresType } from '@supabase/postgres-meta'
 import { IRootStore } from '../RootStore'
 
 export default class TypesStore extends PostgresMetaInterface<PostgresType> {

@@ -3,8 +3,7 @@ import { useRouter } from 'next/router'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { AutoApiService, useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useStore, withAuth } from 'hooks'
+import { useProjectSettings, useStore, withAuth } from 'hooks'
 import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
@@ -40,24 +39,20 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     buckets,
   } = storageExplorerStore || {}
 
-  const { data: settings, isLoading } = useProjectSettingsQuery({ projectRef: ref as string })
-  const apiService = settings?.autoApiService
+  const { services, isLoading } = useProjectSettings(ref as string | undefined)
+  const apiService = find(services ?? [], (service) => service.app.id === 1)
+  const projectUrl = apiService?.app_config?.endpoint ?? ''
   const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
-  const canAccessStorage = !isLoading && apiService && serviceKey
+  const canAccessStorage = !isLoading && services && serviceKey
 
   useEffect(() => {
-    if (!isLoading && apiService) initializeStorageStore(apiService)
+    if (!isLoading && services) initializeStorageStore()
   }, [isLoading])
 
-  const initializeStorageStore = async (apiService: AutoApiService) => {
-    if (apiService.endpoint) {
+  const initializeStorageStore = async () => {
+    if (projectUrl) {
       if (serviceKey) {
-        storageExplorerStore.initStore(
-          ref,
-          apiService.endpoint,
-          apiService.serviceApiKey,
-          apiService.protocol
-        )
+        storageExplorerStore.initStore(ref, projectUrl, serviceKey.api_key)
         await storageExplorerStore.fetchBuckets()
       }
     } else {

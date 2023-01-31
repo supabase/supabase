@@ -1,7 +1,6 @@
 import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { useFlag } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
@@ -63,16 +62,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
               },
             ]
           : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Backups',
-                key: 'backups',
-                url: `/project/${ref}/database/backups/scheduled`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Backups',
+          key: 'backups',
+          url: `/project/${ref}/database/backups/scheduled`,
+          items: [],
+        },
       ],
     },
   ]

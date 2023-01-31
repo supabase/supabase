@@ -48,7 +48,6 @@ export type ServiceApiKey = {
 }
 
 export type AutoApiService = Service & {
-  protocol: 'https' | 'http'
   endpoint: string
   restUrl: string
   project: Project

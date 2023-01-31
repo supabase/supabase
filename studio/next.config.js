@@ -12,14 +12,6 @@ const withTM = require('next-transpile-modules')(['ui', 'common'])
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-const csp = [
-  "frame-ancestors 'none';",
-  // IS_PLATFORM
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? 'upgrade-insecure-requests;' : '',
-]
-  .filter(Boolean)
-  .join(' ')
-
 const nextConfig = {
   async redirects() {
     return [
@@ -145,7 +137,12 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: csp,
+            value: `
+            frame-ancestors 'none';
+            upgrade-insecure-requests;
+            `
+              .replace(/\s{2,}/g, ' ')
+              .trim(),
           },
           {
             key: 'Referrer-Policy',

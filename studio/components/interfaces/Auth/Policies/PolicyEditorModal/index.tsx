@@ -1,7 +1,7 @@
 import { Modal } from 'ui'
 import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
-import type { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
