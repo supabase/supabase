@@ -845,3 +845,80 @@ export const reference_self_hosting_realtime = {
   url: '/reference/self-hosting/realtime/start',
   parent: '/reference',
 }
+
+export const references = [
+  {
+    label: 'Client libraries',
+    items: [
+      {
+        label: 'supabase-js',
+        versions: ['v2', 'v1'],
+        description: 'Official client libraries for JavaScript and TypeScript.',
+        icon: '/docs/img/icons/javascript-icon.svg',
+        url: '/reference/javascript/start',
+      },
+      {
+        label: 'supabase-py',
+        description:
+          'Client library for Python, maintained and supported by the Supabase Community.',
+        icon: '/docs/img/icons/python-icon.svg',
+        url: '/reference/python/start',
+      },
+      {
+        label: 'supabase-dart',
+        versions: ['v1', 'v0'],
+        description: 'Official client libraries for Flutter and Dart.',
+        icon: '/docs/img/icons/dart-icon.svg',
+        url: '/reference/dart/start',
+      },
+      {
+        label: 'supabase-csharp',
+        versions: ['v0'],
+        description: 'Client library for C#, maintained and supported by the Supabase Community.',
+        icon: '/docs/img/icons/c-sharp-icon.svg',
+        url: '/reference/csharp/start',
+      },
+    ],
+  },
+  {
+    label: 'Platform Tools',
+    items: [
+      {
+        label: 'CLI',
+        description:
+          'Develop your project locally, manage database migrations, deploy to the Supabase Platform, and more.',
+        icon: '/docs/img/icons/cli-icon.svg',
+        url: '/reference/cli/start',
+      },
+      {
+        label: 'Management API',
+        description: 'Manage your Supabase projects and organizations programmatically.',
+        icon: '/docs/img/icons/api-icon.svg',
+        url: '/reference/management-api/start',
+      },
+    ],
+  },
+  {
+    label: 'Self-Hosting',
+    items: [
+      {
+        label: 'Auth server',
+        description: 'Self-host your own Auth server.',
+        icon: '/docs/img/icons/menu/auth.svg',
+        url: '/reference/auth/start',
+      },
+      {
+        label: 'Storage server',
+        description: 'Self-host your own Storage server.',
+        icon: '/docs/img/icons/menu/storage.svg',
+        url: '/reference/storage/start',
+      },
+      {
+        label: 'Realtime server',
+        description: 'Self-host your own Realtime server.',
+        icon: '/docs/img/icons/menu/realtime.svg',
+        url: '/reference/realtime/start',
+      },
+    ],
+  },
+]
