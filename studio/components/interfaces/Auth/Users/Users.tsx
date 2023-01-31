@@ -7,6 +7,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import UsersList from './UsersList'
 import InviteUserModal from './InviteUserModal'
+import CreateUserModal from './CreateUserModal'
 
 const Users = () => {
   const PageState: any = useContext(PageContext)
@@ -94,9 +95,8 @@ const Users = () => {
             </Listbox.Option>
           </Listbox>
         </div>
-        <div className="mt-4 flex items-center md:mt-0">
+        <div className="mt-4 flex items-center gap-2 md:mt-0">
           <Button
-            className="mr-2"
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
@@ -106,6 +106,7 @@ const Users = () => {
             Reload
           </Button>
           {inviteEnabled && <InviteUserModal />}
+          <CreateUserModal />
         </div>
       </div>
       <section className="users-table-container mt-4 overflow-visible px-6">
