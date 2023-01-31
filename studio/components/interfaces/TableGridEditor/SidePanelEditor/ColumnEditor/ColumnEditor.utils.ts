@@ -1,6 +1,6 @@
 import { find, isUndefined, isEqual, isNull } from 'lodash'
 import { Dictionary } from 'components/grid'
-import {
+import type {
   PostgresColumn,
   PostgresRelationship,
   PostgresTable,
