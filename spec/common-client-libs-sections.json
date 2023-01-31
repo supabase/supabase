@@ -16,7 +16,8 @@
     "title": "Initializing",
     "id": "initializing",
     "slug": "initializing",
-    "type": "function"
+    "type": "markdown",
+    "libs": ["csharp"]
   },
   {
     "title": "Typescript Support",
@@ -39,7 +40,6 @@
   },
   {
     "title": "Database",
-
     "items": [
       {
         "id": "select",
@@ -90,7 +90,6 @@
         "slug": "using-filters",
         "product": "database",
         "type": "function",
-
         "items": [
           {
             "id": "eq",
@@ -286,7 +285,6 @@
         "product": "database",
         "parent": "modifiers",
         "type": "function",
-
         "items": [
           {
             "id": "db-modifiers-select",
@@ -358,7 +356,6 @@
   },
   {
     "title": "Auth",
-
     "items": [
       {
         "id": "auth-api",
@@ -653,7 +650,6 @@
   },
   {
     "title": "Functions",
-
     "items": [
       {
         "id": "invoke",
@@ -666,7 +662,6 @@
   },
   {
     "title": "Realtime",
-
     "items": [
       {
         "id": "stream",
@@ -729,7 +724,6 @@
   },
   {
     "title": "Storage",
-
     "items": [
       {
         "id": "create-bucket",
