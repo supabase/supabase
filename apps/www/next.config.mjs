@@ -43,12 +43,13 @@ const nextConfig = {
       'https://s3-us-west-2.amazonaws.com',
       's3-us-west-2.amazonaws.com',
       'user-images.githubusercontent.com',
+      'pbs.twimg.com',
     ],
   },
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/:path*',
         headers: [
           {
             key: 'Strict-Transport-Security',

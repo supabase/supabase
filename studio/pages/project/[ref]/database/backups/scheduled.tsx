@@ -22,6 +22,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
       <Tabs
         type="underlined"
+        size="small"
         activeId="scheduled"
         onChange={(id: any) => {
           if (id === 'pitr') router.push(`/project/${ref}/database/backups/pitr`)

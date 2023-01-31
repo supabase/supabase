@@ -6,7 +6,6 @@ import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import { FormsContainer } from 'components/ui/Forms'
 
 export const PageContext: any = createContext(null)
 
@@ -38,7 +37,7 @@ const ApiSettings: NextPageWithLayout = () => {
 
   return (
     <PageContext.Provider value={PageState}>
-      <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
+      <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
         <ServiceList projectRef={ref as string} />
       </div>
     </PageContext.Provider>

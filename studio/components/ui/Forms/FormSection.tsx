@@ -28,8 +28,18 @@ const FormSection = ({
   )
 }
 
-const FormSectionLabel = ({ children }: { children: React.ReactNode | string }) => {
-  return <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">{children}</label>
+const FormSectionLabel = ({
+  className = '',
+  children,
+}: {
+  className?: string
+  children: React.ReactNode | string
+}) => {
+  return (
+    <label className={`text-scale-1200 col-span-12 text-sm lg:col-span-5 ${className}`}>
+      {children}
+    </label>
+  )
 }
 
 const Shimmer = () => (

@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { FC, ReactNode, useState } from 'react'
-import { IconMaximize2, IconMinimize2 } from 'ui'
+import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from 'ui'
 
 interface Props {
   icon?: ReactNode
@@ -64,13 +65,13 @@ const InformationBox: FC<Props> = ({
             <div className="text-scale-1100 text-sm">{description}</div>
 
             {url && (
-              <a
-                href={url}
-                target="_blank"
-                className="text-scale-1100 hover:text-scale-1200 text-sm underline transition-colors"
-              >
-                {urlLabel}
-              </a>
+              <Link href={url}>
+                <a target="_blank" className="pt-2">
+                  <Button type="default" icon={<IconExternalLink />}>
+                    {urlLabel}
+                  </Button>
+                </a>
+              </Link>
             )}
 
             {button && <div>{button}</div>}

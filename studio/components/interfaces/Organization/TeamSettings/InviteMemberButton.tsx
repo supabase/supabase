@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
 
 import { Member, User, Role } from 'types'
-import { checkPermissions, useFlag, useOrganizationDetail, useStore } from 'hooks'
+import { checkPermissions, useOrganizationDetail, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -22,8 +22,6 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
   const { ui } = useStore()
   const router = useRouter()
   const { slug } = router.query
-
-  const enablePermissions = useFlag('enablePermissions')
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
@@ -57,16 +55,14 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
       }
     }
 
-    const roleId = enablePermissions
-      ? Number(values.role)
-      : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+    const roleId = Number(values.role)
 
     setSubmitting(true)
 
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
       owner_id: user.id,
-      ...(enablePermissions ? { role_id: roleId } : {}),
+      role_id: roleId,
     })
 
     if (response.error) {
@@ -141,9 +137,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
             }, [roles])
 
             const selectedRole = roles.find((role) => role.id === Number(values.role))
-            const invalidRoleSelected = enablePermissions
-              ? values.role && !rolesAddable.includes(Number(values.role))
-              : false
+            const invalidRoleSelected = values.role && !rolesAddable.includes(Number(values.role))
 
             return (
               <>
@@ -151,8 +145,9 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                   <div className="w-full py-4">
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        {roles && enablePermissions && (
+                        {roles && (
                           <Select
+                            defaultValue={roles.find((role) => role.name === 'Developer')?.id}
                             name="role"
                             label="Member role"
                             error={

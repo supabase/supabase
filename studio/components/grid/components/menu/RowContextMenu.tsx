@@ -17,13 +17,13 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
     confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete this row? This action cannot be undone.',
-      onConfirm: async () => {
+      onAsyncConfirm: async () => {
         const { props } = p
         const { rowIdx } = props
         const row = state.rows[rowIdx]
         if (!row) return
 
-        const { error } = state.rowService!.delete([row])
+        const { error } = await state.rowService!.delete([row])
         if (error) {
           if (state.onError) state.onError(error)
         } else {

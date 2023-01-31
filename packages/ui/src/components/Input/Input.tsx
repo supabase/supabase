@@ -182,7 +182,7 @@ export interface TextAreaProps
   descriptionText?: string
   error?: string
   icon?: any
-  label?: string
+  label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
   labelOptional?: string

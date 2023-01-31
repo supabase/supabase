@@ -5,7 +5,7 @@ import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTr
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   selectedTable: PostgresTable
@@ -25,11 +25,11 @@ const ColumnList: FC<Props> = ({
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
-    filterString.length === 0
+    (filterString.length === 0
       ? selectedTable.columns
-      : selectedTable.columns.filter((column: any) => column.name.includes(filterString))
+      : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable?.schema ?? '')
+  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
 
   return (
     <>
@@ -96,10 +96,10 @@ const ColumnList: FC<Props> = ({
                   )}
                 </Table.td>
                 <Table.td>
-                  <code className="text-sm">{x.data_type}</code>
+                  <code className="text-xs">{x.data_type}</code>
                 </Table.td>
                 <Table.td className="font-mono text-xs">
-                  <code className="text-sm">{x.format}</code>
+                  <code className="text-xs">{x.format}</code>
                 </Table.td>
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">

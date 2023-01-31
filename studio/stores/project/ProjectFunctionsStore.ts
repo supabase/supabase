@@ -4,6 +4,7 @@ import { keyBy } from 'lodash'
 import { get, post, patch, delete_ } from 'lib/common/fetch'
 import { UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
+import { API_ADMIN_URL } from 'lib/constants'
 
 export interface IProjectFunctionsStore {
   isLoading: boolean
@@ -196,7 +197,7 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
   setProjectRef(ref?: string) {
     if (ref) {
       this.projectRef = ref
-      this.baseUrl = `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${ref}/functions`
+      this.baseUrl = `${API_ADMIN_URL}/projects/${ref}/functions`
     }
   }
 }

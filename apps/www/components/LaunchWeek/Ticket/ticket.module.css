@@ -1,0 +1,152 @@
+.hero {
+  line-height: 1.15;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+  margin: 0;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    line-height: 1;
+    /* font-weight: 800; */
+    /* max-width: 800px; */
+    /* margin-left: auto;
+    margin-right: auto; */
+  }
+}
+
+.description {
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--lw-secondary-color);
+  text-align: center;
+  margin: 30px auto;
+  max-width: 350px;
+}
+
+@media (min-width: 768px) {
+  .description {
+    font-size: 24px;
+    max-width: 415px;
+  }
+}
+
+.ticket-text {
+  margin-bottom: 30px;
+}
+
+.ticket-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 45px;
+  margin: auto;
+  padding: var(--space-4x);
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+@media (min-width: 1200px) {
+  .ticket-layout {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.ticket-share-layout {
+  align-items: center;
+  margin-bottom: auto;
+}
+
+.ticket-visual {
+  position: relative;
+  border-radius: calc(16px * var(--size));
+  /* overflow: hidden; */
+  width: 330px;
+  margin: 0 auto;
+}
+
+/* .ticket-visual:before,
+.ticket-visual:after { */
+/* content: '';
+  display: block;
+  width: 72px;
+  height: 58px; */
+/* background-color: #1C1C1C; */
+/* position: absolute;
+  z-index: 100;
+  border-radius: 50%; */
+/* } */
+
+.ticket-visual:before {
+  left: 50%;
+  top: -7.5%;
+  transform: translateZ(0) translateX(-50%) rotate(90deg);
+}
+
+.ticket-visual:after {
+  left: 50%;
+  bottom: -7.5%;
+  transform: translateZ(0) translateX(-50%) rotate(90deg);
+}
+
+@media (min-width: 768px) {
+  .ticket-visual {
+    width: 650px;
+  }
+
+  .ticket-visual:before {
+    top: 50%;
+    left: -7%;
+    transform: translateZ(0) translateY(-50%);
+  }
+
+  .ticket-visual:after {
+    top: 50%;
+    left: 96%;
+    transform: translateZ(0) translateY(-50%);
+  }
+}
+
+.ticket-actions {
+  margin-top: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.ticket-copy {
+  margin-top: 30px;
+}
+
+.ticket-actions-placeholder {
+  height: 280px;
+}
+
+@media (min-width: 768px) {
+  .ticket-actions {
+    flex-direction: row;
+  }
+  .ticket-actions-placeholder {
+    height: 157px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .ticket-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero {
+    text-align: left;
+  }
+  .description {
+    text-align: left;
+    margin: 30px 0;
+  }
+}
+
+.ticket-visual-wrapper {
+  border-radius: calc(16px * var(--size));
+  width: 100%;
+}

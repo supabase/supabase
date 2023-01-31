@@ -33,7 +33,7 @@ export default async function gen(inputFileName: string, outputDir: string, apiU
 type v3OperationWithPath = OpenAPIV3.OperationObject & {
   path: string
 }
-type enrichedOperation = OpenAPIV3.OperationObject & {
+export type enrichedOperation = OpenAPIV3.OperationObject & {
   path: string
   fullPath: string
   operationId: string

@@ -1,4 +1,4 @@
-import { configure, reaction } from 'mobx'
+import { configure } from 'mobx'
 import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
@@ -9,6 +9,7 @@ import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBack
 import ProjectAuthConfigStore, {
   IProjectAuthConfigStore,
 } from './authConfig/ProjectAuthConfigStore'
+import VaultStore, { IVaultStore } from './project/VaultStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -24,6 +25,7 @@ export interface IRootStore {
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
+  vault: IVaultStore
 
   selectedProjectRef?: string
 
@@ -38,6 +40,7 @@ export class RootStore implements IRootStore {
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
+  vault: IVaultStore
 
   selectedProjectRef: string | undefined
 
@@ -50,6 +53,7 @@ export class RootStore implements IRootStore {
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.backups = new ProjectBackupsStore(this, { projectRef: '' })
     this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
+    this.vault = new VaultStore(this)
   }
 
   /**
@@ -79,7 +83,7 @@ export class RootStore implements IRootStore {
     // - project not found yet. projectStore is loading
     // - connectionString is not available. projectStore loaded
     const found = this.app.projects.find((x: Project) => x.ref === value)
-    if (!found || !found.connectionString) {
+    if (found?.connectionString === undefined) {
       this.app.projects.fetchDetail(value, (project) => {
         setProjectRefs(project)
       })

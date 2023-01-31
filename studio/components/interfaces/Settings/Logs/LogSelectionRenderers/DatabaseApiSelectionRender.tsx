@@ -1,7 +1,12 @@
 import React from 'react'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
-import { jsonSyntaxHighlight, ResponseCodeFormatter, SelectionDetailedRow } from '../LogsFormatters'
+import {
+  jsonSyntaxHighlight,
+  ResponseCodeFormatter,
+  SelectionDetailedRow,
+  SelectionDetailedTimestampRow,
+} from '../LogsFormatters'
 
 const DatabaseApiSelectionRender = ({ log }: any) => {
   const request = log?.metadata[0]?.request?.[0]
@@ -16,9 +21,13 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
   return (
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        <SelectionDetailedRow label="Status" value={status} valueRender={<ResponseCodeFormatter value={status} />} />
+        <SelectionDetailedRow
+          label="Status"
+          value={status}
+          valueRender={<ResponseCodeFormatter value={status} />}
+        />
         <SelectionDetailedRow label="Method" value={method} />
-        <SelectionDetailedRow label="Timestamp" value={log.timestamp} />
+        <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="IP Address" value={ipAddress} />
         <SelectionDetailedRow label="Origin Country" value={countryOrigin} />
         {clientInfo && <SelectionDetailedRow label="Client" value={clientInfo} />}

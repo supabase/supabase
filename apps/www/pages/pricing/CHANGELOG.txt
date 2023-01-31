@@ -1,5 +1,16 @@
 Pricing Changelog
 
+### 18 Jan 2023
+
+- Clarified over-usage of Realtime messages per month
+    - On the Pro tier, $2.50 per million after included 5 million messages
+
+### 09 Jan 2023
+----
+
+Database Compute Add ons
+- Clarified iops values to the latest instance types
+
 ### 02 Nov 2022
 ----
 
