@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconCommand } from '~/../../packages/ui'
+import { IconCommand } from 'ui'
 
 interface Props {
   className?: string
@@ -9,9 +9,13 @@ interface Props {
 const ClippyBubble: FC<Props> = ({ className, onClick }) => {
   return (
     <div
-      className={`flex gap-2 dark:bg-scale-600 rounded-xl p-6 max-w-xs shadow-xl mb-4 relative cursor-pointer ${className}`}
+      className={`flex gap-2 border bg-white dark:bg-scale-300 relative rounded-xl p-6 max-w-xs shadow-xl mb-4 cursor-pointer hover:bg-scale-200 transition-colors overflow-hidden border-scale-500 hover:border-scale-700  ${className}`}
       onClick={onClick}
     >
+      <img
+        className="z-0 absolute -left-24 -top-4 w-[260px]"
+        src="/docs/img/purple-glow-dark.png"
+      />
       What can I help you with?
       <div className="flex items-center space-x-1">
         <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
