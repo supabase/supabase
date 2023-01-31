@@ -1,0 +1,54 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Enable SSO for Your Organization',
+  description: 'General information about enabling single sign-on (SSO) for your organization',
+}
+
+Supabase offers single sign-on (SSO) as a login option to provide additional
+account security for your team. This allows company administrators to enforce
+the use of an identity provider when logging into Supabase. SSO
+improves the onboarding and offboarding experience of the company as the
+employee only needs a single set of credentials to access third-party
+applications or tools—which can also be revoked easily by an administrator.
+
+<Admonition type="note">
+
+Supabase currently provides SAML SSO. Please contact [Enterprise
+Sales](https://supabase.com/contact/enterprise) to have this enabled for your
+organization.
+
+</Admonition>
+
+## Understanding setup and implications
+
+Accounts signing in with SSO have certain limitations.
+The following sections outline the limitations when SSO is enabled or disabled for your team.
+
+### Enable SSO for your team [#enable-sso]
+
+- Organization invites are restricted to members of the company that belong to
+  the same identity provider.
+- Every user has an organization created by default. They can create as many
+  projects as they want.
+- An SSO user will not be able to update their password or reset their
+  password since their access is managed by the company administrator via the
+  identity provider.
+- If an SSO user with the following email of `alice@foocorp.com` attempts to
+  sign-in with a GitHub account that uses the same email, a separate Supabase
+  account is created and will not be linked to the SSO user's account.
+- An SSO user will not be able to see all organizations / projects created
+  under the same identity provider. They will need to be invited to the
+  Supabase organization first. Refer to [access control](/docs/guides/platform/access-control)
+  for more information.
+
+### Disable SSO for your team [#disable-sso]
+
+- You can prevent a user's account from further access to Supabase by removing
+  or disabling their account in your identity provider.
+- You should also remove or downgrade their permissions from any organizations
+  inside Supabase.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

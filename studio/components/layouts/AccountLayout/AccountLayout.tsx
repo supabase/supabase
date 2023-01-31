@@ -37,7 +37,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       isActive:
         router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
       label: organization.name,
-      href: `/org/${organization.slug}/settings`,
+      href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
@@ -108,18 +108,22 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
         },
       ],
     },
-    {
-      key: 'logout-link',
-      links: [
-        {
-          key: `logout`,
-          icon: '/icons/feather/power.svg',
-          label: 'Logout',
-          href: undefined,
-          onClick: onClickLogout,
-        },
-      ],
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'logout-link',
+            links: [
+              {
+                key: `logout`,
+                icon: '/icons/feather/power.svg',
+                label: 'Logout',
+                href: undefined,
+                onClick: onClickLogout,
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -132,7 +136,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <div className="flex h-full">
         <main
           style={{ height: maxHeight, maxHeight }}
-          className="flex w-full flex-1 flex-col overflow-y-auto"
+          className="flex flex-col flex-1 w-full overflow-y-auto"
         >
           <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
             {children}

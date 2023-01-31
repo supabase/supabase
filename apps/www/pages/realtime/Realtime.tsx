@@ -144,7 +144,7 @@ function RealtimePage() {
                 Listen to changes in the Database inserts, updates, and deletes and other changes.
               </p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/postgres-cdc">
+                <Link passHref href="/docs/guides/realtime/postgres-changes">
                   <Button as="a" type="default">
                     View docs
                   </Button>
@@ -238,7 +238,7 @@ function RealtimePage() {
               </p>,
             ]}
             // [TODO] Point to the correct docs URL
-            documentation_link={'/docs/guides//docs/guides/realtime/broadcast'}
+            documentation_link={'/docs/guides/realtime#broadcast'}
           />
         </SectionContainer>
 

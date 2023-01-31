@@ -16,21 +16,19 @@ interface Props {
 
 const ProjectPausedState: FC<Props> = ({ project }) => {
   const { ui, app } = useStore()
-  const isOwner = ui.selectedOrganization?.is_owner
   const orgSlug = ui.selectedOrganization?.slug
 
   const kpsEnabled = useFlag('initWithKps')
-  const enablePermissions = useFlag('enablePermissions')
+  const { membersExceededLimit } = useFreeProjectLimitCheck(orgSlug)
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { membersExceededLimit } = useFreeProjectLimitCheck(orgSlug)
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-
-  const canResumeProject = enablePermissions
-    ? checkPermissions(PermissionAction.INFRA_EXECUTE, 'queue_jobs.projects.initialize_or_resume')
-    : isOwner
+  const canResumeProject = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_jobs.projects.initialize_or_resume'
+  )
 
   const onSelectRestore = () => {
     if (!canResumeProject) {

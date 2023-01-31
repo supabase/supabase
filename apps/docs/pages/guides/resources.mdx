@@ -1,0 +1,116 @@
+import Layout from '~/layouts/DefaultLayout'
+import Link from 'next/link'
+import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
+
+export const meta = {
+  id: 'resources',
+  title: 'Resources',
+  description: 'Resources for getting started building with Supabase.',
+  sidebar_label: 'Overview',
+}
+
+<div className="flex flex-col gap-12 my-12">
+
+<div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {resources.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          passHref
+        >
+          <a className={'col-span-12 md:col-span-4'}>
+            <GlassPanel {...resource} background={false} showIconBg={true}>
+              {resource.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div>
+  <div className="max-w-xl mb-6">
+
+### Migrate to Supabase
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {migrationGuides.map((product) => {
+      return (
+        <Link
+          href={`${product.href}`}
+          key={product.title}
+          passHref
+        >
+          <a className={product.span ?? 'col-span-6 md:col-span-3'}>
+            <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
+              {product.description}
+            </IconPanel>
+          </a>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+{/* end of container */}
+
+</div>
+
+export const resources = [
+  // removing until the examples page is reworked
+  // {
+  //   title: 'Examples',
+  //   hasLightIcon: true,
+  //   href: '/guides/resources/examples',
+  //   description: 'Official GitHub examples, curated content from the community, and more.',
+  // },
+  {
+    title: 'Glossary',
+    hasLightIcon: true,
+    href: '/guides/resources/glossary',
+    description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
+  },
+]
+
+export const migrationGuides = [
+  {
+    title: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firebase-auth',
+    description: 'Move your auth users from a Firebase project to a Supabase project.',
+  },
+  {
+    title: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firestore-data',
+    description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
+  },
+  {
+    title: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firebase-storage',
+    description: 'Convert your Firebase Storage files to Supabase Storage.',
+  },
+  {
+    title: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    href: '/guides/resources/migrating-to-supabase/heroku',
+    description: 'Migrate your Heroku Postgres database to Supabase.',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

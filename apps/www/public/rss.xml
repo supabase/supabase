@@ -5,9 +5,170 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 07 Nov 2022 03:03:30 +0000</lastBuildDate>
+      <lastBuildDate>Wed, 04 Jan 2023 03:03:30 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-beta-december-2022</guid>
+  <title>Supabase Beta December 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-december-2022</link>
+  <description>This month the Beta Update is a Launch Week 6 Special, where we review the cascade of announcements.</description>
+  <pubDate>Wed, 04 Jan 2023 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-hackathon-winners</guid>
+  <title>Launch Week 6 Hackathon Winners</title>
+  <link>https://supabase.com/blog/launch-week-6-hackathon-winners</link>
+  <description>Announcing the winners of the Launch Week 6 Hackathon!</description>
+  <pubDate>Mon, 02 Jan 2023 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/vault-now-in-beta</guid>
+  <title>Supabase Vault is now in Beta</title>
+  <link>https://supabase.com/blog/vault-now-in-beta</link>
+  <description>A Postgres extension to store encrypted secrets and encrypt data.</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgrest-11-prerelease</guid>
+  <title>PostgREST 11 pre-release</title>
+  <link>https://supabase.com/blog/postgrest-11-prerelease</link>
+  <description>Describes new features of PostgREST 11 pre-release</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-point-in-time-recovery</guid>
+  <title>Point in Time Recovery is now available for Pro projects</title>
+  <link>https://supabase.com/blog/postgres-point-in-time-recovery</link>
+  <description>We're making PITR available for more projects, with a new Dashboard UI that makes it simple to use.</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pg-graphql-v1</guid>
+  <title>pg_graphql v1.0</title>
+  <link>https://supabase.com/blog/pg-graphql-v1</link>
+  <description>Announcing the v1.0 release of pg_graphql</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-in-postgres-15</guid>
+  <title>What's new in Postgres 15?</title>
+  <link>https://supabase.com/blog/new-in-postgres-15</link>
+  <description>Describes the release of Postgres 15, new features and reasons to use it</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-wrap-up</guid>
+  <title>Launch Week 6: Wrap Up</title>
+  <link>https://supabase.com/blog/launch-week-6-wrap-up</link>
+  <description>That's a wrap on Supabase Launch Week Day 6. Here's everything we shipped in one long blog post.</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-community-day</guid>
+  <title>Community Day</title>
+  <link>https://supabase.com/blog/launch-week-6-community-day</link>
+  <description>Wrapping up Launch Week 6 with contributors, partners, and friends.</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/custom-domain-names</guid>
+  <title>Custom Domain Names</title>
+  <link>https://supabase.com/blog/custom-domain-names</link>
+  <description>Change your Supabase project's domain name to your own domain.</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</guid>
+  <title>Supabase Wrappers, a Postgres FDW framework written in Rust</title>
+  <link>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</link>
+  <description>A framework for building Postgres Foreign Data Wrappers which connects to Stripe, Firebase, Clickhouse, and more.</description>
+  <pubDate>Wed, 14 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/mfa-auth-via-rls</guid>
+  <title>Multi-factor Authentication via Row Level Security Enforcement</title>
+  <link>https://supabase.com/blog/mfa-auth-via-rls</link>
+  <description>MFA Auth with enforcement via RLS</description>
+  <pubDate>Tue, 13 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/storage-image-resizing-smart-cdn</guid>
+  <title>Supabase Storage v2: Image resizing and Smart CDN</title>
+  <link>https://supabase.com/blog/storage-image-resizing-smart-cdn</link>
+  <description>We're introducing new features for Supabase Storage: Image resizing and a Smart CDN.</description>
+  <pubDate>Mon, 12 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-supabase-docs-built-with-nextjs</guid>
+  <title>New Supabase Docs, built with Next.js</title>
+  <link>https://supabase.com/blog/new-supabase-docs-built-with-nextjs</link>
+  <description>We've redesigned our Docs and migrated to Next.js</description>
+  <pubDate>Sun, 11 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-crdt</guid>
+  <title>pg_crdt - an experimental CRDT extension for Postgres</title>
+  <link>https://supabase.com/blog/postgres-crdt</link>
+  <description>Embedding Yjs and Automerge into Postgres for collaborative applications.</description>
+  <pubDate>Fri, 09 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/who-we-hire</guid>
+  <title>Who We Hire at Supabase</title>
+  <link>https://supabase.com/blog/who-we-hire</link>
+  <description>Traits we look for to maintain a culture of shipping fast and often</description>
+  <pubDate>Thu, 08 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-6-hackathon</guid>
+  <title>Launch Week 6 Hackathon</title>
+  <link>https://supabase.com/blog/launch-week-6-hackathon</link>
+  <description>Build an Open Source Project, Win $1500 and the Supabase Darkmode Keyboard</description>
+  <pubDate>Thu, 08 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-november-2022</guid>
+  <title>Supabase Beta November 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-november-2022</link>
+  <description>We are preparing everything for Launch Week 6, but we still had time to ship some goodies this month!</description>
+  <pubDate>Tue, 06 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/the-supabase-content-storm</guid>
+  <title>The Supabase Content Storm</title>
+  <link>https://supabase.com/blog/the-supabase-content-storm</link>
+  <description>We worked with +30 content creators to drop a mountain of content simultaneously.</description>
+  <pubDate>Mon, 05 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/transparent-column-encryption-with-postgres</guid>
+  <title>Transparent Column Encryption with Postgres</title>
+  <link>https://supabase.com/blog/transparent-column-encryption-with-postgres</link>
+  <description>Using pgsodium's Transparent Column Encryption to encrypt data and provide your users with row-level encryption.</description>
+  <pubDate>Wed, 30 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</guid>
+  <title>SQL or NoSQL? Why not use both (with PostgreSQL)?</title>
+  <link>https://supabase.com/blog/sql-or-nosql-both-with-postgresql</link>
+  <description>How to turn Postgres into an easy-to-use NoSQL database that retains all the power of SQL</description>
+  <pubDate>Wed, 23 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</guid>
+  <title>Flutter Authentication and Authorization with RLS</title>
+  <link>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</link>
+  <description>Learn how you can secure your Flutter app using Supabase Row Level Security.</description>
+  <pubDate>Mon, 21 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</guid>
+  <title>Fetching and caching Supabase data in Next.js 13 Server Components</title>
+  <link>https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components</link>
+  <description>Next.js 13 introduces new data fetching and caching methods to enable React Server Components and Suspense.</description>
+  <pubDate>Wed, 16 Nov 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/authentication-in-ionic-angular</guid>
   <title>Authentication in Ionic Angular with Supabase</title>
   <link>https://supabase.com/blog/authentication-in-ionic-angular</link>

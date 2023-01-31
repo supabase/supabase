@@ -19,6 +19,8 @@ export const CONFIRMATION: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -28,7 +30,7 @@ export const CONFIRMATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -48,6 +50,8 @@ export const INVITE: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -57,7 +61,7 @@ export const INVITE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -77,6 +81,8 @@ export const MAGIC_LINK: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the message
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -86,7 +92,7 @@ export const MAGIC_LINK: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -106,6 +112,8 @@ export const EMAIL_CHANGE: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the email change
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -115,7 +123,7 @@ export const EMAIL_CHANGE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -135,6 +143,8 @@ export const RECOVERY: FormSchema = {
       type: 'code',
       description: ` 
 - \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
+- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .TokenHash }}\` : The hashed token used in the URL
 `,
     },
   },
@@ -144,7 +154,7 @@ export const RECOVERY: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 

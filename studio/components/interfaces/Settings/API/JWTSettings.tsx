@@ -151,7 +151,7 @@ const JWTSettings: FC<Props> = ({}) => {
                     <div className="w-full space-y-2">
                       <div className="flex w-full items-center justify-between">
                         <div className="flex flex-col space-y-1">
-                          <p>Generate a new JWT secret</p>
+                          <p className="text-sm">Generate a new JWT secret</p>
                           <p className="text-sm opacity-50">
                             A random secret will be created, or you can create your own.
                           </p>

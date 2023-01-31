@@ -17,7 +17,7 @@ export const ForeignKeyFormatter = (
     const rowData = deepClone(p.row)
     rowData[p.column.key] = _value
 
-    const { error } = state.rowService!.update(rowData, p.column.key)
+    const { error } = state.rowService!.update(rowData, p.row, p.column.key)
     if (error) {
       if (state.onError) state.onError(error)
     } else {

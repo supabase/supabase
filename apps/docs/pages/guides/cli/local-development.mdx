@@ -8,6 +8,15 @@ export const meta = {
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/vyHyYpvjaks"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 ## Prerequisites
 
 Make sure you have these installed on your local machine:
@@ -21,6 +30,12 @@ Make sure you have these installed on your local machine:
 ```bash
 supabase login
 ```
+
+<Admonition type="note">
+
+If you installed the Supabase CLI via NPM you may have to use `npx supabase login`.
+
+</Admonition>
 
 ## Initialize your project
 
@@ -45,7 +60,7 @@ git init
 supabase init
 ```
 
-Make sure Docker is running. The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/architecture).
+Make sure Docker is running. The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
 This command may take a while to run if this is the first time using the CLI.
 
 ```bash
@@ -122,6 +137,15 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 
 Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Kx5nHBmIxyQ"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 ### Make database changes
 
 For this guide, create a table called `employees`. In Supabase Studio, navigate to the **SQL Editor** page and run the following SQL command:
@@ -155,7 +179,7 @@ Use the seed script in `supabase/seed.sql` (created with [`supabase init`](/docs
 -- in supabase/seed.sql
 insert into public.employees (name)
 values
-  ('Erlich Backman'),
+  ('Erlich Bachman'),
   ('Richard Hendricks'),
   ('Monica Hall');
 ```
@@ -229,7 +253,6 @@ supabase functions deploy <function_name>
 
 The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:
 
-- The Storage interface is coming soon.
 - The Functions interface is coming soon.
 - Logs are not supported through the interface (however you can access them through the Docker containers).
 - You cannot update your project settings in the Dashboard—this must be done using the CLI.

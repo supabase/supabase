@@ -1,11 +1,13 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
+import { useParams, useProjectSubscription } from 'hooks'
+import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
+  const { subscription } = useProjectSubscription(ref)
+  const retentionPeriod = getPITRRetentionDuration(subscription?.addons ?? [])
 
   return (
     <FormPanel
@@ -13,12 +15,12 @@ const PITRNotice = ({}) => {
       footer={
         <div className="flex items-center justify-between p-6">
           <span className="text-scale-1000 text-sm">
-            Recovery retention period can be increased - reach out to us!
+            You can also increase your recovery retention period updating your PITR add-on
           </span>
-          <Link href={`/support/new?ref=${ref}&category=sales`}>
+          <Link href={`/project/${ref}/settings/billing/update/pro`}>
             <a>
               <Button as="span" type="default">
-                Contact support
+                Increase retention period
               </Button>
             </a>
           </Link>
@@ -33,7 +35,8 @@ const PITRNotice = ({}) => {
           <p className="text-sm">Recovery retention period</p>
           <p className="text-sm text-scale-1100">
             Database changes are logged every <span className="text-scale-1200">2 minutes</span>,
-            with a total recovery period of up to <span className="text-scale-1200">7 days</span>.
+            with a total recovery period of up to{' '}
+            <span className="text-brand-900">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

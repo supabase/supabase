@@ -1,10 +1,8 @@
-import update from 'immutability-helper'
 import { FC, useRef, memo } from 'react'
 import { Button, IconMenu, Toggle, IconX } from 'ui'
 import { XYCoord } from 'dnd-core'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 
-import { useUrlState } from 'hooks'
 import { DragItem, Sort } from 'components/grid/types'
 import { useTrackedState } from 'components/grid/store'
 
@@ -12,11 +10,13 @@ type SortRowProps = {
   index: number
   columnName: string
   sort: Sort
+  onDelete: (columnName: string) => void
+  onToggle: (columnName: string, ascending: boolean) => void
+  onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
+const SortRow: FC<SortRowProps> = ({ index, columnName, sort, onDelete, onToggle, onDrag }) => {
   const state = useTrackedState()
-  const [_, setParams] = useUrlState({ arrayKeys: ['sort'] })
 
   const column = state?.table?.columns.find((x) => x.name === columnName)
   if (!column) return null
@@ -89,49 +89,9 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
     },
   })
 
-  function onToggle(value: boolean) {
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = existingSorts.map((sort: string) => {
-        const [column] = sort.split(':')
-        return column === columnName ? `${columnName}:${value ? 'asc' : 'desc'}` : sort
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
-  }
-
-  function onRemoveSort() {
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = existingSorts.filter((sort: string) => {
-        const [column] = sort.split(':')
-        if (column !== columnName) return sort
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
-  }
-
   const moveSort = (dragIndex: number, hoverIndex: number) => {
     if (dragIndex == hoverIndex) return
-    setParams((prevParams) => {
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-      const updatedSorts = update(existingSorts, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, existingSorts[dragIndex]],
-        ],
-      })
-      return {
-        ...prevParams,
-        sort: updatedSorts,
-      }
-    })
+    onDrag(dragIndex, hoverIndex)
   }
 
   const opacity = isDragging ? 0 : 1
@@ -144,12 +104,9 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
-        size="tiny"
-        type="text"
-        onClick={onRemoveSort}
-      />
+      <span className="transition-color text-scale-900 hover:text-scale-1100">
+        <IconMenu strokeWidth={2} size={16} />
+      </span>
       <div className="grow">
         <span className="flex grow items-center gap-1 truncate text-sm text-scale-1200">
           <span className="text-xs text-scale-900">{index > 0 ? 'then by' : 'sort by'}</span>
@@ -163,12 +120,15 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
           layout="flex"
           defaultChecked={sort.ascending}
           // @ts-ignore
-          onChange={(e: boolean) => onToggle(e)}
+          onChange={(e: boolean) => onToggle(columnName, e)}
         />
       </div>
-      <span className="transition-color text-scale-900 hover:text-scale-1100">
-        <IconMenu strokeWidth={2} size={16} />
-      </span>
+      <Button
+        icon={<IconX strokeWidth={1.5} size={14} />}
+        size="tiny"
+        type="text"
+        onClick={() => onDelete(columnName)}
+      />
     </div>
   )
 }
