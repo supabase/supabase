@@ -85,10 +85,15 @@ const AddRestrictionModal: FC<Props> = ({
         onSubmit={onSubmit}
       >
         {({ isSubmitting, values }: { isSubmitting: boolean; values: any }) => {
+          const isPrivate = Address4.isValid(values.ipAddress)
+            ? checkIfPrivate(values.ipAddress)
+            : false
           const isValidBlockSize =
             values.cidrBlockSize !== '' && values.cidrBlockSize >= 0 && values.cidrBlockSize <= 32
           const availableAddresses = Math.pow(2, 32 - (values?.cidrBlockSize ?? 0))
           const addressRange = getAddressEndRange(`${values.ipAddress}/${values.cidrBlockSize}`)
+
+          const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
 
           return (
             <>
@@ -99,8 +104,6 @@ const AddRestrictionModal: FC<Props> = ({
                     your database. Only IPv4 addresses are supported at the moment.
                   </p>
                   <InformationBox
-                    defaultVisibility
-                    hideCollapse
                     title="Note: Restrictions only apply to your database and PgBouncer"
                     description="They do not currently apply to Supabase services such as PostgREST, Storage, or Authentication"
                   />
@@ -111,6 +114,7 @@ const AddRestrictionModal: FC<Props> = ({
                         id="ipAddress"
                         name="ipAddress"
                         placeholder="0.0.0.0"
+                        className=""
                       />
                     </div>
                     <div>
@@ -150,22 +154,40 @@ const AddRestrictionModal: FC<Props> = ({
                       />
                     </div>
                   </div>
-                  {isValidBlockSize && (
-                    <div className="">
-                      <p className="text-sm text-scale-1000">
-                        Number of addresses: {availableAddresses}
-                      </p>
-                      {addressRange !== undefined && (
-                        <p className="text-sm text-scale-1000">
-                          Selected address space:{' '}
-                          <code className="text-xs">{addressRange.start}</code> to{' '}
-                          <code className="text-xs">{addressRange.end}</code>
-                        </p>
-                      )}
-                    </div>
-                  )}
                 </div>
               </Modal.Content>
+              <Modal.Separator />
+              {isValidCIDR ? (
+                <Modal.Content>
+                  <div className="space-y-1 pt-2 pb-4">
+                    <p className="text-sm">
+                      The address range{' '}
+                      <code className="text-xs">
+                        {values.ipAddress}/{values.cidrBlockSize}
+                      </code>{' '}
+                      will be restricted
+                    </p>
+                    <p className="text-sm text-scale-1000">
+                      Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
+                      to <code className="text-xs">{addressRange.end}</code>{' '}
+                    </p>
+                    <p className="text-sm text-scale-1000">
+                      Number of addresses: {availableAddresses}
+                    </p>
+                  </div>
+                </Modal.Content>
+              ) : (
+                <Modal.Content>
+                  <div className="pt-2 pb-4">
+                    <div className="h-[68px] flex items-center">
+                      <p className="text-sm text-scale-1000">
+                        A summary of your restriction will be shown here after entering a valid IP
+                        address and CIDR block size
+                      </p>
+                    </div>
+                  </div>
+                </Modal.Content>
+              )}
               <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
                 <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
                   Cancel
