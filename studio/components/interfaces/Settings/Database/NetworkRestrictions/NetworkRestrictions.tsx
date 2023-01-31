@@ -115,10 +115,12 @@ const NetworkRestrictions = ({}) => {
                       Your database <span className="text-amber-900 opacity-80">cannot</span> be
                       accessed externally
                     </p>
-                    <p className="text-scale-1000 text-sm w-3/5">
-                      Only IP addresses within the range of{' '}
-                      <code className="text-xs">127.0.0.1/32</code> can access your project's
-                      database as all IP addresses have been disallowed.
+                    <p className="text-scale-1000 text-sm">
+                      All external IP addresses have been disallowed from accessing your project's
+                      database.
+                    </p>
+                    <p className="text-scale-1000 text-sm">
+                      Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
                 </div>
@@ -140,8 +142,7 @@ const NetworkRestrictions = ({}) => {
                       database
                     </p>
                     <p className="text-scale-1000 text-sm">
-                      Note: Restrictions only apply to your database, and not to APIs offered over
-                      HTTPS
+                      Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
