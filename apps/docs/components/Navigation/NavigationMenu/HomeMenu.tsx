@@ -96,6 +96,12 @@ const home = [
       level: 'reference_dart',
     },
     {
+      label: 'C#',
+      icon: '/img/icons/menu/reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+    },
+    {
       label: 'Python',
       icon: '/img/icons/menu/reference-python',
       href: '/reference/python/introduction',
@@ -103,7 +109,7 @@ const home = [
       community: true,
     },
     {
-      label: 'Tools Reference',
+      label: 'Tools',
     },
     {
       label: 'Management API',
@@ -114,7 +120,7 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],
