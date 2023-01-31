@@ -88,10 +88,10 @@ const DisplayApiSettings = () => {
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-xs text-white bg-red-900">{'secret'}</code>
+                      <code className="bg-red-900 text-xs text-white">secret</code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
+                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                 </>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
