@@ -35,12 +35,12 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         </div>
       }
     >
-      <div className="z-10">
+      <div className="z-50">
         <div>
           <div className="p-5">
             <div className="flex gap-8">
               <div className="prose">
-                <div className="bg-brand-1000 rounded-xl w-12 h-12 flex justify-center items-center">
+                <div className="bg-brand-1000 dark:bg-brand-800 rounded-xl w-12 h-12 flex justify-center items-center">
                   <img
                     className="w-6"
                     src={`${basePath}/images/pricing/compute-upgrade${
@@ -49,7 +49,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   />
                 </div>
               </div>
-              <div className="max-w-4xl">
+              <div className="max-w-4xl prose">
                 <h2 className="text-2xl">Choose best compute setup for you</h2>
                 <p className="mt-4">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
