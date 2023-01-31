@@ -20,7 +20,7 @@ import {
 } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import { SchemaView } from 'types'
 import { checkPermissions, useStore, useParams } from 'hooks'

@@ -97,7 +97,7 @@ If the trigger fails however, it could block the user sign ups - so make sure th
 For example:
 
 ```sql
--- inserts a row into public.profiles
+-- inserts a row into public.users
 create function public.handle_new_user()
 returns trigger
 language plpgsql

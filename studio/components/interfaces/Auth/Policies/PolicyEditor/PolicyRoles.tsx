@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import type { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 import MultiSelect from 'components/ui/MultiSelect'
 

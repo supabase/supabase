@@ -38,7 +38,8 @@ export default function Config() {
                     <div className="mt-8">
                       <div>
                         <Heading tag="h2" parseAnchors={false} customAnchor={parameter.id}>
-                          <code>{parameter.title}</code>
+                          <span className="mr-2">$</span>
+                          {parameter.title}
                         </Heading>
                         <div className="grid">
                           <div className="border-b pb-8" key={parameter.id}>

@@ -3,8 +3,8 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {

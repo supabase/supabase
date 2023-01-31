@@ -1,4 +1,4 @@
-import type { PostgresRelationship } from '@supabase/postgres-meta'
+import { PostgresRelationship } from '@supabase/postgres-meta'
 
 export interface CreateColumnPayload {
   tableId: number

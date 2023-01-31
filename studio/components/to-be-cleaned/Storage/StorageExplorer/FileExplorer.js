@@ -26,7 +26,7 @@ const FileExplorer = ({
   const fileExplorerRef = useRef(null)
   const storageExplorerStore = useStorageStore()
 
-  const { setSelectedItemToRename, setSelectedItemsToDelete } = storageExplorerStore
+  const { setSelectedItemToRename } = storageExplorerStore
 
   useEffect(() => {
     if (fileExplorerRef) {
