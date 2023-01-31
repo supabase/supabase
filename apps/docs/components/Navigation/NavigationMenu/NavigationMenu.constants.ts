@@ -1,12 +1,3 @@
-// import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
-// import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
-// import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
-// import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
-// import SupabaseCLINav from 'data/nav/supabase-cli'
-// import SupabaseAPINav from 'data/nav/supabase-api'
-// import AuthServerNav from 'data/nav/auth-server'
-// import StorageServerNav from 'data/nav/storage-server'
-
 import { NavMenu, References } from '../Navigation.types'
 
 export const REFERENCES: References = {
@@ -14,7 +5,7 @@ export const REFERENCES: References = {
     name: 'supabase-js',
     library: 'supabase-js',
     versions: ['v2', 'v1'],
-    icon: '/img/libraries/javascript-icon',
+    icon: '/img/libraries/javascript-icon.svg',
   },
   dart: {
     name: 'Flutter',
@@ -27,6 +18,12 @@ export const REFERENCES: References = {
     library: 'supabase-csharp',
     versions: ['v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
+  },
+  python: {
+    name: 'Python',
+    library: 'supabase-python',
+    versions: undefined,
+    icon: '/docs/img/libraries/python-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -140,15 +137,6 @@ export const gettingstarted = {
         },
       ],
     },
-  ],
-}
-
-export const cli = {
-  label: 'CLI',
-  items: [
-    { name: 'Overview', url: '/guides/cli', items: [] },
-    { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments', items: [] },
   ],
 }
 
@@ -753,23 +741,16 @@ export const reference = {
           icon: '/img/icons/menu/reference-csharp',
         },
         {
-          name: 'supbase-python',
+          name: 'supabase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           items: [],
-          icon: 'docs/img/icons/javascript.svg',
+          icon: '/img/icons/menu/reference-python',
         },
-        // {
-        //   name: 'supabase-python',
-        //   url: '/reference/python/start',
-        //   level: 'reference_python',
-        //   items: [],
-        //   icon: '/img/icons/menu/reference-javascript',
-        // },
       ],
     },
     {
-      name: 'Other tools',
+      name: 'Tools',
       items: [
         {
           name: 'Supabase CLI',
@@ -779,7 +760,7 @@ export const reference = {
         },
         {
           name: 'Management API',
-          url: '/reference/javascript',
+          url: '/reference/api/start',
           items: [],
           icon: '/img/icons/menu/reference-api',
         },
@@ -790,187 +771,77 @@ export const reference = {
 
 export const reference_javascript_v1 = {
   icon: 'reference-javascript',
-  title: 'javascript',
-  url: '/guides/reference/javascript',
+  title: 'JavaScript',
+  url: '/reference/javascript/v1/start',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
   icon: 'reference-javascript',
-  title: 'javascript',
-  url: '/guides/reference/javascript',
+  title: 'JavaScript',
+  url: '/reference/javascript/start',
   parent: '/reference',
 }
 
 export const reference_dart_v0 = {
   icon: 'reference-dart',
   title: 'Flutter',
-  url: '/guides/reference/dart',
+  url: '/reference/dart/v0/start',
   parent: '/reference',
 }
 
 export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
-  url: '/guides/reference/dart',
+  url: '/reference/dart/start',
   parent: '/reference',
 }
 
- 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
-  title: 'c#',
-  url: 'guides/reference/csharp',
+  title: 'C#',
+  url: '/reference/csharp/start',
   parent: '/reference',
 }
 
 export const reference_python_v2 = {
   icon: 'reference-python',
   title: 'Python',
-  url: '/guides/reference/python',
+  url: '/reference/python/start',
   parent: '/reference',
 }
 
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
-  url: '/guides/reference/cli',
-  parent: '/',
+  url: '/reference/cli/start',
+  parent: '/reference',
 }
+
 export const reference_api = {
   icon: 'reference-api',
   title: 'Management API',
-  url: '/guides/reference/api',
+  url: '/reference/api/start',
   parent: '/reference',
 }
 
 export const reference_self_hosting_auth = {
   icon: 'reference-auth',
   title: 'Self-Hosting Auth',
-  url: '/guides/reference/self-hosting/auth',
+  url: '/reference/self-hosting/auth/start',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
   icon: 'reference-storage',
   title: 'Self-Hosting Storage',
-  url: '/guides/reference/self-hosting/storage',
+  url: '/reference/self-hosting/storage/start',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
   icon: 'reference-auth',
   title: 'Self-Hosting Realtime',
-  url: '/guides/reference/self-hosting/realtime',
+  url: '/reference/self-hosting/realtime/start',
   parent: '/reference',
 }
-
-// export const reference: [
-//   {
-//     label: 'Official'
-//     items: [
-//       { name: 'Reference Documentation'; url: '/reference'; items: [] },
-//       { name: 'Supabase JavaScript Library'; url: '/reference/javascript'; items: [] },
-//       { name: 'Supabase Flutter Library'; url: '/reference/dart'; items: [] },
-//       { name: 'Supabase CLI'; url: '/reference/cli'; items: [] },
-//       { name: 'Management API'; url: '/reference/api'; items: [] }
-//     ]
-//   },
-//   {
-//     label: 'Self-hosting'
-//     items: [
-//       { name: 'Auth Server'; url: '/reference/auth'; items: [] },
-//       { name: 'Storage Server'; url: '/reference/storage'; items: [] }
-//     ]
-//   }
-//     {
-//       label: 'Clients',
-//       items: [
-//         { name: 'Auth Server', url: '/reference/auth', items: [] },
-//         { name: 'Storage Server', url: '/reference/storage', items: [] },
-//       ],
-//     },
-//   'reference/javascript': SupabaseJsV2Nav,
-//   'reference/javascript/v1': SupabaseJsV1Nav,
-//   'reference/dart': SupabaseDartV1Nav,
-//   'reference/dart/v0': SupabaseDartV0Nav,
-//   'reference/cli': SupabaseCLINav,
-//   'reference/api': SupabaseAPINav,
-//   'reference/auth': AuthServerNav,
-//   'reference/storage': StorageServerNav,
-// ]
-
-export const references = [
-  {
-    label: 'Client libraries',
-    items: [
-      {
-        label: 'supabase-js',
-        versions: ['v2', 'v1'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/javascript-icon.svg',
-        url: '/reference/javascript/start',
-      },
-      {
-        label: 'supabase-py',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/python-icon.svg',
-        url: '/reference/python/start',
-      },
-      {
-        label: 'supabase-dart',
-        versions: ['v1', 'v0'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/dart-icon.svg',
-        url: '/reference/dart/start',
-      },
-      {
-        label: 'supabase-csharp',
-        versions: ['v0'],
-        description: 'something about the reference',
-        icon: '/docs/img/icons/c-sharp-icon.svg',
-        url: '/reference/csharp/start',
-      },
-    ],
-  },
-  {
-    label: 'Platform Tools',
-    items: [
-      {
-        label: 'CLI',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/cli-icon.svg',
-        url: '/reference/cli/start',
-      },
-      {
-        label: 'Management API',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/api-icon.svg',
-        url: '/reference/management-api/start',
-      },
-    ],
-  },
-  {
-    label: 'Self-Hosting',
-    items: [
-      {
-        label: 'Auth server',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/menu/auth.svg',
-        url: '/reference/auth/start',
-      },
-      {
-        label: 'Storage server',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/menu/storage.svg',
-        url: '/reference/storage/start',
-      },
-      {
-        label: 'Realtime server',
-        description: 'something about the reference',
-        icon: '/docs/img/icons/menu/realtime.svg',
-        url: '/reference/realtime/start',
-      },
-    ],
-  },
-]
