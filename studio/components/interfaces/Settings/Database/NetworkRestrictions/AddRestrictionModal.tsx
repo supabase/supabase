@@ -53,6 +53,14 @@ const AddRestrictionModal: FC<Props> = ({
 
     setSubmitting(true)
     const cidr = `${values.ipAddress}/${values.cidrBlockSize}`
+    const alreadyExists = restrictedIps.includes(cidr)
+    if (alreadyExists) {
+      return ui.setNotification({
+        category: 'info',
+        message: `The address ${cidr} is already restricted`,
+      })
+    }
+
     const dbAllowedCidrs = hasOverachingRestriction ? [cidr] : [...restrictedIps, cidr]
 
     try {
@@ -172,7 +180,7 @@ const AddRestrictionModal: FC<Props> = ({
                     </div>
                   </div>
                   <p
-                    className="!mt-2 text-xs transition text-brand-900 opacity-50 hover:opacity-100 cursor-pointer"
+                    className="w-fit !mt-2 text-xs transition text-brand-900 opacity-50 hover:opacity-100 cursor-pointer"
                     onClick={() => getClientIpAddress()}
                   >
                     Use my IP address
