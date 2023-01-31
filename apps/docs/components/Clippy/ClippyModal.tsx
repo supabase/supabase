@@ -2,7 +2,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { FC, useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Input, Loading } from '~/../../packages/ui'
+import { IconSearch, Input, Loading } from 'ui'
 import components from '~/components'
 
 type Props = {
@@ -34,11 +34,11 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
   return (
     <div
-      className="flex flex-col items-center fixed top-0 left-0 w-screen h-screen p-4 md:p-[12vh] backdrop-blur-sm z-50 cursor-pointer bg-black/30"
+      className="flex flex-col items-center fixed top-0 left-0 w-screen h-screen p-4 md:p-[12vh] backdrop-blur-sm z-50 cursor-pointer bg-black/40 dark:bg-black/30 "
       onClick={onClose}
     >
       <div
-        className={`prose dark:prose-dar mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 dark:bg-scale-300 cursor-auto`}
+        className={`prose dark:prose-dark mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <Input
@@ -48,6 +48,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           placeholder="Ask me anything about Supabase"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          icon={<IconSearch size="small" />}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
