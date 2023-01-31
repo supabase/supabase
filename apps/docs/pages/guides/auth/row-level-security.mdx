@@ -328,6 +328,64 @@ Tip: Make sure to enable RLS for all your tables, so that your tables are inacce
 Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
 
+### Testing policies
+
+In order to test policies on the database itself, i.e. from the SQL editor or from `psql` without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
+
+```sql
+GRANT anon, authenticated TO postgres;
+
+CREATE OR REPLACE PROCEDURE auth.login_as_user (user_email text)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    auth_user auth.users;
+BEGIN
+    SELECT
+        * INTO auth_user
+    FROM
+        auth.users
+    WHERE
+        email = user_email;
+    EXECUTE format('SET request.jwt.claim.sub=%L', (auth_user).id::text);
+    EXECUTE format('SET request.jwt.claim.role=%I', (auth_user).ROLE);
+    EXECUTE format('SET request.jwt.claim.email=%L', (auth_user).email);
+    EXECUTE format('SET request.jwt.claims=%L', json_strip_nulls(json_build_object('app_metadata', (auth_user).raw_app_meta_data))::text);
+
+    RAISE NOTICE '%', format( 'SET ROLE %I; -- Logging in as %L (%L)', (auth_user).ROLE, (auth_user).id, (auth_user).email);
+    EXECUTE format('SET ROLE %I', (auth_user).ROLE);
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE auth.login_as_anon ()
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    SET request.jwt.claim.sub='';
+    SET request.jwt.claim.role='';
+    SET request.jwt.claim.email='';
+    SET request.jwt.claims='';
+    SET ROLE anon;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE auth.logout ()
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    SET request.jwt.claim.sub='';
+    SET request.jwt.claim.role='';
+    SET request.jwt.claim.email='';
+    SET request.jwt.claims='';
+    SET ROLE postgres;
+END;
+$$;
+```
+
+In order to switch to a given user (by email), use `CALL auth.login_as_user('my@email.com');`. You can also switch to the `anon` role using `CALL auth.login_as_anon();`. When you are done, use `CALL auth.logout();` which will return yourself to the powerful `postgres` role.
+
+These procedures are also very handy for writing [pgTAP](/docs/guides/database/extensions/pgtap) unit-tests for policies.
+
 ## Deprecated features
 
 We have deprecate some functions to ensure better performance and extensibilty of RLS policies.
