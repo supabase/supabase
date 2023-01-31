@@ -370,8 +370,8 @@ const ProjectLinks: FC = observer(() => {
 
         // Then create env for vercel project with supabase project
         const vercelEnvs = prepareVercelEvns(defaultVercelEnvs, {
-          endpoint: `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
-            projectDetails.autoApiService.endpoint
+          endpoint: `${projectDetails.apiService.protocol ?? 'https'}://${
+            projectDetails.apiService.endpoint ?? '-'
           }`,
           anon_key: projectDetails.autoApiService.defaultApiKey,
           service_key: projectDetails.autoApiService.serviceApiKey,
