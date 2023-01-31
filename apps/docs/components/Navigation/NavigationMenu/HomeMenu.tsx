@@ -95,6 +95,12 @@ const home = [
       level: 'reference_dart',
     },
     {
+      label: 'C#',
+      icon: '/img/icons/menu/reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+    },
+    {
       label: 'Python',
       icon: '/img/icons/menu/reference-python',
       href: '/reference/python/introduction',
