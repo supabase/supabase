@@ -7,6 +7,7 @@ import { useStore, useParams } from 'hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { get } from 'lib/common/fetch'
 
 interface Props {
   restrictedIps: string[]
@@ -84,7 +85,7 @@ const AddRestrictionModal: FC<Props> = ({
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, values }: { isSubmitting: boolean; values: any }) => {
+        {({ isSubmitting, values, resetForm }: any) => {
           const isPrivate = Address4.isValid(values.ipAddress)
             ? checkIfPrivate(values.ipAddress)
             : false
@@ -94,6 +95,22 @@ const AddRestrictionModal: FC<Props> = ({
           const addressRange = getAddressEndRange(`${values.ipAddress}/${values.cidrBlockSize}`)
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
+
+          const getClientIpAddress = async () => {
+            const res = await fetch('http://www.geoplugin.net/json.gp', { method: 'GET' })
+            const { geoplugin_request } = await res.json()
+
+            if (geoplugin_request) {
+              const updatedValues = { ...values, ipAddress: geoplugin_request, cidrBlockSize: 32 }
+              resetForm({ initialValues: updatedValues, values: updatedValues })
+            } else {
+              ui.setNotification({
+                category: 'error',
+                duration: 4000,
+                message: 'Failed to retrieve client IP address, please enter address manually',
+              })
+            }
+          }
 
           return (
             <>
@@ -154,6 +171,12 @@ const AddRestrictionModal: FC<Props> = ({
                       />
                     </div>
                   </div>
+                  <p
+                    className="!mt-2 text-xs transition text-brand-900 opacity-50 hover:opacity-100 cursor-pointer"
+                    onClick={() => getClientIpAddress()}
+                  >
+                    Use my IP address
+                  </p>
                 </div>
               </Modal.Content>
               <Modal.Separator />
