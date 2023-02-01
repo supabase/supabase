@@ -405,6 +405,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
           items: [],
@@ -816,7 +821,6 @@ export const reference_dart_v1 = {
   parent: '/reference',
 }
 
- 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
   title: 'c#',
