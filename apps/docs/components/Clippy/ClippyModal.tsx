@@ -57,7 +57,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} hideFooter closable={false}>
       <div
-        className={`prose mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto relative`}
+        className={`mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto relative`}
         onClick={(e) => e.stopPropagation()}
       >
         <Input
