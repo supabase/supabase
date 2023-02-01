@@ -26,7 +26,6 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
-  console.log('PAGE META', props.meta)
   const [hash] = useHash()
 
   const articleRef = useRef()
