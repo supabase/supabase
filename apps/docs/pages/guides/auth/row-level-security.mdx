@@ -331,7 +331,7 @@ These should never be used in the browser or exposed to customers, but they are 
 
 ### Testing policies
 
-In order to test policies on the database itself, i.e. from the SQL editor or from `psql` without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
+To test policies on the database itself (i.e., from the [SQL Editor](https://app.supabase.com/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
 
 ```sql
 GRANT anon, authenticated TO postgres;
@@ -383,9 +383,9 @@ END;
 $$;
 ```
 
-In order to switch to a given user (by email), use `CALL auth.login_as_user('my@email.com');`. You can also switch to the `anon` role using `CALL auth.login_as_anon();`. When you are done, use `CALL auth.logout();` which will return yourself to the powerful `postgres` role.
+To switch to a given user (by email), use `CALL auth.login_as_user('my@email.com');`. You can also switch to the `anon` role using `CALL auth.login_as_anon();`. When you are done, use `CALL auth.logout();` to return yourself to the `postgres` role.
 
-These procedures are also very handy for writing [pgTAP](/docs/guides/database/extensions/pgtap) unit-tests for policies.
+These procedures can also be used for writing [pgTAP](/docs/guides/database/extensions/pgtap) unit tests for policies.
 
 ## Deprecated features
 
