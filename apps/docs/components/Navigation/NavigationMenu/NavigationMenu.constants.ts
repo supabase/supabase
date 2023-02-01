@@ -616,6 +616,7 @@ export const resources = {
       url: undefined,
       items: [
         { name: 'Drop all tables in schema', url: '/guides/resources/postgres/dropping-all-tables-in-schema' },
+        { name: 'Select first row per group', url: '/guides/resources/postgres/first-row-in-group' },
         { name: 'Print PostgreSQL version', url: '/guides/resources/postgres/which-version-of-postgres' },
       ],
     },
