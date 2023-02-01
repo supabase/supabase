@@ -712,6 +712,7 @@ export const integrations = {
         { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
+        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
         { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
@@ -816,7 +817,6 @@ export const reference_dart_v1 = {
   parent: '/reference',
 }
 
- 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
   title: 'c#',
