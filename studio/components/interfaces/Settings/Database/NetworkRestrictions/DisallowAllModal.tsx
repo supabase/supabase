@@ -45,9 +45,8 @@ const DisallowAllModal: FC<Props> = ({ visible, onClose }) => {
       <Modal.Content>
         <div className="py-6 space-y-4">
           <p className="text-sm text-scale-1100">
-            This will prevent any IP addresses other than those within the range of{' '}
-            <code className="text-xs">127.0.0.1/32</code> from accessing your project's database.
-            Are you sure?
+            This will prevent any external IP addresses from accessing your project's database. Are
+            you sure?
           </p>
           <InformationBox
             defaultVisibility
