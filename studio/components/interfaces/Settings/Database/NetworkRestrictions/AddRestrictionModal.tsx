@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Address4 } from 'ip-address'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -104,7 +104,10 @@ const AddRestrictionModal: FC<Props> = ({
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
 
+          const [isFetchingAddress, setIsFetchingAddress] = useState(false)
+
           const getClientIpAddress = async () => {
+            setIsFetchingAddress(true)
             const res = await fetch('http://www.geoplugin.net/json.gp', { method: 'GET' })
             const { geoplugin_request } = await res.json()
 
@@ -118,6 +121,7 @@ const AddRestrictionModal: FC<Props> = ({
                 message: 'Failed to retrieve client IP address, please enter address manually',
               })
             }
+            setIsFetchingAddress(false)
           }
 
           return (
@@ -142,7 +146,7 @@ const AddRestrictionModal: FC<Props> = ({
                         className=""
                       />
                     </div>
-                    <div>
+                    <div className="flex-grow">
                       <Input
                         label={
                           <div className="flex items-center space-x-2">
@@ -179,12 +183,14 @@ const AddRestrictionModal: FC<Props> = ({
                       />
                     </div>
                   </div>
-                  <p
-                    className="w-fit !mt-2 text-xs transition text-brand-900 opacity-50 hover:opacity-100 cursor-pointer"
+                  <Button
+                    type="default"
+                    loading={isFetchingAddress}
+                    disabled={isFetchingAddress}
                     onClick={() => getClientIpAddress()}
                   >
                     Use my IP address
-                  </p>
+                  </Button>
                 </div>
               </Modal.Content>
               <Modal.Separator />
