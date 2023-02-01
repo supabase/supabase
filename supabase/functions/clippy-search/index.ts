@@ -150,7 +150,7 @@ serve(async (req) => {
     contextText += `${content.trim()}\n---\n`
   }
 
-  const prompt = `You are a very enthusiastic Supabase representative who loves to help people! Given the following sections from the Supabase documentation, answer the question using only that information, outputted in markdown format. Include multiline code snippets when available. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that."
+  const prompt = `You are a very enthusiastic Supabase representative who loves to help people! Given the following sections from the Supabase documentation, answer the question using only that information, outputted in markdown format. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that."
 
 Context sections:
 ${contextText}
@@ -159,7 +159,7 @@ Question: """
 ${query}
 """
 
-Answer as markdown:
+Answer as markdown (including related code snippets if available):
 `
 
   console.log(prompt)
@@ -168,6 +168,7 @@ Answer as markdown:
     model: 'text-davinci-003',
     prompt,
     max_tokens: 512,
+    temperature: 0,
   })
 
   if (completionResponse.status !== 200) {
