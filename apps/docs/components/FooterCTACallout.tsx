@@ -8,7 +8,6 @@ const FooterCTACallout = () => {
           </p>
         </div>
       </div>
-    </div>
   )
 }
 
