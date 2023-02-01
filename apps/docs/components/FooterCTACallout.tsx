@@ -8,7 +8,8 @@ const FooterCTACallout = () => {
           </p>
         </div>
       </div>
-    )
-  }
-  
-  export default FooterCTACallout
+    </div>
+  )
+}
+
+export default FooterCTACallout
