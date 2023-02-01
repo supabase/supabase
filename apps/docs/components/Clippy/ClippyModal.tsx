@@ -2,11 +2,13 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { FC, useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import clippyImageDark from '../../public/img/clippy-dark.png'
 import clippyImage from '../../public/img/clippy.png'
 
+import { useTheme } from 'common/Providers'
+import Image from 'next/image'
 import { Button, IconAlertCircle, IconChevronRight, IconSearch, Input, Loading, Modal } from 'ui'
 import components from '~/components'
-import Image from 'next/image'
 
 type Props = {
   onClose?: () => void
@@ -19,6 +21,7 @@ const questions = [
 ]
 
 const ClippyModal: FC<Props> = ({ onClose }) => {
+  const { isDarkMode } = useTheme()
   const [query, setQuery] = useState('')
   const [answer, setAnswer] = useState<string>()
   const [isLoading, setIsLoading] = useState(false)
@@ -54,7 +57,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} hideFooter closable={false}>
       <div
-        className={` mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto relative`}
+        className={`prose mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto relative`}
         onClick={(e) => e.stopPropagation()}
       >
         <Input
@@ -96,7 +99,12 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               </ul>
             </div>
             <div className="absolute bottom-4 right-4">
-              <Image width={45} height={48} src={clippyImage} alt="Clippy" />
+              <Image
+                width={45}
+                height={48}
+                src={isDarkMode ? clippyImageDark : clippyImage}
+                alt="Clippy"
+              />
             </div>
           </div>
         )}
