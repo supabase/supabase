@@ -3,6 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Select first row for each group in PostgreSQL',
   description: 'PostgreSQL snippet for grabbing the first row in each distinct group by group',
+  footerHelpType: 'postgres',
 }
 
 Given a table `seasons`:
@@ -15,7 +16,7 @@ Given a table `seasons`:
 | 4   | Brighton  |     28 |
 | 5   | Liverpool |     79 |
 
-We want to find the rows containing the maximum number of points *per team*.
+We want to find the rows containing the maximum number of points _per team_.
 
 The expected output we want is:
 
@@ -27,10 +28,16 @@ The expected output we want is:
 From the [SQL editor](https://app.supabase.com/project/_/sql) you can run a query like:
 
 ```sql
-select distinct on (team)
-       id, team, points
-from   seasons
-order  BY id, points desc, team;
+select distinct
+  on (team) id,
+  team,
+  points
+from
+  seasons
+order BY
+  id,
+  points desc,
+  team;
 ```
 
 The important bits here are the `desc` that we put on the ordering of `points` which ranks the points in descending value (starting with the highest). And the `distinct` keyword that tells Postgres to only return a single row per team.
