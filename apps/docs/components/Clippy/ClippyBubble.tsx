@@ -9,7 +9,7 @@ interface Props {
 const ClippyBubble: FC<Props> = ({ className, onClick }) => {
   return (
     <div
-      className={`flex gap-2 border bg-white dark:bg-scale-300 relative rounded-xl p-6 max-w-xs shadow-xl mb-4 cursor-pointer hover:bg-scale-200 transition-colors overflow-hidden border-scale-500 hover:border-scale-700  ${className}`}
+      className={`flex gap-2 border bg-white dark:bg-scale-300 relative rounded-xl p-6 max-w-sm md:max-w-xs shadow-xl mb-1 md:mb-4 cursor-pointer hover:bg-scale-200 transition-colors border-scale-500 hover:border-scale-700  ${className}`}
       onClick={onClick}
     >
       <img
@@ -18,7 +18,7 @@ const ClippyBubble: FC<Props> = ({ className, onClick }) => {
       />
       What can I help you with?
       <div className="flex items-center space-x-1">
-        <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+        <div className="text-scale-1200 flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
           <IconCommand size={12} strokeWidth={1.5} />
           <span className="text-[12px]">J</span>
         </div>
