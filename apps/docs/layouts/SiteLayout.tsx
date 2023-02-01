@@ -340,7 +340,7 @@ const SiteLayout = ({ children }) => {
           </div>
           <MobileMenuBackdrop />
         </Container>
-        <div className=" absolute right-12 bottom-8 z-[300]">
+        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
           <Clippy />
         </div>
       </div>

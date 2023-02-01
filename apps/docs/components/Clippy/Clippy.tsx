@@ -29,9 +29,9 @@ const Clippy: FC = () => {
   return (
     <>
       {!isModalOpen && (
-        <div className="flex flex-col items-end gap-4">
+        <div className="flex flex-col items-end gap-1 md:gap-4">
           <ClippyBubble onClick={onOpen} />
-          <div className="w-[150px]">
+          <div className="w-[120px] md:w-[150px] p-8 md:p-0">
             <Image src={isDarkMode ? clippyImageDark : clippyImage} alt="Clippy" />
           </div>
         </div>
