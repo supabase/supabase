@@ -1,23 +1,13 @@
-import semver from 'semver'
-import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from 'ui'
+import { useContext, useEffect } from 'react'
+import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
-import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
+import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
-import InviteUserModal from './InviteUserModal'
-import CreateUserModal from './CreateUserModal'
 
 const Users = () => {
   const PageState: any = useContext(PageContext)
-  const inviteEnabled = IS_PLATFORM
-    ? semver.gte(
-        // @ts-ignore
-        semver.coerce(PageState?.projectKpsVersion ?? 'kps-v2.5.4'),
-        semver.coerce('kps-v2.5.3')
-      )
-    : true
 
   useEffect(() => {
     PageState.fetchData(1)
@@ -105,8 +95,8 @@ const Users = () => {
           >
             Reload
           </Button>
-          {inviteEnabled && <InviteUserModal />}
-          <CreateUserModal />
+
+          <AddUserDropdown projectKpsVersion={PageState?.projectKpsVersion} />
         </div>
       </div>
       <section className="users-table-container mt-4 overflow-visible px-6">
