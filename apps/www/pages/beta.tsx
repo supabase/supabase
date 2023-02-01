@@ -520,7 +520,7 @@ const Reliability = () => {
               to keep track of uptime across all of our services and critical infrastructure.
             </p>
             <div className="mb-10">
-              <VideoShot src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/videos/marketing/statusPage.mp4" />
+              <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/statusPage.mp4" />
             </div>
             <p>
               For our Alpha & Beta Users we take free, encrypted daily database backups up to 20GB.
@@ -576,7 +576,7 @@ const NewFeaturesAndIntegrations = () => {
                   transactional emails for you. We support passwordless links, and we offer several
                   OAuth providers including Google, GitHub, with more on the way.
                 </p>
-                <VideoShot src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/videos/marketing/tabAuthRules.mp4" />
+                <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabAuthRules.mp4" />
               </li>
               <li className="mb-10">
                 <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -639,7 +639,7 @@ const NewFeaturesAndIntegrations = () => {
                   View and edit your data like a spreadsheet from within the Supabase dashboard.
                   Build your schema, create complex relationships, and import and export to csv.
                 </p>
-                <VideoShot src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/videos/marketing/tabTableEditor.mp4" />
+                <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabTableEditor.mp4" />
               </li>
               <li>
                 <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
@@ -649,7 +649,7 @@ const NewFeaturesAndIntegrations = () => {
                   No need to install third party SQL tools, you can run queries directly from the
                   Supabase Dashboard.
                 </p>
-                <VideoShot src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/videos/marketing/tabSqlEditor.mp4" />
+                <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabSqlEditor.mp4" />
               </li>
             </ul>
           </div>
