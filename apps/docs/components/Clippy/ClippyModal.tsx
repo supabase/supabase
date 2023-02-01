@@ -2,12 +2,21 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { FC, useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { IconSearch, Input, Loading } from 'ui'
+import clippyImage from '../../public/img/clippy.png'
+
+import { Button, IconAlertCircle, IconChevronRight, IconSearch, Input, Loading, Modal } from 'ui'
 import components from '~/components'
+import Image from 'next/image'
 
 type Props = {
   onClose?: () => void
 }
+
+const questions = [
+  'How do I get started with Supabase?',
+  'How do I run Supabase locally?',
+  'How do I connect to my database?',
+]
 
 const ClippyModal: FC<Props> = ({ onClose }) => {
   const [query, setQuery] = useState('')
@@ -32,13 +41,20 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setAnswer(response.data.answer)
   }, [query, supabaseClient])
 
+  function handleQueryPreload(question: string) {
+    setQuery(question)
+    handleConfirm()
+  }
+
+  function handleResetPrompt() {
+    setQuery('')
+    setAnswer(undefined)
+  }
+
   return (
-    <div
-      className="flex flex-col items-center fixed top-0 left-0 w-screen h-screen p-4 md:p-[12vh] backdrop-blur-sm z-50 cursor-pointer bg-black/40 dark:bg-black/30 "
-      onClick={onClose}
-    >
+    <Modal size="xlarge" visible={true} onCancel={onClose} hideFooter closable={false}>
       <div
-        className={`prose dark:prose-dark mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto`}
+        className={` mx-auto flex flex-col gap-4 rounded-lg p-6 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-300 cursor-auto relative`}
         onClick={(e) => e.stopPropagation()}
       >
         <Input
@@ -59,34 +75,68 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             }
           }}
         />
+
+        {!isLoading && !answer && (
+          <div className="flex justify-between relative">
+            <div className="mt-2">
+              <h2 className="text-xs text-scale-900">Not sure where to start?</h2>
+
+              <ul className="text-xs leading-7 mt-1 text-scale-1000">
+                {questions.map((question) => (
+                  <li className="flex gap-1 items-center">
+                    <IconChevronRight width={12} height={12} />
+                    <button
+                      className="hover:underline"
+                      onClick={() => handleQueryPreload(question)}
+                    >
+                      {question}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="absolute bottom-4 right-4">
+              <Image width={45} height={48} src={clippyImage} alt="Clippy" />
+            </div>
+          </div>
+        )}
         {isLoading && (
           <div className="p-6">
             <Loading active>{}</Loading>
           </div>
         )}
         {answer && (
-          <div className="px-8 py-4 dark dark:bg-scale-200 rounded-lg overflow-y-scroll">
-            <ReactMarkdown
-              linkTarget="_blank"
-              remarkPlugins={[remarkGfm]}
-              transformLinkUri={(href) => {
-                const supabaseUrl = new URL('https://supabase.com')
-                const linkUrl = new URL(href, 'https://supabase.com')
+          <div className={`clippy-modal-container px-4 py-4 dark rounded-lg overflow-y-scroll`}>
+            {answer.includes('Sorry, I don') ? (
+              <p className="flex gap-4">
+                <IconAlertCircle /> Sorry, I don&apos;t know how to help with that.{' '}
+                <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+                  Try again?
+                </Button>
+              </p>
+            ) : (
+              <ReactMarkdown
+                linkTarget="_blank"
+                remarkPlugins={[remarkGfm]}
+                transformLinkUri={(href) => {
+                  const supabaseUrl = new URL('https://supabase.com')
+                  const linkUrl = new URL(href, 'https://supabase.com')
 
-                if (linkUrl.origin === supabaseUrl.origin) {
-                  return linkUrl.toString()
-                }
+                  if (linkUrl.origin === supabaseUrl.origin) {
+                    return linkUrl.toString()
+                  }
 
-                return href
-              }}
-              components={components}
-            >
-              {answer}
-            </ReactMarkdown>
+                  return href
+                }}
+                components={components}
+              >
+                {answer}
+              </ReactMarkdown>
+            )}
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   )
 }
 
