@@ -1,6 +1,6 @@
+import { toJS } from 'mobx'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
@@ -8,7 +8,7 @@ import { Input, Button, IconDownload, Tabs, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
@@ -17,16 +17,19 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
+import { ConnectionPooling, NetworkRestrictions } from 'components/interfaces/Settings/Database'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
+  const networkRestrictions = useFlag('networkRestrictions')
+
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
         <GeneralSettings projectRef={projectRef} />
         <ConnectionPooling />
+        {networkRestrictions && <NetworkRestrictions />}
       </div>
     </div>
   )

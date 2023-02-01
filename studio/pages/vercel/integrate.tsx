@@ -10,8 +10,7 @@ import Divider from 'components/ui/Divider'
 import { Dictionary } from 'components/grid'
 
 import { useStore, withAuth } from 'hooks'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import {
   VERCEL_INTEGRATION_CONFIGS,
@@ -370,8 +369,8 @@ const ProjectLinks: FC = observer(() => {
 
         // Then create env for vercel project with supabase project
         const vercelEnvs = prepareVercelEvns(defaultVercelEnvs, {
-          endpoint: `${projectDetails.apiService.protocol ?? 'https'}://${
-            projectDetails.apiService.endpoint ?? '-'
+          endpoint: `${projectDetails.autoApiService.protocol ?? 'https'}://${
+            projectDetails.autoApiService.endpoint ?? '-'
           }`,
           anon_key: projectDetails.autoApiService.defaultApiKey,
           service_key: projectDetails.autoApiService.serviceApiKey,
