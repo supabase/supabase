@@ -1,0 +1,35 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Drop all tables in a PostgreSQL schema',
+  description:
+    'Useful snippet for deleting all tables in a given schema',
+}
+
+If you need to drop all tables in a given schema, you can execute the query below.
+
+Make sure to replace `my-schema-name` with the name of your schema. In Supabase, the default schema is `public`.
+
+<Admonition type="warning">
+
+This will delete all tables and their associated data. Ensure you have recent [backups](/docs/guides/platform/backups) before proceeding.
+
+</Admonition>
+
+```sql
+do $$ declare
+    r record;
+begin
+    for r in (select tablename from pg_tables where schemaname = 'my-schema-name') loop
+        execute 'drop table if exists ' || quote_ident(r.tablename) || ' cascade';
+    end loop;
+end $$;
+```
+
+This snippet works by first listing out all the tables in the given schema. And then executing a `drop table` for each, hence the `for... loop`.
+
+You can run this query from the [SQL editor](https://app.supabase.com/project/_/sql) inside the Supabase dashboard, or via psql if [connecting directly via the command line](/docs/guides/database/connecting-to-postgres#direct-connections).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

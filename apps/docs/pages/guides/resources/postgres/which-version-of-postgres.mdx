@@ -1,0 +1,27 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Print PostgreSQL version',
+  description:
+    'Useful snippet for finding out which version of postgres you are running',
+}
+
+It's important to know which version of PostgreSQL you are running, since each major version has different features and may cause breaking changes. If [upgrading](https://www.postgresql.org/docs/current/pgupgrade.html) or downgrading a major Postgres version, you may need to update your schema.
+
+From the [SQL editor](https://app.supabase.com/project/_/sql) you can run the simple query:
+
+```sql
+select version();
+```
+
+Which should return something like:
+
+```sql
+PostgreSQL 15.1 on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 10.3.0-1ubuntu1~20.04) 10.3.0, 64-bit
+```
+
+This query can also be executed via psql or any other query editor if you prefer to [connect directly to the database](/docs/guides/database/connecting-to-postgres#direct-connections).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
