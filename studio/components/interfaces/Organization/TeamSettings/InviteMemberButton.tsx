@@ -130,8 +130,14 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
             useEffect(() => {
               if (roles) {
                 resetForm({
-                  values: { ...initialValues, role: roles[0].id },
-                  initialValues: { ...initialValues, role: roles[0].id },
+                  values: {
+                    ...initialValues,
+                    role: roles.find((role) => role.name === 'Developer')?.id,
+                  },
+                  initialValues: {
+                    ...initialValues,
+                    role: roles.find((role) => role.name === 'Developer')?.id,
+                  },
                 })
               }
             }, [roles])
