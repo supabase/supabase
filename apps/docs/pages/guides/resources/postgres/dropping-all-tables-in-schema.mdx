@@ -6,13 +6,12 @@ export const meta = {
   footerHelpType: 'postgres',
 }
 
-If you need to drop all tables in a given schema, you can execute the query below.
+Execute the following query to drop all tables in a given schema.
+Replace `my-schema-name` with the name of your schema. In Supabase, the default schema is `public`.
 
-Make sure to replace `my-schema-name` with the name of your schema. In Supabase, the default schema is `public`.
+<Admonition type="caution">
 
-<Admonition type="warning">
-
-This will delete all tables and their associated data. Ensure you have recent [backups](/docs/guides/platform/backups) before proceeding.
+This deletes all tables and their associated data. Ensure you have a recent [backup](/docs/guides/platform/backups) before proceeding.
 
 </Admonition>
 
@@ -26,9 +25,9 @@ begin
 end $$;
 ```
 
-This snippet works by first listing out all the tables in the given schema. And then executing a `drop table` for each, hence the `for... loop`.
+This query works by listing out all the tables in the given schema and then executing a `drop table` for each (hence the `for... loop`).
 
-You can run this query from the [SQL editor](https://app.supabase.com/project/_/sql) inside the Supabase dashboard, or via psql if [connecting directly via the command line](/docs/guides/database/connecting-to-postgres#direct-connections).
+You can run this query using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Supabase Dashboard, or via `psql` if you're [connecting directly to the database](/docs/guides/database/connecting-to-postgres#direct-connections).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

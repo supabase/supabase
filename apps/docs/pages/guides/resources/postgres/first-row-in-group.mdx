@@ -25,7 +25,7 @@ The expected output we want is:
 | 3   | Brighton  |     34 |
 | 2   | Liverpool |     84 |
 
-From the [SQL editor](https://app.supabase.com/project/_/sql) you can run a query like:
+From the [SQL Editor](https://app.supabase.com/project/_/sql), you can run a query like:
 
 ```sql
 select distinct
@@ -40,9 +40,11 @@ order BY
   team;
 ```
 
-The important bits here are the `desc` that we put on the ordering of `points` which ranks the points in descending value (starting with the highest). And the `distinct` keyword that tells Postgres to only return a single row per team.
+The important bits here are:
+- The `desc` keyword to order the `points` from highest to lowest.
+- The `distinct` keyword that tells Postgres to only return a single row per team.
 
-This query can also be executed via psql or any other query editor if you prefer to [connect directly to the database](/docs/guides/database/connecting-to-postgres#direct-connections).
+This query can also be executed via `psql` or any other query editor if you prefer to [connect directly to the database](/docs/guides/database/connecting-to-postgres#direct-connections).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
