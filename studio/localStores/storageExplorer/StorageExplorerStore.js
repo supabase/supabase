@@ -1485,7 +1485,7 @@ class StorageExplorerStore {
         .list(formattedPathToFolder, options)
       folderContents = folderContents.concat(data)
       options.offset += options.limit
-      if (data.length < options.limit) {
+      if ((data || []).length < options.limit) {
         break
       }
     }
