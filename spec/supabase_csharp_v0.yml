@@ -285,6 +285,7 @@ functions:
     notes: |
       - **LINQ expressions do not currently support parsing embedded resource columns. For these cases, `string` will need to be used.**
       - **When using string Column Names to select, they must match names in database, not names specified on model properties.**
+      - Additional information on modeling + querying Joins and Inner Joins can be found [in the `postgrest-csharp README`](https://github.com/supabase-community/postgrest-csharp/blob/master/README.md#foreign-keys-join-tables-and-relationships)
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `From()` can be combined with [Modifiers](/docs/reference/csharp/using-modifiers)
       - `From()` can be combined with [Filters](/docs/reference/csharp/using-filters)
@@ -295,6 +296,23 @@ functions:
         isSpotlight: true
         code: |
           ```c#
+          // Given the following Model (City.cs)
+          [Table("cities")]
+          class City : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("name")]
+              public string Name { get; set; }
+
+              [Column("country_id")]
+              public int CountryId { get; set; }
+
+              //... etc.
+          }
+
+          // A result can be fetched like so.
           var result = await supabase.From<City>().Get();
           var cities = result.Models
           ```
@@ -303,6 +321,23 @@ functions:
         description: You can select specific fields from your tables.
         code: |
           ```c#
+          // Given the following Model (Movie.cs)
+          [Table("movies")]
+          class Movie : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("name")]
+              public string Name { get; set; }
+
+              [Column("created_at")]
+              public DateTime CreatedAt { get; set; }
+
+              //... etc.
+          }
+
+          // A result can be fetched like so.
           var result = await supabase
             .From<Movie>()
             .Select(x => new object[] {x.Name, x.CreatedAt})
