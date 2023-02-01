@@ -73,7 +73,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
       <div
-        className={`mx-auto flex flex-col gap-4 rounded-lg pt-6 px-6 pb-2 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative`}
+        className={`mx-auto flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -95,7 +95,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               }
             }}
           />
-          <div className="absolute right-0 top-0 mt-3 mr-4">
+          <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block">
             <Button type="default" size="tiny" onClick={onClose}>
               esc
             </Button>
@@ -107,7 +107,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             <div className="mt-2">
               <h2 className="text-xs text-scale-900">Not sure where to start?</h2>
 
-              <ul className="text-xs mt-4 text-scale-1000 flex gap-4 flex-wrap max-w-3xl">
+              <ul className="text-xs mt-4 text-scale-1000 grid md:flex gap-4 flex-wrap max-w-3xl">
                 {questions.map((question) => (
                   <li>
                     <button
@@ -132,7 +132,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="px-4 py-4 dark rounded-lg overflow-y-scroll">
             {answer.includes('Sorry, I don') ? (
               <p className="flex flex-col gap-4 items-center">
-                <div className="flex items-center gap-2 mt-4">
+                <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
                   <IconAlertCircle />
                   <p>Sorry, I don&apos;t know how to help with that.</p>
                 </div>
@@ -164,15 +164,14 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
         <div className="border-t border-scale-600 mt-4 text-scale-900">
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
-              Powered by OpenAI.{' '}
+              <span>Powered by OpenAI.</span>
               <a href="" className="underline">
                 Read the blog post
-              </a>{' '}
-              →
+              </a>
             </div>
             <div className="flex items-center gap-6 py-1">
               {isLoading || cantHelp ? (
-                <span className="bg-scale-400 rounded-lg py-1 px-2 flex items-center gap-2">
+                <span className="bg-scale-400 rounded-lg py-1 px-2 items-center gap-2 hidden md:flex">
                   {isLoading && <IconLoader size={14} className="animate-spin" />}
                   {status}
                 </span>
