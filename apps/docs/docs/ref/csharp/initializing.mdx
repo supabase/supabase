@@ -13,6 +13,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 Initializing a new client is pretty straightforward. Find your project url and public key from the
 admin panel and pass it into your client initialization function.
 
+`supabase-csharp` is heavily dependent on Models deriving from `BaseModel`. To interact with the API, one must have the associated model (see example) specified.
+
+Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
+
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
@@ -29,7 +33,7 @@ admin panel and pass it into your client initialization function.
 
         var options = new Supabase.SupabaseOptions
         {
-          AutoConnectRealtime = true
+            AutoConnectRealtime = true
         };
 
         var supabase = new Supabase.Client(url, key, options);
@@ -57,6 +61,57 @@ admin panel and pass it into your client initialization function.
 
               // Note the creation as a singleton.
               builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+        }
+        ```
+
+      </TabPanel>
+      <TabPanel id="csharp-init-showing-models" label="With Models Example">
+
+        ```csharp
+        // Given the following Model representing the Supabase Database (Message.cs)
+        [Table("messages")]
+        public class Message : BaseModel
+        {
+            [PrimaryKey("id")]
+            public int Id { get; set; }
+
+            [Column("username")]
+            public string UserName { get; set; }
+
+            [Column("channel_id")]
+            public int ChannelId { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                return obj is Message message &&
+                        Id == message.Id;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Id);
+            }
+        }
+
+        void Initialize()
+        {
+            // Get All Messages
+            var response = await client.Table<Message>().Get();
+            List<Message> models = response.Models;
+
+            // Insert
+            var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+            await client.Table<Message>().Insert();
+
+            // Update
+            var model = response.Models.First();
+            model.UserName = "elrhomariyounes";
+            await model.Update();
+
+            // Delete
+            await response.Models.Last().Delete();
+
+            // etc.
         }
         ```
 
