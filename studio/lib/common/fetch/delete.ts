@@ -14,7 +14,6 @@ export async function delete_<T = any>(
     const response = await fetch(url, {
       method: 'DELETE',
       body: JSON.stringify(data),
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
