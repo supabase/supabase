@@ -43,9 +43,9 @@ It's good practice to create the extension within a separate schema (like `exten
 </TabPanel>
 </Tabs>
 
-### Creating a Full Text Search Index 
+### Creating a full text search index
 
-Given a table with a `text` column
+Given a table with a `text` column:
 
 ```sql
 create table memos (
@@ -54,7 +54,7 @@ create table memos (
 );
 ```
 
-We can index the column for full text search with a `pgroonga` index
+We can index the column for full text search with a `pgroonga` index:
 
 ```sql
 create index ix_memos_content ON memos USING pgroonga(content);
@@ -71,23 +71,17 @@ values
   ('There is groonga command.');
 ```
 
-The PostgreSQL query planner is smart enough to know that, for extremely small tables, its faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans
+The PostgreSQL query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
 
 ```sql
 -- For testing only. Don't do this in production
 set enable_seqscan = off;
 ```
 
-Now if we run an explain plan on a query filtering on `memos.content`,
+Now if we run an explain plan on a query filtering on `memos.content`:
 
 ```sql
-explain
-select
-  *
-from
-  memos
-where
-  content like '%engine%';
+explain select * from memos where content like '%engine%';
 
                                QUERY PLAN
 -----------------------------------------------------------------------------
@@ -96,17 +90,17 @@ Index Scan using ix_memos_content on memos  (cost=0.00..1.11 rows=1 width=36)
 (2 rows)
 ```
 
-The pgroonga index is used to retrive the result set
+The pgroonga index is used to retrive the result set:
 
 ```markdown
-| id | content                                                                  |
-| -- | ------------------------------------------------------------------------ |
-|  2 | 'Groonga is a fast full text search engine that supports all languages.' |
+| id  | content                                                                  |
+| --- | ------------------------------------------------------------------------ |
+| 2   | 'Groonga is a fast full text search engine that supports all languages.' |
 ```
 
 ## Resources
 
-- Official [`PGroonga` documentation](https://pgroonga.github.io/tutorial/)
+- Official [PGroonga documentation](https://pgroonga.github.io/tutorial/)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
