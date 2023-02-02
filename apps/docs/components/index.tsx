@@ -1,4 +1,5 @@
-import { Button, Tabs, Alert } from 'ui'
+import { Button, Tabs, Alert, GlassPanel } from 'ui'
+import Link from 'next/link'
 
 // Common components
 import Admonition from './Admonition'
@@ -17,6 +18,9 @@ import Extensions from './Extensions'
 import { Heading } from './CustomHTMLElements'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
+import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
+import StorageManagement from './MDX/storage_management.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
@@ -36,12 +40,17 @@ const components = {
   Button,
   ButtonCard,
   CodeBlock,
+  GlassPanel,
+  Link,
   Frameworks,
   AuthProviders,
   FunctionsExamples,
   JwtGenerator,
   QuickstartIntro,
   ProjectSetup,
+  SocialProviderSetup,
+  SocialProviderSettingsSupabase,
+  StorageManagement,
   Mermaid,
   Extensions,
   Alert: (props: any) => (

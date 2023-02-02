@@ -3,80 +3,91 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "type": "markdown",
-    "libs": ["js", "js_v1", "dart", "dart_v0"]
+    "type": "markdown"
   },
   {
     "title": "Installing",
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "libs": ["js", "js_v1", "dart", "dart_v0"]
+    "excludes": ["reference_javascript_v1", "reference_dart_v0", "reference_python_v2"]
   },
   {
     "title": "Initializing",
     "id": "initializing",
     "slug": "initializing",
-    "type": "function"
+    "type": "markdown",
+    "libs": ["csharp"]
   },
   {
     "title": "Typescript Support",
     "id": "typescript-support",
     "slug": "typescript-support",
     "type": "markdown",
-    "libs": ["js", "js_v1"]
+    "excludes": [
+      "reference_javascript_v1",
+      "reference_dart_v0",
+      "reference_dart_v1",
+      "reference_python_v2",
+      "reference_csharp_v0"
+    ]
+  },
+  {
+    "title": "Upgrade guide",
+    "id": "upgrade-guide",
+    "slug": "upgrade-guide",
+    "type": "markdown",
+    "excludes": [
+      "reference_javascript_v2",
+      "reference_dart_v1",
+      "reference_python_v2",
+      "reference_csharp_v0"
+    ]
   },
   {
     "title": "Database",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
         "id": "select",
         "title": "Fetch data",
         "slug": "select",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "insert",
         "title": "Insert data",
         "slug": "insert",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "update",
         "title": "Update data",
         "slug": "update",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "upsert",
         "title": "Upsert data",
         "slug": "upsert",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "delete",
         "title": "Delete data",
         "slug": "delete",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "rpc",
         "title": "Call a Postgres function",
         "slug": "rpc",
         "product": "database",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "using-filters",
@@ -85,7 +96,6 @@
         "slug": "using-filters",
         "product": "database",
         "type": "function",
-        "libs": ["js", "dart", "dart_v0"],
         "items": [
           {
             "id": "eq",
@@ -93,8 +103,7 @@
             "slug": "eq",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "neq",
@@ -102,8 +111,7 @@
             "slug": "neq",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "gt",
@@ -111,8 +119,7 @@
             "slug": "gt",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "gte",
@@ -120,8 +127,7 @@
             "slug": "gte",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "lt",
@@ -129,8 +135,7 @@
             "slug": "lt",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "lte",
@@ -138,8 +143,7 @@
             "slug": "lte",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "like",
@@ -147,8 +151,7 @@
             "slug": "like",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "ilike",
@@ -156,8 +159,7 @@
             "slug": "ilike",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "is",
@@ -165,8 +167,7 @@
             "slug": "is",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "in",
@@ -174,8 +175,7 @@
             "slug": "in",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "contains",
@@ -183,8 +183,7 @@
             "slug": "contains",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "contained-by",
@@ -192,8 +191,7 @@
             "slug": "containedby",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range-gt",
@@ -201,8 +199,7 @@
             "slug": "rangegt",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range-gte",
@@ -210,8 +207,7 @@
             "slug": "rangegte",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range-lt",
@@ -219,8 +215,7 @@
             "slug": "rangelt",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range-lte",
@@ -228,8 +223,7 @@
             "slug": "rangelte",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range-adjacent",
@@ -237,8 +231,7 @@
             "slug": "rangeadjacent",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "overlaps",
@@ -246,8 +239,7 @@
             "slug": "overlaps",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "text-search",
@@ -255,8 +247,7 @@
             "slug": "textsearch",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "match",
@@ -264,8 +255,7 @@
             "slug": "match",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "not",
@@ -273,8 +263,7 @@
             "slug": "not",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "or",
@@ -282,8 +271,7 @@
             "slug": "or",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "filter",
@@ -291,8 +279,7 @@
             "slug": "filter",
             "product": "database",
             "parent": "filters",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           }
         ]
       },
@@ -304,7 +291,6 @@
         "product": "database",
         "parent": "modifiers",
         "type": "function",
-        "libs": ["js", "dart", "dart_v0"],
         "items": [
           {
             "id": "db-modifiers-select",
@@ -312,8 +298,7 @@
             "slug": "db-modifiers-select",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "order",
@@ -321,8 +306,7 @@
             "slug": "order",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "limit",
@@ -330,8 +314,7 @@
             "slug": "limit",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "range",
@@ -339,8 +322,7 @@
             "slug": "range",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "abort-signal",
@@ -348,8 +330,7 @@
             "slug": "db-abortsignal",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "single",
@@ -357,8 +338,7 @@
             "slug": "single",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js", "dart", "dart_v0"]
+            "type": "function"
           },
           {
             "id": "maybe-single",
@@ -366,8 +346,7 @@
             "slug": "maybesingle",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "csv",
@@ -375,8 +354,7 @@
             "slug": "db-csv",
             "product": "database",
             "parent": "modifiers",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           }
         ]
       }
@@ -384,13 +362,12 @@
   },
   {
     "title": "Auth",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
         "id": "auth-api",
         "title": "Overview",
         "slug": "auth-api",
-        "libs": ["js"],
+
         "type": "function"
       },
       {
@@ -398,230 +375,202 @@
         "title": "Create a new user",
         "slug": "auth-signup",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "sign-in",
         "title": "Sign in a user",
         "slug": "auth-signin",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "sign-in-with-provider",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithprovider",
         "product": "auth",
-        "type": "function",
-        "libs": ["dart_v0"]
+        "type": "function"
       },
       {
         "id": "sign-in-with-password",
         "title": "Sign in a user",
         "slug": "auth-signinwithpassword",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "sign-in-with-otp",
         "title": "Sign in a user through OTP",
         "slug": "auth-signinwithotp",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "sign-in-with-oauth",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithoauth",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       },
       {
         "id": "sign-out",
         "title": "Sign out a user",
         "slug": "auth-signout",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart"]
+        "type": "function"
       },
       {
         "id": "session",
         "title": "Retrieve a session",
         "slug": "auth-session",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "auth-update",
         "title": "Update a user",
         "slug": "auth-update",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "set-auth",
         "title": "Update the access token",
         "slug": "auth-setauth",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "user",
         "title": "Retrieve a user",
         "slug": "auth-user",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "session",
         "title": "Retrieve a session",
         "slug": "auth-session",
         "product": "auth",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "verify-otp",
         "title": "Verify and log in through OTP",
         "slug": "auth-verifyotp",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       },
       {
         "id": "current-session",
         "title": "Retrieve a session",
         "slug": "auth-currentsession",
         "product": "auth",
-        "type": "function",
-        "libs": ["dart"]
+        "type": "function"
       },
       {
         "id": "current-user",
         "title": "Retrieve a user",
         "slug": "auth-currentuser",
         "product": "auth",
-        "type": "function",
-        "libs": ["dart"]
+        "type": "function"
       },
       {
         "id": "get-session",
         "title": "Retrieve a session",
         "slug": "auth-getsession",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "refresh-session",
         "title": "Retrieve a new session",
         "slug": "auth-refreshsession",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "get-user",
         "title": "Retrieve a user",
         "slug": "auth-getuser",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "js_v1"]
+        "type": "function"
       },
       {
         "id": "update-user",
         "title": "Update a user",
         "slug": "auth-updateuser",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       },
       {
         "id": "set-session",
         "title": "Set the session data",
         "slug": "auth-setsession",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "on-auth-state-change",
         "title": "Listen to auth events",
         "slug": "auth-onauthstatechange",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "reset-password-for-email",
         "title": "Send a password reset request",
         "slug": "auth-resetpasswordforemail",
         "product": "auth",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "mfa-enroll",
         "title": "Enroll a factor",
         "slug": "auth-mfa-enroll",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "mfa-challenge",
         "title": "Create a challenge",
         "slug": "auth-mfa-challenge",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "mfa-verify",
         "title": "Verify a challenge",
         "slug": "auth-mfa-verify",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "mfa-challenge-and-verify",
         "title": "Create and verify a challenge",
         "slug": "auth-mfa-challengeandverify",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "mfa-unenroll",
         "title": "Unenroll a factor",
         "slug": "auth-mfa-unenroll",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "mfa-get-authenticator-assurance-level",
         "title": "Get Authenticator Assurance Level",
         "slug": "auth-mfa-getauthenticatorassurancelevel",
         "product": "auth",
-        "type": "function",
-        "libs": ["js"]
+        "type": "function"
       },
       {
         "id": "admin-api",
         "title": "Auth Admin",
         "slug": "admin-api",
-        "libs": ["js", "js_v1"],
+
         "type": "function",
         "items": [
           {
@@ -629,88 +578,77 @@
             "title": "Retrieve a user",
             "slug": "auth-admin-getuserbyid",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "list-users",
             "title": "List all users",
             "slug": "auth-admin-listusers",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
+            "type": "function"
           },
           {
             "id": "create-user",
             "title": "Create a user",
             "slug": "auth-admin-createuser",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
+            "type": "function"
           },
           {
             "id": "delete-user",
             "title": "Delete a user",
             "slug": "auth-admin-deleteuser",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
+            "type": "function"
           },
           {
             "id": "invite-user-by-email",
             "title": "Send an email invite link",
             "slug": "auth-admin-inviteuserbyemail",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
+            "type": "function"
           },
           {
             "id": "reset-password-for-email",
             "title": "Send a password reset request",
             "slug": "auth-admin-resetpasswordforemail",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "generate-link",
             "title": "Generate an email link",
             "slug": "auth-admin-generatelink",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "send-mobile-otp",
             "title": "Send a one-time passcode",
             "slug": "auth-api-sendmobileotp",
             "product": "auth-server",
-            "type": "function",
-            "libs": ["js_v1"]
+            "type": "function"
           },
           {
             "id": "update-user-by-id",
             "title": "Update a user",
             "slug": "auth-admin-updateuserbyid",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js", "js_v1"]
+            "type": "function"
           },
           {
             "id": "mfa-list-factors",
             "title": "List all factors for a user",
             "slug": "auth-admin-mfa-listfactors",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           },
           {
             "id": "mfa-delete-factor",
             "title": "Delete a factor for a user",
             "slug": "auth-admin-mfa-deletefactor",
             "product": "auth-admin",
-            "type": "function",
-            "libs": ["js"]
+            "type": "function"
           }
         ]
       }
@@ -718,61 +656,53 @@
   },
   {
     "title": "Functions",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
         "id": "invoke",
         "title": "Invoke a function",
-        "slug": "auth-admin-invoke",
+        "slug": "functions-invoke",
         "product": "functions",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       }
     ]
   },
   {
     "title": "Realtime",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
         "id": "stream",
         "title": "Listen to database changes",
         "slug": "stream",
         "product": "realtime",
-        "type": "function",
-        "libs": ["dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "subscribe",
-        "title": "Subscribe to database changes",
+        "title": "Subscribe to channel",
         "slug": "subscribe",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "remove-subscription",
         "title": "Remove a subscription",
         "slug": "removesubscription",
         "product": "realtime",
-        "type": "function",
-        "libs": ["dart_v0", "js_v1"]
+        "type": "function"
       },
       {
         "id": "remove-all-subscriptions",
         "title": "Remove all subscriptions",
         "slug": "removeallsubscriptions",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
       {
         "id": "get-subscriptions",
         "title": "Retrieve subscriptions",
         "slug": "getsubscriptions",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js_v1"]
+        "type": "function"
       },
 
       {
@@ -780,172 +710,151 @@
         "title": "Unsubscribe from a channel",
         "slug": "removechannel",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       },
       {
         "id": "remove-all-channels",
         "title": "Unsubscribe from all channels",
         "slug": "removeallchannels",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       },
       {
         "id": "get-channels",
         "title": "Retrieve all channels",
         "slug": "getchannels",
         "product": "realtime",
-        "type": "function",
-        "libs": ["js", "dart"]
+        "type": "function"
       }
     ]
   },
   {
     "title": "Storage",
-    "libs": ["js", "js_v1", "dart", "dart_v0"],
     "items": [
       {
         "id": "create-bucket",
         "title": "Create a bucket",
         "slug": "storage-createbucket",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "get-bucket",
         "title": "Retrieve a bucket",
         "slug": "storage-getbucket",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "list-buckets",
         "title": "List all buckets",
         "slug": "storage-listbuckets",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "update-bucket",
         "title": "Update a bucket",
         "slug": "storage-updatebucket",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "delete-bucket",
         "title": "Delete a bucket",
         "slug": "storage-deletebucket",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "empty-bucket",
         "title": "Empty a bucket",
         "slug": "storage-emptybucket",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-upload",
         "title": "Upload a file",
         "slug": "storage-from-upload",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-download",
         "title": "Download a file",
         "slug": "storage-from-download",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-list",
         "title": "List all files in a bucket",
         "slug": "storage-from-list",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-update",
         "title": "Replace an existing file",
         "slug": "storage-from-update",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-move",
         "title": "Move an existing file",
         "slug": "storage-from-move",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-copy",
         "title": "Copy an existing file",
         "slug": "storage-from-copy",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1"]
+        "type": "function"
       },
       {
         "id": "from-remove",
         "title": "Delete files in a bucket",
         "slug": "storage-from-remove",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-create-signed-url",
         "title": "Create a signed URL",
         "slug": "storage-from-createsignedurl",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       },
       {
         "id": "from-create-signed-urls",
         "title": "Create signed URLs",
         "slug": "storage-from-createsignedurls",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1"]
+        "type": "function"
       },
       {
         "id": "from-get-public-url",
         "title": "Retrieve public URL",
         "slug": "storage-from-getpublicurl",
         "product": "storage",
-        "type": "function",
-        "libs": ["js", "js_v1", "dart", "dart_v0"]
+        "type": "function"
       }
     ]
   },
   {
     "title": "Misc",
-    "libs": ["js", "js_v1"],
+    "excludes": ["reference_dart_v1", "reference_dart_v0"],
     "items": [
       {
         "title": "Release Notes",
         "id": "release-notes",
         "slug": "release-notes",
         "isFunc": false,
-        "type": "markdown",
-        "libs": ["js", "js_v1"]
+        "type": "markdown"
       }
     ]
   }

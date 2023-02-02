@@ -7,10 +7,6 @@ import { IconChevronLeft } from '~/../../packages/ui'
 import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 
-interface ImPureProps {
-  // users: Array<User>
-}
-
 const HeaderImage = React.memo(function HeaderImage(props: any) {
   const router = useRouter()
   const { isDarkMode } = useTheme()
@@ -44,12 +40,6 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
   const { isDarkMode } = useTheme()
-
-  let subItemMenuOpen = false
-
-  if (router.asPath.includes(props.subItem.url)) {
-    subItemMenuOpen = true
-  }
 
   const LinkContainer = (props) => {
     return (
@@ -188,7 +178,7 @@ const Content = (props) => {
         return (
           <div key={x.name}>
             {x.items && x.items.length > 0 ? (
-              <div>
+              <div className="flex flex-col gap-1">
                 {x.items.map((subItem, subItemIndex) => {
                   return (
                     <ContentAccordionLink

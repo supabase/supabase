@@ -14,7 +14,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { getURL } from 'lib/helpers'
 import { API_URL } from 'lib/constants'
@@ -39,7 +39,6 @@ const PaymentMethods: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
-  const isOwner = ui.selectedOrganization?.is_owner
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
@@ -105,7 +104,12 @@ const PaymentMethods: FC<Props> = ({
       <div className="space-y-2">
         <div>
           <h4>Payment methods</h4>
-          <p className="text-sm opacity-50">Charges will be deducted from the default card</p>
+          <p className="text-sm opacity-50">
+            When adding a new payment method, either remove the old one or go to your projects'
+            subscription to explicitly update the payment method. Marking a payment method as
+            "default" is only relevant for new projects or if there are no other payment methods on
+            your account.
+          </p>
         </div>
         {!canReadPaymentMethods ? (
           <Panel>
@@ -244,7 +248,7 @@ const PaymentMethods: FC<Props> = ({
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${orgSlug}/settings`}
+        returnUrl={`${getURL()}/org/${orgSlug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
       />
 
