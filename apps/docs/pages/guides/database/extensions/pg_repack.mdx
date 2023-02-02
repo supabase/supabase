@@ -102,7 +102,7 @@ For full list of options please refer: [Official pg_repack documentation](https:
 1. pg_repack cannot reorganize temp tables
 2. pg_repack cannot cluster tables by GiST indexes
 3. You can not to perform DDL commands of the target tables except VACUUM or ANALYZE while pg_repack is working.
-pg_repack holds an ACCESS SHARE lock on the target table to enforce this restriction.
+   pg_repack holds an ACCESS SHARE lock on the target table to enforce this restriction.
 
 ## Resources
 
