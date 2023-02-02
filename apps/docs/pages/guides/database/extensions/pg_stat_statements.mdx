@@ -3,32 +3,24 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'pg_stat_statements',
   title: 'pg_stat_statements: SQL Planning and Execution Statistics',
-  description: 'Track planning and execution statistics of all SQL statements executed on the database.',
+  description:
+    'Track planning and execution statistics of all SQL statements executed on the database.',
 }
 
-`pg_stat_statements` is a database extension for tracking planning and execution statistics about all SQL statements executed on the database.
+`pg_stat_statements` is a database extension that exposes a view, of the same name, to track statistics about SQL statements executed on the database. The following table shows some of the available statistics and metadata:
 
-## Overview
+| Column Type                           | Description                                                                                                                  |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| userid oid (references pg_authid.oid) | OID of user who executed the statement                                                                                       |
+| dbid oid (references pg_database.oid) | OID of database in which the statement was executed                                                                          |
+| toplevel bool                         | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top)              |
+| queryid bigint                        | Hash code to identify identical normalized queries.                                                                          |
+| query text                            | Text of a representative statement                                                                                           |
+| plans bigint                          | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
+| total_plan_time double precision      | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
+| min_plan_time double precision        | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
 
-`pg_stat_statements` exposes a view, of the same name, that tracks statistics about SQL statements executed on the database. The following table shows some of the available statistics and metadata:
-
-```markdown
-
-| Column Type | Description | 
-|-------------|-------------|
-| userid oid (references pg_authid.oid) | OID of user who executed the statement |
-| dbid oid (references pg_database.oid) | OID of database in which the statement was executed |
-| toplevel bool | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top) |
-| queryid bigint | Hash code to identify identical normalized queries. |
-| query text | Text of a representative statement |
-| plans bigint | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero) |
-| total_plan_time double precision
-| Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
-| min_plan_time double precision | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
-| ... | ... |
-```
-A full list of statistics is available in the [`pg_stat_statements` docs](https://www.postgresql.org/docs/current/pgstatstatements.html)
-
+A full list of statistics is available in the [pg_stat_statements docs](https://www.postgresql.org/docs/current/pgstatstatements.html).
 
 ## Usage
 
@@ -65,9 +57,9 @@ It's good practice to create the extension within a separate schema (like `exten
 </TabPanel>
 </Tabs>
 
-### Inspecting Activity
+### Inspecting activity
 
-A common use for `pg_stat_statements` is to track down expensive or slow queries. The `pg_stat_statements` view contains a row for each executed query with statistics inlined. You can leverage the statistics to, for example, identify frequently executed and slow queries against a given table 
+A common use for `pg_stat_statements` is to track down expensive or slow queries. The `pg_stat_statements` view contains a row for each executed query with statistics inlined. For example, you can leverage the statistics to identify frequently executed and slow queries against a given table.
 
 ```sql
 select
@@ -88,11 +80,11 @@ order by
 	calls desc
 ```
 
-From the results, an informed decision about which queries to optimize/index/adjust can be made.
+From the results, an informed decision about which queries to optimize, index, or adjust can be made.
 
 ## Resources
 
-- Official [`pg_stat_statements` documentation](https://www.postgresql.org/docs/current/pgstatstatements.html)
+- Official [pg_stat_statements documentation](https://www.postgresql.org/docs/current/pgstatstatements.html)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
