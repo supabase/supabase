@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
@@ -15,7 +15,7 @@ export const generateRowFields = (
   // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
-  return table.columns.map((column) => {
+  return table.columns!.map((column) => {
     const value = isUndefined(row)
       ? ''
       : DATETIME_TYPES.includes(column.format)

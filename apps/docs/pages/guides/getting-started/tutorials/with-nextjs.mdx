@@ -5,6 +5,7 @@ export const meta = {
   title: 'Quickstart: Next.js',
   description: 'Learn how to use Supabase in your Next App.',
   sidebar_label: 'Next.js',
+  video: 'https://www.youtube.com/v/0Fs96oZ4se0',
 }
 
 <QuickstartIntro />
@@ -106,6 +107,7 @@ Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
 import '../styles/globals.css'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
@@ -125,8 +127,10 @@ export default MyApp
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
 ```jsx lines=2,8 title=pages/_app.tsx
+import { useState } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
+import { AppProps } from 'next/app'
 
 function MyApp({
   Component,
@@ -714,6 +718,10 @@ return (
   </div>
 )
 ```
+
+### Storage management
+
+<StorageManagement />
 
 ## Next steps
 

@@ -283,7 +283,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Automatically refreshes the token for logged in users."
+                                            "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -306,7 +306,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -329,7 +329,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Whether to persist a logged in session to storage."
+                                            "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -352,7 +352,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "A storage provider. Used to store the logged in session."
+                                            "shortText": "A storage provider. Used to store the logged-in session."
                                           },
                                           "sources": [
                                             {
@@ -383,7 +383,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Optional key name used for storing tokens in local storage"
+                                            "shortText": "Optional key name used for storing tokens in local storage."
                                           },
                                           "sources": [
                                             {
@@ -424,7 +424,7 @@
                                     "isOptional": true
                                   },
                                   "comment": {
-                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                                   },
                                   "sources": [
                                     {
@@ -2598,7 +2598,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2621,7 +2621,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2644,7 +2644,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2667,7 +2667,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -2698,7 +2698,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -2739,7 +2739,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -3702,7 +3702,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3725,7 +3725,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3748,7 +3748,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3771,7 +3771,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -3802,7 +3802,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -3843,7 +3843,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -4151,7 +4151,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4174,7 +4174,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4197,7 +4197,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4220,7 +4220,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -4251,7 +4251,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -4292,7 +4292,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -5531,7 +5531,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Automatically refreshes the token for logged in users."
+                            "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5554,7 +5554,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5577,7 +5577,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Whether to persist a logged in session to storage."
+                            "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5600,7 +5600,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "A storage provider. Used to store the logged in session."
+                            "shortText": "A storage provider. Used to store the logged-in session."
                           },
                           "sources": [
                             {
@@ -5631,7 +5631,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Optional key name used for storing tokens in local storage"
+                            "shortText": "Optional key name used for storing tokens in local storage."
                           },
                           "sources": [
                             {
@@ -5672,7 +5672,7 @@
                     "isOptional": true
                   },
                   "comment": {
-                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                   },
                   "sources": [
                     {

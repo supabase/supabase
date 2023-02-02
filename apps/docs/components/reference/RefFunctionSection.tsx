@@ -9,22 +9,8 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-
-interface ICommonFunc {
-  id: string
-  title: string
-  slug: string
-  product: string
-  libs: string
-  items: ICommonFunc[]
-}
-
-interface IRefFunctionSection {
-  funcData: any
-  commonFuncData: ICommonFunc
-  spec: any
-  typeSpec?: any
-}
+import { Fragment } from 'react'
+import { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -32,11 +18,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   // gracefully return nothing if function does not exist
   if (!item) return <></>
 
-  if (item && !item['$ref']) {
-    //console.warn('🚩 issue with $ref in:', item.id)
-  }
-
-  // console.log(item)
   const hasTsRef = item['$ref'] || null
 
   const tsDefinition =
@@ -64,11 +45,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
               </div>
             )}
-            {/* {functionMarkdownContent && (
-                        <div className="prose">
-                          <MDXRemote {...functionMarkdownContent} components={components} />
-                        </div>
-                      )} */}
+
             {item.notes && (
               <div className="prose">
                 <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
@@ -89,25 +66,29 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                     })
 
                     const paramItem = overide?.length > 0 ? overide[0] : param
-
                     return (
-                      <Param {...paramItem}>
+                      <Param {...paramItem} key={param.name}>
                         {paramItem.subContent && (
                           <div className="mt-3">
                             <Options>
                               {param.subContent.map((param) => {
                                 return (
-                                  <>
+                                  <Fragment key={param.name + 'subcontent'}>
                                     <Options.Option {...param}>
                                       {param.subContent && (
                                         <Options>
                                           {param.subContent.map((param) => {
-                                            return <Options.Option {...param} />
+                                            return (
+                                              <Options.Option
+                                                {...param}
+                                                key={param.name + 'subcontent-option'}
+                                              />
+                                            )
                                           })}
                                         </Options>
                                       )}
                                     </Options.Option>
-                                  </>
+                                  </Fragment>
                                 )
                               })}
                             </Options>
@@ -134,6 +115,16 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
                       const exampleString = ''
+
+                      const codeBlockLang = example?.code?.startsWith('```js')
+                        ? 'js'
+                        : example?.code?.startsWith('```ts')
+                        ? 'ts'
+                        : example?.code?.startsWith('```dart')
+                        ? 'dart'
+                        : example?.code?.startsWith('```c#')
+                        ? 'csharp'
+                        : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 
@@ -150,13 +141,29 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       return (
                         <Tabs.Panel
                           id={example.id}
+                          key={example.id}
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
+                          <CodeBlock
+                            className="useless-code-block-class"
+                            language={codeBlockLang}
+                            hideLineNumbers={true}
+                          >
+                            {exampleString +
+                              (example.code &&
+                                example.code
+                                  .replace(/```/g, '')
+                                  .replace('js', '')
+                                  .replace('ts', '')
+                                  .replace('dart', '')
+                                  .replace('c#', ''))}
+                          </CodeBlock>
+
                           {((tables && tables.length > 0) || sql) && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-data`}
-                              label="Example data source"
+                              label="Data source"
                               defaultOpen={false}
                             >
                               <>
@@ -191,31 +198,33 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             </RefDetailCollapse>
                           )}
 
-                          <CodeBlock
-                            className="useless-code-block-class"
-                            language="js"
-                            hideLineNumbers={true}
-                          >
-                            {exampleString +
-                              (example.code &&
-                                example.code
-                                  .replace(/```/g, '')
-                                  .replace('js', '')
-                                  .replace('ts', ''))}
-                          </CodeBlock>
                           {response && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-response`}
-                              label="Example response"
+                              label="Response"
                               defaultOpen={false}
                             >
                               <CodeBlock
-                                className="useless-code-block-class"
-                                language="js"
+                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
+                                language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
                                 {response.replace(/```/g, '').replace('json', '')}
                               </CodeBlock>
+                            </RefDetailCollapse>
+                          )}
+
+                          {example.description && (
+                            <RefDetailCollapse
+                              id={`${example.id}-${exampleIndex}-notes`}
+                              label="Notes"
+                              defaultOpen={false}
+                            >
+                              <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                                <ReactMarkdown className="text-sm">
+                                  {example.description}
+                                </ReactMarkdown>
+                              </div>
                             </RefDetailCollapse>
                           )}
                         </Tabs.Panel>

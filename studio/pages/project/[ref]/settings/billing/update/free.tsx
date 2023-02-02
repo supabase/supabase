@@ -80,7 +80,7 @@ const BillingUpdateFree: NextPageWithLayout = () => {
     )
 
   return (
-    <div className="mx-auto my-10 max-w-5xl">
+    <div className="mx-auto my-10 max-w-5xl px-32 xl:px-0">
       <ExitSurvey
         freeTier={freeTier}
         subscription={subscription}

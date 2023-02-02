@@ -14,7 +14,7 @@ const sections = flattenSections(clientLibsCommonSections)
 export default function JSReference(props) {
   const router = useRouter()
   const slug = router.query.slug[0]
-  const filteredSection = sections.filter((section) => section.id === slug)
+  const filteredSection = sections.filter((section) => section.slug === slug)
 
   const pageTitle = filteredSection[0]?.title
     ? `${filteredSection[0]?.title} | Supabase`
@@ -29,13 +29,14 @@ export default function JSReference(props) {
         spec={spec}
         typeSpec={typeSpec}
         pageProps={props}
+        type="client-lib"
       />
     </>
   )
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/javascript', '/javascript')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, '/javascript')
 }
 
 export function getStaticPaths() {

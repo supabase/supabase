@@ -28,6 +28,12 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Database space',
         units: 'bytes',
         costPerUnit: 0.125,
+        tooltip: (
+          <span>
+            We continuously monitor the total size of your database. Billing is based on the average
+            database size in GB throughout the billing period.
+          </span>
+        ),
       },
       {
         key: 'db_egress',
@@ -35,6 +41,12 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Database egress',
         units: 'bytes',
         costPerUnit: 0.09,
+        tooltip: (
+          <span>
+            Database egress contains any outgoing traffic (egress) from your database. Billing is
+            based on the total sum of egress in GB throughout your billing period.
+          </span>
+        ),
       },
     ],
   },
@@ -48,6 +60,12 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Monthly Active Users',
         units: 'absolute',
         costPerUnit: 0.00325,
+        tooltip: (
+          <span>
+            The amount of distinct users requesting your API throughout the billing period. Resets
+            at the beginning of every billing period.
+          </span>
+        ),
       },
     ],
   },
@@ -61,6 +79,12 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Storage space',
         units: 'bytes',
         costPerUnit: 0.021,
+        tooltip: (
+          <span>
+            The storage size is the sum of all objects in your storage buckets. Billing is based on
+            the average size in GB throughout your billing period.
+          </span>
+        ),
       },
       {
         key: 'storage_egress',
@@ -68,6 +92,14 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Storage egress',
         units: 'bytes',
         costPerUnit: 0.09,
+        tooltip: (
+          <span>
+            Storage egress contains any outgoing traffic (egress) from your storage buckets, only
+            download operations are counted. We currently do not differentiate between no-cache and
+            cache hits. Billing is based on the total amount of egress in GB throughout your billing
+            period.
+          </span>
+        ),
       },
       {
         key: 'storage_image_render_count',
@@ -75,6 +107,14 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Storage Images Transformed',
         units: 'absolute',
         costPerUnit: 0.005,
+        tooltip: (
+          <span>
+            We distinctly count all images that were transformed in the billing period, ignoring any
+            transformations. If you transform one image with different transformations (i.e. once
+            with height=50 and once with height=150), it only counts as one. We only count the
+            unique (origin) images being transformed.
+          </span>
+        ),
       },
     ],
   },
@@ -88,6 +128,12 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Function Count',
         units: 'absolute',
         costPerUnit: 0.1,
+        tooltip: (
+          <span>
+            Every single serverless function invocation independent of response status is counted.
+            Billing is based on the sum of all invocations throughout your billing period.
+          </span>
+        ),
       },
 
       {
@@ -96,6 +142,13 @@ export const USAGE_BASED_PRODUCTS = [
         title: 'Function Invocations',
         units: 'absolute',
         costPerUnit: 0.000002,
+        tooltip: (
+          <span>
+            We continuously monitor the amount of serverless functions in your project. Billing is
+            based on the maximum amount of functions at any point in time throughout your billing
+            period.
+          </span>
+        ),
       },
     ],
   },

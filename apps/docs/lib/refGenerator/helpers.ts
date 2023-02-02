@@ -2,6 +2,7 @@ import { TsDoc } from '../../generator/legacy/definitions'
 
 import { values, mapValues } from 'lodash'
 import { OpenAPIV3 } from 'openapi-types'
+import { flattenSections } from '../helpers'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -217,6 +218,12 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
   operationId: string
   operation: string
   responseList: []
+  description?: string
+  parameters?: []
+  responses?: {}
+  security?: []
+  summary?: string
+  tags?: []
 }
 
 export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
@@ -285,3 +292,23 @@ export const toArrayWithKey = (obj: object, keyAs: string) =>
       return value
     })
   )
+
+export function generateAllowedClientLibKeys(sections, spec) {
+  // Filter parent sections first
+
+  const specIds = spec.functions.map((func) => {
+    return func.id
+  })
+
+  const newShape = flattenSections(sections).filter((section) => {
+    if (specIds.includes(section.id)) {
+      return section
+    }
+  })
+
+  const final = newShape.map((func) => {
+    return func.id
+  })
+
+  return final
+}

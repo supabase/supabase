@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, createContext, useContext, useEffect } from 'react'
+import { useState, useCallback, useRef, createContext, useContext, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Head from 'next/head'
@@ -84,7 +84,7 @@ export function SearchProvider({ children }: any) {
             hitComponent={Hit}
             transformItems={(items) => {
               return items.map((item, index) => {
-                console.log('item', item)
+                // console.log('item', item)
                 // We transform the absolute URL into a relative URL to
                 // leverage Next's preloading.
                 const a = document.createElement('a')

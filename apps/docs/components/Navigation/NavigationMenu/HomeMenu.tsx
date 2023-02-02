@@ -1,8 +1,9 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMenuLevelId } from '~/hooks/useMenuState'
-import { useTheme } from 'common/Providers'
+import { Fragment } from 'react'
+import { Badge } from '~/../../packages/ui'
 
 const home = [
   [
@@ -95,7 +96,21 @@ const home = [
       level: 'reference_dart',
     },
     {
-      label: 'Tools Reference',
+      label: 'Python',
+      icon: '/img/icons/menu/reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+      community: true,
+    },
+    {
+      label: 'C#',
+      icon: '/img/icons/menu/reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Tools',
     },
     {
       label: 'Management API',
@@ -106,14 +121,13 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],
 ]
 
-const NavigationMenuHome = () => {
-  const level = useMenuLevelId()
+const NavigationMenuHome = ({ active }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
@@ -121,15 +135,13 @@ const NavigationMenuHome = () => {
     <div
       className={[
         'transition-all duration-150 ease-out',
-        level === 'home' || !level
-          ? 'opacity-100 ml-0 delay-150'
-          : 'opacity-0 -ml-8 invisible absolute',
+        active ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
       ].join(' ')}
     >
       <ul className="relative w-full flex flex-col gap-4">
         {home.map((section, sectionIndex) => {
           return (
-            <>
+            <Fragment key={`section-container-${sectionIndex}-border`}>
               {sectionIndex !== 0 && (
                 <div
                   className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
@@ -168,6 +180,7 @@ const NavigationMenuHome = () => {
                                 className="w-4 h-4 group-hover:scale-110 ease-out transition-all"
                               />
                               {link.label}
+                              {link.community && <Badge size="small">Community</Badge>}
                             </li>
                           </a>
                         </Link>
@@ -176,7 +189,7 @@ const NavigationMenuHome = () => {
                   })}
                 </div>
               </div>
-            </>
+            </Fragment>
           )
         })}
       </ul>

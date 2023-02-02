@@ -10,7 +10,6 @@ import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { Badge } from 'ui'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -24,7 +23,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
   const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
