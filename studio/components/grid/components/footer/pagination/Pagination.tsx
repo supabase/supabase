@@ -4,6 +4,7 @@ import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from '
 import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { REFRESH_PAGE_AFTER_DELETED_ROWS } from 'components/grid/constants'
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
   dispatch({
@@ -30,6 +31,12 @@ const Pagination: FC<PaginationProps> = () => {
 
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
+
+  useEffect(() => {
+    if (state.refreshPageFlag === REFRESH_PAGE_AFTER_DELETED_ROWS) {
+      setPage(state.page)
+    }
+  }, [state.page, state.refreshPageFlag])
 
   // [Joshen] Note: I've made pagination buttons disabled while rows are being fetched for now
   // at least until we can send an abort signal to cancel requests if users are mashing the

@@ -1,6 +1,6 @@
 import update from 'immutability-helper'
 import {
-  REFRESH_PAGE_DEBOUNCED,
+  REFRESH_PAGE_AFTER_DELETED_ROWS,
   REFRESH_PAGE_IMMEDIATELY,
   TOTAL_ROWS_INITIAL,
   TOTAL_ROWS_RESET,
@@ -143,11 +143,14 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
     }
     case 'REMOVE_ROWS': {
       const totalRows = state.totalRows - action.payload.rowIdxs.length
+      const maxPages = Math.ceil(totalRows / state.rowsPerPage)
+
       return {
         ...state,
         rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
         totalRows: totalRows,
-        refreshPageFlag: state.totalRows > state.rowsPerPage ? REFRESH_PAGE_DEBOUNCED : 0,
+        refreshPageFlag: state.totalRows > state.rowsPerPage ? REFRESH_PAGE_AFTER_DELETED_ROWS : 0,
+        page: Math.min(state.page, maxPages),
       }
     }
     case 'REMOVE_ALL_ROWS': {
