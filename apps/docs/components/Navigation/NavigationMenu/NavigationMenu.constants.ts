@@ -425,6 +425,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pgrepack',
+          items: [],
+        },
+        {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
           items: [],
