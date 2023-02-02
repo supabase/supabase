@@ -415,6 +415,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
+          items: [],
+        },
+        {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
           items: [],
