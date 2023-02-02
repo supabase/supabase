@@ -25,7 +25,7 @@ export const USAGE_BASED_PRODUCTS = [
       {
         key: 'db_size',
         attribute: 'total_db_size_bytes',
-        title: 'Database space',
+        title: 'Database size',
         units: 'bytes',
         costPerUnit: 0.125,
         tooltip: (
