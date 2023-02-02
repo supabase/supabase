@@ -8,7 +8,6 @@ import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
-import { getPageType } from '~/lib/helpers'
 
 interface Props {
   meta: {
@@ -17,6 +16,7 @@ interface Props {
     hide_table_of_contents?: boolean
     breadcrumb?: string
     subtitle?: string
+    video?: string
     canonical?: string
   }
   children: any
@@ -74,6 +74,15 @@ const Layout: FC<Props> = (props) => {
           description: props.meta?.description,
           url: `https://supabase.com/docs${asPath}`,
           type: 'article',
+          videos: props.meta?.video && [
+            {
+              // youtube based video meta
+              url: props.meta?.video,
+              width: 640,
+              height: 385,
+              type: 'application/x-shockwave-flash',
+            },
+          ],
           article: {
             publishedTime: new Date().toISOString(),
             modifiedTime: new Date().toISOString(),
