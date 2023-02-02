@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, IconInfo, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, IconInfo, Loading, IconExternalLink } from 'ui'
 
 import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -40,6 +40,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
 
   const planName = subscriptionTier ? planNames[subscriptionTier] || 'current' : 'current'
 
+  console.log({ subscriptionTier })
+
   useEffect(() => {
     if (error) {
       ui.setNotification({
@@ -58,6 +60,26 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
         title="There was an issue loading the usage details of your project"
       />
     )
+  }
+
+  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+
+  const featureFootnotes: Record<string, JSX.Element> = {
+    db_size: (
+      <div className="flex justify-between items-center">
+        <div className="flex flex-row space-x-4 text-scale-1000">
+          {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
+
+          {isPaidTier && <Badge>Auto-Scaling</Badge>}
+        </div>
+
+        <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+          <a target="_blank" href="https://supabase.com/docs/guides/platform/database-usage">
+            What is disk size?
+          </a>
+        </Button>
+      </div>
+    ),
   }
 
   return (
@@ -171,7 +193,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           )
                         }
 
-                        return (
+                        return [
                           <tr
                             key={feature.title}
                             className="border-t border-panel-border-light dark:border-panel-border-dark"
@@ -217,8 +239,18 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                 </td>
                               </>
                             )}
-                          </tr>
-                        )
+                          </tr>,
+                          featureFootnotes[feature.key] && (
+                            <tr>
+                              <td
+                                className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200"
+                                colSpan={3}
+                              >
+                                {featureFootnotes[feature.key]}
+                              </td>
+                            </tr>
+                          ),
+                        ]
                       })}
                     </tbody>
                   )}
