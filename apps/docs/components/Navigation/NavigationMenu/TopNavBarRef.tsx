@@ -42,6 +42,7 @@ const TopNavBarRef: FC = () => {
 
     const key = localStorage.getItem('supabaseDarkMode')
     document.documentElement.className = key === 'true' ? 'dark' : ''
+    document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
   }
 
   const onSelectVersion = (version: string) => {

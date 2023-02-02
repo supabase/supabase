@@ -5,6 +5,7 @@ export const meta = {
   title: 'Serverless APIs',
   description: 'Auto-generating and Realtime APIs.',
   sidebar_label: 'Overview',
+  video: 'https://www.youtube.com/v/rPAJJFdtPw0',
 }
 
 Supabase auto-generates three types of API directly from your database schema.
@@ -55,6 +56,7 @@ GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-grap
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
+Go to your project's [Replication section](https://app.supabase.com/project/_/database/replication) to get started.
 
 ## Getting started
 
@@ -217,7 +219,7 @@ import { createClient, useQuery } from 'urql'
 // Prepare API key and Authorization header
 const headers = {
   apikey: <SUPABASE_ANON_KEY>,
-  authorization: `Bearer ${<SUPABASE_ANON_KEY}`>
+  authorization: `Bearer ${<SUPABASE_ANON_KEY>}`,
 }
 
 // Create GraphQL client
@@ -260,6 +262,7 @@ const { data, fetching, error } = result
 curl --request POST '<SUPABASE_URL>/graphql/v1' \
 -H 'apikey: <SUPABASE_ANON_KEY>' \
 -H 'Authorization: Bearer <SUPABASE_ANON_KEY>' \
+-H 'Content-Type: application/json' \
 -d '{ "query":"{ todos(first: 3) { edges { node { id } } } }" }'
 ```
 
