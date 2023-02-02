@@ -3,7 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'pg_repack',
   title: 'pg_repack: Physical storage optimization and maintenance',
-  description: 'A tool to remove bloat from tables and indexes and optimize physical data order and physical storage',
+  description:
+    'A tool to remove bloat from tables and indexes and optimize physical data order and physical storage',
 }
 
 [pg_repack](https://github.com/reorg/pg_repack) is a PostgreSQL extension which lets you remove bloat from tables and indexes, and optionally restore the physical order of clustered indexes. Unlike CLUSTER and VACUUM FULL it works online, without holding an exclusive lock on the processed tables during processing. pg_repack is efficient to boot, with performance comparable to using CLUSTER directly.
