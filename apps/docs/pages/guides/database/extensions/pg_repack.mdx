@@ -1,0 +1,112 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'pg_repack',
+  title: 'pg_repack: Physical storage optimization and maintenance',
+  description: 'A tool to remove bloat from tables and indexes and optimize physical data order and physical storage',
+}
+
+[pg_repack](https://github.com/reorg/pg_repack) is a PostgreSQL extension which lets you remove bloat from tables and indexes, and optionally restore the physical order of clustered indexes. Unlike CLUSTER and VACUUM FULL it works online, without holding an exclusive lock on the processed tables during processing. pg_repack is efficient to boot, with performance comparable to using CLUSTER directly.
+
+## Overview
+
+pg_repack provides the following methods to optimize physical storage:
+
+1. Online CLUSTER: ordering table data by cluster index in a non-blocking way
+2. Ordering table data by specified columns
+3. Online VACUUM FULL: packing rows only in a non-blocking way
+4. Rebuild or relocate only the indexes of a table
+
+## Requirements
+
+1. Only superusers can use the utility
+2. Target table must have a PRIMARY KEY, or at least a UNIQUE total index on a NOT NULL column.
+3. Performing a full-table repack requires free disk space about twice as large as the target table and its indexes.
+
+## Usage
+
+### Enable the extension
+
+You can get started with pg_repack by enabling the extension in your Supabase dashboard.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_repack" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Example: enable the "pg_repack" extension
+create extension pg_repack with schema extensions;
+
+-- Example: disable the "postgis" extension
+drop extension if exists pg_repack;
+```
+
+</TabPanel>
+</Tabs>
+
+### Syntax
+
+```
+pg_repack [OPTION]... [DBNAME]
+```
+
+## Examples
+
+It's useful for performance to support tables data ordered on disk and physically remove deleted data that remain
+otherwise.
+
+Perform an online CLUSTER of all the clustered tables in the database `db`, and perform an online `VACUUM FULL` of all the non-clustered tables:
+
+```
+pg_repack db
+```
+
+Perform an online `VACUUM FULL` on the tables `table1` and `table2` in the database `db` (an eventual cluster index is ignored):
+
+```
+pg_repack --no-order --table table1 --table table2 db
+```
+
+Moving indexes to tablespace on a faster volume increase performance of `SELECT` queries using these indexes
+drastically. `INSERT`s and `UPDATE`s of a table with indexes on a fast volume are also faster. This is very useful
+when fast volume is small and can not accomodate all tables, as indexes are much smaller than tables.
+
+Move all indexes of table `table1` to tablespace `tbs`:
+
+```
+pg_repack -d db --table table1 --only-indexes --tablespace tbs
+```
+
+Move the specified index `idx` to tablespace `tbs`:
+
+```
+pg_repack -d db --index idx --tablespace tbs
+```
+
+For full list of options please refer: [Official pg_repack documentation](https://reorg.github.io/pg_repack/)
+
+## Restrictions
+
+1. pg_repack cannot reorganize temp tables
+2. pg_repack cannot cluster tables by GiST indexes
+3. You can not to perform DDL commands of the target tables except VACUUM or ANALYZE while pg_repack is working.
+pg_repack holds an ACCESS SHARE lock on the target table to enforce this restriction.
+
+## Resources
+
+- [Official pg_repack documentation](https://reorg.github.io/pg_repack/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
