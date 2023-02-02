@@ -388,6 +388,11 @@ export const database = {
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
+{
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
         {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
