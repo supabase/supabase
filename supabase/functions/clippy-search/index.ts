@@ -71,13 +71,15 @@ serve(async (req) => {
 
   const { query } = requestData
 
+  const sanitizedQuery = query.trim()
+
   const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
   const configuration = new Configuration({ apiKey: openAiKey })
   const openai = new OpenAIApi(configuration)
 
   // Moderate the content to comply with OpenAI T&C
-  const moderationResponse = await openai.createModeration({ input: query })
+  const moderationResponse = await openai.createModeration({ input: sanitizedQuery })
 
   const [results] = moderationResponse.data.results
 
@@ -97,7 +99,7 @@ serve(async (req) => {
 
   const embeddingResponse = await openai.createEmbedding({
     model: 'text-embedding-ada-002',
-    input: query.replaceAll('\n', ' '),
+    input: sanitizedQuery.replaceAll('\n', ' '),
   })
 
   if (embeddingResponse.status !== 200) {
@@ -156,7 +158,7 @@ Context sections:
 ${contextText}
 
 Question: """
-${query}
+${sanitizedQuery}
 """
 
 Answer as markdown (including related code snippets if available):
