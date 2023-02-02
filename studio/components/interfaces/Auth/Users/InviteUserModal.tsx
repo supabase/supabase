@@ -1,21 +1,18 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
-import { Button, Form, IconMail, Input, Modal } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Modal, Input, IconPlus, IconMail, Form } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
-export type InviteUserModalProps = {
-  visible: boolean
-  setVisible: (visible: boolean) => void
-}
-
-const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
+const InviteUserModal = () => {
   const { ui } = useStore()
   const PageState: any = useContext(PageContext)
+  const [visible, setVisible] = useState(false)
 
   const handleToggle = () => setVisible(!visible)
   const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
@@ -34,7 +31,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     return errors
   }
 
-  const onInviteUser = async (values: any, { setSubmitting }: any) => {
+  const onInviteuser = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
 
     const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
@@ -59,6 +56,28 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
 
   return (
     <div>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button as="span" onClick={handleToggle} icon={<IconPlus />} disabled={!canInviteUsers}>
+            Invite
+          </Button>
+        </Tooltip.Trigger>
+        {!canInviteUsers && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200">
+                You need additional permissions to invite users
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <Modal
         closable
         hideFooter
@@ -69,15 +88,16 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
         onCancel={handleToggle}
       >
         <Form
-          validateOnBlur={false}
+          validateOnBlur
           initialValues={{ email: '' }}
           validate={validate}
-          onSubmit={onInviteUser}
+          onSubmit={onInviteuser}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <div className="space-y-6 py-4">
               <Modal.Content>
                 <Input
+                  autoFocus
                   id="email"
                   className="w-full"
                   label="User email"
@@ -87,7 +107,6 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
                   placeholder="User email"
                 />
               </Modal.Content>
-
               <Modal.Content>
                 <Button
                   block
