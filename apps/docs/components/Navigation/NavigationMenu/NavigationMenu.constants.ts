@@ -22,6 +22,12 @@ export const REFERENCES: References = {
     versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/flutter-icon.svg',
   },
+  csharp: {
+    name: 'C#',
+    library: 'supabase-csharp',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/c-sharp-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -723,6 +729,7 @@ export const integrations = {
         { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
+        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
         { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
@@ -755,6 +762,20 @@ export const reference = {
           level: 'reference_dart',
           items: [],
           icon: '/img/icons/menu/reference-dart',
+        },
+        {
+          name: 'supabase-csharp',
+          url: '/reference/csharp/start',
+          level: 'reference_csharp',
+          items: [],
+          icon: '/img/icons/menu/reference-csharp',
+        },
+        {
+          name: 'supbase-python',
+          url: '/reference/python/start',
+          level: 'reference_python',
+          items: [],
+          icon: 'docs/img/icons/javascript.svg',
         },
         // {
         //   name: 'supabase-python',
@@ -805,10 +826,18 @@ export const reference_dart_v0 = {
   url: '/guides/reference/dart',
   parent: '/reference',
 }
+
 export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
+  parent: '/reference',
+}
+
+export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'c#',
+  url: 'guides/reference/csharp',
   parent: '/reference',
 }
 
@@ -911,6 +940,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/dart-icon.svg',
         url: '/reference/dart/start',
+      },
+      {
+        label: 'supabase-csharp',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/c-sharp-icon.svg',
+        url: '/reference/csharp/start',
       },
     ],
   },

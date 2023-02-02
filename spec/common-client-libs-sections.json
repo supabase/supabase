@@ -16,7 +16,8 @@
     "title": "Initializing",
     "id": "initializing",
     "slug": "initializing",
-    "type": "function"
+    "type": "markdown",
+    "libs": ["csharp"]
   },
   {
     "title": "Typescript Support",
@@ -27,7 +28,8 @@
       "reference_javascript_v1",
       "reference_dart_v0",
       "reference_dart_v1",
-      "reference_python_v2"
+      "reference_python_v2",
+      "reference_csharp_v0"
     ]
   },
   {
@@ -35,11 +37,15 @@
     "id": "upgrade-guide",
     "slug": "upgrade-guide",
     "type": "markdown",
-    "excludes": ["reference_javascript_v2", "reference_dart_v1", "reference_python_v2"]
+    "excludes": [
+      "reference_javascript_v2",
+      "reference_dart_v1",
+      "reference_python_v2",
+      "reference_csharp_v0"
+    ]
   },
   {
     "title": "Database",
-
     "items": [
       {
         "id": "select",
@@ -90,7 +96,6 @@
         "slug": "using-filters",
         "product": "database",
         "type": "function",
-
         "items": [
           {
             "id": "eq",
@@ -286,7 +291,6 @@
         "product": "database",
         "parent": "modifiers",
         "type": "function",
-
         "items": [
           {
             "id": "db-modifiers-select",
@@ -358,7 +362,6 @@
   },
   {
     "title": "Auth",
-
     "items": [
       {
         "id": "auth-api",
@@ -653,7 +656,6 @@
   },
   {
     "title": "Functions",
-
     "items": [
       {
         "id": "invoke",
@@ -666,7 +668,6 @@
   },
   {
     "title": "Realtime",
-
     "items": [
       {
         "id": "stream",
@@ -729,7 +730,6 @@
   },
   {
     "title": "Storage",
-
     "items": [
       {
         "id": "create-bucket",
@@ -848,7 +848,6 @@
   {
     "title": "Misc",
     "excludes": ["reference_dart_v1", "reference_dart_v0"],
-
     "items": [
       {
         "title": "Release Notes",
