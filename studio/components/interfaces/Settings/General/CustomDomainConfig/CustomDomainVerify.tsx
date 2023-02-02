@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
+import { Alert, Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
 
 import { useStore } from 'hooks'
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'
@@ -20,7 +20,6 @@ export type CustomDomainVerifyProps = {
 
 const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
   const { ui } = useStore()
-
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
@@ -29,8 +28,12 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-
   const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+
+  const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
+    (acc, error) => acc || error.message.includes('caa_error'),
+    false
+  )
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) {
@@ -111,6 +114,18 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </div>
         </div>
 
+        {hasCAAErrors && (
+          <Alert
+            withIcon
+            variant="warning"
+            title="Certificate Authority Authentication (CAA) error"
+          >
+            Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
+            <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+            <code className="text-xs">0 issue "digitcert.com"</code>
+          </Alert>
+        )}
+
         <div className="space-y-2">
           <div className="flex gap-4">
             <div className="w-[50px]">
@@ -127,19 +142,6 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               </div>
             </div>
           </div>
-
-          {customDomain.ssl.validation_errors?.reduce(
-            (acc, error) => acc || error.message.includes('caa_error'),
-            false
-          ) && (
-            <div className="flex items-center justify-center space-x-2 py-8">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">
-                CAA error: please add a CAA record allowing "digicert.com" to issue certificates for
-                "${customDomain.hostname}". Example record: `0 issue "digicert.com"`.
-              </p>
-            </div>
-          )}
 
           {customDomain.verification_errors?.includes(
             'custom hostname does not CNAME to this zone.'
