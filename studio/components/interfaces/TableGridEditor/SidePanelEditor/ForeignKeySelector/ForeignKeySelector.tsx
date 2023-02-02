@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Listbox, IconHelpCircle } from 'ui'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { SidePanel, Input, Listbox, IconHelpCircle } from 'ui'
+import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
@@ -71,7 +71,7 @@ const ForeignKeySelector: FC<Props> = ({
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
-        column: table.columns.length > 0 ? table.columns[0].name : undefined,
+        column: table.columns?.length ? table.columns[0].name : undefined,
       })
     }
   }
@@ -165,26 +165,41 @@ const ForeignKeySelector: FC<Props> = ({
           </Listbox>
 
           {selectedForeignKey?.table && (
-            <Listbox
-              value={selectedColumn?.id}
-              // @ts-ignore
-              label={
-                <div>
-                  Select a column from <code>{selectedForeignKey?.table}</code> to reference to
-                </div>
-              }
-              error={errors.column}
-              onChange={(value: string) => updateSelectedColumn(value)}
-            >
-              {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
-                <Listbox.Option key={column.id} value={column.id} label={column.name}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-scale-1200">{column.name}</span>
-                    <span className="text-scale-900">{column.format}</span>
-                  </div>
-                </Listbox.Option>
-              ))}
-            </Listbox>
+            <>
+              {(selectedTable?.columns ?? []).length === 0 ? (
+                <Input
+                  disabled
+                  label={
+                    <div>
+                      Select a column from <code>{selectedForeignKey?.table}</code> to reference to
+                    </div>
+                  }
+                  error={errors.column}
+                  placeholder="This table has no columns available"
+                />
+              ) : (
+                <Listbox
+                  value={selectedColumn?.id}
+                  // @ts-ignore
+                  label={
+                    <div>
+                      Select a column from <code>{selectedForeignKey?.table}</code> to reference to
+                    </div>
+                  }
+                  error={errors.column}
+                  onChange={(value: string) => updateSelectedColumn(value)}
+                >
+                  {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
+                    <Listbox.Option key={column.id} value={column.id} label={column.name}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-scale-1200">{column.name}</span>
+                        <span className="text-scale-900">{column.format}</span>
+                      </div>
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              )}
+            </>
           )}
         </div>
       </SidePanel.Content>

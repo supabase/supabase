@@ -5,19 +5,18 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import Base64 from 'lib/base64'
-import { tryParseJson } from 'lib/helpers'
-import { useStore, withAuth, useUrlState } from 'hooks'
+import { useStore, withAuth, useUrlState, useParams } from 'hooks'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { SchemaView } from 'types'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
-  const { id }: any = router.query
+  const { id } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { meta, ui } = useStore()
@@ -37,13 +36,17 @@ const TableEditorPage: NextPage = () => {
 
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
+  const views: SchemaView[] = meta.views.list()
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
 
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
-      tables.concat(foreignTables).find((table) => table.id === Number(id))
-    : id !== undefined
-    ? tryParseJson(Base64.decode(id))
+      tables
+        // @ts-ignore
+        .concat(views)
+        // @ts-ignore
+        .concat(foreignTables)
+        .find((table) => table.id === Number(id))
     : undefined
 
   useEffect(() => {
@@ -140,7 +143,7 @@ const TableEditorPage: NextPage = () => {
       })
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -171,7 +174,7 @@ const TableEditorPage: NextPage = () => {
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         error,

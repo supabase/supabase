@@ -12,12 +12,6 @@ export const CATEGORY_OPTIONS = [
     query: 'Unable to connect',
   },
   {
-    value: 'Best_practices',
-    label: 'Questions on best practices',
-    description: 'Enquire on how best practices developing with Supabase',
-    query: 'Best practices',
-  },
-  {
     value: 'Performance',
     label: 'Performance issues',
     description: 'Reporting of performance issues is only available on the Pro tier',
