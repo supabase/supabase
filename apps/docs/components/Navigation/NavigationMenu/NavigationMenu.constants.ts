@@ -453,6 +453,11 @@ export const functions = {
           url: '/guides/functions/examples/cloudflare-turnstile',
           items: [],
         },
+        {
+          name: 'Connect to Postgres',
+          url: '/guides/functions/examples/connect-to-postgres',
+          items: [],
+        },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
