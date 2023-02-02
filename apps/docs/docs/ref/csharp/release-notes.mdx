@@ -3,6 +3,39 @@ id: release-notes
 title: Release Notes
 ---
 
+## 0.8.0 - 2023-01-31
+
+- Update dependency: realtime-csharp@5.0.0
+  - Re: [#21](https://github.com/supabase-community/realtime-csharp/pull/21) Provide API for `presence`, `broadcast` and `postgres_changes`
+    - [Major, New] `Channel.PostgresChanges` event will receive the wildcard `*` changes event, not `Channel.OnMessage`.
+    - [Major] `Channel.OnInsert`, `Channel.OnUpdate`, and `Channel.OnDelete` now conform to the server's payload of `Response.Payload.**Data**`
+    - [Major] `Channel.OnInsert`, `Channel.OnUpdate`, and `Channel.OnDelete` now return `PostgresChangesEventArgs`
+    - [Minor] Rename `Channel` to `RealtimeChannel`
+    - Supports better handling of disconnects in `RealtimeSocket` and adds a `Client.OnReconnect` event.
+    - [Minor] Moves `ChannelOptions` to `Channel.ChannelOptions`
+    - [Minor] Moves `ChannelStateChangedEventArgs` to `Channel.ChannelStateChangedEventArgs`
+    - [Minor] Moves `Push` to `Channel.Push`
+    - [Minor] Moves `Channel.ChannelState` to `Constants.ChannelState`
+    - [Minor] Moves `SocketResponse`, `SocketRequest`, `SocketResponsePayload`, `SocketResponseEventArgs`, and `SocketStateChangedEventArgs` to `Socket` namespace.
+    - [New] Adds `RealtimeBroadcast`
+    - [New] Adds `RealtimePresence`
+    - [Improvement] Better handling of disconnection/reconnection
+- Update dependency: postgrest-csharp@3.1.3
+  - Another fix for [#61](https://github.com/supabase-community/postgrest-csharp/issues/61) which further typechecks nullable values.
+
+## 0.7.2 - 2023-01-27
+
+- Update dependency: gotrue-csharp@3.0.4
+  - Makes `Session.CreatedAt` a publicly settable property, which should fix incorrect dates on retrieved `Session`s.
+- Update dependency: postgrest-csharp@3.1.2
+  - Fix [#61](https://github.com/supabase-community/postgrest-csharp/issues/61) which did not correctly parse Linq `Where` when encountering a nullable type.
+  - Add missing support for transforming for `== null` and `!= null`
+
+## 0.7.1 - 2023-01-17
+
+- Update dependency: postgrest-csharp@3.1.1
+  - Fix issue from supabase-community/supabase-csharp#48 where boolean model properties would not be evaluated in predicate expressions
+
 ## 0.7.0 - 2023-01-16
 
 - Update dependency: postgrest-csharp@3.1.0

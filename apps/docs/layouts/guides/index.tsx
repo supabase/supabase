@@ -17,6 +17,7 @@ interface Props {
     breadcrumb?: string
     subtitle?: string
     video?: string
+    canonical?: string
   }
   children: any
   toc?: any
@@ -67,7 +68,7 @@ const Layout: FC<Props> = (props) => {
       <NextSeo
         title={`${props.meta?.title} | Supabase Docs`}
         description={props.meta?.description ? props.meta?.description : props.meta?.title}
-        canonical={`https://supabase.com/docs${asPath}`}
+        canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
         openGraph={{
           title: props.meta?.title,
           description: props.meta?.description,
