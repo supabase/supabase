@@ -4,7 +4,7 @@ import { Query, Dictionary } from 'components/grid'
 import { Modal } from 'ui'
 import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { useStore, useUrlState } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -42,6 +42,7 @@ const SidePanelEditor: FC<Props> = ({
   onTableCreated = () => {},
   onColumnSaved = () => {},
 }) => {
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const { meta, ui } = useStore()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
@@ -139,6 +140,15 @@ const SidePanelEditor: FC<Props> = ({
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
       await meta.tables.loadById(selectedTable!.id)
+      if (
+        !isNewRecord &&
+        payload.name &&
+        selectedColumnToEdit &&
+        selectedColumnToEdit.name !== payload.name
+      ) {
+        reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
+      }
+
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
@@ -149,6 +159,28 @@ const SidePanelEditor: FC<Props> = ({
     }
 
     resolve()
+  }
+
+  /**
+   * Adds the renamed column's filter and/or sort rules.
+   */
+  const reAddRenamedColumnSortAndFilter = (oldColumnName: string, newColumnName: string) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+
+      return {
+        ...prevParams,
+        filter: existingFilters.map((filter: string) => {
+          const [column] = filter.split(':')
+          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
+        }),
+        sort: existingSorts.map((sort: string) => {
+          const [column] = sort.split(':')
+          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
+        }),
+      }
+    })
   }
 
   const saveTable = async (
