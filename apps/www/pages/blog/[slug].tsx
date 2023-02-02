@@ -134,7 +134,15 @@ function BlogPostPage(props: any) {
           description: props.blog.description,
           url: `https://supabase.com/blog/${props.blog.slug}`,
           type: 'article',
-
+          videos: props.blog.video && [
+            {
+              // youtube based video meta
+              url: props.blog.video,
+              type: 'application/x-shockwave-flash',
+              width: 640,
+              height: 385,
+            },
+          ],
           article: {
             //
             // to do: add expiration and modified dates
