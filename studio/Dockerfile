@@ -37,8 +37,7 @@ FROM dev as builder
 RUN npx turbo run build --scope=studio --include-dependencies --no-deps
 
 # Copy only compiled code and dependencies
-FROM node:16-slim as production
-WORKDIR /app
+FROM base as production
 COPY --from=builder /app/studio/public ./studio/public
 COPY --from=builder /app/studio/.next/standalone/app ./
 COPY --from=builder /app/studio/.next/static ./studio/.next/static
