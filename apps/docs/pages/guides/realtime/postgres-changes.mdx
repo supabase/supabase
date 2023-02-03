@@ -41,7 +41,7 @@ commit;
 alter publication supabase_realtime add table messages;
 ```
 
-### Full 'old' Record
+### Full `old` Record
 
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record,
 you can set the `replica identity` of your table to `full`:
