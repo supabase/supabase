@@ -3,8 +3,8 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { checkPermissions, useJwtSecretUpdateStatus } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {
@@ -12,10 +12,10 @@ const DisplayApiSettings = () => {
   const { ref } = router.query
 
   const {
-    data: settings,
+    services,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsQuery({ projectRef: ref as string })
+  } = useProjectSettings(ref as string | undefined)
   const {
     jwtSecretUpdateStatus,
     isError: isJwtSecretUpdateStatusError,
@@ -27,7 +27,8 @@ const DisplayApiSettings = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service
-  const apiKeys = settings?.autoApiService.service_api_keys ?? []
+  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
+  const apiKeys = apiService?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
@@ -84,10 +85,10 @@ const DisplayApiSettings = () => {
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="bg-red-900 text-xs text-white">{'secret'}</code>
+                      <code className="bg-red-900 text-xs text-white">secret</code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
+                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                 </>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
