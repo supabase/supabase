@@ -24,6 +24,20 @@ const questions = [
   'How do I setup authentication?',
 ]
 
+function getEdgeFunctionUrl() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/$/, '')
+  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
+
+  if (isPlatform) {
+    const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
+    return `${schemeAndProjectId}.functions.${domain}.${tld}`
+  } else {
+    return `${supabaseUrl}/functions/v1`
+  }
+}
+
+const edgeFunctionUrl = getEdgeFunctionUrl()
+
 const ClippyModal: FC<Props> = ({ onClose }) => {
   const { isDarkMode } = useTheme()
   const [query, setQuery] = useState('')
@@ -44,17 +58,14 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setAnswer(undefined)
     setIsLoading(true)
 
-    const eventSource = new SSE(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/clippy-search`,
-      {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        payload: JSON.stringify({ query }),
-      }
-    )
+    const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify({ query }),
+    })
 
     // TODO: display an error on the UI
     eventSource.addEventListener('error', (e) => {
