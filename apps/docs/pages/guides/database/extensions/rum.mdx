@@ -130,6 +130,7 @@ CREATE INDEX idx_array ON test_array USING rum (i rum_anyarray_ops);
 ```
 
 Now we can execute the query using index scan:
+
 ```sql
 SELECT * FROM test_array WHERE i && '{1}' ORDER BY i <=> '{1}' ASC;
      i
