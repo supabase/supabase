@@ -5,6 +5,7 @@ export const meta = {
   title: 'Realtime Quickstart',
   description: "Getting started with Realtime's Features",
   sidebar_label: 'Quickstart',
+  video: 'https://www.youtube.com/v/BelYEMJ2N00',
 }
 
 Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres Changes using [Realtime](/docs/guides/realtime).
@@ -121,7 +122,7 @@ channel.subscribe(async (status) => {
 })
 ```
 
-## Track and display which users are online
+## Track and Display Which Users Are Online
 
 [Presence](/docs/guides/realtime#presence) stores and synchronize shared state across clients. The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when new clients join the channel and `leave` event is triggered when clients leave.
 

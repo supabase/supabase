@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ENDPOINT } from 'pages/api/constants'
+import { DEFAULT_PROJECT, PROJECT_ENDPOINT } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -21,20 +21,16 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {
     project: {
+      ...DEFAULT_PROJECT,
       cloud_provider: 'AWS',
+      region: 'ap-southeast-1',
       db_dns_name: '-',
       db_host: 'localhost',
       db_name: 'postgres',
       db_port: 5432,
       db_ssl: false,
       db_user: 'postgres',
-      id: 1,
-      inserted_at: undefined,
       jwt_secret: '-',
-      name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
-      ref: 'default',
-      region: 'ap-southeast-1',
-      status: 'ACTIVE_HEALTHY',
     },
     services: [
       {

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
+import { Badge } from '~/../../packages/ui'
 
 const home = [
   [
@@ -99,9 +100,17 @@ const home = [
       icon: '/img/icons/menu/reference-python',
       href: '/reference/python/introduction',
       level: 'reference_python',
+      community: true,
     },
     {
-      label: 'Tools Reference',
+      label: 'C#',
+      icon: '/img/icons/menu/reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Tools',
     },
     {
       label: 'Management API',
@@ -112,7 +121,7 @@ const home = [
     {
       label: 'Supabase CLI',
       icon: '/img/icons/menu/reference-cli',
-      href: '/reference/cli/introduction',
+      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],
@@ -171,6 +180,7 @@ const NavigationMenuHome = ({ active }) => {
                                 className="w-4 h-4 group-hover:scale-110 ease-out transition-all"
                               />
                               {link.label}
+                              {link.community && <Badge size="small">Community</Badge>}
                             </li>
                           </a>
                         </Link>
