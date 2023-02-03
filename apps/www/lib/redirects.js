@@ -1780,32 +1780,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/introduction',
+    destination: '/docs/reference/javascript/start',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/introduction',
+    destination: '/docs/reference/dart/start',
   },
   {
     permanent: true,
     source: '/docs/reference/cli',
-    destination: '/docs/reference/cli/introduction',
+    destination: '/docs/reference/cli/start',
   },
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/introduction',
+    destination: '/docs/reference/api/start',
   },
   {
     permanent: true,
     source: '/docs/reference/auth',
-    destination: '/docs/reference/auth/introduction',
+    destination: '/docs/reference/self-hosting-auth/start',
   },
   {
     permanent: true,
     source: '/docs/reference/storage',
-    destination: '/docs/reference/storage/introduction',
+    destination: '/docs/reference/self-hosting-storage/start',
   },
   {
     permanent: true,
