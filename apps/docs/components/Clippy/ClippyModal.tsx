@@ -1,5 +1,5 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import clippyImageDark from '../../public/img/clippy-dark.png'
@@ -20,6 +20,7 @@ const questions = [
   'How do I connect to my database?',
   'How do I run migrations? ',
   'How do I listen to changes in a table?',
+  'How do I setup authentication?',
 ]
 
 const ClippyModal: FC<Props> = ({ onClose }) => {
@@ -49,7 +50,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
     if (response.data.answer.includes('Sorry, I don')) {
       setCantHelp(true)
-      setStatus('Clippy has faild you')
+      setStatus('Clippy has failed you')
     } else {
       setStatus('')
       setCantHelp(false)
@@ -58,10 +59,11 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setAnswer(response.data.answer)
   }, [query, supabaseClient])
 
-  function handleQueryPreload(question: string) {
-    setQuery(question)
-    handleConfirm()
-  }
+  useEffect(() => {
+    if (query) {
+      handleConfirm()
+    }
+  }, [query, handleConfirm])
 
   function handleResetPrompt() {
     setQuery('')
@@ -100,19 +102,26 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               esc
             </Button>
           </div>
+          {!isLoading && answer && (
+            <div className="absolute right-0 top-0 mt-3 mr-16 hidden md:block">
+              <Button type="text" size="tiny" onClick={handleResetPrompt}>
+                Try again
+              </Button>
+            </div>
+          )}
         </div>
 
         {!isLoading && !answer && (
           <div className="">
             <div className="mt-2">
-              <h2 className="text-xs text-scale-900">Not sure where to start?</h2>
+              <h2 className="text-sm text-scale-900">Not sure where to start?</h2>
 
-              <ul className="text-xs mt-4 text-scale-1000 grid md:flex gap-4 flex-wrap max-w-3xl">
+              <ul className="text-sm mt-4 text-scale-1000 grid md:flex gap-4 flex-wrap max-w-3xl">
                 {questions.map((question) => (
                   <li>
                     <button
                       className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
-                      onClick={() => handleQueryPreload(question)}
+                      onClick={() => setQuery(question)}
                     >
                       {question}
                     </button>
@@ -129,7 +138,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           </div>
         )}
         {answer && (
-          <div className="px-4 py-4 dark rounded-lg overflow-y-scroll">
+          <div className="px-4 py-4 rounded-lg overflow-y-scroll">
             {answer.includes('Sorry, I don') ? (
               <p className="flex flex-col gap-4 items-center">
                 <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
@@ -141,23 +150,25 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                 </Button>
               </p>
             ) : (
-              <ReactMarkdown
-                linkTarget="_blank"
-                remarkPlugins={[remarkGfm]}
-                transformLinkUri={(href) => {
-                  const supabaseUrl = new URL('https://supabase.com')
-                  const linkUrl = new URL(href, 'https://supabase.com')
+              <div className="prose dark:prose-dark">
+                <ReactMarkdown
+                  linkTarget="_blank"
+                  remarkPlugins={[remarkGfm]}
+                  transformLinkUri={(href) => {
+                    const supabaseUrl = new URL('https://supabase.com')
+                    const linkUrl = new URL(href, 'https://supabase.com')
 
-                  if (linkUrl.origin === supabaseUrl.origin) {
-                    return linkUrl.toString()
-                  }
+                    if (linkUrl.origin === supabaseUrl.origin) {
+                      return linkUrl.toString()
+                    }
 
-                  return href
-                }}
-                components={components}
-              >
-                {answer}
-              </ReactMarkdown>
+                    return href
+                  }}
+                  components={components}
+                >
+                  {answer}
+                </ReactMarkdown>
+              </div>
             )}
           </div>
         )}
