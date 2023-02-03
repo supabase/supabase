@@ -48,6 +48,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
       `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/clippy-search`,
       {
         headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
