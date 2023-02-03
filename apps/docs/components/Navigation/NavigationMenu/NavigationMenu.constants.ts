@@ -420,6 +420,11 @@ export const database = {
           url: '/guides/database/extensions/uuid-ossp',
           items: [],
         },
+        {
+          name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
+          items: [],
+        },
       ],
     },
     {
