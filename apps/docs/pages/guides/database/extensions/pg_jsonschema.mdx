@@ -27,6 +27,7 @@ export const meta = {
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
+{/* prettier-ignore */}
 ```sql
 -- Enable the "pg_jsonschema" extension
 create extension pg_jsonschema with schema extensions;
@@ -52,6 +53,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 Since `pg_jsonschema` exposes its utilities as functions, we can test it with a simple select statement:
 
+{/* prettier-ignore */}
 ```sql
 select
   extensions.json_matches_schema(
@@ -62,6 +64,7 @@ select
 
 `pg_jsonschema` is generally used in tandem with a [check constraint](https://www.postgresql.org/docs/current/ddl-constraints.html) as a way to constrain the contents of a json/b field to match a JSON Schema.
 
+{/* prettier-ignore */}
 ```sql
 create table customer(
     id serial primary key,
