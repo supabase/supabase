@@ -8,7 +8,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: 'dashboard_bug',
     label: 'Dashboard bug',
-    description: 'Issues with connecting to your database',
+    description: 'Issues with the Supabase dashboard',
     query: undefined,
   },
   {
