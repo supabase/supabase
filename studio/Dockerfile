@@ -22,6 +22,13 @@ RUN npx turbo@1.7.0 prune --scope=studio --docker
 FROM base as deps
 COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/package-lock.json ./
+# Install additional dependencies for arm64 build (required by bufferutil)
+ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*; fi
 # No need to clean cache because production uses standalone build
 RUN npm clean-install
 
