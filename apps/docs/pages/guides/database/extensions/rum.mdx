@@ -20,8 +20,8 @@ combinations or phrases.
 
 Main operators for ordering are:
 
-tsvector <=> tsquery | float4 | Distance between tsvector and tsquery.
-value <=> value | float8 | Distance between two values.
+tsvector `<=>` tsquery | float4 | Distance between tsvector and tsquery.
+value `<=>` value | float8 | Distance between two values.
 
 Where value is timestamp, timestamptz, int2, int4, int8, float4, float8, money and oid
 
@@ -83,10 +83,10 @@ CREATE INDEX rumidx ON test_rum USING rum (a rum_tsvector_ops);
 And we can execute `tsvector` selects with ordering by text distance operator:
 
 ```sql
-SELECT t, a <=> to_tsquery('english', 'beautiful | place') AS rank
+SELECT t, a `<=>` to_tsquery('english', 'beautiful | place') AS rank
     FROM test_rum
     WHERE a @@ to_tsquery('english', 'beautiful | place')
-    ORDER BY a <=> to_tsquery('english', 'beautiful | place');
+    ORDER BY a `<=>` to_tsquery('english', 'beautiful | place');
                 t                |  rank
 ---------------------------------+---------
  It looks like a beautiful place | 8.22467
@@ -106,7 +106,7 @@ CREATE INDEX tsts_idx ON tsts USING rum (t rum_tsvector_addon_ops, d)
 Now we can execute the selects with ordering distance operator on attached column:
 
 ```sql
-SELECT id, d, d <=> '2016-05-16 14:21:25' FROM tsts WHERE t @@ 'wr&qh' ORDER BY d <=> '2016-05-16 14:21:25' LIMIT 5;
+SELECT id, d, d `<=>` '2016-05-16 14:21:25' FROM tsts WHERE t @@ 'wr&qh' ORDER BY d `<=>` '2016-05-16 14:21:25' LIMIT 5;
  id  |                d                |   ?column?
 -----+---------------------------------+---------------
  355 | Mon May 16 14:21:22.326724 2016 |      2.673276
@@ -121,7 +121,7 @@ SELECT id, d, d <=> '2016-05-16 14:21:25' FROM tsts WHERE t @@ 'wr&qh' ORDER BY 
 
 `rum_anyarray_ops`
 
-This operator class stores anyarray elements with length of the array. It supports operators &&, @>, <@, =, % operators. It also supports ordering by <=> operator.
+This operator class stores anyarray elements with length of the array. It supports operators `&&`, `@>`, `<@`, `=`, `%` operators. It also supports ordering by `<=>` operator.
 
 ```sql
 CREATE TABLE test_array (i int2[]);
@@ -132,7 +132,7 @@ CREATE INDEX idx_array ON test_array USING rum (i rum_anyarray_ops);
 Now we can execute the query using index scan:
 
 ```sql
-SELECT * FROM test_array WHERE i && '{1}' ORDER BY i <=> '{1}' ASC;
+SELECT * FROM test_array WHERE i && '{1}' ORDER BY i `<=>` '{1}' ASC;
      i
 -----------
  {1}
