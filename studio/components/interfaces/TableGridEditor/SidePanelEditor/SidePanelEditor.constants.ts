@@ -16,6 +16,29 @@ export const POSTGRES_DATA_TYPES = sortBy(
   concat(NUMERICAL_TYPES, JSON_TYPES, TEXT_TYPES, DATETIME_TYPES, OTHER_DATA_TYPES)
 )
 
+export const RECOMMENDED_ALTERNATIVE_DATA_TYPE: {
+  [key: string]: { alternative: string; reference: string }
+} = {
+  varchar: {
+    alternative: 'text',
+    reference:
+      "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_varchar.28n.29_by_default",
+  },
+  json: {
+    alternative: 'jsonb',
+    reference: 'https://www.postgresql.org/docs/current/datatype-json.html',
+  },
+  timetz: {
+    alternative: 'timestamptz',
+    reference: "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timetz",
+  },
+  timestamp: {
+    alternative: 'timestamptz',
+    reference:
+      "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29",
+  },
+}
+
 export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'int2',
@@ -48,12 +71,22 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
     type: 'number',
   },
   {
+    name: 'json',
+    description: 'Textual JSON data',
+    type: 'json',
+  },
+  {
     name: 'jsonb',
     description: 'Binary JSON data, decomposed',
     type: 'json',
   },
   {
     name: 'text',
+    description: 'Variable-length character string',
+    type: 'text',
+  },
+  {
+    name: 'varchar',
     description: 'Variable-length character string',
     type: 'text',
   },
@@ -70,6 +103,16 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'time',
     description: 'Time of day (no time zone)',
+    type: 'time',
+  },
+  {
+    name: 'timetz',
+    description: 'Time of day, including time zone',
+    type: 'time',
+  },
+  {
+    name: 'timestamp',
+    description: 'Date and time (no time zone)',
     type: 'time',
   },
   {

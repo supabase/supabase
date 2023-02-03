@@ -282,7 +282,7 @@ type SupabaseContext = {
   supabase: SupabaseClient<Database>
 }
 
-const Context = createContext<SupabaseContext>()
+const Context = createContext<SupabaseContext | undefined>(undefined)
 
 export default function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createClient())
@@ -294,7 +294,13 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
   )
 }
 
-export const useSupabase = () => useContext(Context)
+export const useSupabase = () => {
+  if (context === undefined) {
+    throw new Error("useSupabase must be used inside SupabaseProvider");
+  }
+
+  return useContext(Context)
+}
 ```
 
 > TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createBrowserSupabaseClient` to add type support to the Supabase client.

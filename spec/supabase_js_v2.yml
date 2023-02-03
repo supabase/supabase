@@ -176,7 +176,7 @@ functions:
           ```
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
-        description: |         
+        description: |
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
@@ -3991,11 +3991,10 @@ functions:
     title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
-      - Row level security is not applied to delete statements.
-      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
-      - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
+      - By default, Broadcast and Presence are enabled for all projects.
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/database/api#realtime-api-overview).
+      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages
