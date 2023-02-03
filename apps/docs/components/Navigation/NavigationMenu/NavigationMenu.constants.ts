@@ -389,19 +389,39 @@ export const database = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
         {
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
+        {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
           items: [],
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
+          name: 'PGRoonga: Multilingual Full Text Search',
+          url: '/guides/database/extensions/pgroonga',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
           items: [],
         },
         {
+          name: 'pg_jsonschema: JSON Schema Validation',
+          url: '/guides/database/extensions/pg_jsonschema',
+          items: [],
+        },
+        {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pgnet',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
           items: [],
         },
         {
