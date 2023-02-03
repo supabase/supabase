@@ -1,4 +1,4 @@
-name: boostsecurity.io
+name: boostsecurity.io (Dev)
 on:
   workflow_dispatch:
   push:
@@ -14,5 +14,6 @@ jobs:
       - name: Run SBOM
         uses: boostsecurityio/boostsec-scanner-github@v4
         with:
+          api_endpoint: https://api.dev.boostsec.io
           api_token: ${{ secrets.BOOST_API_TOKEN_DEV }}
           registry_module: boostsecurityio/trivy-sbom
