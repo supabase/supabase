@@ -59,7 +59,6 @@ const FileExplorerColumn = ({
   selectedFilePreview = {},
   onFilesUpload = () => {},
   onSelectAllItemsInColumn = () => {},
-  onSelectRangeItemsInColumn = () => {},
   onSelectColumnEmptySpace = () => {},
   onColumnLoadMore = () => {},
 }) => {
@@ -202,7 +201,6 @@ const FileExplorerColumn = ({
           selectedItems,
           openedFolders,
           selectedFilePreview,
-          onSelectRangeItemsInColumn,
           // onCheckItem,
           // onRenameFile,
           // onCopyFileURL,

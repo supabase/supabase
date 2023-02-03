@@ -16,7 +16,6 @@ const FileExplorer = ({
   selectedFilePreview = {},
   onFilesUpload = () => {},
   onSelectAllItemsInColumn = () => {},
-  onSelectRangeItemsInColumn = () => {},
   onSelectColumnEmptySpace = () => {},
   onSelectCreateFolder = () => {},
   onChangeView = () => {},
@@ -70,7 +69,6 @@ const FileExplorer = ({
               selectedFilePreview={selectedFilePreview}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectRangeItemsInColumn={onSelectRangeItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
             />
@@ -88,7 +86,6 @@ const FileExplorer = ({
               selectedFilePreview={selectedFilePreview}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectRangeItemsInColumn={onSelectRangeItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
             />
