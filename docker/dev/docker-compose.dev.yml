@@ -1,6 +1,13 @@
 version: "3.8"
 
 services:
+  studio:
+    build:
+      context: ..
+      dockerfile: studio/Dockerfile
+      target: dev
+    ports:
+      - 8082:8082
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3
