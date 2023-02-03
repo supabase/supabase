@@ -29,7 +29,6 @@ import {
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { ColumnExplorerItem } from 'localStores/storageExplorer/StorageExploreStore.types'
 
 const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
@@ -76,15 +75,7 @@ interface Props {
   selectedItems: any[]
   openedFolders: any[]
   selectedFilePreview: any
-  onSelectRangeItemsInColumn: (
-    columnIndex: number,
-    selectItemIndex: number,
-    selectItem: ColumnExplorerItem
-  ) => void
 }
-
-type ExtendKeyboardEvent = React.ChangeEvent<HTMLInputElement> &
-  React.KeyboardEvent<HTMLInputElement>
 
 const FileExplorerRow: FC<Props> = ({
   index: itemIndex,
@@ -94,7 +85,6 @@ const FileExplorerRow: FC<Props> = ({
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
-  onSelectRangeItemsInColumn = () => {},
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
@@ -116,6 +106,7 @@ const FileExplorerRow: FC<Props> = ({
     downloadFile,
     downloadFolder,
     copyFileURLToClipboard,
+    selectRangeItems,
   } = storageExplorerStore
 
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -139,16 +130,18 @@ const FileExplorerRow: FC<Props> = ({
     await fetchFolderContents(folder.id, folder.name, columnIndex)
   }
 
-  const onCheckItem = (item: ColumnExplorerItem, isShiftKeyHeld: boolean, itemIndex: number) => {
+  const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
     if (isShiftKeyHeld && selectedItems.length !== 0) {
-      onSelectRangeItemsInColumn(item.columnIndex, itemIndex, item)
+      selectRangeItems(columnIndex, itemIndex)
       return
     }
-    if (find(selectedItems, item) === undefined) {
-      setSelectedItems(selectedItems.concat([item]))
+    if (find(selectedItems, (item: any) => itemWithColumnIndex.id === item.id) !== undefined) {
+      setSelectedItems(
+        selectedItems.filter((selectedItem: any) => itemWithColumnIndex.id !== selectedItem.id)
+      )
     } else {
-      setSelectedItems(selectedItems.filter((selectedItem: any) => item.id !== selectedItem.id))
+      setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
     closeFilePreview()
   }
@@ -358,9 +351,9 @@ const FileExplorerRow: FC<Props> = ({
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={(event: ExtendKeyboardEvent) => {
+              onChange={(event) => {
                 event.stopPropagation()
-                onCheckItem(itemWithColumnIndex, event.nativeEvent.shiftKey, itemIndex)
+                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
               }}
             />
           </div>
