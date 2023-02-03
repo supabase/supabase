@@ -1,7 +1,8 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { FC, useCallback, useEffect, useState } from 'react'
+import type { CreateCompletionResponse } from 'openai'
+import { FC, useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { SSE } from 'sse.js'
 import clippyImageDark from '../../public/img/clippy-dark.png'
 import clippyImage from '../../public/img/clippy.png'
 
@@ -26,56 +27,72 @@ const questions = [
 const ClippyModal: FC<Props> = ({ onClose }) => {
   const { isDarkMode } = useTheme()
   const [query, setQuery] = useState('')
-  const [status, setStatus] = useState('')
   const [answer, setAnswer] = useState('')
-  const [cantHelp, setCantHelp] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const supabaseClient = useSupabaseClient()
+  const [isResponding, setIsResponding] = useState(false)
 
-  const handleConfirm = useCallback(async () => {
+  const cantHelp = answer === "Sorry, I don't know how to help with that."
+  const status = isLoading
+    ? 'Clippy is searching...'
+    : isResponding
+    ? 'Clippy is responding...'
+    : cantHelp
+    ? 'Clippy has failed you'
+    : undefined
+
+  const handleConfirm = useCallback(async (query: string) => {
     setAnswer(undefined)
     setIsLoading(true)
-    setStatus('Clippy is searching...')
 
-    const response = await supabaseClient.functions.invoke('clippy-search', { body: { query } })
-
-    setIsLoading(false)
-    setStatus('')
+    const eventSource = new SSE(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/clippy-search`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        payload: JSON.stringify({ query }),
+      }
+    )
 
     // TODO: display an error on the UI
-    if (response.error) {
-      console.error('Clippy search failed', response.error)
-      return
-    }
+    eventSource.addEventListener('error', (e) => {
+      console.error(e)
+    })
 
-    if (response.data.answer.includes('Sorry, I don')) {
-      setCantHelp(true)
-      setStatus('Clippy has failed you')
-    } else {
-      setStatus('')
-      setCantHelp(false)
-    }
+    eventSource.addEventListener('message', (e) => {
+      setIsLoading(false)
 
-    setAnswer(response.data.answer)
-  }, [query, supabaseClient])
+      if (e.data === '[DONE]') {
+        setIsResponding(false)
+        return
+      }
 
-  useEffect(() => {
-    if (query) {
-      handleConfirm()
-    }
-  }, [query, handleConfirm])
+      setIsResponding(true)
+
+      const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+      const [{ text }] = completionResponse.choices
+
+      setAnswer((answer) => {
+        return (answer ?? '') + text
+      })
+    })
+
+    eventSource.stream()
+
+    setIsLoading(true)
+  }, [])
 
   function handleResetPrompt() {
     setQuery('')
     setAnswer(undefined)
-    setStatus('')
-    setCantHelp(false)
+    setIsResponding(false)
   }
 
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
       <div
-        className={`mx-auto flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
+        className={`mx-auto max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full max-w-3xl shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -90,7 +107,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             onKeyDown={(e) => {
               switch (e.key) {
                 case 'Enter':
-                  handleConfirm()
+                  handleConfirm(query)
                   return
                 default:
                   return
@@ -121,7 +138,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                   <li>
                     <button
                       className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
-                      onClick={() => setQuery(question)}
+                      onClick={() => {
+                        setQuery(question)
+                        handleConfirm(question)
+                      }}
                     >
                       {question}
                     </button>
@@ -131,16 +151,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             </div>
           </div>
         )}
-        {isLoading && (
-          <div className="p-6 grid gap-6 mt-4">
-            <Loading active>{}</Loading>
-            <p className="text-lg text-center">Searching for results</p>
-          </div>
-        )}
         {answer && (
-          <div className="px-4 py-4 rounded-lg overflow-y-scroll">
-            {answer.includes('Sorry, I don') ? (
-              <p className="flex flex-col gap-4 items-center">
+          <div className="px-4 py-4 rounded-lg overflow-y-auto bg-scale-200">
+            {cantHelp ? (
+              <p className="flex flex-col gap-4 items-center p-4">
                 <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
                   <IconAlertCircle />
                   <p>Sorry, I don&apos;t know how to help with that.</p>
@@ -172,6 +186,12 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             )}
           </div>
         )}
+        {isLoading && (
+          <div className="p-6 grid gap-6 mt-4">
+            <Loading active>{}</Loading>
+            <p className="text-lg text-center">Searching for results</p>
+          </div>
+        )}
         <div className="border-t border-scale-600 mt-4 text-scale-900">
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
@@ -181,9 +201,9 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               </a>
             </div>
             <div className="flex items-center gap-6 py-1">
-              {isLoading || cantHelp ? (
+              {status ? (
                 <span className="bg-scale-400 rounded-lg py-1 px-2 items-center gap-2 hidden md:flex">
-                  {isLoading && <IconLoader size={14} className="animate-spin" />}
+                  {(isLoading || isResponding) && <IconLoader size={14} className="animate-spin" />}
                   {status}
                 </span>
               ) : (
