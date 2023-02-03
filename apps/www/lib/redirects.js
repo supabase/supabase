@@ -1810,7 +1810,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/realtime',
-    destination: '/docs/reference/realtime/introduction',
+    destination: '/docs/reference/self-hosting-realtime/start',
   },
   {
     permanent: true,
