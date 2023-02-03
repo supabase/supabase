@@ -509,6 +509,8 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],

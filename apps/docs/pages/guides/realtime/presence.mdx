@@ -1,0 +1,165 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'presence',
+  title: 'Presence',
+  description: "Getting started with Realtime's Presence feature",
+}
+
+Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
+
+When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message instead of waiting for all other clients to send their individual states.
+
+Clients are free to come-and-go as they please, and as long as they are all subscribed to the same channel then they will all have the same Presence state as each other.
+
+The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+
+## Presence State
+
+You can get started by listening to `sync` event messages notifying the client that a channel's state has been synchronized on the server. You can get the state by calling the channel's `presenceState` helper:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+
+const channel = supabase.channel('test')
+
+channel
+  .on('presence', { event: 'sync' }, () => {
+    const state = channel.presenceState()
+    console.log(state)
+  })
+  .subscribe()
+```
+
+Whenever there's Presence activity on the `'test'` channel, this `sync` event will be broadcast to all clients subscribed to the channel.
+
+## Listen to Joins
+
+You can create a client and listen to new state joining the channel's Presence:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('test')
+
+channel
+  .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+    console.log(key, newPresences)
+  })
+  .subscribe()
+```
+
+## Track Presence
+
+On another client, subscribe to the channel and insert state to be tracked by Presence:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('test')
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const presenceTrackStatus = await channel.track({
+      user: 'user-1',
+      online_at: new Date().toISOString(),
+    })
+    console.log(presenceTrackStatus)
+  }
+})
+```
+
+### Presence Key
+
+By default, Presence will generate an `UUIDv1` key on the server to uniquely track a client channel's state but you may pass Presence a custom key when creating the channel.
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('test', {
+  config: {
+    presence: {
+      key: 'userId-1',
+    },
+  },
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const presenceTrackStatus = await channel.track({
+      user: 'user-1',
+      online_at: new Date().toISOString(),
+    })
+    console.log(presenceTrackStatus)
+  }
+})
+```
+
+## Listen to Leaves
+
+You can create a client and listen to a client channel's state leaving:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('test')
+
+channel
+  .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+    console.log(key, leftPresences)
+  })
+  .subscribe()
+```
+
+## Untrack Presence
+
+On another client, subscribe to the channel, and remove tracked state from Presence:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('test')
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const presenceTrackStatus = await channel.track({
+      user: 'user-1',
+      online_at: new Date().toISOString(),
+    })
+
+    if (presenceTrackStatus === 'ok') {
+      const presenceUntrackStatus = await channe.untrack()
+      console.log(presenceUntrackStatus)
+    }
+  }
+})
+```
+
+## Client-Side Rate Limit
+
+There is a default client-side rate limit that enables you to send 10 messages per second, or one message every 100 milliseconds. You can customize this when creating the client:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY,
+  {
+    realtime: {
+      params: {
+        eventsPerSecond: 5
+      }
+    }
+  }
+```
+
+By setting `eventsPerSecond` to 5, you can send one message every 200 milliseconds on a per client basis.
+
+Learn more by visiting the [Rate Limits](/docs/guides/realtime/rate-limits) section.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
