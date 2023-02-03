@@ -147,7 +147,6 @@ SELECT * FROM test_array WHERE i && '{1}' ORDER BY i <=> '{1}' ASC;
 The does the same with anyarray index as `rum_tsvector_addon_ops` i.e. allows to order select results using distance
 operator by attached column.
 
-
 ## Limitations
 
 `RUM` has slower build and insert times than `GIN` due to:
