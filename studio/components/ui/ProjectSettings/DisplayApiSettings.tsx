@@ -3,8 +3,8 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {
@@ -13,7 +13,6 @@ const DisplayApiSettings = () => {
 
   const {
     services,
-    error: projectSettingsError,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
   } = useProjectSettings(ref as string | undefined)
@@ -86,10 +85,10 @@ const DisplayApiSettings = () => {
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="bg-red-900 text-xs text-white">{'secret'}</code>
+                      <code className="bg-red-900 text-xs text-white">secret</code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
+                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                 </>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
