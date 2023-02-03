@@ -82,6 +82,7 @@
     "remark-gfm": "^3.0.1",
     "remark-slug": "^7.0.1",
     "shiki": "^0.11.1",
+    "sse.js": "^0.6.1",
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",

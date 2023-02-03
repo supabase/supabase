@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
-import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
+import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -166,32 +166,33 @@ Answer as markdown (including related code snippets if available):
 
   console.log(prompt)
 
-  const completionResponse = await openai.createCompletion({
+  const completionOptions: CreateCompletionRequest = {
     model: 'text-davinci-003',
     prompt,
     max_tokens: 512,
     temperature: 0,
+    stream: true,
+  }
+
+  const response = await fetch('https://api.openai.com/v1/completions', {
+    headers: {
+      Authorization: `Bearer ${openAiKey}`,
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(completionOptions),
   })
 
-  if (completionResponse.status !== 200) {
+  // TODO: handle response errors
+  if (!response.ok) {
     throw new Error('Failed to complete')
   }
 
-  // TODO: handle response errors
-  const {
-    id,
-    choices: [{ text: answer }],
-  } = completionResponse.data
-
-  console.log(completionResponse.data)
-
-  return new Response(
-    JSON.stringify({
-      id,
-      answer,
-    }),
-    {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    }
-  )
+  // Proxy the streamed SSE response from OpenAI
+  return new Response(response.body, {
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'text/event-stream',
+    },
+  })
 })
