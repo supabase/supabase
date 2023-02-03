@@ -1220,13 +1220,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime#broadcast',
+    source: '/docs/guides/realtime#broadcast',
+    destination: '/docs/guides/realtime/broadcast',
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime#presence',
+    source: '/docs/guides/realtime#presence',
+    destination: '/docs/guides/realtime/presence',
   },
   {
     permanent: true,
