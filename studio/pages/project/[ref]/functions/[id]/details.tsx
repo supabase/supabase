@@ -6,7 +6,8 @@ import { IconGlobe, IconTerminal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useProjectSettings, useStore } from 'hooks'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { checkPermissions, useStore } from 'hooks'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import NoPermission from 'components/ui/NoPermission'
@@ -95,16 +96,14 @@ const PageLayout: NextPageWithLayout = () => {
     },
   ]
 
-  const { services } = useProjectSettings(ref as string | undefined)
-
-  const API_SERVICE_ID = 1
-
   // Get the API service
-  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
-  const apiKeys = apiService?.service_api_keys ?? []
-  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
+  const { data: settings } = useProjectSettingsQuery({ projectRef: ref as string })
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
 
-  const endpoint = apiService?.app_config.endpoint ?? ''
+  const endpoint = apiService?.endpoint ?? ''
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),

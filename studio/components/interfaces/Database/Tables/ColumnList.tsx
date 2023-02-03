@@ -5,7 +5,7 @@ import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTr
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   selectedTable: PostgresTable
@@ -25,11 +25,11 @@ const ColumnList: FC<Props> = ({
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
-    filterString.length === 0
+    (filterString.length === 0
       ? selectedTable.columns
-      : selectedTable.columns.filter((column: any) => column.name.includes(filterString))
+      : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable?.schema ?? '')
+  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
 
   return (
     <>
