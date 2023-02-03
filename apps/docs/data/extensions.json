@@ -481,7 +481,7 @@
     "default_version": "1.1",
     "installed_version": null,
     "comment": "XPath querying and XSLT"
-  }
+  },
   {
     "name": "rum",
     "schema": "extensions",
