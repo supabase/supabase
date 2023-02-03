@@ -14,12 +14,22 @@ import { useInView } from 'react-intersection-observer'
  */
 
 interface Props {
-  tag: string
+  tag?: string
+  parseAnchors?: boolean
+  customAnchor?: string
 }
 
-const Heading: React.FC<Props> = ({ tag, children }) => {
+/**
+ * This TOC is used in .mdx files and in .tsx files.
+ * In mdx files, we need to parse the content and format them to match the
+ * expected tocList format (text, link,level).
+ *
+ * In tsx files, we can generate this tocList directly. For these files, we don't
+ * need to parse the <a> and generate anchors
+ */
+const Heading: React.FC<Props> = ({ tag, parseAnchors = false, customAnchor, children }) => {
   const HeadingTag = `${tag}` as any
-  const anchor = getAnchor(children)
+  const anchor = customAnchor ? customAnchor : getAnchor(children)
   const link = `#${anchor}`
 
   const { ref } = useInView({
@@ -33,7 +43,7 @@ const Heading: React.FC<Props> = ({ tag, children }) => {
 
   return (
     <HeadingTag id={anchor} ref={ref} className="group scroll-mt-24">
-      {removeAnchor(children)}
+      {parseAnchors ? removeAnchor(children) : children}
       {anchor && (
         <a href={link} className="ml-2 opacity-0 group-hover:opacity-100 transition">
           #

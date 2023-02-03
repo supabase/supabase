@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
-import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
@@ -17,6 +17,7 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   table?: PostgresTable
@@ -215,22 +216,19 @@ const TableEditor: FC<Props> = ({
                   <p>
                     Restrict access to your table by enabling RLS and writing Postgres policies.
                   </p>
-
                   <p>
-                    If RLS is not enabled, anyone with the anon key can modify and delete your data.
+                    RLS is secure by default - all normal access to this table must be allowed by a
+                    policy.
                   </p>
                   {!tableFields.isRLSEnabled && (
                     <Alert
                       withIcon
                       variant="warning"
                       className="!px-4 !py-3 mt-3"
-                      // @ts-ignore
-                      title={
-                        <span className="text-amber-1100 text-sm">
-                          Turning off RLS means that you are allowing anonymous access to your table
-                        </span>
-                      }
-                    />
+                      title="Turning off RLS means that you are allowing anonymous access to your table"
+                    >
+                      As such, anyone with the anonymous key can modify or delete your data.
+                    </Alert>
                   )}
                 </>
               }

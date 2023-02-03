@@ -7,6 +7,7 @@ import BaseLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { IS_PLATFORM } from 'lib/constants'
 
 interface Props {
   title?: string
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui, backups } = useStore()
+  const { meta, ui, vault, backups } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const project = ui.selectedProject
 
@@ -34,7 +35,10 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       meta.extensions.load()
       meta.publications.load()
 
-      backups.load()
+      if (IS_PLATFORM) {
+        backups.load()
+      }
+      vault.load()
     }
   }, [ui.selectedProject?.ref])
 

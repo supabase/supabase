@@ -5,7 +5,7 @@ import { Button, IconArrowRight } from 'ui'
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
 import { getForeignKeyUIState } from './ColumnEditor.utils'
-import { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PostgresRelationship } from '@supabase/postgres-meta'
 
 interface Props {
   column: ColumnField
