@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { isNil } from 'lodash'
 import { Select } from 'ui'
-import { PostgresType } from '@supabase/postgres-meta'
+import type { PostgresType } from '@supabase/postgres-meta'
 
 import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'

@@ -6,7 +6,7 @@ router
   .get('/oak-server', (context) => {
     context.response.body = 'This is an example Oak server running on Edge Functions!'
   })
-  .post('/oak-server/greet', (context) => {
+  .post('/oak-server/greet', async (context) => {
     // Note: request body will be streamed to the function as chunks, set limit to 0 to fully read it.
     const result = context.request.body({ type: 'json', limit: 0 })
     const body = await result.value

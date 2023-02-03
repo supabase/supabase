@@ -469,10 +469,24 @@
     "comment": "generate universally unique identifiers (UUIDs)"
   },
   {
+    "name": "vector",
+    "schema": "extensions",
+    "default_version": "0.4.0",
+    "installed_version": null,
+    "comment": "vector data type with similarity search"
+  },
+  {
     "name": "xml2",
     "schema": null,
     "default_version": "1.1",
     "installed_version": null,
     "comment": "XPath querying and XSLT"
+  },
+  {
+    "name": "pg_repack",
+    "schema": "extensions",
+    "default_version": "1.4.8",
+    "installed_version": "1.4.8",
+    "comment": "optimize physical storage and remove bloat from tables and indexes"
   }
 ]

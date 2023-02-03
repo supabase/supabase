@@ -29,7 +29,7 @@ const levelsData = {
   },
   functions: {
     icon: '/docs/img/icons/menu/functions',
-    name: 'Functions',
+    name: 'Edge Functions',
   },
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
@@ -38,6 +38,10 @@ const levelsData = {
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
+  },
+  supabase_cli: {
+    icon: '/docs/img/icons/menu/reference-cli',
+    name: 'Supabase CLI',
   },
   platform: {
     icon: '/docs/img/icons/menu/platform',
@@ -70,6 +74,10 @@ const levelsData = {
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
     name: 'Dart Reference v0.0',
+  },
+  reference_csharp_v0: {
+    icon: '/docs/img/icons/menu/reference-csharp',
+    name: 'C# Reference v0.0',
   },
   reference_python_v2: {
     icon: '/docs/img/icons/menu/reference-python',
