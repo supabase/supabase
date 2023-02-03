@@ -1,7 +1,19 @@
 import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import { find, compact, isEqual, isNil, has, some, chunk, get, uniq } from 'lodash'
+import {
+  find,
+  compact,
+  isEqual,
+  isNil,
+  has,
+  some,
+  chunk,
+  get,
+  uniq,
+  uniqBy,
+  findIndex,
+} from 'lodash'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
 
@@ -1688,6 +1700,40 @@ class StorageExplorerStore {
       this.view = view
       this.sortBy = sortBy
       this.sortByOrder = sortByOrder
+    }
+  }
+
+  selectRangeItems = (columnIndex, toItemIndex) => {
+    const columnItems = this.columns[columnIndex].items
+    const toItem = columnItems[toItemIndex]
+    const selectedItemIds = this.selectedItems.map((item) => item.id)
+    const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
+    const lastSelectedItemIndex = findIndex(columnItems, { id: lastSelectedItemId })
+
+    // Get the start and end index of the range to select
+    const start = Math.min(toItemIndex, lastSelectedItemIndex)
+    const end = Math.max(toItemIndex, lastSelectedItemIndex)
+
+    // Get the range to select and reverse the order if necessary
+    const rangeToSelect = columnItems
+      .slice(start, end + 1)
+      // we need `columnIndex` in all item of `selectedItems`
+      .map((item) => ({ ...item, columnIndex }))
+    if (toItemIndex < lastSelectedItemIndex) {
+      rangeToSelect.reverse()
+    }
+
+    if (selectedItemIds.includes(toItem.id)) {
+      const rangeToDeselectIds = rangeToSelect.map((item) => item.id)
+      // Deselect all items within the selection range
+      this.setSelectedItems(
+        this.selectedItems.filter(
+          (item) => item.id === toItem.id || !rangeToDeselectIds.includes(item.id)
+        )
+      )
+    } else {
+      // Select items within the range
+      this.setSelectedItems(uniqBy(this.selectedItems.concat(rangeToSelect), 'id'))
     }
   }
 }
