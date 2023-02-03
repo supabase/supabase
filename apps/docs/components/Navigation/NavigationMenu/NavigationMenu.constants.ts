@@ -389,19 +389,44 @@ export const database = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
         {
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
+        {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
           items: [],
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
+          name: 'PGRoonga: Multilingual Full Text Search',
+          url: '/guides/database/extensions/pgroonga',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
           items: [],
         },
         {
+          name: 'pg_jsonschema: JSON Schema Validation',
+          url: '/guides/database/extensions/pg_jsonschema',
+          items: [],
+        },
+        {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pgnet',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
+          items: [],
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pgrepack',
           items: [],
         },
         {
@@ -413,6 +438,11 @@ export const database = {
         {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
+          items: [],
+        },
+        {
+          name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
           items: [],
         },
       ],
@@ -451,6 +481,11 @@ export const functions = {
         {
           name: 'Cloudflare Turnstile',
           url: '/guides/functions/examples/cloudflare-turnstile',
+          items: [],
+        },
+        {
+          name: 'Connect to Postgres',
+          url: '/guides/functions/examples/connect-to-postgres',
           items: [],
         },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
@@ -712,6 +747,7 @@ export const integrations = {
         { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
+        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
         { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
@@ -816,7 +852,6 @@ export const reference_dart_v1 = {
   parent: '/reference',
 }
 
- 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
   title: 'c#',
