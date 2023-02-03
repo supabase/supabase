@@ -9,22 +9,20 @@
 #    docker builder prune
 
 FROM node:16-slim as base
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-RUN npm i -g turbo
+
 WORKDIR /app
 
 # Prune unneeded dependencies with turbo (from apps/ for example)
 FROM base as turbo
 COPY . .
-RUN turbo prune --scope=studio --docker
+# Upstream bug: https://github.com/vercel/turbo/issues/3570
+RUN npx turbo@1.7.0 prune --scope=studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps
 COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/package-lock.json ./
+# No need to clean cache because production uses standalone build
 RUN npm clean-install
 
 # dev contains dependencies and source code not compiled
