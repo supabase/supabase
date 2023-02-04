@@ -18,10 +18,16 @@ const PageTelemetry: FC = ({ children }) => {
     }
 
     // @ts-ignore
-    window?.gtag('get', 'G-H5JFS1XWE8', 'client_id', (client_id) => {
-      console.log(client_id)
-      clientId = client_id
-    })
+    window?.gtag(
+      'get',
+      `'${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}'`,
+      'client_id',
+      // @ts-ignore
+      (client_id) => {
+        console.log(client_id)
+        clientId = client_id
+      }
+    )
 
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
