@@ -10,11 +10,19 @@ const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const { ui } = useStore()
   const { profile } = ui
+  let clientId: string
 
   useEffect(() => {
     function handleRouteChange() {
       handlePageTelemetry(profile)
     }
+
+    // @ts-ignore
+    window?.gtag('get', 'G-H5JFS1XWE8', 'client_id', (client_id) => {
+      console.log(client_id)
+      clientId = client_id
+    })
+
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
@@ -32,12 +40,14 @@ const PageTelemetry: FC = ({ children }) => {
     }
   }, [])
 
-  const handlePageTelemetry = (profile?: User) => {
+  const handlePageTelemetry = async (profile?: User) => {
     if (IS_PLATFORM) {
       /**
        * Get referrer from browser
        */
       let referrer: string | undefined = document.referrer
+
+      console.log('my clientId = ', clientId)
 
       /**
        * Send page telemetry
