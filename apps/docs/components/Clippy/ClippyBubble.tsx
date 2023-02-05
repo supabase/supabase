@@ -9,7 +9,7 @@ interface Props {
 const ClippyBubble: FC<Props> = ({ className, onClick }) => {
   return (
     <div
-      className={`flex gap-2 border bg-white dark:bg-scale-300 relative rounded-xl p-6 max-w-sm md:max-w-xs shadow-xl mb-1 md:mb-4 cursor-pointer hover:bg-scale-200 transition-colors border-scale-500 hover:border-scale-700  ${className}`}
+      className={`flex gap-2 border bg-white dark:bg-scale-300 relative rounded-xl p-4 lg:p-6 max-w-sm lg:max-w-xs shadow-xl mb-1 lg:mb-4 cursor-pointer hover:bg-scale-200 transition-colors border-scale-500 hover:border-scale-700  ${className}`}
       onClick={onClick}
     >
       <img
