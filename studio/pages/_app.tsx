@@ -50,6 +50,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [rootStore] = useState(() => new RootStore())
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+    // @ts-ignore
+    window.rootStore = rootStore
+  }, [])
+
+  useEffect(() => {
     async function handleEmailVerificationError() {
       const { error } = await auth.initialize()
 
