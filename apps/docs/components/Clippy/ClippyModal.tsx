@@ -208,7 +208,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
               <span>Powered by OpenAI.</span>
-              <a href="" className="underline">
+              <a href="/blog/clippy" className="underline">
                 Read the blog post
               </a>
             </div>
