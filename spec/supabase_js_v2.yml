@@ -4421,7 +4421,7 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              upsert: false
+              upsert: true
             })
           ```
       - id: update-file-using-arraybuffer-from-base64-file-data
