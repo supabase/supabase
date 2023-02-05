@@ -2,7 +2,7 @@ import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
 import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
-import Telemetry from 'lib/telemetry'
+import Telemetry, { getScreenResolution, GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en_US'
@@ -18,6 +18,8 @@ export interface IUiStore {
   profile?: User
   permissions?: Permission[]
 
+  googleAnalyticsProps?: GoogleAnalyticsProps
+
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
   onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
@@ -26,6 +28,7 @@ export interface IUiStore {
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
   setPermissions: (permissions?: Permission[]) => void
+  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -38,6 +41,9 @@ export default class UiStore implements IUiStore {
   notification?: Notification
   profile?: User
   permissions?: Permission[] = []
+
+  // GA4 client id. It's synced with every Telemetry call
+  gaClientId?: string
 
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore
@@ -98,6 +104,14 @@ export default class UiStore implements IUiStore {
     return this.theme === 'dark'
   }
 
+  get googleAnalyticsProps() {
+    return {
+      clientId: this.gaClientId,
+      screenResolution: getScreenResolution(),
+      language: this.language,
+    }
+  }
+
   load() {
     if (typeof window === 'undefined') return
     const localStorageThemeOption = window.localStorage.getItem('theme')
@@ -149,7 +163,7 @@ export default class UiStore implements IUiStore {
 
   setProfile(value?: User) {
     if (value && value?.id !== this.profile?.id) {
-      Telemetry.sendIdentify(value)
+      Telemetry.sendIdentify(value, this.googleAnalyticsProps)
     }
 
     this.profile = value
@@ -157,5 +171,9 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
+  }
+
+  setGaClientId(clientId?: string) {
+    this.gaClientId = clientId
   }
 }
