@@ -1,21 +1,37 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Button, IconAlertCircle, IconLock } from 'ui'
+import { Button, IconAlertCircle, IconCode, IconLock } from 'ui'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 
 interface Props {
   table: PostgresTable
+  apiPreviewPanelOpen: boolean
+  setApiPreviewPanelOpen: (apiPreviewPanelOpen: boolean) => void
 }
 
-const GridHeaderActions: FC<Props> = ({ table }) => {
+const GridHeaderActions: FC<Props> = ({ table, apiPreviewPanelOpen, setApiPreviewPanelOpen }) => {
   const { ui, meta } = useStore()
   const projectRef = ui.selectedProject?.ref
   const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
 
+  const RenderAPIPreviewToggle = () => {
+    return (
+      <Button
+        size="tiny"
+        type="default"
+        icon={<IconCode size={14} strokeWidth={2} />}
+        onClick={() => setApiPreviewPanelOpen(!apiPreviewPanelOpen)}
+      >
+        API Preview
+      </Button>
+    )
+  }
+
   return (
     <div className="flex items-center space-x-3">
+      <RenderAPIPreviewToggle />
       <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
         <a>
           <Button
