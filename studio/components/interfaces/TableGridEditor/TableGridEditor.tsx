@@ -11,6 +11,13 @@ import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import { SidePanel } from 'ui'
+import ActionBar from './SidePanelEditor/ActionBar'
+import { GeneralContent, ResourceContent } from '../Docs'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { snakeToCamel } from 'lib/helpers'
+import useSWR from 'swr'
+import { get } from 'lib/common/fetch'
 
 interface Props {
   /** Theme for the editor */
@@ -56,16 +63,65 @@ const TableGridEditor: FC<Props> = ({
 }) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
+  const { query } = router
+  const { page } = query
+
   const gridRef = useRef<SupabaseGridRef>(null)
   const projectRef = ui.selectedProject?.ref
+  const tables = meta.tables.list()
 
+  const { data: settings } = useProjectSettingsQuery({ projectRef: projectRef })
+
+  const autoApiService = {
+    ...settings?.autoApiService,
+    endpoint: `${settings?.autoApiService.protocol ?? 'https'}://${
+      settings?.autoApiService.endpoint ?? '-'
+    }`,
+  }
+  const [selectedLang, setSelectedLang] = useState<any>('js')
   const [encryptedColumns, setEncryptedColumns] = useState([])
+  const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
   const isVaultEnabled = useFlag('vaultExtension')
 
   const getEncryptedColumns = async (table: any) => {
     const columns = await vault.listEncryptedColumns(table.schema, table.name)
     setEncryptedColumns(columns)
   }
+
+  function getResourcesFromJsonSchema(value: any) {
+    const { paths } = value || {}
+    const functionPath = 'rpc/'
+    let resources: any = {}
+
+    Object.entries(paths || []).forEach(([name, val]) => {
+      let trimmed = name.slice(1)
+      let id = trimmed.replace(functionPath, '')
+      let displayName = id.replace(/_/g, ' ')
+      let camelCase = snakeToCamel(id)
+      let enriched = { id, displayName, camelCase }
+      if (!trimmed.length) return
+      else resources[id] = enriched
+    })
+
+    return resources
+  }
+
+  const API_KEY = settings?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
+    ? settings.autoApiService.defaultApiKey
+    : undefined
+
+  const swaggerUrl = settings?.autoApiService.restUrl
+  console.log('swaggerUrl:', swaggerUrl)
+  const headers: any = { apikey: API_KEY }
+
+  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
+
+  const { data: jsonSchema, error: jsonSchemaError } = useSWR(
+    () => swaggerUrl,
+    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
+  )
+  if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
+  const resources = getResourcesFromJsonSchema(jsonSchema)
 
   useEffect(() => {
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
@@ -169,7 +225,13 @@ const TableGridEditor: FC<Props> = ({
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          canEditViaTableEditor && <GridHeaderActions table={selectedTable as PostgresTable} />
+          canEditViaTableEditor && (
+            <GridHeaderActions
+              table={selectedTable as PostgresTable}
+              apiPreviewPanelOpen={apiPreviewPanelOpen}
+              setApiPreviewPanelOpen={setApiPreviewPanelOpen}
+            />
+          )
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
@@ -195,6 +257,45 @@ const TableGridEditor: FC<Props> = ({
           closePanel={onClosePanel}
         />
       )}
+
+      <SidePanel
+        key="WrapperTableEditor"
+        size="xlarge"
+        visible={apiPreviewPanelOpen}
+        onCancel={() => console.log('cancel')}
+        header={<span>Connect to your table</span>}
+        customFooter={
+          <ActionBar
+            backButtonLabel="Back"
+            hideApply={true}
+            formId="wrapper-table-editor-form"
+            closePanel={() => setApiPreviewPanelOpen(false)}
+          />
+        }
+      >
+        <div className="Docs">
+          <SidePanel.Content>
+            <GeneralContent
+              autoApiService={autoApiService}
+              selectedLang={selectedLang}
+              showApiKey={true}
+              page={page}
+            />
+            {jsonSchema?.definitions && (
+              <ResourceContent
+                autoApiService={autoApiService}
+                selectedLang={selectedLang}
+                resourceId={tables.find((table) => table.id === Number(query.id))?.name}
+                resources={resources}
+                definitions={jsonSchema.definitions}
+                paths={jsonSchema.paths}
+                showApiKey={true}
+                // refreshDocs={refreshDocs}
+              />
+            )}
+          </SidePanel.Content>
+        </div>
+      </SidePanel>
     </>
   )
 }

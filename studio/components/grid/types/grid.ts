@@ -69,6 +69,11 @@ export interface SupabaseGridProps {
    * error handler
    */
   onError?: (error: any) => void
+  /**
+   * Toggle api preview panel open
+   */
+  apiPreviewPanelOpen?: boolean
+  setApiPreviewPanelOpen?: () => void
 }
 
 export interface SupabaseGridRef {
