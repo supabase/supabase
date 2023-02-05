@@ -1194,6 +1194,56 @@ functions:
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`*, cities(count)`)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text, 
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+            
+            with country as (
+              insert into countries (name) 
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values 
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
+              "name": "United Kingdom",
+              "cities": [
+                {
+                  "count": 4
+                }
+              ]
+            }
+          ]
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
         code: |
