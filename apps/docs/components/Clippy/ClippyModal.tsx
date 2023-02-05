@@ -8,7 +8,16 @@ import clippyImage from '../../public/img/clippy.png'
 
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
-import { Button, IconAlertCircle, IconLoader, IconSearch, Input, Loading, Modal } from 'ui'
+import {
+  Button,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconLoader,
+  IconSearch,
+  Input,
+  Loading,
+  Modal,
+} from 'ui'
 import components from '~/components'
 
 type Props = {
@@ -44,8 +53,9 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const [answer, setAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
+  const [hasError, setHasError] = useState(true)
 
-  const cantHelp = answer === "Sorry, I don't know how to help with that."
+  const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
     ? 'Clippy is searching...'
     : isResponding
@@ -55,6 +65,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     : undefined
 
   const handleConfirm = useCallback(async (query: string) => {
+    setHasError(false)
     setAnswer(undefined)
     setIsLoading(true)
 
@@ -69,6 +80,8 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
     // TODO: display an error on the UI
     eventSource.addEventListener('error', (e) => {
+      setIsLoading(false)
+      setHasError(true)
       console.error(e)
     })
 
@@ -99,6 +112,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setQuery('')
     setAnswer(undefined)
     setIsResponding(false)
+    setHasError(false)
   }
 
   return (
@@ -140,7 +154,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           )}
         </div>
 
-        {!isLoading && !answer && (
+        {!isLoading && !answer && !hasError && (
           <div className="">
             <div className="mt-2">
               <h2 className="text-sm text-scale-900">Not sure where to start?</h2>
@@ -202,6 +216,16 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="p-6 grid gap-6 mt-4">
             <Loading active>{}</Loading>
             <p className="text-lg text-center">Searching for results</p>
+          </div>
+        )}
+        {hasError && (
+          <div className="p-6 flex flex-col items-center gap-6 mt-4">
+            <IconAlertTriangle strokeWidth={1.5} size={40} />
+            <p className="text-lg text-center">Sorry, looks like Clippy is having a hard time!</p>
+            <p className="text-sm text-center">Please try again in a bit.</p>
+            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+              Try again?
+            </Button>
           </div>
         )}
         <div className="border-t border-scale-600 mt-4 text-scale-900">

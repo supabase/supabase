@@ -3,6 +3,7 @@ import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
+import { ApplicationError, UserError } from './errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -14,145 +15,98 @@ export const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  try {
+    // Handle CORS
+    if (req.method === 'OPTIONS') {
+      return new Response('ok', { headers: corsHeaders })
+    }
 
-  if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'Missing environment variable OPENAI_KEY',
-      }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
+    if (!openAiKey) {
+      throw new ApplicationError('Missing environment variable OPENAI_KEY')
+    }
 
-  if (!supabaseUrl) {
-    return new Response(
-      JSON.stringify({
-        error: 'Missing environment variable SUPABASE_URL',
-      }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
+    if (!supabaseUrl) {
+      throw new ApplicationError('Missing environment variable SUPABASE_URL')
+    }
 
-  if (!supabaseServiceKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'Missing environment variable SUPABASE_SERVICE_ROLE_KEY',
-      }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
+    if (!supabaseServiceKey) {
+      throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
+    }
 
-  const requestData = await req.json()
+    const requestData = await req.json()
 
-  if (!requestData) {
-    return new Response(
-      JSON.stringify({
-        error: 'Missing request data',
-      }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
+    if (!requestData) {
+      throw new UserError('Missing request data')
+    }
 
-  const { query } = requestData
+    const { query } = requestData
 
-  const sanitizedQuery = query.trim()
+    if (!query) {
+      throw new UserError('Missing query in request data')
+    }
 
-  const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+    const sanitizedQuery = query.trim()
 
-  const configuration = new Configuration({ apiKey: openAiKey })
-  const openai = new OpenAIApi(configuration)
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
-  // Moderate the content to comply with OpenAI T&C
-  const moderationResponse = await openai.createModeration({ input: sanitizedQuery })
+    const configuration = new Configuration({ apiKey: openAiKey })
+    const openai = new OpenAIApi(configuration)
 
-  const [results] = moderationResponse.data.results
+    // Moderate the content to comply with OpenAI T&C
+    const moderationResponse = await openai.createModeration({ input: sanitizedQuery })
 
-  if (results.flagged) {
-    return new Response(
-      JSON.stringify({
-        error: 'Flagged content',
+    const [results] = moderationResponse.data.results
+
+    if (results.flagged) {
+      throw new UserError('Flagged content', {
         flagged: true,
         categories: results.categories,
-      }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
-  const embeddingResponse = await openai.createEmbedding({
-    model: 'text-embedding-ada-002',
-    input: sanitizedQuery.replaceAll('\n', ' '),
-  })
-
-  if (embeddingResponse.status !== 200) {
-    console.log(
-      `Failed to create embedding for question. OpenAI response status ${embeddingResponse.status}`
-    )
-
-    return new Response(
-      JSON.stringify({
-        error: 'Failed to process questions',
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
-  const [{ embedding }] = embeddingResponse.data.data
-
-  const { error: matchError, data: pageSections } = await supabaseClient.rpc(
-    'match_page_sections',
-    {
-      embedding,
-      match_threshold: 0.78,
-      match_count: 10,
-      min_content_length: 50,
-    }
-  )
-
-  if (matchError) {
-    console.log(matchError.message)
-    throw matchError
-  }
-
-  const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
-  let tokenCount = 0
-  let contextText = ''
-
-  for (let i = 0; i < pageSections.length; i++) {
-    const pageSection = pageSections[i]
-    const content = pageSection.content
-    const encoded = tokenizer.encode(content)
-    tokenCount += encoded.text.length
-
-    if (tokenCount >= 1500) {
-      break
+      })
     }
 
-    contextText += `${content.trim()}\n---\n`
-  }
+    const embeddingResponse = await openai.createEmbedding({
+      model: 'text-embedding-ada-002',
+      input: sanitizedQuery.replaceAll('\n', ' '),
+    })
 
-  const prompt = `You are a very enthusiastic Supabase representative who loves to help people! Given the following sections from the Supabase documentation, answer the question using only that information, outputted in markdown format. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that."
+    if (embeddingResponse.status !== 200) {
+      throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
+    }
+
+    const [{ embedding }] = embeddingResponse.data.data
+
+    const { error: matchError, data: pageSections } = await supabaseClient.rpc(
+      'match_page_sections',
+      {
+        embedding,
+        match_threshold: 0.78,
+        match_count: 10,
+        min_content_length: 50,
+      }
+    )
+
+    if (matchError) {
+      throw new ApplicationError('Failed to match page sections', matchError)
+    }
+
+    const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
+    let tokenCount = 0
+    let contextText = ''
+
+    for (let i = 0; i < pageSections.length; i++) {
+      const pageSection = pageSections[i]
+      const content = pageSection.content
+      const encoded = tokenizer.encode(content)
+      tokenCount += encoded.text.length
+
+      if (tokenCount >= 1500) {
+        break
+      }
+
+      contextText += `${content.trim()}\n---\n`
+    }
+
+    const prompt = `You are a very enthusiastic Supabase representative who loves to help people! Given the following sections from the Supabase documentation, answer the question using only that information, outputted in markdown format. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that."
 
 Context sections:
 ${contextText}
@@ -164,35 +118,61 @@ ${sanitizedQuery}
 Answer as markdown (including related code snippets if available):
 `
 
-  console.log(prompt)
+    const completionOptions: CreateCompletionRequest = {
+      model: 'text-davinci-003',
+      prompt,
+      max_tokens: 512,
+      temperature: 0,
+      stream: true,
+    }
 
-  const completionOptions: CreateCompletionRequest = {
-    model: 'text-davinci-003',
-    prompt,
-    max_tokens: 512,
-    temperature: 0,
-    stream: true,
+    const response = await fetch('https://api.openai.com/v1/completions', {
+      headers: {
+        Authorization: `Bearer ${openAiKey}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify(completionOptions),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new ApplicationError('Failed to generate completion', error)
+    }
+
+    // Proxy the streamed SSE response from OpenAI
+    return new Response(response.body, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+      },
+    })
+  } catch (err: unknown) {
+    if (err instanceof UserError) {
+      return new Response(
+        JSON.stringify({
+          error: err.message,
+          data: err.data,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Print out unexpected errors to help with debugging
+    console.error(err)
+
+    // TODO: include more response info in debug environments
+    return new Response(
+      JSON.stringify({
+        error: 'There was an error processing your request',
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
   }
-
-  const response = await fetch('https://api.openai.com/v1/completions', {
-    headers: {
-      Authorization: `Bearer ${openAiKey}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: JSON.stringify(completionOptions),
-  })
-
-  // TODO: handle response errors
-  if (!response.ok) {
-    throw new Error('Failed to complete')
-  }
-
-  // Proxy the streamed SSE response from OpenAI
-  return new Response(response.body, {
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'text/event-stream',
-    },
-  })
 })
