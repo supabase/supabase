@@ -1,6 +1,7 @@
 import TableList from './Tables/TableList'
 import ColumnList from './Tables/ColumnList'
 
+import RoleCreate from './Roles/RoleCreate'
 import RolesList from './Roles/RolesList'
 import RolesSettings from './Roles/RolesSettings'
 
@@ -26,6 +27,7 @@ import DeleteFunction from './Functions/DeleteFunction'
 export {
   TableList,
   ColumnList,
+  RoleCreate,
   RolesList,
   RolesSettings,
   Extensions,
