@@ -1,67 +1,30 @@
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC } from 'react'
 import { createPortal } from 'react-dom'
 import clippyImageDark from '../../public/img/clippy-dark.png'
 import clippyImage from '../../public/img/clippy.png'
 import ClippyBubble from './ClippyBubble'
 import ClippyModal from './ClippyModal'
+import { useClippy } from './ClippyProvider'
 
 const Clippy: FC = () => {
   const { isDarkMode } = useTheme()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const onOpen = useCallback(() => {
-    setIsModalOpen(true)
-    document.body.classList.add('DocSearch--active')
-  }, [])
-
-  const onClose = useCallback(() => {
-    setIsModalOpen(false)
-    document.body.classList.remove('DocSearch--active')
-  }, [])
-
-  useSearchKeyboardEvents({
-    onOpen,
-    onClose,
-  })
+  const { isOpen, open, close } = useClippy()
 
   return (
     <>
-      {!isModalOpen && (
-        <div className="flex flex-col items-end gap-1 md:gap-4">
-          <ClippyBubble onClick={onOpen} />
-          <div className="w-[120px] md:w-[150px] p-8 md:p-0">
+      {!isOpen && (
+        <div className="hidden md:flex flex-col items-end gap-1 md:gap-4">
+          <ClippyBubble onClick={open} />
+          <div className="w-[100px] lg:w-[150px] p-8 md:p-0">
             <Image src={isDarkMode ? clippyImageDark : clippyImage} alt="Clippy" />
           </div>
         </div>
       )}
-      {isModalOpen && createPortal(<ClippyModal onClose={onClose} />, document.body)}
+      {isOpen && createPortal(<ClippyModal onClose={close} />, document.body)}
     </>
   )
 }
 
 export default Clippy
-
-function useSearchKeyboardEvents({ onOpen, onClose }) {
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case 'Escape':
-          onClose()
-          return
-        case 'j':
-          if (event.metaKey || event.ctrlKey) {
-            onOpen()
-          }
-          return
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [onOpen, onClose])
-}

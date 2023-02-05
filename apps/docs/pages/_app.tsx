@@ -5,6 +5,7 @@ import { DefaultSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
+import ClippyProvider from '~/components/Clippy/ClippyProvider'
 import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
@@ -87,9 +88,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <SessionContextProvider supabaseClient={supabase}>
         <ThemeProvider>
           <SearchProvider>
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
+            <ClippyProvider>
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+            </ClippyProvider>
           </SearchProvider>
         </ThemeProvider>
       </SessionContextProvider>
