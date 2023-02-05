@@ -175,5 +175,12 @@ export default class UiStore implements IUiStore {
 
   setGaClientId(clientId?: string) {
     this.gaClientId = clientId
+
+    /**
+     * We need to access ga client_id from base.constructHeaders method or from supabase.com
+     * in order to set custom header('ga_client_id).
+     * TODO: Do we have a better way than storing the value in local storage?
+     */
+    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }
