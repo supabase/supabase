@@ -40,11 +40,13 @@ const sendEvent = (
 
 /**
  * TODO: GA4 doesn't have identify method.
- * We may or may not need gaClientId here
+ * We may or may not need gaClientId here. Confirm later
  */
 const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
   if (!IS_PLATFORM) return
 
+  // TODO: server doesn't care about the user object sent up by client
+  // confirm and clean up later
   return post(`${API_URL}/telemetry/identify`, {
     user,
     ga: {
