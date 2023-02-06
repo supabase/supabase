@@ -4421,6 +4421,7 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
+              // Overwrite file if it exists
               upsert: true
             })
           ```
