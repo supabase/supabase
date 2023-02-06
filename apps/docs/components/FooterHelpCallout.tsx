@@ -21,19 +21,18 @@ const FooterHelpCallout = ({
   title: any
 }) => {
   return (
-    <div className="mt-32 not-prose">
+    <div className="mt-32 prose prose--remove-p-margin max-w-none">
       <div
         className="
         min-w-full 
         px-8 py-6 
-        prose 
         bg-scale-300 dark:bg-whiteA-200 
-        rounded"
+        rounded 
+        text-sm text-scale-900
+      "
       >
-        <h5 className="text-sm m-0 text-scale-1100">{content[footerHelpType].title}</h5>
-        <p className="m-0 text-sm text-scale-900">
-          <ReactMarkdown>{content[footerHelpType].description}</ReactMarkdown>
-        </p>
+        <h5 className="text-sm text-scale-1100 m-0">{content[footerHelpType].title}</h5>
+        <ReactMarkdown>{content[footerHelpType].description}</ReactMarkdown>
       </div>
     </div>
   )
