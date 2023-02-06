@@ -31,7 +31,6 @@ const sendEvent = (
     label: label,
     value: value,
     ga: {
-      client_id: gaProps?.clientId,
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
     },
@@ -50,7 +49,6 @@ const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
   return post(`${API_URL}/telemetry/identify`, {
     user,
     ga: {
-      client_id: gaProps?.clientId,
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
     },
