@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
+import { oneLine, stripIndent } from 'https://esm.sh/common-tags@1.8.2'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { ApplicationError, UserError } from './errors.ts'
@@ -106,17 +107,25 @@ serve(async (req) => {
       contextText += `${content.trim()}\n---\n`
     }
 
-    const prompt = `You are a very enthusiastic Supabase representative who loves to help people! Given the following sections from the Supabase documentation, answer the question using only that information, outputted in markdown format. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that."
+    const prompt = stripIndent`
+      ${oneLine`
+        You are a very enthusiastic Supabase representative who loves
+        to help people! Given the following sections from the Supabase
+        documentation, answer the question using only that information,
+        outputted in markdown format. If you are unsure and the answer
+        is not explicitly written in the documentation, say
+        "Sorry, I don't know how to help with that."
+      `}
 
-Context sections:
-${contextText}
+      Context sections:
+      ${contextText}
 
-Question: """
-${sanitizedQuery}
-"""
+      Question: """
+      ${sanitizedQuery}
+      """
 
-Answer as markdown (including related code snippets if available):
-`
+      Answer as markdown (including related code snippets if available):
+    `
 
     const completionOptions: CreateCompletionRequest = {
       model: 'text-davinci-003',
