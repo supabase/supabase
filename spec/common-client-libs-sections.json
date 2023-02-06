@@ -358,6 +358,14 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "returns",
+            "title": "Override type of successful response",
+            "slug": "db-returns",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
           }
         ]
       }
