@@ -251,9 +251,9 @@ order by
 select *
 from (
     SELECT 
+      name,
       metadata->>'mimetype' as mimetype,
       bucket_id, 
-      path_tokens,
       (metadata->>'size')::bigint as size, 
       row_number() over (partition by bucket_id ORDER BY (metadata->>'size')::bigint DESC ) AS row
     FROM storage.objects
@@ -294,7 +294,7 @@ select
 count(id) filter (where last_accessed_at < (NOW() - interval '1 month') ) as one_month,
 count(id) filter (where last_accessed_at < (NOW() - interval '3 month') ) as three_month,
 count(id) filter (where last_accessed_at < (NOW() - interval '6 month') ) as six_month,
-count(id) filter (where last_accessed_at < (NOW() - interval '1 year') ) as one_year
+count(id) filter (where last_accessed_at < (NOW() - interval '1 year') ) as twelve_month
 from storage.objects
         `,
       },
