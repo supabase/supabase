@@ -62,7 +62,7 @@ const Subscription: FC<Props> = ({
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey].cost
+              return usage[productKey].cost ?? 0
             })
             .reduce((prev, current) => prev + current, 0)
 
