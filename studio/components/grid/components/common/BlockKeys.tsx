@@ -33,7 +33,7 @@ export const BlockKeys: FC<BlockKeysProps> = ({ value, children, onEscape, onEnt
   )
 
   function onBlur() {
-    // [Joshen] Commenting this out for now as its causing some odd behaviour
+    // [Joshen] Commenting this out for now as its causing some odd behavior
     // where its triggering when a children of the Popover overlay component is clicked
     // Also to make the save action a bit more deliberate
     // if (onEnter) onEnter(value)
