@@ -50,7 +50,6 @@ const PageTelemetry: FC = ({ children }) => {
         referrer: referrer,
         title: document.title,
         ga: {
-          client_id: ui.googleAnalyticsProps?.clientId,
           screen_resolution: ui.googleAnalyticsProps?.screenResolution,
           language: ui.googleAnalyticsProps?.language,
         },

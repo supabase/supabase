@@ -42,9 +42,6 @@ export default class UiStore implements IUiStore {
   profile?: User
   permissions?: Permission[] = []
 
-  // GA4 client id. It's synced with every Telemetry call
-  gaClientId?: string
-
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore
     makeAutoObservable(this, {
@@ -106,7 +103,6 @@ export default class UiStore implements IUiStore {
 
   get googleAnalyticsProps() {
     return {
-      clientId: this.gaClientId,
       screenResolution: getScreenResolution(),
       language: this.language,
     }
@@ -174,8 +170,6 @@ export default class UiStore implements IUiStore {
   }
 
   setGaClientId(clientId?: string) {
-    this.gaClientId = clientId
-
     /**
      * We need to access ga client_id from base.constructHeaders method or from supabase.com
      * in order to set custom header('ga_client_id).
