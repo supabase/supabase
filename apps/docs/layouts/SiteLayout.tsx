@@ -334,7 +334,6 @@ const SiteLayout = ({ children }) => {
           </div>
           <div className="grow px-5 max-w-7xl mx-auto py-16">
             {children}
-            <FooterHelpCallout />
             <Footer />
           </div>
           <MobileMenuBackdrop />

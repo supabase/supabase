@@ -66,9 +66,9 @@ functions:
             db: { schema: 'other_schema' }
           })
           ```
-
+        description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+          Go to [Settings > API > Exposed schemas](https://app.supabase.com/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
@@ -81,7 +81,7 @@ functions:
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
-
+        description: |
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
@@ -101,7 +101,7 @@ functions:
             },
           });
           ```
-
+        description: |
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   - id: auth-api
     title: 'Overview'
@@ -3893,6 +3893,25 @@ functions:
           ```
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: returns
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    title: returns()
+    examples:
+      - id: override-type-of-successful-response
+        name: Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .returns<MyType>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType | null
+          ```
         hideCodeBlock: true
         isSpotlight: true
 
