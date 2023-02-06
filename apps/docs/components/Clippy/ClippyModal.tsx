@@ -53,7 +53,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const [answer, setAnswer] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
-  const [hasError, setHasError] = useState(true)
+  const [hasError, setHasError] = useState(false)
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
