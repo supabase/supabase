@@ -60,7 +60,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     ? 'Clippy is searching...'
     : isResponding
     ? 'Clippy is responding...'
-    : cantHelp
+    : cantHelp || hasError
     ? 'Clippy has failed you'
     : undefined
 
@@ -78,29 +78,34 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
       payload: JSON.stringify({ query }),
     })
 
-    // TODO: display an error on the UI
-    eventSource.addEventListener('error', (e) => {
+    function handleError<T>(err: T) {
       setIsLoading(false)
+      setIsResponding(false)
       setHasError(true)
-      console.error(e)
-    })
+      console.error(err)
+    }
 
+    eventSource.addEventListener('error', handleError)
     eventSource.addEventListener('message', (e) => {
-      setIsLoading(false)
+      try {
+        setIsLoading(false)
 
-      if (e.data === '[DONE]') {
-        setIsResponding(false)
-        return
+        if (e.data === '[DONE]') {
+          setIsResponding(false)
+          return
+        }
+
+        setIsResponding(true)
+
+        const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+        const [{ text }] = completionResponse.choices
+
+        setAnswer((answer) => {
+          return (answer ?? '') + text
+        })
+      } catch (err) {
+        handleError(err)
       }
-
-      setIsResponding(true)
-
-      const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-      const [{ text }] = completionResponse.choices
-
-      setAnswer((answer) => {
-        return (answer ?? '') + text
-      })
     })
 
     eventSource.stream()
