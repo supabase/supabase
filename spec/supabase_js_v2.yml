@@ -4440,7 +4440,8 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              upsert: false
+              // Overwrite file if it exists
+              upsert: true
             })
           ```
       - id: update-file-using-arraybuffer-from-base64-file-data
