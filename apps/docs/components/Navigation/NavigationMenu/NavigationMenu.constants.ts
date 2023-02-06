@@ -410,6 +410,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_graphql: GraphQL support',
+          url: '/guides/database/extensions/pg_graphql',
+          items: [],
+        },
+        {
           name: 'pg_jsonschema: JSON Schema Validation',
           url: '/guides/database/extensions/pg_jsonschema',
           items: [],
@@ -420,7 +425,12 @@ export const database = {
           items: [],
         },
         {
-          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          name: 'pg_stat_monitor: Extended Query Performance Monitoring',
+          url: '/guides/database/extensions/pg_stat_monitor',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: Query Performance Monitoring,
           url: '/guides/database/extensions/pg_stat_statements',
           items: [],
         },
@@ -442,6 +452,11 @@ export const database = {
         },
         {
           name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
+          items: [],
+        },
+        {
+          name: 'wrappers: 3rd Party Integrations',
           url: '/guides/database/extensions/rum',
           items: [],
         },
