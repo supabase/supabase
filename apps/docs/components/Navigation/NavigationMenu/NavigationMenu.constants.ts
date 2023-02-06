@@ -420,6 +420,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
           items: [],
