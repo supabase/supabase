@@ -88,15 +88,18 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
      * get Ga4 client_id when it's available
      * */
     // @ts-ignore
-    window?.gtag(
-      'get',
-      `${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`,
-      'client_id',
+    if (!!window?.gtag) {
       // @ts-ignore
-      (client_id) => {
-        ui.setGaClientId(client_id)
-      }
-    )
+      window?.gtag(
+        'get',
+        `${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`,
+        'client_id',
+        // @ts-ignore
+        (client_id) => {
+          ui.setGaClientId(client_id)
+        }
+      )
+    }
 
     return () =>
       window
