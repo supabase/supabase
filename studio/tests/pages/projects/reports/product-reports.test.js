@@ -1,11 +1,4 @@
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
-
 import { get, post } from 'lib/common/fetch'
-
-import { useRouter } from 'next/router'
-import { useParams } from 'hooks'
 import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api'
@@ -17,15 +10,7 @@ beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
   post.mockReset()
-  useRouter.mockReset()
-  useRouter.mockReturnValue({
-    query: { ref: '123' },
-  })
-  useParams.mockReturnValue({ ref: '123' })
-  get.mockImplementation(async (url) => {
-    return [{ data: [] }]
-  })
-  get.mockResolvedValue([])
+  get.mockImplementation(async (_url) => [{ data: [] }])
   post.mockResolvedValue([])
 })
 
@@ -36,7 +21,6 @@ describe.each([
 ])('$Page rendering', ({ Page, contains }) => {
   test(`contains ${contains}`, async () => {
     render(<Page />)
-
     contains.forEach((word) => {
       expect(screen.findByText(word)).resolves.toBeTruthy()
     })
@@ -45,5 +29,15 @@ describe.each([
     render(<Page />)
     await screen.findByText(/Last 7 days/)
     await screen.findAllByText(/Refresh/)
+  })
+
+  test('changing date range triggers query refresh', async () => {
+    render(<Page />)
+    await waitFor(() => expect(get).toBeCalled())
+    get.mockReset()
+    const refresh = await screen.findByText(/Refresh/)
+    fireEvent.click(refresh)
+    const calls = get.mock.calls.concat(post.mock.calls)
+    expect(calls.length).toBeGreaterThan(0)
   })
 })
