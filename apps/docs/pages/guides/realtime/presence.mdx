@@ -130,7 +130,7 @@ channel.subscribe(async (status) => {
     })
 
     if (presenceTrackStatus === 'ok') {
-      const presenceUntrackStatus = await channe.untrack()
+      const presenceUntrackStatus = await channel.untrack()
       console.log(presenceUntrackStatus)
     }
   }
