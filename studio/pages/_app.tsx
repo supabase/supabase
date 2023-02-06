@@ -112,7 +112,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
 
-            {/* <!-- Global site tag (gtag.js) - Google Analytics --> */}
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
               strategy="afterInteractive"
