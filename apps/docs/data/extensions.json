@@ -481,5 +481,19 @@
     "default_version": "1.1",
     "installed_version": null,
     "comment": "XPath querying and XSLT"
+  },
+  {
+    "name": "rum",
+    "schema": "extensions",
+    "default_version": "1.3.13",
+    "installed_version": "1.3.13",
+    "comment": "GIN-like index for text search"
+  },
+  {
+    "name": "pg_repack",
+    "schema": "extensions",
+    "default_version": "1.4.8",
+    "installed_version": "1.4.8",
+    "comment": "optimize physical storage and remove bloat from tables and indexes"
   }
 ]
