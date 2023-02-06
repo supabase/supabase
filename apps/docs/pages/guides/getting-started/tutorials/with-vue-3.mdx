@@ -68,7 +68,7 @@ Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/su
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html title=/src/components/Auth.vue
+```vue title=/src/components/Auth.vue
 <script setup>
 import { ref } from 'vue'
 import { supabase } from '../supabase'
@@ -120,7 +120,7 @@ const handleLogin = async () => {
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.vue`.
 
-```html title=src/components/Account.vue
+```vue title=src/components/Account.vue
 <script setup>
 import { supabase } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
@@ -233,7 +233,7 @@ async function signOut() {
 
 Now that we have all the components in place, let's update `App.vue`:
 
-```html title=src/App.vue
+```vue title=src/App.vue
 <script setup>
 import { onMounted, ref } from 'vue'
 import Account from './components/Account.vue'
@@ -279,7 +279,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```html title=src/components/Avatar.vue
+```vue title=src/components/Avatar.vue
 <script setup>
 import { ref, toRefs, watch } from 'vue'
 import { supabase } from '../supabase'
@@ -344,7 +344,7 @@ watch(path, () => {
 
     <div :style="{ width: size + 'em' }">
       <label class="button primary block" for="single">
-        {{ uploading ? "Uploading ..." : "Upload" }}
+        {{ uploading ? 'Uploading ...' : 'Upload' }}
       </label>
       <input
         style="visibility: hidden; position: absolute"
@@ -363,7 +363,7 @@ watch(path, () => {
 
 And then we can add the widget to the Account page:
 
-```html title=src/components/Account.vue
+```vue title=src/components/Account.vue
 <script>
 // Import the new component
 import Avatar from './Avatar.vue'
