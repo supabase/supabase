@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useFlag } from 'hooks'
+import { useFlag } from '~/hooks/useFlag'
 
 interface Props {
   children: ReactNode
