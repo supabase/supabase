@@ -39,7 +39,7 @@ export const getIdentity = (gotrueUser: User) => {
 }
 
 // NOTE: do not use any imports in this function,
-// as it is use standalone in the documents head
+// as it is used standalone in the documents head
 export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
   let returnTo = searchParams.get('returnTo') ?? fallback
