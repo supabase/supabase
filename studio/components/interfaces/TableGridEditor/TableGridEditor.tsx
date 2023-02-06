@@ -11,6 +11,7 @@ import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 
 interface Props {
   /** Theme for the editor */
@@ -20,19 +21,21 @@ interface Props {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
+  selectedValueForJsonEdit?: JsonEditValue
 
   onAddRow: () => void
   onEditRow: (row: Dictionary<any>) => void
   onAddColumn: () => void
   onEditColumn: (column: PostgresColumn) => void
   onDeleteColumn: (column: PostgresColumn) => void
+  onExpandJSONEditor: (column: string, row: any) => void
   onClosePanel: () => void
 }
 
@@ -46,12 +49,14 @@ const TableGridEditor: FC<Props> = ({
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
 
   onAddRow = () => {},
   onEditRow = () => {},
   onAddColumn = () => {},
   onEditColumn = () => {},
   onDeleteColumn = () => {},
+  onExpandJSONEditor = () => {},
   onClosePanel = () => {},
 }) => {
   const { meta, ui, vault } = useStore()
@@ -59,8 +64,8 @@ const TableGridEditor: FC<Props> = ({
   const gridRef = useRef<SupabaseGridRef>(null)
   const projectRef = ui.selectedProject?.ref
 
-  const [encryptedColumns, setEncryptedColumns] = useState([])
   const isVaultEnabled = useFlag('vaultExtension')
+  const [encryptedColumns, setEncryptedColumns] = useState([])
 
   const getEncryptedColumns = async (table: any) => {
     const columns = await vault.listEncryptedColumns(table.schema, table.name)
@@ -178,6 +183,7 @@ const TableGridEditor: FC<Props> = ({
         onEditRow={onEditRow}
         onError={onError}
         onSqlQuery={onSqlQuery}
+        onExpandJSONEditor={onExpandJSONEditor}
       />
       {!isUndefined(selectedSchema) && (
         <SidePanelEditor
@@ -187,6 +193,7 @@ const TableGridEditor: FC<Props> = ({
           selectedRowToEdit={selectedRowToEdit}
           selectedColumnToEdit={selectedColumnToEdit}
           selectedTableToEdit={selectedTableToEdit}
+          selectedValueForJsonEdit={selectedValueForJsonEdit}
           sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
