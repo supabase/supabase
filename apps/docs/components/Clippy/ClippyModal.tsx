@@ -162,9 +162,9 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
         {!isLoading && !answer && !hasError && (
           <div className="">
             <div className="mt-2">
-              <h2 className="text-sm text-scale-900">Not sure where to start?</h2>
+              <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
 
-              <ul className="text-sm mt-4 text-scale-1000 grid md:flex gap-4 flex-wrap max-w-3xl">
+              <ul className="text-sm mt-4 text-scale-1100 grid md:flex gap-4 flex-wrap max-w-3xl">
                 {questions.map((question) => (
                   <li>
                     <button
@@ -233,7 +233,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             </Button>
           </div>
         )}
-        <div className="border-t border-scale-600 mt-4 text-scale-900">
+        <div className="border-t border-scale-600 mt-4 text-scale-1100">
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
               <span>Powered by OpenAI.</span>
