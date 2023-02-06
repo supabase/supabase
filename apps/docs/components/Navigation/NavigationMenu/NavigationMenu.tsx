@@ -253,7 +253,7 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="csharp"
         spec={spec_csharp_v0}
-       />
+      />
 
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}
@@ -262,7 +262,6 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="python"
         spec={spec_python_v2}
-
       />
       {/* // Tools */}
       <NavigationMenuRefList

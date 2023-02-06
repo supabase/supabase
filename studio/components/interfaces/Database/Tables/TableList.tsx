@@ -166,7 +166,7 @@ const TableList: FC<Props> = ({
                   <code className="text-sm">{x.size}</code>
                 </Table.td>
                 <Table.td className="hidden xl:table-cell text-center">
-                  {realtimePublication.tables.find((table: any) => table.id === x.id) && (
+                  {(realtimePublication?.tables ?? []).find((table: any) => table.id === x.id) && (
                     <div className="flex justify-center">
                       <IconCheck strokeWidth={2} />
                     </div>
