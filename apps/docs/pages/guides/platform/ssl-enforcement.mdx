@@ -7,13 +7,13 @@ export const meta = {
 
 <Admonition type="note">
 
-Postgres SSL Enforcement are currently in beta and are being slowly made available to all projects. Please [contact Support](https://app.supabase.com/support/new) if you'd like to request early access.
+Postgres SSL Enforcement is currently in beta and is slowly being made available to all projects. [Contact support](https://app.supabase.com/support/new) if you'd like to request early access.
 
 </Admonition>
 
-Your Supabase project supports connecting to the Postgres DB without SSL enabled, in order to maximize client compatibility. For increased security, you can prevent clients from connecting if they're not using SSL.
+Your Supabase project supports connecting to the Postgres DB without SSL enabled to maximize client compatibility. For increased security, you can prevent clients from connecting if they're not using SSL.
 
-SSL enforcement only applies to connections to both Postgres and PgBouncer ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g. PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections.
+SSL enforcement only applies to connections to both Postgres and PgBouncer ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections.
 
 To get started:
 
@@ -46,7 +46,7 @@ The `update` subcommand is used to change the SSL enforcement status for your pr
 SSL is now being enforced.
 ```
 
-Similarly, to disable SSL being enforced:
+Similarly, to disable SSL enforcement:
 
 ```bash
 > supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement --experimental
