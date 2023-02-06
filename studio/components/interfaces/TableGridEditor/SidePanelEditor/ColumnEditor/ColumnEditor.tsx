@@ -249,6 +249,7 @@ const ColumnEditor: FC<Props> = ({
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <ColumnType
+            showRecommendation
             value={columnFields?.format ?? ''}
             layout="vertical"
             enumTypes={enumTypes}
