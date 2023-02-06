@@ -1,9 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-
 import { NextPageWithLayout } from 'types'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ReportsLayout } from 'components/layouts'
 import { hooksFactory, usePresetReport } from 'components/interfaces/Reports/Reports.utils'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
@@ -68,8 +67,6 @@ export const StorageReport: NextPageWithLayout = () => {
           data={topDownloaded[0]?.data || []}
           renderer={renderTopDownloaded}
         />
-
-        <Divider light />
 
         <ReportWidget
           isLoading={isLoading}
