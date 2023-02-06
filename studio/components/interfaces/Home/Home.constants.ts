@@ -10,7 +10,7 @@ export const CLIENT_LIBRARIES = [
     language: 'Python',
     officialSupport: false,
     releaseState: 'Alpha',
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/python/introduction',
     gitUrl: 'https://github.com/supabase/supabase-py',
   },
   {
