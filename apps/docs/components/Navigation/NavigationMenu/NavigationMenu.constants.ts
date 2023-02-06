@@ -625,8 +625,7 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    // removing until the examples page is reworked
-    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -651,6 +650,24 @@ export const resources = {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
           items: [],
+        },
+      ],
+    },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Drop all tables in schema',
+          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select first row per group',
+          url: '/guides/resources/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL version',
+          url: '/guides/resources/postgres/which-version-of-postgres',
         },
       ],
     },
