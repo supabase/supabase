@@ -53,7 +53,7 @@ function useSearchKeyboardEvents({ onOpen, onClose }) {
         case 'Escape':
           onClose()
           return
-        case 'j':
+        case '/':
           if (event.metaKey || event.ctrlKey) {
             onOpen()
           }

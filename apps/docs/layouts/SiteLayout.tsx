@@ -10,6 +10,7 @@ import { memo, useEffect } from 'react'
 import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { useFlag } from '~/hooks/useFlag'
 
 const levelsData = {
   home: {
@@ -301,6 +302,7 @@ const NavContainer = memo(function NavContainer() {
 
 const SiteLayout = ({ children }) => {
   // const mobileMenuOpen = useMenuMobileOpen()
+  const enableClippy = useFlag('enableClippy')
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
@@ -341,7 +343,7 @@ const SiteLayout = ({ children }) => {
           <MobileMenuBackdrop />
         </Container>
         <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
-          <Clippy />
+          {enableClippy && <Clippy />}
         </div>
       </div>
     </main>
