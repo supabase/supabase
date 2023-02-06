@@ -228,5 +228,16 @@ module.exports = ui({
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    function ({ addUtilities, addVariant }) {
+      addUtilities({
+        // prose (tailwind typography) helpers
+        // useful for removing margins in prose styled sections
+        '.prose--remove-p-margin p': {
+          margin: '0',
+        },
+      })
+    },
+  ],
 })
