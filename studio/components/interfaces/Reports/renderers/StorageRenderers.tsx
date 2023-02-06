@@ -109,6 +109,7 @@ export const renderStaleFiles = (
     twelve_month: number
   }>
 ) => {
+  if (!props.data[0]) return null
   return (
     <div className="flex flex-row w-full px-4 justify-between gap-4">
       {[
@@ -183,31 +184,6 @@ export const renderCacheHitRate = (
       xAxisKey="timestamp"
       yAxisKey="count"
       stackKey="type"
-    />
-  )
-
-  return (
-    <Table
-      containerClassName="max-h-72 w-full overflow-y-auto"
-      className="relative rounded border border-scale-600"
-      head={
-        <>
-          <Table.th className="sticky top-0 z-10">timestamp</Table.th>
-          <Table.th className="sticky top-0 z-10">hit</Table.th>
-          <Table.th className="sticky top-0 z-10">miss</Table.th>
-        </>
-      }
-      body={
-        <>
-          {props.data.map((row, index) => (
-            <Table.tr key={index}>
-              <Table.td>{row.timestamp}</Table.td>
-              <Table.td>{row.hit_count}</Table.td>
-              <Table.td>{row.miss_count}</Table.td>
-            </Table.tr>
-          ))}
-        </>
-      }
     />
   )
 }
