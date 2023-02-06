@@ -3895,6 +3895,25 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: returns
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    title: returns()
+    examples:
+      - id: override-type-of-successful-response
+        name: Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .returns<MyType>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
 
   # NOTE: Not available on currently deployed PostgREST
   # db.geojson():
