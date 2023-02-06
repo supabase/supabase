@@ -42,7 +42,7 @@ export const StorageReport: NextPageWithLayout = () => {
         <ReportWidget
           isLoading={isLoading}
           params={cacheHitRate[0].params}
-          className="col-span-3 col-start-1"
+          className="col-span-6 col-start-1"
           title="Cache Hit Rate"
           description="Edge Network Cache Hit Rate"
           data={cacheHitRate[0]?.logData || []}
@@ -51,21 +51,32 @@ export const StorageReport: NextPageWithLayout = () => {
 
         <ReportWidget
           isLoading={isLoading}
-          params={largestObjectsPerBucket[0].params}
-          className="col-span-3 col-start-1"
-          title="Largest Objects"
-          description="Large objects in each bucket"
-          data={largestObjectsPerBucket[0]?.data || []}
-          renderer={renderLargestObjectsPerBucket}
+          params={topSizes[0].params}
+          className="col-span-2 col-start-1"
+          title="Top Object Sizes"
+          description="Most frequently used object sizes"
+          data={topSizes[0]?.logData || []}
+          renderer={renderTopSizes}
         />
         <ReportWidget
           isLoading={isLoading}
           params={topDownloaded[0].params}
-          className="col-span-3 col-start-1"
+          className="col-span-4 col-start-3"
           title="Top Downloaded Objects"
           description="Top download objectss"
           data={topDownloaded[0]?.data || []}
           renderer={renderTopDownloaded}
+        />
+
+        <Divider light />
+        <ReportWidget
+          isLoading={isLoading}
+          params={staleFiles[0].params}
+          className="col-span-6 col-start-1"
+          title="Stale Objects"
+          description="Objects by months from last access"
+          data={staleFiles[0]?.data || []}
+          renderer={renderStaleFiles}
         />
 
         <ReportWidget
@@ -80,22 +91,12 @@ export const StorageReport: NextPageWithLayout = () => {
 
         <ReportWidget
           isLoading={isLoading}
-          params={staleFiles[0].params}
-          className="col-span-3 col-start-1"
-          title="Stale Objects"
-          description="Objects by months from last access"
-          data={staleFiles[0]?.data || []}
-          renderer={renderStaleFiles}
-        />
-
-        <ReportWidget
-          isLoading={isLoading}
-          params={topSizes[0].params}
-          className="col-span-3 col-start-1"
-          title="Top Object Sizes"
-          description="Most frequently used object sizes"
-          data={topSizes[0]?.logData || []}
-          renderer={renderTopSizes}
+          params={largestObjectsPerBucket[0].params}
+          className="col-span-3 col-start-4"
+          title="Largest Objects"
+          description="Large objects in each bucket"
+          data={largestObjectsPerBucket[0]?.data || []}
+          renderer={renderLargestObjectsPerBucket}
         />
       </div>
     </Layout>

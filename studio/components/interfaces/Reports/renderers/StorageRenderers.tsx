@@ -1,5 +1,7 @@
 import Table from 'components/to-be-cleaned/Table'
+import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { ReportWidgetProps } from '../ReportWidget'
+import Statistic from '../Statistic'
 
 export const renderLargestObjectsPerBucket = (
   props: ReportWidgetProps<{
@@ -104,34 +106,23 @@ export const renderStaleFiles = (
     one_month: number
     three_month: number
     six_month: number
-    one_year: number
+    twelve_month: number
   }>
 ) => {
   return (
-    <Table
-      containerClassName="max-h-72 w-full overflow-y-auto"
-      className="relative rounded border border-scale-600"
-      head={
-        <>
-          <Table.th className="sticky top-0 z-10">1 Month</Table.th>
-          <Table.th className="sticky top-0 z-10">3 Months</Table.th>
-          <Table.th className="sticky top-0 z-10">6 Months</Table.th>
-          <Table.th className="sticky top-0 z-10">12 Months</Table.th>
-        </>
-      }
-      body={
-        <>
-          {props.data.map((row, index) => (
-            <Table.tr key={index}>
-              <Table.td>{row.one_month}</Table.td>
-              <Table.td>{row.three_month}</Table.td>
-              <Table.td>{row.six_month}</Table.td>
-              <Table.td>{row.one_year}</Table.td>
-            </Table.tr>
-          ))}
-        </>
-      }
-    />
+    <div className="flex flex-row w-full px-4 justify-between gap-4">
+      {[
+        { key: 'one_month', label: '1 Month' },
+        { key: 'three_month', label: '3 Month' },
+        { key: 'six_month', label: '6 Month' },
+        { key: 'twelve_month', label: '12 Month' },
+      ].map(({ key, label }) => (
+        <div className="flex flex-col items-center">
+          <Statistic value={props.data[0][key as keyof typeof props.data[0]]} />
+          <span className="text-lg text-scale-1000">{label}</span>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -171,6 +162,30 @@ export const renderCacheHitRate = (
     miss_count: number
   }>
 ) => {
+  const stackedData = props.data.flatMap((datum) => [
+    {
+      timestamp: datum.timestamp,
+      count: datum.hit_count,
+      type: 'hit',
+    },
+    {
+      timestamp: datum.timestamp,
+      count: datum.miss_count,
+      type: 'miss',
+    },
+  ])
+
+  return (
+    <StackedBarChart
+      hideHeader
+      variant="percentages"
+      data={stackedData}
+      xAxisKey="timestamp"
+      yAxisKey="count"
+      stackKey="type"
+    />
+  )
+
   return (
     <Table
       containerClassName="max-h-72 w-full overflow-y-auto"
