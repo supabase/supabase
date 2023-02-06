@@ -5,7 +5,7 @@ import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag, useParams } from 'hooks'
+import { checkPermissions, useFlag, useParams } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
@@ -33,7 +33,6 @@ const Subscription: FC<Props> = ({
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
-  const { ui } = useStore()
   const router = useRouter()
 
   const { ref: projectRef } = useParams()
@@ -63,7 +62,7 @@ const Subscription: FC<Props> = ({
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey as keyof ProjectUsageResponse].cost
+              return usage[productKey as keyof ProjectUsageResponse].cost ?? 0
             })
             .reduce((prev, current) => prev + current, 0)
 

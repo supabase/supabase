@@ -110,7 +110,7 @@ export const filterSensitiveProjectProps = (project: any) => {
 }
 
 /**
- * Returns undefine if the string isn't parse-able
+ * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
@@ -120,7 +120,7 @@ export const tryParseInt = (str: string) => {
   }
 }
 
-// Used as checker for memoised components
+// Used as checker for memoized components
 export const propsAreEqual = (prevProps: any, nextProps: any) => {
   try {
     Object.keys(prevProps).forEach((key) => {
