@@ -20,7 +20,7 @@ const ClippyBubble: FC<Props> = ({ className, onClick }) => {
       <div className="flex items-center space-x-1">
         <div className="text-scale-1200 flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
           <IconCommand size={12} strokeWidth={1.5} />
-          <span className="text-[12px]">J</span>
+          <span className="text-[12px]">/</span>
         </div>
       </div>
       <div className="absolute -bottom-4 right-[90px] text-scale-600">
