@@ -86,7 +86,6 @@ create extension vector;
 
 Next let's create a table to store our documents and their embeddings:
 
-<!-- prettier-ignore-start -->
 ```sql
 create table documents (
   id bigserial primary key,
@@ -94,7 +93,6 @@ create table documents (
   embedding vector (1536)
 );
 ```
-<!-- prettier-ignore-end -->
 
 `pgvector` introduces a new data type called `vector`. In the code above, we create a column named `embedding` with the `vector` data type. The size of the vector defines how many dimensions the vector holds. OpenAI's `text-embedding-ada-002` model outputs 1536 dimensions, so we will use that for our vector size.
 
@@ -102,7 +100,6 @@ We also create a `text` column named `content` to store the original document te
 
 Soon we're going to need to perform a similarity search over these embeddings. Let's create a function to do that:
 
-<!-- prettier-ignore-start -->
 ```sql
 create or replace function match_documents (
   query_embedding vector(1536),
@@ -129,7 +126,6 @@ begin
 end;
 $$;
 ```
-<!-- prettier-ignore-end -->
 
 `pgvector` introduces 3 new operators that can be used to calculate similarity:
 
@@ -149,13 +145,11 @@ Once your table starts to grow with embeddings, you will likely want to add an i
 
 Each distance operator requires a different type of index. We expect to order by cosine distance, so we need `vector_cosine_ops` index. A good starting number of lists is 4 \* sqrt(table_rows):
 
-<!-- prettier-ignore-start -->
 ```sql
 create index on documents 
 using ivfflat (embedding vector_cosine_ops)
 with (lists = 100);
 ```
-<!-- prettier-ignore-end -->
 
 You can read more about indexing on `pgvector`'s GitHub page [here](https://github.com/pgvector/pgvector#indexing).
 
