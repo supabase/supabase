@@ -7,6 +7,7 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
 import { memo, useEffect } from 'react'
+import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 
@@ -338,6 +339,9 @@ const SiteLayout = ({ children }) => {
           </div>
           <MobileMenuBackdrop />
         </Container>
+        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
+          <Clippy />
+        </div>
       </div>
     </main>
   )

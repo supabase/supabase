@@ -1,0 +1,101 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'pgvector',
+  title: 'pgvector: Embeddings and vector similarity',
+  description:
+    'pgvector: a PostgreSQL extension for storing embeddings and performing vector similarity search.',
+}
+
+[pgvector](https://github.com/pgvector/pgvector/) is a PostgreSQL extension for vector similarity search. It can also be used for storing [embeddings](https://en.wikipedia.org/wiki/Word_embedding).
+
+## Concepts
+
+### Vector similarity
+
+Vector similarity refers to a measure of the similarity between two related items. For example, if you have a list of products, you can use vector similarity to find similar products. To do this, you need to convert each product into a "vector" of numbers, using a mathematical model. You can use a similar model for text, images, and other types of data. Once all of these vectors are stored in the database, you can use vector similarity to find similar items.
+
+### Embeddings
+
+This is particularly useful if you're building on top of OpenAI's [GPT-3](https://openai.com/blog/gpt-3-apps/). You can create and store [embeddings](https://platform.openai.com/docs/guides/embeddings) which match the GPT model you're using.
+
+## Usage
+
+### Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "vector" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+ -- Example: enable the "vector" extension.
+create extension vector
+with
+  schema extensions;
+
+-- Example: disable the "vector" extension
+drop
+  extension if exists vector;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+</TabPanel>
+</Tabs>
+
+## Usage
+
+### Create a table to store vectors
+
+```sql
+create table
+  posts (
+    id serial primary key,
+    title text not null,
+    body text not null,
+    embedding vector (1536)
+  );
+```
+
+### Storing a vector / embedding
+
+In this example we'll generate a vector using the OpenAI API client, then store it in the database using the Supabase client.
+
+```js
+const title = 'First post!'
+const body = 'Hello world!'
+
+// Generate a vector using OpenAI
+const embeddingResponse = await openai.createEmbedding({
+  model: 'text-embedding-ada-002',
+  input: body,
+})
+const [responseData] = embeddingResponse.data.data.
+
+// Store the vector in Postgres
+const { data, error } = await supabase.from('posts').insert({
+  title,
+  body,
+  embedding: responseData.embedding,
+})
+```
+
+## Resources
+
+- Source code: [github.com/pgvector/pgvector](https://github.com/pgvector/pgvector/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
