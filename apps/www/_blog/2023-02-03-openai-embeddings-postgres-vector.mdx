@@ -351,10 +351,9 @@ serve(async (req) => {
     choices: [{ text }],
   } = completionResponse.data
 
-  return new Response(
-    JSON.stringify({ id, text, }), 
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  )
+  return new Response(JSON.stringify({ id, text }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
 })
 ```
 
