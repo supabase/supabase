@@ -457,7 +457,7 @@ export const database = {
         },
         {
           name: 'wrappers: 3rd Party Integrations',
-          url: '/guides/database/extensions/rum',
+          url: '/guides/database/extensions/wrappers',
           items: [],
         },
       ],
