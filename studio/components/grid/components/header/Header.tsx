@@ -1,5 +1,5 @@
 import { FC, useState, ReactNode } from 'react'
-import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'ui'
+import { Button, IconDownload, IconPlus, IconX, IconTrash, Dropdown, IconColumns } from 'ui'
 import { saveAs } from 'file-saver'
 
 import { useStore } from 'hooks'
@@ -53,23 +53,7 @@ interface DefaultHeaderProps {
   onAddRow?: () => void
 }
 const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, onAddRow }) => {
-  const renderNewColumn = (onAddColumn?: () => void) => {
-    if (!onAddColumn) return null
-    return (
-      <Button type="text" onClick={onAddColumn}>
-        New Column
-      </Button>
-    )
-  }
-
-  const renderAddRow = (onAddRow?: () => void) => {
-    if (!onAddRow) return null
-    return (
-      <Button size="tiny" icon={<IconPlus size={14} strokeWidth={2} />} onClick={onAddRow}>
-        Insert row
-      </Button>
-    )
-  }
+  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   return (
     <div className="flex items-center gap-4">
@@ -78,11 +62,46 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
         <FilterDropdown />
         <SortPopover />
       </div>
-      <div className="h-[50%] w-px bg-scale-600"></div>
-      <div className="flex items-center gap-2">
-        {renderNewColumn(onAddColumn)}
-        {renderAddRow(onAddRow)}
-      </div>
+      {canAddNew && (
+        <>
+          <div className="h-[20px] w-px border-r border-scale-600"></div>
+          <div className="flex items-center gap-2">
+            <Dropdown
+              side="bottom"
+              align="center"
+              size="small"
+              overlay={[
+                ...(onAddColumn !== undefined
+                  ? [
+                      <Dropdown.Item
+                        key="add-column"
+                        onClick={onAddColumn}
+                        disabled={onAddColumn === undefined}
+                      >
+                        New column
+                      </Dropdown.Item>,
+                    ]
+                  : []),
+                ...(onAddRow !== undefined
+                  ? [
+                      <Dropdown.Item
+                        key="add-row"
+                        onClick={onAddRow}
+                        disabled={onAddRow === undefined}
+                      >
+                        New row
+                      </Dropdown.Item>,
+                    ]
+                  : []),
+              ]}
+            >
+              <Button size="tiny" icon={<IconPlus size={14} strokeWidth={1.5} />}>
+                Add new
+              </Button>
+            </Dropdown>
+          </div>
+        </>
+      )}
     </div>
   )
 }
