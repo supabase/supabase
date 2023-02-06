@@ -19,10 +19,10 @@ The exponential progress of AI functionality over the past year has inspired man
 
 Embeddings capture the “relatedness” of text, images, video, or other types of information. This relatedness is most commonly used for:
 
-* **Search:** how similar is a search term to a body of text?
-* **Recommendations:** how similar are two products?
-* **Classifications:** how do we categorize a body of text?
-* **Clustering:** how do we identify trends?
+- **Search:** how similar is a search term to a body of text?
+- **Recommendations:** how similar are two products?
+- **Classifications:** how do we categorize a body of text?
+- **Clustering:** how do we identify trends?
 
 Let's explore an example of text embeddings. Say we have three phrases:
 
@@ -133,11 +133,11 @@ $$;
 
 `pgvector` introduces 3 new operators that can be used to calculate similarity:
 
-| Operator   | Description            |
-| ---------- | ---------------------- |
-| `<->`      | Euclidean distance     |
-| `<#>`      | negative inner product |
-| `<=>`      | cosine distance        |
+| Operator | Description            |
+| -------- | ---------------------- |
+| `<->`    | Euclidean distance     |
+| `<#>`    | negative inner product |
+| `<=>`    | cosine distance        |
 
 OpenAI recommends cosine similarity on their embeddings, so we will use that here.
 
@@ -357,10 +357,9 @@ serve(async (req) => {
     choices: [{ text }],
   } = completionResponse.data
 
-  return new Response(
-    JSON.stringify({ id, text, }), 
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  )
+  return new Response(JSON.stringify({ id, text }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
 })
 ```
 
