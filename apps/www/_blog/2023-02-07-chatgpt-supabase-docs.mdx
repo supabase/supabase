@@ -12,7 +12,7 @@ toc_depth: 3
 ---
 
 We all know that Microsoft's real agenda for pouring billions into OpenAI to revive their favorite friend Clippy.
-Today, we're doing our part to support the momentum by releasing “Supabase Clippy” for our docs (and we don't expect this name to last long before the lawyers catch on). 
+Today, we're doing our part to support the momentum by releasing “Supabase Clippy” for our docs (and we don't expect this name to last long before the lawyers catch on).
 
 ![Clippy](/images/blog/docsgpt/clippy.png)
 
@@ -22,7 +22,7 @@ Want to try it out? It's a hidden feature while in MVP - visit [supabase.com/doc
 
 Last launch week we [released](/blog/new-supabase-docs-built-with-nextjs) our new documentation site to improve the developer experience, especially for new users.
 
-When we first started Supabase our docs were very concise. We deliberately withheld "non-critical information" so that developers could consume everything in one sitting. 
+When we first started Supabase our docs were very concise. We deliberately withheld "non-critical information" so that developers could consume everything in one sitting.
 
 Our product suite has grown in the past 2 years and our docs have grown as a result. There's a lot to read. We're also attracting developers who've never used Postgres before, and it's becoming incumbent on us to train these developers on best-practices.
 
@@ -30,7 +30,7 @@ Our product suite has grown in the past 2 years and our docs have grown as a res
 
 ### The “ask” interface
 
-Developers have recently gained an the ability to trust a bot. Where Clippy failed, ChatGPT succeeded. 
+Developers have recently gained an the ability to trust a bot. Where Clippy failed, ChatGPT succeeded.
 
 This is convenient timing for us, since our documentation content is more than the average developer wants to consume in one go. Today we're providing a similar interface to ChatGPT which is trained on our own docs.
 
@@ -38,7 +38,7 @@ This is convenient timing for us, since our documentation content is more than t
   <source src="/images/blog/embeddings/embeddings.mp4" type="video/mp4" />
 </video>
 
-To keep your expectations low, this implementation is a 1-week MVP. We're sharing this iteration to gather feedback and to teach you how to build something similar. 
+To keep your expectations low, this implementation is a 1-week MVP. We're sharing this iteration to gather feedback and to teach you how to build something similar.
 
 ## How it's built
 
@@ -68,7 +68,7 @@ You can find a full write up in our previous blog post: [Storing OpenAI embeddin
 
 ## What's next
 
-This current version is very basic, which makes it a good starting point if you want to build something similar. 
+This current version is very basic, which makes it a good starting point if you want to build something similar.
 
 - **Expand the knowledge base:** Create embeddings for our reference docs, GitHub Discussions, Discord discussions, etc. The current iteration is only using the Guides.
 - **Caching:** Cache queries so that we can provide answers instantly to similar/matching questions.
@@ -77,7 +77,7 @@ This current version is very basic, which makes it a good starting point if you 
 
 ## Bonus: The power of open source
 
-One of the most interesting things about this feature was *how* it happened - almost completely from open source contributions. A short series of events:
+One of the most interesting things about this feature was _how_ it happened - almost completely from open source contributions. A short series of events:
 
 ### A friendly email
 
@@ -103,7 +103,7 @@ After we merged the PR, I reached out to see if Greg was interested in helping w
 
 We sponsored Greg to work on an MVP with us, along with some guides to help developers do the same. He [pushed all his changes](https://github.com/supabase/supabase/pull/12056) to the Supabase Docs, and we wrote a [blog post](/blog/openai-embeddings-postgres-vector) together to help developers build something similar.
 
-If you re-read the events above and swap “Supabase” for any other big-tech company, you'll grasp how impossible this series of events is for any company that's not open source. All the code that was contributed is licensed liberally, so we didn't need to jump through IP checklists. Our docs are publicly available on GitHub, so Greg could build his prototype without being granted access. 
+If you re-read the events above and swap “Supabase” for any other big-tech company, you'll grasp how impossible this series of events is for any company that's not open source. All the code that was contributed is licensed liberally, so we didn't need to jump through IP checklists. Our docs are publicly available on GitHub, so Greg could build his prototype without being granted access.
 
 We're incredibly grateful for Greg's work here, so if you like what he's done then consider supporting him by checking out [prmpts.ai](https://prmpts.ai/) and following him on twitter: [@ggrdson](https://twitter.com/ggrdson).
 
@@ -111,6 +111,6 @@ While you're at it, consider supporting [@ankane](https://github.com/ankane)'s g
 
 ## Try it out
 
-Want to try Supabase Clippy? It's a hidden feature while in MVP - visit [supabase.com/docs](/docs) and hit `cmd` + `/` to pull up the search box (sorry mobile users). 
+Want to try Supabase Clippy? It's a hidden feature while in MVP - visit [supabase.com/docs](/docs) and hit `cmd` + `/` to pull up the search box (sorry mobile users).
 
-{ /* If you have any comments we'd love to hear them in our ShowHN: */ }
+{/* If you have any comments we'd love to hear them in our ShowHN: */}
