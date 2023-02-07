@@ -5,6 +5,7 @@ export const meta = {
   title: 'Serverless APIs',
   description: 'Auto-generating and Realtime APIs.',
   sidebar_label: 'Overview',
+  video: 'https://www.youtube.com/v/rPAJJFdtPw0',
 }
 
 Supabase auto-generates three types of API directly from your database schema.
@@ -55,6 +56,7 @@ GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-grap
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
+Go to your project's [Replication section](https://app.supabase.com/project/_/database/replication) to get started.
 
 ## Getting started
 
@@ -83,7 +85,12 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
 1. Click **Save**.
 
 <video width="99%" muted playsInline controls="true">
-  <source src={'/docs/videos/api/api-create-table-sm.mp4'} type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabPanel>
@@ -111,7 +118,12 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-  <source src={'/docs/videos/api/api-url-and-key.mp4'} type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 The REST API and the GraphQL API are both accessible through this URL:
@@ -140,7 +152,12 @@ Let's view the documentation for a `countries` table which we created in our dat
 3. Switch between the JavaScript and the cURL docs using the tabs.
 
 <video width="99%" muted playsInline controls="true">
-  <source src={'/docs/videos/api/api-docs.mp4'} type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-docs.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 #### GraphQL
@@ -217,7 +234,7 @@ import { createClient, useQuery } from 'urql'
 // Prepare API key and Authorization header
 const headers = {
   apikey: <SUPABASE_ANON_KEY>,
-  authorization: `Bearer ${<SUPABASE_ANON_KEY}`>
+  authorization: `Bearer ${<SUPABASE_ANON_KEY>}`,
 }
 
 // Create GraphQL client
@@ -285,7 +302,12 @@ By default Realtime is disabled on your database. Let's turn on Realtime for the
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
-  <source src={'/docs/videos/api/api-realtime.mp4'} type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabPanel>

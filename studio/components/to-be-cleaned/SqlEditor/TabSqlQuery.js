@@ -246,6 +246,16 @@ const ResultsDropdown = observer(() => {
     }
   }
 
+  const formatDataForCSV = (data = []) => {
+    return data.map((row) => {
+      const formattedRow = { ...row }
+      Object.keys(row).forEach((key) => {
+        if (typeof row[key] === 'object') formattedRow[key] = JSON.stringify(row[key])
+      })
+      return formattedRow
+    })
+  }
+
   return (
     <Dropdown
       side="bottom"
@@ -263,7 +273,7 @@ const ResultsDropdown = observer(() => {
       <CSVLink
         ref={csvRef}
         className="hidden"
-        data={sqlEditorStore.activeTab?.csvData || ''}
+        data={formatDataForCSV(sqlEditorStore.activeTab?.csvData || '')}
         filename={`supabase_${sqlEditorStore.projectRef}_${sqlEditorStore.activeTab.name}`}
       />
     </Dropdown>

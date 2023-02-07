@@ -2,7 +2,7 @@ import { useState } from 'react'
 import router from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore, withAuth } from 'hooks'
 import { NextPageWithLayout } from 'types'
@@ -56,7 +56,7 @@ const Editor: NextPageWithLayout = () => {
         category: 'success',
         message: `Successfully deleted ${selectedTableToDelete!.name}`,
       })
-      await meta.schemas.loadViews(selectedSchema)
+      await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

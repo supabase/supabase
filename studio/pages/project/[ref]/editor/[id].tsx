@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { isUndefined, isNaN } from 'lodash'
+import { isUndefined } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { NextPageWithLayout } from 'types'
-import Base64 from 'lib/base64'
-import { tryParseJson } from 'lib/helpers'
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
 import { useTableQuery } from 'data/tables/table-query'
 import { Dictionary } from 'components/grid'
@@ -143,7 +141,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       })
 
       await meta.tables.loadById(selectedColumnToDelete!.table_id)
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -174,7 +172,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
-      if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
+      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
         error,

@@ -2,14 +2,14 @@ import { useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined, noop } from 'lodash'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { SchemaView } from 'types'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
 
 export interface TableGridEditorProps {
@@ -81,7 +81,7 @@ const TableGridEditor = ({
 
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
-  const isViewSelected = Object.keys(selectedTable).length === 2
+  const isViewSelected = !Object.keys(selectedTable).includes('rls_enabled')
   const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
   const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
@@ -92,7 +92,7 @@ const TableGridEditor = ({
       ? parseSupaTable(
           {
             table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns,
+            columns: (selectedTable as PostgresTable).columns ?? [],
             primaryKeys: (selectedTable as PostgresTable).primary_keys,
             relationships: (selectedTable as PostgresTable).relationships,
           },

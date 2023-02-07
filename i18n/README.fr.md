@@ -23,7 +23,7 @@
 
 Pour une documentation complète, visitez [supabase.com/docs](https://supabase.com/docs)
 
-Pour voir comment Contribuer, visitez [Getting Started](./DEVELOPERS.md)
+Pour voir comment Contribuer, visitez [Getting Started](../DEVELOPERS.md)
 
 ## Communauté et Support
 

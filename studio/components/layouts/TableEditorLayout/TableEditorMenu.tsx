@@ -8,6 +8,7 @@ import {
   IconCopy,
   IconEdit,
   IconLoader,
+  IconLock,
   IconRefreshCw,
   IconSearch,
   IconTrash,
@@ -19,15 +20,15 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import Base64 from 'lib/base64'
 import { checkPermissions, useParams } from 'hooks'
-import { SchemaView } from './TableEditorLayout.types'
+
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { Table } from 'data/tables/table-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/tables/schemas-query'
 import { SYSTEM_SCHEMAS } from 'lib/constants'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 export type TableEditorMenuProps = {
   selectedSchema?: string
@@ -225,146 +226,169 @@ const TableEditorMenu = ({
         </div>
       </div>
 
-      <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
-        {/* List of tables belonging to selected schema */}
-        {allTables.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <>
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center space-x-1">
-                      <p>Tables</p>
-                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allTables.length})</p>
+      {isLoadingTables ? (
+        <div className="mx-7 flex items-center space-x-2">
+          <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1000">Loading tables...</p>
+        </div>
+      ) : searchText.length === 0 && allTables.length === 0 && allViews.length === 0 ? (
+        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No tables available</p>
+          <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
+        </div>
+      ) : (
+        <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
+          {/* List of tables belonging to selected schema */}
+          {allTables.length > 0 && (
+            <Menu type="pills">
+              <Menu.Group
+                // @ts-ignore
+                title={
+                  <>
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <p>Tables</p>
+                        <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allTables.length})</p>
+                      </div>
+                      <button className="cursor-pointer" onClick={refreshTables}>
+                        <IconRefreshCw
+                          className={isRefetchingTables ? 'animate-spin' : ''}
+                          size={14}
+                        />
+                      </button>
                     </div>
-                    <button className="cursor-pointer" onClick={refreshTables}>
-                      <IconRefreshCw
-                        className={isRefetchingTables || isRefetchingSchemas ? 'animate-spin' : ''}
-                        size={14}
-                      />
-                    </button>
-                  </div>
-                </>
-              }
-            />
+                  </>
+                }
+              />
 
-            <div>
-              {allTables.map((table) => {
-                const isActive = Number(id) === table.id
+              <div>
+                {allTables.map((table) => {
+                  const isActive = Number(id) === table.id
+                  return (
+                    <ProductMenuItem
+                      key={table.name}
+                      url={`/project/${projectRef}/editor/${table.id}`}
+                      name={table.name}
+                      hoverText={table.comment ? table.comment : table.name}
+                      isActive={isActive}
+                      action={
+                        isActive &&
+                        !isLocked && (
+                          <Dropdown
+                            size="small"
+                            side="bottom"
+                            align="start"
+                            overlay={[
+                              <Dropdown.Item
+                                key="edit-table"
+                                icon={<IconEdit size="tiny" />}
+                                onClick={() => onEditTable(table)}
+                              >
+                                Edit Table
+                              </Dropdown.Item>,
+                              <Dropdown.Item
+                                key="duplicate-table"
+                                icon={<IconCopy size="tiny" />}
+                                onClick={() => onDuplicateTable(table)}
+                              >
+                                Duplicate Table
+                              </Dropdown.Item>,
+                              <Link
+                                href={`/project/${projectRef}/auth/policies?search=${table.id}`}
+                              >
+                                <a>
+                                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
+                                    View Policies
+                                  </Dropdown.Item>
+                                </a>
+                              </Link>,
+                              <Dropdown.Separator key="separator" />,
+                              <Dropdown.Item
+                                key="delete-table"
+                                icon={<IconTrash size="tiny" />}
+                                onClick={() => onDeleteTable(table)}
+                              >
+                                Delete Table
+                              </Dropdown.Item>,
+                            ]}
+                          >
+                            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                              <IconChevronDown size={14} strokeWidth={2} />
+                            </div>
+                          </Dropdown>
+                        )
+                      }
+                    />
+                  )
+                })}
+              </div>
+            </Menu>
+          )}
+
+          {/* List of views belonging to selected schema */}
+          {allViews.length > 0 && (
+            <Menu type="pills">
+              <Menu.Group
+                // @ts-ignore
+                title={
+                  <div className="flex w-full items-center space-x-1">
+                    <p>Views</p>
+                    <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allViews.length})</p>
+                  </div>
+                }
+              />
+
+              {allViews.map((view) => {
+                const isActive = Number(id) === view.id
                 return (
-                  <ProductMenuItem
-                    key={table.name}
-                    url={`/project/${projectRef}/editor/${table.id}`}
-                    name={table.name}
-                    hoverText={table.comment ? table.comment : table.name}
-                    isActive={isActive}
-                    action={
-                      isActive &&
-                      !isLocked && (
-                        <Dropdown
-                          size="small"
-                          side="bottom"
-                          align="start"
-                          overlay={[
-                            <Dropdown.Item
-                              key="edit-table"
-                              icon={<IconEdit size="tiny" />}
-                              onClick={() => onEditTable(table)}
-                            >
-                              Edit Table
-                            </Dropdown.Item>,
-                            <Dropdown.Item
-                              key="duplicate-table"
-                              icon={<IconCopy size="tiny" />}
-                              onClick={() => onDuplicateTable(table)}
-                            >
-                              Duplicate Table
-                            </Dropdown.Item>,
-                            <Dropdown.Separator key="separator" />,
-                            <Dropdown.Item
-                              key="delete-table"
-                              icon={<IconTrash size="tiny" />}
-                              onClick={() => onDeleteTable(table)}
-                            >
-                              Delete Table
-                            </Dropdown.Item>,
-                          ]}
-                        >
-                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                            <IconChevronDown size={14} strokeWidth={2} />
-                          </div>
-                        </Dropdown>
-                      )
-                    }
-                  />
+                  <Link key={view.id} href={`/project/${projectRef}/editor/${view.id}?type=view`}>
+                    <a>
+                      <Menu.Item key={view.id} rounded active={isActive}>
+                        <div className="flex justify-between">
+                          <p className="truncate">{view.name}</p>
+                        </div>
+                      </Menu.Item>
+                    </a>
+                  </Link>
                 )
               })}
-            </div>
-          </Menu>
-        )}
+            </Menu>
+          )}
 
-        {/* List of views belonging to selected schema */}
-        {allViews.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <div className="flex w-full items-center space-x-1">
-                  <p>Views</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({allViews.length})</p>
-                </div>
-              }
-            />
+          {/* List of foreign tables belonging to selected schema */}
+          {foreignTables.length > 0 && (
+            <Menu type="pills">
+              <Menu.Group
+                // @ts-ignore
+                title={
+                  <div className="flex w-full items-center space-x-1">
+                    <p>Foreign Tables</p>
+                    <p style={{ fontVariantNumeric: 'tabular-nums' }}>({foreignTables.length})</p>
+                  </div>
+                }
+              />
 
-            {allViews.map((view: SchemaView) => {
-              const viewId = Base64.encode(JSON.stringify(view))
-              const isActive = id === viewId
-              return (
-                <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
-                  <a>
-                    <Menu.Item key={viewId} rounded active={isActive}>
-                      <div className="flex justify-between">
-                        <p className="truncate">{view.name}</p>
-                      </div>
-                    </Menu.Item>
-                  </a>
-                </Link>
-              )
-            })}
-          </Menu>
-        )}
-
-        {/* List of foreign tables belonging to selected schema */}
-        {foreignTables.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <div className="flex w-full items-center space-x-1">
-                  <p>Foreign Tables</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({foreignTables.length})</p>
-                </div>
-              }
-            />
-
-            {foreignTables.map((table) => {
-              const isActive = Number(id) === table.id
-              return (
-                <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
-                  <a>
-                    <Menu.Item key={table.id} rounded active={isActive}>
-                      <div className="flex justify-between">
-                        <p className="truncate">{table.name}</p>
-                      </div>
-                    </Menu.Item>
-                  </a>
-                </Link>
-              )
-            })}
-          </Menu>
-        )}
-      </div>
+              {foreignTables.map((table: Partial<PostgresTable>) => {
+                const isActive = Number(id) === table.id
+                return (
+                  <Link
+                    key={table.id}
+                    href={`/project/${projectRef}/editor/${table.id}?type=foreign`}
+                  >
+                    <a>
+                      <Menu.Item key={table.id} rounded active={isActive}>
+                        <div className="flex justify-between">
+                          <p className="truncate">{table.name}</p>
+                        </div>
+                      </Menu.Item>
+                    </a>
+                  </Link>
+                )
+              })}
+            </Menu>
+          )}
+        </div>
+      )}
 
       {isLoadingTables && (
         <div className="flex flex-col items-center justify-center gap-2">
