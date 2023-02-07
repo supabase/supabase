@@ -420,6 +420,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
           items: [],
@@ -509,6 +514,8 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
@@ -623,8 +630,7 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    // removing until the examples page is reworked
-    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -649,6 +655,24 @@ export const resources = {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
           items: [],
+        },
+      ],
+    },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Drop all tables in schema',
+          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select first row per group',
+          url: '/guides/resources/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL version',
+          url: '/guides/resources/postgres/which-version-of-postgres',
         },
       ],
     },
@@ -793,7 +817,7 @@ export const reference = {
           url: '/reference/python/start',
           level: 'reference_python',
           items: [],
-          icon: 'docs/img/icons/javascript.svg',
+          icon: '/img/icons/menu/reference-python',
         },
         // {
         //   name: 'supabase-python',

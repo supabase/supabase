@@ -1,14 +1,14 @@
 import { FC, useState } from 'react'
 import { Input, Button, Modal, Form, Alert } from 'ui'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { NewAccessToken, useAccessTokens } from 'hooks/queries/useAccessTokens'
+import {
+  NewAccessToken,
+  useAccessTokenCreateMutation,
+} from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
 
 const NewAccessTokenButton = observer(() => {
   const { ui } = useStore()
-  const { mutateNewToken } = useAccessTokens()
   const [isOpen, setIsOpen] = useState(false)
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>(undefined)
 
@@ -20,21 +20,24 @@ const NewAccessTokenButton = observer(() => {
     return errors
   }
 
+  const { mutateAsync: createAccessToken } = useAccessTokenCreateMutation()
+
   async function onFormSubmit(values: any, { setSubmitting }: any) {
     setSubmitting(true)
-    const response = await post(`${API_URL}/profile/access-tokens`, { name: values.tokenName })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create token: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      mutateNewToken(response)
+
+    try {
+      const response = await createAccessToken({ name: values.tokenName })
       setNewToken(response)
 
       setSubmitting(false)
       setIsOpen(false)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create token: ${error.message}`,
+      })
+
+      setSubmitting(false)
     }
   }
 
@@ -68,7 +71,7 @@ const NewAccessTokenButton = observer(() => {
           validate={validate}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
+            <div className="py-3 space-y-4">
               <Modal.Content>
                 <Input
                   id="tokenName"
@@ -109,7 +112,7 @@ const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
           copy
           readOnly
           size="small"
-          className="input-mono max-w-xl"
+          className="max-w-xl input-mono"
           value={data.token}
           onChange={() => {}}
         />
