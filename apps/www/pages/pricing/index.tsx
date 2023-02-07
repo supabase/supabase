@@ -119,7 +119,7 @@ export default function IndexPage() {
       href: 'https://forms.supabase.com/enterprise',
       description: 'For large-scale applications managing serious workloads.',
       features: [
-        `Point in time recovery`,
+        `Point in Time Recovery`,
         `Designated Support manager & SLAs`,
         `Enterprise OAuth providers`,
         `SSO/ SAML`,
@@ -140,7 +140,7 @@ export default function IndexPage() {
       heroImg: 'addons-compute-hero',
       icon: 'compute-upgrade',
       price: 'Starts from $5',
-      description: 'Increase the captability of your database only for what you need.',
+      description: 'Increase the capability of your database only for what you need.',
       leftCtaText: 'Documentation',
       leftCtaLink: 'http://.....',
       rightCtaText: 'See Pricing breakdown',
@@ -159,7 +159,7 @@ export default function IndexPage() {
       rightCtaLink: 'http://',
     },
     {
-      name: 'Point in time recovery',
+      name: 'Point in Time Recovery',
       heroImg: 'addons-pitr-hero',
       icon: 'pitr-upgrade',
       price: 'Starts from $5',
@@ -367,7 +367,7 @@ export default function IndexPage() {
                           )}
                         </div>
                         <a href={tier.href}>
-                          <Button block size="small" className="dark:text-white">
+                          <Button block size="small">
                             {tier.cta}
                           </Button>
                         </a>
@@ -391,7 +391,7 @@ export default function IndexPage() {
       <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12">
         <div>
           <div className="text-center">
-            <h2 className="text-scale-1200 text-3xl">Easily customizable add-Ons</h2>
+            <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
             <p className="text-scale-1100 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
@@ -762,7 +762,7 @@ export default function IndexPage() {
                                 <a>
                                   <Button
                                     size="tiny"
-                                    type={tier.name === 'Enterprise' ? 'secondary' : 'primary'}
+                                    type={tier.name === 'Enterprise' ? 'default' : 'primary'}
                                     block
                                   >
                                     Get Started
@@ -815,7 +815,7 @@ export default function IndexPage() {
                     <td className="px-6 pt-5">
                       <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
-                          <Button size="medium" type="default" block>
+                          <Button size="tiny" type="primary" block>
                             Get started
                           </Button>
                         </a>
@@ -825,7 +825,7 @@ export default function IndexPage() {
                     <td className="px-6 pt-5">
                       <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
-                          <Button size="medium" type="default" block>
+                          <Button size="tiny" type="primary" block>
                             Get started
                           </Button>
                         </a>
@@ -835,7 +835,7 @@ export default function IndexPage() {
                     <td className="px-6 pt-5">
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
-                          <Button size="medium" type="default" block>
+                          <Button size="tiny" type="primary" block>
                             Contact us
                           </Button>
                         </a>
