@@ -1,9 +1,8 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useStore, useProjectUsage } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
@@ -11,15 +10,15 @@ import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
 
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
-  const { usage } = useProjectUsage(ref as string)
+  const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
@@ -67,7 +66,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
                 {/* {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${ref}/settings/billing/subscription`}>
+                    <Link href={`/project/${projectRef}/settings/billing/subscription`}>
                       <a>
                         <Badge color="red">Project has exceeded usage limits </Badge>
                       </a>
