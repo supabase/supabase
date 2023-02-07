@@ -66,7 +66,6 @@ All the changes we made are in [this](https://github.com/supabase/supabase/pull/
   allowfullscreen
 ></iframe>
 
-
 You can find a full write up in our previous blog post: [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector).
 
 ## What's next
@@ -80,19 +79,18 @@ This current version is very basic, which makes it a good starting point if you 
 
 ## Bonus: The power of open source
 
-One of the coolest things about this implementation was *how* it happened - almost all from open source contributions. A short series of events:
+One of the most interesting things about this feature was *how* it happened - almost completely from open source contributions. A short series of events:
 
 ### A friendly email
 
-A few weeks ago I received an email, drawing our attention to a [Pull Request](https://github.com/supabase/postgres/pull/472) in our `[postgres](https://github.com/supabase/postgres)` GitHub repo:
+A few weeks ago I received an email, drawing our attention to a [Pull Request](https://github.com/supabase/postgres/pull/472) in our [`postgres`](https://github.com/supabase/postgres) GitHub repo:
 
 ![Greg](/images/blog/docsgpt/greg.png)
 
 
 ### A friendly chat
 
-After it was merged I reached out to see if he was interested to help with some documentation or a blog post that would help the community to use pgvector with embeddings. On the call, Greg showed me a full prototype where he had ingested the Supabase docs for a ChatGPT-like experience. I was suitably impressed and suggested that we could explore ways to work together to build it into the Supabase docs. He wasted no time:
-
+After we merged the PR, I reached out to see if Greg was interested in helping with some documentation or a blog post to help the community to use pgvector. On the call, Greg surprised me with an initial prototype where he had ingested the Supabase docs for a ChatGPT-like experience. I was suitably impressed and suggested that we could explore ways to work together to build it into the Supabase docs. He wasted no time:
 
 <iframe
   width="560"
@@ -106,13 +104,13 @@ After it was merged I reached out to see if he was interested to help with some 
 
 ### A friendly collaboration
 
-And then a friendly collaboration was started. Greg [pushed all his changes](https://github.com/supabase/supabase/pull/12056) to the Supabase Docs, and we wrote a couple of blog posts together to help developers build the same features themselves.
+And then a friendly collaboration was started. Greg [pushed all his changes](https://github.com/supabase/supabase/pull/12056) to the Supabase Docs, and we wrote a [blog post](/blog/openai-embeddings-postgres-vector) together to help developers build something similar.
 
-If you re-read the events above and swap “Supabase” for any other big-tech company, you'll grasp how impossible this series of events is for any company that's not open source. All the code that was contributed is licensed liberally, so we don't need to jump through IP hurdles. All code is available, so developers can contribute and build prototypes without being granted access. Of course, Supabase chooses what will be merged into production but there are so many obstacles cleared by building in public.
+If you re-read the events above and swap “Supabase” for any other big-tech company, you'll grasp how impossible this series of events is for any company that's not open source. All the code that was contributed is licensed liberally, so we didn't need to jump through IP checklists. Our docs are publicly available on GitHub, so Greg could build his prototype without being granted access. 
 
-We're incredibly grateful for Greg's work here, so if you like what he's done then consider supporting him by checking out [prmpts.ai](https://prmpts.ai/).
+We're incredibly grateful for Greg's work here, so if you like what he's done then consider supporting him by checking out [prmpts.ai](https://prmpts.ai/) and following him on twitter: [@ggrdson](https://twitter.com/ggrdson).
 
-While you're at it, consider supporting [@ankane](https://github.com/ankane)'s great work on [pgvector](https://github.com/pgvector/pgvector) by starring them on GitHub, and sending your thanks 
+While you're at it, consider supporting [@ankane](https://github.com/ankane)'s great work on [pgvector](https://github.com/pgvector/pgvector) by starring them on GitHub, and sending your thanks.
 
 ## Try it out
 
