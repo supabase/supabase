@@ -10,8 +10,8 @@ const PageTelemetry: FC = ({ children }) => {
   const { ui } = useStore()
 
   useEffect(() => {
-    function handleRouteChange() {
-      handlePageTelemetry(router.route)
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -24,9 +24,9 @@ const PageTelemetry: FC = ({ children }) => {
   useEffect(() => {
     /**
      * Send page telemetry on first page load
-     * if there asPath is defined, then this isn't needed
+     * if the route is not ready. Don't need to send it will be picked up by router.event above
      */
-    if (router.route === '/' && router.asPath === '/') {
+    if (router.isReady) {
       handlePageTelemetry(router.route)
     }
   }, [])
