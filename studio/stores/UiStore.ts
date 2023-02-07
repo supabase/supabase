@@ -2,7 +2,7 @@ import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
 import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
-import Telemetry, { getScreenResolution, GoogleAnalyticsProps } from 'lib/telemetry'
+import Telemetry, { GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en-US'
@@ -103,7 +103,8 @@ export default class UiStore implements IUiStore {
 
   get googleAnalyticsProps() {
     return {
-      screenResolution: getScreenResolution(),
+      screenResolution:
+        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined,
       language: this.language,
     }
   }
@@ -171,9 +172,9 @@ export default class UiStore implements IUiStore {
 
   setGaClientId(clientId?: string) {
     /**
-     * We need to access ga client_id from base.constructHeaders method or from supabase.com
+     * We need to access ga client_id from base.constructHeaders method
      * in order to set custom header('ga_client_id).
-     * TODO: Do we have a better way than storing the value in local storage?
+     * TODO: Do we have a better way than storing in local storage?
      */
     window.localStorage.setItem('ga_client_id', String(clientId))
   }
