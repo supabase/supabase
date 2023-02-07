@@ -5,7 +5,7 @@ import { IRootStore } from './RootStore'
 import Telemetry, { getScreenResolution, GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
-  language: 'en_US'
+  language: 'en-US'
   theme: 'dark' | 'light'
   themeOption: 'dark' | 'light' | 'system'
 
@@ -32,7 +32,7 @@ export interface IUiStore {
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
-  language: 'en_US' = 'en_US'
+  language: 'en-US' = 'en-US'
   theme: 'dark' | 'light' = 'dark'
   themeOption: 'dark' | 'light' | 'system' = 'dark'
 
