@@ -168,10 +168,13 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       )
+    } else if (err instanceof ApplicationError) {
+      // Print out application errors with their additional data
+      console.error(`${err.message}: ${JSON.stringify(err.data)}`)
+    } else {
+      // Print out unexpected errors as is to help with debugging
+      console.error(err)
     }
-
-    // Print out unexpected errors to help with debugging
-    console.error(err)
 
     // TODO: include more response info in debug environments
     return new Response(
