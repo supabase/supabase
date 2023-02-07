@@ -5,14 +5,21 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 05 Jan 2023 23:11:00 +0000</lastBuildDate>
+      <lastBuildDate>Mon, 06 Feb 2023 23:11:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/chatgpt-supabase-docs</guid>
+  <title>Supabase Clippy: ChatGPT for Supabase Docs</title>
+  <link>https://supabase.com/blog/chatgpt-supabase-docs</link>
+  <description>How to create a ChatGPT interface for developer documentation.</description>
+  <pubDate>Mon, 06 Feb 2023 23:11:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/openai-embeddings-postgres-vector</guid>
   <title>Storing OpenAI embeddings in Postgres with pgvector</title>
   <link>https://supabase.com/blog/openai-embeddings-postgres-vector</link>
   <description>An example of how to build an AI-powered search engine using OpenAI's embeddings and PostgreSQL.</description>
-  <pubDate>Thu, 05 Jan 2023 23:11:00 +0000</pubDate>
+  <pubDate>Sun, 05 Feb 2023 23:11:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-december-2022</guid>
