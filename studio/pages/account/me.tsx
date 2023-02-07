@@ -1,17 +1,16 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
 
 import { Session } from '@supabase/supabase-js'
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
-import { useProfile, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
-import { NextPageWithLayout } from 'types'
 import Link from 'next/link'
+import { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -39,14 +38,16 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateProfile } = useProfile()
+  const { mutate } = useProfileUpdateMutation()
   const user = ui.profile
 
   const updateUser = async (model: any) => {
     try {
-      const updatedUser = await post(`${API_URL}/profile/update`, model)
-      mutateProfile(updatedUser, false)
-      ui.setProfile(updatedUser)
+      mutate({
+        firstName: model.first_name,
+        lastName: model.last_name,
+      })
+
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
     } catch (error) {
       ui.setNotification({
