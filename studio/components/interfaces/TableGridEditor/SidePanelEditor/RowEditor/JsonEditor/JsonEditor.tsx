@@ -86,7 +86,6 @@ const JsonEdit: FC<JsonEditProps> = ({
       onCancel={closePanel}
       customFooter={
         <ActionBar
-          // loading
           closePanel={closePanel}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
