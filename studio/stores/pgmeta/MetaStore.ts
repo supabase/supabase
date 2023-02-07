@@ -498,21 +498,20 @@ export default class MetaStore implements IMetaStore {
     }
   ) {
     const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
-    const sourceTableName = duplicateTable.name
+    const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
     const duplicatedTableName = payload.name
 
     // The following query will copy the structure of the table along with indexes, constraints and
     // triggers. However, foreign key constraints are not duplicated over - has to be done separately
     const table = await this.rootStore.meta.query(
-      `CREATE TABLE "${duplicatedTableName}" (LIKE "${sourceTableName}" INCLUDING ALL);`
+      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`
     )
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
     const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
-      // @ts-ignore, but might need to investigate, sounds bad:
-      // Type instantiation is excessively deep and possibly infinite
+      // @ts-ignore
       relationships.map(async (relationship: PostgresRelationship) => {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
@@ -525,7 +524,7 @@ export default class MetaStore implements IMetaStore {
     // Duplicate rows if needed
     if (isDuplicateRows) {
       const rows = await this.rootStore.meta.query(
-        `INSERT INTO "${duplicatedTableName}" SELECT * FROM ${sourceTableName};`
+        `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`
       )
       if (rows.error) throw rows.error
 
@@ -535,7 +534,7 @@ export default class MetaStore implements IMetaStore {
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
-          `SELECT setval('${duplicatedTableName}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${sourceTableName}"));`
+          `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`
         )
         if (identity.error) throw identity.error
       })
@@ -543,7 +542,7 @@ export default class MetaStore implements IMetaStore {
 
     await this.tables.load()
     const tables = this.tables.list()
-    const duplicatedTable = find(tables, { name: duplicatedTableName })
+    const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
