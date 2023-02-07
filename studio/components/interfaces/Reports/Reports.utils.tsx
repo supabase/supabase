@@ -65,7 +65,7 @@ export const usePresetReport = (hooks: PresetHookResult[]) => {
   const isLoading = data.map((datum) => datum.isLoading).some((v) => v)
 
   const Layout: React.FC<{ title: string }> = ({ title, children }) => (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
+    <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <h1 className="text-2xl text-scale-1200">{title}</h1>
       <div className="flex flex-row justify-between">
         <DatePickers
