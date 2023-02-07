@@ -1842,4 +1842,9 @@ module.exports = [
     source: '/docs/guides/examples',
     destination: '/docs/guides/resources/examples',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/v0/rpc',
+    destination: '/docs/reference/javascript/rpc',
+  },
 ]
