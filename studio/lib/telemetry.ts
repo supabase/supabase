@@ -3,7 +3,6 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { User } from 'types'
 
 export interface GoogleAnalyticsProps {
-  clientId?: string
   screenResolution?: string
   language: string
 }
