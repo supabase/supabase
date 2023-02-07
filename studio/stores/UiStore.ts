@@ -2,10 +2,10 @@ import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
 import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
-import Telemetry from 'lib/telemetry'
+import Telemetry, { GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
-  language: 'en_US'
+  language: 'en-US'
   theme: 'dark' | 'light'
   themeOption: 'dark' | 'light' | 'system'
 
@@ -18,6 +18,8 @@ export interface IUiStore {
   profile?: User
   permissions?: Permission[]
 
+  googleAnalyticsProps?: GoogleAnalyticsProps
+
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
   onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
@@ -26,10 +28,11 @@ export interface IUiStore {
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
   setPermissions: (permissions?: Permission[]) => void
+  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
-  language: 'en_US' = 'en_US'
+  language: 'en-US' = 'en-US'
   theme: 'dark' | 'light' = 'dark'
   themeOption: 'dark' | 'light' | 'system' = 'dark'
 
@@ -98,6 +101,14 @@ export default class UiStore implements IUiStore {
     return this.theme === 'dark'
   }
 
+  get googleAnalyticsProps() {
+    return {
+      screenResolution:
+        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined,
+      language: this.language,
+    }
+  }
+
   load() {
     if (typeof window === 'undefined') return
     const localStorageThemeOption = window.localStorage.getItem('theme')
@@ -149,7 +160,7 @@ export default class UiStore implements IUiStore {
 
   setProfile(value?: User) {
     if (value && value?.id !== this.profile?.id) {
-      Telemetry.sendIdentify(value)
+      Telemetry.sendIdentify(value, this.googleAnalyticsProps)
     }
 
     this.profile = value
@@ -157,5 +168,14 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
+  }
+
+  setGaClientId(clientId?: string) {
+    /**
+     * We need to access ga client_id from base.constructHeaders method
+     * in order to set custom header('ga_client_id).
+     * TODO: Do we have a better way than storing in local storage?
+     */
+    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }

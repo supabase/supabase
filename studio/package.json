@@ -84,7 +84,6 @@
     "semver": "^6.3.0",
     "shared-data": "*",
     "sqlstring": "^2.3.2",
-    "swr": "^1.2.1",
     "ui": "*",
     "uniforms-bootstrap4": "^3.6.2",
     "uniforms-bridge-json-schema": "^3.6.2",
