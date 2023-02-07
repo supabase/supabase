@@ -494,6 +494,87 @@ let { data, error } = await supabase.auth.signUp({
 `,
     },
   }),
+  execResult: (values) => ({
+    title: 'Result:',
+    bash: {
+      language: 'bash',
+      code: `select js version please`,
+    },
+    js: {
+      language: 'js',
+      code: `
+console.log(JSON.stringify({data, error}))
+
+${JSON.stringify(values, null, 2)}
+`,
+    },
+  }),
+  authSignupFull: (values) => ({
+    title: 'Code Example',
+    bash: {
+      language: 'bash',
+      code: `select js version please`,
+    },
+    js: {
+      language: 'js',
+      code: `
+const supabase = createClient('${values.endpoint}', '${values.key}')
+const { data, error } = ${
+        values.useAdmin ? 'supabase.auth.admin.createUser' : 'await supabase.auth.signUp'
+      }({
+  email: '${values.email}',
+  password: '${values.password}', ${
+        values.useAdmin
+          ? `
+  email_confirm: true,`
+          : ''
+      }
+})
+`,
+    },
+  }),
+  authLoginFull: (values) => ({
+    title: 'Code Example',
+    bash: {
+      language: 'bash',
+      code: `select js version please`,
+    },
+    js: {
+      language: 'js',
+      code: `
+const supabase = createClient('${values.endpoint}', '${values.key}')
+const { data, error } = supabase.auth.signInWithPassword({
+  email: '${values.email}',
+  password: '${values.password}',
+})
+`,
+    },
+  }),
+  selectProperty: (values) => ({
+    title: 'Code Example',
+    bash: {
+      language: 'bash',
+      code: `select js version please`,
+    },
+    js: {
+      language: 'js',
+      code: `
+const supabase = createClient('${values.endpoint}', '${values.key}')
+${
+  values.email && values.password
+    ? `const {data, error} = await supabase.auth.signInWithPassword({
+  email: '${values.email}',
+  password: '${values.password}',
+})`
+    : ''
+}
+const result = await supabase
+  .from('${values.table}')
+  .select('${values.column}')
+  .limit(10) // limit to 10 rows
+`,
+    },
+  }),
   authLogin: (endpoint, apiKey, randomPassword) => ({
     title: 'User login',
     bash: {

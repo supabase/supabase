@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import { Button, IconLock, IconMail, Input, Form, Modal, Select, Toggle } from 'ui'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 import Param from 'components/to-be-cleaned/Docs/Param'
@@ -27,8 +30,195 @@ const ResourceContent = ({
     required: resourceDefinition?.required?.includes(id),
   }))
 
+  const [open, setOpen] = useState(false)
+  const [execMethod, setExecMethod] = useState<{
+    method: (values: any) => void
+    fields: any
+    snippet: (values: any) => {
+      title: string
+      bash: {
+        language: string
+        code: string
+      }
+      js: {
+        language: string
+        code: string
+      }
+    }
+  }>(undefined as any)
+  const [execValues, setExecValues] = useState<any>({})
+  const [execResult, setExecResult] = useState<any>(null)
+
+  const validate = (values: any) => {
+    const errors: any = {}
+    const emailValidateRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+
+    if (values.email.length === 0) {
+      return errors
+    } else if (!emailValidateRegex.test(values.email)) {
+      errors.email = `${values.email} is an invalid email`
+    }
+
+    return errors
+  }
+
+  const handleExec = ({
+    v,
+    m,
+    f,
+    s,
+  }: {
+    v: any
+    m: (values: any) => void
+    f: any
+    s: (values: any) => {
+      title: string
+      bash: {
+        language: string
+        code: string
+      }
+      js: {
+        language: string
+        code: string
+      }
+    }
+  }) => {
+    setExecValues({ endpoint: autoApiService.endpoint, ...v })
+    setExecResult(null)
+    setExecMethod({ method: m, fields: f, snippet: s })
+    setOpen(true)
+  }
+
+  const selectField: (values: any) => Promise<void> = async (values: any) => {
+    if (!values.key) {
+      return
+    }
+    values = { ...execValues, ...values }
+    const supabase = createClient(autoApiService.endpoint, values.key)
+
+    if (values.email && values.password) {
+      const result = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      })
+      if (result.error) {
+        setExecResult(result)
+        return
+      }
+    }
+    const result = await supabase.from(values.table).select(values.column).limit(10)
+
+    setExecResult(result)
+    return
+  }
+
   return (
     <>
+      <Modal
+        size="xxlarge"
+        visible={open}
+        onCancel={() => setOpen(!open)}
+        header={
+          <div className="text-scale-1200 flex items-center gap-2">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-sm">Try it out:</h3>
+            </div>
+          </div>
+        }
+        contentStyle={{ padding: 0 }}
+        hideFooter
+      >
+        <div className="flex w-full">
+          <Form
+            validateOnBlur
+            initialValues={{ email: '' }}
+            validate={validate}
+            onSubmit={execMethod?.method}
+            className="w-1/2"
+          >
+            {({ isSubmitting }: { isSubmitting: boolean }) => (
+              <div className="space-y-6 py-4">
+                {execMethod?.fields?.email && (
+                  <Modal.Content>
+                    <Input
+                      autoFocus
+                      id="email"
+                      className="w-full"
+                      label="User email"
+                      icon={<IconMail />}
+                      type="email"
+                      name="email"
+                      placeholder="User email"
+                      onChange={(e) => setExecValues({ ...execValues, email: e.target.value })}
+                    />
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.password && (
+                  <Modal.Content>
+                    <Input
+                      autoFocus
+                      id="password"
+                      className="w-full"
+                      label="User password"
+                      icon={<IconLock />}
+                      type="password"
+                      name="password"
+                      placeholder="User password"
+                      onChange={(e) => setExecValues({ ...execValues, password: e.target.value })}
+                    />
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.key && (
+                  <Modal.Content>
+                    <Select
+                      id="key"
+                      label="Select supabase API key"
+                      onChange={(e) => setExecValues({ ...execValues, key: e.target.value })}
+                    >
+                      <Select.Option value="">{'--'}</Select.Option>
+                      <Select.Option value={autoApiService.defaultApiKey}>ANON_KEY</Select.Option>
+                      <Select.Option value={autoApiService.serviceApiKey}>
+                        SERVICE_KEY
+                      </Select.Option>
+                    </Select>
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.useAdminApi && (
+                  <Modal.Content>
+                    <Toggle
+                      id="useAdmin"
+                      className="col-span-8"
+                      label="Use admin API method"
+                      layout="flex"
+                      descriptionText="If this is enabled, according method from admin API will be used."
+                      onChange={(e) => setExecValues({ ...execValues, useAdmin: e })}
+                    />
+                  </Modal.Content>
+                )}
+                <Modal.Content>
+                  <Button
+                    block
+                    size="small"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                  >
+                    Execute
+                  </Button>
+                </Modal.Content>
+              </div>
+            )}
+          </Form>
+          <article className="code w-1/2 p-4">
+            <CodeSnippet selectedLang="js" snippet={execMethod?.snippet(execValues)} />
+            <div className="h-1 w-full border-b-2 my-2" />
+            {execResult && (
+              <CodeSnippet selectedLang="js" snippet={Snippets.execResult(execResult)} />
+            )}
+          </article>
+        </div>
+      </Modal>
       <h2 className="text-scale-1200mt-0">
         <span className="px-6 py-2 text-2xl">{resourceId}</span>
       </h2>
@@ -73,6 +263,22 @@ const ResourceContent = ({
                     columnName: x.id,
                   })}
                 />
+                <Button
+                  size="tiny"
+                  type="default"
+                  className="m-4 h-fit w-fit self-end float-right"
+                  onClick={() =>
+                    handleExec({
+                      m: selectField,
+                      f: { email: true, password: true, key: true },
+                      s: Snippets.selectProperty,
+                      v: { table: resourceId, column: x.id },
+                    })
+                  }
+                  // style={{ padding: '2px 5px' }}
+                >
+                  Execute
+                </Button>
               </article>
             </div>
           ))}

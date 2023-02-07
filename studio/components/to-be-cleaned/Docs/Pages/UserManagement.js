@@ -1,18 +1,213 @@
+import { useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
+import { Button, IconLock, IconMail, Input, Form, Modal, Select, Toggle } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
 import { useRouter } from 'next/router'
 import { makeRandomString } from 'lib/helpers'
+import { useStore, checkPermissions } from 'hooks'
 
 const randomPassword = makeRandomString(20)
 
 export default function UserManagement({ autoApiService, selectedLang, showApiKey }) {
+  const { ui } = useStore()
   const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [execMethod, setExecMethod] = useState(undefined)
+  const [execValues, setExecValues] = useState({})
+  const [execResult, setExecResult] = useState(null)
+  const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
 
+  const handleExec = ({ m, f, s }) => {
+    setExecValues({ endpoint: autoApiService.endpoint })
+    setExecResult(null)
+    setExecMethod({ method: m, fields: f, snippet: s })
+    console.log('handleExec', execMethod)
+    setOpen(true)
+  }
+
+  const signUpUser = async (values) => {
+    if (!canInviteUsers) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create user: You need additional permissions to create users`,
+      })
+      return
+    }
+
+    if (!values.key) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create user: You need TO specify an API key`,
+      })
+      return
+    }
+    const supabase = createClient(autoApiService.endpoint, values.key)
+
+    let result = null
+    if (values.useAdmin) {
+      result = await supabase.auth.admin.createUser({
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        email_confirm: true,
+        phone_confirm: true,
+      })
+    } else {
+      result = await supabase.auth.signUp({
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+      })
+    }
+
+    setExecResult(result)
+    return
+  }
+
+  const signInUser = async (values) => {
+    if (!values.key) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create user: You need to specify an API key`,
+      })
+      return
+    }
+    const supabase = createClient(autoApiService.endpoint, values.key)
+
+    const result = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    })
+
+    setExecResult(result)
+    return
+  }
+
+  const validate = (values) => {
+    const errors = {}
+    const emailValidateRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+
+    if (values.email.length === 0) {
+      errors.email = 'Please enter a valid email'
+    } else if (!emailValidateRegex.test(values.email)) {
+      errors.email = `${values.email} is an invalid email`
+    }
+
+    return errors
+  }
+
   return (
     <>
+      <Modal
+        size="xxlarge"
+        visible={open}
+        onCancel={() => setOpen(!open)}
+        header={
+          <div className="text-scale-1200 flex items-center gap-2">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-sm">Try it out:</h3>
+            </div>
+          </div>
+        }
+        contentStyle={{ padding: 0 }}
+        hideFooter
+      >
+        <div className="flex w-full">
+          <Form
+            validateOnBlur
+            initialValues={{ email: '' }}
+            validate={validate}
+            onSubmit={execMethod?.method}
+            className="w-1/2"
+          >
+            {({ isSubmitting }) => (
+              <div className="space-y-6 py-4">
+                {execMethod?.fields?.email && (
+                  <Modal.Content>
+                    <Input
+                      autoFocus
+                      id="email"
+                      className="w-full"
+                      label="User email"
+                      icon={<IconMail />}
+                      type="email"
+                      name="email"
+                      placeholder="User email"
+                      onChange={(e) => setExecValues({ ...execValues, email: e.target.value })}
+                    />
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.password && (
+                  <Modal.Content>
+                    <Input
+                      autoFocus
+                      id="password"
+                      className="w-full"
+                      label="User password"
+                      icon={<IconLock />}
+                      type="password"
+                      name="password"
+                      placeholder="User password"
+                      onChange={(e) => setExecValues({ ...execValues, password: e.target.value })}
+                    />
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.key && (
+                  <Modal.Content>
+                    <Select
+                      id="key"
+                      label="Select supabase API key"
+                      onChange={(e) => setExecValues({ ...execValues, key: e.target.value })}
+                    >
+                      <Select.Option value="">{'--'}</Select.Option>
+                      <Select.Option value={autoApiService.defaultApiKey}>ANON_KEY</Select.Option>
+                      <Select.Option value={autoApiService.serviceApiKey}>
+                        SERVICE_KEY
+                      </Select.Option>
+                    </Select>
+                  </Modal.Content>
+                )}
+                {execMethod?.fields?.useAdminApi && (
+                  <Modal.Content>
+                    <Toggle
+                      id="useAdmin"
+                      className="col-span-8"
+                      label="Use admin API method"
+                      layout="flex"
+                      descriptionText="If this is enabled, according method from admin API will be used."
+                      onChange={(e) => setExecValues({ ...execValues, useAdmin: e })}
+                    />
+                  </Modal.Content>
+                )}
+                <Modal.Content>
+                  <Button
+                    block
+                    size="small"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={!canInviteUsers || isSubmitting}
+                  >
+                    Execute
+                  </Button>
+                </Modal.Content>
+              </div>
+            )}
+          </Form>
+          <article className="code w-1/2 p-4">
+            <CodeSnippet selectedLang="js" snippet={execMethod?.snippet(execValues)} />
+            <div className="h-1 w-full border-b-2 my-2" />
+            {execResult && (
+              <CodeSnippet selectedLang="js" snippet={Snippets.execResult(execResult)} />
+            )}
+          </article>
+        </div>
+      </Modal>
       <h2 className="doc-heading">User Management</h2>
       <div className="doc-section">
         <article className="text ">
@@ -28,8 +223,24 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
           </p>
         </article>
       </div>
-
-      <h2 className="doc-heading">Sign up</h2>
+      <div className="flex justify-between">
+        <h2 className="doc-heading">Sign up</h2>
+        <Button
+          size="tiny"
+          type="default"
+          className="m-4"
+          onClick={() =>
+            handleExec({
+              m: signUpUser,
+              f: { email: true, password: true, key: true, useAdminApi: true },
+              s: Snippets.authSignupFull,
+            })
+          }
+          // style={{ padding: '2px 5px' }}
+        >
+          Execute
+        </Button>
+      </div>
       <div className="doc-section ">
         <article className="text ">
           <p>Allow your users to sign up and create a new account.</p>
@@ -46,7 +257,24 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         </article>
       </div>
 
-      <h2 className="doc-heading">Log in with Email/Password</h2>
+      <div className="flex justify-between">
+        <h2 className="doc-heading">Log in with Email/Password</h2>
+        <Button
+          size="tiny"
+          type="default"
+          className="m-4"
+          onClick={() =>
+            handleExec({
+              m: signInUser,
+              f: { email: true, password: true, key: true, useAdminApi: false },
+              s: Snippets.authLoginFull,
+            })
+          }
+          // style={{ padding: '2px 5px' }}
+        >
+          Execute
+        </Button>
+      </div>
       <div className="doc-section ">
         <article className="text ">
           <p>If an account is created, users can login to your app.</p>
