@@ -42,6 +42,7 @@ export function getGridColumns(
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
+    onExpandJSONEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
@@ -76,7 +77,9 @@ export function getGridColumns(
           format={x.format}
         />
       ),
-      editor: options?.editable ? getColumnEditor(x, columnType) : undefined,
+      editor: options?.editable
+        ? getColumnEditor(x, columnType, options.onExpandJSONEditor)
+        : undefined,
       formatter: getColumnFormatter(x, columnType),
     }
 
@@ -91,7 +94,11 @@ export function getGridColumns(
   return gridColumns
 }
 
-function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
+function getColumnEditor(
+  columnDefinition: SupaColumn,
+  columnType: ColumnType,
+  onExpandJSONEditor: (column: string, row: any) => void
+) {
   if (columnDefinition.isPrimaryKey || !columnDefinition.isUpdatable) {
     return
   }
@@ -117,7 +124,7 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
     }
     case 'array':
     case 'json': {
-      return JsonEditor
+      return (p: any) => <JsonEditor {...p} onExpandEditor={onExpandJSONEditor} />
     }
     case 'number': {
       return NumberEditor

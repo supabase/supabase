@@ -234,14 +234,20 @@ const ResultsDropdown = observer(() => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    Telemetry.sendEvent('sql_editor', 'sql_download_csv', '')
+    Telemetry.sendEvent(
+      { category: 'sql_editor', action: 'sql_download_csv', label: '' },
+      ui.googleAnalyticsProps
+    )
   }
 
   function onCopyAsMarkdown() {
     if (navigator) {
       copyToClipboard(sqlEditorStore.activeTab.markdownData, () => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
-        Telemetry.sendEvent('sql_editor', 'sql_copy_as_markdown', '')
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
+          ui.googleAnalyticsProps
+        )
       })
     }
   }
