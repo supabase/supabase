@@ -7,10 +7,6 @@ export interface GoogleAnalyticsProps {
   language: string
 }
 
-export const getScreenResolution = () => {
-  return typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined
-}
-
 const sendEvent = (
   event: {
     category: string
