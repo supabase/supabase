@@ -1,21 +1,26 @@
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { ThemeProvider } from 'common/Providers'
 import { DefaultSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
+import ClippyProvider from '~/components/Clippy/ClippyProvider'
 import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
-import { ThemeProvider } from 'common/Providers'
 import SiteLayout from '~/layouts/SiteLayout'
+import { post } from '~/lib/fetchWrappers'
+import FlagProvider from 'components/Flag/FlagProvider'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
-import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const [supabase] = useState(() => createBrowserSupabaseClient())
 
   function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
@@ -58,36 +63,42 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <Favicons />
-      <DefaultSeo
-        title={SITE_TITLE}
-        description={SITE_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/docs',
-          site_name: SITE_TITLE,
-          images: [
-            {
-              url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
-      <ThemeProvider>
-        <SearchProvider>
-          <SiteLayout>
-            <Component {...pageProps} />
-          </SiteLayout>
-        </SearchProvider>
-      </ThemeProvider>
+      <FlagProvider>
+        <Favicons />
+        <DefaultSeo
+          title={SITE_TITLE}
+          description={SITE_DESCRIPTION}
+          openGraph={{
+            type: 'website',
+            url: 'https://supabase.com/docs',
+            site_name: SITE_TITLE,
+            images: [
+              {
+                url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
+                width: 800,
+                height: 600,
+                alt: 'Supabase Og Image',
+              },
+            ],
+          }}
+          twitter={{
+            handle: '@supabase',
+            site: '@supabase',
+            cardType: 'summary_large_image',
+          }}
+        />
+        <SessionContextProvider supabaseClient={supabase}>
+          <ThemeProvider>
+            <SearchProvider>
+              <ClippyProvider>
+                <SiteLayout>
+                  <Component {...pageProps} />
+                </SiteLayout>
+              </ClippyProvider>
+            </SearchProvider>
+          </ThemeProvider>
+        </SessionContextProvider>
+      </FlagProvider>
     </>
   )
 }
