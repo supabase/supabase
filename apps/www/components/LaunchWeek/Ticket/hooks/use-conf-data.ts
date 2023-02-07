@@ -9,6 +9,7 @@ export type UserData = {
   username?: string
   name?: string
   golden?: boolean
+  referrals?: number
 }
 
 type ConfDataContextType = {

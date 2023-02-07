@@ -20,10 +20,18 @@ type Props = {
   ticketNumber: UserData['ticketNumber']
   name: UserData['name']
   golden: UserData['golden']
+  referrals: number
   sharePage?: boolean
 }
 
-export default function Ticket({ username, name, ticketNumber, sharePage, golden }: Props) {
+export default function Ticket({
+  username,
+  name,
+  ticketNumber,
+  sharePage,
+  golden,
+  referrals,
+}: Props) {
   const ticketRef = useRef<HTMLDivElement>(null)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')
@@ -70,7 +78,9 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
             ) : golden ? (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
-              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">You have a ticket!</p>
+              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
+                Claim your unique Ticket!
+              </p>
             )}
           </h1>
           <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
@@ -80,31 +90,28 @@ export default function Ticket({ username, name, ticketNumber, sharePage, golden
               </p>
             ) : golden ? (
               <>
-                You got a Golden ticket. This means you’re in, and you also won a Supabase goodie
-                bag. Tweet it to redeem your swag pack!
+                You got a Golden ticket. This means you’re in, and you also won a Supabase sticker
+                pack!
               </>
             ) : username ? (
-              <>Here is your unique ticket image for bragging on socials!</>
+              <>
+                <p>Here is your unique ticket image for bragging on socials!</p>
+                <p>Referrals: {referrals}</p>
+              </>
             ) : (
               <>
-                This means you're in. Generate a unique ticket image with your GitHub profile, cause
-                a few of the lucky attendees will get a limited edition Supabase goodie bag. Make
-                sure you don't skip your chance.
+                Generate a unique ticket image with your GitHub profile, cause a few of the lucky
+                attendees will get a limited edition Supabase goodie bag. Make sure you don't skip
+                your chance.
               </>
             )}
           </h2>
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
-          {!sharePage ? (
-            <>
-              <TicketForm
-                defaultUsername={username ?? undefined}
-                setTicketGenerationState={setTicketGenerationState}
-              />
-            </>
-          ) : (
-            <Form sharePage align="Left" />
-          )}
+          <TicketForm
+            defaultUsername={username ?? undefined}
+            setTicketGenerationState={setTicketGenerationState}
+          />
         </div>
       </div>
       <div className={styles['ticket-visual-wrapper']}>

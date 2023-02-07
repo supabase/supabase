@@ -15,6 +15,7 @@ type Props = {
   name: string | null
   ticketNumber: number | null
   golden: boolean
+  referrals: number
 }
 
 const supabaseAdmin = createClient(
@@ -23,7 +24,7 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export default function TicketShare({ username, ticketNumber, name, golden }: Props) {
+export default function TicketShare({ username, ticketNumber, name, golden, referrals }: Props) {
   const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
@@ -76,6 +77,7 @@ export default function TicketShare({ username, ticketNumber, name, golden }: Pr
               name: name || '',
               ticketNumber,
               golden,
+              referrals,
             }}
             sharePage
           />
@@ -90,16 +92,18 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   let name: string | null | undefined
   let ticketNumber: number | null | undefined
   let golden = false
+  let referrals = 0
 
   if (username) {
     const { data: user } = await supabaseAdmin!
-      .from('lw6_tickets_golden')
-      .select('name, ticketNumber, golden')
+      .from('lw7_tickets_golden')
+      .select('name, ticketNumber, golden, referrals')
       .eq('username', username)
       .single()
     name = user?.name
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
+    referrals = user?.referrals ?? 0
   }
   return {
     props: {
@@ -108,6 +112,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
       name: ticketNumber ? name || username || null : null,
       ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
       golden,
+      referrals,
     },
     revalidate: 5,
   }

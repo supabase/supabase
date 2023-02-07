@@ -42,6 +42,7 @@ export default function Conf({
           ticketNumber={userData.ticketNumber}
           sharePage={sharePage}
           golden={userData.golden}
+          referrals={userData.referrals ?? 0}
         />
       )}
     </ConfDataContext.Provider>
