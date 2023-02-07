@@ -12,31 +12,56 @@ export interface GridProps {
 }
 
 export interface SupabaseGridProps {
-  // database table swagger or table name
+  /**
+   * database table swagger or table name
+   */
   table: SupaTable | string
-  // run sql query
+  /**
+   *
+   * run sql query
+   */
   onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
 
-  // Optional react node to display in grid header
+  /**
+   * Optional react node to display in grid header
+   */
   headerActions?: React.ReactNode
   editable?: boolean
-  // props to config grid view
+  /**
+   * props to config grid view
+   */
   gridProps?: GridProps
-  // table schema. Default set to 'public' if not provided
+  /**
+   * table schema. Default set to 'public' if not provided
+   */
   schema?: string
-  // storageRef is used to save state on localstorage
+  /**
+   * storageRef is used to save state on localstorage
+   */
   storageRef?: string
-  // Optional grid theme
+  /**
+   * Optional grid theme
+   */
   theme?: 'dark' | 'light'
-  // show create new column button if available
+  /**
+   * show create new column button if available
+   */
   onAddColumn?: () => void
-  // show add row button if available
+  /**
+   * show add row button if available
+   */
   onAddRow?: () => void
-  // show delete column menu if available
+  /**
+   * show delete column menu if available
+   */
   onDeleteColumn?: (columnName: string) => void
-  // show edit column menu if available
+  /**
+   * show edit column menu if available
+   */
   onEditColumn?: (columnName: string) => void
-  // show edit row button if available
+  /**
+   * show edit row button if available
+   */
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
