@@ -92,12 +92,12 @@ This is what your `schema.prisma` file should look like:
 
 ```go
 datasource db {
-  provider = “postgresql”
-  url      = env(“DATABASE_URL”)
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 generator client {
-  provider = “prisma-client-js”
+  provider = "prisma-client-js"
 }
 model Post {
   id        Int     @id @default(autoincrement())

@@ -61,7 +61,6 @@ import {
   User,
 } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
-import { Database } from 'src/schema'
 
 export interface Profile {
   id?: string
@@ -135,7 +134,7 @@ Let's set up an Angular component to manage logins and sign ups. We'll use Magic
 Create an **AuthComponent** with `ng g c auth` Angular CLI command.
 
 ```ts title=src/app/auth/auth.component.ts
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -144,7 +143,7 @@ import { SupabaseService } from '../supabase.service'
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent {
   loading = false
 
   signInForm = this.formBuilder.group({
@@ -155,8 +154,6 @@ export class AuthComponent implements OnInit {
     private readonly supabase: SupabaseService,
     private readonly formBuilder: FormBuilder
   ) {}
-
-  ngOnInit(): void {}
 
   async onSubmit(): Promise<void> {
     try {
@@ -401,7 +398,7 @@ Let's create an avatar for the user so that they can upload a profile photo.
 Create an **AvatarComponent** with `ng g c avatar` Angular CLI command.
 
 ```ts title=src/app/avatar/avatar.component.ts
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -410,7 +407,7 @@ import { SupabaseService } from '../supabase.service'
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined
   uploading = false
 
@@ -424,8 +421,6 @@ export class AvatarComponent implements OnInit {
   @Output() upload = new EventEmitter<string>()
 
   constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {}
-
-  ngOnInit(): void {}
 
   async downloadImage(path: string) {
     try {
