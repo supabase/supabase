@@ -953,6 +953,7 @@ body {
 // search bar
 input[type='search'].DocSearch-Input {
   background-color: var(--colors-scale1);
+  box-shadow: none;
 }
 
 .dark .DocSearch-Input {
