@@ -11,12 +11,14 @@ import clippyImage from '../../../public/img/clippy.png'
 
 import { getPageType } from '~/lib/helpers'
 import { useClippy } from '~/components/Clippy/ClippyProvider'
+import { useFlag } from '~/hooks/useFlag'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { open: openClippy } = useClippy()
+  const enableClippy = useFlag('enableClippy')
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
@@ -89,15 +91,17 @@ const TopNavBarRef: FC = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex md:hidden cursor-pointer">
-            <Image
-              onClick={openClippy}
-              width={26}
-              height={29}
-              src={isDarkMode ? clippyImageDark : clippyImage}
-              alt="Clippy"
-            />
-          </div>
+          {enableClippy && (
+            <div className="flex md:hidden cursor-pointer">
+              <Image
+                onClick={openClippy}
+                width={26}
+                height={29}
+                src={isDarkMode ? clippyImageDark : clippyImage}
+                alt="Clippy"
+              />
+            </div>
+          )}
           <SearchButton className="md:w-full lg:w-96">
             <div
               className="
