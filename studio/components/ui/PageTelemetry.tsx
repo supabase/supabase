@@ -2,10 +2,8 @@ import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
-import { route } from 'next/dist/server/router'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
-import { User } from 'types'
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
