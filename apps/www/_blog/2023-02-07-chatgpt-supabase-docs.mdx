@@ -48,7 +48,7 @@ It's built with Supabase/Postgres, and consists of several key parts:
 
 1. Parsing the Supabase docs into sections.
 2. Creating embeddings for each section using OpenAI's embeddings API.
-3. Storing the embeddings into Postgres using the pgvector extension.
+3. Storing the embeddings in Postgres using the pgvector extension.
 4. Getting a user's question.
 5. Query the Postgres database for the most relevant documents related to the question.
 6. Inject these documents as context for GPT-3 to reference in its answer.
