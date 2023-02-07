@@ -2,6 +2,7 @@ import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
+import { route } from 'next/dist/server/router'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 import { User } from 'types'
@@ -9,11 +10,10 @@ import { User } from 'types'
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const { ui } = useStore()
-  const { profile } = ui
 
   useEffect(() => {
     function handleRouteChange() {
-      handlePageTelemetry(profile)
+      handlePageTelemetry(router.route)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -21,7 +21,7 @@ const PageTelemetry: FC = ({ children }) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events, profile])
+  }, [router.events])
 
   useEffect(() => {
     /**
@@ -29,11 +29,11 @@ const PageTelemetry: FC = ({ children }) => {
      * if there asPath is defined, then this isn't needed
      */
     if (router.route === '/' && router.asPath === '/') {
-      handlePageTelemetry(profile)
+      handlePageTelemetry(router.route)
     }
   }, [])
 
-  const handlePageTelemetry = async (profile?: User) => {
+  const handlePageTelemetry = async (route?: string) => {
     if (IS_PLATFORM) {
       /**
        * Get referrer from browser
@@ -49,6 +49,7 @@ const PageTelemetry: FC = ({ children }) => {
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
         title: document.title,
+        route,
         ga: {
           screen_resolution: ui.googleAnalyticsProps?.screenResolution,
           language: ui.googleAnalyticsProps?.language,
