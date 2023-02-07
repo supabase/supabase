@@ -26,8 +26,8 @@ export default function TicketHome() {
   }
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session)
+    supabase.auth.onAuthStateChange((event, supaSession) => {
+      setSession(supaSession)
     })
   }, [])
 
@@ -68,7 +68,7 @@ export default function TicketHome() {
             supabase={supabase}
             session={session}
             defaultUserData={defaultUserData}
-            defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+            defaultPageState="ticket"
           />
         </SectionContainer>
       </DefaultLayout>
