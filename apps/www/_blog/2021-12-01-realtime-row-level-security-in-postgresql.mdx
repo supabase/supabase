@@ -22,15 +22,17 @@ Today, we're announcing security improvements to Realtime, where database change
 
 ## Demo
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/zHvatf2wySI"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    width="640"
+    height="385"
+    src="https://www.youtube-nocookie.com/embed/zHvatf2wySI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Overview
 
@@ -60,17 +62,22 @@ An RLS policy is a snippet of SQL filtering which users have the authority to cr
 For example, the following policy would allow users to select their own rows in a todos table:
 
 ```sql hideCopy
-create policy todo_select_policy
-    on todos for select
-    using ( auth.uid() = user_id );
+create policy todo_select_policy on todos for
+select
+  using (auth.uid () = user_id);
 ```
 
 which is equivalent to adding
 
 ```sql hideCopy
-select *
-from todos
-where auth.uid() = todos.user_id; -- Policy is implicitly added.
+select
+  *
+from
+  todos
+where
+  auth.uid () = todos.user_id;
+
+-- Policy is implicitly added.
 ```
 
 to queries.
@@ -116,15 +123,22 @@ To maximize throughput, the query used to evaluate if a row is visible to a subs
 For example:
 
 ```sql hideCopy
-select exists(select 1 from some_table where id = 806);
+select
+  exists (
+    select
+      1
+    from
+      some_table
+    where
+      id = 806
+  );
 ```
 
 When more than one subscriber exists, the query is wrapped in a [prepared statement](https://www.postgresql.org/docs/13/sql-prepare.html) to remove the cost of the PostgreSQL
 query planner on subsequent calls. The query planner time is frequently 2-3x execution time for simple queries, so this immediately multiplies throughput in the most common cases!
 
 ```sql hideCopy
-"Planning Time: 0.099 ms"
-"Execution Time: 0.051 ms"
+"Planning Time: 0.099 ms" "Execution Time: 0.051 ms"
 ```
 
 **Colocation**

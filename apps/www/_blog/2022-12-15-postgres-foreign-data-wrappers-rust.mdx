@@ -30,9 +30,7 @@ Let's step through a full example using the Stripe Wrapper.
 First, let's give your Postgres database some authentication details to access your Stripe account:
 
 ```sql
-create server stripe_server
-foreign data wrapper stripe_wrapper
-options (api_key 'sk_test_xxx');
+create server stripe_server foreign data wrapper stripe_wrapper options (api_key 'sk_test_xxx');
 ```
 
 ### Creating a Foreign Table
@@ -40,15 +38,13 @@ options (api_key 'sk_test_xxx');
 Now we can map your Stripe data to Foreign Tables, which are just like normal tables except that the data exists _outside_ of your database.
 
 ```sql
--- Create a foreign table for your Stripe products
+ -- Create a foreign table for your Stripe products
 create foreign table products (
   id text,
   name text,
   description text,
   default_price text
-)
-server my_stripe_server
-options ( object 'products' );
+) server my_stripe_server options (object 'products');
 ```
 
 ### Accessing remote data
@@ -56,10 +52,13 @@ options ( object 'products' );
 After setting up your foreign table, you can query you Stripe products directly from your database:
 
 ```sql
--- Fetch all your stripe products in Postgres
-select *
-from products
-limit 10;
+ -- Fetch all your stripe products in Postgres
+select
+  *
+from
+  products
+limit
+  10;
 ```
 
 ![Stripe Products](/images/blog/launch-week-6/wrappers/stripe-data.png)
@@ -126,15 +125,18 @@ create foreign table snowflake.order_history (
   ts timestamptz,
   event text,
   user_id uuid
-)
-server my_snowflake_warehouse
-options (table 'order_history', rowid_column 'id');
+) server my_snowflake_warehouse options (table 'order_history', rowid_column 'id');
 ```
 
 Now from your Supabase database you can query your Snowflake data directly:
 
 ```sql
-select * from snowflake.order_history limit 1000;
+select
+  *
+from
+  snowflake.order_history
+limit
+  1000;
 ```
 
 You can even join remote data with your local tables to enrich existing operational data. For example, to figure out how many times a user has purchased something from your store:
@@ -142,14 +144,13 @@ You can even join remote data with your local tables to enrich existing operatio
 ```sql
 select
   users.id,
-	count(order_history.event)
+  count(order_history.event)
 from
-	snowflake.order_history
-join
-	auth.users on auth.users.id = snowflake.order_history.user_id
+  snowflake.order_history
+  join auth.users on auth.users.id = snowflake.order_history.user_id
 where
-  order_history.event = 'purchase' and
-  order_history.user_id = '<some_user_id>';
+  order_history.event = 'purchase'
+  and order_history.user_id = '<some_user_id>';
 ```
 
 We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.
@@ -166,9 +167,14 @@ This gives us the basis of QETL:
 This is a two-way process. It's equally useful to offload large datasets from your Postgres database to your Data Warehouse. With FDWs, this can be as simple as:
 
 ```sql
-insert into snowflake.analytics
-select * from analytics
-where ts > (now() - interval '1 DAY');
+insert into
+  snowflake.analytics
+select
+  *
+from
+  analytics
+where
+  ts > (now () - interval '1 DAY');
 ```
 
 On-demand ETL is a strong compliment for current ETL practices, and another tool in the toolbelt for Data Engineering and Developers that works with immediately with tools that interface with Postgres.
@@ -245,15 +251,17 @@ If you're interested in getting involved or building your own Wrapper, don't hes
 - View the documentation: [supabase.github.io/wrappers](https://supabase.github.io/wrappers/)
 - Supabase Launch Week: [supabase.com/launch-week](https://supabase.com/launch-week)
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="385"
-  src="https://www.youtube-nocookie.com/embed/QA2qC5F-4OU"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="video-with-border w-full"
+    width="640"
+    height="385"
+    src="https://www.youtube-nocookie.com/embed/QA2qC5F-4OU"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## More Launch Week 6
 
