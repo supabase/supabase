@@ -111,7 +111,7 @@ const SSLConfiguration = () => {
           }
         >
           <FormSectionContent loading={false} className="lg:!col-span-5">
-            <div className="flex items-center justify-end h-full space-x-2">
+            <div className="flex items-center justify-end mt-2.5 space-x-2">
               {(isLoading || isSubmitting) && (
                 <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
               )}
