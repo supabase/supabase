@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useParams } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconExternalLink } from 'ui'
+import { Button, IconDownload, Toggle, IconExternalLink, IconLoader } from 'ui'
 import {
   FormHeader,
   FormPanel,
@@ -12,14 +12,18 @@ import {
 } from 'components/ui/Forms'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
+import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 
 const SSLConfiguration = () => {
+  const { ui } = useStore()
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
     projectRef: ref,
   })
+  const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
 
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
@@ -35,9 +39,28 @@ const SSLConfiguration = () => {
     }
   }, [isLoading])
 
+  // [Joshen] What is applied successfully = false?
+
   const toggleSSLEnforcement = async () => {
-    console.log('toggleSSLEnforcement')
+    if (!ref) return console.error('Project ref is required')
+
     setIsEnforced(!isEnforced)
+    setIsSubmitting(true)
+
+    try {
+      await updateSSLEnforcement({
+        projectRef: ref,
+        requestedConfig: { database: !isEnforced },
+      })
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update SSL enforcement: ${error.message}`,
+      })
+      setIsEnforced(isEnforced)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -69,8 +92,13 @@ const SSLConfiguration = () => {
           }
         >
           <FormSectionContent loading={false}>
-            <div className="flex items-center justify-end h-full">
-              <Toggle checked={isEnforced} onChange={toggleSSLEnforcement} />
+            <div className="flex items-center justify-end h-full space-x-2">
+              {isSubmitting && <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />}
+              <Toggle
+                disabled={isSubmitting}
+                checked={isEnforced}
+                onChange={toggleSSLEnforcement}
+              />
             </div>
           </FormSectionContent>
         </FormSection>

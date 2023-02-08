@@ -1,48 +1,51 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { resourceKeys } from './keys'
+import { put } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
+import { sslEnforcementKeys } from './keys'
 
-export type ResourceUpdateVariables = {
+export type SSLEnforcementUpdateVariables = {
   projectRef: string
-  id: string
-  updatedParam: string
+  requestedConfig: { database: boolean }
 }
 
-export async function updateResource({ projectRef, id, updatedParam }: ResourceUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/resources/${id}`, {
-    updated_param: updatedParam,
-  })
-  if (response.error) {
-    throw response.error
-  }
+export type SSLEnforcementUpdateResponse = {
+  appliedSuccessfully: boolean
+  currentConfig: { database: boolean }
+  error?: any
+}
+
+export async function updateSSLEnforcement({
+  projectRef,
+  requestedConfig,
+}: SSLEnforcementUpdateVariables) {
+  if (!projectRef) throw new Error('projectRef is required')
+
+  const response = (await put(`${API_ADMIN_URL}/projects/${projectRef}/ssl-enforcement`, {
+    requestedConfig,
+  })) as SSLEnforcementUpdateResponse
+  if (response.error) throw response.error
 
   return response
 }
 
-type ResourceUpdateData = Awaited<ReturnType<typeof updateResource>>
+type SSLEnforcementUpdateData = Awaited<ReturnType<typeof updateSSLEnforcement>>
 
-export const useResourceUpdateMutation = ({
+export const useSSLEnforcementUpdateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, unknown, ResourceUpdateVariables>,
+  UseMutationOptions<SSLEnforcementUpdateData, unknown, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, unknown, ResourceUpdateVariables>(
-    (vars) => updateResource(vars),
+  return useMutation<SSLEnforcementUpdateData, unknown, SSLEnforcementUpdateVariables>(
+    (vars) => updateSSLEnforcement(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, id } = variables
-
-        await Promise.all([
-          queryClient.invalidateQueries(resourceKeys.list(projectRef)),
-          queryClient.invalidateQueries(resourceKeys.resource(projectRef, id)),
-        ])
-
-        await onSuccess?.(data, variables, context)
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(sslEnforcementKeys.list(projectRef)),
+          await onSuccess?.(data, variables, context)
       },
       ...options,
     }

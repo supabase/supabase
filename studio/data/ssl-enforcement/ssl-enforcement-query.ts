@@ -7,7 +7,7 @@ import { sslEnforcementKeys } from './keys'
 export type SSLEnforcementVariables = { projectRef?: string }
 
 export type SSLEnforcementResponse = {
-  appliedSuccessfully: false
+  appliedSuccessfully: boolean
   currentConfig: { database: boolean }
   error?: any
   isNotAllowed?: boolean
