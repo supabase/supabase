@@ -123,7 +123,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
       <div
-        className={`mx-auto max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
+        className={`mx-auto max-h-[50vh] lg:max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -237,7 +237,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
               <span>Powered by OpenAI.</span>
-              <a href="/blog/clippy" className="underline">
+              <a href="/blog/chatgpt-supabase-docs" className="underline">
                 Read the blog post
               </a>
             </div>

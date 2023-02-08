@@ -98,7 +98,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useAutoAuthRedirect()
+  useAutoAuthRedirect(queryClient)
 
   const getLayout = Component.getLayout ?? ((page) => page)
 

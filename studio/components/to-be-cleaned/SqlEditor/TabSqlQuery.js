@@ -383,7 +383,7 @@ const Results = ({ results }) => {
       <div className="group sb-grid-select-cell__formatter overflow-hidden">
         <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
 
-        {row[column] && (
+        {row[column] != undefined && (
           <Button
             type="outline"
             icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}
