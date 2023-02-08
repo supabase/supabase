@@ -86,7 +86,7 @@ const SSLConfiguration = () => {
               description={
                 <div className="space-y-4">
                   <p className="text-sm text-scale-1000">
-                    Reject connections made to your database without a valid certificate
+                    Reject non-SSL connections to your database
                   </p>
                   {!sslEnforcementConfiguration?.appliedSuccessfully && (
                     <Alert
@@ -106,7 +106,7 @@ const SSLConfiguration = () => {
                 </div>
               }
             >
-              Enforce SSL
+              Enforce SSL on incoming connections
             </FormSectionLabel>
           }
         >
