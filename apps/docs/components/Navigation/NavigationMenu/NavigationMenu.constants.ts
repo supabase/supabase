@@ -850,14 +850,14 @@ export const reference = {
 
 export const reference_javascript_v1 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
@@ -878,7 +878,7 @@ export const reference_dart_v1 = {
 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
-  title: 'c#',
+  title: 'C#',
   url: 'guides/reference/csharp',
   parent: '/reference',
 }
