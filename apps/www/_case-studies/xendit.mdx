@@ -17,19 +17,19 @@ stats:
     { stat: '00,000', label: Example stat },
     { stat: '00,000', label: Example stat },
   ]
-misc: [{ label: 'Founded', text: San Francisco }]
-about: Vercel combines the best developer experience with an obsessive focus on end-user performance. Our platform enables frontend teams to do their best work.
+misc: [{ label: 'Founded', text: Jakarta Selatan }]
+about: Xendit is a financial technology company that provides payment solutions and simplifies the payment process for businesses in Indonesia, the Philippines, and Southeast Asia, from SMEs and e-commerce startups to large enterprises.
 ---
 
-### Challenge
+## Challenge
 
 As a payment processor, Xendit are responsible for verifying that all transactions are legal. Any transactions which are suspicions must be verified against a strict set of criteria, and the parties involved need to be checked against international sanctions lists. This is a critical anti-money-laundering operation and needs to be performed in realtime to prevent any delays on legitimate payments.
 
-### Why they chose Supabase
+## Why they chose Supabase
 
 Xendit needed something fast. Something that was cheaper than using the global players like Worldcheck or Refinitiv. Xendit already uses Postgres for a lot of their critical infrastructure, and so Xendit team are familiar with the technology and comfortable in it's ability to scale.
 
-### What they built
+## What they built
 
 Xendit parses international sanctions lists from the UN and the Indonesian government and loads them into Supabase. Since Supabase provides a full Postgres server, they can then use the [Trigram](https://www.postgresql.org/docs/current/pgtrgm.html) extension to perform full-text search on the lists, with a relevance score on every search.
 
