@@ -405,6 +405,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pgRouting: Geospatial Routing',
+          url: '/guides/database/extensions/pgrouting',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
           items: [],
