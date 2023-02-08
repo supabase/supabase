@@ -19,14 +19,18 @@ import Panel from 'components/ui/Panel'
 import { ConnectionPooling, NetworkRestrictions } from 'components/interfaces/Settings/Database'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
+import SSLEnforcement from 'components/interfaces/Settings/Database/SSLEnforcement'
+
 const ProjectSettings: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
   const networkRestrictions = useFlag('networkRestrictions')
+  const sslEnforcement = useFlag('sslEnforcement')
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
+        <SSLEnforcement />
         <GeneralSettings projectRef={projectRef} />
         <ConnectionPooling />
         {networkRestrictions && <NetworkRestrictions />}
