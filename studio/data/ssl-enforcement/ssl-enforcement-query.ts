@@ -7,8 +7,10 @@ import { sslEnforcementKeys } from './keys'
 export type SSLEnforcementVariables = { projectRef?: string }
 
 export type SSLEnforcementResponse = {
-  id: string
+  appliedSuccessfully: false
+  currentConfig: { database: boolean }
   error?: any
+  isNotAllowed?: boolean
 }
 
 export async function getSSLEnforcementConfiguration(
@@ -21,7 +23,23 @@ export async function getSSLEnforcementConfiguration(
     signal,
   })) as SSLEnforcementResponse
 
-  if (response.error) throw response.error
+  // Not allowed error is a valid response to denote if a project
+  // has access to the SSL enforcement UI, so we'll handle it here
+  if (response.error) {
+    const isNotAllowedError =
+      (response.error as any)?.code === 400 &&
+      (response.error as any)?.message?.includes('not allowed to configure SSL enforcements')
+
+    if (isNotAllowedError) {
+      return {
+        appliedSuccessfully: false,
+        currentConfig: { database: false },
+        isNotAllowed: true,
+      } as SSLEnforcementResponse
+    } else {
+      throw response.error
+    }
+  }
 
   return response as SSLEnforcementResponse
 }
