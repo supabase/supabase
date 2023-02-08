@@ -100,6 +100,7 @@ const home = [
       icon: '/img/icons/menu/reference-python',
       href: '/reference/python/start',
       level: 'reference_python',
+      community: true,
     },
     {
       label: 'C#',

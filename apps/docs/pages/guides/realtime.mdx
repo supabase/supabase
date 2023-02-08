@@ -9,47 +9,17 @@ export const meta = {
 
 Supabase provides a globally distributed cluster of [Realtime](https://github.com/supabase/realtime) servers that enable the following functionality:
 
-- [Broadcast](#broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](#presence): Track and synchronize shared state between clients.
-- [Postgres Changes](#postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+- [Broadcast](/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
+- [Presence](/docs/guides/realtime/presence): Track and synchronize shared state between clients.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 
 A [channel](https://hexdocs.pm/phoenix/channels.html) is the basic building block of Realtime and narrows the scope of data flow to subscribed clients. You can think of a channel as a chatroom where participants are able to see who's online and send and receive messages; similar to a Discord or Slack channel.
 
 All clients can connect to a channel and take advantage of the built-in features, Broadcast and Presence, while extensions, like Postgres Changes, must be enabled prior to use.
 
-## Broadcast
-
-Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where a client publishes messages to a channel with a unique identifier. For example, a user could send a message to a channel with id `room-1`.
-
-Other clients can elect to receive the message in real-time by subscribing to the channel with id `room-1`. If these clients are online and subscribed then they will receive the message.
-
-Broadcast works by connecting your client to the nearest Realtime server, which will communicate with other servers to relay messages to other clients.
-
-A common use-case is sharing a user's cursor position with other clients in an online game.
-
-## Presence
-
-Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
-
-When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message instead of waiting for all other clients to send their individual states.
-
-Clients are free to come-and-go as they please, and as long as they are all subscribed to the same channel then they will all have the same Presence state as each other.
-
-The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
-
-## Postgres Changes
-
-Postgres Changes enable you to listen to database changes and have them broadcast to authorized clients based on [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies.
-
-This works by Realtime polling your database's logical replication slot for changes, passing those changes to the [apply_rls](https://github.com/supabase/walrus#reading-wal) SQL function to determine which clients have permission, and then using Broadcast to send those changes to clients.
-
-Realtime requires a publication called `supabase_realtime` to determine which tables to poll. You must add tables to this publication prior to clients subscribing to channels that want to listen for database changes.
-
-We strongly encourage you to enable RLS on your database tables and have RLS policies in place to prevent unauthorized parties from accessing your data.
-
 ## See Also
 
-- [Realtime quickstart](/docs/guides/realtime/quickstart)
+- [Quickstart](/docs/guides/realtime/quickstart)
 - [Realtime: Multiplayer Edition](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability) blog post
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

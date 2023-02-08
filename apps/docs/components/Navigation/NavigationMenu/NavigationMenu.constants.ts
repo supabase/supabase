@@ -48,7 +48,7 @@ export const gettingstarted = {
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
@@ -60,7 +60,7 @@ export const gettingstarted = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'Next.js',
+          name: 'NextJS',
           url: '/guides/getting-started/tutorials/with-nextjs',
           items: [],
         },
@@ -367,8 +367,8 @@ export const database = {
       name: 'Serverless APIs',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+        { name: 'Overview', url: '/guides/database/api', items: [] },
+        { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
       ],
     },
     {
@@ -377,19 +377,49 @@ export const database = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
         {
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
+        {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
           items: [],
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
+          name: 'PGRoonga: Multilingual Full Text Search',
+          url: '/guides/database/extensions/pgroonga',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
           items: [],
         },
         {
+          name: 'pg_jsonschema: JSON Schema Validation',
+          url: '/guides/database/extensions/pg_jsonschema',
+          items: [],
+        },
+        {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pgnet',
+          items: [],
+        },
+        {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
+          items: [],
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pgrepack',
           items: [],
         },
         {
@@ -401,6 +431,11 @@ export const database = {
         {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
+          items: [],
+        },
+        {
+          name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
           items: [],
         },
       ],
@@ -441,11 +476,17 @@ export const functions = {
           url: '/guides/functions/examples/cloudflare-turnstile',
           items: [],
         },
+        {
+          name: 'Connect to Postgres',
+          url: '/guides/functions/examples/connect-to-postgres',
+          items: [],
+        },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
         { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
         { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis', items: [] },
       ],
     },
   ],
@@ -462,6 +503,8 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
@@ -532,6 +575,7 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
     },
     {
@@ -576,8 +620,7 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    // removing until the examples page is reworked
-    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -602,6 +645,24 @@ export const resources = {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
           items: [],
+        },
+      ],
+    },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Drop all tables in schema',
+          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select first row per group',
+          url: '/guides/resources/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL version',
+          url: '/guides/resources/postgres/which-version-of-postgres',
         },
       ],
     },
@@ -700,6 +761,7 @@ export const integrations = {
         { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
         { name: 'Directus', url: '/guides/integrations/directus', items: [] },
         { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
+        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow', items: [] },
         { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
         { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
       ],
