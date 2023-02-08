@@ -178,8 +178,8 @@ export const menuItems: NavMenu = {
           name: 'Serverless APIs',
           url: undefined,
           items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+            { name: 'Overview', url: '/guides/database/api', items: [] },
+            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
           ],
         },
         {
@@ -278,6 +278,7 @@ export const menuItems: NavMenu = {
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
         { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },

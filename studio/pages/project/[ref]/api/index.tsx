@@ -1,17 +1,16 @@
-import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
 import { Button, Dropdown, IconKey } from 'ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { snakeToCamel } from 'lib/helpers'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 
 const PageContext = createContext(null)
 
@@ -66,37 +65,41 @@ const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 const DocView: FC<any> = observer(({}) => {
   const PageState: any = useContext(PageContext)
-  const router = useRouter()
+  const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
-  const API_KEY = data?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
-    ? data.autoApiService.defaultApiKey
+  const { data, error } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const apiService = data?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = data?.autoApiService.restUrl
-  const headers: any = { apikey: API_KEY }
+  const swaggerUrl = data?.autoApiService?.restUrl
 
   const canReadServiceKey = checkPermissions(
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )
 
-  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
-
-  const { data: jsonSchema, error: jsonSchemaError } = useSWR(
-    () => swaggerUrl,
-    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
-  )
+  const {
+    data: jsonSchema,
+    error: jsonSchemaError,
+    refetch,
+  } = useProjectJsonSchemaQuery({
+    projectRef,
+    swaggerUrl,
+    apiKey: anonKey,
+  })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
   }, [jsonSchema])
 
   const refreshDocs = async () => {
-    // A bit hacky calling coding this up twice - at some point we should move this function
-    // and the SWR into the store.
-    mutate(swaggerUrl)
+    await refetch()
   }
 
   if (error || jsonSchemaError)
@@ -121,8 +124,6 @@ const DocView: FC<any> = observer(({}) => {
     endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
 
-  const { query } = router
-  const { page, resource, rpc } = query
   const { paths, definitions } = PageState.jsonSchema
 
   const PAGE_KEY: any = resource || rpc || page || 'index'
@@ -174,7 +175,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: API_KEY,
+                              key: anonKey,
                               name: 'anon (public)',
                             })
                           }

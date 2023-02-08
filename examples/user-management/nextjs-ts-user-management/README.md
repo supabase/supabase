@@ -1,4 +1,4 @@
-# Supabase Next.js User Management
+# Supabase Next.js Auth & User Management Starter
 
 This example will set you up for a very common situation: users can sign up or sign in and then update their account with public profile information, including a profile image.
 
@@ -27,7 +27,13 @@ The Vercel deployment will guide you through creating a Supabase account and pro
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
-## Build from scratch
+## Build locally
+
+Or create a new projec locally with `create-next-app`:
+
+```bash
+npx create-next-app -e with-supabase
+```
 
 ### 1. Create new project
 
@@ -128,6 +134,23 @@ create policy "Anyone can upload an avatar." on storage.objects
 create policy "Anyone can update their own avatar." on storage.objects
   for update using ( auth.uid() = owner ) with check (bucket_id = 'avatars');
 ```
+
+## More Supabase Examples & Resources
+
+## Examples
+
+These official examples are maintained by the Supabase team:
+
+- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
+- [Next.js Slack Clone](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone)
+- [Next.js 13 Data Fetching](https://github.com/supabase/supabase/tree/master/examples/caching/with-nextjs-13)
+- [And more...](https://github.com/supabase/supabase/tree/master/examples)
+
+## Other resources
+
+- [[Docs] Next.js User Management Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
+- [[Egghead.io] Build a SaaS product with Next.js, Supabase and Stripe](https://egghead.io/courses/build-a-saas-product-with-next-js-supabase-and-stripe-61f2bc20)
+- [[Blog] Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components)
 
 ## Authors
 
