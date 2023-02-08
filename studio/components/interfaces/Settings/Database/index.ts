@@ -1,4 +1,5 @@
 import ConnectionPooling from './ConnectionPooling'
 import NetworkRestrictions from './NetworkRestrictions/NetworkRestrictions'
+import DatabaseSettings from './DatabaseSettings/DatabaseSettings'
 
-export { ConnectionPooling, NetworkRestrictions }
+export { ConnectionPooling, DatabaseSettings, NetworkRestrictions }
