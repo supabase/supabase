@@ -1,20 +1,23 @@
-import useSWR from 'swr'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
 import { useStore } from 'hooks'
-import { patch, get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
 
-const StorageSettings: FC<any> = ({ projectRef }) => {
-  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config/storage`, get)
+export type StorageSettingsProps = {
+  projectRef: string | undefined
+}
+
+const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
+  const { data, error } = useProjectStorageConfigQuery({ projectRef })
 
   if (error || data?.error) {
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-sm">Error loading storage settings</p>
       </div>
     )
@@ -22,7 +25,7 @@ const StorageSettings: FC<any> = ({ projectRef }) => {
 
   if (!data) {
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-sm">Loading...</p>
       </div>
     )
@@ -58,6 +61,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
     return errors
   }
 
+  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
+
   const onSubmit = async (values: any) => {
     const errors = onValidate(values)
 
@@ -67,20 +72,23 @@ const StorageConfig = ({ config, projectRef }: any) => {
         message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
       })
     } else {
-      const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
-      const res = await patch(`${API_URL}/projects/${projectRef}/config/storage`, payload)
-      if (res?.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update storage settings: ${res.error.message}`,
+      try {
+        const res = await updateStorageConfig({
+          projectRef,
+          fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
         })
-      } else {
+
         const updatedValue = convertFromBytes(res.fileSizeLimit)
         initialValues = {
           fileSizeLimit: updatedValue.value,
           unformattedFileSizeLimit: res.fileSizeLimit,
         }
         ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+      } catch (error: any) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to update storage settings: ${error?.message}`,
+        })
       }
     }
   }
@@ -119,12 +127,12 @@ const StorageConfig = ({ config, projectRef }: any) => {
                   ].join(' ')}
                 >
                   <div className="flex flex-col gap-0 divide-y divide-scale-400">
-                    <div className="block grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
-                      <div className="relative col-span-12 flex flex-col gap-6 lg:col-span-4">
+                    <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
+                      <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                         <p className="text-sm">Upload file size limit</p>
                       </div>
-                      <div className="relative col-span-12 flex flex-col gap-x-6 gap-y-2 lg:col-span-8">
-                        <div className="col-span-12 grid grid-cols-12 gap-2">
+                      <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
+                        <div className="grid grid-cols-12 col-span-12 gap-2">
                           <div className="col-span-8">
                             <Input
                               id="fileSizeLimit"
@@ -181,8 +189,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
                     </div>
                   )}
                   <div className="border-t border-scale-400" />
-                  <div className="flex justify-between py-4 px-8">
-                    <div className="flex w-full items-center justify-end gap-2">
+                  <div className="flex justify-between px-8 py-4">
+                    <div className="flex items-center justify-end w-full gap-2">
                       <div className="flex gap-2">
                         <Button
                           type="default"

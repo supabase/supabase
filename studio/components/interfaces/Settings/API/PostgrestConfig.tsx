@@ -1,13 +1,12 @@
 import { useContext, FC, useEffect } from 'react'
 import { indexOf } from 'lodash'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useProjectPostgrestConfig } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
+import { checkPermissions, useStore, useParams } from 'hooks'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import MultiSelect from 'components/ui/MultiSelect'
 import { PageContext } from 'pages/project/[ref]/settings/api'
 
@@ -26,11 +25,10 @@ const PostgrestConfig: FC<Props> = ({}) => {
   const { ui } = useStore()
   const { meta } = PageState
 
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const formId = 'project-postgres-config'
-  const { config, isError, isLoading } = useProjectPostgrestConfig(ref as string | undefined)
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
 
   const initialValues = {
     db_schema: '',
@@ -43,14 +41,20 @@ const PostgrestConfig: FC<Props> = ({}) => {
     'custom_config_postgrest'
   )
 
-  const updateConfig = async (updatedConfig: any) => {
+  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
+
+  const updateConfig = async (updatedConfig: typeof initialValues) => {
+    if (!projectRef) return
+
     try {
-      const response = await patch(`${API_URL}/projects/${ref}/config/postgrest`, updatedConfig)
-      if (response.error) {
-        throw response.error
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-      }
+      await updatePostgrestConfig({
+        projectRef,
+        dbSchema: updatedConfig.db_schema,
+        maxRows: updatedConfig.max_rows,
+        dbExtraSearchPath: updatedConfig.db_extra_search_path,
+      })
+
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -86,7 +90,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         useEffect(() => {
-          if (!isLoading && config) {
+          if (config) {
             const values = {
               db_schema: config.db_schema,
               max_rows: config.max_rows,
@@ -94,7 +98,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
             }
             resetForm({ values, initialValues: values })
           }
-        }, [isLoading])
+        }, [config])
 
         return (
           <>
@@ -102,7 +106,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
               disabled={true}
               header={<p>API settings</p>}
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex px-8 py-4">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
@@ -119,7 +123,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
               }
             >
               {isError ? (
-                <div className="flex items-center justify-center space-x-2 py-8">
+                <div className="flex items-center justify-center py-8 space-x-2">
                   <IconAlertCircle size={16} strokeWidth={1.5} />
                   <p className="text-sm text-scale-1100">Failed to retrieve API settings</p>
                 </div>
@@ -142,8 +146,8 @@ const PostgrestConfig: FC<Props> = ({}) => {
                           emptyMessage={
                             <>
                               <IconAlertCircle strokeWidth={2} />
-                              <div className="mt-2 flex flex-col text-center">
-                                <p className="align-center text-sm">
+                              <div className="flex flex-col mt-2 text-center">
+                                <p className="text-sm align-center">
                                   No schema available to choose
                                 </p>
                                 <p className="text-xs opacity-50">
