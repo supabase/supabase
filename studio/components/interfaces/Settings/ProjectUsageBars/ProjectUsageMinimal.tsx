@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Loading } from 'ui'
 
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsagResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
@@ -41,7 +41,7 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
       {usage && (
         <div className="space-y-8">
           {product.features.map((feature) => {
-            const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+            const featureUsage = usage[feature.key as ProjectUsagResponseUsageKeys]
             const usageRatio = (featureUsage.usage ?? 0) / featureUsage.limit
             const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
             const isExceeded = usageRatio >= 1

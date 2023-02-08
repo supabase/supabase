@@ -8,7 +8,7 @@ import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsagResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -89,7 +89,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
               showUsageExceedMessage &&
               product.features
                 .map((feature) => {
-                  const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+                  const featureUsage = usage[feature.key as ProjectUsagResponseUsageKeys]
                   return (featureUsage.usage ?? 0) / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
@@ -136,7 +136,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   ) : (
                     <tbody>
                       {product.features.map((feature) => {
-                        const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+                        const featureUsage = usage[feature.key as ProjectUsagResponseUsageKeys]
                         const usageValue = featureUsage.usage || 0
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
