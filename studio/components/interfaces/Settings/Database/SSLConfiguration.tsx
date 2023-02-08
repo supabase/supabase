@@ -112,10 +112,12 @@ const SSLConfiguration = () => {
         >
           <FormSectionContent loading={false} className="lg:!col-span-5">
             <div className="flex items-center justify-end h-full space-x-2">
-              {isSubmitting && <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />}
+              {(isLoading || isSubmitting) && (
+                <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
+              )}
               <Toggle
-                disabled={isSubmitting}
                 checked={isEnforced}
+                disabled={isLoading || isSubmitting}
                 onChange={toggleSSLEnforcement}
               />
             </div>
