@@ -21,7 +21,7 @@ const ProjectSettings: NextPageWithLayout = () => {
       <div className="content h-full w-full overflow-y-auto space-y-10">
         <DatabaseSettings projectRef={projectRef} />
         <ConnectionPooling />
-        <SSLConfiguration />
+        {sslEnforcement && <SSLConfiguration />}
         {networkRestrictions && <NetworkRestrictions />}
       </div>
     </div>
