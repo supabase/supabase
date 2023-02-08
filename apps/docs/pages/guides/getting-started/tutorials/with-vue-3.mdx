@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-vue-3',
-  title: 'Quickstart: Vue 3',
+  title: 'Build a User Management App with Vue 3',
   description: 'Learn how to use Supabase in your Vue 3 App.',
-  sidebar_label: 'Vue 3',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -383,12 +382,7 @@ import Avatar from './Avatar.vue'
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
