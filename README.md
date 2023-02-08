@@ -60,8 +60,6 @@ Supabase is a combination of open source tools. We’re building the features of
 Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
-![diagram (1)](https://user-images.githubusercontent.com/8291514/191737181-22e6a111-817d-403b-8c3f-489279a2a7da.png)
-
 ![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
