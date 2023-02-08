@@ -34,7 +34,7 @@ const questions = [
 ]
 
 function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/$/, '')
+  const supabaseUrl = 'http://localhost:3001/'//process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/$/, '')
   const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
 
   if (isPlatform) {
