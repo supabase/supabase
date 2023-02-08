@@ -239,7 +239,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             )}
                           </tr>,
                           featureFootnotes[feature.key] && (
-                            <tr>
+                            <tr key={`${feature.title}-footnote`}>
                               <td
                                 className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200"
                                 colSpan={3}
