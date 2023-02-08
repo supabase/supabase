@@ -8,9 +8,7 @@ export const meta = {
 
 <Admonition type="note">
 
-Network Restrictions are currently in beta and are being slowly made available to all projects.
-
-The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer. Support for restricting connections to PostgREST, Storage, and Auth will be added at a later date.
+Network Restrictions is currently in beta and is slowly being made available to all projects. [Contact support](https://app.supabase.com/support/new) if you'd like to request early access.
 
 </Admonition>
 
@@ -20,6 +18,7 @@ To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. If your project was created before 23rd December 2022, it will need to be [upgraded to the latest Supabase version](/docs/guides/platform/migrating-and-upgrading-projects) before Network Restrictions can be used.
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
 
 ## Check restrictions
@@ -67,8 +66,8 @@ Restrictions applied successfully: true
 
 ## Limitations
 
-1. Network Restrictions do not currently apply to APIs offered over HTTPS (e.g. PostgREST, Storage, Auth).
-1. Network Restrictions should not be used if you require you need to connect to your Postgres database using Edge Functions.
+- The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer and doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth).
+- Network Restrictions should not be used if you need to connect to your Postgres database using Edge Functions.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
