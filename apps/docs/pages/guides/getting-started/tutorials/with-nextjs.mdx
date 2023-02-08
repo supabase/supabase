@@ -1,10 +1,8 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-nextjs',
-  title: 'Quickstart: Next.js',
+  title: 'Build a User Management App with NextJS',
   description: 'Learn how to use Supabase in your Next App.',
-  sidebar_label: 'Next.js',
   video: 'https://www.youtube.com/v/0Fs96oZ4se0',
 }
 
@@ -12,7 +10,7 @@ export const meta = {
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### Video Guide
+## Video Guide
 
 <div class="video-container">
   <iframe
@@ -23,9 +21,10 @@ export const meta = {
   ></iframe>
 </div>
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -723,17 +722,15 @@ return (
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
 
-- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel.
-- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui).
-- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs).
-- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers).
-- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
+## See also
+
+- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel
+- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui)
+- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs)
+- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
+- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

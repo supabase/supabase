@@ -109,6 +109,8 @@ This will be used any time we need to create a Supabase client _server-side_ - i
 
 Next, we need a middleware file to refresh the user's session on navigation.
 
+> If you were using Middleware prior to 12.2, see the [upgrade guide](https://nextjs.org/docs/messages/middleware-upgrade-guide).
+
 <Tabs
   scrollable
   size="small"
@@ -117,7 +119,7 @@ Next, we need a middleware file to refresh the user's session on navigation.
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a new `/app/middleware.js` file and populate with the following:
+Create a new `middleware.js` file at the same level as your `app` (in the root or `src` directory) and populate with the following:
 
 ```jsx title="middleware.js"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
@@ -140,7 +142,7 @@ export async function middleware(req) {
 
 <TabPanel id="ts" label="TypeScript">
 
-Create a new `/app/middleware.ts` file and populate with the following:
+Create a new `middleware.ts` file at the same level as your `app` (in the root or `src` directory) and populate with the following:
 
 ```tsx title="middleware.ts"
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'

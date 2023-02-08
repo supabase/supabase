@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { IS_PLATFORM } from 'lib/constants'
@@ -8,7 +9,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
-import { useSWRConfig } from 'swr'
 import { Button, IconFileText } from 'ui'
 
 type SignInLayoutProps = {
@@ -27,7 +27,7 @@ const SignInLayout = ({
 }: PropsWithChildren<SignInLayoutProps>) => {
   const pushNext = usePushNext()
   const { ui } = useStore()
-  const { cache } = useSWRConfig()
+  const queryClient = useQueryClient()
   const { theme } = ui
 
   useEffect(() => {
@@ -54,9 +54,7 @@ const SignInLayout = ({
       } = await auth.getSession()
 
       if (session) {
-        // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
-        // @ts-ignore
-        cache.clear()
+        await queryClient.resetQueries()
 
         await pushNext()
       }
