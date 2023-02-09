@@ -1,7 +1,10 @@
 import { FC, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Badge, Button, IconAlertCircle, IconInfo, Loading } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
@@ -9,8 +12,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useRouter } from 'next/router'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface Props {
   projectRef?: string
@@ -20,6 +21,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
   const router = useRouter()
+
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const subscriptionTier = ui.selectedProject?.subscription_tier
 
@@ -128,14 +134,16 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           usageElement = (
                             <div className="flex items-center justify-between">
                               <span>Not included in {planName} tier</span>
-                              <Button
-                                size="tiny"
-                                onClick={() =>
-                                  router.push(`/project/${projectRef}/settings/billing/update`)
-                                }
-                              >
-                                Upgrade to Pro
-                              </Button>
+                              {canUpdateSubscription && (
+                                <Button
+                                  size="tiny"
+                                  onClick={() =>
+                                    router.push(`/project/${projectRef}/settings/billing/update`)
+                                  }
+                                >
+                                  Upgrade to Pro
+                                </Button>
+                              )}
                             </div>
                           )
                         } else if (showUsageExceedMessage) {

@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useParams, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconDownload, Toggle, IconExternalLink, IconLoader, Alert } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import {
   FormHeader,
   FormPanel,
@@ -24,6 +26,8 @@ const SSLConfiguration = () => {
     projectRef: ref,
   })
   const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
+
+  const canUpdateSSLEnforcement = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -115,11 +119,30 @@ const SSLConfiguration = () => {
               {(isLoading || isSubmitting) && (
                 <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
               )}
-              <Toggle
-                checked={isEnforced}
-                disabled={isLoading || isSubmitting}
-                onChange={toggleSSLEnforcement}
-              />
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Toggle
+                    checked={isEnforced}
+                    disabled={!canUpdateSSLEnforcement || isLoading || isSubmitting}
+                    onChange={toggleSSLEnforcement}
+                  />
+                </Tooltip.Trigger>
+                {!canUpdateSSLEnforcement && (
+                  <Tooltip.Content align="center" side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200 w-[250px]',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to update SSL configurations
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </div>
           </FormSectionContent>
         </FormSection>
