@@ -20,7 +20,7 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-10">
         <section className="space-y-6">
           <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
           <Panel
@@ -116,7 +116,7 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
     `-U ${connectionInfo.db_user}`
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-10">
       <section className="space-y-6">
         <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
         <Panel
