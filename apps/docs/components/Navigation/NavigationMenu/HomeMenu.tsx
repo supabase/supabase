@@ -86,26 +86,26 @@ const home = [
     {
       label: 'JavaScript',
       icon: '/img/icons/menu/reference-javascript',
-      href: '/reference/javascript/start',
+      href: '/reference/javascript',
       level: 'reference_javascript',
     },
     {
       label: 'Flutter',
       icon: '/img/icons/menu/reference-dart',
-      href: '/reference/dart/start',
+      href: '/reference/dart',
       level: 'reference_dart',
     },
     {
       label: 'Python',
       icon: '/img/icons/menu/reference-python',
-      href: '/reference/python/start',
+      href: '/reference/python',
       level: 'reference_python',
       community: true,
     },
     {
       label: 'C#',
       icon: '/img/icons/menu/reference-csharp',
-      href: '/reference/csharp/start',
+      href: '/reference/csharp',
       level: 'reference_csharp',
       community: true,
     },
@@ -115,7 +115,7 @@ const home = [
     {
       label: 'Management API',
       icon: '/img/icons/menu/reference-api',
-      href: '/reference/api/start',
+      href: '/reference/api',
       level: 'reference_javascript',
     },
     {
