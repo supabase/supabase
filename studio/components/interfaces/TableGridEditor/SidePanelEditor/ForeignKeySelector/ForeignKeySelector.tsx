@@ -1,16 +1,16 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle } from 'ui'
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
+import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
 
+import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
-  tables: PostgresTable[]
   column: ColumnField
   metadata?: any
   visible: boolean
@@ -18,15 +18,14 @@ interface Props {
   saveChanges: (value: { table: PostgresTable; column: PostgresColumn } | undefined) => void
 }
 
-const ForeignKeySelector: FC<Props> = ({
-  tables = [] as PostgresTable[],
-  column,
-  visible = false,
-  closePanel,
-  saveChanges,
-}) => {
+const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
+  const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
+  const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>()
+
+  const schemas = meta.schemas.list()
+  const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
 
   const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
@@ -36,6 +35,10 @@ const ForeignKeySelector: FC<Props> = ({
   const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
     name: selectedForeignKey?.column,
   })
+
+  useEffect(() => {
+    meta.tables.loadBySchema(selectedSchema)
+  }, [selectedSchema])
 
   useEffect(() => {
     // Reset the state of the side panel
@@ -87,6 +90,9 @@ const ForeignKeySelector: FC<Props> = ({
 
   const onSaveChanges = (resolve: () => void) => {
     const errors = {} as Dictionary<any>
+    if (!selectedForeignKey?.table) {
+      errors['table'] = 'Please select a table'
+    }
     if (selectedForeignKey?.table && !selectedForeignKey.column) {
       errors['column'] = `The table ${selectedForeignKey.table} has no columns`
     }
@@ -139,6 +145,30 @@ const ForeignKeySelector: FC<Props> = ({
             url="https://www.postgresql.org/docs/current/tutorial-fk.html"
             urlLabel="Postgres Foreign Key Documentation"
           />
+
+          <Listbox
+            label="Select a schema"
+            value={selectedSchema}
+            error={errors.schema}
+            onChange={(value: string) => setSelectedSchema(value)}
+          >
+            {schemas.map((schema: PostgresSchema) => {
+              return (
+                <Listbox.Option
+                  key={schema.id}
+                  value={schema.name}
+                  label={schema.name}
+                  addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* For aria searching to target the schema name instead of schema */}
+                    <span className="hidden">{schema.name}</span>
+                    <span className="text-scale-1200">{schema.name}</span>
+                  </div>
+                </Listbox.Option>
+              )
+            })}
+          </Listbox>
 
           <Listbox
             label="Select a table to reference to"
