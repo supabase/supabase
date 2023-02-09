@@ -12,9 +12,9 @@
 - [x] Banco de dados hospedado de Postgres. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autenticação e Autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs auto-geradas.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funções.
   - [x] Funções do Banco de Dados [Docs]https://supabase.com/docs/guides/database/functions)
   - [x] Funções de borda [Docs](https://supabase.com/docs/guides/functions)

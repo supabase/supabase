@@ -51,7 +51,7 @@ export const gettingstarted = {
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
@@ -63,7 +63,7 @@ export const gettingstarted = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'Next.js',
+          name: 'NextJS',
           url: '/guides/getting-started/tutorials/with-nextjs',
           items: [],
         },
@@ -379,8 +379,8 @@ export const database = {
       name: 'Serverless APIs',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+        { name: 'Overview', url: '/guides/database/api', items: [] },
+        { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
       ],
     },
     {
@@ -498,6 +498,7 @@ export const functions = {
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
         { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
         { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis', items: [] },
       ],
     },
   ],
@@ -586,6 +587,7 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
     },
     {
