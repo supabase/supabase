@@ -440,7 +440,7 @@ export const database = {
           items: [],
         },
         {
-          name: 'pg_stat_statements: Query Performance Monitoring,
+          name: 'pg_stat_statements: Query Performance Monitoring',
           url: '/guides/database/extensions/pg_stat_statements',
           items: [],
         },
