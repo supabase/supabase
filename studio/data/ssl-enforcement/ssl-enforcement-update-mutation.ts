@@ -44,8 +44,8 @@ export const useSSLEnforcementUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(sslEnforcementKeys.list(projectRef)),
-          await onSuccess?.(data, variables, context)
+        await queryClient.invalidateQueries(sslEnforcementKeys.list(projectRef))
+        await onSuccess?.(data, variables, context)
       },
       ...options,
     }
