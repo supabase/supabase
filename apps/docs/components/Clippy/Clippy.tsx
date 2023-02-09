@@ -2,6 +2,7 @@ import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import { FC } from 'react'
 import { createPortal } from 'react-dom'
+import { IS_PLATFORM } from '~/lib/constants'
 import clippyImageDark from '../../public/img/clippy-dark.png'
 import clippyImage from '../../public/img/clippy.png'
 import ClippyBubble from './ClippyBubble'
@@ -24,7 +25,7 @@ const Clippy: FC = () => {
             </> */}
         </div>
       )}
-      {isOpen && createPortal(<ClippyModal onClose={close} />, document.body)}
+      {isOpen && IS_PLATFORM && createPortal(<ClippyModal onClose={close} />, document.body)}
     </>
   )
 }
