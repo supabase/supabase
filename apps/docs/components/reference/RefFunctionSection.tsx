@@ -124,7 +124,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
-                      const exampleString = ""
+                      const exampleString = ''
 
                       // async function serializeContent() {
                       //   return await serialize(exampleString ?? '', {
@@ -284,19 +284,19 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
 
 export async function getStaticProps() {
   console.log('static props ran')
-//   const mdx = `# Hello World
+  //   const mdx = `# Hello World
 
-// Here's a component used inside Markdown:
+  // Here's a component used inside Markdown:
 
-// <Hello />`
+  // <Hello />`
 
-//   const mdxSource = await serialize(mdx)
+  //   const mdxSource = await serialize(mdx)
 
-//   return {
-//     props: {
-//       source: mdxSource,
-//     },
-//   }
+  //   return {
+  //     props: {
+  //       source: mdxSource,
+  //     },
+  //   }
 }
 
 export default RefFunctionSection

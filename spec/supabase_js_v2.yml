@@ -1328,7 +1328,7 @@ functions:
               "name" text, 
               "country_id" "uuid" references public.countries on delete cascade
             );
-            
+
             with country as (
               insert into countries (name) 
               values ('united kingdom') returning id
