@@ -12,6 +12,7 @@ import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 
 const PageContext = createContext(null)
 
@@ -128,10 +129,18 @@ const DocView: FC<any> = observer(({}) => {
   const PAGE_KEY: any = resource || rpc || page || 'index'
 
   return (
-    <div className="Docs h-full w-full overflow-y-auto" key={PAGE_KEY}>
+    <div className="Docs Docs--api-page h-full w-full overflow-y-auto" key={PAGE_KEY}>
       <div className="Docs--inner-wrapper">
         <div className="sticky top-0 z-40 flex w-full flex-row-reverse ">
-          <div className="bg-scale-100 dark:bg-scale-300" style={{ width: '50%' }}>
+          <LangSelector
+            selectedLang={selectedLang}
+            setSelectedLang={setSelectedLang}
+            showApiKey={showApiKey}
+            setShowApiKey={setShowApiKey}
+            apiKey={API_KEY}
+            autoApiService={autoApiService}
+          />
+          {/* <div className="bg-scale-100 dark:bg-scale-300" style={{ width: '50%' }}>
             <div className="z-0 flex ">
               <button
                 type="button"
@@ -202,7 +211,7 @@ const DocView: FC<any> = observer(({}) => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="">
           {resource ? (

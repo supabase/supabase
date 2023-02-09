@@ -51,7 +51,7 @@ const Param: FC<Props> = ({
             </label>
 
             <div className="flex items-center gap-4">
-              <span className="font-bold text-lg text-scale-1100">{name}</span>
+              <span className="text-lg text-scale-1100 pb-0.5">{name}</span>
             </div>
           </div>
         </div>
