@@ -7,8 +7,15 @@ export const meta = {
   sidebar_label: 'Render',
 }
 
-Supabase is a top\-notch, free alternative to Render Postgres. In this guide, we will walk you through how to transfer your Render Postgres database to Supabase.
+
+Render is a popular Web Hosting service in the online services category that also has a managed Postgres service. Render has a great developer experience, allowing users to deploy straight from GitHub or GitLab. This is the core of their product and they do it really well. However, when it comes to Postgres databases, it may not be the best option.
+
+Supabase is a top-notch, free alternative to Render Postgres. We provide all the backend features developers need to build a product: a Postgres database, authentication, instant APIs, edge functions, realtime subscriptions, and storage. Postgres is the core of Supabase, for example, you can use row-level security and we have more than 40 Postgres extensions available.
+
+In this guide, we'll show you how to migrate from Render to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+
 You will need to use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which come included in a full PostgreSQL installation.
+
 If you prefer a quicker option, try the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb) for a simple, few-click migration.
 
 ## Retrieve your Render database credentials [#retrieve-render-credentials]
