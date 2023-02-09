@@ -41,13 +41,17 @@ Example:
 
 ![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/render/supabase_dashboard.png)
 
-## Run the migration in Colab [#run-migration]
+## Quick Method:
+
+### Run the migration in Colab [#run-migration]
 
 1. Set the environment variables (`PSQL_COMMAND`, `SUPABASE_HOST`, `SUPABASE_PASSWORD`) in the Colab notebook.
 1. Run the first two steps in [the notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb) in order. The first sets the variables and the second installs PSQL and the migration script.
 1. Run the third step to start the migration. This will take a few minutes.
 
-## Export your Render database to a file in console [#export-render-database]
+## Manual Method:
+
+### Export your Render database to a file in console [#export-render-database]
 
 Use `pg_dump` with your Render credentials to export your Render database to a file (e.g., `render_dump.sql`).
 
@@ -57,7 +61,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
  --no-owner --no-privileges > render_dump.sql
 ```
 
-## Import the database to your Supabase project [#import-database-to-supabase]
+### Import the database to your Supabase project [#import-database-to-supabase]
 
 Use `psql` to import the Render database file to your Supabase project.
 
@@ -65,7 +69,7 @@ Use `psql` to import the Render database file to your Supabase project.
 psql -h $SUPA_URL -U postgres --file render_dump.sql -p 6543 -d postgres
 ```
 
-## Additional options
+### Additional options
 
 - To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
 - To exclude a schema: `--exclude-schema=PATTERN`.
