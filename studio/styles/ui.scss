@@ -224,6 +224,12 @@
     @apply border-b flex border-scale-500;
   }
 
+  .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
   .doc-section article:first-child {
     @apply prose prose-docs prose-sm max-w-none;
   }
@@ -239,7 +245,7 @@
     a {
       @apply transition;
     }
-    
+
     a:hover {
       @apply text-brand-1000;
     }
