@@ -1,7 +1,7 @@
 const authProviders = [
   {
     name: 'Apple',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/apple-icon',
     href: '/guides/auth/social-login/auth-apple',
     official: true,
     supporter: 'Supabase',
@@ -10,7 +10,7 @@ const authProviders = [
   },
   {
     name: 'Azure',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/microsoft-icon',
     href: '/guides/auth/social-login/auth-azure',
     official: false,
     supporter: 'TBD',
@@ -19,7 +19,7 @@ const authProviders = [
   },
   {
     name: 'Bitbucket',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/bitbucket-icon',
     href: '/guides/auth/social-login/auth-bitbucket',
     official: true,
     supporter: 'Supabase',
@@ -28,7 +28,7 @@ const authProviders = [
   },
   {
     name: 'Discord',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/discord-icon',
     href: '/guides/auth/social-login/auth-discord',
     official: true,
     supporter: 'Supabase',
@@ -37,7 +37,7 @@ const authProviders = [
   },
   {
     name: 'Facebook',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/facebook-icon',
     href: '/guides/auth/social-login/auth-facebook',
     official: true,
     supporter: 'Supabase',
@@ -46,7 +46,7 @@ const authProviders = [
   },
   {
     name: 'GitHub',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/github-icon',
     href: '/guides/auth/social-login/auth-github',
     official: true,
     supporter: 'Supabase',
@@ -55,7 +55,7 @@ const authProviders = [
   },
   {
     name: 'GitLab',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/gitlab-icon',
     href: '/guides/auth/social-login/auth-gitlab',
     official: true,
     supporter: 'Supabase',
@@ -64,7 +64,7 @@ const authProviders = [
   },
   {
     name: 'Google',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/google-icon',
     href: '/guides/auth/social-login/auth-google',
     official: true,
     supporter: 'Supabase',
@@ -73,6 +73,7 @@ const authProviders = [
   },
   {
     name: 'Keycloak',
+    logo: '/docs/img/icons/keycloak-icon',
     href: '/guides/auth/social-login/auth-keycloak',
     official: true,
     supporter: 'Supabase',
@@ -81,7 +82,7 @@ const authProviders = [
   },
   {
     name: 'LinkedIn',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/linkedin-icon',
     href: '/guides/auth/social-login/auth-linkedin',
     official: true,
     supporter: 'Supabase',
@@ -90,7 +91,7 @@ const authProviders = [
   },
   {
     name: 'MessageBird',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/messagebird-icon',
     href: '/guides/auth/phone-login/messagebird',
     official: false,
     supporter: 'MessageBird',
@@ -99,7 +100,7 @@ const authProviders = [
   },
   {
     name: 'Notion',
-    // logo: '/img/libraries/notion-icon.svg',
+    logo: '/docs/img/icons/notion-icon',
     href: '/guides/auth/social-login/auth-notion',
     official: true,
     supporter: 'Supabase',
@@ -108,7 +109,7 @@ const authProviders = [
   },
   {
     name: 'Slack',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/slack-icon',
     href: '/guides/auth/social-login/auth-slack',
     official: true,
     supporter: 'Supabase',
@@ -117,7 +118,7 @@ const authProviders = [
   },
   {
     name: 'Spotify',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/spotify-icon',
     href: '/guides/auth/social-login/auth-spotify',
     official: true,
     supporter: 'Supabase',
@@ -126,7 +127,7 @@ const authProviders = [
   },
   {
     name: 'Twitter',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/twitter-icon',
     href: '/guides/auth/social-login/auth-twitter',
     official: true,
     supporter: 'Supabase',
@@ -135,7 +136,7 @@ const authProviders = [
   },
   {
     name: 'Twitch',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/twitch-icon',
     href: '/guides/auth/social-login/auth-twitch',
     official: true,
     supporter: 'Supabase',
@@ -144,7 +145,7 @@ const authProviders = [
   },
   {
     name: 'Zoom',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/zoom-icon',
     href: '/guides/auth/social-login/auth-zoom',
     official: true,
     supporter: 'Supabase',
@@ -153,7 +154,7 @@ const authProviders = [
   },
   {
     name: 'Twilio',
-    // logo: '/img/libraries/dart-icon.svg',
+    logo: '/docs/img/icons/twilio-icon',
     href: '/guides/auth/phone-login/twilio',
     official: true,
     supporter: 'Supabase',
@@ -162,6 +163,7 @@ const authProviders = [
   },
   {
     name: 'Vonage',
+    logo: '/docs/img/icons/vonage-icon',
     href: '/guides/auth/phone-login/vonage',
     official: false,
     supporter: 'Supabase',
