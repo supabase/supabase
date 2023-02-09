@@ -99,15 +99,16 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     }
   }
 
-  if (!isLoading && !canAccessStorage) {
-    return (
-      <BaseLayout>
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's storage" />
-        </main>
-      </BaseLayout>
-    )
-  }
+  // [Joshen TODO] Revisit this
+  // if (!isLoading && !canAccessStorage) {
+  //   return (
+  //     <BaseLayout>
+  //       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+  //         <NoPermission isFullPage resourceText="access your project's storage" />
+  //       </main>
+  //     </BaseLayout>
+  //   )
+  // }
 
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>

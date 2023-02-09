@@ -51,6 +51,8 @@ const FunctionsList: FC<any> = ({
             title="Functions"
             ctaButtonLabel="Create a new function"
             onClickCta={() => createFunction()}
+            disabled={!canCreateFunctions}
+            disabledMessage="You need additional permissions to create functions"
           >
             <AlphaPreview />
             <p className="text-sm text-scale-1100">
