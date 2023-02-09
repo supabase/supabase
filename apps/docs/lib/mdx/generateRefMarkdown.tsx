@@ -62,7 +62,7 @@ async function generateRefMarkdown(sections, slug, spec) {
               })
             : null,
         })
-      } else {
+      } else if (spec) {
         const foundFunction = spec.functions.find((item: any) => item.id === x.id)
         if (!foundFunction) return null
 

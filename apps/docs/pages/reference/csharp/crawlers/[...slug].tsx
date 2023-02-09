@@ -36,7 +36,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/csharp')
+  return handleRefStaticProps(sections, '/csharp', undefined)
 }
 
 export function getStaticPaths() {

@@ -15,7 +15,7 @@ export default function CliRef(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/cli')
+  return handleRefStaticProps(sections, '/cli', undefined)
 }
 
 export function getStaticPaths() {

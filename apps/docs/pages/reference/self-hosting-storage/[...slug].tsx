@@ -16,7 +16,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/self-hosting-storage')
+  return handleRefStaticProps(sections, '/self-hosting-storage', undefined)
 }
 
 export function getStaticPaths() {

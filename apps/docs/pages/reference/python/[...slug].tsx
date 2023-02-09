@@ -22,7 +22,7 @@ export default function PyReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/python')
+  return handleRefStaticProps(sections, '/python', undefined)
 }
 
 export function getStaticPaths() {

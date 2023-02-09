@@ -22,7 +22,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/javascript/v1')
+  return handleRefStaticProps(sections, '/javascript/v1', undefined)
 }
 
 export function getStaticPaths() {

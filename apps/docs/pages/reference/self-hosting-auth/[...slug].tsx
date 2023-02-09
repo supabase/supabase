@@ -16,7 +16,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/self-hosting-auth')
+  return handleRefStaticProps(sections, '/self-hosting-auth', undefined)
 }
 
 export function getStaticPaths() {

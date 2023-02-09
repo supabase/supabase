@@ -13,7 +13,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/self-hosting-realtime')
+  return handleRefStaticProps(sections, '/self-hosting-realtime', undefined)
 }
 
 export function getStaticPaths() {

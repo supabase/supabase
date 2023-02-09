@@ -13,7 +13,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/dart')
+  return handleRefStaticProps(sections, '/dart', undefined)
 }
 
 export function getStaticPaths() {

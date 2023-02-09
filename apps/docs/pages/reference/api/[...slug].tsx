@@ -16,7 +16,7 @@ export default function Config(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/api')
+  return handleRefStaticProps(sections, '/api', undefined)
 }
 
 export function getStaticPaths() {

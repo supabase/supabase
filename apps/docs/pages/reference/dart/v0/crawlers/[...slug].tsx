@@ -35,7 +35,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/dart/v0')
+  return handleRefStaticProps(sections, '/dart/v0', undefined)
 }
 
 export function getStaticPaths() {

@@ -36,7 +36,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/javascript')
+  return handleRefStaticProps(sections, '/javascript', undefined)
 }
 
 export function getStaticPaths() {
