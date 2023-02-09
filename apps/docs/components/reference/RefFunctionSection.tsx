@@ -14,13 +14,14 @@ import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
 
 // codehike
-// import { serialize } from 'next-mdx-remote/serialize'
+import { serialize } from 'next-mdx-remote/serialize'
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from '~/codeHikeTheme.js'
 import { MDXRemote } from 'next-mdx-remote'
 import components from '~/components'
 import { CH } from '@code-hike/mdx/components'
 import remarkGfm from 'remark-gfm'
+import matter from 'gray-matter'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -130,17 +131,22 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       //   return await serialize(exampleString ?? '', {
                       //     // MDX's available options, see the MDX docs for more info.
                       //     // https://mdxjs.com/packages/mdx/#compilefile-options
-                      //     mdxOptions: {
-                      //       remarkPlugins: [
-                      //         [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-                      //       ],
-                      //       useDynamicImport: true,
-                      //     },
+                      //     // mdxOptions: {
+                      //     //   remarkPlugins: [
+                      //     //     [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                      //     //   ],
+                      //     //   useDynamicImport: true,
+                      //     // },
                       //     // Indicates whether or not to parse the frontmatter from the mdx source
                       //   })
                       // }
 
                       // const serializeddd = serializeContent()
+
+                      const { data: exampleData, content: exampleContent } = matter(example.code)
+
+                      console.log('exampleContent', exampleContent)
+                      console.log('exampleData', exampleData)
 
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
@@ -164,6 +170,10 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const sql = staticExample?.data?.sql
                       const tables = staticExample?.data?.tables
 
+                      const markdown = `
+\`\`\`js const hello = "world"\`\`\`
+`
+
                       return (
                         <Tabs.Panel
                           id={example.id}
@@ -171,22 +181,21 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
-                          <div>
-                            {/* <ReactMarkdown remarkPlugins={[
-      [
-        remarkCodeHike,
-        {
-          theme: codeHikeTheme,
-          autoImport: false,
-          lineNumbers: true,
-          showCopyButton: true,
-        },
-      ],
-      remarkGfm,
-    ]}>{example?.code}</ReactMarkdown> */}
-                            {/* <MDXRemote {...serializeddd} components={components} /> */}
-                            {/* <MDXProvider components={components}>{example?.code}</MDXProvider> */}
-                            <CodeBlock
+                          <div className="prose">
+                            <ReactMarkdown
+                              remarkPlugins={[
+                                [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                              ]}
+                              components={components}
+                            >
+                              {exampleContent}
+                            </ReactMarkdown>
+                            <MDXProvider components={components}>{exampleContent}</MDXProvider>
+                            {/* <MDXRemote {...exampleContent} components={components}>
+                              {exampleContent}
+                            </MDXRemote> */}
+                            <MDXProvider components={components}>{exampleContent}</MDXProvider>
+                            {/* <CodeBlock
                               className="useless-code-block-class"
                               language={codeBlockLang}
                               hideLineNumbers={true}
@@ -199,7 +208,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                     .replace('ts', '')
                                     .replace('dart', '')
                                     .replace('c#', ''))}
-                            </CodeBlock>
+                            </CodeBlock> */}
                           </div>
 
                           {((tables && tables.length > 0) || sql) && (
