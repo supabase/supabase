@@ -7,13 +7,15 @@ import RolesSettings from './Roles/RolesSettings'
 import Extensions from './Extensions/Extensions'
 
 import Wrappers from './Wrappers/Wrappers'
+import CreateWrapper from './Wrappers/CreateWrapper'
+import EditWrapper from './Wrappers/EditWrapper'
 
 import PublicationsList from './Publications/PublicationsList'
 import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
 
-import ConnectionPooling from './Pooling/ConnectionPooling'
+import ConnectionPooling from '../Settings/Database/ConnectionPooling'
 
 import CreateTrigger from './Triggers/CreateTrigger'
 import DeleteTrigger from './Triggers/DeleteTrigger'
@@ -28,6 +30,8 @@ export {
   RolesSettings,
   Extensions,
   Wrappers,
+  CreateWrapper,
+  EditWrapper,
   PublicationsList,
   PublicationsTables,
   BackupsList,

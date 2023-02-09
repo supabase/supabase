@@ -70,18 +70,22 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
 
   return (
     <>
-      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
+      <Menu
+        id={ROW_CONTEXT_MENU_ID}
+        animation={false}
+        className="!bg-scale-300 border border-scale-500"
+      >
         <Item onClick={onCopyCellContent}>
           <IconClipboard size="tiny" />
-          <span className="sb-grid-context-menu__label">Copy cell content</span>
+          <span className="ml-2 text-xs">Copy cell content</span>
         </Item>
         <Item onClick={onEditRowClick} hidden={isItemHidden} data="edit">
           <IconEdit size="tiny" />
-          <span className="sb-grid-context-menu__label">Edit row</span>
+          <span className="ml-2 text-xs">Edit row</span>
         </Item>
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
-          <span className="sb-grid-context-menu__label">Delete row</span>
+          <span className="ml-2 text-xs">Delete row</span>
         </Item>
       </Menu>
     </>

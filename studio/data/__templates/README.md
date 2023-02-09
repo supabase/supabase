@@ -27,7 +27,7 @@ For queries that return a list of results.
 
 For getting a single item based on parameter(s). `id` is used in this example but can be updated to whatever is needed.
 
-### `resource-update.ts`
+### `resource-update-mutation.ts`
 
 For updating a resource. This can easily be adapted to work for create, delete, or any verb that is needed. You may need to modify the `invalidateQueries` section depending on your use case. For example removing:
 

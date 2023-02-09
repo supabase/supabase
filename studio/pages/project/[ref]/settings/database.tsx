@@ -1,9 +1,6 @@
-import useSWR from 'swr'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
 import { Input, Button, IconDownload, Tabs, Modal } from 'ui'
@@ -11,24 +8,28 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
-import { get, patch } from 'lib/common/fetch'
+import { patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
+import { ConnectionPooling, NetworkRestrictions } from 'components/interfaces/Settings/Database'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
+
+  const networkRestrictions = useFlag('networkRestrictions')
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
-        <GeneralSettings projectRef={ref} />
+        <GeneralSettings projectRef={projectRef} />
         <ConnectionPooling />
+        {networkRestrictions && <NetworkRestrictions />}
       </div>
     </div>
   )
@@ -38,7 +39,7 @@ ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</S
 
 export default observer(ProjectSettings)
 
-const ResetDbPassword: FC<any> = () => {
+const ResetDbPassword: FC<any> = ({ disabled = false }) => {
   const { ui, app, meta } = useStore()
   const { ref } = useParams()
 
@@ -127,7 +128,7 @@ const ResetDbPassword: FC<any> = () => {
                 <Tooltip.Trigger>
                   <Button
                     type="default"
-                    disabled={!canResetDbPassword}
+                    disabled={!canResetDbPassword || disabled}
                     onClick={() => setShowResetDbPass(true)}
                   >
                     Reset Database Password
@@ -204,7 +205,7 @@ const ResetDbPassword: FC<any> = () => {
   )
 }
 
-const DownloadCertificate: FC<any> = ({ createdAt }) => {
+const DownloadCertificate: FC<any> = ({ createdAt, disabled = false }) => {
   // instances before 3 : 08 pm sgt 29th April don't have certs installed
   if (new Date(createdAt) < new Date('2021-04-30')) return null
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -222,7 +223,7 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
             </div>
           </div>
           <div className="flex items-end justify-end">
-            <Button type="default" icon={<IconDownload />}>
+            <Button type="default" icon={<IconDownload />} disabled={disabled}>
               <a
                 href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
               >
@@ -237,9 +238,9 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 }
 
 const GeneralSettings: FC<any> = ({ projectRef }) => {
-  const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
+  const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
 
-  if (data?.error || error) {
+  if (isError) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <p className="text-scale-1000">Error loading database settings</p>
@@ -247,19 +248,90 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     )
   }
 
-  if (!data) {
+  if (isLoading) {
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <p className="text-scale-1000">Loading...</p>
-      </div>
+      <>
+        <div className="mb-8">
+          <section className="space-y-6">
+            <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
+            <Panel
+              title={
+                <h5 key="panel-title" className="mb-0">
+                  Connection info
+                </h5>
+              }
+            >
+              <Panel.Content className="space-y-8">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full"
+                  >
+                    <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                    <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+                  </div>
+                ))}
+              </Panel.Content>
+            </Panel>
+          </section>
+          <ResetDbPassword disabled={true} />
+          <DownloadCertificate disabled={true} />
+        </div>
+        <div className="mt-8">
+          <section className="space-y-6">
+            <Panel
+              title={
+                <h5 key="panel-title" className="mb-0">
+                  Connection string
+                </h5>
+              }
+            >
+              <Panel.Content>
+                <Tabs type="underlined" size="small">
+                  <Tabs.Panel id="psql" label="PSQL">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="uri" label="URI">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="golang" label="Golang">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="jdbc" label="JDBC">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="dotnet" label=".NET">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="nodejs" label="Nodejs">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="php" label="PHP">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel id="python" label="Python">
+                    <ShimmeringLoader className="h-8 w-full" />
+                  </Tabs.Panel>
+                </Tabs>
+              </Panel.Content>
+            </Panel>
+          </section>
+        </div>
+      </>
     )
   }
 
   const { project } = data
-  const formModel = toJS(project)
 
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
+  const connectionInfo = pluckObjectFields(project, DB_FIELDS)
 
   const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
@@ -352,22 +424,18 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
           >
             <Panel.Content>
               <Tabs type="underlined" size="small">
-                {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
                   <Input copy readOnly disabled value={psqlConnString} />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="uri" label="URI">
                   <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="golang" label="Golang">
                   <Input copy readOnly disabled value={golangConnString} />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="jdbc" label="JDBC">
                   <Input
                     copy
@@ -382,7 +450,6 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
                   />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="dotnet" label=".NET">
                   <Input
                     copy
@@ -398,17 +465,14 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
                   />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="nodejs" label="Nodejs">
                   <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="php" label="PHP">
                   <Input copy readOnly disabled value={golangConnString} />
                 </Tabs.Panel>
 
-                {/* @ts-ignore */}
                 <Tabs.Panel id="python" label="Python">
                   <Input
                     copy

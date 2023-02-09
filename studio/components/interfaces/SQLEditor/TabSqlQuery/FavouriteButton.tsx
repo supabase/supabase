@@ -44,7 +44,10 @@ const FavouriteButton = () => {
        */
       const { query, name, desc } = sqlEditorStore.activeTab || {}
       sqlEditorStore.addToFavorite(id, query, name, desc)
-      Telemetry.sendEvent('sql_editor', 'sql_favourited', name)
+      Telemetry.sendEvent(
+        { category: 'sql_editor', action: 'sql_favourited', label: name },
+        ui.googleAnalyticsProps
+      )
 
       /*
        * reload sql data in store and re-select tab
@@ -82,7 +85,10 @@ const FavouriteButton = () => {
        */
       const { name } = sqlEditorStore.activeTab || {}
       sqlEditorStore.unFavorite(id)
-      Telemetry.sendEvent('sql_editor', 'sql_unfavourited', name)
+      Telemetry.sendEvent(
+        { category: 'sql_editor', action: 'sql_unfavourited', label: name },
+        ui.googleAnalyticsProps
+      )
 
       /*
        * reload sql data in store and re-select tab
