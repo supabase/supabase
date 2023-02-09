@@ -68,7 +68,7 @@ By default, Prisma migrations will try to drop the `postgres` database, which ca
 Create a shadow database in your PostgreSQL server within the same Supabase project using the `psql` CLI and the `DATABASE_URL` from the previous steps (or use the local database).
 
 ```bash
-psql postgresql://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.red:5432
+psql postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432
 ```
 
 After you connect to your project's PostgreSQL instance, create another database (e.g., `postgres_shadow`):
@@ -83,8 +83,8 @@ In the `.env` file, update `DATABASE_URL` and `SHADOW_DATABASE_URL` to the conne
 
 ```env
 # .env
-DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:5432/postgres"
-SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:5432/postgres_shadow"
+DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres_shadow"
 ```
 
 In the `schema.prisma` file, change the `provider` from "sqlite" to `"postgresql"` and add the `shadowDatabaseUrl` property.
@@ -92,12 +92,12 @@ This is what your `schema.prisma` file should look like:
 
 ```go
 datasource db {
-  provider = “postgresql”
-  url      = env(“DATABASE_URL”)
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 generator client {
-  provider = “prisma-client-js”
+  provider = "prisma-client-js"
 }
 model Post {
   id        Int     @id @default(autoincrement())
@@ -145,8 +145,8 @@ When migrating, you need to use the non-pooled connection URL (like the one used
 
 ```env
 # .env
-DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:6543/postgres?pgbouncer=true&connection_limit=1"
-SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:5432/postgres_shadow"
+DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true&connection_limit=1"
+SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres_shadow"
 ```
 
 Prisma Migrate uses database transactions to check out the current state of the database and the migrations table. However, the Migration Engine is designed to use a single connection to the database, and does not support connection pooling with PgBouncer. If you attempt to run Prisma Migrate commands in any environment that uses PgBouncer for connection pooling, you might see the following error:
