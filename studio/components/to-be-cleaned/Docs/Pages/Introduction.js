@@ -5,7 +5,7 @@ export default function Introduction({ autoApiService, selectedLang }) {
   return (
     <>
       <h2 className="doc-heading">Introduction</h2>
-      <div className="doc-section">
+      <div className="doc-section doc-section--introduction">
         <article className="text ">
           <p>
             This API provides an easy way to integrate with your Postgres database. The API
