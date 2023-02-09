@@ -1,6 +1,7 @@
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
 const CodeSnippet = ({ selectedLang, snippet }) => {
+  console.log(snippet, 'snippet')
   if (!snippet[selectedLang]) return null
   return (
     <>

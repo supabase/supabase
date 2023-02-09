@@ -30,7 +30,7 @@ const ResourceContent = ({
 
   return (
     <>
-      <h2 className="text-scale-1200 mt-0 flex items-center px-6 gap-2">
+      <h2 className="doc-section__table-name text-scale-1200 mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
           <IconTable size="small" />
         </span>
@@ -54,7 +54,7 @@ const ResourceContent = ({
         <div>
           {properties.map((x) => (
             <div className="doc-section py-4" key={x.id}>
-              <article className="text">
+              <div className="text">
                 <Param
                   key={x.id}
                   name={x.id}
@@ -68,8 +68,8 @@ const ResourceContent = ({
                   }}
                   onDesciptionUpdated={refreshDocs}
                 />
-              </article>
-              <article className="code">
+              </div>
+              <div className="code">
                 <CodeSnippet
                   selectedLang={selectedLang}
                   snippet={Snippets.readColumns({
@@ -80,7 +80,7 @@ const ResourceContent = ({
                     columnName: x.id,
                   })}
                 />
-              </article>
+              </div>
             </div>
           ))}
         </div>

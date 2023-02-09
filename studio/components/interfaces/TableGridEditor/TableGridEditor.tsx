@@ -11,13 +11,14 @@ import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
 import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
-import { SidePanel } from 'ui'
+import { IconBookOpen, SidePanel } from 'ui'
 import ActionBar from './SidePanelEditor/ActionBar'
 import { GeneralContent, ResourceContent } from '../Docs'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { snakeToCamel } from 'lib/helpers'
 import useSWR from 'swr'
 import { get } from 'lib/common/fetch'
+import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 
 interface Props {
   /** Theme for the editor */
@@ -78,9 +79,14 @@ const TableGridEditor: FC<Props> = ({
       settings?.autoApiService.endpoint ?? '-'
     }`,
   }
-  const [selectedLang, setSelectedLang] = useState<any>('js')
+  const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
+
+  const [selectedLang, setSelectedLang] = useState<any>('js')
+  const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+
   const isVaultEnabled = useFlag('vaultExtension')
 
   const getEncryptedColumns = async (table: any) => {
@@ -263,7 +269,12 @@ const TableGridEditor: FC<Props> = ({
         size="xlarge"
         visible={apiPreviewPanelOpen}
         onCancel={() => console.log('cancel')}
-        header={<span>Connect to your table</span>}
+        header={
+          <span className="flex items-center gap-2">
+            <IconBookOpen size="tiny" />
+            API
+          </span>
+        }
         customFooter={
           <ActionBar
             backButtonLabel="Back"
@@ -273,14 +284,25 @@ const TableGridEditor: FC<Props> = ({
           />
         }
       >
-        <div className="Docs">
+        <div className="Docs Docs--table-editor">
           <SidePanel.Content>
+            <div className="sticky top-0 bg-scale-200 z-10">
+              <LangSelector
+                selectedLang={selectedLang}
+                setSelectedLang={setSelectedLang}
+                showApiKey={showApiKey}
+                setShowApiKey={setShowApiKey}
+                apiKey={API_KEY}
+                autoApiService={autoApiService}
+              />
+            </div>
             <GeneralContent
               autoApiService={autoApiService}
               selectedLang={selectedLang}
               showApiKey={true}
               page={page}
             />
+
             {jsonSchema?.definitions && (
               <ResourceContent
                 autoApiService={autoApiService}
