@@ -10,6 +10,8 @@ import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 const sections = flattenSections(clientLibsCommonSections)
 
 export default function JSReference(props) {
+  console.log(props)
+  // console.info(new Blob([JSON.stringify(props)]).size) // 38
   return (
     <RefSectionHandler
       sections={sections}
@@ -22,7 +24,7 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/javascript')
+  return handleRefStaticProps(sections, '/javascript', spec)
 }
 
 export function getStaticPaths() {

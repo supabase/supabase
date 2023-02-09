@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import { MDXProvider } from '@mdx-js/react'
 
 import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -11,6 +12,15 @@ import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
+
+// codehike
+// import { serialize } from 'next-mdx-remote/serialize'
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from '~/codeHikeTheme.js'
+import { MDXRemote } from 'next-mdx-remote'
+import components from '~/components'
+import { CH } from '@code-hike/mdx/components'
+import remarkGfm from 'remark-gfm'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -114,7 +124,23 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
-                      const exampleString = ''
+                      const exampleString = ""
+
+                      // async function serializeContent() {
+                      //   return await serialize(exampleString ?? '', {
+                      //     // MDX's available options, see the MDX docs for more info.
+                      //     // https://mdxjs.com/packages/mdx/#compilefile-options
+                      //     mdxOptions: {
+                      //       remarkPlugins: [
+                      //         [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                      //       ],
+                      //       useDynamicImport: true,
+                      //     },
+                      //     // Indicates whether or not to parse the frontmatter from the mdx source
+                      //   })
+                      // }
+
+                      // const serializeddd = serializeContent()
 
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
@@ -145,20 +171,36 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
-                          <CodeBlock
-                            className="useless-code-block-class"
-                            language={codeBlockLang}
-                            hideLineNumbers={true}
-                          >
-                            {exampleString +
-                              (example.code &&
-                                example.code
-                                  .replace(/```/g, '')
-                                  .replace('js', '')
-                                  .replace('ts', '')
-                                  .replace('dart', '')
-                                  .replace('c#', ''))}
-                          </CodeBlock>
+                          <div>
+                            {/* <ReactMarkdown remarkPlugins={[
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          autoImport: false,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
+      remarkGfm,
+    ]}>{example?.code}</ReactMarkdown> */}
+                            {/* <MDXRemote {...serializeddd} components={components} /> */}
+                            {/* <MDXProvider components={components}>{example?.code}</MDXProvider> */}
+                            <CodeBlock
+                              className="useless-code-block-class"
+                              language={codeBlockLang}
+                              hideLineNumbers={true}
+                            >
+                              {exampleString +
+                                (example.code &&
+                                  example.code
+                                    .replace(/```/g, '')
+                                    .replace('js', '')
+                                    .replace('ts', '')
+                                    .replace('dart', '')
+                                    .replace('c#', ''))}
+                            </CodeBlock>
+                          </div>
 
                           {((tables && tables.length > 0) || sql) && (
                             <RefDetailCollapse
@@ -238,6 +280,23 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
       </RefSubLayout.Section>
     </>
   )
+}
+
+export async function getStaticProps() {
+  console.log('static props ran')
+//   const mdx = `# Hello World
+
+// Here's a component used inside Markdown:
+
+// <Hello />`
+
+//   const mdxSource = await serialize(mdx)
+
+//   return {
+//     props: {
+//       source: mdxSource,
+//     },
+//   }
 }
 
 export default RefFunctionSection

@@ -38,10 +38,11 @@
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",
     "@algolia/autocomplete-plugin-recent-searches": "^1.7.2",
+    "@code-hike/mdx": "v0.8.1-next.0",
     "@docsearch/react": "^3.3.0",
     "@mdx-js/loader": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
-    "@next/mdx": "^12.0.4",
+    "@next/mdx": "^12.3.4",
     "@radix-ui/react-accordion": "^1.0.1",
     "@supabase/auth-helpers-nextjs": "^0.5.4",
     "@supabase/auth-helpers-react": "^0.3.1",
