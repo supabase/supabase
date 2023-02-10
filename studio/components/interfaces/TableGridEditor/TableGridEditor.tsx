@@ -266,9 +266,9 @@ const TableGridEditor: FC<Props> = ({
 
       <SidePanel
         key="WrapperTableEditor"
-        size="xlarge"
+        size="xxlarge"
         visible={apiPreviewPanelOpen}
-        onCancel={() => console.log('cancel')}
+        onCancel={() => setApiPreviewPanelOpen(false)}
         header={
           <span className="flex items-center gap-2">
             <IconBookOpen size="tiny" />
@@ -277,7 +277,7 @@ const TableGridEditor: FC<Props> = ({
         }
         customFooter={
           <ActionBar
-            backButtonLabel="Back"
+            backButtonLabel="Close"
             hideApply={true}
             formId="wrapper-table-editor-form"
             closePanel={() => setApiPreviewPanelOpen(false)}
@@ -286,7 +286,7 @@ const TableGridEditor: FC<Props> = ({
       >
         <div className="Docs Docs--table-editor">
           <SidePanel.Content>
-            <div className="sticky top-0 bg-scale-200 z-10">
+            <div className="sticky top-0 bg-scale-100 z-10">
               <LangSelector
                 selectedLang={selectedLang}
                 setSelectedLang={setSelectedLang}

@@ -51,7 +51,7 @@ const Param: FC<Props> = ({
             </label>
 
             <div className="flex items-center gap-4">
-              <span className="text-lg text-scale-1100 pb-0.5">{name}</span>
+              <span className="text-md text-scale-1200 pb-0.5">{name}</span>
             </div>
           </div>
         </div>
@@ -63,8 +63,8 @@ const Param: FC<Props> = ({
           <div className="mb-4 flex items-center gap-2">
             <label className="font-mono text-xs uppercase text-scale-900 min-w-[55px]">Type</label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 rounded-lg">
-                <span className="flex items-center gap-2">
+              <span className="flex grow-0 bg-slate-300 px-2 rounded-md text-scale-1000">
+                <span className="flex items-center gap-2 text-sm">
                   <IconCode size="tiny" />
                   <span>{getColumnType(type, format)}</span>
                 </span>
@@ -76,8 +76,8 @@ const Param: FC<Props> = ({
               Format
             </label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 rounded-lg">
-                <span className="flex items-center gap-2">
+              <span className="flex grow-0 bg-slate-300 px-2 rounded-md text-scale-1000">
+                <span className="flex items-center gap-2 text-sm">
                   <IconDatabase size="tiny" />
                   <span>{format}</span>
                 </span>
