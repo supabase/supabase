@@ -731,7 +731,7 @@ class _GamePageState extends State<GamePage> {
     _game = MyGame(
       onGameStateUpdate: (position, health) async {
         ChannelResponse response;
-        // Loop until the send succedes if the payload is to notify defeat.
+        // Loop until the send succeeds if the payload is to notify defeat.
         do {
           response = await _gameChannel!.send(
             type: RealtimeListenTypes.broadcast,
