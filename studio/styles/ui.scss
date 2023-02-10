@@ -224,7 +224,7 @@
     @apply border-b flex border-scale-500;
   }
 
-  .doc-section--introduction {
+  &.Docs--table-editor .doc-section--introduction {
     .text {
       width: 85%;
     }
@@ -279,6 +279,9 @@
     .is-highlighted {
       @apply text-brand-900;
     }
+  }
+  .codeblock-container + .codeblock-container {
+    @apply mt-12;
   }
 }
 

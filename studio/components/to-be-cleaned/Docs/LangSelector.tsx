@@ -30,7 +30,7 @@ const LangSelector: FC<Props> = ({
   )
 
   return (
-    <div className="bg-slate-200 dark:bg-scale-300 p-1 w-1/2 ml-auto">
+    <div className="p-1 w-1/2 ml-auto">
       <div className="z-0 flex justify-end">
         <button
           type="button"
