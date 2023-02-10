@@ -142,7 +142,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                               id="fileSizeLimit"
                               name="fileSizeLimit"
                               type="number"
-                              disabled={isFreeTier}
+                              disabled={isFreeTier || !canUpdateStorageSettings}
                               step={1}
                               onKeyPress={(event) => {
                                 if (event.charCode < 48 || event.charCode > 57) {
