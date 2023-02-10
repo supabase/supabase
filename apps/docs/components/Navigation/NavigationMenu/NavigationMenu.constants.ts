@@ -405,6 +405,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pgjwt: JSON Web Tokens',
+          url: '/guides/database/extensions/pgjwt',
+          items: [],
+        },
+        {
           name: 'PGRoonga: Multilingual Full Text Search',
           url: '/guides/database/extensions/pgroonga',
           items: [],
