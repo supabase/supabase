@@ -461,6 +461,11 @@ export const database = {
         },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
         {
+          name: 'plpgsql_check: PL/pgSQL Linter',
+          url: '/guides/database/extensions/plpgsql_check',
+          items: [],
+        },
+        {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
           items: [],
