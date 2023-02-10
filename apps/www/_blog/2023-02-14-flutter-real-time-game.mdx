@@ -40,9 +40,20 @@ Open the created app with your favorite IDE and let’s get started with coding!
 
 ### Step 2. Building the Flutter widgets
 
+We will have a simple directory structure to build this app. Since we only have a few widgets, we will just add them inside `main.dart` file.
+
+```
+├── lib/
+|   ├── game/
+│   │   ├── game.dart
+│   │   ├── player.dart
+│   │   └── bullet.dart
+│   └── main.dart
+```
+
 ### Create the Main Game Page
 
-We will create minimal Flutter widgets for this app as most of the game logic will be handled in the Flame Game classes later. Our game will have a single page with two dialogs before the game starts and after the game ends. The page will simply contain the [GameWidget](https://docs.flame-engine.org/1.6.0/flame/game_widget.html) while displaying a nice background image. We will make it a StatefulWidget, because we will add methods to handle sending and receiving real-time data later on. Since we only have a few widgets, we will just add these in the `main.dart` file.
+We will create minimal Flutter widgets for this app as most of the game logic will be handled in the Flame Game classes later. Our game will have a single page with two dialogs before the game starts and after the game ends. The page will simply contain the [GameWidget](https://docs.flame-engine.org/1.6.0/flame/game_widget.html) while displaying a nice background image. We will make it a StatefulWidget, because we will add methods to handle sending and receiving real-time data later on. Add the following to `main.dart` file.
 
 ```dart
 import 'package:flame/game.dart';
@@ -545,7 +556,6 @@ class Bullet extends PositionComponent with CollisionCallbacks, HasGameRef {
 }
 ```
 
-
 ### Step 4. Add real-time communications between players
 
 At this point, we have a working shooting game except the opponent does not move, because we have not added any ways to communicate between clients. We will use Supabase’s [realtime features](https://supabase.com/docs/guides/realtime) for this, because it gives us an out of the box solution to handle low-latency real-time communication between players. If you do not have a Supabase project created yet, head over to [database.new](https://database.new/) to create one.
@@ -560,12 +570,12 @@ uuid: ^3.0.7
 Once `pub get` is complete, let’s initialize Supabase. We will override the `main` function to initialize Supabase. You can get your Supabase URL and Anon Key at `Project Setting` > `API`. Copy and paste them into the `Supabase.initialize` call.
 
 void main() async {
-  await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_ANON_KEY',
-    realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 40),
-  );
-  runApp(const MyApp());
+await Supabase.initialize(
+url: 'YOUR_SUPABASE_URL',
+anonKey: 'YOUR_ANON_KEY',
+realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 40),
+);
+runApp(const MyApp());
 }
 
 // Extract Supabase client for easy access to Supabase
@@ -719,7 +729,7 @@ class _GamePageState extends State<GamePage> {
     _game = MyGame(
       onGameStateUpdate: (position, health) async {
         ChannelResponse response;
-        // Loop until the send succedes if the payload is to notify defeat. 
+        // Loop until the send succedes if the payload is to notify defeat.
         do {
           response = await _gameChannel!.send(
             type: RealtimeListenTypes.broadcast,
