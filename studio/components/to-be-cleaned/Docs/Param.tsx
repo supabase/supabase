@@ -2,16 +2,6 @@ import { FC } from 'react'
 import { Badge, IconCode, IconDatabase } from 'ui'
 import Description from './Description'
 
-interface Props {
-  name: string
-  type: string
-  format: string
-  required: string
-  description: boolean
-  metadata: any
-  onDesciptionUpdated: () => void
-}
-
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
   if (type === undefined && (format === 'jsonb' || format === 'json')) return 'json'
@@ -32,6 +22,15 @@ function getColumnType(type: string, format: string) {
   }
 }
 
+interface Props {
+  name: string
+  type: string
+  format: string
+  required: boolean
+  description: boolean
+  metadata?: any
+  onDesciptionUpdated?: () => void
+}
 const Param: FC<Props> = ({
   name,
   type,
