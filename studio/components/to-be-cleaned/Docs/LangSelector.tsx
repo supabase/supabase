@@ -3,7 +3,7 @@ import { Button, Dropdown, IconKey } from 'ui'
 import { checkPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { showApiKey } from 'components/interfaces/Docs/docs.types'
+import { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
