@@ -569,6 +569,7 @@ uuid: ^3.0.7
 
 Once `pub get` is complete, let’s initialize Supabase. We will override the `main` function to initialize Supabase. You can get your Supabase URL and Anon Key at `Project Setting` > `API`. Copy and paste them into the `Supabase.initialize` call.
 
+```dart
 void main() async {
 await Supabase.initialize(
 url: 'YOUR_SUPABASE_URL',
@@ -580,6 +581,7 @@ runApp(const MyApp());
 
 // Extract Supabase client for easy access to Supabase
 final supabase = Supabase.instance.client;
+```
 
 `RealtimeClientOptions` here is a parameter to override how many events per second each client will send to Supabase. The default is 10, but we want to ovreide to 40 to provide a more in-synced experience.
 
