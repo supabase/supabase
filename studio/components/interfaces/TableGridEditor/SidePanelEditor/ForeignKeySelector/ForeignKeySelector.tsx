@@ -21,11 +21,16 @@ interface Props {
 const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
   const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
-  const [selectedSchema, setSelectedSchema] = useState('public')
-  const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>()
+  const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
+    schema: 'public',
+    table: '',
+    column: '',
+  })
 
   const schemas = meta.schemas.list()
-  const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+  const tables = meta.tables.list(
+    (table: PostgresTable) => table.schema === selectedForeignKey.schema
+  )
 
   const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
@@ -37,13 +42,10 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
   })
 
   useEffect(() => {
-    meta.tables.loadBySchema(selectedSchema)
-  }, [selectedSchema])
-
-  useEffect(() => {
     // Reset the state of the side panel
     if (visible) {
       setErrors({})
+
       if (foreignKey) {
         setSelectedForeignKey({
           schema: foreignKey.target_table_schema,
@@ -52,13 +54,19 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         })
       } else {
         setSelectedForeignKey({
-          schema: '',
+          schema: 'public',
           table: '',
           column: '',
         })
       }
     }
   }, [visible])
+
+  const updateSelectedSchema = (schema: string) => {
+    meta.tables.loadBySchema(schema)
+    const updatedForeignKey = { ...selectedForeignKey, schema, table: '', column: '' } as ForeignKey
+    setSelectedForeignKey(updatedForeignKey)
+  }
 
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
@@ -147,10 +155,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
           />
 
           <Listbox
+            id="schema"
             label="Select a schema"
-            value={selectedSchema}
+            value={selectedForeignKey.schema}
             error={errors.schema}
-            onChange={(value: string) => setSelectedSchema(value)}
+            onChange={(value: string) => updateSelectedSchema(value)}
           >
             {schemas.map((schema: PostgresSchema) => {
               return (
@@ -171,12 +180,13 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
           </Listbox>
 
           <Listbox
+            id="table"
             label="Select a table to reference to"
-            value={selectedTable?.id}
+            value={selectedTable?.id ?? 1}
             error={errors.table}
             onChange={(value: string) => updateSelectedTable(Number(value))}
           >
-            <Listbox.Option key="empty" value="" label="---">
+            <Listbox.Option key="empty" value={1} label="---">
               ---
             </Listbox.Option>
             {/* @ts-ignore */}
@@ -209,6 +219,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                 />
               ) : (
                 <Listbox
+                  id="column"
                   value={selectedColumn?.id}
                   // @ts-ignore
                   label={
