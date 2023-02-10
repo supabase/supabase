@@ -44,8 +44,16 @@ You can authenticate your users in several ways:
 
 We provide a suite of Providers and login methods, as well as [Auth helpers](/docs/guides/auth/auth-helpers/).
 
+#### Social Auth
+
 <div className="container" style={{ padding: 0 }}>
-  <AuthProviders />
+  <AuthProviders type="social" />
+</div>
+
+#### Phone Auth
+
+<div className="container" style={{ padding: 0 }}>
+  <AuthProviders type="phone" />
 </div>
 
 ### Configure third-party providers

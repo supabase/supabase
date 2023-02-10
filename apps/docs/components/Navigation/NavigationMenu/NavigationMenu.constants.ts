@@ -658,6 +658,11 @@ export const resources = {
           url: '/guides/resources/migrating-to-supabase/heroku',
           items: [],
         },
+        {
+          name: 'Render',
+          url: '/guides/resources/migrating-to-supabase/render',
+          items: [],
+        },
       ],
     },
     {
@@ -720,6 +725,7 @@ export const migrate = {
     { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
     { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
+    { name: 'Render', url: '/guides/migrations/render', items: [] },
   ],
 }
 
