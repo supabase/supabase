@@ -7,6 +7,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Azure',
@@ -16,6 +17,7 @@ const authProviders = [
     supporter: 'TBD',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Bitbucket',
@@ -25,6 +27,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Discord',
@@ -34,6 +37,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Facebook',
@@ -43,6 +47,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'GitHub',
@@ -52,6 +57,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'GitLab',
@@ -61,6 +67,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Google',
@@ -70,6 +77,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Keycloak',
@@ -79,6 +87,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'LinkedIn',
@@ -88,6 +97,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'MessageBird',
@@ -97,6 +107,7 @@ const authProviders = [
     supporter: 'MessageBird',
     platform: true,
     selfHosted: true,
+    authType: 'phone'
   },
   {
     name: 'Notion',
@@ -106,6 +117,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Slack',
@@ -115,6 +127,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Spotify',
@@ -124,6 +137,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Twitter',
@@ -133,6 +147,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Twitch',
@@ -142,6 +157,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Zoom',
@@ -151,6 +167,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'social',
   },
   {
     name: 'Twilio',
@@ -160,6 +177,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'phone',
   },
   {
     name: 'Vonage',
@@ -169,6 +187,7 @@ const authProviders = [
     supporter: 'Supabase',
     platform: true,
     selfHosted: true,
+    authType: 'phone',
   },
 ]
 
