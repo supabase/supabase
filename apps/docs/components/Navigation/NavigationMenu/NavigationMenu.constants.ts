@@ -400,7 +400,7 @@ export const database = {
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
-          name: 'PGRoonga: Multilingual Full Text Search',
+          name: 'PGroonga: Multilingual Full Text Search',
           url: '/guides/database/extensions/pgroonga',
           items: [],
         },
