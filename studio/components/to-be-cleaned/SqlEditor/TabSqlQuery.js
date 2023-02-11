@@ -297,11 +297,20 @@ const UtilityTabResults = observer(() => {
       </div>
     )
   } else if (sqlEditorStore.activeTab.errorResult) {
-    return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
-      </div>
-    )
+    if (sqlEditorStore.activeTab.errorResult.indexOf('canceling statement due to statement timeout') !== -1) {
+      return (
+        <div className="bg-table-header-light dark:bg-table-header-dark">
+          <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono">You can either <a className="underline" href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">optimize your query</a>, or <a className="underline" href="https://supabase.com/docs/guides/database/timeouts">increase the statement timeout</a>.</p>
+        </div>
+      )
+    } else {
+      return (
+        <div className="bg-table-header-light dark:bg-table-header-dark">
+          <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
+        </div>
+      )
+    }
   } else if (sqlEditorStore.activeTab.hasNoResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
