@@ -9,7 +9,7 @@ tags:
   - mobile
   - realtime
 date: '2023-02-14'
-toc_depth: 4
+toc_depth: 3
 ---
 
 Flutter is a UI library to build apps that run on any platform, but it can also build interactive games thanks to an open-source game engine built on top of Flutter called [Flame](https://flame-engine.org/). Flame takes care of things like collision detection or loading image sprites to bring game development to all the Flutter devs. We can take it a step further to introduce real-time communication features so that players can play against each other in real-time.
@@ -201,7 +201,7 @@ class _LobbyDialogState extends State<_LobbyDialog> {
 
 Now the fun part starts! We will start out by creating our game class. We create a `MyGame` class that extends the [FlameGame](https://docs.flame-engine.org/1.6.0/flame/game.html) class. `FlameGame` takes care of collision detection and pan-detection, and it will also be the parent of all the components that we will add to the game. The game contains 2 components, `Player` and `Bullet`. `MyGame	` is a class that wrapps around all components of the game and can control the child components.
 
-![Structure of the shooting game](/images/blog/game-structure.png)
+![Structure of the shooting game](/images/blog/flutter-realtime-game/game-structure.png)
 
 Let’s add flame to our app by adding the following to our `pubspec.yaml` file to install flame.
 
@@ -818,7 +818,7 @@ class _GamePageState extends State<GamePage> {
 
 You can see that within `_openLobbyDialog`, there is an `onGameStarted` callback for when the game has started. Once a game has been started, it creates a new channel using the game ID as the channel name and starts listening to game state updates from the opponent.You can see that within the `onGameOver` callback, we are showing a simple dialog. Upon tapping `Back to Lobby`, the user will be taken back to the lobby dialog, where they can start another game if they want to.
 
-![Post game dialog](/images/blog/post-game-dialog.png)
+![Post game dialog](/images/blog/flutter-realtime-game/post-game-dialog.png)
 
 With all of that put together, we have a functioning real-time multiplayer shooting game. Grab a friend, run the app with `flutter run`, and have fun with it!
 
