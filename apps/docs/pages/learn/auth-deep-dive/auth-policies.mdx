@@ -157,7 +157,7 @@ Supabase comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`
 
 To create your own functions, navigate to the SQL editor and create a a new query.
 ```
-create or replace function auth.useragent() returns text as $$
+create or replace function useragent() returns text as $$
   select nullif(current_setting('request.headers', true)::json->>'user-agent', '')::text;
 $$ language sql;
 ```
