@@ -84,6 +84,30 @@ functions:
             }
           })
           ```
+  - id: sign-in-with-password
+    title: 'sign_in_with_password'
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - id: sign-in-with-email-and-password
+        name: Sign in with email and password
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+          ```
+      - id: sign-in-with-phone-and-password
+        name: Sign in with phone and password
+        isSpotlight: false
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+          # After receiving a SMS with a OTP.
+          data = await supabase.auth.verify_otp({
+            phone: '+13334445555',
+            token: '123456',
+          })
+          ```
   - id: sign-out
     title: 'sign_out()'
     notes: |
