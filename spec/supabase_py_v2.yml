@@ -55,7 +55,7 @@ functions:
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
-      - If signUp() is called for an existing confirmed user:
+      - If sign_up() is called for an existing confirmed user:
           - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
@@ -113,7 +113,7 @@ functions:
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If the user doesn't exist, `sign_in_with_otp()` will signup the user instead. To restrict this behaviour, you can set `should_create_user` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -203,8 +203,8 @@ functions:
   - id: verify-otp
     title: 'verify_otp'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
-      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+      - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
     examples:
       - id: verify-sms-one-time-password
         name: Verify SMS One-Time Password (OTP)
@@ -213,7 +213,7 @@ functions:
           res = supabase.auth.verify_otp(phone, token)
           ```
   - id: get-user
-    title: 'get_User'
+    title: 'get_user'
     notes: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
