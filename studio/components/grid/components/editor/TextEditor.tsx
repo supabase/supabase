@@ -44,9 +44,21 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
             value={value ?? ''}
             onChange={onChange}
           />
-          <div className="flex items-center justify-end p-2 bg-scale-400 space-x-2">
-            <p className="text-xs text-scale-1100">Save changes</p>
-            <code className="text-xs">⏎</code>
+          <div className="flex items-start justify-between p-2 bg-scale-400 space-x-2">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <div className="px-1.5 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <span className="text-[10px]">⏎</span>
+                </div>
+                <p className="text-xs text-scale-1100">Save changes</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="px-1 py-[2.5px] rounded bg-scale-600 border border-scale-700 flex items-center justify-center">
+                  <span className="text-[10px]">Esc</span>
+                </div>
+                <p className="text-xs text-scale-1100">Cancel changes</p>
+              </div>
+            </div>
           </div>
         </BlockKeys>
       }
