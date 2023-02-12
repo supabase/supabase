@@ -2,6 +2,7 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useParams } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { FC } from 'react'
@@ -9,11 +10,20 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
+  
   const {
     data: settings,
     isLoading: isProjectSettingsLoading,
     isError: isProjectSettingsError,
   } = useProjectSettingsQuery({
+    projectRef,
+  })
+
+  const {
+    data: api,
+    isLoading: isProjectApiLoading,
+    isError: isProjectApiError,
+  } = useProjectApiQuery({
     projectRef,
   })
 
@@ -32,11 +42,11 @@ const DisplayConfigSettings = () => {
     (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
   )
   const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
+  const apiUrl = `${api?.autoApiService.protocol ?? "https"}://${apiConfig?.endpoint ?? '-'}`
 
   return (
     <ConfigContentWrapper>
-      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+      {isProjectSettingsError || isProjectApiError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
@@ -45,7 +55,7 @@ const DisplayConfigSettings = () => {
               : 'Failed to update JWT secret'}
           </p>
         </div>
-      ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      ) : isProjectSettingsLoading || isProjectApiLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
