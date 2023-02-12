@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
 
+import type { Organization } from 'types'
+
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -18,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
-  const response = [
+  const response: Organization[] = [
     {
       id: 1,
       name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',

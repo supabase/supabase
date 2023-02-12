@@ -3,6 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
 import { DEFAULT_PROJECT, PROJECT_ENDPOINT } from 'pages/api/constants'
 
+import type { ProjectSettingsResponse } from 'data/config/project-settings-query'
+
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -19,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
-  const response = {
+  const response: ProjectSettingsResponse = {
     project: {
       ...DEFAULT_PROJECT,
       cloud_provider: 'AWS',
@@ -31,6 +33,32 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       db_ssl: false,
       db_user: 'postgres',
       jwt_secret: '-',
+      services: [
+        {
+          id: 1,
+          name: 'Default API',
+          service_api_keys: [
+            {
+              api_key: process.env.SUPABASE_SERVICE_KEY!,
+              api_key_encrypted: '-',
+              name: 'service_role key',
+              tags: 'service_role',
+            },
+            {
+              api_key: process.env.SUPABASE_ANON_KEY!,
+              api_key_encrypted: '-',
+              name: 'anon key',
+              tags: 'anon',
+            },
+          ],
+          app: { id: 1, name: 'Auto API' },
+          app_config: {
+            db_schema: 'public',
+            endpoint: PROJECT_ENDPOINT,
+            realtime_multitenant_enabled: true,
+          },
+        },
+      ],
     },
     services: [
       {
@@ -38,13 +66,13 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         name: 'Default API',
         service_api_keys: [
           {
-            api_key: process.env.SUPABASE_SERVICE_KEY,
+            api_key: process.env.SUPABASE_SERVICE_KEY!,
             api_key_encrypted: '-',
             name: 'service_role key',
             tags: 'service_role',
           },
           {
-            api_key: process.env.SUPABASE_ANON_KEY,
+            api_key: process.env.SUPABASE_ANON_KEY!,
             api_key_encrypted: '-',
             name: 'anon key',
             tags: 'anon',
@@ -54,7 +82,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         app_config: {
           db_schema: 'public',
           endpoint: PROJECT_ENDPOINT,
-          realtime_enabled: true,
+          realtime_multitenant_enabled: true,
         },
       },
     ],

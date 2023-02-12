@@ -51,7 +51,7 @@ export type AutoApiService = Service & {
   protocol: 'https' | 'http'
   endpoint: string
   restUrl: string
-  project: Project
+  project: Pick<Project, "ref">
   defaultApiKey: string
   serviceApiKey: string
 }

@@ -8,6 +8,8 @@ import {
   PROJECT_REST_URL,
 } from 'pages/api/constants'
 
+import type { ProjectApiResponse } from 'data/config/project-api-query'
+
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -24,15 +26,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
-  const response = {
+  const response: ProjectApiResponse = {
     project: {
       ...DEFAULT_PROJECT,
-      api_key_supabase_encrypted: '',
       db_host: 'localhost',
       db_name: 'postgres',
       db_port: 5432,
       db_ssl: false,
       db_user: 'postgres',
+      db_schema: "postgres",
       services: [
         {
           id: 1,
@@ -41,7 +43,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
           app_config: {
             db_schema: 'public',
             endpoint: PROJECT_ENDPOINT,
-            realtime_enabled: true,
+            realtime_multitenant_enabled: true,
           },
           service_api_keys: [
             {
@@ -66,13 +68,13 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       app_config: {
         db_schema: 'public',
         endpoint: PROJECT_ENDPOINT,
-        realtime_enabled: true,
+        realtime_multitenant_enabled: true,
       },
       protocol: PROJECT_ENDPOINT_PROTOCOL,
       endpoint: PROJECT_ENDPOINT,
       restUrl: PROJECT_REST_URL,
-      defaultApiKey: process.env.SUPABASE_ANON_KEY,
-      serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
+      defaultApiKey: process.env.SUPABASE_ANON_KEY!,
+      serviceApiKey: process.env.SUPABASE_SERVICE_KEY!,
       service_api_keys: [
         {
           api_key_encrypted: '-',
