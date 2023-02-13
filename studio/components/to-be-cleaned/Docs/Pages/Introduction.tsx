@@ -1,7 +1,33 @@
 import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
+import Image from 'next/image'
+import { useStore } from 'hooks'
+import { AutoApiService } from 'data/config/project-settings-query'
 
-export default function Introduction({ autoApiService, selectedLang }) {
+const libs = [
+  {
+    name: 'Javascript',
+    url: 'https://supabase.com/docs/reference/javascript/introduction',
+    icon: 'javascript',
+  },
+  { name: 'Flutter', url: 'https://supabase.com/docs/reference/dart/introduction', icon: 'dart' },
+  {
+    name: 'Python',
+    url: 'https://supabase.com/docs/reference/python/introduction',
+    icon: 'python',
+  },
+  { name: 'C#', url: 'https://supabase.com/docs/reference/csharp/introduction', icon: 'csharp' },
+]
+
+interface Props {
+  autoApiService: AutoApiService
+  selectedLang: string
+}
+
+export default function Introduction({ autoApiService, selectedLang }: Props) {
+  const { ui } = useStore()
+  const { isDarkTheme } = ui
+
   return (
     <>
       <h2 className="doc-heading">Introduction</h2>
@@ -21,6 +47,33 @@ export default function Introduction({ autoApiService, selectedLang }) {
             update your API implementation accordingly whenever you make changes to your Supabase
             schema from the graphical interface.
           </p>
+
+          <div className="not-prose">
+            <p>Read the reference documentation:</p>
+            <div className="flex items-center gap-4 mt-2">
+              {libs.map((lib) => (
+                <a
+                  href={lib.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="
+                  flex items-center gap-1 rounded-md px-3 py-1
+                  bg-scale-300 dark:bg-scale-500
+                  hover:dark:bg-scale-700 transition-colors
+                  !text-scale-1100 hover:text-scale-1100
+                  "
+                >
+                  <Image
+                    src={`/img/icons/reference-${isDarkTheme ? lib.icon : `${lib.icon}-light`}.svg`}
+                    width={16}
+                    height={16}
+                    alt={lib.name}
+                  />
+                  {lib.name}
+                </a>
+              ))}
+            </div>
+          </div>
         </article>
       </div>
 

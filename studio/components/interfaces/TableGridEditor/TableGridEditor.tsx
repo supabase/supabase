@@ -286,7 +286,7 @@ const TableGridEditor: FC<Props> = ({
       >
         <div className="Docs Docs--table-editor">
           <SidePanel.Content>
-            <div className="sticky top-0 bg-scale-100 z-10">
+            <div className="sticky top-0 bg-scale-100 dark:bg-scale-300 z-10">
               <LangSelector
                 selectedLang={selectedLang}
                 setSelectedLang={setSelectedLang}
