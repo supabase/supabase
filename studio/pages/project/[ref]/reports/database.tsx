@@ -1,19 +1,19 @@
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
 import { IconArrowRight } from 'ui'
 
-import { useStore, useProjectUsage } from 'hooks'
-import { formatBytes } from 'lib/helpers'
+import { useParams, useStore } from 'hooks'
 import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ReportsLayout } from 'components/layouts'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -35,13 +35,12 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default observer(DatabaseReport)
 
 const DatabaseUsage: FC<any> = () => {
-  const router = useRouter()
   const { meta, ui } = useStore()
   const [databaseSize, setDatabaseSize] = useState<any>(0)
   const [dateRange, setDateRange] = useState<any>(undefined)
 
-  const { ref } = router.query
-  const { usage } = useProjectUsage(ref as string)
+  const { ref: projectRef } = useParams()
+  const { data: usage } = useProjectUsageQuery({ projectRef })
 
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
   const databaseEgressLimit = usage?.db_egress?.limit ?? 0
@@ -50,7 +49,7 @@ const DatabaseUsage: FC<any> = () => {
     let cancel = false
     const getDatabaseSize = async () => {
       const res = await meta.query(
-        'select sum(pg_database_size(pg_database.datname))::integer as db_size from pg_database;'
+        'select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;'
       )
       if (!res.error && !cancel) {
         setDatabaseSize(res[0].db_size)

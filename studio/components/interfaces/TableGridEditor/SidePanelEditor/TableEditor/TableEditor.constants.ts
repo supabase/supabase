@@ -14,6 +14,7 @@ export const DEFAULT_COLUMNS: ColumnField[] = [
     isPrimaryKey: true,
     isIdentity: true,
     isNewColumn: true,
+    isEncrypted: false,
   },
   {
     id: uuidv4(),
@@ -27,5 +28,6 @@ export const DEFAULT_COLUMNS: ColumnField[] = [
     isPrimaryKey: false,
     isIdentity: false,
     isNewColumn: true,
+    isEncrypted: false,
   },
 ]

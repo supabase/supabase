@@ -1,0 +1,26 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Oliver Rice at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Thu, 15 Dec 2022 03:03:30 +0000</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-oli_rice-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/pg-graphql-v1</guid>
+  <title>pg_graphql v1.0</title>
+  <link>https://supabase.com/blog/pg-graphql-v1</link>
+  <description>Announcing the v1.0 release of pg_graphql</description>
+  <pubDate>Thu, 15 Dec 2022 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/audit</guid>
+  <title>Postgres Auditing in 150 lines of SQL</title>
+  <link>https://supabase.com/blog/audit</link>
+  <description>PostgreSQL has a robust set of features which we can leverage to create a generic auditing solution in 150 lines of SQL.</description>
+  <pubDate>Mon, 07 Mar 2022 03:03:30 +0000</pubDate>
+</item>
+
+    </channel>
+  </rss>

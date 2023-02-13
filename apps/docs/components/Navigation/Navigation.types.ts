@@ -19,5 +19,6 @@ export interface References {
     library?: string
     versions: string[]
     icon: string
+    currentVersion?: string
   }
 }

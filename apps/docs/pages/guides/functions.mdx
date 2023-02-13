@@ -1,0 +1,93 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'functions',
+  title: 'Edge Functions',
+  description: 'Globally distributed TypeScript functions.',
+  sidebar_label: 'Overview',
+  hide_table_of_contents: true,
+}
+
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
+
+- It is open source.
+- It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
+- It is TypeScript first and supports WASM.
+- Edge Functions are globally distributed for low-latency.
+
+<div className="not-prose">
+  <Button as="a" href="/docs/guides/functions/quickstart" size="medium">
+    Get started
+  </Button>
+</div>
+
+## Examples
+
+Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-4" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+            {x.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const examples = [
+  {
+    name: 'With supabase-js',
+    description: 'Use the Supabase client inside your Edge Function.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts',
+  },
+  {
+    name: 'With CORS headers',
+    description: 'Send CORS headers for invoking from the browser.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts',
+  },
+  {
+    name: 'React Native with Stripe',
+    description: 'Full example for using Supabase and Stripe, with Expo.',
+    href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
+  },
+  {
+    name: 'Flutter with Stripe',
+    description: 'Full example for using Supabase and Stripe, with Flutter.',
+    href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
+  },
+  {
+    name: 'Building a RESTful Service API',
+    description:
+      'Learn how to use HTTP methods and paths to build a RESTful service for managing tasks.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts',
+  },
+  {
+    name: 'Working with Supabase Storage',
+    description: 'An example on reading a file from Supabase Storage.',
+    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
+  },
+  {
+    name: 'Open Graph Image Generation',
+    description: 'Generate Open Graph images with Deno and Supabase Edge Functions.',
+    href: '/guides/functions/examples/og-image',
+  },
+  {
+    name: 'OG Image Generation & Storage CDN Caching',
+    description: 'Cache generated images with Supabase Storage CDN.',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
+  },
+  {
+    name: 'Get User Location',
+    description: `Get user location data from user's IP address.`,
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/location',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+
+export default Page

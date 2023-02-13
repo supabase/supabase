@@ -1,27 +1,31 @@
 import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
-import { useFlag } from 'hooks'
 
 export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-
-  const logsPostgrest = useFlag('logsPostgrest')
-  const logsPgbouncer = useFlag('logsPgbouncer')
 
   return [
     ...(IS_PLATFORM
       ? [
           {
+            title: 'Logs Explorer',
+            items: [
+              { key: 'explorer', name: 'Query', root: true },
+              { key: 'saved', name: 'Saved Queries' },
+              { key: 'recent', name: 'Recent Queries' },
+              { key: 'templates', name: 'Templates' },
+            ].map(({ key, name, root }) => ({
+              name,
+              key,
+              url: `/project/${ref}/logs/explorer${root ? '' : '/' + key}`,
+              items: [],
+            })),
+          },
+          {
             items: [
               {
-                name: 'Logs Explorer',
-                key: 'explorer',
-                url: `/project/${ref}/logs/explorer`,
-                items: [],
-              },
-              {
-                name: 'Edge',
+                name: 'API Edge Network',
                 key: 'edge-logs',
                 url: `/project/${ref}/logs/edge-logs`,
                 items: [],
@@ -32,26 +36,18 @@ export const generateLogsMenu = (project?: Project): ProductMenuGroup[] => {
                 url: `/project/${ref}/logs/postgres-logs`,
                 items: [],
               },
-              ...(logsPostgrest
-                ? [
-                    {
-                      name: 'PostgREST',
-                      key: 'postgrest-logs',
-                      url: `/project/${ref}/logs/postgrest-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(logsPgbouncer
-                ? [
-                    {
-                      name: 'PgBouncer',
-                      key: 'pgbouncer-logs',
-                      url: `/project/${ref}/logs/pgbouncer-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
+              {
+                name: 'PostgREST',
+                key: 'postgrest-logs',
+                url: `/project/${ref}/logs/postgrest-logs`,
+                items: [],
+              },
+              {
+                name: 'PgBouncer',
+                key: 'pgbouncer-logs',
+                url: `/project/${ref}/logs/pgbouncer-logs`,
+                items: [],
+              },
               {
                 name: 'Auth',
                 key: 'auth-logs',

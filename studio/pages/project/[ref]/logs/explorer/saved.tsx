@@ -26,7 +26,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   const saved = content.savedLogSqlSnippets()
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
-      <LogsExplorerHeader />
+      <LogsExplorerHeader subtitle="Saved Queries" />
       <div className="flex flex-col gap-3 py-6">
         {saved.length > 0 && (
           <Table

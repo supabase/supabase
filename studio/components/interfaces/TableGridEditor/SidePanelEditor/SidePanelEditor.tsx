@@ -2,18 +2,15 @@ import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
 import { Modal } from 'ui'
-import {
-  PostgresRelationship,
-  PostgresTable,
-  PostgresColumn,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditValue } from './RowEditor/RowEditor.types'
 
 interface Props {
   selectedSchema: string
@@ -21,7 +18,8 @@ interface Props {
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
-  sidePanelKey?: 'row' | 'column' | 'table'
+  selectedValueForJsonEdit?: JsonEditValue
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -30,7 +28,7 @@ interface Props {
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
   onTableCreated?: (table: PostgresTable) => void
-  onColumnSaved?: () => void
+  onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
 const SidePanelEditor: FC<Props> = ({
@@ -39,6 +37,7 @@ const SidePanelEditor: FC<Props> = ({
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
   sidePanelKey,
   isDuplicating = false,
   closePanel,
@@ -53,9 +52,6 @@ const SidePanelEditor: FC<Props> = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
 
   const saveRow = async (
     payload: any,
@@ -121,21 +117,39 @@ const SidePanelEditor: FC<Props> = ({
     }
   }
 
+  const onSaveJSON = async (value: string | number) => {
+    if (selectedTable === undefined || selectedValueForJsonEdit === undefined) return
+
+    try {
+      const { row, column } = selectedValueForJsonEdit
+      const payload = { [column]: JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error: any) {}
+  }
+
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
     resolve: any
   ) => {
+    const { columnId, ...securityConfig } = configuration
     const response = isNewRecord
       ? await meta.createColumn(
           payload as CreateColumnPayload,
           selectedTable as PostgresTable,
-          foreignKey
+          foreignKey,
+          securityConfig
         )
       : await meta.updateColumn(
-          configuration.columnId as string,
+          columnId as string,
           payload as UpdateColumnPayload,
           selectedTable as PostgresTable,
           foreignKey
@@ -145,9 +159,13 @@ const SidePanelEditor: FC<Props> = ({
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
       await meta.tables.loadById(selectedTable!.id)
-      onColumnSaved()
+      onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
+    }
+
+    if (configuration.isEncrypted && selectedTable?.schema) {
+      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
@@ -271,7 +289,6 @@ const SidePanelEditor: FC<Props> = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          enumTypes={enumTypes}
           tables={tables}
           column={selectedColumnToEdit}
           selectedTable={selectedTable}
@@ -289,6 +306,15 @@ const SidePanelEditor: FC<Props> = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+      />
+      <JsonEdit
+        visible={sidePanelKey === 'json'}
+        column={selectedValueForJsonEdit?.column ?? ''}
+        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+        backButtonLabel="Cancel"
+        applyButtonLabel="Save changes"
+        closePanel={onClosePanel}
+        onSaveJSON={onSaveJSON}
       />
       <ConfirmationModal
         visible={isClosingPanel}

@@ -27,7 +27,7 @@ async function gen_v001(spec: CliSpec, dest: string) {
 
   const commands = spec.commands.map((x) => {
     const isChild = x.subcommands.length < 1
-    const heading = isChild ? `### ${x.summary} {#${x.id}}` : `## ${x.summary} {#${x.id}}`
+    const heading = isChild ? `### ${x.summary} [#${x.id}]` : `## ${x.summary} [#${x.id}]`
 
     return {
       ...x,

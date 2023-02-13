@@ -3,11 +3,12 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { auth } from 'lib/gotrue'
+import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { useStore, withAuth, useFlag } from 'hooks'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
 import { SidebarSection } from './AccountLayout.types'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   title: string
@@ -21,14 +22,16 @@ interface Props {
 const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const router = useRouter()
   const { app, ui } = useStore()
+  const queryClient = useQueryClient()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const onClickLogout = async () => {
     await auth.signOut()
-    localStorage.clear();
-    router.reload()
+    localStorage.removeItem(STORAGE_KEY)
+    await router.push('/sign-in')
+    await queryClient.resetQueries()
   }
 
   const organizationsLinks = app.organizations
@@ -37,7 +40,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       isActive:
         router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
       label: organization.name,
-      href: `/org/${organization.slug}/settings`,
+      href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
@@ -48,9 +51,9 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       key: 'projects',
       links: [
         {
-          isActive: router.pathname === '/',
+          isActive: router.pathname === '/projects',
           label: 'All projects',
-          href: '/',
+          href: '/projects',
           key: 'all-projects-item',
         },
       ],
@@ -103,23 +106,27 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
+          href: 'https://supabase.com/docs/guides/database/api',
           isExternal: true,
         },
       ],
     },
-    {
-      key: 'logout-link',
-      links: [
-        {
-          key: `logout`,
-          icon: '/icons/feather/power.svg',
-          label: 'Logout',
-          href: undefined,
-          onClick: onClickLogout,
-        },
-      ],
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'logout-link',
+            links: [
+              {
+                key: `logout`,
+                icon: '/icons/feather/power.svg',
+                label: 'Logout',
+                href: undefined,
+                onClick: onClickLogout,
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -132,7 +139,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <div className="flex h-full">
         <main
           style={{ height: maxHeight, maxHeight }}
-          className="flex w-full flex-1 flex-col overflow-y-auto"
+          className="flex flex-col flex-1 w-full overflow-y-auto"
         >
           <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
             {children}

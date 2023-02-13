@@ -1,7 +1,7 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
-import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.2/mod.ts'
+import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 
-export async function handler(req: Request) {
+export function handler(req: Request) {
   return new ImageResponse(
     (
       <div

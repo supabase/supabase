@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
-import { useProfile, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -23,7 +24,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { profile } = useProfile()
+  const { data: profile } = useProfileQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(false)
@@ -32,7 +33,7 @@ const JoinOrganizationPage = () => {
   const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
     tokenValidationInfo || {}
 
-  const loginRedirectLink = `/?next=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   useEffect(() => {
     const fetchTokenInfo = async () => {
@@ -236,7 +237,7 @@ const JoinOrganizationPage = () => {
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
     >
-      <Link href="/">
+      <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
             src="/img/supabase-logo.svg"

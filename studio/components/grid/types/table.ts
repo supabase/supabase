@@ -12,6 +12,7 @@ export interface SupaColumn {
   readonly isGeneratable?: boolean
   readonly isNullable?: boolean
   readonly isUpdatable?: boolean
+  readonly isEncrypted?: boolean
   readonly targetTableSchema?: string | null
   readonly targetTableName?: string | null
   readonly targetColumnName?: string | null

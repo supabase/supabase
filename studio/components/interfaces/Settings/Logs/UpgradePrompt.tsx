@@ -3,6 +3,7 @@ import { Button, Modal } from 'ui'
 import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useFlag } from 'hooks'
 
 interface Props {
   show: boolean
@@ -12,6 +13,8 @@ interface Props {
 const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
   const router = useRouter()
   const { ref } = router.query
+
+  const teamTierEnabled = useFlag('teamTier')
 
   return (
     <Modal
@@ -43,6 +46,12 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
                   <p className="w-[40%] text-sm">Pro</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.PRO.text}</p>
                 </div>
+                {teamTierEnabled && (
+                  <div className="flex items-center px-4 py-1">
+                    <p className="w-[40%] text-sm">Team</p>
+                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
+                  </div>
+                )}
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[40%] text-sm">Enterprise</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.ENTERPRISE.text}</p>

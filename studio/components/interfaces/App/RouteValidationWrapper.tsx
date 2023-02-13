@@ -47,7 +47,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
-        router.push('/')
+        router.push('/projects')
         return
       }
     }
@@ -64,7 +64,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
-        router.push('/')
+        router.push('/projects')
         return
       }
     }

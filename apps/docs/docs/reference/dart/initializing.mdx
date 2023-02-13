@@ -28,6 +28,33 @@ Once you initialize Supabase in your `main()` method, you can access the `Supaba
 final supabase = Supabase.instance.client;
 ```
 
+### Call `initialize()` with custom headers
+
+You can pass `headers` to initialize your Supabase client with customer headers. 
+Here is an example of passing a custom auth header to Supabase client.
+```dart title=main.dart
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://xyzcompany.supabase.co',
+    anonKey: 'public-anon-key',
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+  runApp(const MyApp());
+}
+```
+
+### Call `initialize()`multiple times
+
+You can initialize Supabase multiple times in your app. When doing so, call `dispose()` each time before you initialize again.
+
+```dart
+Supabase.instance.dispose();
+
+await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+```
+
 ## Other Dart Projects
 
 You can initialize a new Supabase client using the `SupabaseClient()` method.
