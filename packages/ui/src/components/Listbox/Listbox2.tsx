@@ -151,7 +151,7 @@ function Listbox({
       /*
        * if no selected value (including a `defaultvalue`), then use first child
        */
-      setSelectedNode(content[0].props)
+      setSelectedNode(content[0]?.props)
       return
     }
   }, [selected])
