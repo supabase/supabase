@@ -23,7 +23,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const page = router.pathname.split('/')[4]
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
