@@ -1,11 +1,12 @@
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresRole } from '@supabase/postgres-meta'
+import { Button, IconPlus } from 'ui'
 
 import { useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
-import { PostgresRole } from '@supabase/postgres-meta'
 import RoleRow from './RoleRow'
 
 interface Props {
@@ -15,7 +16,6 @@ interface Props {
 const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
   const { meta } = useStore()
   const roles = meta.roles.list()
-  const [expandedRoleId, setExpandedRoleId] = useState<number>()
 
   const connectionLimit = Math.max(...roles.map((role: PostgresRole) => role.connection_limit))
   const totalActiveConnections = roles
@@ -32,7 +32,7 @@ const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
           title="Database Roles"
           description="Manage access control to your database through users, groups, and permissions"
         />
-        <div className="mb-6">
+        <div className="flex items-center mb-6 space-x-6">
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <div className="w-42">
@@ -60,7 +60,7 @@ const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
                   'border border-scale-200 space-y-1',
                 ].join(' ')}
               >
-                <p className="text-xs text-scale-1100 pr-2">Connection breakdown:</p>
+                <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
                 {rolesWithActiveConnections.map((role: PostgresRole) => (
                   <div key={role.id} className="text-xs text-scale-1200">
                     {role.name}: {role.active_connections}
@@ -69,20 +69,15 @@ const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
               </div>
             </Tooltip.Content>
           </Tooltip.Root>
+          <Button type="primary" icon={<IconPlus size="tiny" />}>
+            Add role
+          </Button>
         </div>
       </div>
 
       <div>
         {roles.map((role: PostgresRole, i: number) => (
-          <RoleRow
-            key={role.id}
-            role={role}
-            isExpanded={expandedRoleId === role.id}
-            onClick={() => {
-              if (expandedRoleId === role.id) setExpandedRoleId(undefined)
-              else setExpandedRoleId(role.id)
-            }}
-          />
+          <RoleRow key={role.id} role={role} />
         ))}
       </div>
     </div>
