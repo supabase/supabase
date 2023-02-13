@@ -1,7 +1,7 @@
 import { get, post } from 'lib/common/fetch'
 import { render } from '../../../helpers'
 import { fireEvent, waitFor, screen } from '@testing-library/react'
-import { ApiReport } from 'pages/project/[ref]/reports/api'
+import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
 import { AuthReport } from 'pages/project/[ref]/reports/auth'
 import userEvent from '@testing-library/user-event'
 import { StorageReport } from 'pages/project/[ref]/reports/storage'

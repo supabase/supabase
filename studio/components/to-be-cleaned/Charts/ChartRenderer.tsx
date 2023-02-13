@@ -139,6 +139,7 @@ export function BarChart({
   minimalHeader,
   chartSize = 'normal',
   className = '',
+  wrapperClassName = '',
   noDataTitle,
   noDataMessage,
 }: any) {
@@ -172,7 +173,7 @@ export function BarChart({
   }[chartSize as string] as number
 
   return (
-    <Loading active={!data}>
+    <Loading active={!data} className={wrapperClassName}>
       <div className={className}>
         <Header
           minimalHeader={minimalHeader}
