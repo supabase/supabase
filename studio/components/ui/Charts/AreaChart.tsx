@@ -36,13 +36,18 @@ const AreaChart: React.FC<AreaChartProps> = ({
   displayDateInUtc,
   minimalHeader,
   className = '',
+  size = 'normal',
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
-  const chartHeight = 160
+  const chartHeight = {
+    tiny: 76,
+    small: 96,
+    normal: 160,
+  }[size as string] as number
 
-  if (data.length === 0) return <ChartNoData />
+  if (data.length === 0) return <ChartNoData className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =

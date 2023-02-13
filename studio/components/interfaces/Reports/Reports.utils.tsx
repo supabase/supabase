@@ -1,4 +1,5 @@
 import { IconRefreshCw } from '@supabase/ui'
+import { useStore } from 'hooks'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryData, LogsQueryHandlers } from 'hooks/analytics/useLogsQuery'
 import React from 'react'
@@ -6,13 +7,41 @@ import { Button } from 'ui'
 import { DatePickerToFrom } from '../Settings/Logs'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DEFAULT_QUERY_PARAMS, REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import { DbQueryData, DbQueryHandler, PresetConfig } from './Reports.types'
+import { BaseQueries, DbQuery, DbQueryData, DbQueryHandler, LogsQuery, PresetConfig } from './Reports.types'
 
 /**
  * Converts a query params string to an object
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+
+export const queriesFactory = <T,>(queries: BaseQueries<T>):PresetHooks => {
+  const {ui} = useStore()
+  const projectRef = ui.selectedProject?.ref ?? 'default'
+
+  const hooks: PresetHooks = Object.entries<DbQuery | LogsQuery>(queries).reduce(
+    (acc, [k, { sql, queryType }]) => {
+      if (queryType === 'db') {
+        return {
+          ...acc,
+          [k]: () => useDbQuery(sql),
+        }
+      } else {
+        return {
+          ...acc,
+          [k]: () =>
+            useLogsQuery(projectRef, {
+              sql: sql as string,
+              ...DEFAULT_QUERY_PARAMS,
+            }),
+        }
+      }
+    },
+    {}
+  )
+  return hooks
 }
 
 // generate hooks based on preset config
