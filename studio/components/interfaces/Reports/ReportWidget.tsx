@@ -28,7 +28,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
       bodyClassName="h-full"
       wrapWithLoading={false}
     >
-      <Panel.Content className="space-y-4">
+      <Panel.Content className="space-y-4 ">
         <div className="flex flex-row items-start justify-between">
           <div className="gap-2">
             <div className="flex flex-row gap-2">
@@ -86,7 +86,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           </Dropdown>
         </div>
 
-        <LoadingOpacity active={props.isLoading}>{props.data === undefined ? null : props.renderer(props)}</LoadingOpacity>
+        <LoadingOpacity className="w-full" active={props.isLoading}>{props.data === undefined ? null : props.renderer(props)}</LoadingOpacity>
       </Panel.Content>
     </Panel>
   )

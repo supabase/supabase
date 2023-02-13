@@ -5,6 +5,8 @@ import { useFlag } from 'hooks'
 export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const productReports = useFlag('productReports')
+  const reportStorage = useFlag('reportStorage')
+  const reportAuth = useFlag('reportAuth')
 
   return [
     {
@@ -18,30 +20,25 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
         },
       ],
     },
+
+    ...(productReports
+      ? [
+          {
+            title: 'API Performance',
+            items: [
+              {
+                name: 'Overview',
+                key: 'api-overview',
+                url: `/project/${ref}/reports/api-overview`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
+
     {
       items: [
-        ...(productReports
-          ? [
-              {
-                name: 'API',
-                key: 'api',
-                url: `/project/${ref}/reports/api`,
-                items: [],
-              },
-              {
-                name: 'Auth',
-                key: 'auth',
-                url: `/project/${ref}/reports/auth`,
-                items: [],
-              },
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/reports/storage`,
-                items: [],
-              },
-            ]
-          : []),
         {
           name: 'Database',
           key: 'database',
