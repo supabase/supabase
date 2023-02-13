@@ -1,10 +1,8 @@
-import type { NextPage } from 'next'
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
-
-import { useEffect, useState } from 'react'
-
-import { withPageAuth } from '@supabase/auth-helpers-nextjs'
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { RealtimePresenceState } from '@supabase/supabase-js'
+import type { GetServerSidePropsContext, NextPage } from 'next'
+import { useEffect, useState } from 'react'
 
 const HomePage: NextPage = () => {
   const supabaseClient = useSupabaseClient()
@@ -12,7 +10,7 @@ const HomePage: NextPage = () => {
   const [userState, setUserState] = useState<RealtimePresenceState>({})
 
   useEffect(() => {
-    console.log('user : ', this_user)
+    console.log('user: ', this_user)
 
     const channel = supabaseClient.channel('online-users', {
       config: {
@@ -25,7 +23,7 @@ const HomePage: NextPage = () => {
     channel.on('presence', { event: 'sync' }, () => {
       const presentState = channel.presenceState()
 
-      console.log(' inside presence ', presentState)
+      console.log('inside presence: ', presentState)
 
       setUserState({ ...presentState })
     })
@@ -39,7 +37,7 @@ const HomePage: NextPage = () => {
         const status = await channel.track({
           user_name: this_user?.email ? this_user?.email : 'Unknown',
         })
-        console.log(status)
+        console.log('status: ', status)
       }
     })
   }, [])
@@ -55,6 +53,28 @@ const HomePage: NextPage = () => {
   )
 }
 
-export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  }
+}
 
 export default HomePage

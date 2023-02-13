@@ -1,5 +1,5 @@
-// pages/profile.js
-import { withPageAuth, User } from '@supabase/auth-helpers-nextjs'
+import { createServerSupabaseClient, User } from '@supabase/auth-helpers-nextjs'
+import { GetServerSidePropsContext } from 'next'
 import Link from 'next/link'
 
 export default function Profile({ user }: { user: User }) {
@@ -14,4 +14,26 @@ export default function Profile({ user }: { user: User }) {
   )
 }
 
-export const getServerSideProps = withPageAuth({ redirectTo: '/' })
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx)
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session)
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  }
+}
