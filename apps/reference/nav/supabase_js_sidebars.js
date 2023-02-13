@@ -25,7 +25,6 @@ const sidebars = {
         'installing',
         'generated/initializing',
         'typescript-support',
-        'protocol',
         'release-notes',
         'upgrade-guide',
       ],
