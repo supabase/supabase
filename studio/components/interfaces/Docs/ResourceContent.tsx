@@ -274,21 +274,6 @@ const ResourceContent = ({
           </article>
         </div>
       </>
-      <>
-        <h3 className="text-scale-1200 mt-4 px-6">Much more</h3>
-        <div className="doc-section py-4">
-          <article className="text ">
-            <p>
-              These docs are a work in progress! See our{' '}
-              <a href="https://supabase.com/docs/" target="_blank">
-                docs
-              </a>{' '}
-              for the additional functionality Supabase has to offer.
-            </p>
-          </article>
-          <article className="code"></article>
-        </div>
-      </>
     </>
   )
 }
