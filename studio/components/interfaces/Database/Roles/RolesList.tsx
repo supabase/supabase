@@ -1,10 +1,12 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconChevronRight } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
-import Table from 'components/to-be-cleaned/Table'
+import { FormHeader } from 'components/ui/Forms'
+import { PostgresRole } from '@supabase/postgres-meta'
+import RoleRow from './RoleRow'
 
 interface Props {
   onSelectRole: (role: any) => void
@@ -13,43 +15,77 @@ interface Props {
 const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
   const { meta } = useStore()
   const roles = meta.roles.list()
+  const [expandedRoleId, setExpandedRoleId] = useState<number>()
+
+  const connectionLimit = Math.max(...roles.map((role: PostgresRole) => role.connection_limit))
+  const totalActiveConnections = roles
+    .map((role: PostgresRole) => role.active_connections)
+    .reduce((a, b) => a + b, 0)
+  const rolesWithActiveConnections = roles
+    .filter((role: PostgresRole) => role.active_connections > 0)
+    .sort((a, b) => b.active_connections - a.active_connections)
 
   return (
-    <>
-      <Table
-        head={[
-          <Table.th key="name">Name</Table.th>,
-          <Table.th key="system-id">System ID</Table.th>,
-          <Table.th key="connections">Connections</Table.th>,
-          <Table.th key="blank"></Table.th>,
-        ]}
-        body={roles.map((x, i) => (
-          <Table.tr key={x.id} onClick={() => onSelectRole(x)}>
-            <Table.td style={{ width: '25%' }}>
-              <p>{x.name}</p>
-            </Table.td>
-            <Table.td style={{ width: '25%' }}>
-              <p>{x.id}</p>
-            </Table.td>
-            <Table.td className="w-full">
-              <div className="flex items-center space-x-3">
-                <p>
-                  {x.active_connections}/{x.connection_limit} connections
-                </p>
+    <div>
+      <div className="flex items-center justify-between">
+        <FormHeader
+          title="Database Roles"
+          description="Manage access control to your database through users, groups, and permissions"
+        />
+        <div className="mb-6">
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <div className="w-42">
                 <SparkBar
-                  max={x.connection_limit}
-                  value={x.active_connections}
-                  barClass={'bg-green-800'}
+                  type="horizontal"
+                  max={connectionLimit}
+                  value={totalActiveConnections}
+                  barClass={
+                    totalActiveConnections > 0.9 * connectionLimit
+                      ? 'bg-red-800'
+                      : totalActiveConnections > 0.75 * connectionLimit
+                      ? 'bg-amber-900'
+                      : 'bg-green-800'
+                  }
+                  labelTop={`${totalActiveConnections}/${connectionLimit}`}
+                  labelBottom="Active connections"
                 />
               </div>
-            </Table.td>
-            <Table.td style={{ maxWidth: '64px' }} className="w-min">
-              <IconChevronRight className="text-scale-1100" size="small" />
-            </Table.td>
-          </Table.tr>
+            </Tooltip.Trigger>
+            <Tooltip.Content align="start" side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200 space-y-1',
+                ].join(' ')}
+              >
+                <p className="text-xs text-scale-1100 pr-2">Connection breakdown:</p>
+                {rolesWithActiveConnections.map((role: PostgresRole) => (
+                  <div key={role.id} className="text-xs text-scale-1200">
+                    {role.name}: {role.active_connections}
+                  </div>
+                ))}
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </div>
+      </div>
+
+      <div>
+        {roles.map((role: PostgresRole, i: number) => (
+          <RoleRow
+            key={role.id}
+            role={role}
+            isExpanded={expandedRoleId === role.id}
+            onClick={() => {
+              if (expandedRoleId === role.id) setExpandedRoleId(undefined)
+              else setExpandedRoleId(role.id)
+            }}
+          />
         ))}
-      />
-    </>
+      </div>
+    </div>
   )
 }
 
