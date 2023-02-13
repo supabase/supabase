@@ -78,7 +78,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="mb-4">
-        <Listbox size="small" label="test"></Listbox>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-[230px]">
