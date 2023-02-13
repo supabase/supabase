@@ -511,6 +511,7 @@ export const realtime = {
   items: [
     { name: 'Overview', url: '/guides/realtime', items: [] },
     { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
+    { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
     {
       name: 'Channels',
       url: undefined,
