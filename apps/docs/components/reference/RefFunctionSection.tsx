@@ -10,22 +10,7 @@ import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers
 
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
-
-interface ICommonFunc {
-  id: string
-  title: string
-  slug: string
-  product: string
-  libs: string
-  items: ICommonFunc[]
-}
-
-interface IRefFunctionSection {
-  funcData: any
-  commonFuncData: ICommonFunc
-  spec: any
-  typeSpec?: any
-}
+import { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -130,6 +115,16 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
                       const exampleString = ''
+
+                      const codeBlockLang = example?.code?.startsWith('```js')
+                        ? 'js'
+                        : example?.code?.startsWith('```ts')
+                        ? 'ts'
+                        : example?.code?.startsWith('```dart')
+                        ? 'dart'
+                        : example?.code?.startsWith('```c#')
+                        ? 'csharp'
+                        : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 
@@ -150,18 +145,25 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                           label={example.name}
                           className="flex flex-col gap-3"
                         >
-                          {example.description && (
-                            <div className="prose">
-                              <ReactMarkdown className="text-sm">
-                                {example.description}
-                              </ReactMarkdown>
-                            </div>
-                          )}
+                          <CodeBlock
+                            className="useless-code-block-class"
+                            language={codeBlockLang}
+                            hideLineNumbers={true}
+                          >
+                            {exampleString +
+                              (example.code &&
+                                example.code
+                                  .replace(/```/g, '')
+                                  .replace('js', '')
+                                  .replace('ts', '')
+                                  .replace('dart', '')
+                                  .replace('c#', ''))}
+                          </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-data`}
-                              label="Example data source"
+                              label="Data source"
                               defaultOpen={false}
                             >
                               <>
@@ -196,32 +198,33 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             </RefDetailCollapse>
                           )}
 
-                          <CodeBlock
-                            className="useless-code-block-class"
-                            language="js"
-                            hideLineNumbers={true}
-                          >
-                            {exampleString +
-                              (example.code &&
-                                example.code
-                                  .replace(/```/g, '')
-                                  .replace('js', '')
-                                  .replace('ts', ''))}
-                          </CodeBlock>
-
                           {response && (
                             <RefDetailCollapse
                               id={`${example.id}-${exampleIndex}-response`}
-                              label="Example response"
+                              label="Response"
                               defaultOpen={false}
                             >
                               <CodeBlock
-                                className="useless-code-block-class"
-                                language="js"
+                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
+                                language={codeBlockLang}
                                 hideLineNumbers={true}
                               >
                                 {response.replace(/```/g, '').replace('json', '')}
                               </CodeBlock>
+                            </RefDetailCollapse>
+                          )}
+
+                          {example.description && (
+                            <RefDetailCollapse
+                              id={`${example.id}-${exampleIndex}-notes`}
+                              label="Notes"
+                              defaultOpen={false}
+                            >
+                              <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                                <ReactMarkdown className="text-sm">
+                                  {example.description}
+                                </ReactMarkdown>
+                              </div>
                             </RefDetailCollapse>
                           )}
                         </Tabs.Panel>

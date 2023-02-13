@@ -184,6 +184,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   return (
     <div className="sb-grid">
       <Header
+        table={table}
         sorts={sorts}
         filters={filters}
         onAddRow={editable ? props.onAddRow : undefined}

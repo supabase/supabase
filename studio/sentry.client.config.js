@@ -38,7 +38,7 @@ Sentry.init({
     // the URL params instead of the store, but we cannot repro locally, staging nor on prod
     // Safe to ignore since it's not a user-facing issue + we've not received any user feedback/report about it
     // Ref: https://github.com/supabase/supabase/pull/9729
-    'The provided `href` (/org/[slug]/settings) value is missing query values (slug)',
+    'The provided `href` (/org/[slug]/general) value is missing query values (slug)',
   ],
   beforeSend: (event) => filterConsoleErrors(event),
 })

@@ -37,7 +37,14 @@ const TabWelcome = observer(() => {
               sql={x.sql}
               onClick={(sql, title) => {
                 handleNewQuery({ sql, name: title })
-                Telemetry.sendEvent('scripts', 'script_clicked', x.title)
+                Telemetry.sendEvent(
+                  {
+                    category: 'scripts',
+                    action: 'script_clicked',
+                    label: x.title,
+                  },
+                  ui.googleAnalyticsProps
+                )
               }}
             />
           ))}
@@ -64,7 +71,14 @@ const TabWelcome = observer(() => {
               sql={x.sql}
               onClick={(sql, title) => {
                 handleNewQuery({ sql, name: title })
-                Telemetry.sendEvent('quickstart', 'quickstart_clicked', x.title)
+                Telemetry.sendEvent(
+                  {
+                    category: 'quickstart',
+                    action: 'quickstart_clicked',
+                    label: x.title,
+                  },
+                  ui.googleAnalyticsProps
+                )
               }}
             />
           ))}

@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainCreateVariables = {
@@ -16,7 +17,7 @@ export async function createCustomDomain({
   }
 
   const response = await post(
-    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname/initialize`,
+    `${API_ADMIN_URL}/projects/${projectRef}/custom-hostname/initialize`,
     {
       custom_hostname: customDomain,
     }
