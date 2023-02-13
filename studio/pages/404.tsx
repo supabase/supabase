@@ -24,7 +24,7 @@ const Error404: NextPage = ({}) => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <a href="/">
+              <a href="/projects">
                 <Image
                   src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
                   alt="supabase"
@@ -53,7 +53,7 @@ const Error404: NextPage = ({}) => {
           <p className="text-scale-1100">We couldn't find the page that you're looking for!</p>
         </div>
         <div className="flex items-center space-x-4">
-          <Link href="/">
+          <Link href="/projects">
             <a>
               <Button size="small">Head back</Button>
             </a>

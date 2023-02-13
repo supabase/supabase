@@ -6,6 +6,8 @@ import ProUpgrade from './ProUpgrade'
 import ExitSurvey from './ExitSurvey/ExitSurvey'
 import PaymentSummaryPanel from './PaymentSummaryPanel/PaymentSummaryPanel'
 import ComputeSizeSelection from './AddOns/ComputeSizeSelection'
+import PITRDurationSelection from './AddOns/PITRDurationSelection'
+import CustomDomainSelection from './AddOns/CustomDomainSelection'
 import AddNewPaymentMethodModal from './AddNewPaymentMethodModal/AddNewPaymentMethodModal'
 import UpdateSuccess from './UpdateSuccess'
 
@@ -20,6 +22,8 @@ export {
   ExitSurvey,
   PaymentSummaryPanel,
   ComputeSizeSelection,
+  PITRDurationSelection,
+  CustomDomainSelection,
   AddNewPaymentMethodModal,
   UpdateSuccess,
   Invoices,

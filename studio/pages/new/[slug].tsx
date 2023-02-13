@@ -1,5 +1,5 @@
 import Router, { useRouter } from 'next/router'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, PropsWithChildren } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -21,14 +21,8 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import {
-  useStore,
-  useFlag,
-  withAuth,
-  useSubscriptionStats,
-  checkPermissions,
-  useFreeProjectLimitCheck,
-} from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -42,15 +36,13 @@ import {
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useParams()
   const { app, ui } = useStore()
 
-  const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const subscriptionStats = useSubscriptionStats()
-  const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheck(slug as string)
+  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -66,13 +58,8 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const isOrganizationOwner = ui.selectedOrganization?.is_owner
   const availableRegions = getAvailableRegions()
-
-  const isAdmin = enablePermissions
-    ? checkPermissions(PermissionAction.CREATE, 'projects')
-    : isOrganizationOwner
-
+  const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
@@ -80,10 +67,7 @@ const Wizard: NextPageWithLayout = () => {
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const canCreateProject =
-    isAdmin &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
     projectName !== '' &&
@@ -208,19 +192,15 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={
-        !app.organizations.isInitialized ||
-        subscriptionStats.isLoading ||
-        isLoadingFreeProjectLimitCheck
-      }
+      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
         </div>
       }
       footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => Router.push('/')}>
+        <div key="panel-footer" className="flex items-center justify-between w-full">
+          <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">
@@ -248,7 +228,7 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="border-t border-panel-border-interior-light pb-8 dark:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
@@ -302,7 +282,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -324,7 +304,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"
@@ -415,7 +395,7 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 const PageLayout = withAuth(
-  observer(({ children }) => {
+  observer<PropsWithChildren<{}>>(({ children }) => {
     const router = useRouter()
     const { slug } = router.query
 

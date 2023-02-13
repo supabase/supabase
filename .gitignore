@@ -118,3 +118,5 @@ typings/
 # Supabase
 **/supabase/.branches
 **/supabase/.temp
+
+apps/new-docs/*

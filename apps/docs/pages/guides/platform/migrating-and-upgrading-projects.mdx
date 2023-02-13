@@ -1,0 +1,126 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'migrating-and-upgrading-projects',
+  title: 'Migrating and Upgrading Projects',
+  description: 'Upgrade your project to the latest version of Supabase.',
+  sidebar_label: 'Migrating and upgrading',
+}
+
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible.
+In some cases, access to new features require upgrading or migrating your Supabase project.
+
+## Upgrade your project
+
+<Admonition type="note">This is only available for projects on the Free plan.</Admonition>
+
+When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
+
+1. On the [General Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
+
+## Migrate your project
+
+Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
+
+### Before you begin
+
+- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
+- Create a new [Supabase project](https://app.supabase.com).
+- Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
+
+### Migrate the database
+
+1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
+2. In your new project, enable all extensions that were enabled in your old project.
+3. Run the following command from your terminal:
+
+```sh
+set -euo pipefail
+
+pg_dump \
+  --clean \
+  --if-exists \
+  --quote-all-identifiers \
+  --exclude-table-data 'storage.objects' \
+  --exclude-schema 'extensions|graphql|graphql_public|net|pgbouncer|pgsodium|pgsodium_masks|realtime|supabase_functions|pg_toast|pg_catalog|information_schema' \
+  --schema '*' \
+  --dbname "$OLD_DB_URL" \
+| sed 's/^DROP SCHEMA IF EXISTS "auth";$/-- DROP SCHEMA IF EXISTS "auth";/' \
+| sed 's/^DROP SCHEMA IF EXISTS "storage";$/-- DROP SCHEMA IF EXISTS "storage";/' \
+| sed 's/^CREATE SCHEMA "auth";$/-- CREATE SCHEMA "auth";/' \
+| sed 's/^CREATE SCHEMA "storage";$/-- CREATE SCHEMA "storage";/' \
+| sed 's/^ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/-- ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/' \
+> dump.sql
+
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file dump.sql \
+  --dbname "$NEW_DB_URL"
+```
+
+### Enable publication on tables
+
+Replication for Realtime is disabled for all tables in your new project. On the [Replication](https://app.supabase.com/project/_/database/replication) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
+
+### Migrate Storage objects
+
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.com](mailto:support@supabase.com).
+
+```js
+// npm install @supabase/supabase-js@1
+const { createClient } = require('@supabase/supabase-js')
+
+const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+;(async () => {
+  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
+    schema: 'storage',
+  })
+  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
+  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
+  if (error) {
+    console.log('error getting objects from old bucket')
+    throw error
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`)
+    try {
+      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .download(objectData.name)
+      if (downloadObjectError) {
+        throw downloadObjectError
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        })
+      if (uploadObjectError) {
+        throw uploadObjectError
+      }
+    } catch (err) {
+      console.log('error moving ', objectData)
+      console.log(err)
+    }
+  }
+})()
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -16,7 +16,7 @@ and is the easiest way to interact with everything we offer within the Supabase 
 ## Parameters
 
 <ul className="method-list-group">
-  
+
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -34,7 +34,7 @@ and is the easiest way to interact with everything we offer within the Supabase 
 The unique Supabase URL which is supplied when you create a new project in your project dashboard.
 
   </div>
-  
+
 </li>
 
 <li className="method-list-item">
@@ -54,7 +54,7 @@ The unique Supabase URL which is supplied when you create a new project in your 
 The unique Supabase Key which is supplied when you create a new project in your project dashboard.
 
   </div>
-  
+
 </li>
 
 <li className="method-list-item">
@@ -74,7 +74,7 @@ The unique Supabase Key which is supplied when you create a new project in your 
 No description provided.
 
   </div>
-  
+
 </li>
 
 </ul>
@@ -117,7 +117,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 ```
 
 By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`. 
 
 Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
 

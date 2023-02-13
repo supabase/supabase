@@ -20,6 +20,6 @@
     "jsx": "preserve",
     "module": "esnext"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/guides/append-test.js"],
   "exclude": ["node_modules"]
 }

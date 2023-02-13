@@ -8,6 +8,7 @@
    - [Running turborepo](#running-turborepo)
      - [Shared components](#shared-components)
      - [Installing packages](#installing-packages)
+   - [New Supabase docs](#new-supabase-docs)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
@@ -34,8 +35,6 @@ You need to install and configure the following dependencies on your machine to 
 We are in the process of migrating this repository to monorepo, using [Turborepo](https://turborepo.org/docs).
 
 Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
-
-If you are working on the ([docs site](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
 
 ### Fork the repository
 
@@ -71,15 +70,15 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 Then visit, and edit, any of the following sites:
 
-| Site                                         | Directory      | Scope name | Description                          | Local development server |
-| -------------------------------------------- | -------------- | ---------- | ------------------------------------ | ------------------------ |
-| [supabase.com](https://supabase.com)         | `/apps/www`    | www        | The main website                     | http://localhost:3000    |
-| [app.supabase.com](https://app.supabase.com) | `/studio`      | studio     | Studio dashboard                     | http://localhost:8082    |
-| [supabase.com/docs] Next.js based Docs site  | `/apps/docs` . | docs       | Guides and Reference (Next.js based) | http://localhost:3001    |
+| Site                                           | Directory    | Scope name | Description                          | Local development server   |
+| ---------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
+| [supabase.com](https://supabase.com)           | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
+| [app.supabase.com](https://app.supabase.com)   | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs) | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
 
 #### Running sites individually
 
-You can run any of the sites indiviudally by using the scope name. For example:
+You can run any of the sites individually by using the scope name. For example:
 
 ```sh
 npm run dev:www
@@ -107,6 +106,14 @@ For example:
 - `npm install react -w studio`: installs into `./studio`
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
+
+#### New Supabase docs
+
+Following the changes to the [Supabase docs](https://supabase.com/blog/new-supabase-docs-built-with-nextjs) the following is needed to run the new docs locally:
+
+- Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
+
+Now when you run a local devlopment docs server you will see the new docs site.
 
 ---
 

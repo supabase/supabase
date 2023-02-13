@@ -86,7 +86,7 @@ const AlgoliaSearch: FC<Props> = ({}) => {
         },
       },
       onSelect({ item, setQuery, setIsOpen, refresh }) {
-        console.log('onSelect', item.url)
+        //console.log('onSelect', item.url)
       },
       // @ts-ignore
       getSources({ query }) {
@@ -110,15 +110,17 @@ const AlgoliaSearch: FC<Props> = ({}) => {
                                 : 'capitalize'
                             }`}
                           >
-                            {item.category}
-                            {item.version ? ` (${item.version})` : ''}:
+                            <>
+                              {item.category}
+                              {item.version ? ` (${item.version})` : ''}:
+                            </>
                           </p>
                         )}
                         <p>
                           <components.Highlight hit={item} attribute="title" />
                         </p>
                       </div>
-                      <p className="aa-ItemContentSubtitle">{item.description}</p>
+                      <p className="aa-ItemContentSubtitle">{item.description as string}</p>
                     </div>
                   </a>
                 )

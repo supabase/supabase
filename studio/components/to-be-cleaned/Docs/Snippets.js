@@ -366,7 +366,7 @@ curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Prefer: return=representation" \\
+-H "Prefer: return=minimal" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
 `,
     },
@@ -436,7 +436,7 @@ curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Prefer: return=representation" \\
+-H "Prefer: return=minimal" \\
 -d '{ "other_column": "otherValue" }'
 `,
     },
@@ -487,7 +487,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -511,7 +511,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithPassword({
+let { data, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -534,7 +534,7 @@ curl -X POST '${endpoint}/auth/v1/magiclink' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
 `,
@@ -557,7 +557,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signUp({
+let { data, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password'
 })
@@ -580,7 +580,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOtp({
+let { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
 `,
@@ -604,9 +604,10 @@ curl -X POST '${endpoint}/auth/v1/verify' \\
     js: {
       language: 'js',
       code: `
-let { session, error } = await supabase.auth.verifyOTP({
+let { data, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
-  token: '123456'
+  token: '123456',
+  type: 'sms'
 })
 `,
     },
@@ -633,7 +634,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     },
   }),
   authThirdPartyLogin: (endpoint, apiKey) => ({
-    title: '',
+    title: 'Third Party Login',
     bash: {
       language: 'bash',
       code: ``,
@@ -641,7 +642,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signInWithOAuth({
+let { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
 `,
@@ -660,7 +661,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     js: {
       language: 'js',
       code: `
-const user = supabase.auth.user()
+const { data: { user } } = await supabase.auth.getUser()
 `,
     },
   }),
@@ -680,7 +681,7 @@ const user = supabase.auth.user()
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
+let { data, error } = await supabase.auth.resetPasswordForEmail(email)
 `,
     },
   }),
@@ -705,7 +706,7 @@ let { data, error } = await supabase.auth.api.resetPasswordForEmail(email)
     js: {
       language: 'js',
       code: `
-const { user, error } = await supabase.auth.update({
+const { data, error } = await supabase.auth.updateUser({
   email: "new@email.com",
   password: "new-password",
   data: { hello: 'world' }

@@ -41,12 +41,17 @@ export const Grid = memo(
         )
 
         if (changedColumn) {
-          const { error } = state.rowService!.update(rowData, changedColumn, (payload) => {
-            dispatch({
-              type: 'EDIT_ROW',
-              payload,
-            })
-          })
+          const { error } = state.rowService!.update(
+            rowData,
+            originRowData,
+            changedColumn,
+            (payload) => {
+              dispatch({
+                type: 'EDIT_ROW',
+                payload,
+              })
+            }
+          )
           if (error && onErrorFunc) onErrorFunc(error)
         }
       }

@@ -12,9 +12,9 @@
 - [x] ஹோஸ்ட் செய்யப்பட்ட பூஸ்ட்ஜீஆர்இஎஸ் தரவுத்தளம். [ஆவணம்](https://supabase.com/docs/guides/database)
 - [x] அங்கீகாரம் மற்றும் அங்கீகாரம்.. [ஆவணம்](https://supabase.com/docs/guides/auth)
 - [x] தானாக உருவாக்கப்பட்ட ஏபிஐ கள்.
-  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/api#rest-api)
-  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] செயல்பாடுகள்.
   - [x] தரவுத்தளம் செயல்பாடுகள். [ஆவணம்](https://supabase.com/docs/guides/database/functions)
   - [x] விளிம்பு செயல்பாடுகள் [ஆவணம்](https://supabase.com/docs/guides/functions)

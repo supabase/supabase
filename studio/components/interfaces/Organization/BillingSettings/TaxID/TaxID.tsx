@@ -50,12 +50,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }, [taxIds])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
-
-  const enablePermissions = useFlag('enablePermissions')
   const canReadTaxIds = checkPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
-    : ui.selectedOrganization?.is_owner
+  const canUpdateTaxIds = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
   const onUpdateTaxId = (id: string, key: string, value: string) => {
     const updatedTaxIds = taxIdValues.map((taxId: any) => {

@@ -25,6 +25,7 @@ export interface ProjectBase {
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
   connectionString?: string
+  dbVersion?: string
   kpsVersion?: string
   restUrl?: string
   // store subscription tier products.metadata.supabase_prod_id
@@ -40,7 +41,7 @@ export interface Project extends ProjectBase {
 
 export interface User {
   id: number
-  mobile: string
+  mobile: string | null
   primary_email: string
   username: string
   first_name: string

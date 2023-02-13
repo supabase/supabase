@@ -9,13 +9,8 @@ interface Props {
   sentCategory?: string
 }
 
-const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
-  const categoriesToShowAdditionalResources = [
-    'Problem',
-    'Unresponsive',
-    'Best_practices',
-    'Performance',
-  ]
+const Success: FC<Props> = ({ sentCategory = '' }) => {
+  const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
   const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)
   const [searchValue, setSearchValue] = useState<string>(selectedCategory?.query ?? '')
@@ -75,7 +70,7 @@ const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
         <Divider light />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Link href="/">
+        <Link href="/projects">
           <Button>Go back to dashboard</Button>
         </Link>
       </div>

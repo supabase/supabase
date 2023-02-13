@@ -80,6 +80,7 @@ export function RightSlot({ children }: any) {
 }
 
 interface ItemProps {
+  className?: string
   children: React.ReactNode
   icon?: React.ReactNode
   disabled?: boolean
@@ -87,11 +88,15 @@ interface ItemProps {
   rightSlot?: React.ReactNode
 }
 
-export function Item({ children, icon, disabled, onClick, rightSlot }: ItemProps) {
+export function Item({ className, children, icon, disabled, onClick, rightSlot }: ItemProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.Item className={__styles.item} disabled={disabled} onSelect={onClick}>
+    <RadixDropdown.Item
+      className={`${__styles.item} ${className}`}
+      disabled={disabled}
+      onSelect={onClick}
+    >
       {icon && icon}
       <span>{children}</span>
     </RadixDropdown.Item>

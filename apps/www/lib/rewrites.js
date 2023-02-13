@@ -17,20 +17,6 @@ module.exports = [
     source: '/docs/:path*',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
   },
-  // rewrite to keep existing ticket urls working
-  {
-    source: '/launch-week/tickets/:path',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
-  },
-  // rewrite to move ticket website to another path
-  {
-    source: '/launch-week-register',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
-  },
-  {
-    source: '/launch-week-register/:path*',
-    destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
-  },
   {
     source: '/new-docs',
     destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
@@ -57,10 +43,6 @@ module.exports = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
-  },
-  {
-    source: '/oss',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/oss`,
   },
   {
     source: '/feed.xml',

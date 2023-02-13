@@ -1,0 +1,161 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'custom-domains',
+  title: 'Custom Domains',
+  description: 'Configuring a Custom Domain for your Supabase project.',
+  video: 'https://www.youtube.com/v/6rcGnW_Mh-0',
+}
+
+<Admonition type="note">
+
+Custom Domains are currently in beta, and are being slowly made available to projects.
+
+</Admonition>
+
+Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid tier](https://app.supabase.com/project/_/settings/billing/update). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/6rcGnW_Mh-0"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Configure a Custom Domain using the Supabase Dashboard
+
+Follow the **Custom Domains** steps in the [General Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
+
+## Configure a Custom Domain using the Supabase CLI
+
+This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+
+To get started:
+
+1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.11.3+.
+1. [Log in](/docs/guides/resources/supabase-cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+
+### Configure a CNAME
+
+Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co.`, with as low a TTL as possible.
+
+### Configure TXT Verification
+
+Use the `create` subcommand of the CLI to notify Supabase of your domain and retrieve TXT verification records:
+
+```bash
+supabase domains create --project-ref foobarbaz --custom-hostname api.example.com --experimental
+```
+
+The output of the `create` command includes two TXT records[^1] you will need to set up, in order to verify your control over the domain in question,
+and for us to issue SSL certificates for it. For example:
+
+```bash
+[...]
+Required outstanding validation records:
+        _cf-custom-hostname.api.example.com TXT -> 46BBC14D-D50A-409C-8DB5-F862CF5BA660
+        api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
+```
+
+[^1] One of the records requires you to _replace_ the CNAME record set up in [the first step](#configure-a-cname) with a TXT record. You'll be able to restore it back to the CNAME after the verification process has been completed.
+
+### Verify your domain
+
+Set up both records as instructed, and then use the `reverify` command for the Supabase Platform to verify the records:
+
+```bash
+supabase domains reverify --project-ref foobarbaz --experimental
+```
+
+You might need to wait a few minutes before your updated DNS records are propagated, especially if the older records were using a high TTL.
+
+### Activate your domain
+
+The final activation step reconfigures your project to start serving traffic on your custom domain (`api.example.com`).
+The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
+As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your custom domain:
+
+- any client code (e.g., frontends, mobile apps)
+- any OAuth providers (e.g., google, github)
+
+Additionally, update the DNS configuration for `api.example.com` to once more use a CNAME record that resolves to `foobarbaz.supabase.co`.
+Finally, you can use the `activate` subcommand to reconfigure your project:
+
+```bash
+supabase domains activate --project-ref foobarbaz --experimental
+```
+
+## Remove a Custom Domain
+
+If you have a custom domain (`api.example.com`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+
+```bash
+supabase domains delete --project-ref foobarbaz --experimental
+```
+
+As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
+
+## Vanity Subdomains
+
+<Admonition type="note">
+
+Vanity Subdomains are currently in beta, and are being slowly made available to projects. [Contact Support](https://app.supabase.com/support/new) if you'd like to request early access.
+
+</Admonition>
+
+Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
+
+To get started:
+
+1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.22.0+.
+1. [Log in](/docs/guides/resources/supabase-cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project you'd like to set up a vanity subdomain for.
+1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise tier) in the [Billing page of the Dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
+
+## Configure a Vanity Subdomain
+
+This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a vanity subdomain at `my-example-brand.supabase.co`.
+
+### Check subdomain availability
+
+Use the `check-availability` subcommand of the CLI to check if your desired subdomain is available for use:
+
+```bash
+supabase vanity-subdomains --project-ref foobarbaz check-availability --desired-subdomain my-example-brand --experimental
+```
+
+### Activate a subdomain
+
+Once you've chosen an available subdomain, you can reconfigure your Supabase project to start serving traffic on the vanity subdomain (`my-example-brand.supabase.co`).
+The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
+As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your vanity subdomain:
+
+- any client code (e.g., frontends, mobile apps)
+- any OAuth providers (e.g., Google, GitHub)
+
+The `activate` subcommand can be used to initiate the activation:
+
+```bash
+supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt check-availability --desired-subdomain my-example-subdomain --experimental
+```
+
+## Remove a Vanity Subdomain
+
+If you have a vanity subdomain (`my-example-brand.supabase.co`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+
+```bash
+supabase vanity-subdomains delete --project-ref foobarbaz --experimental
+```
+
+As with the final activation stage of the process for setting up a vanity subdomain, you'll need to update any references in your client code and OAuth providers from the vanity subdomain to the Supabase-provisioned endpoints.
+
+## Limitations
+
+- Edge functions do not honor the custom domain or the vanity subdomain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
+- A Supabase project can—at this time—use either a Custom Domain or a Vanity Subdomain, but not both.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
