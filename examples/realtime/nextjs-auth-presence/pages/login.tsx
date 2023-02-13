@@ -1,13 +1,7 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import type { NextPage } from 'next'
+import styles from '../styles/Home.module.css'
 
 const LoginPage: NextPage = () => {
   const supabaseClient = useSupabaseClient()
@@ -32,7 +26,6 @@ const LoginPage: NextPage = () => {
       <pre>{JSON.stringify(user, null, 2)}</pre>
     </>
   )
-  return <h1> Hi</h1>
 }
 
 export default LoginPage
