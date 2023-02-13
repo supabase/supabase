@@ -10,7 +10,7 @@ const DatabaseRoles: NextPageWithLayout = () => {
   const [selectedRole, setSelectedRole] = useState<any>()
 
   return (
-    <div className="p-4">
+    <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       {isUndefined(selectedRole) ? (
         <RolesList onSelectRole={setSelectedRole} />
       ) : (
