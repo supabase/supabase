@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_REST_URL } from 'pages/api/constants'
+import { DEFAULT_PROJECT, PROJECT_REST_URL } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -20,13 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {
-    id: 1,
-    ref: 'default',
-    name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
-    organization_id: 1,
-    cloud_provider: 'localhost',
-    status: 'ACTIVE_HEALTHY',
-    region: 'local',
+    ...DEFAULT_PROJECT,
     connectionString: '',
     kpsVersion: 'kps-v1.0.0',
     restUrl: PROJECT_REST_URL,

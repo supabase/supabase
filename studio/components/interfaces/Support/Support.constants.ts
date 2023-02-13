@@ -6,16 +6,16 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
+    value: 'Dashboard_bug',
+    label: 'Dashboard bug',
+    description: 'Issues with the Supabase dashboard',
+    query: undefined,
+  },
+  {
     value: 'Database_unresponsive',
     label: 'Database unresponsive',
     description: 'Issues with connecting to your database',
     query: 'Unable to connect',
-  },
-  {
-    value: 'Best_practices',
-    label: 'Questions on best practices',
-    description: 'Enquire on how best practices developing with Supabase',
-    query: 'Best practices',
   },
   {
     value: 'Performance',
@@ -36,7 +36,7 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
-    value: 'Abuse',
+    value: 'Problem',
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
     query: undefined,

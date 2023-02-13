@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from 'lib/api/apiWrapper'
+import { DEFAULT_PROJECT } from '../constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -30,18 +31,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
-        projects: [
-          {
-            id: 1,
-            ref: 'default',
-            name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
-            organization_id: 1,
-            cloud_provider: 'localhost',
-            status: 'ACTIVE_HEALTHY',
-            region: 'local',
-            connectionString: '',
-          },
-        ],
+        projects: [{ ...DEFAULT_PROJECT, connectionString: '' }],
       },
     ],
   }

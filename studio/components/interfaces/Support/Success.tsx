@@ -9,13 +9,8 @@ interface Props {
   sentCategory?: string
 }
 
-const Success: FC<Props> = ({ sentCategory = 'Best_practices' }) => {
-  const categoriesToShowAdditionalResources = [
-    'Problem',
-    'Unresponsive',
-    'Best_practices',
-    'Performance',
-  ]
+const Success: FC<Props> = ({ sentCategory = '' }) => {
+  const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
   const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)
   const [searchValue, setSearchValue] = useState<string>(selectedCategory?.query ?? '')
