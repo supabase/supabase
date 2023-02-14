@@ -631,8 +631,8 @@ export default function IndexPage() {
                 <>
                   <MobileHeader
                     tier="Enterprise"
-                    price={'Contact Us'}
-                    priceDescription={'for a quote'}
+                    price={'Contact us for a quote'}
+                    priceDescription={''}
                     description={
                       'Designated support team, account manager and technical specialist'
                     }
