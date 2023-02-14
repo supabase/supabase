@@ -43,7 +43,7 @@ const TableEditorMenu: FC<Props> = ({
   onDeleteTable = () => {},
   onDuplicateTable = () => {},
 }) => {
-  const { meta, ui } = useStore()
+  const { meta } = useStore()
   const { id, ref } = useParams()
 
   const schemas: PostgresSchema[] = meta.schemas.list()
