@@ -30,12 +30,12 @@ const questions = [
   'How do I connect to my database?',
   'How do I run migrations? ',
   'How do I listen to changes in a table?',
-  'How do I setup authentication?',
+  'How do I set up authentication?',
 ]
 
 function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/$/, '')
-  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
+  const isPlatform = supabaseUrl?.match(/(supabase\.co)|(supabase\.in)/)
 
   if (isPlatform) {
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
