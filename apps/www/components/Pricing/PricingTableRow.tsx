@@ -2,64 +2,7 @@ import { IconHelpCircle } from 'ui'
 import ProductIcon from 'components/ProductIcon'
 import React, { Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
-
-export const Check = () => (
-  <svg className="-ml-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="none">
-    <path
-      fill="#3ECF8E"
-      fillRule="evenodd"
-      d="M12 21.212a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-.708-6.414 4.463-4.463-.707-.708-4.11 4.11-1.986-1.986-.707.707 2.34 2.34h.707Z"
-      clipRule="evenodd"
-    />
-  </svg>
-)
-
-const IncludedCheck = (props: any) => (
-  <span className="mx-auto">
-    <Check />
-    <span className="sr-only">Included in {props.tier}</span>
-  </span>
-)
-
-const Minus = (props: any) => (
-  <>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      fill="none"
-      className="text-scale-700"
-    >
-      <path
-        fill="currentColor"
-        fillRule="evenodd"
-        d="M9 18A9 9 0 1 0 9 0a9 9 0 0 0 0 18ZM5.534 9.534h6.804v-1H5.534v1Z"
-        clipRule="evenodd"
-      />
-    </svg>
-    <span className="sr-only">Not included in {props.tier}</span>
-  </>
-)
-
-const InfoIcon = () => (
-  <>
-    <svg
-      className="text-scale-900 -ml-0.5"
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      fill="none"
-    >
-      <path
-        fill="currentColor"
-        fillRule="evenodd"
-        d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm.724-11.97c0 .463-.328.764-.774.764-.436 0-.773-.3-.773-.764s.337-.783.774-.783c.445 0 .773.319.773.783Zm1.455 6.194H9.877v-.855h1.628v-2.956H9.877v-.828h2.674v3.784h1.628v.855Z"
-        clipRule="evenodd"
-      />
-    </svg>
-    <span className="sr-only">Info</span>
-  </>
-)
+import { IconPricingIncludedCheck, IconPricingInfo, IconPricingMinus } from './PricingIcons'
 
 export const PricingTableRowDesktop = (props: any) => {
   const category = props.category
@@ -117,10 +60,10 @@ export const PricingTableRowDesktop = (props: any) => {
                     ].join(' ')}
                   >
                     {typeof tierValue === 'boolean' && tierValue === true ? (
-                      <IncludedCheck tier={tierValue} />
+                      <IconPricingIncludedCheck tier={tierValue} />
                     ) : typeof tierValue === 'boolean' && tierValue === false ? (
                       <div className="text-scale-900">
-                        <Minus tier={tierValue} />
+                        <IconPricingMinus tier={tierValue} />
                       </div>
                     ) : (
                       <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
@@ -129,7 +72,7 @@ export const PricingTableRowDesktop = (props: any) => {
                             className="shrink-0 hover:text-scale-300 cursor-pointer transition-colors"
                             data-tip={feat.tooltips[tierName]}
                           >
-                            <InfoIcon />
+                            <IconPricingInfo />
                           </span>
                         )}
                         {tierValue}
@@ -185,11 +128,11 @@ export const PricingTableRowMobile = (props: any) => {
                 <td className="py-3 pr-4 text-right">
                   {typeof feat.tiers[tier] === 'boolean' && feat.tiers[tier] === true ? (
                     <div className="inline-block">
-                      <IncludedCheck tier={tier} />
+                      <IconPricingIncludedCheck tier={tier} />
                     </div>
                   ) : typeof feat.tiers[tier] === 'boolean' && feat.tiers[tier] === false ? (
                     <div className="inline-block">
-                      <Minus tier={tier} />
+                      <IconPricingMinus tier={tier} />
                     </div>
                   ) : (
                     <span className="text-scale-1200 block text-sm">{feat.tiers[tier]}</span>
