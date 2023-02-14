@@ -6,7 +6,7 @@ export const meta = {
   description: 'Understanding Realtime Protocol',
 }
 
-The Realtime Protocol is a set of message formats used for communication between a Realtime client and server. These messages are used to initiate a connection, update access tokens, receive system status updates, and receive real-time updates from the Postgres database.
+The Realtime Protocol is a set of message formats used for communication over a WebSocket connection between a Realtime client and server. These messages are used to initiate a connection, update access tokens, receive system status updates, and receive real-time updates from the Postgres database.
 
 ## Connection
 
@@ -29,7 +29,7 @@ In the initial message, the client sends a message specifying the features they 
                "event": "*" | "INSERT" | "UPDATE" | "DELETE",
                "schema": string,
                "table": string,
-               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" +  '.' + string
+               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" +  '.' + string
             }
          ]
       }
@@ -37,6 +37,7 @@ In the initial message, the client sends a message specifying the features they 
    "ref": string
 }
 ```
+The `in` filter has the format `COLUMN_NAME=in.(value1, valu2, value3)`
 
 In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.
 
@@ -52,7 +53,7 @@ In response, the server sends the Postgres configuration with a unique ID. With 
                "event": "*" | "INSERT" | "UPDATE" | "DELETE",
                "schema": string,
                "table": string,
-               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" +  '.' + string
+               "filter": string + '=' + "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" +  '.' + string
             }
          ]
       },
