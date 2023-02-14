@@ -55,7 +55,7 @@ functions:
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
-      - If signUp() is called for an existing confirmed user:
+      - If sign_up() is called for an existing confirmed user:
           - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
@@ -64,25 +64,130 @@ functions:
         name: Sign up
         code: |
           ```
-          res = supabase.auth.signUp({
-            email: 'example@email.com',
-            password: 'example-password',
+          res = supabase.auth.sign_up({
+            "email": 'example@email.com',
+            "password": 'example-password',
           })
           ```
       - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         code: |
           ```
-          res = supabase.auth.signUp({
-            email: 'example@email.com',
-            password: 'example-password',
-            options: {
-              data: {
-                first_name: 'John',
-                age: 27,
+          res = supabase.auth.sign_up({
+            "email": 'example@email.com',
+            "password": 'example-password',
+            "options": {
+              "data": {
+                "first_name": 'John',
+                "age": 27,
               }
             }
           })
+          ```
+  - id: sign-in-with-password
+    title: 'sign_in_with_password'
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - id: sign-in-with-email-and-password
+        name: Sign in with email and password
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+          ```
+      - id: sign-in-with-phone-and-password
+        name: Sign in with phone and password
+        isSpotlight: false
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"phone": "+1234566", password": "testsupabasenow"})
+          # After receiving a SMS with a OTP.
+          data = supabase.auth.verify_otp({
+            "phone": '+13334445555',
+            "token": '123456',
+          })
+          ```
+  - id: sign-in-with-otp
+    title: 'sign_in_with_otp'
+    notes: |
+      - Requires either an email or phone number.
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If the user doesn't exist, `sign_in_with_otp()` will signup the user instead. To restrict this behavior, you can set `should_create_user` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+    examples:
+      - id: sign-in-with-email
+        name: Sign in with email
+        isSpotlight: true
+        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_otp({
+            "email": 'example@email.com',
+            "options": {
+              "email_redirect_to": 'https://example.com/welcome'
+            }
+          })
+          ```
+      - id: sign-in-with-sms-otp
+        name: Sign in with SMS OTP
+        isSpotlight: false
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_otp({
+            phone: '+13334445555',
+          })
+          ```
+  - id: sign-in-with-oauth
+    title: 'sign_in_with_oauth'
+    notes: |
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    examples:
+      - id: sign-in-using-a-third-party-provider
+        name: Sign in using a third-party provider
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github'
+          })
+          ```
+      - id: sign-in-using-a-third-party-provider-with-redirect
+        name: Sign in using a third-party provider with redirect
+        isSpotlight: false
+        description: |
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github',
+            "options": {
+              "redirect_to": 'https://example.com/welcome'
+            }
+          })
+          ```
+      - id: sign-in-with-scopes
+        name: Sign in with scopes
+        isSpotlight: false
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github',
+            "options": {
+              "scopes": 'repo gist notifications'
+            }
+          })
+          oauth_token = data.session.provider_token # use to access provider API
           ```
   - id: sign-out
     title: 'sign_out()'
@@ -96,10 +201,10 @@ functions:
           res = supabase.auth.sign_out()
           ```
   - id: verify-otp
-    title: 'verify_otp()'
+    title: 'verify_otp'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
-      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+      - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
     examples:
       - id: verify-sms-one-time-password
         name: Verify SMS One-Time Password (OTP)
@@ -107,15 +212,35 @@ functions:
           ```
           res = supabase.auth.verify_otp(phone, token)
           ```
-
-  - id: get-session
-    title: 'get_session_from_url'
+  - id: get-user
+    title: 'get_user'
+    notes: |
+      - This method gets the user object from the current session.
+      - Fetches the user object from the database instead of local session.
     examples:
-      - id: get-session
-        name: Get the session data from URL
+      - id: get-the-logged-in-user-with-the-current-existing-session
+        name: Get the logged in user with the current existing session
+        isSpotlight: true
         code: |
           ```
-          res = supabase.auth.get_session_from_url(url)
+          data = supabase.auth.get_user()
+          ```
+      - id: get-the-logged-in-user-with-a-custom-access-token-jwt
+        name: Get the logged in user with a custom access token jwt
+        isSpotlight: false
+        code: |
+          ```
+          data = supabase.auth.get_user(jwt)
+          ```
+
+  - id: get-session
+    title: 'get_session'
+    examples:
+      - id: get-session
+        name: Get the session data
+        code: |
+          ```
+          res = supabase.auth.get_session()
           ```
 
   - id: set-session
@@ -132,10 +257,10 @@ functions:
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         code: |
           ```
-          res = supabase.auth.set_session(refresh_token)
+          res = supabase.auth.set_session({"access_token": access_token, "refresh_token": refresh_token)
           ```
   - id: refresh-session
-    title: 'refresh_ession()'
+    title: 'refresh_session()'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
       - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
@@ -158,7 +283,7 @@ functions:
           ```
           r = supabase
           .from('countries')
-          .select("*")
+          .select("*").execute()
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
@@ -166,7 +291,7 @@ functions:
           ```
           r = await supabase
           .from('countries')
-          .select('name')
+          .select('name').execute()
           ```
 
   - id: invoke

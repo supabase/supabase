@@ -51,7 +51,7 @@ export const gettingstarted = {
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
@@ -63,7 +63,7 @@ export const gettingstarted = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'Next.js',
+          name: 'NextJS',
           url: '/guides/getting-started/tutorials/with-nextjs',
           items: [],
         },
@@ -379,8 +379,8 @@ export const database = {
       name: 'Serverless APIs',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+        { name: 'Overview', url: '/guides/database/api', items: [] },
+        { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
       ],
     },
     {
@@ -389,19 +389,44 @@ export const database = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
         {
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
+        {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
           items: [],
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
+          name: 'PGroonga: Multilingual Full Text Search',
+          url: '/guides/database/extensions/pgroonga',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
           items: [],
         },
         {
+          name: 'pg_jsonschema: JSON Schema Validation',
+          url: '/guides/database/extensions/pg_jsonschema',
+          items: [],
+        },
+        {
           name: 'pg_net: Async Networking',
           url: '/guides/database/extensions/pgnet',
+          items: [],
+        },
+        {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
           items: [],
         },
         {
@@ -418,6 +443,11 @@ export const database = {
         {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
+          items: [],
+        },
+        {
+          name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
           items: [],
         },
       ],
@@ -468,6 +498,7 @@ export const functions = {
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
         { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
         { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis', items: [] },
       ],
     },
   ],
@@ -484,6 +515,8 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
@@ -554,6 +587,7 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
     },
     {
@@ -598,8 +632,7 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    // removing until the examples page is reworked
-    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -624,6 +657,29 @@ export const resources = {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
           items: [],
+        },
+        {
+          name: 'Render',
+          url: '/guides/resources/migrating-to-supabase/render',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Drop all tables in schema',
+          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select first row per group',
+          url: '/guides/resources/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL version',
+          url: '/guides/resources/postgres/which-version-of-postgres',
         },
       ],
     },
@@ -669,6 +725,7 @@ export const migrate = {
     { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
     { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
+    { name: 'Render', url: '/guides/migrations/render', items: [] },
   ],
 }
 
@@ -768,7 +825,7 @@ export const reference = {
           url: '/reference/python/start',
           level: 'reference_python',
           items: [],
-          icon: 'docs/img/icons/javascript.svg',
+          icon: '/img/icons/menu/reference-python',
         },
         // {
         //   name: 'supabase-python',
@@ -801,14 +858,14 @@ export const reference = {
 
 export const reference_javascript_v1 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
@@ -829,7 +886,7 @@ export const reference_dart_v1 = {
 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
-  title: 'c#',
+  title: 'C#',
   url: 'guides/reference/csharp',
   parent: '/reference',
 }
