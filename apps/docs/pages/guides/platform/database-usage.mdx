@@ -6,36 +6,51 @@ export const meta = {
   description: 'Understanding how database usage applies to your subscription.',
 }
 
-Database storage refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
+Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
+Database size is the total size of used storage from your database, whereas disk size describes the size of the underlying available storage.
 
-For an instantaneous live view of the DB storage usage, you can execute in Postgres:
+For an instantaneous live view of the DB size, you can execute in Postgres:
 
 ```sql
-select sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
-from pg_database;
+select
+  sum(pg_database_size (pg_database.datname)) / (1024 * 1024) as db_size_mb
+from
+  pg_database;
 ```
 
 This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
 
 ## Database storage management
 
-Supabase uses network-attached storage to balance performance with scalability. For Pro and Enterprise projects, database storage expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the database storage quota. Automatic database storage expansion can only occur once every six hours. Pro projects can store up to 1024TB.
+Supabase uses network-attached storage to balance performance with scalability.
+For Pro and Enterprise projects, disk size expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the disk size.
+Automatic disk size expansion can only occur once every six hours.
+Pro projects can store up to 1024TB.
 
-All projects enter read-only mode when you reach 95% of the database storage quota. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the database storage quota.
+All projects enter read-only mode when you reach 95% of the disk size. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
 
-If you need more than 1024TB of database storage or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+If you need more than 1024TB of disk size or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
-### Increasing available database storage
+### Increasing available disk size
 
-1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your storage quota.
+1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your quota and expand your disk size automatically.
 
 2. Delete data from your project's database to lower its disk usage. If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
 
    ```sql
-   SET default_transaction_read_only = 'off';
+   SET
+     default_transaction_read_only = 'off';
    ```
 
    This allows you to delete data from within the session.
+
+### Preoccupied Space
+
+When launching a new project, your database size will be roughly ~40-60mb.
+The space is used up by preinstalled extensions, schema/data used by our services that are offered with each project and default Postgres data.
+
+When installing additional extensions, even if you don't actively use them, additional database size is used.
 
 ## Vacuum operations
 

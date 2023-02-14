@@ -12,9 +12,9 @@
 - [x] ホスティングされた Postgres データベース [Docs](https://supabase.com/docs/guides/database)
 - [x] 認証・認可 [Docs](https://supabase.com/docs/guides/auth)
 - [x] API を自動生成
-  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] 関数
   - [x] データベース関数 [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)

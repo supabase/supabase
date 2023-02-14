@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from 'ui'
 
-import { useProjectSubscription, useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'
 import { LogsLayout } from 'components/layouts'
@@ -28,20 +29,18 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
+  const { ui, content } = useStore()
   const router = useRouter()
-  const { ui } = useStore()
-
-  const { ref, q, ite, its } = router.query
+  const { ref: projectRef, q, ite, its } = useParams()
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const { content } = useStore()
-  const { subscription } = useProjectSubscription(ref as string)
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
-    useLogsQuery(ref as string, {
+    useLogsQuery(projectRef as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
     })
@@ -148,11 +147,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="mx-auto w-full px-5 py-6 h-full">
+    <div className="w-full h-full px-5 py-6 mx-auto">
       <LogsExplorerHeader />
 
-      <div className="flex h-full flex-grow flex-col gap-4">
-        <div className="rounded border">
+      <div className="flex flex-col flex-grow h-full gap-4">
+        <div className="border rounded">
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
@@ -178,13 +177,18 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             />
           </div>
         </div>
-        <div className="relative flex flex-grow flex-col">
+        <div className="relative flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex h-full flex-grow">
-              <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
+            <div className="flex flex-grow h-full">
+              <LogTable
+                params={params}
+                data={logData}
+                error={error}
+                projectRef={projectRef as string}
+              />
             </div>
           </LoadingOpacity>
-          <div className="mt-2 flex flex-row justify-end">
+          <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
         </div>
@@ -256,7 +260,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                   </div>
                 </Modal.Content>
               </div>
-              <div className="border-t bg-scale-300 py-3">
+              <div className="py-3 border-t bg-scale-300">
                 <Modal.Content>
                   <div className="flex items-center justify-end gap-2">
                     <Button

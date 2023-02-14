@@ -37,7 +37,7 @@ const TableEditorLayout: FC<Props> = ({
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {

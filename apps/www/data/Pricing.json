@@ -21,8 +21,8 @@
         }
       },
       {
-        "title": "Database space",
-        "tooltip": "Billing is based on the average database size in GB throughout the billing period.",
+        "title": "Database size",
+        "tooltip": "Billing is based on the average daily database size in GB throughout the billing period.",
         "tiers": {
           "free": "Up to 500 MB",
           "pro": "8 GB included, then $0.125 per GB",
