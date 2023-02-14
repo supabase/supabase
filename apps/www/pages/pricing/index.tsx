@@ -270,11 +270,11 @@ export default function IndexPage() {
                     key={tier.name}
                     className={[
                       'flex flex-col overflow-hidden',
-                      tier.name === 'Pro' ? '' : 'border h-full rounded-xl',
+                      tier.name === 'Pro' ? '' : 'border h-full rounded-[4px]',
                     ].join(' ')}
                   >
                     <div
-                      className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-xl rounded-tl-xl ${
+                      className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
                         tier.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
@@ -337,7 +337,7 @@ export default function IndexPage() {
                     </div>
                     <div
                       className={[
-                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl flex-1 flex-col bg-white px-8 py-6`,
+                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 py-6`,
                         tier.name === 'Enterprise' ? 'pt-0' : '',
                         tier.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
@@ -401,7 +401,7 @@ export default function IndexPage() {
 
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-white dark:bg-scale-300 rounded-lg" key={addon.name}>
+              <div className="bg-white dark:bg-scale-300 rounded-sm" key={addon.name}>
                 <div className="overflow-hidden rounded-lg">
                   <img
                     className="w-full"
