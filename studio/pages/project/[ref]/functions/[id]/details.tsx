@@ -1,20 +1,18 @@
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { IconGlobe, IconTerminal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import NoPermission from 'components/ui/NoPermission'
 
 const PageLayout: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref, id } = router.query
+  const { ref: projectRef, id } = useParams()
 
   const { functions, ui } = useStore()
 
@@ -23,6 +21,10 @@ const PageLayout: NextPageWithLayout = () => {
   useEffect(() => {
     setSelectedFunction(functions.byId(id))
   }, [functions.isLoaded, ui.selectedProject])
+
+  const { data: settings } = useProjectApiQuery({
+    projectRef,
+  })
 
   // get the .co or .net TLD from the restUrl
   const restUrl = ui.selectedProject?.restUrl
@@ -97,13 +99,12 @@ const PageLayout: NextPageWithLayout = () => {
   ]
 
   // Get the API service
-  const { data: settings } = useProjectSettingsQuery({ projectRef: ref as string })
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
 
-  const endpoint = apiService?.endpoint ?? ''
+  const endpoint = apiService?.app_config.endpoint ?? ''
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),
@@ -113,7 +114,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   const invokeCommands: any = [
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.${restUrlTld}/${
+      command: `curl -L -X POST 'https://${projectRef}.functions.supabase.${restUrlTld}/${
         selectedFunction?.slug
       }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello function',
@@ -176,7 +177,7 @@ const PageLayout: NextPageWithLayout = () => {
           <div className="grid grid-cols-3">
             <span className="cols-span-1 mb-1 block text-sm text-scale-1000">Endpoint URL</span>
             <div className="col-span-2">
-              <span className="w-full break-words text-sm text-scale-1200">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
+              <span className="w-full break-words text-sm text-scale-1200">{`https://${projectRef}.functions.supabase.co/${selectedFunction?.slug}`}</span>
             </div>
           </div>
 
