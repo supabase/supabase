@@ -4,6 +4,7 @@ import { useTheme } from 'common/Providers'
 import { IconCheckCircle, IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
+
 interface Props {
   showComputeModal: boolean
   setShowComputeModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -19,6 +20,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
       )[0],
     []
   )
+  console.log('pricingAddOn:', pricingAddOn)
 
   return (
     <Modal
