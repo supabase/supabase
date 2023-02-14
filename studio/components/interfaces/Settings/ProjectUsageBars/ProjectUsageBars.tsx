@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, IconInfo, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, IconInfo, Loading, IconExternalLink } from 'ui'
 
 import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -8,7 +8,7 @@ import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -60,6 +60,26 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     )
   }
 
+  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+
+  const featureFootnotes: Record<string, JSX.Element> = {
+    db_size: (
+      <div className="flex justify-between items-center">
+        <div className="flex flex-row space-x-4 text-scale-1000">
+          {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
+
+          {isPaidTier && <Badge>Auto-Scaling</Badge>}
+        </div>
+
+        <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+          <a target="_blank" href="https://supabase.com/docs/guides/platform/database-usage">
+            What is disk size?
+          </a>
+        </Button>
+      </div>
+    ),
+  }
+
   return (
     <Loading active={isLoading}>
       {usage && (
@@ -69,7 +89,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
               showUsageExceedMessage &&
               product.features
                 .map((feature) => {
-                  const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+                  const featureUsage = usage[feature.key as ProjectUsageResponseUsageKeys]
                   return (featureUsage.usage ?? 0) / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
@@ -116,7 +136,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   ) : (
                     <tbody>
                       {product.features.map((feature) => {
-                        const featureUsage = usage[feature.key as keyof ProjectUsageResponse]
+                        const featureUsage = usage[feature.key as ProjectUsageResponseUsageKeys]
                         const usageValue = featureUsage.usage || 0
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
@@ -171,7 +191,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           )
                         }
 
-                        return (
+                        return [
                           <tr
                             key={feature.title}
                             className="border-t border-panel-border-light dark:border-panel-border-dark"
@@ -217,8 +237,18 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                 </td>
                               </>
                             )}
-                          </tr>
-                        )
+                          </tr>,
+                          featureFootnotes[feature.key] && (
+                            <tr key={`${feature.title}-footnote`}>
+                              <td
+                                className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200"
+                                colSpan={3}
+                              >
+                                {featureFootnotes[feature.key]}
+                              </td>
+                            </tr>
+                          ),
+                        ]
                       })}
                     </tbody>
                   )}

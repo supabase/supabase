@@ -23,7 +23,7 @@
         }
       },
       {
-        "title": "Database space",
+        "title": "Database size",
         "tooltips": {
           "main": "Billing is based on the average database size in GB throughout the billing period.",
           "pro": "8 GB included, then $0.125 per GB"
