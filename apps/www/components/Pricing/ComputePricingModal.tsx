@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'common/Providers'
 import { IconCheckCircle, IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 interface Props {
   showComputeModal: boolean
   setShowComputeModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -89,16 +90,13 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                       ].join(' ')}
                     >
                       {row.columns.map((column) => (
-                        <td
-                          key={column.key}
-                          className={`p-3 ${column.key === 'dedicated' ? 'hay' : 'nope'}`}
-                        >
+                        <td key={column.key} className="p-3">
                           {column.key === 'dedicated' ? (
-                            <IconCheckCircle
-                              size={14}
-                              strokeWidth={2}
-                              className={column.value ? 'text-brand-1000' : 'text-scale-700'}
-                            />
+                            column.value ? (
+                              <IconPricingIncludedCheck tier="Pro tier" />
+                            ) : (
+                              <IconPricingMinus tier="Free tier" />
+                            )
                           ) : (
                             column.value
                           )}
