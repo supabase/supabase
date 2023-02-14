@@ -353,7 +353,6 @@ const ColumnManagement: FC<Props> = ({
         </div>
       </div>
       <ForeignKeySelector
-        tables={tables}
         column={selectedColumnToEditRelation as ColumnField}
         visible={!isUndefined(selectedColumnToEditRelation)}
         closePanel={() => setSelectedColumnToEditRelation(undefined)}

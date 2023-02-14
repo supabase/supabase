@@ -375,7 +375,6 @@ const ColumnEditor: FC<Props> = ({
       )}
 
       <ForeignKeySelector
-        tables={tables}
         column={columnFields}
         visible={isEditingRelation}
         closePanel={() => setIsEditingRelation(false)}

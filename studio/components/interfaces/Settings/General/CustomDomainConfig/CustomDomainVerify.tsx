@@ -122,7 +122,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           >
             Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
             <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
-            <code className="text-xs">0 issue "digitcert.com"</code>
+            <code className="text-xs">0 issue "digicert.com"</code>
           </Alert>
         )}
 

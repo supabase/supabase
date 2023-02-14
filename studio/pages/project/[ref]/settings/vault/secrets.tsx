@@ -17,7 +17,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isLoading = meta.extensions.isLoading
-  const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+  const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
     if (isEnabled) {
