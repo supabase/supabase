@@ -1,6 +1,5 @@
 import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconKey } from 'ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 

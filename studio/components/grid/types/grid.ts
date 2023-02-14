@@ -74,6 +74,10 @@ export interface SupabaseGridProps {
    */
   apiPreviewPanelOpen?: boolean
   setApiPreviewPanelOpen?: () => void
+  /**
+   * Refresh the docs after a change is made to the table
+   */
+  refreshDocs: () => void
 }
 
 export interface SupabaseGridRef {
