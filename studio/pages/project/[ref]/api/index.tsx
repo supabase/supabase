@@ -1,16 +1,15 @@
-import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { snakeToCamel } from 'lib/helpers'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 
 const PageContext = createContext(null)
@@ -66,42 +65,46 @@ const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 const DocView: FC<any> = observer(({}) => {
   const PageState: any = useContext(PageContext)
-  const router = useRouter()
+  const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error } = useProjectSettingsQuery({ projectRef: PageState.projectRef as string })
-  const API_KEY = data?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
-    ? data.autoApiService.defaultApiKey
+  const { data, error } = useProjectApiQuery({
+    projectRef,
+  })
+
+  const apiService = data?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = data?.autoApiService.restUrl
-  const headers: any = { apikey: API_KEY }
+  const swaggerUrl = data?.autoApiService?.restUrl
 
   const canReadServiceKey = checkPermissions(
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )
 
-  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
-
-  const { data: jsonSchema, error: jsonSchemaError } = useSWR(
-    () => swaggerUrl,
-    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
-  )
+  const {
+    data: jsonSchema,
+    error: jsonSchemaError,
+    refetch,
+  } = useProjectJsonSchemaQuery({
+    projectRef,
+    swaggerUrl,
+    apiKey: anonKey,
+  })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
   }, [jsonSchema])
 
   const refreshDocs = async () => {
-    // A bit hacky calling coding this up twice - at some point we should move this function
-    // and the SWR into the store.
-    mutate(swaggerUrl)
+    await refetch()
   }
 
   if (error || jsonSchemaError)
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-scale-1000">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
@@ -110,7 +113,7 @@ const DocView: FC<any> = observer(({}) => {
     )
   if (!data || !jsonSchema || !PageState.jsonSchema)
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
@@ -121,22 +124,20 @@ const DocView: FC<any> = observer(({}) => {
     endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
   }
 
-  const { query } = router
-  const { page, resource, rpc } = query
   const { paths, definitions } = PageState.jsonSchema
 
   const PAGE_KEY: any = resource || rpc || page || 'index'
 
   return (
-    <div className="Docs Docs--api-page h-full w-full overflow-y-auto" key={PAGE_KEY}>
+    <div className="w-full h-full overflow-y-auto Docs Docs--api-page" key={PAGE_KEY}>
       <div className="Docs--inner-wrapper">
-        <div className="sticky top-0 z-40 flex w-full flex-row-reverse ">
+        <div className="sticky top-0 z-40 flex flex-row-reverse w-full ">
           <LangSelector
             selectedLang={selectedLang}
             setSelectedLang={setSelectedLang}
             showApiKey={showApiKey}
             setShowApiKey={setShowApiKey}
-            apiKey={API_KEY}
+            apiKey={anonKey}
             autoApiService={autoApiService}
           />
           {/* <div className="bg-scale-100 dark:bg-scale-300" style={{ width: '50%' }}>
@@ -172,7 +173,7 @@ const DocView: FC<any> = observer(({}) => {
                   <Dropdown
                     align="end"
                     side="bottom"
-                    className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
+                    className="p-0 pl-2 pr-8 text-sm bg-transparent border-none cursor-pointer text-scale-900"
                     overlay={
                       <>
                         <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
@@ -182,7 +183,7 @@ const DocView: FC<any> = observer(({}) => {
                           key="anon"
                           onClick={() =>
                             setShowApiKey({
-                              key: API_KEY,
+                              key: anonKey,
                               name: 'anon (public)',
                             })
                           }

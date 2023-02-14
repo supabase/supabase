@@ -12,9 +12,9 @@
 - [x] Hostovana Postgres Baza. [Dokumentacija](https://supabase.com/docs/guides/database)
 - [x] Autentifikacija i Autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
 - [x] Auto-generisani API-ji.
-  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Subskripcije u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta). [Dokumentacija](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funkcije.
   - [x] Funkcije u bazi. [Dokumentacija](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Funkcije [Dokumentacija](https://supabase.com/docs/guides/functions)

@@ -249,6 +249,7 @@ const ColumnEditor: FC<Props> = ({
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <ColumnType
+            showRecommendation
             value={columnFields?.format ?? ''}
             layout="vertical"
             enumTypes={enumTypes}
@@ -374,7 +375,6 @@ const ColumnEditor: FC<Props> = ({
       )}
 
       <ForeignKeySelector
-        tables={tables}
         column={columnFields}
         visible={isEditingRelation}
         closePanel={() => setIsEditingRelation(false)}
