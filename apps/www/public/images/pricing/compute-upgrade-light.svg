@@ -1,9 +1,1 @@
-<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M0.25 0.5L0.75 0H13.25L13.75 0.5V4.49501L16.1943 6.97461L15.8382 7.82562H13.7528V13H13.75V15.5L13.25 16H0.75L0.25 15.5V10.5L0.75 10H0.877441V6H0.75L0.25 5.5V0.5ZM12.75 1V3.48058L11.0443 1.75025H10.3321L7.12864 5H6.33957V4.9997H1.37744L1.37714 5H1.25V1H12.75ZM1.87744 6H6.14287L5.18213 6.97461L5.53821 7.82562H7.81807V10H1.87744V6ZM1.25 11H7.81807V12.3371H8.81807V7.32562L8.31807 6.82562H6.73318L10.6882 2.81349L14.6433 6.82562H13.2528L12.7528 7.32562V11.944H12.75V15H1.25V11ZM10.1731 7.96826V13.5877H11.1731V7.96826H10.1731Z" fill="url(#paint0_linear_2725_17826)"/>
-<defs>
-<linearGradient id="paint0_linear_2725_17826" x1="0.25" y1="16" x2="16.2499" y2="0.0557877" gradientUnits="userSpaceOnUse">
-<stop stop-opacity="0.5"/>
-<stop offset="1" stop-color="#020202"/>
-</linearGradient>
-</defs>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"><path stroke="#11181c" stroke-linejoin="bevel" stroke-miterlimit="10" d="M5.472 4.599h-3.97v4M11 9.754V12.6H1v-4h5.73M11 3.992V.599H1v4h5.242m.812 5.47v-4.01H4.831L8.95 1.88l4.12 4.18h-2.069v4.54M8.938 6.573v4.495"/></svg>

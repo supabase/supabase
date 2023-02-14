@@ -26,10 +26,10 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
       //onCancel={() => setVideoVisible(false)}
       hideFooter
       header={
-        <div className="flex items-center justify-between z-20">
+        <div className="flex items-center justify-between z-20 mt-16 lg:mt-0">
           <span className="text-scale-1200">Compute pricing</span>
           <IconXCircle
-            className="text-scale-900 hover:text-scale-1200 w-4 cursor-pointer transition"
+            className="text-scale-900 hover:text-scale-1200 w-8 cursor-pointer transition"
             onClick={() => setShowComputeModal(false)}
           />
         </div>
@@ -38,7 +38,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
       <div className="z-50">
         <div>
           <div className="p-5">
-            <div className="flex gap-8">
+            <div className="grid lg:flex gap-8">
               <div className="prose">
                 <div className="bg-brand-1000 dark:bg-brand-800 rounded-xl w-12 h-12 flex justify-center items-center">
                   <img
@@ -89,7 +89,10 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                       ].join(' ')}
                     >
                       {row.columns.map((column) => (
-                        <td key={column.key} className="p-3">
+                        <td
+                          key={column.key}
+                          className={`p-3 ${column.key === 'dedicated' ? 'hay' : 'nope'}`}
+                        >
                           {column.key === 'dedicated' ? (
                             <IconCheckCircle
                               size={14}
@@ -113,9 +116,29 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               {pricingAddOn.database.rows.map((row, i) => (
                 <Fragment key={i}>
                   {row.columns.map((column) => (
-                    <tr key={column.key} className={`${i % 2 === 0 && 'bg-scale-300'}`}>
-                      <th className="py-3 pl-4 text-left font-medium">{column.title}</th>
-                      <td className="px-4 py-3">{column.value}</td>
+                    <tr key={column.key}>
+                      <th
+                        className={`py-3 pl-4 text-left font-medium ${
+                          column.key === 'plan' ? 'pt-16 lg:pt-3' : ''
+                        }`}
+                      >
+                        {column.title}
+                      </th>
+                      <td
+                        className={`px-4 py-3 ${
+                          column.key === 'plan' ? 'text-brand-900 pt-16 lg:pt-3' : ''
+                        }`}
+                      >
+                        {column.key === 'dedicated' ? (
+                          <IconCheckCircle
+                            size={14}
+                            strokeWidth={2}
+                            className={column.value ? 'text-brand-1000' : 'text-scale-700'}
+                          />
+                        ) : (
+                          column.value
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </Fragment>

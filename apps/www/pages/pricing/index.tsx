@@ -233,9 +233,7 @@ export default function IndexPage() {
         <div className="relative z-10 py-16 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-              <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
-                Pricing
-              </h1>
+              <h1 className="text-brand-900 text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users
@@ -461,7 +459,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center mt-12 lg:mt-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto">
           <div>
             <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
