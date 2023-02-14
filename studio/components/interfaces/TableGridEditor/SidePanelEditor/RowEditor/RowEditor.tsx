@@ -3,9 +3,9 @@ import { isUndefined, partition, isEmpty } from 'lodash'
 import { SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
 import { Query } from 'components/grid/query/Query'
-import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { Table } from 'data/tables/table-query'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
@@ -21,7 +21,7 @@ import { JsonEditValue, ReferenceRow, RowField } from './RowEditor.types'
 
 interface Props {
   row?: Dictionary<any>
-  selectedTable: PostgresTable
+  selectedTable: Table
   visible: boolean
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
@@ -57,7 +57,7 @@ const RowEditor: FC<Props> = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable)
+      const rowFields = generateRowFields(row, selectedTable as any) // TODO(alaister): update type
       setRowFields(rowFields)
     }
   }, [visible])

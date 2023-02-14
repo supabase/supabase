@@ -1,12 +1,13 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { Button, IconAlertCircle, IconLock } from 'ui'
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { Table } from 'data/tables/table-query'
 
 interface Props {
-  table: PostgresTable
+  table: Table
 }
 
 const GridHeaderActions: FC<Props> = ({ table }) => {

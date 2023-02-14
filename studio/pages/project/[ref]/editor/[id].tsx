@@ -45,7 +45,7 @@ const TableEditorPage: NextPageWithLayout = () => {
     id,
   })
 
-  const selectedTable = data?.result
+  const selectedTable = data
 
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {

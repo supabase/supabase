@@ -1,8 +1,8 @@
 import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
-import { Query, Dictionary } from 'components/grid'
+import { Dictionary } from 'components/grid'
 import { Modal } from 'ui'
-import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresRelationship, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
@@ -12,13 +12,14 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowCreateMutation } from 'data/tables/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/tables/table-row-update-mutation'
+import { Table } from 'data/tables/table-query'
 
 interface Props {
   selectedSchema: string
-  selectedTable?: PostgresTable
+  selectedTable?: Table
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
-  selectedTableToEdit?: PostgresTable
+  selectedTableToEdit?: Table
   sidePanelKey?: 'row' | 'column' | 'table'
   isDuplicating?: boolean
   closePanel: () => void
@@ -27,7 +28,7 @@ interface Props {
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
-  onTableCreated?: (table: PostgresTable) => void
+  onTableCreated?: (table: Table) => void
   onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
@@ -64,7 +65,8 @@ const SidePanelEditor: FC<Props> = ({
   ) => {
     if (!project || selectedTable === undefined) {
       // TODO(alaister): should we have an error state here?
-      return}
+      return
+    }
 
     let saveRowError = false
     // @ts-ignore
@@ -81,7 +83,7 @@ const SidePanelEditor: FC<Props> = ({
           connectionString: project.connectionString,
           table: selectedTable as any,
           payload,
-          enumArrayColumns
+          enumArrayColumns,
         })
 
         onRowCreated(result[0])
@@ -100,7 +102,7 @@ const SidePanelEditor: FC<Props> = ({
               table: selectedTable as any,
               configuration,
               payload,
-              enumArrayColumns
+              enumArrayColumns,
             })
 
             onRowUpdated(result[0], configuration.rowIdx)
@@ -137,14 +139,14 @@ const SidePanelEditor: FC<Props> = ({
     const response = isNewRecord
       ? await meta.createColumn(
           payload as CreateColumnPayload,
-          selectedTable as PostgresTable,
+          selectedTable as any, // TODO(alaister): update type
           foreignKey,
           securityConfig
         )
       : await meta.updateColumn(
           columnId as string,
           payload as UpdateColumnPayload,
-          selectedTable as PostgresTable,
+          selectedTable as any, // TODO(alaister): update type
           foreignKey
         )
 
@@ -184,7 +186,7 @@ const SidePanelEditor: FC<Props> = ({
 
     try {
       if (isDuplicating) {
-        const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+        const duplicateTable = find(tables, { id: tableId })! // TODO(alaister): update type!!
         toastId = ui.setNotification({
           category: 'loading',
           message: `Duplicating table: ${duplicateTable.name}...`,
@@ -228,7 +230,7 @@ const SidePanelEditor: FC<Props> = ({
         })
         const { table, hasError }: any = await meta.updateTable(
           toastId,
-          selectedTableToEdit,
+          selectedTableToEdit as any, // TODO(alaister): update type
           payload,
           columns,
           isRealtimeEnabled

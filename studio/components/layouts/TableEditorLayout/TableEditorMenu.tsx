@@ -226,17 +226,14 @@ const TableEditorMenu = ({
         </div>
       </div>
 
-      {isLoadingTables ? (
-        <div className="mx-7 flex items-center space-x-2">
+      {isLoadingTables && (
+        <div className="flex flex-col items-center justify-center gap-2">
           <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1000">Loading tables...</p>
+          <span className="text-sm text-scale-900">Loading tables...</span>
         </div>
-      ) : searchText.length === 0 && allTables.length === 0 && allViews.length === 0 ? (
-        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No tables available</p>
-          <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
-        </div>
-      ) : (
+      )}
+
+      {isSuccessTables && objects.length > 0 && (
         <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
           {/* List of tables belonging to selected schema */}
           {allTables.length > 0 && (
@@ -387,13 +384,6 @@ const TableEditorMenu = ({
               })}
             </Menu>
           )}
-        </div>
-      )}
-
-      {isLoadingTables && (
-        <div className="flex flex-col items-center justify-center gap-2">
-          <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-          <span className="text-sm text-scale-900">Loading tables...</span>
         </div>
       )}
 
