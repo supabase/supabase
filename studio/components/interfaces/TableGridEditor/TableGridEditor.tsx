@@ -16,7 +16,7 @@ import ActionBar from './SidePanelEditor/ActionBar'
 import { GeneralContent, ResourceContent } from '../Docs'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { snakeToCamel } from 'lib/helpers'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 import { get } from 'lib/common/fetch'
 import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 
@@ -117,7 +117,7 @@ const TableGridEditor: FC<Props> = ({
     : undefined
 
   const swaggerUrl = settings?.autoApiService.restUrl
-  console.log('swaggerUrl:', swaggerUrl)
+
   const headers: any = { apikey: API_KEY }
 
   if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
@@ -126,8 +126,14 @@ const TableGridEditor: FC<Props> = ({
     () => swaggerUrl,
     (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
   )
+
   if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
+
   const resources = getResourcesFromJsonSchema(jsonSchema)
+
+  const refreshDocs = async () => {
+    mutate(swaggerUrl)
+  }
 
   useEffect(() => {
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
@@ -230,12 +236,14 @@ const TableGridEditor: FC<Props> = ({
         editable={canUpdateTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
+        refreshDocs={refreshDocs}
         headerActions={
           canEditViaTableEditor && (
             <GridHeaderActions
               table={selectedTable as PostgresTable}
               apiPreviewPanelOpen={apiPreviewPanelOpen}
               setApiPreviewPanelOpen={setApiPreviewPanelOpen}
+              refreshDocs={refreshDocs}
             />
           )
         }
@@ -286,34 +294,53 @@ const TableGridEditor: FC<Props> = ({
       >
         <div className="Docs Docs--table-editor">
           <SidePanel.Content>
-            <div className="sticky top-0 bg-scale-100 dark:bg-scale-300 z-10">
-              <LangSelector
-                selectedLang={selectedLang}
-                setSelectedLang={setSelectedLang}
-                showApiKey={showApiKey}
-                setShowApiKey={setShowApiKey}
-                apiKey={API_KEY}
-                autoApiService={autoApiService}
-              />
-            </div>
-            <GeneralContent
-              autoApiService={autoApiService}
-              selectedLang={selectedLang}
-              showApiKey={true}
-              page={page}
-            />
+            {jsonSchemaError ? (
+              <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+                <div className="text-scale-1000">
+                  <p>Error connecting to API</p>
+                  <p>{`${jsonSchemaError}`}</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {jsonSchema ? (
+                  <>
+                    <div className="sticky top-0 bg-scale-100 dark:bg-scale-300 z-10">
+                      <LangSelector
+                        selectedLang={selectedLang}
+                        setSelectedLang={setSelectedLang}
+                        showApiKey={showApiKey}
+                        setShowApiKey={setShowApiKey}
+                        apiKey={API_KEY}
+                        autoApiService={autoApiService}
+                      />
+                    </div>
+                    <GeneralContent
+                      autoApiService={autoApiService}
+                      selectedLang={selectedLang}
+                      showApiKey={true}
+                      page={page}
+                    />
 
-            {jsonSchema?.definitions && (
-              <ResourceContent
-                autoApiService={autoApiService}
-                selectedLang={selectedLang}
-                resourceId={tables.find((table) => table.id === Number(query.id))?.name}
-                resources={resources}
-                definitions={jsonSchema.definitions}
-                paths={jsonSchema.paths}
-                showApiKey={true}
-                // refreshDocs={refreshDocs}
-              />
+                    {jsonSchema?.definitions && (
+                      <ResourceContent
+                        autoApiService={autoApiService}
+                        selectedLang={selectedLang}
+                        resourceId={tables.find((table) => table.id === Number(query.id))?.name}
+                        resources={resources}
+                        definitions={jsonSchema.definitions}
+                        paths={jsonSchema.paths}
+                        showApiKey={true}
+                        refreshDocs={refreshDocs}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+                    <h3 className="text-lg">Building docs ...</h3>
+                  </div>
+                )}
+              </>
             )}
           </SidePanel.Content>
         </div>

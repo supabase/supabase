@@ -9,12 +9,23 @@ interface Props {
   table: PostgresTable
   apiPreviewPanelOpen: boolean
   setApiPreviewPanelOpen: (apiPreviewPanelOpen: boolean) => void
+  refreshDocs: () => void
 }
 
-const GridHeaderActions: FC<Props> = ({ table, apiPreviewPanelOpen, setApiPreviewPanelOpen }) => {
+const GridHeaderActions: FC<Props> = ({
+  table,
+  apiPreviewPanelOpen,
+  setApiPreviewPanelOpen,
+  refreshDocs,
+}) => {
   const { ui, meta } = useStore()
   const projectRef = ui.selectedProject?.ref
   const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
+
+  function handlePreviewToggle() {
+    setApiPreviewPanelOpen(!apiPreviewPanelOpen)
+    refreshDocs()
+  }
 
   const RenderAPIPreviewToggle = () => {
     return (
@@ -22,7 +33,7 @@ const GridHeaderActions: FC<Props> = ({ table, apiPreviewPanelOpen, setApiPrevie
         size="tiny"
         type="default"
         icon={<IconCode size={14} strokeWidth={2} />}
-        onClick={() => setApiPreviewPanelOpen(!apiPreviewPanelOpen)}
+        onClick={handlePreviewToggle}
       >
         API Preview
       </Button>
