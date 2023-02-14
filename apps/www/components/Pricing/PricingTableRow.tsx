@@ -1,6 +1,6 @@
-import { IconHelpCircle, IconInfo, IconX, IconXCircle, Modal } from 'ui'
+import { IconHelpCircle } from 'ui'
 import ProductIcon from 'components/ProductIcon'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 export const Check = () => (
@@ -145,7 +145,7 @@ export const PricingTableRowDesktop = (props: any) => {
           </Fragment>
         )
       })}
-      <ReactTooltip effect={'solid'} />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
     </>
   )
 }
@@ -200,7 +200,7 @@ export const PricingTableRowMobile = (props: any) => {
           })}
         </tbody>
       </table>
-      <ReactTooltip effect={'solid'} />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
     </>
   )
 }

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
 import {
   BaseReportParams,
@@ -6,28 +7,45 @@ import {
   MetaQueryResponse,
   DbQuery,
 } from 'components/interfaces/Reports/Reports.types'
-import { useStore } from 'hooks'
-import useSWR from 'swr'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 type UseDbQuery = (sql: DbQuery['sql'], params?: BaseReportParams) => [DbQueryData, DbQueryHandler]
 const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
-  const { meta } = useStore()
+  const { project } = useProjectContext()
 
   const resolvedSql = typeof sql === 'function' ? sql(params) : sql
+
   const {
     data,
-    error: swrError,
-    isValidating: isLoading,
-    mutate,
-  } = useSWR<MetaQueryResponse>(resolvedSql, async () => await meta.query(resolvedSql), {
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 2000,
-  })
+    error: rqError,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useQuery(
+    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql }],
+    ({ signal }) => {
+      return executeSql(
+        {
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          sql: resolvedSql,
+        },
+        signal
+      ).then((res) => res.result) as Promise<MetaQueryResponse>
+    },
+    {
+      enabled: Boolean(resolvedSql),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
+  )
 
-  const error = swrError || (typeof data === 'object' ? data?.error : '')
-  return [{ error, data, isLoading, params }, { runQuery: () => mutate() }]
+  const error = rqError || (typeof data === 'object' ? data?.error : '')
+  return [
+    { error, data, isLoading: isLoading || isRefetching, params },
+    { runQuery: () => refetch() },
+  ]
 }
 
 export default useDbQuery

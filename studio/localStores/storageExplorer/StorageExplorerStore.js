@@ -97,17 +97,16 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey) {
+  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
     this.projectRef = projectRef
-    this.initializeSupabaseClient(serviceKey, url)
+    this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    console.debug(serviceEndpoint)
+  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
     this.supabaseClient = createClient(
-      `${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${serviceEndpoint}`,
+      `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
       {
         auth: {
@@ -318,6 +317,13 @@ class StorageExplorerStore {
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
 
+    if (!/^[a-zA-Z0-9_-]*$/.test(formattedName)) {
+      return this.ui.setNotification({
+        message: 'Folder name contains invalid special characters',
+        category: 'error',
+        duration: 8000,
+      })
+    }
     /**
      * todo: move this to a util file, as renameFolder() uses same logic
      */
@@ -1486,7 +1492,7 @@ class StorageExplorerStore {
         .list(formattedPathToFolder, options)
       folderContents = folderContents.concat(data)
       options.offset += options.limit
-      if (data.length < options.limit) {
+      if ((data || []).length < options.limit) {
         break
       }
     }

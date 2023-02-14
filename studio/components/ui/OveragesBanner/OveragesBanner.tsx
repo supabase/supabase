@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Alert, Button } from 'ui'
 
-import { useStore, useProjectUsage } from 'hooks'
+import { useParams } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { getResourcesApproachingLimits, getResourcesExceededLimits } from './OveragesBanner.utils'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   tier: string
@@ -14,10 +15,8 @@ interface Props {
 // Banner will not be shown for PAYG or Enterprise projects
 
 const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
-  const { ui } = useStore()
-  const ref = ui.selectedProject?.ref
-
-  const { usage, error, isLoading } = useProjectUsage(ref as string)
+  const { ref: projectRef } = useParams()
+  const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
 
   const resourcesApproachingLimits = getResourcesApproachingLimits(usage)
   const isApproachingUsageLimits = resourcesApproachingLimits.length > 0
@@ -86,7 +85,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         actions={
           minimal ? (
             <div className="flex h-full items-center">
-              <Link href={`/project/${ref}/settings/billing/subscription`}>
+              <Link href={`/project/${projectRef}/settings/billing/subscription`}>
                 <a>
                   <Button type="default">Explore usage details</Button>
                 </a>
