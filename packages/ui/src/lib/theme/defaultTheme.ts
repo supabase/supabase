@@ -1146,13 +1146,13 @@ export default {
       },
     },
     label_before: {
-      base: 'text-scale-500 ',
+      base: 'text-scale-1000 ',
       size: {
         ...defaults.size.text,
       },
     },
     label_after: {
-      base: 'text-scale-500',
+      base: 'text-scale-1000',
       size: {
         ...defaults.size.text,
       },

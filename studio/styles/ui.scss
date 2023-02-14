@@ -334,3 +334,9 @@
 .pitr-listbox {
   @apply md:gap-x-2;
 }
+
+.roles-toggle {
+  label {
+    @apply mt-1;
+  }
+}
