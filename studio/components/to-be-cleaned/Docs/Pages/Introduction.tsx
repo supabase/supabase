@@ -48,7 +48,7 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
             schema from the graphical interface.
           </p>
 
-          <div className="not-prose">
+          <div className="not-prose mb-6">
             <p>Read the reference documentation:</p>
             <div className="flex items-center gap-4 mt-2">
               {libs.map((lib) => (

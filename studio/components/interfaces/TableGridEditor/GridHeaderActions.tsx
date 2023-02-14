@@ -35,7 +35,7 @@ const GridHeaderActions: FC<Props> = ({
         icon={<IconCode size={14} strokeWidth={2} />}
         onClick={handlePreviewToggle}
       >
-        API Preview
+        API Quickstart
       </Button>
     )
   }
