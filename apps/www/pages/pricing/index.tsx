@@ -401,7 +401,7 @@ export default function IndexPage() {
 
           <div className="grid lg:grid-cols-3 gap-4 mb-16">
             {addons.map((addon) => (
-              <div className="bg-white dark:bg-scale-300 rounded-sm" key={addon.name}>
+              <div className="bg-white dark:bg-scale-300 rounded-[4px]" key={addon.name}>
                 <div className="overflow-hidden rounded-lg">
                   <img
                     className="w-full"
