@@ -82,7 +82,7 @@ export default function IndexPage() {
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
-      preface: 'Everything below included in the base plan',
+      preface: 'Everything in the Free plan, plus',
       additional: '',
       cta: 'Get Started',
     },
@@ -127,9 +127,13 @@ export default function IndexPage() {
         `Custom contracts & invoicing`,
         `On-premise support`,
         `24×7×365 premium enterprise support`,
+        `Custom Security questionnaires`,
+        `Private Slack channel`,
+        `Uptime SLA`,
       ],
       priceLabel: 'Custom quotas',
       priceMonthly: 'Exclusive pricing',
+      preface: 'The following features will apply to all projects within the organization',
       scale: '',
       shutdown: '',
       cta: 'Contact Us',
@@ -308,6 +312,7 @@ export default function IndexPage() {
                       dark:border-scale-500
                       pt-4
                       pb-8
+                      min-h-[175px]
                       "
                       >
                         <div className="flex flex-col gap-1">
@@ -316,8 +321,13 @@ export default function IndexPage() {
                               <p className="text-scale-900 ml-1 text-xs font-normal">
                                 {tier.priceLabel}
                               </p>
-                              <p className="text-5xl mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1">
-                                {tier.name !== 'Enterprise' && '$'} {tier.priceMonthly}
+                              <p
+                                className={`mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1 ${
+                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl max-w-[75%]'
+                                }`}
+                              >
+                                {tier.name !== 'Enterprise' && '$'}
+                                {tier.priceMonthly}
                               </p>
                               {tier.costUnit && (
                                 <p className="text-scale-900 mt-0.5 text-xs">{tier.costUnit}</p>
@@ -338,7 +348,6 @@ export default function IndexPage() {
                     <div
                       className={[
                         `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 py-6`,
-                        tier.name === 'Enterprise' ? 'pt-0' : '',
                         tier.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
