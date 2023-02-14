@@ -1,3 +1,20 @@
+export const SUPABASE_ROLES = [
+  'anon',
+  'service_role',
+  'authenticated',
+  'authenticator',
+  'dashboard_user',
+  'supabase_admin',
+  'supabase_auth_admin',
+  'supabase_replication_admin',
+  'supabase_storage_admin',
+  'supabase_functions_admin',
+  'pgbouncer',
+  'pgsodium_keyholder',
+  'pgsodium_keyiduser',
+  'pgsodium_keymaker',
+]
+
 export const ROLE_PERMISSIONS: any = {
   can_login: {
     disabled: false,
