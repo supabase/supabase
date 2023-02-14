@@ -471,6 +471,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'timescaledb: Time-series data',
+          url: '/guides/database/extensions/timescaledb',
+          items: [],
+        },
+        {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
           items: [],
