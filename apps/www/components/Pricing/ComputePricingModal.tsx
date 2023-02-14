@@ -50,8 +50,8 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 </div>
               </div>
               <div className="max-w-4xl prose">
-                <h2 className="text-2xl">Choose best compute setup for you</h2>
-                <p className="mt-4">
+                <h2 className="text-lg">Choose best compute setup for you</h2>
+                <p className="text-sm lg:max-w-3xl">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
                   instance running inside a virtual machine (VM). The following table describes the
                   base instance with additional compute add-ons available if you need extra
@@ -76,7 +76,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   <Fragment key={`row-${i}`}>
                     {i === 0 && (
                       <tr className="">
-                        <td className="pb-1 rounded-tr-lg bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
+                        <td className="pb-1 bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
                           <span className="">Included in Free and Pro tiers</span>
                         </td>
                       </tr>
