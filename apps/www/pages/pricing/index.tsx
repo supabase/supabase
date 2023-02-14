@@ -281,7 +281,7 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium
+                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {tier.name}
