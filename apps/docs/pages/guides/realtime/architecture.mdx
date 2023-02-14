@@ -51,7 +51,7 @@ Every Realtime region has at least two nodes so if one node goes offline the oth
 
 ## Streaming the Write-Ahead Log
 
-During the connection process a Postgres replication slot is aquired.
+During the connection process a Postgres replication slot is acquired.
 
 Realtime delivers changes by polling the replication slot and appending connection IDs to each wal record. Each connection ID is a WebSocket connection.
 
@@ -67,9 +67,9 @@ Clients can send and receive messages bi-directionally over a Channel. The Realt
 
 A single client can receive change records from Postgres, Broadcast messages from other clients and Presence updates all over the same Channel.
 
-Channels are implimented over [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
+Channels are implemented over [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
 
-The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to impliment the PubSub model where a publisher can send messages to many subscribers.
+The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
