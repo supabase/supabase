@@ -11,14 +11,12 @@ import clippyImage from '../../../public/img/clippy.png'
 
 import { getPageType } from '~/lib/helpers'
 import { useClippy } from '~/components/Clippy/ClippyProvider'
-import { useFlag } from '~/hooks/useFlag'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { open: openClippy } = useClippy()
-  const enableClippy = useFlag('enableClippy')
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
@@ -91,18 +89,7 @@ const TopNavBarRef: FC = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          {enableClippy && (
-            <div className="flex md:hidden cursor-pointer">
-              <Image
-                onClick={openClippy}
-                width={26}
-                height={29}
-                src={isDarkMode ? clippyImageDark : clippyImage}
-                alt="Clippy"
-              />
-            </div>
-          )}
-          <SearchButton className="md:w-full lg:w-96">
+          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
             <div
               className="
               flex
@@ -130,6 +117,16 @@ const TopNavBarRef: FC = () => {
               </div>
             </div>
           </SearchButton>
+
+          <div className="flex cursor-pointer order-1 lg:order-2">
+            <Image
+              onClick={openClippy}
+              width={26}
+              height={29}
+              src={isDarkMode ? clippyImageDark : clippyImage}
+              alt="Clippy"
+            />
+          </div>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button

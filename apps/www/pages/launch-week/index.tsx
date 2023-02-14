@@ -786,7 +786,7 @@ export default function launchweek() {
                               </span>
                             </div>
                             <SectionButtons
-                              docs="/docs/guides/api#graphql-api"
+                              docs="/docs/guides/database/api#graphql-api"
                               blog="/blog/pg-graphql-v1"
                             />
                           </div>

@@ -287,7 +287,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -972,6 +972,40 @@ functions:
             .from('countries')
             .select()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
@@ -979,6 +1013,37 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables
         name: Query foreign tables
@@ -994,6 +1059,54 @@ functions:
                 name
               )
             `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
@@ -1327,12 +1440,6 @@ functions:
   - id: insert
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    params:
-      - name: values
-        type: object | object []
-        isOptional: false
-        description: |
-          Bobby Bobby Bobby Bobby Bobby Bobby
     examples:
       - id: create-a-record
         name: Create a record
@@ -4061,7 +4168,7 @@ functions:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
-      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/database/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
     examples:
