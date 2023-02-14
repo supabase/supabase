@@ -1,9 +1,8 @@
+import Reports from 'components/interfaces/Reports/Reports'
+import { ReportsLayout } from 'components/layouts'
+import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
-import { ProjectLayoutWithAuth } from 'components/layouts'
-import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
-import Reports from 'components/interfaces/Reports/Reports'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 
 const PageLayout: NextPageWithLayout = () => (
   <>

@@ -6,13 +6,17 @@ import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from '
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 import { useTheme } from 'common/Providers'
+import clippyImageDark from '../../../public/img/clippy-dark.png'
+import clippyImage from '../../../public/img/clippy.png'
 
 import { getPageType } from '~/lib/helpers'
+import { useClippy } from '~/components/Clippy/ClippyProvider'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { open: openClippy } = useClippy()
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
@@ -84,8 +88,8 @@ const TopNavBarRef: FC = () => {
           {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}
         </div>
 
-        <div className="flex items-center gap-12">
-          <SearchButton className="w-full lg:w-96">
+        <div className="flex items-center gap-6">
+          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
             <div
               className="
               flex
@@ -113,6 +117,16 @@ const TopNavBarRef: FC = () => {
               </div>
             </div>
           </SearchButton>
+
+          <div className="flex cursor-pointer order-1 lg:order-2">
+            <Image
+              onClick={openClippy}
+              width={26}
+              height={29}
+              src={isDarkMode ? clippyImageDark : clippyImage}
+              alt="Clippy"
+            />
+          </div>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button

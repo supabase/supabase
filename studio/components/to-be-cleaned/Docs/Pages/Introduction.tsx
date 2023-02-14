@@ -2,7 +2,7 @@ import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
 import Image from 'next/image'
 import { useStore } from 'hooks'
-import { AutoApiService } from 'data/config/project-settings-query'
+import { AutoApiService } from 'data/config/project-api-query'
 
 const libs = [
   {

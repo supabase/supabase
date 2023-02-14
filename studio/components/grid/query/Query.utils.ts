@@ -203,11 +203,10 @@ function isFilterSql(filter: Filter) {
 
 function filterLiteral(value: any) {
   if (typeof value === 'string') {
-    const temp = value.trim()
-    if (temp?.startsWith('ARRAY[') && temp?.endsWith(']')) {
-      return temp
+    if (value?.startsWith('ARRAY[') && value?.endsWith(']')) {
+      return value
     } else {
-      return literal(temp)
+      return literal(value)
     }
   }
   return value

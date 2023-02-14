@@ -1,5 +1,4 @@
 import { FC, useState, Dispatch, SetStateAction } from 'react'
-import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   Alert,
@@ -24,27 +23,22 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { uuidv4 } from 'lib/helpers'
-import {
-  useStore,
-  useJwtSecretUpdateStatus,
-  useProjectPostgrestConfig,
-  checkPermissions,
-} from 'hooks'
-import { API_URL } from 'lib/constants'
+import { useStore, checkPermissions, useParams } from 'hooks'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
 import Panel from 'components/ui/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { patch } from 'lib/common/fetch'
 
 interface Props {}
 
 const JWTSettings: FC<Props> = ({}) => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const [customToken, setCustomToken] = useState<string>('')
   const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
@@ -59,41 +53,39 @@ const JWTSettings: FC<Props> = ({}) => {
     'queue_job.projects.update_jwt'
   )
 
-  const {
-    changeTrackingId,
-    jwtSecretUpdateError,
-    jwtSecretUpdateProgress,
-    jwtSecretUpdateStatus,
-    mutateJwtSecretUpdateStatus,
-  }: any = useJwtSecretUpdateStatus(ref)
-
-  const { config, isError } = useProjectPostgrestConfig(ref as string | undefined)
+  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
-  const isJwtSecretUpdateFailed = jwtSecretUpdateStatus === Failed
+  const isJwtSecretUpdateFailed = data?.jwtSecretUpdateStatus === Failed
   const isNotUpdatingJwtSecret =
-    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === Updated
-  const isUpdatingJwtSecret = jwtSecretUpdateStatus === Updating
+    data?.jwtSecretUpdateStatus === undefined || data?.jwtSecretUpdateStatus === Updated
+  const isUpdatingJwtSecret = data?.jwtSecretUpdateStatus === Updating
   const jwtSecretUpdateErrorMessage =
-    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
+    JWT_SECRET_UPDATE_ERROR_MESSAGES[data?.jwtSecretUpdateError as JwtSecretUpdateError]
   const jwtSecretUpdateProgressMessage =
-    JWT_SECRET_UPDATE_PROGRESS_MESSAGES[jwtSecretUpdateProgress as JwtSecretUpdateProgress]
+    JWT_SECRET_UPDATE_PROGRESS_MESSAGES[data?.jwtSecretUpdateProgress as JwtSecretUpdateProgress]
+
+  const { mutateAsync: updateJwt } = useJwtSecretUpdateMutation()
 
   async function handleJwtSecretUpdate(
     jwt_secret: string,
     setModalVisibility: Dispatch<SetStateAction<boolean>>
   ) {
+    if (!projectRef) return
+
     setIsSubmittingJwtSecretUpdateRequest(true)
     try {
       const trackingId = uuidv4()
-      const res = await patch(`${API_URL}/projects/${ref}/config/secrets`, {
-        jwt_secret,
-        change_tracking_id: trackingId,
+      await updateJwt({
+        projectRef,
+        jwtSecret: jwt_secret,
+        changeTrackingId: trackingId,
       })
-      if (res.error) throw res.error
+
       setModalVisibility(false)
-      mutateJwtSecretUpdateStatus()
+
       ui.setNotification({
         category: 'info',
         message:
@@ -111,7 +103,7 @@ const JWTSettings: FC<Props> = ({}) => {
       <Panel title={<h5 className="mb-0">JWT Settings</h5>}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isError ? (
-            <div className="flex items-center justify-center space-x-2 py-8">
+            <div className="flex items-center justify-center py-8 space-x-2">
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-scale-1100">Failed to retrieve JWT settings</p>
             </div>
@@ -139,7 +131,7 @@ const JWTSettings: FC<Props> = ({}) => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="rounded-md border bg-bg-alt-light p-3 px-6 shadow-sm dark:border-dark dark:bg-bg-alt-dark">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-bg-alt-light dark:border-dark dark:bg-bg-alt-dark">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
@@ -149,7 +141,7 @@ const JWTSettings: FC<Props> = ({}) => {
                     </div>
                   ) : (
                     <div className="w-full space-y-2">
-                      <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center justify-between w-full">
                         <div className="flex flex-col space-y-1">
                           <p className="text-sm">Generate a new JWT secret</p>
                           <p className="text-sm opacity-50">
@@ -223,7 +215,7 @@ const JWTSettings: FC<Props> = ({}) => {
                   <Alert withIcon variant="warning" title="Failed to update JWT secret">
                     Please try again. If the failures persist, please contact Supabase support with
                     the following details: <br />
-                    Change tracking ID: {changeTrackingId} <br />
+                    Change tracking ID: {data?.changeTrackingId} <br />
                     Error message: {jwtSecretUpdateErrorMessage}
                   </Alert>
                 ) : canGenerateNewJWTSecret ? (
@@ -283,7 +275,7 @@ const JWTSettings: FC<Props> = ({}) => {
         }
       >
         <Modal.Content>
-          <div className="space-y-2 py-4">
+          <div className="py-4 space-y-2">
             <p className="text-sm text-scale-1100">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
@@ -302,7 +294,7 @@ const JWTSettings: FC<Props> = ({}) => {
               label="Custom JWT secret"
               descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
               actions={
-                <div className="mr-1 flex items-center justify-center">
+                <div className="flex items-center justify-center mr-1">
                   <Button
                     type="default"
                     icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
