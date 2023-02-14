@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
-import BaseLayout from '..'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateReportsMenu } from './ReportsMenu.utils'
 
@@ -18,7 +18,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
   const page = router.pathname.split('/')[4] || ''
 
   return (
-    <BaseLayout
+    <ProjectLayout
       title={title}
       product="Reports"
       productMenu={<ProductMenu page={page} menu={generateReportsMenu(project)} />}
@@ -26,7 +26,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

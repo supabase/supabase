@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
 import { Dictionary } from 'components/grid'
@@ -13,6 +13,8 @@ import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { SchemaView } from 'types'
+import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import { tryParseJson } from 'lib/helpers'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
@@ -29,10 +31,11 @@ const TableEditorPage: NextPage = () => {
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
-  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table'>()
+  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table' | 'json'>()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
+  const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
 
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
@@ -103,6 +106,11 @@ const TableEditorPage: NextPage = () => {
     setSidePanelKey('table')
     setIsDuplicating(true)
     setSelectedTableToEdit(table)
+  }
+
+  const onExpandJSONEditor = (column: string, row: any) => {
+    setSidePanelKey('json')
+    setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
   }
 
   const onClosePanel = () => {
@@ -204,11 +212,13 @@ const TableEditorPage: NextPage = () => {
         selectedRowToEdit={selectedRowToEdit}
         selectedColumnToEdit={selectedColumnToEdit}
         selectedTableToEdit={selectedTableToEdit}
+        selectedValueForJsonEdit={selectedValueForJsonEdit}
         onAddRow={onAddRow}
         onEditRow={onEditRow}
         onAddColumn={onAddColumn}
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
+        onExpandJSONEditor={onExpandJSONEditor}
         onClosePanel={onClosePanel}
         theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />

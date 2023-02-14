@@ -15,7 +15,7 @@ import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
 
-import ConnectionPooling from './Pooling/ConnectionPooling'
+import ConnectionPooling from '../Settings/Database/ConnectionPooling'
 
 import CreateTrigger from './Triggers/CreateTrigger'
 import DeleteTrigger from './Triggers/DeleteTrigger'

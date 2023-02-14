@@ -18,7 +18,7 @@ import { partition } from 'lodash'
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
 
 interface Props {
   selectedSchema: string
@@ -166,7 +166,7 @@ const TableList: FC<Props> = ({
                   <code className="text-sm">{x.size}</code>
                 </Table.td>
                 <Table.td className="hidden xl:table-cell text-center">
-                  {realtimePublication.tables.find((table: any) => table.id === x.id) && (
+                  {(realtimePublication?.tables ?? []).find((table: any) => table.id === x.id) && (
                     <div className="flex justify-center">
                       <IconCheck strokeWidth={2} />
                     </div>

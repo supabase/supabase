@@ -5,7 +5,8 @@ import { Loading } from 'ui'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import { useProjectSubscription, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout, Project } from 'types'
 
 import { Subscription } from 'components/interfaces/Billing'
@@ -15,8 +16,8 @@ const ProjectBilling: NextPageWithLayout = () => {
   const project = ui.selectedProject
 
   return (
-    <div className="content h-full w-full overflow-y-auto">
-      <div className="mx-auto w-full">
+    <div className="w-full h-full overflow-y-auto content">
+      <div className="w-full mx-auto">
         <Settings project={project} />
       </div>
     </div>
@@ -38,16 +39,16 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   const projectTier = ui.selectedProject?.subscription_tier
 
   const {
-    subscription,
+    data: subscription,
     isLoading: loading,
     error,
-  } = useProjectSubscription(ui.selectedProject?.ref)
+  } = useProjectSubscriptionQuery({ projectRef: ui.selectedProject?.ref })
 
   useEffect(() => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
@@ -57,7 +58,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   }
 
   return (
-    <div className="container max-w-4xl space-y-8 p-4">
+    <div className="container max-w-4xl p-4 space-y-8">
       {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
       {/* {projectTier !== undefined && <OveragesBanner tier={projectTier} />} */}
       <Subscription
@@ -69,8 +70,8 @@ const Settings: FC<SettingsProps> = ({ project }) => {
       />
       {loading ? (
         <Loading active={loading}>
-          <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
-            <div className="flex items-center justify-center bg-panel-body-light px-6 py-6 dark:bg-panel-body-dark">
+          <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
+            <div className="flex items-center justify-center px-6 py-6 bg-panel-body-light dark:bg-panel-body-dark">
               <p>Loading usage breakdown</p>
             </div>
           </div>
