@@ -6,7 +6,8 @@ import { useMonaco } from '@monaco-editor/react'
 import { DataGridHandle } from '@supabase/react-data-grid'
 
 import { useUrlState } from 'hooks'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
+import { Dictionary, SupabaseGridProps, SupabaseGridRef, SupaTable } from './types'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
 import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from './constants'
@@ -22,6 +23,7 @@ import {
   formatFilterURLParams,
   formatSortURLParams,
 } from './SupabaseGrid.utils'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 /** Supabase Grid: React component to render database table */
 
@@ -73,7 +75,22 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
 
   // [Joshen] This is not a perfect fix, but the useEffect to initialize the data in the editor
   // was not getting retriggered for views, works fine for tables.
-  const table = typeof props.table === 'string' ? { name: props.table } : props.table
+  const table = (typeof props.table === 'string' ? { name: props.table } : props.table) as SupaTable // TODO(alaister): add support for views
+
+  const { project } = useProjectContext()
+  const { data } = useTableRowsQuery(
+    {
+      queryKey: [table.schema, table.name],
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      table,
+      sorts,
+      filters,
+      page: state.page,
+      limit: state.rowsPerPage,
+    },
+    { keepPreviousData: true }
+  )
 
   useImperativeHandle(ref, () => ({
     rowAdded(row: Dictionary<any>) {
@@ -94,19 +111,20 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     if (!mounted) setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (state.refreshPageFlag === REFRESH_PAGE_IMMEDIATELY) {
-      fetchPage(state, dispatch, sorts, filters)
-    } else if (state.refreshPageFlag !== 0) {
-      refreshPageDebounced(state, dispatch, sorts, filters)
-    }
-  }, [state.refreshPageFlag])
+  // TODO(alaister): update this to react-query
+  // useEffect(() => {
+  //   if (state.refreshPageFlag === REFRESH_PAGE_IMMEDIATELY) {
+  //     fetchPage(state, dispatch, sorts, filters)
+  //   } else if (state.refreshPageFlag !== 0) {
+  //     refreshPageDebounced(state, dispatch, sorts, filters)
+  //   }
+  // }, [state.refreshPageFlag])
 
-  useEffect(() => {
-    if (state.totalRows === TOTAL_ROWS_RESET) {
-      fetchCount(state, dispatch, filters)
-    }
-  }, [state.totalRows])
+  // useEffect(() => {
+  //   if (state.totalRows === TOTAL_ROWS_RESET) {
+  //     fetchCount(state, dispatch, filters)
+  //   }
+  // }, [state.totalRows])
 
   useEffect(() => {
     if (mounted) {
@@ -191,7 +209,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
       />
-      <Grid ref={gridRef} {...gridProps} rows={state.rows} />
+      <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} />
       <Footer />
       <Shortcuts gridRef={gridRef} />
       {mounted && createPortal(<RowContextMenu />, document.body)}
