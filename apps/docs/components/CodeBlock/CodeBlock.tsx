@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { Children, FC } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
@@ -49,10 +49,18 @@ const CodeBlock: FC<Props> = ({
     }, 1000)
   }
 
+  // Extract string when `children` has a single string node
+  const childrenArray = Children.toArray(children)
+  const [singleChild] = childrenArray.length === 1 ? childrenArray : []
+  const singleString = typeof singleChild === 'string' ? singleChild : undefined
+
+  let codeValue = value ?? singleString ?? children
+  codeValue = codeValue?.trimEnd?.() ?? codeValue
+
   // check the length of the string inside the <code> tag
   // if it's fewer than 70 characters, add a white-space: pre so it doesn't wrap
   const shortCodeBlockClasses =
-    typeof children === 'string' && children.length < 70 ? 'short-inline-codeblock' : ''
+    typeof codeValue === 'string' && codeValue.length < 70 ? 'short-inline-codeblock' : ''
 
   let lang = language ? language : className ? className.replace('language-', '') : 'js'
   // force jsx to be js highlighted
@@ -118,7 +126,7 @@ const CodeBlock: FC<Props> = ({
               paddingBottom: '4px',
             }}
           >
-            {(value || children)?.trimEnd()}
+            {codeValue}
           </SyntaxHighlighter>
           {!hideCopy && (value || children) && className ? (
             <div
@@ -128,7 +136,7 @@ const CodeBlock: FC<Props> = ({
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
-              {/* // 
+              {/* //
               @ts-ignore */}
               <CopyToClipboard text={value || children}>
                 <Button

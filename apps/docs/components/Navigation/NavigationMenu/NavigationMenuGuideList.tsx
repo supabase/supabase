@@ -12,8 +12,17 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
 
   // get url
   const url = router.asPath
-  // remove the end of the url if a deep link
-  const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
+
+  // We need to decide how deep we want the menu to be for matching urls
+  // if the links are really deep, we don't want to match all the way out
+  // But we need to reach out further to make the structure of  /resources/postgres/  work
+  // look at /resources/postgres/  vs /auth/phone-login for how these are different
+  let firstLevelRoute
+  if (url.includes('resources/postgres/')) {
+    firstLevelRoute = url?.split('/')?.slice(0, 5)?.join('/')
+  } else {
+    firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
+  }
 
   return (
     <Accordion.Root

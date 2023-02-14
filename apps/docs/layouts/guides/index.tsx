@@ -6,6 +6,7 @@ import { FC, useEffect, useRef, useState } from 'react'
 import { IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 
@@ -16,6 +17,7 @@ interface Props {
     hide_table_of_contents?: boolean
     breadcrumb?: string
     subtitle?: string
+    footerHelpType?: FooterHelpCalloutType
     video?: string
     canonical?: string
   }
@@ -161,6 +163,7 @@ const Layout: FC<Props> = (props) => {
           </div>
         )}
       </div>
+      <FooterHelpCallout footerHelpType={props.meta?.footerHelpType} title={props.meta?.title} />
     </>
   )
 }

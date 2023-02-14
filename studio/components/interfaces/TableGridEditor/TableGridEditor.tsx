@@ -14,11 +14,11 @@ import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'compo
 import { IconBookOpen, SidePanel } from 'ui'
 import ActionBar from './SidePanelEditor/ActionBar'
 import { GeneralContent, ResourceContent } from '../Docs'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
-import useSWR, { mutate } from 'swr'
-import { get } from 'lib/common/fetch'
 import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
+import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 
 interface Props {
   /** Theme for the editor */
@@ -28,19 +28,21 @@ interface Props {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
+  selectedValueForJsonEdit?: JsonEditValue
 
   onAddRow: () => void
   onEditRow: (row: Dictionary<any>) => void
   onAddColumn: () => void
   onEditColumn: (column: PostgresColumn) => void
   onDeleteColumn: (column: PostgresColumn) => void
+  onExpandJSONEditor: (column: string, row: any) => void
   onClosePanel: () => void
 }
 
@@ -54,12 +56,14 @@ const TableGridEditor: FC<Props> = ({
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
 
   onAddRow = () => {},
   onEditRow = () => {},
   onAddColumn = () => {},
   onEditColumn = () => {},
   onDeleteColumn = () => {},
+  onExpandJSONEditor = () => {},
   onClosePanel = () => {},
 }) => {
   const { meta, ui, vault } = useStore()
@@ -71,7 +75,7 @@ const TableGridEditor: FC<Props> = ({
   const projectRef = ui.selectedProject?.ref
   const tables = meta.tables.list()
 
-  const { data: settings } = useProjectSettingsQuery({ projectRef: projectRef })
+  const { data: settings } = useProjectApiQuery({ projectRef: projectRef })
 
   const autoApiService = {
     ...settings?.autoApiService,
@@ -81,13 +85,12 @@ const TableGridEditor: FC<Props> = ({
   }
   const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
+  const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
-
-  const isVaultEnabled = useFlag('vaultExtension')
 
   const getEncryptedColumns = async (table: any) => {
     const columns = await vault.listEncryptedColumns(table.schema, table.name)
@@ -112,27 +115,33 @@ const TableGridEditor: FC<Props> = ({
     return resources
   }
 
-  const API_KEY = settings?.autoApiService.service_api_keys.find((key: any) => key.tags === 'anon')
-    ? settings.autoApiService.defaultApiKey
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
     : undefined
+  const swaggerUrl = settings?.autoApiService?.restUrl
 
-  const swaggerUrl = settings?.autoApiService.restUrl
-
-  const headers: any = { apikey: API_KEY }
-
-  if (API_KEY) headers['Authorization'] = `Bearer ${API_KEY}`
-
-  const { data: jsonSchema, error: jsonSchemaError } = useSWR(
-    () => swaggerUrl,
-    (url: string) => get(url, { headers, credentials: 'omit' }).then((res) => res)
+  const canReadServiceKey = checkPermissions(
+    PermissionAction.READ,
+    'service_api_keys.service_role_key'
   )
+
+  const {
+    data: jsonSchema,
+    error: jsonSchemaError,
+    refetch,
+  } = useProjectJsonSchemaQuery({
+    projectRef,
+    swaggerUrl,
+    apiKey: anonKey,
+  })
 
   if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
 
   const resources = getResourcesFromJsonSchema(jsonSchema)
 
   const refreshDocs = async () => {
-    mutate(swaggerUrl)
+    await refetch()
   }
 
   useEffect(() => {
@@ -254,6 +263,7 @@ const TableGridEditor: FC<Props> = ({
         onEditRow={onEditRow}
         onError={onError}
         onSqlQuery={onSqlQuery}
+        onExpandJSONEditor={onExpandJSONEditor}
       />
       {!isUndefined(selectedSchema) && (
         <SidePanelEditor
@@ -263,6 +273,7 @@ const TableGridEditor: FC<Props> = ({
           selectedRowToEdit={selectedRowToEdit}
           selectedColumnToEdit={selectedColumnToEdit}
           selectedTableToEdit={selectedTableToEdit}
+          selectedValueForJsonEdit={selectedValueForJsonEdit}
           sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
@@ -295,7 +306,7 @@ const TableGridEditor: FC<Props> = ({
         <div className="Docs Docs--table-editor">
           <SidePanel.Content>
             {jsonSchemaError ? (
-              <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+              <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
                 <div className="text-scale-1000">
                   <p>Error connecting to API</p>
                   <p>{`${jsonSchemaError}`}</p>
@@ -305,13 +316,13 @@ const TableGridEditor: FC<Props> = ({
               <>
                 {jsonSchema ? (
                   <>
-                    <div className="sticky top-0 bg-scale-100 dark:bg-scale-300 z-10">
+                    <div className="sticky top-0 z-10 bg-scale-100 dark:bg-scale-300">
                       <LangSelector
                         selectedLang={selectedLang}
                         setSelectedLang={setSelectedLang}
                         showApiKey={showApiKey}
                         setShowApiKey={setShowApiKey}
-                        apiKey={API_KEY}
+                        apiKey={anonKey}
                         autoApiService={autoApiService}
                       />
                     </div>
@@ -336,7 +347,7 @@ const TableGridEditor: FC<Props> = ({
                     )}
                   </>
                 ) : (
-                  <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+                  <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
                     <h3 className="text-lg">Building docs ...</h3>
                   </div>
                 )}

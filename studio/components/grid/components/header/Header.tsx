@@ -1,5 +1,14 @@
 import { FC, useState, ReactNode } from 'react'
-import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'ui'
+import {
+  Button,
+  IconDownload,
+  IconPlus,
+  IconX,
+  IconTrash,
+  Dropdown,
+  IconColumns,
+  IconChevronDown,
+} from 'ui'
 import { saveAs } from 'file-saver'
 
 import { useStore } from 'hooks'
@@ -7,7 +16,7 @@ import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { Sort, Filter } from 'components/grid/types'
+import { Sort, Filter, SupaTable } from 'components/grid/types'
 import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 
@@ -17,6 +26,7 @@ import { useDispatch, useTrackedState } from 'components/grid/store'
 const MAX_EXPORT_ROW_COUNT = 500000
 
 interface HeaderProps {
+  table: Partial<SupaTable>
   sorts: Sort[]
   filters: Filter[]
   onAddColumn?: () => void
@@ -24,7 +34,14 @@ interface HeaderProps {
   headerActions?: ReactNode
 }
 
-const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, headerActions }) => {
+const Header: FC<HeaderProps> = ({
+  table,
+  sorts,
+  filters,
+  onAddColumn,
+  onAddRow,
+  headerActions,
+}) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
@@ -34,6 +51,7 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
         <RowHeader sorts={sorts} filters={filters} />
       ) : (
         <DefaultHeader
+          table={table}
           sorts={sorts}
           filters={filters}
           onAddColumn={onAddColumn}
@@ -47,29 +65,20 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
 export default Header
 
 interface DefaultHeaderProps {
+  table: Partial<SupaTable>
   sorts: Sort[]
   filters: Filter[]
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, onAddRow }) => {
-  const renderNewColumn = (onAddColumn?: () => void) => {
-    if (!onAddColumn) return null
-    return (
-      <Button type="text" onClick={onAddColumn}>
-        New Column
-      </Button>
-    )
-  }
-
-  const renderAddRow = (onAddRow?: () => void) => {
-    if (!onAddRow) return null
-    return (
-      <Button size="tiny" icon={<IconPlus size={14} strokeWidth={2} />} onClick={onAddRow}>
-        Insert row
-      </Button>
-    )
-  }
+const DefaultHeader: FC<DefaultHeaderProps> = ({
+  table,
+  sorts,
+  filters,
+  onAddColumn,
+  onAddRow,
+}) => {
+  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   return (
     <div className="flex items-center gap-4">
@@ -78,11 +87,78 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
         <FilterDropdown />
         <SortPopover />
       </div>
-      <div className="h-[50%] w-px bg-scale-600"></div>
-      <div className="flex items-center gap-2">
-        {renderNewColumn(onAddColumn)}
-        {renderAddRow(onAddRow)}
-      </div>
+      {canAddNew && (
+        <>
+          <div className="h-[20px] w-px border-r border-scale-600"></div>
+          <div className="flex items-center gap-2">
+            <Dropdown
+              side="bottom"
+              align="start"
+              size="medium"
+              overlay={[
+                ...(onAddRow !== undefined
+                  ? [
+                      <Dropdown.Item
+                        key="add-row"
+                        className="group"
+                        onClick={onAddRow}
+                        disabled={onAddRow === undefined}
+                        icon={
+                          <div className="-mt-2 pr-1.5">
+                            <div className="border border-scale-1000 w-[15px] h-[4px]" />
+                            <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                            <div
+                              className={[
+                                'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
+                              ].join(' ')}
+                            />
+                          </div>
+                        }
+                      >
+                        <div className="">
+                          <p>Insert row</p>
+                          <p className="text-scale-1000">Insert a new row into {table.name}</p>
+                        </div>
+                      </Dropdown.Item>,
+                    ]
+                  : []),
+                ...(onAddColumn !== undefined
+                  ? [
+                      <Dropdown.Item
+                        key="add-column"
+                        className="group"
+                        onClick={onAddColumn}
+                        disabled={onAddColumn === undefined}
+                        icon={
+                          <div className="flex -mt-2 pr-1.5">
+                            <div className="border border-scale-1000 w-[4px] h-[15px]" />
+                            <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
+                            <div
+                              className={[
+                                'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
+                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
+                              ].join(' ')}
+                            />
+                          </div>
+                        }
+                      >
+                        <div className="">
+                          <p>Insert column</p>
+                          <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                        </div>
+                      </Dropdown.Item>,
+                    ]
+                  : []),
+              ]}
+            >
+              <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                Insert
+              </Button>
+            </Dropdown>
+          </div>
+        </>
+      )}
     </div>
   )
 }
