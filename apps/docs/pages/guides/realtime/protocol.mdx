@@ -6,17 +6,13 @@ export const meta = {
   description: 'Understanding Realtime Protocol',
 }
 
-## Introduction
-
 The Realtime Protocol is a set of message formats used for communication between a Realtime client and server. These messages are used to initiate a connection, update access tokens, receive system status updates, and receive real-time updates from the Postgres database.
-
-The Realtime Protocol is a set of message formats that you send and receive from the Realtime server.
 
 ## Connection
 
-In the initial message, the client sends a message specifying the features that wants to use (Broadcase, Presence, Postgres Changes).
+In the initial message, the client sends a message specifying the features they want to use (Broadcase, Presence, Postgres Changes).
 
-```typescript
+```ts
 {
    "event": "phx_join",
    "topic": string,
@@ -44,7 +40,7 @@ In the initial message, the client sends a message specifying the features that 
 
 In response, the server sends the Postgres configuration with a unique ID. With this ID, the client should route incoming changes to the appropriate callback.
 
-```typescript
+```ts
 {
    "event": "phx_reply",
    "topic": string,
@@ -71,12 +67,12 @@ In response, the server sends the Postgres configuration with a unique ID. With 
 System message are used to inform a client about the status of the Postgres subscription. The `payload.status` indicates if the subscription successful or not.
 The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscribing to PostgreSQL failed" with subscription params.
 
-```typescript
+```ts
 {
    "event": "system",
    "topic": string,
    "payload":{
-      "channel": "any",
+      "channel": string,
       "extension": "postgres_changes",
       "message": "Subscribed to PostgreSQL" | "Subscribing to PostgreSQL failed",
       "status": "ok" | "error"
@@ -89,7 +85,7 @@ The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscrib
 
 The heartbeat message should be sent every 60 seconds to avoid a connection timeout.
 
-```typescript
+```ts
 {
    "event": "heartbeat",
    "topic": "phoenix",
@@ -102,7 +98,7 @@ The heartbeat message should be sent every 60 seconds to avoid a connection time
 
 To update the access token, you need to send to the server a message specifying a new token in the `payload.access_token` value.
 
-```typescript
+```ts
 {
    "event": "access_token",
    "topic": string,
@@ -117,7 +113,7 @@ To update the access token, you need to send to the server a message specifying 
 
 Realtime sends a message with the following structure
 
-```typescript
+```ts
 {
    "event": "postgres_changes",
    "topic": string,
@@ -142,7 +138,7 @@ Realtime sends a message with the following structure
 
 Structure of the broadcast event
 
-```typescript
+```ts
 {
    "event": "broadcast",
    "topic": string,
@@ -163,7 +159,7 @@ The Presence events allow clients to monitor the online status of other clients 
 
 After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys in UUID format, where each key represents a client and its value is a JSON object containing information about that client.
 
-```typescript
+```ts
 {
    "event": "presence_state",
    "topic": string,
@@ -178,7 +174,7 @@ After joining, the server sends a `presence_state` message to a client with pres
 
 After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. The values associated with each key are UUIDs of the clients.
 
-```typescript
+```ts
 {
    "event": "presence_diff",
    "topic": string,
