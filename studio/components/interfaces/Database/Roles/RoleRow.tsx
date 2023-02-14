@@ -12,16 +12,19 @@ import {
   IconHelpCircle,
   IconMoreVertical,
 } from 'ui'
+
+import { useStore } from 'hooks'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface Props {
   role: PostgresRole
+  disabled?: boolean
   onSelectDelete: (role: PostgresRole) => void
 }
 
-const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
+const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
+  const { ui, meta } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
 
   const {
     is_superuser,
@@ -32,10 +35,22 @@ const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
     can_bypass_rls,
   } = role
 
-  const onSaveChanges = async (values: any) => {
-    setIsSaving(true)
-    console.log(values)
-    setIsSaving(false)
+  const onSaveChanges = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true)
+    const res = await meta.roles.update(role.id, values)
+    setSubmitting(false)
+
+    if (res.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update role "${role.name}": ${res.error.message}`,
+      })
+    } else {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated role "${role.name}"`,
+      })
+    }
   }
 
   return (
@@ -63,7 +78,7 @@ const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
         'last:rounded-bl last:rounded-br',
       ].join(' ')}
     >
-      {({ values, initialValues, handleReset }: any) => {
+      {({ values, initialValues, handleReset, isSubmitting }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         return (
@@ -79,42 +94,65 @@ const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
               >
                 <div className="flex items-start space-x-3">
                   <IconChevronUp
+                    id="collapsible-trigger"
                     className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
                   <div className="space-x-2 flex items-center">
-                    <p className="text-left text-sm">{role.name}</p>
-                    <p className="text-left text-sm text-scale-1000">(ID: {role.id})</p>
+                    <p className="text-left text-sm" id="collapsible-trigger">
+                      {role.name}
+                    </p>
+                    <p className="text-left text-sm text-scale-1000" id="collapsible-trigger">
+                      (ID: {role.id})
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
+                  {role.active_connections > 0 && (
+                    <div className="relative h-2 w-2">
+                      <span className="flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-900 opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-900 opacity-75"></span>
+                      </span>
+                    </div>
+                  )}
                   <p
+                    id="collapsible-trigger"
                     className={`text-sm ${
                       role.active_connections > 0 ? 'text-scale-1100' : 'text-scale-1000'
                     }`}
                   >
                     {role.active_connections} connections
                   </p>
-                  <Dropdown
-                    side="bottom"
-                    className="w-[120px]"
-                    overlay={
-                      <>
-                        <Dropdown.Item
-                          icon={<IconTrash className="text-red-800" size="tiny" strokeWidth={2} />}
-                          onClick={(event: any) => {
-                            event.stopPropagation()
-                            onSelectDelete(role)
-                          }}
-                        >
-                          Delete
-                        </Dropdown.Item>
-                      </>
-                    }
-                  >
-                    <Button as="span" type="default" className="px-1" icon={<IconMoreVertical />} />
-                  </Dropdown>
+                  {!disabled && (
+                    <Dropdown
+                      side="bottom"
+                      className="w-[120px]"
+                      overlay={
+                        <>
+                          <Dropdown.Item
+                            icon={
+                              <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                            }
+                            onClick={(event: any) => {
+                              event.stopPropagation()
+                              onSelectDelete(role)
+                            }}
+                          >
+                            Delete
+                          </Dropdown.Item>
+                        </>
+                      }
+                    >
+                      <Button
+                        as="span"
+                        type="default"
+                        className="px-1"
+                        icon={<IconMoreVertical />}
+                      />
+                    </Dropdown>
+                  )}
                 </div>
               </button>
             </Collapsible.Trigger>
@@ -128,12 +166,13 @@ const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
                       id={permission}
                       name={permission}
                       label={ROLE_PERMISSIONS[permission].description}
-                      disabled={ROLE_PERMISSIONS[permission].disabled}
+                      disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                       className={[
                         'roles-toggle',
                         ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
                       ].join(' ')}
                       afterLabel={
+                        !disabled &&
                         ROLE_PERMISSIONS[permission].disabled && (
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger type="button">
@@ -162,18 +201,25 @@ const RoleRow: FC<Props> = ({ role, onSelectDelete }) => {
                     />
                   ))}
                 </div>
-                <div className="py-4 flex items-center space-x-2 justify-end">
-                  <Button
-                    type="default"
-                    disabled={!hasChanges || isSaving}
-                    onClick={() => handleReset()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="primary" disabled={!hasChanges || isSaving} loading={isSaving}>
-                    Save
-                  </Button>
-                </div>
+                {!disabled && (
+                  <div className="py-4 flex items-center space-x-2 justify-end">
+                    <Button
+                      type="default"
+                      disabled={!hasChanges || isSubmitting}
+                      onClick={() => handleReset()}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      disabled={!hasChanges || isSubmitting}
+                      loading={isSubmitting}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
               </div>
             </Collapsible.Content>
           </Collapsible>
