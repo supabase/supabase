@@ -430,6 +430,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_hashids: Short UIDs',
+          url: '/guides/database/extensions/pg_hashids',
+          items: [],
+        },
+        {
           name: 'pg_jsonschema: JSON Schema Validation',
           url: '/guides/database/extensions/pg_jsonschema',
           items: [],
