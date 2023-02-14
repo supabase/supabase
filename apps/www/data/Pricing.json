@@ -217,7 +217,7 @@
         "title": "Asset transformations",
         "tooltips": {
           "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
-          "pro": "5$ per 1000 origin images after the first 100"
+          "pro": "$5 per 1000 origin images after the first 100"
         },
         "tiers": {
           "free": false,

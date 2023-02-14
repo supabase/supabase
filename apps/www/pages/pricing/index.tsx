@@ -399,7 +399,7 @@ export default function IndexPage() {
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
-            <p className="text-scale-1100 mb-8 lg:mb-16 text-lg">
+            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
               Level up your Supabase experience with add-ons.
             </p>
           </div>
@@ -497,7 +497,7 @@ export default function IndexPage() {
             <h2 className="text-scale-1200 text-3xl scroll-m-20" id="compare-plans">
               Compare Plans
             </h2>
-            <p className="text-scale-1100 mb-8 lg:mb-16 text-lg">
+            <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
@@ -772,7 +772,7 @@ export default function IndexPage() {
                                     type={tier.name === 'Enterprise' ? 'default' : 'primary'}
                                     block
                                   >
-                                    Get Started
+                                    {tier.cta}
                                   </Button>
                                 </a>
                               </Link>
