@@ -464,6 +464,11 @@ export const database = {
           url: '/guides/database/extensions/pg-safeupdate',
           items: [],
         },
+        {
+          name: 'pgsodium: Encryption Features',
+          url: '/guides/database/extensions/pgsodium',
+          items: [],
+        },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
         {
           name: 'plpgsql_check: PL/pgSQL Linter',
