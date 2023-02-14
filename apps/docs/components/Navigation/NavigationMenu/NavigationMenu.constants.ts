@@ -512,14 +512,23 @@ export const realtime = {
     { name: 'Overview', url: '/guides/realtime', items: [] },
     { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
     {
-      name: 'Channels',
+      name: 'Discover',
+      url: undefined,
+      items: [{ name: 'Architecture', url: '/guides/realtime/architecture', items: [] }],
+    },
+    {
+      name: 'Extensions',
       url: undefined,
       items: [
         { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
         { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
+    },
+    {
+      name: 'Administer',
+      url: undefined,
+      items: [{ name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] }],
     },
   ],
 }
