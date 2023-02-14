@@ -59,7 +59,7 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
                   className="
                   flex items-center gap-1 rounded-md px-3 py-1
                   bg-scale-300 dark:bg-scale-500
-                  hover:dark:bg-scale-700 transition-colors
+                  hover:bg-scale-500 hover:dark:bg-scale-700 transition-colors
                   !text-scale-1100 hover:text-scale-1100
                   "
                 >
