@@ -257,7 +257,7 @@ export default function IndexPage() {
                   key={`row-${tier.name}`}
                   className={[
                     tier.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[14px]'
+                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
@@ -267,11 +267,15 @@ export default function IndexPage() {
                   <div
                     key={tier.name}
                     className={[
-                      'flex flex-col overflow-hidden rounded-xl',
-                      tier.name === 'Pro' ? '' : 'border h-full rounded-xl',
+                      'flex flex-col overflow-hidden',
+                      tier.name === 'Pro' ? '' : 'border h-full hallo rounded-xl',
                     ].join(' ')}
                   >
-                    <div className="dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-xl rounded-tl-xl">
+                    <div
+                      className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-xl rounded-tl-xl ${
+                        tier.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
+                      }`}
+                    >
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
@@ -335,7 +339,7 @@ export default function IndexPage() {
                       className={[
                         `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-xl rounded-br-xl flex-1 flex-col bg-white px-8 py-6`,
                         tier.name === 'Enterprise' ? 'pt-0' : '',
-                        tier.name === 'Pro' ? 'mb-0.5' : '',
+                        tier.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
                       {tier.preface && (
