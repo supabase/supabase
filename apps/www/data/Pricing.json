@@ -293,6 +293,7 @@
         "title": "Messages Per Month",
         "tooltips": {
           "main": "Billing is based on the total sum of Realtime messages throughout your billing period.",
+          "pro": "Then $2.50 per million",
           "free": "2 Million (including database)"
         },
         "tiers": {
@@ -420,7 +421,6 @@
       {
         "title": "Custom Domains",
         "tooltips": {
-          "main": "Contact us to access this feature",
           "enterprise": "Volume discounts available."
         },
         "tiers": {
