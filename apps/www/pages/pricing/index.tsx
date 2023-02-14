@@ -128,6 +128,8 @@ export default function IndexPage() {
         `On-premise support`,
         `24×7×365 premium enterprise support`,
       ],
+      priceLabel: 'Custom quotas',
+      priceMonthly: 'Exclusive pricing',
       scale: '',
       shutdown: '',
       cta: 'Contact Us',
@@ -268,7 +270,7 @@ export default function IndexPage() {
                     key={tier.name}
                     className={[
                       'flex flex-col overflow-hidden',
-                      tier.name === 'Pro' ? '' : 'border h-full hallo rounded-xl',
+                      tier.name === 'Pro' ? '' : 'border h-full rounded-xl',
                     ].join(' ')}
                   >
                     <div
@@ -279,7 +281,7 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-semibold
+                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-medium
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {tier.name}
@@ -295,9 +297,8 @@ export default function IndexPage() {
                         {tier.description}
                       </p>
 
-                      {tier.name !== 'Enterprise' && (
-                        <div
-                          className="
+                      <div
+                        className="
                       text-scale-1200 flex items-baseline
                       text-5xl
                       font-normal
@@ -308,32 +309,31 @@ export default function IndexPage() {
                       pt-4
                       pb-8
                       "
-                        >
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-end gap-2">
-                              <div>
-                                <p className="text-scale-900 ml-1 text-xs font-normal">
-                                  {tier.priceLabel}
-                                </p>
-                                <p className="text-5xl mt-2 gradient-text-scale-500 dark:gradient-text-scale-100">
-                                  ${tier.priceMonthly}
-                                </p>
-                                {tier.costUnit && (
-                                  <p className="text-scale-900 mt-1 text-xs">{tier.costUnit}</p>
-                                )}
+                      >
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-end gap-2">
+                            <div>
+                              <p className="text-scale-900 ml-1 text-xs font-normal">
+                                {tier.priceLabel}
+                              </p>
+                              <p className="text-5xl mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1">
+                                {tier.name !== 'Enterprise' && '$'} {tier.priceMonthly}
+                              </p>
+                              {tier.costUnit && (
+                                <p className="text-scale-900 mt-0.5 text-xs">{tier.costUnit}</p>
+                              )}
 
-                                {tier.warning && (
-                                  <p className="-mt-2">
-                                    <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
-                                      {tier.warning}
-                                    </span>
-                                  </p>
-                                )}
-                              </div>
+                              {tier.warning && (
+                                <p className="-mt-2">
+                                  <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
+                                    {tier.warning}
+                                  </span>
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                     <div
                       className={[
@@ -700,7 +700,7 @@ export default function IndexPage() {
                         scope="col"
                         key={tier.name}
                       >
-                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-semibold uppercase flex items-center gap-4">
+                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {tier.name}
                         </h3>
                         <div
