@@ -110,6 +110,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                     {content.img_url && (
                       <Image
                         src={`${basePath}${content.img_url}`}
+                        alt={content.title}
                         layout="responsive"
                         width="1460"
                         height="960"
