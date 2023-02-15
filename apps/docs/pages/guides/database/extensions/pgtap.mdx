@@ -15,9 +15,7 @@ Let's cover some basic concepts:
 - Unit tests: allow you to test small parts of a system (like a database table!).
 - TAP: stands for [Test Anything Protocol](http://testanything.org/). It is an framework which aims to simplify the error reporting during testing.
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -45,12 +43,12 @@ drop extension if exists pgtap;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 </TabPanel>
 </Tabs>
 
-### Testing tables
+## Testing tables
 
 ```sql
 begin;
@@ -68,7 +66,7 @@ API:
 - [`has_index()`](https://pgtap.org/documentation.html#has_index): Checks for the existence of a named index associated with the named table.
 - [`has_relation()`](https://pgtap.org/documentation.html#has_relation): Tests whether or not a relation exists in the database.
 
-### Testing columns
+## Testing columns
 
 ```sql
 begin;
@@ -86,7 +84,7 @@ API:
 - [`has_column()`](https://pgtap.org/documentation.html#has_column): Tests whether or not a column exists in a given table, view, materialized view or composite type.
 - [`col_is_pk()`](https://pgtap.org/documentation.html#col_is_pk): Tests whether the specified column or columns in a table is/are the primary key for that table.
 
-### Testing RLS Policies
+## Testing RLS Policies
 
 ```sql
 begin;
@@ -133,7 +131,7 @@ API:
 - [`results_eq()`](https://pgtap.org/documentation.html#results_eq)
 - [`results_ne()`](https://pgtap.org/documentation.html#results_ne)
 
-### Testing Functions
+## Testing Functions
 
 ```sql
 begin;
