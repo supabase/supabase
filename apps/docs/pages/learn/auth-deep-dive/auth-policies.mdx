@@ -164,6 +164,7 @@ language sql
 as $$
   select nullif(current_setting('request.headers', true)::json->>'user-agent', '')::text;
 $$;
+```
 
 See the full PostgreSQL policy docs here: [https://www.postgresql.org/docs/12/sql-createpolicy.html](https://www.postgresql.org/docs/12/sql-createpolicy.html)
 
