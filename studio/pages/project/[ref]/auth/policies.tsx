@@ -138,14 +138,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<IconSearch size="tiny" />}
             />
           </div>
-          <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-            >
+          <a
+            target="_blank"
+            href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+          >
+            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
               What is RLS?
-            </a>
-          </Button>
+            </Button>
+          </a>
         </div>
       </div>
       <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />

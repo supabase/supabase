@@ -39,7 +39,7 @@
     "clipboard": "^2.0.8",
     "common": "*",
     "config": "*",
-    "configcat-js": "^5.6.0",
+    "configcat-js": "^7.0.0",
     "dayjs": "^1.11.0",
     "file-saver": "^2.0.5",
     "generate-password": "^1.7.0",
