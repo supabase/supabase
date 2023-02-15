@@ -4,15 +4,7 @@
     "comment": "Used to parse an address into constituent elements. Generally used to support geocoding address normalization step."
   },
   {
-    "name": "address_standardizer-3",
-    "comment": "Used to parse an address into constituent elements. Generally used to support geocoding address normalization step."
-  },
-  {
     "name": "address_standardizer_data_us",
-    "comment": "Address Standardizer US dataset example"
-  },
-  {
-    "name": "address_standardizer_data_us-3",
     "comment": "Address Standardizer US dataset example"
   },
   {
@@ -80,6 +72,10 @@
     "comment": "HTTP client for PostgreSQL, allows web page retrieval inside the database."
   },
   {
+    "name": "hypopg",
+    "comment": "Hypothetical indexes for PostgreSQL"
+  },
+  {
     "name": "insert_username",
     "comment": "functions for tracking who changed a table"
   },
@@ -108,6 +104,10 @@
     "comment": "functions for tracking last modification time"
   },
   {
+    "name": "old_snapshot",
+    "comment": "utilities in support of old_snapshot_threshold"
+  },
+  {
     "name": "pageinspect",
     "comment": "inspect the contents of database pages at a low level"
   },
@@ -124,12 +124,40 @@
     "comment": "examine the free space map (FSM)"
   },
   {
+    "name": "pg_graphql",
+    "comment": "pg_graphql: GraphQL support"
+  },
+  {
+    "name": "pg_hashids",
+    "comment": "pg_hashids"
+  },
+  {
+    "name": "pg_jsonschema",
+    "comment": "pg_jsonschema"
+  },
+  {
+    "name": "pg_net",
+    "comment": "Async HTTP"
+  },
+  {
     "name": "pg_prewarm",
     "comment": "prewarm relation data"
   },
   {
+    "name": "pg_repack",
+    "comment": "Reorganize tables in PostgreSQL databases with minimal locks"
+  },
+  {
+    "name": "pg_stat_monitor",
+    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information."
+  },
+  {
     "name": "pg_stat_statements",
-    "comment": "track execution statistics of all SQL statements executed"
+    "comment": "track planning and execution statistics of all SQL statements executed"
+  },
+  {
+    "name": "pg_surgery",
+    "comment": "extension to perform surgery on a damaged relation"
   },
   {
     "name": "pg_trgm",
@@ -138,6 +166,10 @@
   {
     "name": "pg_visibility",
     "comment": "examine the visibility map (VM) and page-level visibility info"
+  },
+  {
+    "name": "pg_walinspect",
+    "comment": "functions to inspect contents of PostgreSQL Write-Ahead Log"
   },
   {
     "name": "pgaudit",
@@ -152,8 +184,24 @@
     "comment": "JSON Web Token API for Postgresql"
   },
   {
+    "name": "pgroonga",
+    "comment": "Super fast and all languages supported full text search index based on Groonga"
+  },
+  {
+    "name": "pgroonga_database",
+    "comment": "PGroonga database management module"
+  },
+  {
+    "name": "pgrouting",
+    "comment": "pgRouting Extension"
+  },
+  {
     "name": "pgrowlocks",
     "comment": "show row-level locking information"
+  },
+  {
+    "name": "pgsodium",
+    "comment": "Postgres extension for libsodium functions"
   },
   {
     "name": "pgstattuple",
@@ -192,15 +240,7 @@
     "comment": "PostGIS geometry and geography spatial types and functions"
   },
   {
-    "name": "postgis-3",
-    "comment": "PostGIS geometry and geography spatial types and functions"
-  },
-  {
     "name": "postgis_raster",
-    "comment": "PostGIS raster types and functions"
-  },
-  {
-    "name": "postgis_raster-3",
     "comment": "PostGIS raster types and functions"
   },
   {
@@ -208,23 +248,11 @@
     "comment": "PostGIS SFCGAL functions"
   },
   {
-    "name": "postgis_sfcgal-3",
-    "comment": "PostGIS SFCGAL functions"
-  },
-  {
     "name": "postgis_tiger_geocoder",
     "comment": "PostGIS tiger geocoder and reverse geocoder"
   },
   {
-    "name": "postgis_tiger_geocoder-3",
-    "comment": "PostGIS tiger geocoder and reverse geocoder"
-  },
-  {
     "name": "postgis_topology",
-    "comment": "PostGIS topology spatial types and functions"
-  },
-  {
-    "name": "postgis_topology-3",
     "comment": "PostGIS topology spatial types and functions"
   },
   {
@@ -236,6 +264,10 @@
     "comment": "functions for implementing referential integrity (obsolete)"
   },
   {
+    "name": "rum",
+    "comment": "RUM index access method"
+  },
+  {
     "name": "seg",
     "comment": "data type for representing line segments or floating-point intervals"
   },
@@ -244,12 +276,20 @@
     "comment": "information about SSL certificates"
   },
   {
+    "name": "supautils",
+    "comment": "Supabase standard library"
+  },
+  {
     "name": "tablefunc",
     "comment": "functions that manipulate whole tables, including crosstab"
   },
   {
     "name": "tcn",
     "comment": "Triggered change notifications"
+  },
+  {
+    "name": "timescaledb",
+    "comment": "Enables scalable inserts and complex queries for time-series data"
   },
   {
     "name": "tsm_system_rows",
@@ -269,18 +309,14 @@
   },
   {
     "name": "vector",
-    "comment": "vector data type with similarity search"
+    "comment": "vector data type and ivfflat access method"
+  },
+  {
+    "name": "wrappers",
+    "comment": "Foreign data wrappers developed by Supabase"
   },
   {
     "name": "xml2",
     "comment": "XPath querying and XSLT"
-  },
-  {
-    "name": "rum",
-    "comment": "GIN-like index for text search"
-  },
-  {
-    "name": "pg_repack",
-    "comment": "optimize physical storage and remove bloat from tables and indexes"
   }
 ]
