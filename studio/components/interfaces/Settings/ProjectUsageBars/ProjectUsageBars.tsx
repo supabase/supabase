@@ -1,13 +1,14 @@
 import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, IconInfo, Loading } from 'ui'
+import { Badge, Button, IconAlertCircle, IconInfo, Loading, IconExternalLink } from 'ui'
 
-import { useStore, useProjectUsage } from 'hooks'
+import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -17,7 +18,7 @@ interface Props {
 
 const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
-  const { usage, error, isLoading } = useProjectUsage(projectRef)
+  const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
   const router = useRouter()
 
   const subscriptionTier = ui.selectedProject?.subscription_tier
@@ -43,7 +44,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project's usage data: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project's usage data: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
@@ -59,6 +60,26 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     )
   }
 
+  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+
+  const featureFootnotes: Record<string, JSX.Element> = {
+    db_size: (
+      <div className="flex justify-between items-center">
+        <div className="flex flex-row space-x-4 text-scale-1000">
+          {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
+
+          {isPaidTier && <Badge>Auto-Scaling</Badge>}
+        </div>
+
+        <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+          <a target="_blank" href="https://supabase.com/docs/guides/platform/database-usage">
+            What is disk size?
+          </a>
+        </Button>
+      </div>
+    ),
+  }
+
   return (
     <Loading active={isLoading}>
       {usage && (
@@ -68,8 +89,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
               showUsageExceedMessage &&
               product.features
                 .map((feature) => {
-                  const featureUsage = usage[feature.key]
-                  return featureUsage.usage / featureUsage.limit > 1
+                  const featureUsage = usage[feature.key as ProjectUsageResponseUsageKeys]
+                  return (featureUsage.usage ?? 0) / featureUsage.limit > 1
                 })
                 .some((x) => x === true)
 
@@ -99,23 +120,23 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         </div>
                       </th>
                       {/* Plan Limits */}
-                      <th className="hidden p-3 text-left text-xs font-medium leading-4 text-gray-400 lg:table-cell">
+                      <th className="hidden p-3 text-xs font-medium leading-4 text-left text-gray-400 lg:table-cell">
                         {isExceededUsage && <Badge color="red">Exceeded usage</Badge>}
                       </th>
                       {/* Usage */}
-                      <th className="p-3 text-left text-xs font-medium leading-4 text-gray-400" />
+                      <th className="p-3 text-xs font-medium leading-4 text-left text-gray-400" />
                     </tr>
                   </thead>
 
                   {/* Line items */}
                   {usage === undefined ? (
-                    <div className="w-96 px-4 pt-1 pb-4">
+                    <div className="px-4 pt-1 pb-4 w-96">
                       <ShimmeringLoader />
                     </div>
                   ) : (
                     <tbody>
                       {product.features.map((feature) => {
-                        const featureUsage = usage[feature.key]
+                        const featureUsage = usage[feature.key as ProjectUsageResponseUsageKeys]
                         const usageValue = featureUsage.usage || 0
                         const usageRatio = usageValue / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
@@ -125,7 +146,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         let usageElement
                         if (!isAvailableInPlan) {
                           usageElement = (
-                            <div className="flex justify-between items-center">
+                            <div className="flex items-center justify-between">
                               <span>Not included in {planName} tier</span>
                               <Button
                                 size="tiny"
@@ -170,12 +191,12 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           )
                         }
 
-                        return (
+                        return [
                           <tr
                             key={feature.title}
                             className="border-t border-panel-border-light dark:border-panel-border-dark"
                           >
-                            <td className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200">
+                            <td className="px-6 py-3 text-sm whitespace-nowrap text-scale-1200">
                               {feature.title}
                               {feature.tooltip && (
                                 <Tooltip.Root delayDuration={0}>
@@ -203,7 +224,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             {ui.selectedProject?.subscription_tier !== undefined && (
                               <>
                                 {showUsageExceedMessage && (
-                                  <td className="hidden w-1/5 whitespace-nowrap p-3 text-sm text-scale-1200 lg:table-cell">
+                                  <td className="hidden w-1/5 p-3 text-sm whitespace-nowrap text-scale-1200 lg:table-cell">
                                     {isAvailableInPlan ? (
                                       <>{(usageRatio * 100).toFixed(2)} %</>
                                     ) : (
@@ -216,8 +237,18 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                 </td>
                               </>
                             )}
-                          </tr>
-                        )
+                          </tr>,
+                          featureFootnotes[feature.key] && (
+                            <tr key={`${feature.title}-footnote`}>
+                              <td
+                                className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200"
+                                colSpan={3}
+                              >
+                                {featureFootnotes[feature.key]}
+                              </td>
+                            </tr>
+                          ),
+                        ]
                       })}
                     </tbody>
                   )}
