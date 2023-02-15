@@ -6,7 +6,7 @@ export const meta = {
   description: 'Requires a where clause for update and delete',
 }
 
-[pg-safeupdate](https://github.com/eradman/pg-safeupdate) is a PostgreSQL extension designed to prevent users from accidentally updating or deleting too many records in a single statement by requiring a "where" clause in all update and delete statements. 
+[pg-safeupdate](https://github.com/eradman/pg-safeupdate) is a PostgreSQL extension designed to prevent users from accidentally updating or deleting too many records in a single statement by requiring a "where" clause in all update and delete statements.
 
 The `pg-safeupdate` extension is a useful tool for protecting data integrity and preventing accidental data loss. Without it, a user could accidentally execute an update or delete statement that affects all records in a table. With `pg-safeupdate`, users are required to be more deliberate in their update and delete statements, which reduces the risk of significant error.
 
