@@ -171,7 +171,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                       disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                       className={[
                         'roles-toggle',
-                        ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                        disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
                       ].join(' ')}
                       afterLabel={
                         !disabled &&

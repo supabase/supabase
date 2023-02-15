@@ -29,7 +29,7 @@ export const ROLE_PERMISSIONS: any = {
     description: 'User can create databases',
   },
   can_bypass_rls: {
-    disabled: false,
+    disabled: true,
     description: 'User bypasses every row level security policy',
   },
   is_superuser: {
