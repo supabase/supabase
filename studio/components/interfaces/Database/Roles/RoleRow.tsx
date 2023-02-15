@@ -35,7 +35,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
     can_bypass_rls,
   } = role
 
-  const onSaveChanges = async (values: any, { setSubmitting }: any) => {
+  const onSaveChanges = async (values: any, { setSubmitting, resetForm }: any) => {
     setSubmitting(true)
     const { is_superuser, is_replication_role, ...payload } = values
     const res = await meta.roles.update(role.id, payload)
@@ -51,6 +51,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
         category: 'success',
         message: `Successfully updated role "${role.name}"`,
       })
+      resetForm({ values: { ...values }, initialValues: { ...values } })
     }
   }
 

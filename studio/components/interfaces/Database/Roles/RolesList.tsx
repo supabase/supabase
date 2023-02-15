@@ -1,10 +1,10 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { Button, Input, IconPlus, IconSearch, IconX, Badge } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
 import RoleRow from './RoleRow'
@@ -18,13 +18,23 @@ interface Props {
 }
 
 const RolesList: FC<Props> = ({}) => {
-  const { ref } = useParams()
   const { meta } = useStore()
 
+  const [maxConnectionLimit, setMaxConnectionLimit] = useState(0)
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+
+  useEffect(() => {
+    const getMaxConnectionLimit = async () => {
+      const res = await meta.query('show max_connections')
+      if (!res.error) {
+        setMaxConnectionLimit(Number(res[0]?.max_connections ?? 0))
+      }
+    }
+    getMaxConnectionLimit()
+  }, [])
 
   const roles = meta.roles.list()
   const filteredRoles = (
@@ -36,7 +46,6 @@ const RolesList: FC<Props> = ({}) => {
     SUPABASE_ROLES.includes(role.name)
   )
 
-  const connectionLimit = Math.max(...roles.map((role: PostgresRole) => role.connection_limit))
   const totalActiveConnections = roles
     .map((role: PostgresRole) => role.active_connections)
     .reduce((a, b) => a + b, 0)
@@ -107,16 +116,18 @@ const RolesList: FC<Props> = ({}) => {
                 <div className="w-42">
                   <SparkBar
                     type="horizontal"
-                    max={connectionLimit}
+                    max={maxConnectionLimit}
                     value={totalActiveConnections}
                     barClass={
-                      totalActiveConnections > 0.9 * connectionLimit
+                      maxConnectionLimit === 0
+                        ? 'bg-gray-100 dark:bg-gray-600'
+                        : totalActiveConnections > 0.9 * maxConnectionLimit
                         ? 'bg-red-800'
-                        : totalActiveConnections > 0.75 * connectionLimit
+                        : totalActiveConnections > 0.75 * maxConnectionLimit
                         ? 'bg-amber-900'
                         : 'bg-green-800'
                     }
-                    labelTop={`${totalActiveConnections}/${connectionLimit}`}
+                    labelTop={`${totalActiveConnections}/${maxConnectionLimit}`}
                     labelBottom="Active connections"
                   />
                 </div>
