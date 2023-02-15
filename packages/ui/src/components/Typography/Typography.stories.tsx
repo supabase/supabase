@@ -1,13 +1,10 @@
 import React from 'react'
-// import { AutoForm } from 'uniforms'
 // @ts-ignore
 import MarkdownExample from './../../lib/MarkdownSample.md'
 import ReactMarkdown from 'react-markdown'
 const gfm = require('remark-gfm')
 
 import Typography from '.'
-// @ts-ignore
-import { Space } from '../../index'
 
 const { Title, Text, Link } = Typography
 

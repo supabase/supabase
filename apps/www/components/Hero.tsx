@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, Space } from 'ui'
+import { Button, IconBookOpen } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'

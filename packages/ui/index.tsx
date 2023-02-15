@@ -28,7 +28,6 @@ export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
 
 // UTILITIES
-export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
 

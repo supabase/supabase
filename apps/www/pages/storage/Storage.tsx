@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'

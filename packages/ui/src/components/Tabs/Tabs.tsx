@@ -113,7 +113,6 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
             </TabsPrimitive.Trigger>
           )
         })}
-        {/* </Space> */}
         {addOnAfter}
       </TabsPrimitive.List>
       <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>

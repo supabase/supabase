@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 // import but don't use for stylesheet placement
 // @ts-ignore
 import ModalStyles from './Modal.module.css'
-import { Button, Space } from './../../../index'
+import { Button } from './../../../index'
 import { AnimationTailwindClasses } from '../../types'
 import * as Dialog from '@radix-ui/react-dialog'
 import styleHandler from '../../lib/theme/styleHandler'

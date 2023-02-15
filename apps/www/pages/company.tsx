@@ -15,7 +15,7 @@ import InvestorData from 'data/Investors'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button, Card, Space } from 'ui'
+import { Button, Card } from 'ui'
 import { NextSeo } from 'next-seo'
 
 type Props = {}
