@@ -20,7 +20,6 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
       )[0],
     []
   )
-  console.log('pricingAddOn:', pricingAddOn)
 
   return (
     <Modal
