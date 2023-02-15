@@ -307,14 +307,14 @@ const Press = () => {
           <Link href={x.href} key={x.href}>
             <a target="_blank">
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
-                <Space className="h-40 justify-between" direction="vertical">
+                <div className="h-40 justify-between">
                   <div>
                     <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
                     <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                       {x.title}
                     </p>
                   </div>
-                </Space>
+                </div>
               </Card>
             </a>
           </Link>
@@ -325,14 +325,14 @@ const Press = () => {
           <Link href={x.href} key={x.href}>
             <a target="_blank">
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
-                <Space className="h-40 justify-between" direction="vertical">
+                <div className="h-40 justify-between">
                   <div>
                     <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
                     <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                       {x.title}
                     </p>
                   </div>
-                </Space>
+                </div>
               </Card>
             </a>
           </Link>

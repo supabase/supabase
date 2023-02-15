@@ -2,7 +2,7 @@ import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { Tabs, Button, Space } from 'ui'
+import { Tabs, Button } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
@@ -122,7 +122,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                   </span>
                 </p>
                 <p className="p mb-6 block">{extension.detail_text}</p>
-                <Space className="justify-between">
+                <div className="justify-between">
                   {extension.url && (
                     <Link href={extension.url} as={extension.url}>
                       <a className="ml-px">
@@ -139,7 +139,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                         return <Badge key={badge}>{badge}</Badge>
                       })}
                   </div>
-                </Space>
+                </div>
               </SwiperSlide>
             )
           })}

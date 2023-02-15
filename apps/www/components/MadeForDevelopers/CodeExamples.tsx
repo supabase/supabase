@@ -11,7 +11,7 @@ import {
   ExampleProps,
 } from 'data/CodeExamples'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
-import { Button, IconCopy, Space, Tabs } from 'ui'
+import { Button, IconCopy, Tabs } from 'ui'
 
 SyntaxHighlighter.registerLanguage('javascript', js)
 
@@ -72,15 +72,8 @@ const CodeExamples = () => {
   }
 
   const Buttons = () => (
-    <Space direction="vertical" size={1}>
+    <div>
       {Object.values(exampleList).map((x, i) => {
-        const length: number = Object.values(exampleList).length - 1
-        // const radiusStyles = {
-        //   borderBottomRightRadius: i !== length ? '0' : undefined,
-        //   borderBottomLeftRadius: i !== length ? '0' : undefined,
-        //   borderTopLeftRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
-        //   borderTopRightRadius: i !== length + 1 && i !== 0 ? '0' : undefined,
-        // }
         return (
           <Button
             block
@@ -93,20 +86,15 @@ const CodeExamples = () => {
                 ? {
                     background: 'white',
                     color: '#3d3d3d',
-                    // borderBottom: i !== 0 ? 'none' : 'red',
-                    // ...radiusStyles,
                   }
-                : {
-                    // borderBottom: i !== length ? 'none' : undefined,
-                    // ...radiusStyles,
-                  }
+                : {}
             }
           >
             {x.name}
           </Button>
         )
       })}
-    </Space>
+    </div>
   )
 
   const TabNav = () => (

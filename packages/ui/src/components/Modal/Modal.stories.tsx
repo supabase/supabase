@@ -543,7 +543,7 @@ customFooter.args = {
   title: 'This is the title of the modal',
   description: 'And i am the description',
   customFooter: [
-    <Space>
+    <div>
       <div>
         <Badge color="red" dot size="small">
           Proceed with caution
@@ -551,7 +551,7 @@ customFooter.args = {
       </div>
       <Button type="secondary">Cancel</Button>
       <Button danger>Delete</Button>
-    </Space>,
+    </div>,
   ],
 }
 
@@ -564,14 +564,14 @@ customFooterVertical.args = {
   description: 'And i am the description',
   layout: 'vertical',
   customFooter: [
-    <Space style={{ width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <Button size="medium" block type="secondary">
         Cancel
       </Button>
       <Button size="medium" block danger icon={<IconTrash />}>
         Delete
       </Button>
-    </Space>,
+    </div>,
   ],
 }
 
@@ -586,10 +586,10 @@ customFooterOneButton.args = {
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.',
   layout: 'vertical',
   customFooter: [
-    <Space style={{ width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <Button size="medium" block icon={<IconCheck />}>
         Confirm
       </Button>
-    </Space>,
+    </div>,
   ],
 }

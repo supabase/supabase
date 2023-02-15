@@ -90,7 +90,7 @@ const Modal = ({
   const footerContent = customFooter ? (
     customFooter
   ) : (
-    <Space
+    <div
       className="flex w-full space-x-2"
       style={{
         width: '100%',
@@ -104,7 +104,7 @@ const Modal = ({
       <Button onClick={onConfirm} loading={loading} danger={variant === 'danger'}>
         {confirmText}
       </Button>
-    </Space>
+    </div>
   )
 
   function handleOpenChange(open: boolean) {
