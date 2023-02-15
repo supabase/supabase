@@ -8,7 +8,7 @@ export const meta = {
 
 [pgRouting](http://pgrouting.org) is PostgreSQL and [PostGIS](http://postgis.net) extension adding geospatial routing functionality.
 
-The core functionality of pgRouting is a set of path finding algorithms including:
+The core functionality of `pgRouting` is a set of path finding algorithms including:
 
 - All Pairs Shortest Path, Johnson’s Algorithm
 - All Pairs Shortest Path, Floyd-Warshall Algorithm
@@ -22,9 +22,8 @@ The core functionality of pgRouting is a set of path finding algorithms includin
 - Traveling Sales Person
 - Turn Restriction Shortest Path (TRSP)
 
-## Usage
 
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -56,7 +55,7 @@ To disable an extension you can call `drop extension`.
 </TabPanel>
 </Tabs>
 
-## Example Usage
+## Example
 
 As an example, we'll solve the [traveling salesman probelem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the pgRouting's `pgr_TSPeuclidean` function from some PostGIS coodinates.
 

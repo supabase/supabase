@@ -22,9 +22,8 @@ export const meta = {
 
 A full list of statistics is available in the [pg_stat_statements docs](https://www.postgresql.org/docs/current/pgstatstatements.html).
 
-## Usage
 
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -53,12 +52,12 @@ drop extension if exists pg_stat_statements;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 </TabPanel>
 </Tabs>
 
-### Inspecting activity
+## Inspecting activity
 
 A common use for `pg_stat_statements` is to track down expensive or slow queries. The `pg_stat_statements` view contains a row for each executed query with statistics inlined. For example, you can leverage the statistics to identify frequently executed and slow queries against a given table.
 
@@ -82,7 +81,7 @@ order by
 	calls desc
 ```
 
-From the results, an informed decision about which queries to optimize, index, or adjust can be made.
+From the results, we can make an informed decision about which queries to optimize or index.
 
 ## Resources
 

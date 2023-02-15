@@ -6,9 +6,9 @@ export const meta = {
   description: 'Generate Short UIDs from Numbers',
 }
 
-[pg_hashids] provides a simple and secure way to generate short, unique, non-sequential ids from numbers. The hashes are intended to be small, easy-to-remember identifiers that can be used to obfuscate data (optionally) with a password, alphabet, and salt. For example, you may wish to hide data like user IDs, order numbers, or tracking codes in favor of `pg_hashid`'s unique identifers.
+[pg_hashids](https://github.com/iCyberon/pg_hashids) provides a secure way to generate short, unique, non-sequential ids from numbers. The hashes are intended to be small, easy-to-remember identifiers that can be used to obfuscate data (optionally) with a password, alphabet, and salt. For example, you may wish to hide data like user IDs, order numbers, or tracking codes in favor of `pg_hashid`'s unique identifers.
 
-### Enable the Extension
+## Enable the Extension
 
 <Tabs
   scrollable
@@ -37,7 +37,7 @@ drop extension if exists pg_hashids;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep your `public` schema clean.
 
 </TabPanel>
 </Tabs>

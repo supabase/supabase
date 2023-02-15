@@ -13,9 +13,7 @@ The `uuid-ossp` extension can be used to generate a `UUID`.
 A `UUID` is a "Universally Unique Identifier" and it is, for practical purposes, unique.
 This makes them particularly well suited as Primary Keys. It is occasionally referred to as a `GUID`, which stands for "Globally Unique Identifier".
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -46,7 +44,7 @@ drop extension if exists "uuid-ossp";
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension, call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 **Note**:
 Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
@@ -54,11 +52,11 @@ Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 </TabPanel>
 </Tabs>
 
-### The `uuid` type
+## The `uuid` type
 
 Once the extension is enabled, you now have access to a `uuid` type.
 
-### `uuid_generate_v1()`
+## `uuid_generate_v1()`
 
 Creates a UUID value based on the combination of computer’s MAC address, current timestamp, and a random value.
 
@@ -67,7 +65,7 @@ Creates a UUID value based on the combination of computer’s MAC address, curre
   applications.
 </Admonition>
 
-### `uuid_generate_v4()`
+## `uuid_generate_v4()`
 
 Creates UUID values based solely on random numbers. You can also use Postgres's built-in [`gen_random_uuid()`](https://www.postgresql.org/docs/current/functions-uuid.html) function to generate a UUIDv4.
 

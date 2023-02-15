@@ -8,9 +8,8 @@ export const meta = {
 
 The [pgjwt](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
 
-## Usage
 
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -39,7 +38,7 @@ drop extension if exists pgjwt;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 </TabPanel>
 </Tabs>
