@@ -21,12 +21,10 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
-// export * from './src/components/Breadcrumb'
 
 // NAV
 
 export * from './src/components/Menu'
-export * from './src/components/Breadcrumb'
 
 // OVERLAYS
 
