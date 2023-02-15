@@ -244,6 +244,7 @@ You would [connect](../../guides/database/connecting-to-postgres#direct-connecti
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
   -c "\COPY movies FROM './movies.csv';"
 ```
+
 Additionally use the `DELIMITER`, `HEADER` and `FORMAT` options as defined in the PostgreSQL [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
 
 ```bash
