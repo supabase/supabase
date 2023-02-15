@@ -70,7 +70,7 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider type="horizontal" light orientation="center" />
+                <Divider />
                 <div>
                   <div
                     className="
@@ -118,7 +118,7 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider type="horizontal" light orientation="center" />
+                <Divider />
                 <div>
                   <div
                     className="
@@ -189,7 +189,7 @@ const Index = ({}: Props) => {
                     </p>
                   </div>
                 </div>
-                <Divider type="horizontal" light orientation="center" />
+                <Divider />
                 <div>
                   <div
                     className="

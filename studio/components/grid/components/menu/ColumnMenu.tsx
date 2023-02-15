@@ -80,7 +80,7 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
         </Dropdown.Item>
         {state.editable && onDeleteColumn !== undefined && (
           <>
-            <Divider light />
+            <Divider />
             <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
               Delete Column
             </Dropdown.Item>

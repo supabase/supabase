@@ -42,24 +42,24 @@ const RolesSettings: FC<Props> = ({ selectedRole, onSelectBack = () => {} }) => 
           <p className="text-sm">Super user</p>
           <code className="text-sm">{selectedRole.is_superuser ? 'true' : 'false'}</code>
         </Panel.Content>
-        <Divider light />
+        <Divider />
         <Panel.Content className="flex w-full items-center justify-between">
           <p className="text-sm">User can login</p>
           <code className="text-sm">{selectedRole.can_login ? 'true' : 'false'}</code>
         </Panel.Content>
-        <Divider light />
+        <Divider />
         <Panel.Content className="flex w-full items-center justify-between">
           <p className="text-sm">User can create databases</p>
           <code className="text-sm">{selectedRole.can_create_db ? 'true' : 'false'}</code>
         </Panel.Content>
-        <Divider light />
+        <Divider />
         <Panel.Content className="flex w-full items-center justify-between">
           <p className="text-sm">
             User can initiate streaming replication and put the system in and out of backup mode
           </p>
           <code className="text-sm">{selectedRole.is_replication_role ? 'true' : 'false'}</code>
         </Panel.Content>
-        <Divider light />
+        <Divider />
         <Panel.Content className="flex w-full items-center justify-between">
           <p className="text-sm">User bypasses every row level security policy</p>
           <code className="text-sm">{selectedRole.can_bypass_rls ? 'true' : 'false'}</code>

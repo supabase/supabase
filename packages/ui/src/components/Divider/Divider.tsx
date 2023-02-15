@@ -6,9 +6,9 @@ interface Props {
   style?: React.CSSProperties
 }
 
-export default function Divider({ children, style }: Props) {
+export default function Divider({ children, style, className }: Props) {
   return (
-    <div role="separator" style={style}>
+    <div role="separator" style={style} className={className}>
       {children && <span>{children}</span>}
     </div>
   )

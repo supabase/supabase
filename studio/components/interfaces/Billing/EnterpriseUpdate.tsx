@@ -241,25 +241,25 @@ const EnterpriseUpdate: FC<Props> = ({
                   <>
                     {currentAddons.supportPlan !== undefined && (
                       <>
-                        <Divider light />
+                        <Divider />
                         <SupportPlan currentOption={currentAddons.supportPlan} />
                       </>
                     )}
-                    <Divider light />
+                    <Divider />
                     <CustomDomainSelection
                       options={customDomainOptions}
                       currentOption={currentAddons.customDomains}
                       selectedOption={selectedAddons.customDomains}
                       onSelectOption={setSelectedCustomDomainOption}
                     />
-                    <Divider light />
+                    <Divider />
                     <PITRDurationSelection
                       pitrDurationOptions={pitrDurationOptions}
                       currentPitrDuration={currentAddons.pitrDuration}
                       selectedPitrDuration={selectedAddons.pitrDuration}
                       onSelectOption={setSelectedPITRDuration}
                     />
-                    <Divider light />
+                    <Divider />
                     <ComputeSizeSelection
                       computeSizes={computeSizes || []}
                       currentComputeSize={currentAddons.computeSize}

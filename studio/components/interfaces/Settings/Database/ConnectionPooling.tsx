@@ -49,7 +49,7 @@ const ConnectionPooling: FC<Props> = () => {
                 <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
                 <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
               </div>
-              <Divider light />
+              <Divider />
             </Fragment>
           ))}
 
@@ -202,7 +202,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           <div className="space-y-6 py-4">
             <ToggleField name="pgbouncer_enabled" />
 
-            <Divider light />
+            <Divider />
 
             {updates.pgbouncer_enabled && (
               <>
@@ -225,11 +225,11 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                     .
                   </p>
                 </div>
-                <Divider light />
+                <Divider />
                 <AutoField name="ignore_startup_parameters" />
               </>
             )}
-            <Divider light />
+            <Divider />
             <Input
               className="input-mono"
               layout="horizontal"
@@ -239,7 +239,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
               value={connectionInfo.db_port}
               label="Port"
             />
-            <Divider light />
+            <Divider />
             <Input
               className="input-mono"
               layout="vertical"

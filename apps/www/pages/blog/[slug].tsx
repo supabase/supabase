@@ -338,7 +338,7 @@ function BlogPostPage(props: any) {
                                   </span>
                                 </div>
                               </p>
-                              <Divider light className="mt-2" />
+                              <Divider className="mt-2" />
                             </div>
                           </Link>
                         ))}

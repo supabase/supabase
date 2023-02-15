@@ -32,7 +32,7 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>
           <div className="!my-10 w-full">
-            <Divider light />
+            <Divider />
           </div>
           <div className="flex flex-col items-center px-12 space-y-2">
             <p>In the meantime, tap into our community</p>
@@ -67,7 +67,7 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
         </>
       )}
       <div className="!mt-10 w-full">
-        <Divider light />
+        <Divider />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
         <Link href="/projects">

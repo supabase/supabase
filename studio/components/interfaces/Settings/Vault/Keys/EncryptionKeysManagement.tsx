@@ -186,7 +186,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                         />
                       </div>
                     </div>
-                    {idx !== keys.length - 1 && <Divider light />}
+                    {idx !== keys.length - 1 && <Divider />}
                   </Fragment>
                 )
               })}

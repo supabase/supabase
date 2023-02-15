@@ -445,7 +445,7 @@ const ProjectLinks: FC = observer(() => {
         <h4 className="text-lg">Link Vercel to Supabase</h4>
         <p>Choose which of your Vercel projects to link to your existing Supabase projects.</p>
       </div>
-      <Divider light />
+      <Divider />
       <div className="space-y-2">
         <div className="flex justify-between">
           <p className="text-scale-1000">Vercel Projects</p>
@@ -453,7 +453,7 @@ const ProjectLinks: FC = observer(() => {
           <p className="text-scale-1000">Supabase Projects</p>
         </div>
         <ProjectLinkList />
-        <Divider light />
+        <Divider />
         <div className="flex justify-end py-4">{displayButton()}</div>
       </div>
     </div>

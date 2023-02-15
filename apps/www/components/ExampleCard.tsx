@@ -29,7 +29,7 @@ function ExampleCard(props: any) {
           </div>
         </div>
       </div>
-      <Divider light />
+      <Divider />
       <div>
         <div
           className="

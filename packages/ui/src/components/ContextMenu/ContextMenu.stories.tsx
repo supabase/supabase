@@ -43,16 +43,12 @@ export const Default = (args: any) => (
             </Typography.Text>
           </div>
         </ContextMenu.Misc>,
-        <Divider light />,
+        <Divider />,
         <ContextMenu.Label>Group label</ContextMenu.Label>,
-        <ContextMenu.Item onClick={() => console.log('clicked')}>
-          Account
-        </ContextMenu.Item>,
+        <ContextMenu.Item onClick={() => console.log('clicked')}>Account</ContextMenu.Item>,
         <ContextMenu.Item>Settings</ContextMenu.Item>,
-        <Divider light />,
-        <ContextMenu.Item icon={<IconLogIn size="tiny" />}>
-          Log out
-        </ContextMenu.Item>,
+        <Divider />,
+        <ContextMenu.Item icon={<IconLogIn size="tiny" />}>Log out</ContextMenu.Item>,
       ]}
     >
       {triggerArea}
@@ -71,7 +67,7 @@ export const doNotcloseOverlay = (args: any) => (
           <Typography.Text>Signed in as </Typography.Text>
           <Typography.Text strong>tom@example.com </Typography.Text>
         </ContextMenu.Misc>,
-        <Divider light />,
+        <Divider />,
         <ContextMenu.Item>Account</ContextMenu.Item>,
         <ContextMenu.Item>Settings</ContextMenu.Item>,
         <ContextMenu.Item>
@@ -104,10 +100,10 @@ export const withCustomStyles = (args: any) => (
           <Typography.Text>Signed in as </Typography.Text>
           <Typography.Text strong>tom@example.com </Typography.Text>
         </ContextMenu.Item>,
-        <Divider light />,
+        <Divider />,
         <ContextMenu.Item>Account</ContextMenu.Item>,
         <ContextMenu.Item>Settings</ContextMenu.Item>,
-        <Divider light />,
+        <Divider />,
         <ContextMenu.Item>
           <Button type="default" icon={<IconLogOut />}>
             Log out
@@ -130,11 +126,9 @@ export const Checkbox = (args: any) => {
       <ContextMenu
         {...args}
         overlay={[
-          <ContextMenu.Item icon={<IconSettings size="small" />}>
-            Account
-          </ContextMenu.Item>,
+          <ContextMenu.Item icon={<IconSettings size="small" />}>Account</ContextMenu.Item>,
           <ContextMenu.Item>Settings</ContextMenu.Item>,
-          <Divider light />,
+          <Divider />,
           <ContextMenu.Checkbox checked={checked} onChange={setChecked}>
             Show subtitles
           </ContextMenu.Checkbox>,

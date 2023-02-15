@@ -128,7 +128,7 @@ const SecretsManagement: FC<Props> = ({}) => {
                       onSelectEdit={setSelectedSecretToEdit}
                       onSelectRemove={setSelectedSecretToRemove}
                     />
-                    {idx !== secrets.length - 1 && <Divider light />}
+                    {idx !== secrets.length - 1 && <Divider />}
                   </Fragment>
                 )
               })}

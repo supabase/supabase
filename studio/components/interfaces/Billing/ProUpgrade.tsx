@@ -284,11 +284,11 @@ const ProUpgrade: FC<Props> = ({
                 <>
                   {currentAddons.supportPlan !== undefined && (
                     <>
-                      <Divider light />
+                      <Divider />
                       <SupportPlan currentOption={currentAddons.supportPlan} />
                     </>
                   )}
-                  <Divider light />
+                  <Divider />
                   <CustomDomainSelection
                     options={customDomainOptions}
                     currentOption={
@@ -297,7 +297,7 @@ const ProUpgrade: FC<Props> = ({
                     selectedOption={selectedAddons.customDomains}
                     onSelectOption={setSelectedCustomDomainOption}
                   />
-                  <Divider light />
+                  <Divider />
                   <PITRDurationSelection
                     pitrDurationOptions={pitrDurationOptions}
                     currentPitrDuration={
@@ -306,7 +306,7 @@ const ProUpgrade: FC<Props> = ({
                     selectedPitrDuration={selectedAddons.pitrDuration}
                     onSelectOption={setSelectedPITRDuration}
                   />
-                  <Divider light />
+                  <Divider />
                   <ComputeSizeSelection
                     computeSizes={computeSizes || []}
                     currentComputeSize={currentAddons.computeSize}

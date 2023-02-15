@@ -365,12 +365,12 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               </div>
             )}
 
-            <Divider light />
+            <Divider />
 
             {/* {values.category === 'Problem' && (
               <>
                 <ClientLibrariesGuidance />
-                <Divider light />
+                <Divider />
               </>
             )} */}
 

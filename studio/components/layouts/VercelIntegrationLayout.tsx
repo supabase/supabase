@@ -26,7 +26,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
             </div>
           </div>
         </div>
-        <Divider light />
+        <Divider />
         <div className="flex-grow">
           <div className="max-w-7xl h-full mx-auto px-4 sm:px-6">
             <div className="max-w-xl h-full mx-auto py-10">{children}</div>
