@@ -156,15 +156,14 @@ create policy "Only Blizzard staff can update leaderboard"
 Supabase comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`.
 
 To create your own functions, navigate to the SQL editor and create a a new query.
-```
-create or replace function useragent() returns text as $$
+
+```sql
+create or replace function user_agent() 
+returns text 
+language sql
+as $$
   select nullif(current_setting('request.headers', true)::json->>'user-agent', '')::text;
-$$ language sql;
-```
-You can access request headers, cookies and JWT claims by reading GUC variables set by PostgREST per request. They are named `request.headers`, `request.cookies` and `request.jwt.claims`.
-
-
-Read more about the http-context here: [https://postgrest.org/en/v10.0/api.html#http-context](https://postgrest.org/en/v10.0/api.html#http-context)
+$$;
 
 See the full PostgreSQL policy docs here: [https://www.postgresql.org/docs/12/sql-createpolicy.html](https://www.postgresql.org/docs/12/sql-createpolicy.html)
 
