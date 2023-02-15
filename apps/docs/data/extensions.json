@@ -158,6 +158,7 @@
     "default_version": "1.3",
     "installed_version": "1.3",
     "comment": "HTTP client for PostgreSQL, allows web page retrieval inside the database.",
+    "link": "https://supabase.com/docs/guides/database/extensions/http",
     "tags": []
   },
   {
@@ -238,6 +239,7 @@
     "default_version": "1.3",
     "installed_version": "1.3",
     "comment": "Job scheduler for PostgreSQL",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgcron",
     "tags": []
   },
   {
@@ -262,6 +264,7 @@
     "default_version": "1.7",
     "installed_version": null,
     "comment": "track execution statistics of all SQL statements executed",
+    "link": "https://supabase.com/docs/guides/database/extensions/pg_stat_statements",
     "tags": []
   },
   {
@@ -286,6 +289,7 @@
     "default_version": "1.4",
     "installed_version": null,
     "comment": "provides auditing functionality",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgaudit",
     "tags": []
   },
   {
@@ -302,6 +306,7 @@
     "default_version": "0.1.0",
     "installed_version": "0.1.0",
     "comment": "JSON Web Token API for Postgresql",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgjwt",
     "tags": []
   },
   {
@@ -326,6 +331,7 @@
     "default_version": "1.1.0",
     "installed_version": null,
     "comment": "Unit testing for PostgreSQL",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgtap",
     "tags": []
   },
   {
@@ -366,6 +372,7 @@
     "default_version": "1.11",
     "installed_version": null,
     "comment": "extended check for plpgsql functions",
+    "href": "https://supabase.com/docs/guides/database/extensions/plpgsql_check",
     "tags": []
   },
   {
@@ -374,6 +381,7 @@
     "default_version": "3.0alpha",
     "installed_version": null,
     "comment": "PL/JavaScript (v8) trusted procedural language",
+    "link": "http://localhost:3001/docs/guides/database/extensions/plv8",
     "tags": []
   },
   {
@@ -382,6 +390,7 @@
     "default_version": "3.1.1",
     "installed_version": null,
     "comment": "PostGIS geometry and geography spatial types and functions",
+    "link": "https://supabase.com/docs/guides/database/extensions/postgis",
     "tags": ["GIS"]
   },
   {
@@ -534,6 +543,7 @@
     "default_version": "1.1",
     "installed_version": "1.1",
     "comment": "generate universally unique identifiers (UUIDs)",
+    "link": "https://supabase.com/docs/guides/database/extensions/uuid-ossp",
     "tags": []
   },
   {
@@ -542,6 +552,7 @@
     "default_version": "0.4.0",
     "installed_version": null,
     "comment": "vector data type with similarity search",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgvector",
     "tags": []
   },
   {
@@ -557,7 +568,9 @@
     "schema": "extensions",
     "default_version": "1.3.13",
     "installed_version": "1.3.13",
-    "comment": "GIN-like index for text search"
+    "comment": "GIN-like index for text search",
+    "link": "https://supabase.com/docs/guides/database/extensions/rum",
+    "tags": []
   },
   {
     "name": "pg_repack",
@@ -565,6 +578,7 @@
     "default_version": "1.4.8",
     "installed_version": "1.4.8",
     "comment": "optimize physical storage and remove bloat from tables and indexes",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgrepack",
     "tags": []
   }
 ]

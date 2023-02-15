@@ -16,7 +16,9 @@ type extension = {
 function getUniqueTags(json: extension[]) {
   const tags = []
   for (const item of json) {
-    tags.push(...item.tags)
+    if (item.tags) {
+      tags.push(...item.tags)
+    }
   }
   return [...new Set(tags)]
 }
@@ -51,7 +53,7 @@ export default function Extensions() {
             <h3 className="text-sm text-scale-1100">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
               {tags.map((tag) => (
-                <li>
+                <li key={tag}>
                   <label
                     htmlFor={tag}
                     className={`text-sm text-scale-900 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
