@@ -252,7 +252,7 @@ psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
   -c "\COPY movies FROM './movies.csv' WITH DELIMITER ',' CSV HEADER"
 ```
 
-Tip: If you get a `FATAL:  password authentication failed for user "postgres"` error, reset the password in your Database settings and try again.
+If you receive an error `FATAL:  password authentication failed for user "postgres"`, reset your database password in the Database Settings and try again.
 
 ## Joining tables with Foreign Keys
 
