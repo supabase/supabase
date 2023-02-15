@@ -10,15 +10,14 @@ Supabase Auth and provides some guidance on building secure applications.
 :::note
 To report a security vulnerability with Supabase Auth or any
 other Supabase service, email [security@supabase.com](mailto:security@supabase.com). Review the
-[security.txt](https://supabase.com/.well-known/security.txt) policy for a list of vulnerabilities that are not in scope.
+[security.txt](https://supabase.com/.well-known/security.txt) policy for a list of vulnerabilities that are in scope.
 :::
 
 ## Credentials
 
 Credentials such as email addresses, phone numbers, passwords, and one-time
 passwords are always sent to Supabase Auth as `POST` requests over TLS. This
-prevents them from being accidentally logged in HTTP request logs as part of
-the URL.
+prevents them from being logged as part of the URL in HTTP request logs.
 
 An exception to this rule is magic links, which encode a short-lived,
 difficult-to-guess code in a URL. This URL sends a `GET` request to
@@ -35,49 +34,44 @@ your project.
 
 Social login (e.g., Login with GitHub) often uses the OAuth authorization
 protocol. Supabase Auth does not store the token issued by the provider, but
-does make it available to your browser's app should you need further access to
+makes it available to your browser's app if you need further access to
 it. Each subsequent sign-in with OAuth updates the user's identifying
 information in Supabase Auth.
 
 ### Automatic linking
 
-Users with the same email address in different social login providers will get
-one single user account in Supabase Auth. We believe this to be the most common
-expected behavior for modern applications.
+Users with the same email address across different social login providers get
+one single user account in Supabase Auth. We believe this is the most common behavior for modern applications.
 
 :::warning
-**Not all social login providers can be trusted!** Some providers will allow
-social login with your application **even if the user's email address is not
-confirmed.** This has the unintended side-effect that attackers could abuse
+Not all social login providers can be trusted! Some providers allow
+social login with your application even if the user's email address is not
+confirmed. This has the unintended side-effect that attackers could abuse
 such a social login provider to gain access to a legitimate user's account.
-**Always make sure you verify the behavior of social login providers with
-regards to confirming the user's email address!**
+Always make sure to verify the behavior of social login providers and whether the user's email address is confirmed.
 :::
 
 ### Magic links
 
-Supabase Auth provides passwordless sign-in with magic links. Magic links are a
-URL that contains a single-use and unguessable code. By default this URL is
+Supabase Auth provides passwordless sign-in with magic links. Magic links are 
+URLs that contains a single-use, difficult-to-guess code. By default, this URL is
 hosted by the Supabase Auth server and immediately redirects back to your app.
 
-You should be aware that email messages are inherently insecure, although the
+Be aware that email messages are inherently insecure, although the
 default SMTP settings from Supabase Auth always attempt to deliver email
 messages via TLS to the receiving server.
 
 There are a number of email clients, enterprise and end-user security software,
 which inspect email messages for malware. Often this software will visit links
 in messages (sometimes multiple times) in an attempt to scan for viruses.
-Unfortunately this has the effect of signing up a user without their knowledge
+Unfortunately, this has the effect of signing up a user without their knowledge
 or express consent. Furthermore, it does give out an access and refresh token
 to this software which could be used maliciously.
 
-:::warning
-We do not recommend using magic-link sign in without customization for
-applications requiring a high level of authentication security. Should you wish
-to still use magic-links you can prevent this type of issues by modifying the
+We do not recommend using magic link sign-in with the default settings for
+applications requiring a high level of authentication security. You can prevent this type of issue by modifying the
 magic link email template to point to your application where you can present
-the user with a button that will lead to the magic link URL.
-:::
+the user with a button that leads to the magic link URL.
 
 ## User information
 
@@ -85,15 +79,15 @@ Supabase Auth stores user account information in your project's database. This
 information is provided by your application or collected from third-party
 identity providers.
 
-Email addresses, phone numbers and other personally identifiable information is
-not stored encrypted in your project's database. If you need to store encrypted
-data for users, we recommend you check out Supabase Vault as an easy and safe
+Email addresses, phone numbers, and other personally identifiable information is
+not encrypted in your project's database. If you need to store encrypted
+data for users, check out Supabase Vault as an easy and safe
 way to achieve this.
 
 ### User enumeration protection
 
 User enumeration is a technique where third-parties gather information about
-the existence of accounts on a system. In and of itself the use of this
+the existence of accounts on a system. The use of this
 technique does not indicate malicious behavior, but it may be used as part of
 such an effort.
 
@@ -117,23 +111,19 @@ and still gather information from the side-channel.
 With passwordless login or flows such as forgot password, information about
 whether an account exists in the system can leak even if the application
 returns an ambigouous message such as "If you have an account an email has been
-sent." This is because the final part of the request handling will need to send
-out an email message or SMS using a third-party system. This makes requests
-naturally last longer when an account exists. Sometimes applications add
+sent." This is because the final part of the request handling needs to send an email message or SMS using a third-party system and requests last longer when an account exists. Sometimes applications add
 per-account rate-limiting to stop abuse, but this can exacerbate the problem as
 rate-limiting counts toward accounts that exist, not those that do not. Thus
 attackers can intentionally trigger rate-limits and gather information that
 way.
 3. **Account creation vs. login.**  
-Often applications will obfuscate login requests, but not account creation
-requests, thus leaking information and confusing legitimate users. Those on the
-login flow will be told "Email or password is not correct." while on the
-sign-up flow they will be outright told "An account with this email address
-already exists." The problem compounds if the user has both social login and
-password based login. In this situation there is no solution to the problem,
-you can either: tell the user outright that there is already an account,
-redirect to the social login provider (which again leaks the information), or
-return a server error (that still leaks the information).
+Applications often obfuscate login requests, but not account creation
+requests, which can leak information and confuse legitimate users. 
+Login flows typically show a message like "Email or password is not correct," whereas sign-up flows usually show "an account with this email address already exists." The problem compounds if the user has both a social login and
+a password-based login. In this situation,
+you can tell the user that there is already an account and
+redirect to the social login provider (which again leaks the information) or
+return a server error (still leaks the information).
 
 Large scale user enumeration attacks can be partially mitigated or made
 inefficient by enabling some form of abuse protection for your project, such as
@@ -142,13 +132,8 @@ CAPTCHA.
 
 ### Guarantees
 
-As having a solution that covers all possible cases is virtually impossible,
-Supabase Auth gives out these conditional guarantees on the user enumeration
-problem.
-
-We believe these guarantees strike the right balance between user experience,
-system performance, privacy and security both for hobby and enterprise
-projects.
+It's difficult to give consistent guarantees across all users and authentication methods. Supabase Auth provides conditional guarantees which strike the right balance between user experience,
+system performance, privacy, and security both for hobby and enterprise projects.
 
 **No guarantees.**
 
@@ -192,59 +177,55 @@ A successful user login triggers Supabase Auth to issue an access and refresh
 token.
 
 Access tokens are in the form of a JSON Web Token (JWT) and include most
-standard JWT claims for this purpose. At this time each JWT is signed using the
+standard JWT claims for this purpose. Each JWT is signed using the
 `HS256` algorithm (HMAC with SHA256). The secret key used to derive the
-signature is generated from a cryptographically-secure pseudo random number
-generator when a project is initially created and is 512 bits long. This key is
+signature is generated from a 512 bit, cryptographically-secure pseudo random number
+generator when a project is initially created. This key is
 stored encrypted in our database, so Supabase staff are unable to readily
 access it.
 
-We believe in giving project owners maximum flexibility, so this key is visible
-to you only in your project's dashboard. Make sure you never share this value
+To give developers full ownership of their projects, this key is visible
+to you only in your project's dashboard. Never share this value
 with parties you don't completely trust.
 
 :::tip
-You can always rotate the JWT signing key if you suspect it has leaked.
-Rotating keys on a regular basis is a good practice. Note that rotating a key
-means that all access tokens will immediately become invalid. Make sure you do
-not forget to update all other services that you use Supabase Auth access
-tokens in with the rotated secret to avoid any disruptions.
+You can rotate the JWT signing key if you suspect it has leaked.
+Rotating keys on a regular basis is a good practice. Rotating a key
+means that all access tokens will immediately become invalid. 
+Remember to update all services that use Supabase Auth access
+tokens with the rotated secret.
 :::
 
-Access tokens are also short lived, and you can configure their validity
-duration in the project's settings page. The default value at this time is 1
-hour, which is common across the industry. We do not recommend exceeding this
-duration period, and recommend using a shorter value if it makes sense for your
-application. Durations less than 5 minutes are discouraged as computers often
-may have significant clock skew that could introduce confusing and difficult to
-debug application errors and behaviors. Shortening the duration also increases
+Access tokens are short lived, and you can configure their validity
+duration in the project's settings page. The default value is 1
+hour, which is common across the industry. We do not recommend exceeding this, 
+and recommend using a shorter value if it is sensible for your
+application. Durations of less than 5 minutes are discouraged as computers
+may have significant clock skew that introduce confusing application errors and behaviors 
+which are difficult to debug. Shortening the duration also increases
 the application's dependence of the uptime of the authentication server.
 
-The purpose of access tokens is to be readily shared between components of your
-application, be it the browser, Supabase services such as PostgREST and
-functions, your hosting or other API servers under your control. Due to
-their short lifetime, any security incident involving them will have a
+Access tokens can be readily shared between components of your
+application, including the browser, Supabase services (such as PostgREST and
+Edge Functions), or other servers that you control. Due to
+their short lifetime, any security incident involving access tokens will have a
 time-limited blast radius.
 
-Always make sure that access tokens are passed as headers or cookies, and avoid
-passing them as URL query parameters (regardless of request methods) to prevent
-them from appearing in access logs which may not be under your total control.
-When using them in Supabase functions or other API servers, take care to not
+Always pass access tokens as headers or cookies rather than
+URL query parameters (regardless of request methods) to prevent
+them from appearing in access logs.
+When using access tokens in Edge Functions or other API servers, take care to not
 accidentally write them to logs.
 
-It is for this reason that Supabase Auth returns both the access token and
+Supabase Auth returns the access token and
 refresh token to your browser application via the URL fragment (anything after
-the `#` sign), as browsers will actually avoid sending this data to the
-underlying server. Thus this makes sure that the access and refresh token are
-received only by the JavaScript running in your browser and does not end up in
-access logs or is visible by your application's hosting service. Even if the
-servers hosting your browser application are under your total control, we've
-found that often there are various other appliances that intercept HTTP
-requests where disabling logging is difficult or sometimes impossible.
+the `#` sign). This prevents browsers sending the data to the
+server. URL fragments are only
+accessible to the JavaScript running in your browser.
 
-Access tokens are not stored by Supabase Auth or other services, regardless if
-they are valid or not. We also recommend that any Supabase functions or API
-servers you use avoid storing access tokens they've seen.
+Access tokens are never stored by Supabase Auth or other services, regardless if
+they are valid or not. We recommend that you avoid storing  them in Edge Functions or  otherAPI
+servers.
 
 :::tip
 Sometimes it is necessary to record or identify if a server has seen an access
