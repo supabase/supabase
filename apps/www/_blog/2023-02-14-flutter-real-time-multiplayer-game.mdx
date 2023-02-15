@@ -204,7 +204,7 @@ class _LobbyDialogState extends State<_LobbyDialog> {
 
 ### Creating the FlameGame
 
-Now the fun part starts! We will start out by creating our game class. We create a `MyGame` class that extends the [FlameGame](https://docs.flame-engine.org/1.6.0/flame/game.html) class. `FlameGame` takes care of collision detection and pan-detection, and it will also be the parent of all the components that we will add to the game. The game contains 2 components, `Player` and `Bullet`. `MyGame	` is a class that wrapps around all components of the game and can control the child components.
+Now the fun part starts! We will start out by creating our game class. We create a `MyGame` class that extends the [FlameGame](https://docs.flame-engine.org/1.6.0/flame/game.html) class. `FlameGame` takes care of collision detection and pan-detection, and it will also be the parent of all the components that we will add to the game. The game contains 2 components, `Player` and `Bullet`. `MyGame	` is a class that wraps around all components of the game and can control the child components.
 
 ![Structure of the shooting game](/images/blog/flutter-realtime-game/game-structure.png)
 
@@ -588,7 +588,7 @@ runApp(const MyApp());
 final supabase = Supabase.instance.client;
 ```
 
-`RealtimeClientOptions` here is a parameter to override how many events per second each client will send to Supabase. The default is 10, but we want to ovreide to 40 to provide a more in-synced experience.
+`RealtimeClientOptions` here is a parameter to override how many events per second each client will send to Supabase. The default is 10, but we want to override to 40 to provide a more in-synced experience.
 
 With this, we are ready to get into adding the real-time features now.
 
