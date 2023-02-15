@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
 import { useEffect, useState } from 'react'
@@ -13,7 +13,10 @@ export type RefreshButtonProps = {
 const RefreshButton = ({ projectRef, table }: RefreshButtonProps) => {
   const queryClient = useQueryClient()
 
-  const [loading, setLoading] = useState(false)
+  const queryKey = sqlKeys.query(projectRef, [table.schema, table.name])
+
+  const loading = useIsFetching({ queryKey }) > 0
+
   const [status, setStatus] = useState<string>()
 
   useEffect(() => {
@@ -39,9 +42,7 @@ const RefreshButton = ({ projectRef, table }: RefreshButtonProps) => {
   }, [])
 
   async function onClick() {
-    setLoading(true)
-    await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-    setLoading(false)
+    await queryClient.invalidateQueries(queryKey)
   }
 
   return (

@@ -6,6 +6,7 @@ import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 
 function rowKeyGetter(row: SupaRow) {
   return row?.idx ?? -1
@@ -13,13 +14,14 @@ function rowKeyGetter(row: SupaRow) {
 
 interface IGrid extends GridProps {
   rows: any[]
+  updateRow: (previousRow: any, updatedData: any) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
 export const Grid = memo(
   forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass, rows },
+      { width, height, containerClass, gridClass, rowClass, rows, updateRow },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
@@ -41,18 +43,7 @@ export const Grid = memo(
         )
 
         if (changedColumn) {
-          const { error } = state.rowService!.update(
-            rowData,
-            originRowData,
-            changedColumn,
-            (payload) => {
-              dispatch({
-                type: 'EDIT_ROW',
-                payload,
-              })
-            }
-          )
-          if (error && onErrorFunc) onErrorFunc(error)
+          updateRow(originRowData, { [changedColumn]: rowData[changedColumn] })
         }
       }
 

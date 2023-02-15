@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect, useState } from 'react'
+import { FC, useRef, useEffect, useState, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
@@ -10,8 +10,16 @@ import { checkPermissions, useFlag, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import {
+  Dictionary,
+  parseSupaTable,
+  SupabaseGrid,
+  SupabaseGridRef,
+  SupaTable,
+} from 'components/grid'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
   /** Theme for the editor */
@@ -62,7 +70,8 @@ const TableGridEditor: FC<Props> = ({
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const gridRef = useRef<SupabaseGridRef>(null)
-  const projectRef = ui.selectedProject?.ref
+  const { project } = useProjectContext()
+  const projectRef = project?.ref
 
   const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
@@ -162,6 +171,38 @@ const TableGridEditor: FC<Props> = ({
     })
   }
 
+  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
+    onError(error) {
+      onError(error)
+    },
+  })
+
+  const updateTableRow = (previousRow: any, updatedData: any) => {
+    if (!project) return
+
+    const enumArrayColumns = selectedTable.columns
+      .filter((column: any) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column: any) => column.name)
+
+    const identifiers = {} as Dictionary<any>
+    ;(selectedTable as PostgresTable).primary_keys.forEach(
+      (column) => (identifiers[column.name] = previousRow[column.name])
+    )
+
+    const configuration = { identifiers }
+
+    mutateUpdateTableRow({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      table: gridTable as SupaTable,
+      configuration,
+      payload: updatedData,
+      enumArrayColumns,
+    })
+  }
+
   return (
     <>
       <SupabaseGrid
@@ -180,6 +221,7 @@ const TableGridEditor: FC<Props> = ({
         onEditColumn={onSelectEditColumn}
         onDeleteColumn={onSelectDeleteColumn}
         onAddRow={onAddRow}
+        updateTableRow={updateTableRow}
         onEditRow={onEditRow}
         onError={onError}
         onSqlQuery={onSqlQuery}
