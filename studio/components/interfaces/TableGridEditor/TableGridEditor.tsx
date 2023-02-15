@@ -112,7 +112,12 @@ const TableGridEditor: FC<Props> = ({
           },
           encryptedColumns
         )
-      : (selectedTable as SchemaView).name
+      : parseSupaTable({
+          table: selectedTable as SchemaView,
+          columns: (selectedTable as SchemaView).columns ?? [],
+          primaryKeys: [],
+          relationships: [],
+        })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 

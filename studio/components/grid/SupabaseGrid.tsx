@@ -6,11 +6,9 @@ import { useMonaco } from '@monaco-editor/react'
 import { DataGridHandle } from '@supabase/react-data-grid'
 
 import { useUrlState } from 'hooks'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef, SupaTable } from './types'
+import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
-import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from './constants'
 import { Shortcuts } from './components/common'
 import { Grid } from './components/grid'
 import Header from './components/header'
@@ -73,9 +71,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const sorts = formatSortURLParams(sort as string[])
   const filters = formatFilterURLParams(filter as string[])
 
-  // [Joshen] This is not a perfect fix, but the useEffect to initialize the data in the editor
-  // was not getting retriggered for views, works fine for tables.
-  const table = (typeof props.table === 'string' ? { name: props.table } : props.table) as SupaTable // TODO(alaister): add support for views
+  const table = props.table
 
   const { project } = useProjectContext()
   const { data } = useTableRowsQuery(
@@ -118,21 +114,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
-
-  // TODO(alaister): update this to react-query
-  // useEffect(() => {
-  //   if (state.refreshPageFlag === REFRESH_PAGE_IMMEDIATELY) {
-  //     fetchPage(state, dispatch, sorts, filters)
-  //   } else if (state.refreshPageFlag !== 0) {
-  //     refreshPageDebounced(state, dispatch, sorts, filters)
-  //   }
-  // }, [state.refreshPageFlag])
-
-  // useEffect(() => {
-  //   if (state.totalRows === TOTAL_ROWS_RESET) {
-  //     fetchCount(state, dispatch, filters)
-  //   }
-  // }, [state.totalRows])
 
   useEffect(() => {
     if (mounted) {

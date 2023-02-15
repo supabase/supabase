@@ -15,7 +15,7 @@ export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string
+  table: SupaTable
   /**
    *
    * run sql query
