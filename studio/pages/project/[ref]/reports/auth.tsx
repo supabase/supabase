@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 
 import { NextPageWithLayout } from 'types'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
-import ReportsLayout from 'components/layouts'
+import { ReportsLayout } from 'components/layouts'
 import { hooksFactory, usePresetReport } from 'components/interfaces/Reports/Reports.utils'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'

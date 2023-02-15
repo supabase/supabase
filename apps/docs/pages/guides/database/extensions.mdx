@@ -27,11 +27,14 @@ Supabase has pre-installed some of the most useful open source extensions.
 <TabPanel id="sql" label="SQL">
 
 ```sql
--- Example: enable the "pgtap" extension and ensure it is installed
-create extension pgtap with schema extensions;
+ -- Example: enable the "pgtap" extension and ensure it is installed
+create extension pgtap
+with
+  schema extensions;
 
 -- Example: disable the "pgtap" extension
-drop extension pgtap;
+drop
+  extension pgtap;
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".

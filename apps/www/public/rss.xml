@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 04 Jan 2023 03:03:30 +0000</lastBuildDate>
+      <lastBuildDate>Tue, 07 Feb 2023 03:03:30 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-beta-january-2023</guid>
+  <title>Supabase Beta January 2023</title>
+  <link>https://supabase.com/blog/supabase-beta-january-2023</link>
+  <description>New Postgres extensions, pg_graphql updates, changes to Edge Functions, and more!</description>
+  <pubDate>Tue, 07 Feb 2023 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/chatgpt-supabase-docs</guid>
+  <title>Supabase Clippy: ChatGPT for Supabase Docs</title>
+  <link>https://supabase.com/blog/chatgpt-supabase-docs</link>
+  <description>Creating a ChatGPT interface for the Supabase documentation.</description>
+  <pubDate>Mon, 06 Feb 2023 03:03:30 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/openai-embeddings-postgres-vector</guid>
+  <title>Storing OpenAI embeddings in Postgres with pgvector</title>
+  <link>https://supabase.com/blog/openai-embeddings-postgres-vector</link>
+  <description>An example of how to build an AI-powered search engine using OpenAI's embeddings and PostgreSQL.</description>
+  <pubDate>Sun, 05 Feb 2023 03:03:30 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-beta-december-2022</guid>
   <title>Supabase Beta December 2022</title>
   <link>https://supabase.com/blog/supabase-beta-december-2022</link>

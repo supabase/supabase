@@ -1220,13 +1220,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime#broadcast',
+    source: '/docs/guides/realtime#broadcast',
+    destination: '/docs/guides/realtime/broadcast',
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime#presence',
+    source: '/docs/guides/realtime#presence',
+    destination: '/docs/guides/realtime/presence',
   },
   {
     permanent: true,
@@ -1780,37 +1780,37 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/introduction',
+    destination: '/docs/reference/javascript/start',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/introduction',
+    destination: '/docs/reference/dart/start',
   },
   {
     permanent: true,
     source: '/docs/reference/cli',
-    destination: '/docs/reference/cli/introduction',
+    destination: '/docs/reference/cli/start',
   },
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/introduction',
+    destination: '/docs/reference/api/start',
   },
   {
     permanent: true,
     source: '/docs/reference/auth',
-    destination: '/docs/reference/auth/introduction',
+    destination: '/docs/reference/self-hosting-auth/start',
   },
   {
     permanent: true,
     source: '/docs/reference/storage',
-    destination: '/docs/reference/storage/introduction',
+    destination: '/docs/reference/self-hosting-storage/start',
   },
   {
     permanent: true,
     source: '/docs/reference/realtime',
-    destination: '/docs/reference/realtime/introduction',
+    destination: '/docs/reference/self-hosting-realtime/start',
   },
   {
     permanent: true,
@@ -1829,6 +1829,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/api',
+    destination: '/docs/guides/database/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/database/api/generating-types',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1836,5 +1846,15 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/dart/upgrade-guide',
     destination: '/docs/reference/dart/v0/upgrade-guide',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/examples',
+    destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/v0/rpc',
+    destination: '/docs/reference/javascript/rpc',
   },
 ]

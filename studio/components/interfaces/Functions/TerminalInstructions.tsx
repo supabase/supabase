@@ -1,12 +1,12 @@
-import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2, IconBookOpen, IconCode } from 'ui'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useAccessTokens } from 'hooks/queries/useAccessTokens'
-import { Commands } from './Functions.types'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { FC, useState } from 'react'
-import { useStore } from 'hooks'
+import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useParams } from 'hooks'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
+import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+import { Commands } from './Functions.types'
 
 interface Props {
   closable?: boolean
@@ -14,21 +14,21 @@ interface Props {
 
 const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   const router = useRouter()
-  const { ref } = router.query
-  const { ui } = useStore()
-
-  const { tokens } = useAccessTokens()
-  const { data: settings } = useProjectSettingsQuery({ projectRef: ref as string })
+  const { ref: projectRef } = useParams()
 
   const [showInstructions, setShowInstructions] = useState(!closable)
 
-  // Get the API service
+  const { data: tokens } = useAccessTokensQuery()
+
+  const { data: settings } = useProjectApiQuery({
+    projectRef,
+  })
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x: any) => x.name === 'anon key')
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
-  const endpoint = apiService?.endpoint ?? ''
   const endpointSections = endpoint.split('.')
   const functionsEndpoint = [
     ...endpointSections.slice(0, 1),
@@ -37,8 +37,8 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   ].join('.')
 
   // get the .co or .net TLD from the restUrl
-  const restUrl = ui.selectedProject?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrl = settings?.autoApiService.restUrl
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : ''
 
   const commands: Commands[] = [
     {
@@ -54,20 +54,20 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
       comment: 'Create a function',
     },
     {
-      command: `supabase functions deploy hello-world --project-ref ${ref}`,
+      command: `supabase functions deploy hello-world --project-ref ${projectRef}`,
       description: 'Deploys function at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">supabase</span> functions deploy hello-world
-            --project-ref {ref}
+            --project-ref {projectRef}
           </>
         )
       },
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${projectRef}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
@@ -86,13 +86,13 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
 
   return (
     <div
-      className="col-span-7 overflow-hidden rounded border bg-scale-100 shadow transition-all dark:bg-scale-300"
+      className="col-span-7 overflow-hidden transition-all border rounded shadow bg-scale-100 dark:bg-scale-300"
       style={{ maxHeight: showInstructions ? 500 : 80 }}
     >
-      <div className="space-y-6 px-8 py-6">
+      <div className="px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-100 p-2">
+            <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-scale-100">
               <IconTerminal strokeWidth={2} />
             </div>
             <h4>Terminal instructions</h4>
@@ -112,7 +112,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
         </div>
       </div>
       {tokens && tokens.length === 0 ? (
-        <div className="space-y-3 border-t px-8 py-6">
+        <div className="px-8 py-6 space-y-3 border-t">
           <div>
             <h3 className="text-base text-scale-1200">You may need to create an access token</h3>
             <p className="text-sm text-scale-1100">
@@ -124,7 +124,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3 border-t px-8 py-6">
+        <div className="px-8 py-6 space-y-3 border-t">
           <div>
             <h3 className="text-base text-scale-1200">Need help?</h3>
             <p className="text-sm text-scale-1100">

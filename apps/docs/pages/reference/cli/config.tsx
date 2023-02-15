@@ -12,7 +12,6 @@ const tocList = TAGS.map((tag) =>
   specFile.parameters
     .filter((param: Parameter) => param.tags[0] === tag)
     .map((parameter) => {
-      console.log('the param', parameter)
       const text = parameter.id
       const link = `#${parameter.id}`
       const level = '2'
