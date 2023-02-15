@@ -8,7 +8,6 @@ export const meta = {
 
 The [pgjwt](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
 
-
 ## Enable the extension
 
 <Tabs
@@ -45,15 +44,15 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ## API
 
-- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containng *payload* with *secret* using *algorithm*.
-- [`verify(token text, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT *token* that was signed with *secret* using *algorithm*.
+- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containng _payload_ with _secret_ using _algorithm_.
+- [`verify(token text, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT _token_ that was signed with _secret_ using _algorithm_.
 
 Where:
+
 - `payload` is an encrypted JWT represented as a string.
 - `secret` is the private/secret passcode which is used to sign the JWT and verify its integrity.
 - `algorithm` is the method used to sign the JWT using the secret.
 - `token` is an encrypted JWT represented as a string.
-
 
 ## Usage
 
@@ -84,7 +83,6 @@ The pgjwt_encode function returns a string that represents the JWT, which can th
 ```
 
 To parse a JWT and extract its claims, you can use the `verify` function. Here's an example:
-
 
 {/* prettier-ignore */}
 ```sql
