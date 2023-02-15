@@ -14,7 +14,7 @@ import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import NoPermission from 'components/ui/NoPermission'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   project: any
@@ -62,7 +62,7 @@ const Subscription: FC<Props> = ({
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey as keyof ProjectUsageResponse].cost ?? 0
+              return usage[productKey as ProjectUsageResponseUsageKeys].cost ?? 0
             })
             .reduce((prev, current) => prev + current, 0)
 
@@ -183,10 +183,10 @@ const Subscription: FC<Props> = ({
               {isPayg &&
                 USAGE_BASED_PRODUCTS.map((product) => {
                   return product.features.map((feature) => {
-                    const amount = usage?.[feature.key as keyof ProjectUsageResponse]?.usage ?? 0
-                    const limit = usage?.[feature.key as keyof ProjectUsageResponse]?.limit ?? 0
+                    const amount = usage?.[feature.key as ProjectUsageResponseUsageKeys]?.usage ?? 0
+                    const limit = usage?.[feature.key as ProjectUsageResponseUsageKeys]?.limit ?? 0
                     const cost = (
-                      usage?.[feature.key as keyof ProjectUsageResponse]?.cost ?? 0
+                      usage?.[feature.key as ProjectUsageResponseUsageKeys]?.cost ?? 0
                     ).toFixed(2)
 
                     return (
