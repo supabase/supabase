@@ -218,7 +218,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
       />
-      <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} />
+      <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} updateRow={props.updateTableRow} />
       <Footer />
       <Shortcuts gridRef={gridRef} />
       {mounted && createPortal(<RowContextMenu table={table} />, document.body)}
