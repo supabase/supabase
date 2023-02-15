@@ -17,8 +17,10 @@ jobs:
       PROJECT_ID: ${{ secrets.PROJECT_ID }}
 
     steps:
+      - name: Check out repo
       - uses: actions/checkout@v3
 
+      - name: Setup the Supabase CLI
       - uses: supabase/setup-cli@v1
         with:
           version: 1.0.0
