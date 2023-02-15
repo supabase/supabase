@@ -747,14 +747,17 @@ export default function IndexPage() {
                       <td className="h-full px-6 py-2 align-top" key={`price-${tier.name}`}>
                         <div className="relative table h-full w-full">
                           <div className="flex flex-col justify-between h-full">
-                            {tier.name !== 'Enterprise' && (
-                              <>
-                                <span className="text-5xl text-scale-1200">
-                                  ${tier.priceMonthly}
-                                </span>
-                                <p className="p text-xs mt-1">per project per month</p>
-                              </>
-                            )}
+                            <>
+                              <span
+                                className={`text-scale-1200 ${
+                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl max-w-[75%]'
+                                }`}
+                              >
+                                {tier.name !== 'Enterprise' && '$'}
+                                {tier.priceMonthly}
+                              </span>
+                              <p className="p text-xs mt-1">per project per month</p>
+                            </>
 
                             {tier.warning && (
                               <p className="-mt-2">
@@ -765,7 +768,7 @@ export default function IndexPage() {
                             )}
 
                             <div className={tier.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                              <Link href={tier.href} as={tier.href}>
                                 <a>
                                   <Button
                                     size="tiny"
