@@ -98,6 +98,7 @@
   {
     "name": "hypopg",
     "comment": "Hypothetical indexes for PostgreSQL",
+    "link": "https://supabase.com/docs/guides/database/extensions/hypopg",
     "tags": []
   },
   {
@@ -170,21 +171,25 @@
   {
     "name": "pg_graphql",
     "comment": "pg_graphql: GraphQL support",
+    "link": "https://supabase.com/docs/guides/database/extensions/pg_graphql",
     "tags": []
   },
   {
     "name": "pg_hashids",
     "comment": "pg_hashids",
+    "link": "https://supabase.com/docs/guides/database/extensions/pg_hashids",
     "tags": []
   },
   {
     "name": "pg_jsonschema",
     "comment": "pg_jsonschema",
+    "link": "https://supabase.com/docs/guides/database/extensions/pg_jsonschema",
     "tags": []
   },
   {
     "name": "pg_net",
     "comment": "Async HTTP",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgnet",
     "tags": []
   },
   {
@@ -193,13 +198,9 @@
     "tags": []
   },
   {
-    "name": "pg_repack",
-    "comment": "Reorganize tables in PostgreSQL databases with minimal locks",
-    "tags": []
-  },
-  {
     "name": "pg_stat_monitor",
     "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
+    "link": "https://supabase.com/docs/guides/database/extensions/pg_stat_monitor",
     "tags": []
   },
   {
@@ -248,6 +249,7 @@
   {
     "name": "pgroonga",
     "comment": "Super fast and all languages supported full text search index based on Groonga",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgroonga",
     "tags": []
   },
   {
@@ -258,6 +260,7 @@
   {
     "name": "pgrouting",
     "comment": "pgRouting Extension",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgrouting",
     "tags": []
   },
   {
@@ -268,6 +271,7 @@
   {
     "name": "pgsodium",
     "comment": "Postgres extension for libsodium functions",
+    "link": "https://supabase.com/docs/guides/database/extensions/pgsodium",
     "tags": []
   },
   {
@@ -408,6 +412,7 @@
   {
     "name": "timescaledb",
     "comment": "Enables scalable inserts and complex queries for time-series data",
+    "link": "https://supabase.com/docs/guides/database/extensions/timescaledb",
     "tags": []
   },
   {
@@ -432,25 +437,21 @@
     "tags": []
   },
   {
-    "name": "vector",
+    "name": "pgvector",
     "comment": "vector data type with similarity search",
     "link": "https://supabase.com/docs/guides/database/extensions/pgvector",
     "tags": []
   },
   {
-    "name": "xml2",
-    "comment": "XPath querying and XSLT",
-    "tags": []
-  },
-  {
     "name": "pg_repack",
-    "comment": "optimize physical storage and remove bloat from tables and indexes",
+    "comment": "Optimize physical storage and remove bloat from tables and indexes",
     "link": "https://supabase.com/docs/guides/database/extensions/pgrepack",
     "tags": []
   },
   {
     "name": "wrappers",
     "comment": "Foreign data wrappers developed by Supabase",
+    "link": "https://supabase.com/docs/guides/database/extensions/wrappers",
     "tags": []
   },
   {

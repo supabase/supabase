@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { IconExternalLink, IconX, Input } from 'ui'
+import { IconLink, IconX, Input } from 'ui'
 import extensions from '../data/extensions.json'
 
 type extension = {
@@ -109,10 +109,10 @@ export default function Extensions() {
                       <Link href={extension.link}>
                         <a
                           target="_blank"
-                          className="absolute top-2 right-4 hover:bg-slate-400 transition-colors p-2 rounded-md"
+                          className="text-xs no-underline absolute top-2 right-4 bg-slate-200 hover:bg-slate-400 transition-colors p-2 rounded-md"
                         >
                           <span>
-                            <IconExternalLink size={14} className="" />
+                            <IconLink size={14} className="" />
                           </span>
                         </a>
                       </Link>
