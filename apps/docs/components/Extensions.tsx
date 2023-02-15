@@ -5,9 +5,6 @@ import extensions from '../data/extensions.json'
 
 type extension = {
   name: string
-  schema: string | null
-  default_version: string
-  installed_version: string | null
   comment: string
   tags: string[]
   link?: string
