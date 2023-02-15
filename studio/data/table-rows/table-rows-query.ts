@@ -1,8 +1,8 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
-import { isNumericalColumn } from 'components/grid/utils'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
+import { formatFilterValue } from './utils'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -25,7 +25,18 @@ export const getTableRowsSqlQuery = ({
     return ``
   }
 
-  let queryChains = query.from(table.name, table.schema ?? undefined).select()
+  const enumArrayColumns = table.columns
+    .filter((column) => {
+      return (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    })
+    .map((column) => column.name)
+
+  let queryChains =
+    enumArrayColumns.length > 0
+      ? query
+          .from(table.name, table.schema ?? undefined)
+          .select(`*,${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`)
+      : query.from(table.name, table.schema ?? undefined).select()
 
   filters
     .filter((x) => x.value && x.value != '')
@@ -33,7 +44,6 @@ export const getTableRowsSqlQuery = ({
       const value = formatFilterValue(table, x)
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
-
   sorts.forEach((x) => {
     queryChains = queryChains.order(x.column, x.ascending, x.nullsFirst)
   })
@@ -103,18 +113,4 @@ export const useTableRowsPrefetch = ({
       { table: { name: table?.name, schema: table?.schema }, ...args },
     ],
   })
-}
-
-/**
- * temporary fix until we implement a better filter UI
- * which validate input value base on the column type
- */
-export function formatFilterValue(table: SupaTable, filter: Filter) {
-  const column = table.columns.find((x) => x.name == filter.column)
-  if (column && isNumericalColumn(column.format)) {
-    const numberValue = Number(filter.value)
-    if (Number.isNaN(numberValue)) return filter.value
-    else return Number(filter.value)
-  }
-  return filter.value
 }

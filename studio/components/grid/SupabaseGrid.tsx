@@ -89,7 +89,15 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       page: state.page,
       limit: state.rowsPerPage,
     },
-    { keepPreviousData: true }
+    {
+      keepPreviousData: true,
+      onSuccess(data) {
+        dispatch({
+          type: 'SET_ROWS_COUNT',
+          payload: data.rows.length,
+        })
+      },
+    }
   )
 
   useImperativeHandle(ref, () => ({
@@ -202,6 +210,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   return (
     <div className="sb-grid">
       <Header
+        projectRef={project?.ref}
         table={table}
         sorts={sorts}
         filters={filters}
@@ -212,7 +221,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} />
       <Footer />
       <Shortcuts gridRef={gridRef} />
-      {mounted && createPortal(<RowContextMenu />, document.body)}
+      {mounted && createPortal(<RowContextMenu table={table} />, document.body)}
     </div>
   )
 })
