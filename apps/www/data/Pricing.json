@@ -5,7 +5,9 @@
     "features": [
       {
         "title": "Dedicated Postgres Database",
-        "tooltip": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats.",
+        "tooltips": {
+          "main": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats."
+        },
         "tiers": {
           "free": true,
           "pro": true,
@@ -22,46 +24,60 @@
       },
       {
         "title": "Database size",
-        "tooltip": "Billing is based on the average daily database size in GB throughout the billing period.",
+        "tooltips": {
+          "main": "Billing is based on the average database size in GB throughout the billing period.",
+          "pro": "8 GB included, then $0.125 per GB"
+        },
         "tiers": {
-          "free": "Up to 500 MB",
-          "pro": "8 GB included, then $0.125 per GB",
+          "free": "500 MB",
+          "pro": "8 GB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Automatic backups",
-        "tooltip": "Backups are entire copies of your database that can be restored in the future.",
+        "tooltips": {
+          "main": "Backups are entire copies of your database that can be restored in the future.",
+          "pro": "7 days of backup (if > 1TB, contact for Enterprise pricing)"
+        },
         "tiers": {
           "free": false,
-          "pro": "7 days of backup (if > 1TB, contact enterprise)",
+          "pro": "7 days",
           "enterprise": "Custom"
         }
       },
       {
         "title": "Point in time recovery",
-        "tooltip": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
+        "tooltips": {
+          "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
+          "pro": "$100 per 7 days. If > 28 day rollback period, contact enterprise"
+        },
         "tiers": {
           "free": false,
-          "pro": "$100 per 7 day rollback period (if > 28 days, contact enterprise)",
+          "pro": "$100 per 7 days",
           "enterprise": true
         }
       },
       {
         "title": "Pausing",
-        "tooltip": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard",
+        "tooltips": {
+          "main": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard"
+        },
         "tiers": {
-          "free": "Paused after 1 week inactivity",
+          "free": "After 1 inactive week",
           "pro": "Never",
           "enterprise": "Never"
         }
       },
       {
         "title": "Database egress",
-        "tooltip": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period.",
+        "tooltips": {
+          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit",
+          "pro": "50GB included per month, then $0.09 per GB"
+        },
         "tiers": {
-          "free": "Up to 2GB",
-          "pro": "50GB included per month, then $0.09 per GB",
+          "free": "2GB",
+          "pro": "50GB",
           "enterprise": "Unlimited"
         }
       }
@@ -73,7 +89,7 @@
     "features": [
       {
         "title": "Total Users",
-        "tooltip": "The maximum number of users your project can have",
+        "tooltips": { "main": "The maximum number of users your project can have" },
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
@@ -82,10 +98,13 @@
       },
       {
         "title": "MAUs",
-        "tooltip": "Distinct users requesting your API throughout the billing period.",
+        "tooltips": {
+          "main": "Distinct users requesting your API throughout the billing period.",
+          "pro": "100,000 included, then $0.00325 per MAU"
+        },
         "tiers": {
-          "free": "Up to 50,000 MAUs",
-          "pro": "100,000 included, then $0.00325 per MAU",
+          "free": "50,000",
+          "pro": "100,000",
           "enterprise": "Unlimited"
         }
       },
@@ -131,7 +150,7 @@
       },
       {
         "title": "Supabase Auth emails",
-        "tooltip": "Rate limits do not apply to Custom SMTP",
+        "tooltips": { "main": "Rate limits do not apply to Custom SMTP" },
         "tiers": {
           "free": "30 / hour",
           "pro": "100 / hour",
@@ -151,22 +170,29 @@
   "storage": {
     "title": "Storage",
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
+
     "features": [
       {
         "title": "Storage",
-        "tooltip": "The sum of all objects' size in your storage buckets.",
-        "tiers": {
-          "free": "Up to 1 GB",
+        "tooltips": {
           "pro": "100 GB included, then $0.021 per GB",
+          "main": "The sum of all objects' size in your storage buckets."
+        },
+        "tiers": {
+          "free": "1 GB",
+          "pro": "100 GB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Storage egress",
-        "tooltip": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted.",
+        "tooltips": {
+          "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted.",
+          "pro": "200 GB included, then $0.09 per GB"
+        },
         "tiers": {
-          "free": "Up to 2 GB",
-          "pro": "200 GB included, then $0.09 per GB",
+          "free": "2 GB",
+          "pro": "200 GB",
           "enterprise": "Unlimited"
         }
       },
@@ -180,20 +206,22 @@
       },
       {
         "title": "Max file upload size",
-        "tooltip": "You can change the upload size in the dashboard",
+        "tooltips": { "main": "You can change the upload size in the dashboard" },
         "tiers": {
-          "free": "Up to 50MB",
-          "pro": "Up to 5GB",
+          "free": "50MB",
+          "pro": "5GB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Asset transformations",
-        "tooltip": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
+        "tooltips": {
+          "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
+          "pro": "Unlimited for 100 origin images. $5 per 1000 origin images after the first 100"
+        },
         "tiers": {
           "free": false,
-          "pro": "Unlimited transformations for 100 origin images, then $5 per 1000 origin images",
-          "enterprise": "Unlimited"
+          "pro": "Unlimited for 100 origin images"
         }
       }
     ]
@@ -204,27 +232,34 @@
     "features": [
       {
         "title": "Invocations",
-        "tooltip": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
+        "tooltips": {
+          "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
+          "pro": "2 Million per month, then $2 per 1 million invocations"
+        },
+        "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
         "tiers": {
-          "free": "500K per month",
-          "pro": "2 Million per month, then $2 per 1 million invocations",
+          "free": "500K/month",
+          "pro": "2 Million/month",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Script size",
         "tiers": {
-          "free": "2 mb",
-          "pro": "10 mb",
+          "free": "2 MB",
+          "pro": "10 MB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Number of functions",
-        "tooltip": "Billing is based on the maximum amount of functions at any point in time throughout your billing period.",
+        "tooltips": {
+          "main": "Billing is based on the maximum amount of functions at any point in time throughout your billing period.",
+          "pro": "100, then $10 per additional 100 functions"
+        },
         "tiers": {
           "free": "10",
-          "pro": "100, then $10 per additional 100 functions",
+          "pro": "100",
           "enterprise": "Unlimited"
         }
       }
@@ -244,27 +279,34 @@
       },
       {
         "title": "Concurrent Peak Connections",
-        "tooltip": "We only charge for successful connections - not connection attempts!",
+        "tooltips": {
+          "main": "We only charge for successful connections - not connection attempts!",
+          "pro": "Up to 500, then $10 per 1000"
+        },
         "tiers": {
-          "free": "Up to 200",
-          "pro": "Up to 500, then $10 per 1000",
+          "free": "200",
+          "pro": "500",
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
       {
         "title": "Messages Per Month",
-        "tooltip": "Billing is based on the total sum of Realtime messages throughout your billing period.",
-        "tiers": {
+        "tooltips": {
+          "main": "Billing is based on the total sum of Realtime messages throughout your billing period.",
           "free": "2 Million (including database)",
-          "pro": "5 Million, then $2.50 per million",
+          "pro": "5 Million, then $2.50 per million"
+        },
+        "tiers": {
+          "free": "2 Million",
+          "pro": "5 Million",
           "enterprise": "Volume discounts on messages"
         }
       },
       {
         "title": "Max Message Size",
         "tiers": {
-          "free": "250 Kb",
-          "pro": "3 Mb",
+          "free": "250 KB",
+          "pro": "3 MB",
           "enterprise": "Custom"
         }
       }
@@ -378,10 +420,13 @@
       },
       {
         "title": "Custom Domains",
+        "tooltips": {
+          "enterprise": "Volume discounts available."
+        },
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
-          "enterprise": "1 included, additional custom domains $10 per custom domain per month. Volume discounts available."
+          "enterprise": "1 included, additional $10/domain/month"
         }
       }
     ]
