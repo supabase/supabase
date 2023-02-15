@@ -445,6 +445,11 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_plan_filter: Restrict Total Cost',
+          url: '/guides/database/extensions/pg_plan_filter',
+          items: [],
+        },
+        {
           name: 'pg_stat_monitor: Extended Query Performance Monitoring',
           url: '/guides/database/extensions/pg_stat_monitor',
           items: [],
