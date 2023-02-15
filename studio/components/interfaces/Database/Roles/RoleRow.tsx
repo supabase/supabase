@@ -37,7 +37,8 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
 
   const onSaveChanges = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    const res = await meta.roles.update(role.id, values)
+    const { is_superuser, is_replication_role, ...payload } = values
+    const res = await meta.roles.update(role.id, payload)
     setSubmitting(false)
 
     if (res.error) {
