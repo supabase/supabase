@@ -87,7 +87,10 @@ The `sub` claim is usually what we use to match the JWT to rows in your database
 For the curious, try heading to the SQL editor and querying:
 
 ```sql
-select * from auth.users;
+select
+  *
+from
+  auth.users;
 ```
 
 If supabase-js is loaded on your site (in this case http://localhost:3000) it automatically plucks the `access_token` out of the URL and initiates a session. You can retrieve the [session](/docs/reference/javascript/auth-getsession) to see if there is a valid session:
@@ -99,19 +102,30 @@ console.log(supabase.auth.getSession())
 Now that we can use methods to issue JWTs to users, we want to start fetching resources specific to that user. So let's make some. Go to the SQL editor and run:
 
 ```sql
-create table my_scores (
-    name text,
-    score int,
-    user_id uuid not null
-);
+create table
+  my_scores (name text, score int, user_id uuid not null);
 
-ALTER TABLE my_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE
+  my_scores ENABLE ROW LEVEL SECURITY;
 
-insert into my_scores(name, score, user_id)
+insert into
+  my_scores (name, score, user_id)
 values
-  ('Paul', 100, '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'),
-  ('Paul', 200, '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'),
-  ('Leto', 50,  '9ec94326-2e2d-2ea2-22e3-3a535a4365e7');
+  (
+    'Paul',
+    100,
+    '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'
+  ),
+  (
+    'Paul',
+    200,
+    '5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca'
+  ),
+  (
+    'Leto',
+    50,
+    '9ec94326-2e2d-2ea2-22e3-3a535a4365e7'
+  );
 
 -- use UUIDs from the auth.users table if you want to try it
 -- for yourself
@@ -120,9 +134,7 @@ values
 Now we'll write our policy, again in SQL, but note it's also possible to add via the dashboard in Auth > Policies:
 
 ```sql
-CREATE POLICY user_update_own_scores ON my_scores
-    FOR ALL
-    USING (auth.uid() = user_id);
+CREATE POLICY user_update_own_scores ON my_scores FOR ALL USING (auth.uid () = user_id);
 ```
 
 Now, assuming you have an active session in your javascript/supabase-js environment you can do:
@@ -146,10 +158,10 @@ There are some more notes here on how to structure your schema to best integrate
 Once you get the hang of policies you can start to get a little bit fancy. Let's say I work at Blizzard and I only want Blizzard staff members to be able to update people's high scores, I can write something like:
 
 ```sql
-create policy "Only Blizzard staff can update leaderboard"
-  on my_scores
-  for update using (
-    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
+create policy "Only Blizzard staff can update leaderboard" on my_scores for
+update
+  using (
+    right (auth.jwt () - > > 'email', 13) = '@blizzard.com'
   );
 ```
 
@@ -158,12 +170,13 @@ Supabase comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`
 To create your own functions, navigate to the SQL editor and create a a new query.
 
 ```sql
-create or replace function user_agent() 
-returns text 
+create or replace function user_agent()
+returns text
 language sql
 as $$
   select nullif(current_setting('request.headers', true)::json->>'user-agent', '')::text;
 $$;
+```
 
 See the full PostgreSQL policy docs here: [https://www.postgresql.org/docs/12/sql-createpolicy.html](https://www.postgresql.org/docs/12/sql-createpolicy.html)
 
