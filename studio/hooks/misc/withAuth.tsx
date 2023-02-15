@@ -1,12 +1,14 @@
-import { ComponentType, useEffect } from 'react'
 import Head from 'next/head'
 import { NextRouter, useRouter } from 'next/router'
+import { ComponentType, useEffect } from 'react'
 
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfile, useStore, usePermissions } from 'hooks'
-import Error500 from '../../pages/500'
+import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { NextPageWithLayout } from 'types'
+import Error500 from '../../pages/500'
 
 const PLATFORM_ONLY_PAGES = [
   'reports',
@@ -34,14 +36,24 @@ export function withAuth<T>(
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
-    const returning =
-      app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
-    const { profile, isLoading, error } = useProfile(returning)
     const {
-      permissions,
-      isLoading: isPermissionLoading,
-      mutate: mutatePermissions,
-    } = usePermissions(profile, returning)
+      data: profile,
+      isLoading,
+      error,
+    } = useProfileQuery({
+      onSuccess(profile) {
+        ui.setProfile(profile)
+
+        if (!app.organizations.isInitialized) app.organizations.load()
+        if (!app.projects.isInitialized) app.projects.load()
+      },
+    })
+
+    usePermissionsQuery({
+      onSuccess(permissions) {
+        ui.setPermissions(permissions)
+      },
+    })
 
     const isAccessingBlockedPage =
       !IS_PLATFORM &&
@@ -51,31 +63,14 @@ export function withAuth<T>(
       checkRedirectTo(isLoading, router, profile, error, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // This should run before redirecting
-      if (!isLoading) {
-        if (!profile) {
-          ui.setProfile(undefined)
-        } else if (returning !== 'minimal') {
-          ui.setProfile(profile)
-
-          if (!app.organizations.isInitialized) app.organizations.load()
-          if (!app.projects.isInitialized) app.projects.load()
-          mutatePermissions()
-        }
-      }
-
-      if (!isPermissionLoading) {
-        ui.setPermissions(permissions)
-      }
-
       // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
+    }, [isRedirecting, redirectTo])
 
     useEffect(() => {
-      if (!isLoading && router.isReady) {
+      if (router.isReady) {
         if (ref) {
           rootStore.setProjectRef(Array.isArray(ref) ? ref[0] : ref)
         }

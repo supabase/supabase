@@ -56,5 +56,5 @@ export const useResourcePrefetch = ({ projectRef, id }: ResourceVariables) => {
         getResource({ projectRef, id }, signal)
       )
     }
-  }, [projectRef])
+  }, [projectRef, id])
 }

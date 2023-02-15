@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
@@ -11,6 +11,7 @@ import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { Input } from 'ui'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface Props {}
 
@@ -32,7 +33,32 @@ const ConnectionPooling: FC<Props> = () => {
     setIsLoading(false)
   }
 
-  if (isLoading) return <Loading />
+  if (isLoading) {
+    return (
+      <Panel
+        title={
+          <h5 key="panel-title" className="mb-0">
+            Connection Pooling
+          </h5>
+        }
+      >
+        <Panel.Content className="space-y-8">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Fragment key={i}>
+              <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
+                <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+              </div>
+              <Divider light />
+            </Fragment>
+          ))}
+
+          <ShimmeringLoader className="h-8 w-full" />
+        </Panel.Content>
+      </Panel>
+    )
+  }
+
   if (poolingConfiguration.error) {
     return (
       <div className="p-4">

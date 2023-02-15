@@ -1,20 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-expo',
-  title: 'Quickstart: Expo',
+  title: 'Build a User Management App with Expo',
   description: 'Learn how to use Supabase in your React Native App.',
-  sidebar_label: 'Expo',
-  hide_table_of_contents: false,
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/expo-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/expo-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -504,12 +502,7 @@ expo prebuild
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
