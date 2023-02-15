@@ -54,7 +54,7 @@ export type ProjectUsageResponse = {
   disk_volume_size_gb: number
 }
 
-export type ProjectUsagResponseUsageKeys = keyof Omit<ProjectUsageResponse, 'disk_volume_size_gb'>
+export type ProjectUsageResponseUsageKeys = keyof Omit<ProjectUsageResponse, 'disk_volume_size_gb'>
 
 export async function getProjectUsage({ projectRef }: ProjectUsageVariables, signal?: AbortSignal) {
   if (!projectRef) {
