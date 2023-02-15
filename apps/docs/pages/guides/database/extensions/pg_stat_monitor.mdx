@@ -6,7 +6,10 @@ export const meta = {
   description: 'Query performance monitoring for PostgreSQL',
 }
 
-[pg_stat_monitor](https://github.com/percona/pg_stat_monitor) is query performance monitoring tool that provides query execution statistics in a SQL view named `pg_stat_monitor`. It tracks a superset of statistics available in [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html).
+[pg_stat_monitor](https://github.com/percona/pg_stat_monitor) is query performance monitoring tool that provides query execution statistics in a SQL view named `pg_stat_monitor`. It tracks a superset of statistics available in [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html). Some of the most useful features are:
+- **Time Interval Grouping**: configurable time buckets to track query usage over time
+- **Capture Parameters**: optionally track parameters passed into queries instead of generic placeholders `$1`
+- **Query Plan**: store query plans used for execution 
 
 ## Usage
 
