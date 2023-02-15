@@ -50,7 +50,7 @@
         "title": "Point in time recovery",
         "tooltips": {
           "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
-          "pro": "If > 28 day rollback period, contact enterprise"
+          "pro": "$100 per 7 days. If > 28 day rollback period, contact enterprise"
         },
         "tiers": {
           "free": false,
@@ -217,7 +217,7 @@
         "title": "Asset transformations",
         "tooltips": {
           "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
-          "pro": "$5 per 1000 origin images after the first 100"
+          "pro": "Unlimited for 100 origin images. $5 per 1000 origin images after the first 100"
         },
         "tiers": {
           "free": false,
@@ -293,8 +293,8 @@
         "title": "Messages Per Month",
         "tooltips": {
           "main": "Billing is based on the total sum of Realtime messages throughout your billing period.",
-          "pro": "Then $2.50 per million",
-          "free": "2 Million (including database)"
+          "free": "2 Million (including database)",
+          "pro": "5 Million, then $2.50 per million"
         },
         "tiers": {
           "free": "2 Million",
