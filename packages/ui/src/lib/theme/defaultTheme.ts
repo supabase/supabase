@@ -1481,6 +1481,7 @@ export default {
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
+      z-50
     `,
     separator: `
       w-full
