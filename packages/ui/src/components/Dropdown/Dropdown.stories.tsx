@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Button } from '../Button'
-import { Divider } from '../Divider'
 import {
   IconSettings,
   IconLogOut,

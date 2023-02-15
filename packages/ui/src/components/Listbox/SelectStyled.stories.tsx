@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-
 import Listbox from './Listbox2'
-import { IconBook, IconUser } from '../../../index'
 import { Button } from '../Button'
 import Typography from '../Typography'
 
@@ -9,8 +7,6 @@ export default {
   title: 'Data Input/Listbox',
   component: Listbox,
 }
-
-const { Option } = Listbox
 
 const options = [
   { value: 'one', label: 'one' },
@@ -27,8 +23,8 @@ export const Default = (args: any) => (
           label={option.label}
           value={option.value}
           children={({ active, selected }: any) => {
-            // console.log('selected', selected)
-            // console.log('active', active)
+            console.log('selected', selected)
+            console.log('active', active)
             return <span>{option.label}</span>
           }}
         />

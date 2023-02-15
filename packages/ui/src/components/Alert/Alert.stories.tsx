@@ -1,8 +1,5 @@
 import React from 'react'
-
 import { Alert } from './../../../'
-
-// import ThemeProvider from '../../theme/themeContext'
 
 export default {
   title: 'Displays/Alerts',

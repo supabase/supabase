@@ -1,7 +1,5 @@
-import { actions } from '@storybook/addon-actions'
 import { useState } from 'react'
 import { action } from '@storybook/addon-actions'
-
 import { Modal } from '.'
 import Typography from '../Typography'
 import { Badge } from '../Badge'
@@ -10,7 +8,6 @@ import { Button } from '../Button'
 import { Space } from '../Space'
 import { IconTrash, IconAlertCircle, IconCheck } from './../../../index'
 import { Dropdown } from '../Dropdown'
-import { IconGlobe } from '../Icon/icons/IconGlobe'
 import { IconLink2 } from '../Icon/icons/IconLink2'
 import { Input } from '../Input'
 
@@ -65,9 +62,6 @@ export const withUseState = () => {
           onCancel={() => setVisible(!visible)}
           header={
             <div className="flex items-center gap-2 text-scale-1200">
-              {/* <div className="text-scale-600">
-              <IconTrash strokeWidth={2} />
-            </div> */}
               <div className="flex items-baseline gap-2">
                 <h3 className="text-sm">Delete your project</h3>
                 <span className="text-xs text-scale-900">Are you sure?</span>
@@ -83,7 +77,6 @@ export const withUseState = () => {
             }}
             onSubmit={(values: any, { setSubmitting }: any) => {
               setTimeout(() => {
-                // alert(JSON.stringify(values, null, 2))
                 setSubmitting(false)
                 setVisible(false)
               }, 400)

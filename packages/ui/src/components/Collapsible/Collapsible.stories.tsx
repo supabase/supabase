@@ -1,6 +1,4 @@
 import React from 'react'
-// import { AutoForm } from 'uniforms'
-
 import { Collapsible } from '.'
 import { IconChevronUp } from '../../../index'
 import { Button } from '../Button'

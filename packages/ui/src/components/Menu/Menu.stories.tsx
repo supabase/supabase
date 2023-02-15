@@ -1,12 +1,8 @@
 import React from 'react'
-
 import { Divider } from '../Divider'
 import { IconMail } from './../../../index'
-import Typography from '../Typography'
-
 import { Menu } from './'
 import { Button } from '../Button'
-import { IconDatabase } from '../Icon/icons/IconDatabase'
 import { IconMenu } from '../Icon/icons/IconMenu'
 import { IconRefreshCcw } from '../Icon/icons/IconRefreshCcw'
 

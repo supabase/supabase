@@ -18,7 +18,6 @@ interface Props {
 
 const GlassPanel = ({
   title,
-  span,
   icon,
   children,
   header,

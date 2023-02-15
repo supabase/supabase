@@ -80,7 +80,6 @@ function Input({
   }
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // console.log('input event', e)
     if (onChange) onChange(e)
     // update form
     if (formContextOnChange) formContextOnChange(e)
@@ -91,10 +90,6 @@ function Input({
   useEffect(() => {
     if (validation) fieldLevelValidation(id, validation(value))
   }, [])
-
-  // useEffect(() => {
-  //   error = touched && touched[id] ? error : undefined
-  // }, [errors, touched])
 
   function onCopy(value: any) {
     navigator.clipboard.writeText(value)?.then(

@@ -1,20 +1,15 @@
-import * as React from 'react'
-
 // Providers
 
 export * from './src/providers'
 
-// // GENERAL
-
+// GENERAL
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
-// export * from './src/components/Image'
 
 // DISPLAYS
-
 export * from './src/components/Card'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
@@ -23,27 +18,21 @@ export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 
 // NAV
-
 export * from './src/components/Menu'
 
 // OVERLAYS
-
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
-// export * from './src/components/Toast'
 
 // UTILITIES
-
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
-
 export * from './src/components/Select'
 export * from './src/components/Listbox'
 export * from './src/components/Checkbox'
@@ -54,21 +43,7 @@ export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
 
-// config
-
-// export { default as Config } from './../ui.config'
-
-// ARCHIVE
-
-// export * from './src/components/Textarea'
-
-// AUTH
-
-// export * from './src/components/Auth'
-
 // ICONS
-
-// export icons
 export * from './src/components/Icon/icons/IconActivity'
 export * from './src/components/Icon/icons/IconAirplay'
 export * from './src/components/Icon/icons/IconAlertCircle'

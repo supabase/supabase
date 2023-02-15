@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import { IconAlertTriangle } from '../Icon/icons/IconAlertTriangle'
-
 import { IconInfo } from '../Icon/icons/IconInfo'
 import { IconX } from '../Icon/icons/IconX'
-
-// @ts-ignore
-// import AlertStyles from './Alert.module.css'
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
 import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'

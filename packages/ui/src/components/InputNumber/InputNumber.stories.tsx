@@ -1,10 +1,6 @@
 import React, { useState, useCallback } from 'react'
-// import { AutoForm } from 'uniforms'
-
 import { InputNumber } from '.'
 import { IconPackage } from './../../../index'
-import { Button } from '../Button'
-import { Space } from '../Space'
 
 export default {
   title: 'Data Input/InputNumber',
@@ -21,7 +17,6 @@ export const Controlled = (props: any) => {
   const [state, setState] = useState(() => undefined)
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log({ e, value: e.currentTarget.value })
     setState(e.currentTarget.value)
   }, [])
 

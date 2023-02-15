@@ -1,8 +1,6 @@
 import React from 'react'
-import { Space } from '../Space'
 import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface MenuProps {
@@ -40,16 +38,7 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
-export function Item({
-  children,
-  icon,
-  active,
-  rounded,
-  onClick,
-  doNotCloseOverlay = false,
-  showActiveBar = false,
-  style,
-}: ItemProps) {
+export function Item({ children, icon, active, onClick, style }: ItemProps) {
   const __styles = styleHandler('menu')
 
   const { type } = useMenuContext()
@@ -103,9 +92,7 @@ export function Group({ children, icon, title }: GroupProps) {
   const __styles = styleHandler('menu')
   const { type } = useMenuContext()
   return (
-    <div
-      className={[__styles.group.base, __styles.group.variants[type]].join(' ')}
-    >
+    <div className={[__styles.group.base, __styles.group.variants[type]].join(' ')}>
       {icon && <span className={__styles.group.icon}>{icon}</span>}
       <span className={__styles.group.content}>{title}</span>
       {children}
@@ -119,15 +106,9 @@ interface MiscProps {
 
 export function Misc({ children }: MiscProps) {
   return (
-    <div
-    // className={MenuStyles['sbui-menu__misc']}
-    >
+    <div>
       <Typography.Text>
-        <span
-        // className={MenuStyles['sbui-menu__content']}
-        >
-          {children}
-        </span>
+        <span>{children}</span>
       </Typography.Text>
     </div>
   )

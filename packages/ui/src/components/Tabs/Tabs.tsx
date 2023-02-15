@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { TabsContext } from './TabsContext'
-
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useRouter } from 'next/router'
-
-// @ts-ignore
-// import TabsStyles from './Tabs.module.css'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface TabsProps {
@@ -143,8 +138,7 @@ export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
 
   return (
     <TabsContext.Consumer>
-      {({ activeId }) => {
-        const active = activeId === id
+      {({ activeId: _activeId }) => {
         return (
           <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
             {children}

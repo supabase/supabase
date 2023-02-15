@@ -59,11 +59,7 @@ function Popover({
       onOpenChange={onOpenChange}
       open={open}
     >
-      <RadixPopover.Trigger
-        // className={DropdownStyles['sbui-popover__trigger']}
-        className={__styles.trigger}
-        aria-label={ariaLabel}
-      >
+      <RadixPopover.Trigger className={__styles.trigger} aria-label={ariaLabel}>
         {children}
       </RadixPopover.Trigger>
 
@@ -75,12 +71,7 @@ function Popover({
         style={style}
         portalled={portalled}
       >
-        {arrow && (
-          <RadixPopover.Arrow
-            // className={DropdownStyles['sbui-popover__arrow']}
-            offset={10}
-          ></RadixPopover.Arrow>
-        )}
+        {arrow && <RadixPopover.Arrow offset={10}></RadixPopover.Arrow>}
         {header && <div className={__styles.header}>{header}</div>}
         {overlay}
         {footer && <div className={__styles.footer}>{footer}</div>}

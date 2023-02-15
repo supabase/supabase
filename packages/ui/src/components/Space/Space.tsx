@@ -1,6 +1,4 @@
 import React from 'react'
-// @ts-ignore
-// import SpaceStyles from './Space.module.css'
 
 function Space({ direction, size = 2, className, block, style, minus, children }: any) {
   // const classes = []

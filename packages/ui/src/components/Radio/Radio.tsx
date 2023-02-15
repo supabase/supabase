@@ -1,12 +1,8 @@
 import React, { useEffect, useState, createRef } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { RadioContext } from './RadioContext'
-
 import { useFormContext } from '../Form/FormContext'
-
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
-
 import randomIdGenerator from './../../utils/randomIdGenerator'
 
 interface GroupProps {
@@ -59,18 +55,9 @@ function RadioGroup({
 
   const __styles = styleHandler('radio')
 
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    // handleBlur,
-    touched,
-    fieldLevelValidation,
-  } = useFormContext()
+  const { formContextOnChange, values, errors, touched, fieldLevelValidation } = useFormContext()
 
   if (values && !value) value = values[id || name]
-  // console.log('errors in. radio group', errors)
-  // console.log('values in radio group', values)
 
   if (!error) {
     if (errors && !error) error = errors[id || name]
@@ -179,13 +166,11 @@ function Radio({
     <RadioContext.Consumer>
       {({ parentCallback, type, name, activeId, parentSize }) => {
         // if id does not exist, use label
-
         const markupId = id
 
         // if name does not exist on Radio then use Context Name from Radio.Group
         const markupName = name || inputName
 
-        // console.log('markupName', markupName)
         // @ts-ignore
         size = parentSize || size
 
@@ -197,7 +182,6 @@ function Radio({
 
         let classes = [
           __styles.variants[type].container.base,
-          // __styles.variants[type].container.align[align],
           type === 'list' && !hidden && __styles.variants[type].container.size[size],
         ]
 

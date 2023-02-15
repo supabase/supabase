@@ -4,14 +4,10 @@ import { ChevronRight } from 'react-feather'
 
 interface Props {
   title: string
-
   icon?: string | React.ReactNode
   children?: React.ReactNode
-
   background?: boolean
-
   hasLightIcon?: boolean
-
   showLink?: boolean
 }
 

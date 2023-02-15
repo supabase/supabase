@@ -1,13 +1,7 @@
 import React, { useState } from 'react'
-
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu'
 import { IconCheck } from '../Icon/icons/IconCheck'
-
-// @ts-ignore
-// import DropdownStyles from './Dropdown.module.css'
-
 import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
-
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
 
