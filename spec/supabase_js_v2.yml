@@ -66,9 +66,9 @@ functions:
             db: { schema: 'other_schema' }
           })
           ```
-
+        description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+          Go to [Settings > API > Exposed schemas](https://app.supabase.com/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
@@ -81,7 +81,7 @@ functions:
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
-
+        description: |
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
@@ -101,7 +101,7 @@ functions:
             },
           });
           ```
-
+        description: |
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   - id: auth-api
     title: 'Overview'
@@ -287,7 +287,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -356,6 +356,7 @@ functions:
     notes: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
+      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -972,6 +973,40 @@ functions:
             .from('countries')
             .select()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
@@ -979,6 +1014,37 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables
         name: Query foreign tables
@@ -994,6 +1060,54 @@ functions:
                 name
               )
             `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
@@ -1194,6 +1308,56 @@ functions:
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`*, cities(count)`)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text, 
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+            
+            with country as (
+              insert into countries (name) 
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values 
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
+              "name": "United Kingdom",
+              "cities": [
+                {
+                  "count": 4
+                }
+              ]
+            }
+          ]
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
         code: |
@@ -1277,12 +1441,6 @@ functions:
   - id: insert
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    params:
-      - name: values
-        type: object | object []
-        isOptional: false
-        description: |
-          Bobby Bobby Bobby Bobby Bobby Bobby
     examples:
       - id: create-a-record
         name: Create a record
@@ -3845,6 +4003,25 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: returns
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    title: returns()
+    examples:
+      - id: override-type-of-successful-response
+        name: Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .returns<MyType>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
 
   # NOTE: Not available on currently deployed PostgREST
   # db.geojson():
@@ -3992,7 +4169,7 @@ functions:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
-      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/database/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
     examples:
@@ -4371,7 +4548,8 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              upsert: false
+              // Overwrite file if it exists
+              upsert: true
             })
           ```
       - id: update-file-using-arraybuffer-from-base64-file-data

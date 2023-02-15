@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-angular',
-  title: 'Quickstart: Angular',
+  title: 'Build a User Management App with Angular',
   description: 'Learn how to use Supabase in your Angular App.',
-  sidebar_label: 'Angular',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -62,7 +61,6 @@ import {
   User,
 } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
-import { Database } from 'src/schema'
 
 export interface Profile {
   id?: string
@@ -136,7 +134,7 @@ Let's set up an Angular component to manage logins and sign ups. We'll use Magic
 Create an **AuthComponent** with `ng g c auth` Angular CLI command.
 
 ```ts title=src/app/auth/auth.component.ts
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
 
@@ -145,7 +143,7 @@ import { SupabaseService } from '../supabase.service'
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent {
   loading = false
 
   signInForm = this.formBuilder.group({
@@ -156,8 +154,6 @@ export class AuthComponent implements OnInit {
     private readonly supabase: SupabaseService,
     private readonly formBuilder: FormBuilder
   ) {}
-
-  ngOnInit(): void {}
 
   async onSubmit(): Promise<void> {
     try {
@@ -195,11 +191,7 @@ export class AuthComponent implements OnInit {
         />
       </div>
       <div>
-        <button
-          type="submit"
-          class="button block"
-          [disabled]="loading"
-        >
+        <button type="submit" class="button block" [disabled]="loading">
           {{ loading ? 'Loading' : 'Send magic link' }}
         </button>
       </div>
@@ -406,7 +398,7 @@ Let's create an avatar for the user so that they can upload a profile photo.
 Create an **AvatarComponent** with `ng g c avatar` Angular CLI command.
 
 ```ts title=src/app/avatar/avatar.component.ts
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 
@@ -415,7 +407,7 @@ import { SupabaseService } from '../supabase.service'
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined
   uploading = false
 
@@ -429,8 +421,6 @@ export class AvatarComponent implements OnInit {
   @Output() upload = new EventEmitter<string>()
 
   constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {}
-
-  ngOnInit(): void {}
 
   async downloadImage(path: string) {
     try {
@@ -534,12 +524,7 @@ export class AccountComponent implements OnInit {
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

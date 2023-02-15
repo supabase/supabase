@@ -553,6 +553,13 @@
     "tags": []
   },
   {
+    "name": "rum",
+    "schema": "extensions",
+    "default_version": "1.3.13",
+    "installed_version": "1.3.13",
+    "comment": "GIN-like index for text search"
+  },
+  {
     "name": "pg_repack",
     "schema": "extensions",
     "default_version": "1.4.8",
