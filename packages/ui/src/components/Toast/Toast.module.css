@@ -3,7 +3,7 @@
 
   @apply border border-solid;
   @apply bg-white border-gray-300;
-  @apply dark:bg-dark-700 dark:border-gray-400;
+  @apply dark:border-gray-400;
 }
 
 .sbui-toast-container--sm {
@@ -79,10 +79,6 @@
   animation-duration: 1500ms;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
-  /* transform: rotate(3deg); */
-  /* transform: rotate(0.3rad);/ */
-  /* transform: rotate(3grad); */
-  /* transform: rotate(.03turn);  */
   transform-origin: center center;
 }
 

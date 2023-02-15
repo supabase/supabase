@@ -1,8 +1,5 @@
 import React from 'react'
-
 import { Accordion } from '.'
-import { Typography } from '../Typography'
-import { IconArrowUp } from '../Icon/icons/IconArrowUp'
 import { Badge } from '../Badge'
 
 export default {

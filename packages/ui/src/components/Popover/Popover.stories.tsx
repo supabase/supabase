@@ -1,6 +1,6 @@
 import { Button } from '../Button'
 import { Divider } from '../Divider'
-import { IconChevronDown } from '../../index'
+import { IconChevronDown } from '../../../index'
 import Typography from '../Typography'
 
 import { Popover } from '.'

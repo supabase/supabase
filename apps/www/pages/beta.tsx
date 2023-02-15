@@ -15,9 +15,6 @@ import Layout from '~/components/Layouts/Default'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
-// Dark text: text-dark-400
-// Light text: text-dark-300
-
 type Props = {
   darkMode: boolean
 }
@@ -34,11 +31,11 @@ const NavFlyOutMenu = (props: any) => {
             key={segment.key}
             onClick={() => scrollTo(segment.key)}
             className={`
-              text-dark-300 dark:text-dark-400 dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500 border-dark-300 dark:border-dark-400 col-span-12 cursor-pointer border-t border-dashed
+              border-dark-300 dark:border-dark-400 col-span-12 cursor-pointer border-t border-dashed
               bg-white px-4 py-4 sm:border-l lg:col-span-4 lg:px-6 lg:py-10`}
           >
             <p className="flex items-center text-black dark:text-white">
-              <span className="mr-2 font-mono text-xs text-dark-300 dark:text-dark-400">
+              <span className="mr-2 font-mono text-xs">
                 0{segment.no}
               </span>
               <span>{segment.name}</span>
@@ -55,10 +52,10 @@ const VideoShot = (props: any) => {
   return (
     <div className="p-2 rounded-xl bg-gradient-to-r from-green-400 via-violet-500 to-blue-500">
       <div className="rounded-md shadow-lg" style={{ height: 'fit-content' }}>
-        <div className="flex items-center justify-start w-full h-5 px-2 bg-dark-400 rounded-t-md">
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
+        <div className="flex items-center justify-start w-full h-5 px-2 rounded-t-md">
+          <div className="w-2 h-2 mr-2 rounded-full" />
+          <div className="w-2 h-2 mr-2 rounded-full" />
+          <div className="w-2 h-2 mr-2 rounded-full" />
         </div>
         <video className="rounded-b-md" src={src} autoPlay loop muted playsInline>
           Your browser does not support the video tag
@@ -114,7 +111,7 @@ const Hero = (props: Props) => {
       }}
       className="py-16 bg-no-repeat dark:bg-scale-300 bg-gray-50 lg:py-36"
     >
-      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
+      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 text-scale-900 dark:text-white md:col-span-9 lg:col-span-8 xl:col-span-6">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
@@ -131,7 +128,7 @@ const Hero = (props: Props) => {
 
 const Introduction = () => {
   return (
-    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
+    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
       <div className="col-span-12 sm:col-span-9 xl:col-span-8">
         <p>
           <span className="block text-2xl text-scale-1200">
@@ -198,7 +195,7 @@ const Introduction = () => {
                 {stat.icon}
               </div>
             </div>
-            <div className="col-span-7 sm-col-span-8 text-dark-400 md:col-span-9 xl:col-span-10">
+            <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10">
               <p className="text-5xl text-scale-1200 lg:text-6xl">
                 <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                   {stat.value}
@@ -219,7 +216,7 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="dark:bg-scale-300 text-dark-400 dark:text-dark-200 bg-gray-50">
+    <div className="dark:bg-scale-300 bg-gray-50">
       <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 mb-10 text-base">
           <p className="text-2xl text-black dark:text-white">
@@ -302,7 +299,7 @@ const Performance = () => {
         {PerformanceComparisonData.map((metric: any) => {
           const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
           return (
-            <div key={`${metric.key}`} className="mb-10 text-dark-400 dark:text-dark-300">
+            <div key={`${metric.key}`} className="mb-10">
               <p className="pb-2 mb-4 sm:w-36">{metric.title}</p>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <div className="w-full sm:w-5/6">
@@ -315,7 +312,7 @@ const Performance = () => {
                         color={
                           stat.name === 'Supabase'
                             ? 'bg-brand-900 dark:bg-brand-800'
-                            : 'bg-dark-300 dark:bg-dark-400'
+                            : ''
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
@@ -324,7 +321,7 @@ const Performance = () => {
                   ))}
                 </div>
                 <div className="flex flex-col text-left sm:w-1/6 sm:text-right">
-                  <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
+                  <p className="text-6xl">{multiplier}x</p>
                   <p className="-mt-2 text-sm">more {metric.key}s per second</p>
                 </div>
               </div>
@@ -337,7 +334,7 @@ const Performance = () => {
 
   return (
     <div id="performance" className="bg-white dark:bg-scale-200">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={1} header="Performance" />
 
         <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -375,7 +372,7 @@ const Performance = () => {
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p className="text-dark-400 dark:text-dark-300">
+            <p>
               We're publishing the results of our benchmarks here and we'll continue to seek gains
               throughout our Beta program and beyond. Our{' '}
               <a
@@ -420,7 +417,7 @@ const Performance = () => {
 const Security = () => {
   return (
     <div id="security" className="dark:bg-scale-300 bg-gray-50">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={2} header="Security" />
 
         <div className="grid grid-cols-12 col-span-12 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -484,7 +481,7 @@ const Security = () => {
 const Reliability = () => {
   return (
     <div id="reliability" className="bg-white dark:bg-scale-200">
-      <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28 ">
+      <div className="container grid grid-cols-12 px-8 py-12 mx-auto gap-y-10 lg:px-28 ">
         <SectionHeader sectionNumber={3} header="Reliability" />
 
         <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -537,7 +534,7 @@ const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
     <div id="newFeaturesAndIntegrations" className="dark:bg-scale-300 bg-gray-50">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
         <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -661,7 +658,7 @@ const NewFeaturesAndIntegrations = () => {
 
 const BetaPricing = () => (
   <div id="betaPricing" className="bg-white dark:bg-scale-200">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -729,7 +726,7 @@ const BetaPricing = () => (
 
 const OpenSource = () => (
   <div id="openSource" className="dark:bg-scale-300 bg-gray-50">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -796,7 +793,7 @@ const OpenSource = () => (
 
 const FundingPartners = () => (
   <div id="fundingPartners" className="bg-white dark:bg-scale-200">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={7} header="Funding Partners" />
       <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
@@ -833,7 +830,7 @@ const FundingPartners = () => (
 
 const ScalingOurTeam = () => (
   <div id="scalingOurTeam" className="dark:bg-scale-300 bg-gray-50">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -873,7 +870,7 @@ const WhatsNext = () => (
     id="whatsNext"
     className="bg-white border-b-px dark:bg-scale-200 dark:border-scale-600 border-gray-50"
   >
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={9} header="What's Next" />
 
       <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
@@ -1044,7 +1041,7 @@ const Beta = (props: Props) => {
         <div ref={references['next']}>
           <WhatsNext />
         </div>
-        <CTABanner darkerBg={true} />
+        <CTABanner />
       </Container>
     </Layout>
   )

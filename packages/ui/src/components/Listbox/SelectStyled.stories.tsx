@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import Listbox from './Listbox2'
-import { IconBook, IconUser } from '../../index'
+import { IconBook, IconUser } from '../../../index'
 import { Button } from '../Button'
 import Typography from '../Typography'
 

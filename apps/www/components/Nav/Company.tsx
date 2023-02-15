@@ -16,7 +16,7 @@ const Company = () => {
     const content = (
       <a
         href="#"
-        className="dark:hover:bg-dark-700 -m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50"
+        className="-m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50"
       >
         {/* <!-- Heroicon name: support --> */}
         <svg
@@ -31,7 +31,7 @@ const Company = () => {
         </svg>
         <div className="ml-4">
           <p className="text-base font-medium text-gray-900 dark:text-white">{text}</p>
-          <p className="dark:text-dark-300 mt-1 text-sm text-gray-500">{description}</p>
+          <p className="mt-1 text-sm text-gray-500">{description}</p>
         </div>
       </a>
     )
@@ -56,7 +56,7 @@ const Company = () => {
       </nav>
       <div className="px-4 py-8 sm:py-12 sm:px-6 lg:px-8 xl:pl-12">
         <div>
-          <h3 className="dark:text-dark-300 text-sm font-medium uppercase tracking-wide text-gray-500">
+          <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500">
             Latest blog posts
           </h3>
           <ul className="mt-6 space-y-6">
@@ -64,13 +64,13 @@ const Company = () => {
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <a
                   href={caseStudy.url}
-                  className="dark:hover:bg-dark-600 -m-3 flex rounded-lg py-3 transition duration-150 ease-in-out hover:bg-gray-100"
+                  className="-m-3 flex rounded-lg py-3 transition duration-150 ease-in-out hover:bg-gray-100"
                 >
                   <div className="min-w-0 flex-1 sm:ml-3">
                     <h4 className="truncate text-base font-medium text-gray-900 dark:text-white">
                       {caseStudy.title}
                     </h4>
-                    <p className="dark:text-dark-300 mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       {caseStudy.description}
                     </p>
                   </div>

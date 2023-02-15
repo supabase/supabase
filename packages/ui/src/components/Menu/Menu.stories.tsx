@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Divider } from '../Divider'
-import { IconMail } from './../../index'
+import { IconMail } from './../../../index'
 import Typography from '../Typography'
 
 import { Menu } from './'

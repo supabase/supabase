@@ -2,7 +2,7 @@ import React from 'react'
 // import { AutoForm } from 'uniforms'
 
 import { Input } from '.'
-import { IconPackage } from './../../index'
+import { IconPackage } from './../../../index'
 import { Button } from '../Button'
 import { Space } from '../Space'
 

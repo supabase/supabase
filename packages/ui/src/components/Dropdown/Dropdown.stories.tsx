@@ -7,7 +7,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconHardDrive,
-} from './../../index'
+} from '../../../index'
 import Typography from '../Typography'
 
 import { Dropdown } from './'

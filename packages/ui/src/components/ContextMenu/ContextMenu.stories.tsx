@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '../Button'
 import { Divider } from '../Divider'
-import { IconSettings, IconLogOut } from '../../index'
+import { IconSettings, IconLogOut } from '../../../index'
 import Typography from '../Typography'
 
 import { ContextMenu } from '.'

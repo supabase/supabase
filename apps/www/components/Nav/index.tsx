@@ -73,7 +73,7 @@ const Nav = () => {
                 </Badge>
               )}
             </p>
-            <p className="text-scale-1100 dark:text-dark-100 mt-1 text-sm">{description}</p>
+            <p className="text-scale-1100 mt-1 text-sm">{description}</p>
           </div>
           {url && (
             <p className="text-brand-900 mt-2 text-sm font-medium lg:mt-4">
@@ -215,7 +215,7 @@ const Nav = () => {
                   <Link href="/pricing">
                     <a
                       className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium
                       `}
@@ -226,7 +226,7 @@ const Nav = () => {
                   <Link href="/blog">
                     <a
                       className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium
                       `}

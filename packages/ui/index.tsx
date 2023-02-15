@@ -26,6 +26,7 @@ export * from './src/components/Collapsible'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/Breadcrumb'
 
 // OVERLAYS
 

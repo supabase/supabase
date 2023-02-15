@@ -1,10 +1,5 @@
-// import React, { useRef, useState } from 'react'
-// import defaultTheme from '../../theme/defaultTheme'
-// import { ThemeProvider } from './../ThemeProvider'
-// import customThemeExample from '../../lib/theme/customThemeExample'
-
 import { useRef, useState } from 'react'
-import { Button, IconPackage, IconChevronRight } from './../../index'
+import { Button, IconPackage, IconChevronRight } from './../../../index'
 
 export default {
   title: 'General/Button',
@@ -30,7 +25,6 @@ export const withRef = () => {
   function onClick() {
     const message = `button:${buttonRef?.current}  `
     setMsg(message)
-    // console.log(message)
   }
 
   return (

@@ -1,7 +1,7 @@
 .sbui-menu__item {
   @apply px-4 py-2;
   @apply cursor-pointer;
-  @apply hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors duration-150;
+  @apply hover:bg-gray-100 transition-colors duration-150;
 }
 
 .sbui-menu__group {

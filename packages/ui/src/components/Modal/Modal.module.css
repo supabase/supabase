@@ -62,17 +62,6 @@
   @apply hidden sm:inline-block sm:align-middle sm:h-screen;
 }
 
-/* .sbui-modal {
-  @apply inline-block bg-white dark:bg-dark-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all align-middle;
-  @apply border-gray-400 border border-solid;
-  @apply dark:border-gray-600 border border-solid;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-} */
-
 .sbui-modal--tiny {
   @apply sm:align-middle sm:w-full sm:max-w-xs;
 }
@@ -98,7 +87,7 @@
 }
 
 .sbui-modal-footer--with-bg {
-  @apply bg-gray-50 dark:bg-dark-600 px-6 py-3 sm:px-6 sm:flex sm:flex-row justify-end;
+  @apply bg-gray-50 px-6 py-3 sm:px-6 sm:flex sm:flex-row justify-end;
 }
 
 .sbui-modal-icon-container {
@@ -123,12 +112,7 @@
 
 .sbui-modal-close-container button,
 .dark .sbui-modal-close-container button {
-  @apply text-gray-300;
-  @apply hover:text-gray-400;
-
-  /* @apply dark:text-dark-400; */
-  @apply hover:text-dark-300;
-
+  @apply text-gray-300 hover:text-gray-400;
   @apply hover:bg-transparent;
 }
 

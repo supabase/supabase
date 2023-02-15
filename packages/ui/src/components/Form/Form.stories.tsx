@@ -8,7 +8,7 @@ import {
   Radio,
   Select,
   Listbox,
-} from '../../index'
+} from '../../../index'
 
 import * as Yup from 'yup'
 import { User } from '../Icon/IconImportHandler'

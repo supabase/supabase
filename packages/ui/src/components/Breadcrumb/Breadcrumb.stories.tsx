@@ -1,5 +1,5 @@
 import React from 'react'
-import { Breadcrumb } from './../../../'
+import { Breadcrumb } from './../../../index'
 
 export default {
   title: 'Navigation/Breadcrumb',

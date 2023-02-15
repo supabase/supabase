@@ -5,7 +5,7 @@ const Benchmark = () => {
   const { basePath } = useRouter()
   return (
     <div className="mx-auto mt-6 max-w-lg lg:mx-0 lg:mt-16 lg:max-w-none">
-      <div className="bg-dark-800 grid grid-cols-1 items-center gap-4 overflow-auto rounded-md shadow-lg lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-center gap-4 overflow-auto rounded-md shadow-lg lg:grid-cols-12">
         <div className="col-span-1 flex flex-col items-center lg:col-span-10 lg:flex-row">
           <img
             className="mb-10 hidden w-full lg:mb-0 lg:mr-14 lg:block lg:h-44 lg:w-auto"

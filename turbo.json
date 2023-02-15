@@ -10,6 +10,13 @@
     "dev": {
       "cache": false
     },
+    "studio#dev": {
+      "dependsOn": ["studio#storybook"],
+      "cache": false
+    },
+    "studio#storybook": {
+      "cache": false
+    },
     "test": {
       "cache": false
     }
