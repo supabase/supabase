@@ -293,6 +293,10 @@ export const auth = {
       url: '/guides/auth/overview',
     },
     {
+      name: 'Security',
+      url: '/guides/auth/auth-security',
+    },
+    {
       name: 'Authentication',
       url: undefined,
       items: [
