@@ -209,6 +209,7 @@ function BlogPostPage(props: any) {
                                     <Image
                                       src={author.author_image_url}
                                       className="dark:border-dark rounded-full border"
+                                      alt={`${author.author} avatar`}
                                       width="100%"
                                       height="100%"
                                       layout="responsive"
@@ -253,6 +254,7 @@ function BlogPostPage(props: any) {
                           <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
+                              alt={props.blog.title}
                               layout="fill"
                               objectFit="cover"
                             />
