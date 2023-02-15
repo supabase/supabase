@@ -8,12 +8,11 @@ export const meta = {
 
 [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) is query performance monitoring tool that provides query execution statistics in a SQL view named `pg_stat_monitor`. It tracks a superset of statistics available in [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html). Some of the most useful features are:
 - **Time Interval Grouping**: configurable time buckets to track query usage over time
-- **Capture Parameters**: optionally track parameters passed into queries instead of generic placeholders `$1`
+- **Capture Parameters**: optionally track parameters passed into queries instead of generic placeholders e.g. `$1`
 - **Query Plan**: store query plans used for execution 
 
-## Usage
 
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -42,7 +41,7 @@ drop extension if exists pg_stat_monitor;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 </TabPanel>
 </Tabs>
@@ -72,7 +71,7 @@ The following table shows a subset of available columns:
 | total_plan_time double precision      | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
 | min_plan_time double precision        | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
 
-A full list of statistics is available in the [pg_stat_monitor](https://docs.percona.com/pg-stat-monitor/reference.html#postgresql-15) docs.
+A full list of statistics is available in the [pg_stat_monitor docs](https://docs.percona.com/pg-stat-monitor/reference.html#postgresql-15).
 
 ## Functions
 - [`pg_stat_monitor_reset()`](https://docs.percona.com/pg-stat-monitor/functions.html): Resets the statistics tracked by the `pg_stat_monitor` view and deletes all previous data.

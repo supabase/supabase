@@ -6,11 +6,9 @@ export const meta = {
   description: 'Lint PL/pgSQL code',
 }
 
-plpg_sqlcheck is a PostgreSQL extension that lints plpgsql for syntax, semantic and other related issues. The tool helps developers to identify and correct errors before executing the code. plpgsql_sqlcheck is most useful for developers who are working with large or complex SQL codebases, as it can help identify and resolve issues early in the development cycle.
+[plpgsql_check](https://github.com/okbob/plpgsql_check) is a PostgreSQL extension that lints plpgsql for syntax, semantic and other related issues. The tool helps developers to identify and correct errors before executing the code. plpgsql_check is most useful for developers who are working with large or complex SQL codebases, as it can help identify and resolve issues early in the development cycle.
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -46,11 +44,11 @@ To disable an extension you can call `drop extension`.
 
 - [`plpgsql_check_function( ... )`](https://github.com/okbob/plpgsql_check#active-mode): Scans a function for errors.
 
-`plpgsql_check_function` is highly customizable. For a complete list of available arguments see [their doc](https://github.com/okbob/plpgsql_check#arguments)
+`plpgsql_check_function` is highly customizable. For a complete list of available arguments see [the docs](https://github.com/okbob/plpgsql_check#arguments)
 
 ## Usage
 
-To demonstrate plpgsql_check we can create a function with a known error. In this case we create a function `some_func`, that references a non-existent column `location.created_at`.
+To demonstrate `plpgsql_check` we can create a function with a known error. In this case we create a function `some_func`, that references a non-existent column `place.created_at`.
 
 {/* prettier-ignore */}
 ```sql
@@ -68,7 +66,7 @@ declare
 begin
   for rec in select * from place
   loop
-    -- Bug: There is no column `created_at` on table `location`
+    -- Bug: There is no column `created_at` on table `place`
     raise notice '%', rec.created_at;
   end loop;
 end;

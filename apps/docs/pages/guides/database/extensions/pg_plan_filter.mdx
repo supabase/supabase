@@ -64,7 +64,7 @@ explain select * from book;
 (1 row)
 ```
 
-Now we can choose a `statement_cost_filter` between the total cost for the single select (2.49) and the whole table select (135.0) so one statement will succeed and one will fail.
+Now we can choose a `statement_cost_filter` value between the total cost for the single select (2.49) and the whole table select (135.0) so one statement will succeed and one will fail.
 
 {/* prettier-ignore */}
 ```sql
