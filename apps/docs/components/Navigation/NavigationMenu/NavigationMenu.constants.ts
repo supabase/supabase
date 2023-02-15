@@ -410,7 +410,7 @@ export const database = {
           items: [],
         },
         {
-          name: 'PGRoonga: Multilingual Full Text Search',
+          name: 'PGroonga: Multilingual Full Text Search',
           url: '/guides/database/extensions/pgroonga',
           items: [],
         },
@@ -425,7 +425,7 @@ export const database = {
           items: [],
         },
         {
-          name: 'pg_graphql: GraphQL support',
+          name: 'pg_graphql: GraphQL Support',
           url: '/guides/database/extensions/pg_graphql',
           items: [],
         },
