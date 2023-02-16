@@ -127,14 +127,14 @@ const useApiReport = () => {
     }
   }, [JSON.stringify(filters)])
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     activeHooks.forEach(([_hookData, hookHandler]) => {
       hookHandler.runQuery()
     })
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
     activeHooks.forEach(([_hookData, hookHandler]) => {
-      hookHandler.setParams?.((prev) => ({ ...prev, ...params }))
+      hookHandler.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
   const isLoading = activeHooks.some(([hookData]) => hookData.isLoading)

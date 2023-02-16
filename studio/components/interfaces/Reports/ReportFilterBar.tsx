@@ -187,7 +187,10 @@ const ReportFilterBar: React.FC<Props> = ({
               filter.key !== currentProductFilter?.filterKey
           )
           .map((filter) => (
-            <div className="text-xs rounded border border-scale-1100 bg-scale-500 px-1 h-7 flex flex-row justify-center gap-1 items-center">
+            <div
+              key={`${filter.key}-${filter.compare}-${filter.value}`}
+              className="text-xs rounded border border-scale-1100 bg-scale-500 px-1 h-7 flex flex-row justify-center gap-1 items-center"
+            >
               {filter.key} {filter.compare} {filter.value}
               <Button
                 type="text"
@@ -223,7 +226,7 @@ const ReportFilterBar: React.FC<Props> = ({
           }
           open={showAdder}
           onOpenChange={(openValue) => setShowAdder(openValue)}
-          overlay={[
+          overlay={
             <div className="px-3 py-3 flex flex-col gap-2">
               <Select
                 size="tiny"
@@ -232,7 +235,6 @@ const ReportFilterBar: React.FC<Props> = ({
                   setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
                 }}
                 label="Attribute Filter"
-                defaultValue={'request.path'}
               >
                 {filterKeys.map((key) => (
                   <Select.Option key={key} value={key}>
@@ -264,11 +266,12 @@ const ReportFilterBar: React.FC<Props> = ({
                   setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
                 }}
               />
-            </div>,
-          ]}
+            </div>
+          }
           showClose
         >
           <Button
+            as="span"
             type="default"
             size="tiny"
             icon={<IconPlus size="tiny" className={`text-scale-1100 `} />}
