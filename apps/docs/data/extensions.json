@@ -8,7 +8,7 @@
   {
     "name": "address_standardizer-3",
     "comment": "Used to parse an address into constituent elements. Generally used to support geocoding address normalization step.",
-    "tags": ["Utility"],
+    "tags": ["Utility"]
   },
   {
     "name": "address_standardizer_data_us",
