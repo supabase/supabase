@@ -5,8 +5,6 @@ import { useFlag } from 'hooks'
 export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const productReports = useFlag('productReports')
-  const reportStorage = useFlag('reportStorage')
-  const reportAuth = useFlag('reportAuth')
 
   return [
     {
