@@ -6,14 +6,14 @@ import 'graphiql/graphiql.css'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
-import { useParams, useProjectSettings, useStore } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { useParams, useStore } from 'hooks'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEffect, useMemo } from 'react'
 import { NextPageWithLayout } from 'types'
 import { IconAlertCircle } from 'ui'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
+  const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
 
   const isExtensionsLoading = meta.extensions.isLoading
@@ -28,25 +28,26 @@ const GraphiQLPage: NextPageWithLayout = () => {
   }, [ui.selectedProject?.ref])
 
   const {
-    services,
+    data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettings(ref)
+  } = useProjectApiQuery({
+    projectRef,
+  })
 
-  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
-  const apiConfig = apiService?.app_config ?? {}
-  const apiKeys = apiService?.service_api_keys ?? []
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
+  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
-  const graphqlUrl = `https://${apiConfig.endpoint}/graphql/v1`
-  const anonKey = apiKeys.find((key: any) => key.tags === 'anon')?.api_key
+  const graphqlUrl = `https://${endpoint}/graphql/v1`
 
   const fetcher = useMemo(() => {
     return createGraphiQLFetcher({
       url: graphqlUrl,
       fetch,
-      headers: {
-        apikey: anonKey,
-      },
+      ...(anonKey && { headers: { apikey: anonKey } }),
     })
   }, [graphqlUrl, anonKey])
 
