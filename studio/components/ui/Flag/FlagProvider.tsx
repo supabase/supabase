@@ -7,11 +7,7 @@ import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import FlagContext from './FlagContext'
 
-let client: configcat.IConfigCatClient = configcat.getClient(
-  process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-  configcat.PollingMode.AutoPoll,
-  { pollIntervalSeconds: 10 }
-)
+let client: configcat.IConfigCatClient
 
 const FlagProvider: FC = ({ children }) => {
   const { ui } = useStore()
@@ -29,6 +25,14 @@ const FlagProvider: FC = ({ children }) => {
   }, [profile])
 
   const getFlags = async (user?: User) => {
+    if (!client) {
+      client = configcat.getClient(
+        process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
+        configcat.PollingMode.AutoPoll,
+        { pollIntervalSeconds: 10 }
+      )
+    }
+
     const flagStore: any = {}
     const flagValues =
       user !== undefined
