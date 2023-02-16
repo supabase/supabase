@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { IconLink, IconX, Input } from 'ui'
+import { GlassPanel, IconLink, IconX, Input } from 'ui'
 import extensions from '../data/extensions.json'
 
 type extension = {
@@ -94,28 +94,37 @@ export default function Extensions() {
                 filters.length === 0 ? x : x.tags.some((item) => filters.includes(item))
               )
               .map((extension) => (
-                <div className="my-2 px-2 relative" key={extension.name}>
-                  <div className="border rounded-sm p-4">
-                    <h3 className="m-0">
-                      <code className="text-sm">{extension.name}</code>
-                    </h3>
-                    <p className=" mt-4">
-                      {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
-                    </p>
-                    {extension.link && (
-                      <Link href={extension.link}>
-                        <a
-                          target="_blank"
-                          className="text-xs no-underline absolute top-2 right-4 bg-slate-200 hover:bg-slate-400 transition-colors p-2 rounded-md"
-                        >
-                          <span>
-                            <IconLink size={14} className="" />
-                          </span>
-                        </a>
-                      </Link>
-                    )}
-                  </div>
-                </div>
+                <Link passHref href={`/guides/database/extensions/${extension.name}`}>
+                  <a>
+                    <GlassPanel title={extension.name} background={false} key={extension.name}>
+                      <p className=" mt-4">
+                        {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                      </p>
+                    </GlassPanel>
+                  </a>
+                </Link>
+                // <div className="my-2 px-2 relative" key={extension.name}>
+                //   <div className="border rounded-sm p-4">
+                //     <h3 className="m-0">
+                //       <code className="text-sm">{extension.name}</code>
+                //     </h3>
+                //     <p className=" mt-4">
+                //       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                //     </p>
+                //     {extension.link && (
+                //       <Link href={extension.link}>
+                //         <a
+                //           target="_blank"
+                //           className="text-xs no-underline absolute top-2 right-4 bg-slate-200 hover:bg-slate-400 transition-colors p-2 rounded-md"
+                //         >
+                //           <span>
+                //             <IconLink size={14} className="" />
+                //           </span>
+                //         </a>
+                //       </Link>
+                //     )}
+                //   </div>
+                // </div>
               ))}
           </div>
         </div>
