@@ -10,7 +10,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
-import { join } from 'path'
+import { basename, dirname, join } from 'path'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
 import { inspect } from 'util'
@@ -158,17 +158,33 @@ function processMdxForSearch(content: string): ProcessedMdx {
   }
 }
 
-async function walk(dir: string): Promise<string[]> {
+type WalkEntry = {
+  path: string
+  parentPath?: string
+}
+
+async function walk(dir: string, parentPath?: string): Promise<WalkEntry[]> {
   const immediateFiles = await readdir(dir)
 
   const recursiveFiles = await Promise.all(
     immediateFiles.map(async (file) => {
-      const filePath = join(dir, file)
-      const stats = await stat(filePath)
+      const path = join(dir, file)
+      const stats = await stat(path)
       if (stats.isDirectory()) {
-        return walk(filePath)
+        // Keep track of document hierarchy (if this dir has corresponding doc file)
+        const docPath = `${basename(path)}.mdx`
+
+        return walk(
+          path,
+          immediateFiles.includes(docPath) ? join(dirname(path), docPath) : parentPath
+        )
       } else if (stats.isFile()) {
-        return [filePath]
+        return [
+          {
+            path: path,
+            parentPath,
+          },
+        ]
       } else {
         return []
       }
@@ -180,7 +196,7 @@ async function walk(dir: string): Promise<string[]> {
     []
   )
 
-  return flattenedFiles
+  return flattenedFiles.sort((a, b) => a.path.localeCompare(b.path))
 }
 
 async function generateEmbeddings() {
@@ -200,23 +216,25 @@ async function generateEmbeddings() {
   )
 
   const markdownFiles = (await walk('pages'))
-    .filter((fileName) => /\.mdx?$/.test(fileName))
-    .filter((fileName) => !ignoredFiles.includes(fileName))
+    .filter(({ path }) => /\.mdx?$/.test(path))
+    .filter(({ path }) => !ignoredFiles.includes(path))
 
   console.log(`Discovered ${markdownFiles.length} pages`)
   console.log('Checking which pages are new or have changed')
 
   for (const markdownFile of markdownFiles) {
-    const path = markdownFile.replace(/^pages/, '').replace(/\.mdx?$/, '')
+    const path = markdownFile.path.replace(/^pages/, '').replace(/\.mdx?$/, '')
+    const parentPath = markdownFile.parentPath?.replace(/^pages/, '').replace(/\.mdx?$/, '')
+
     try {
-      const contents = await readFile(markdownFile, 'utf8')
+      const contents = await readFile(markdownFile.path, 'utf8')
 
       const { checksum, meta, sections } = processMdxForSearch(contents)
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
         .from('page')
-        .select()
+        .select('id, path, checksum, parentPage:parent_page_id(id, path)')
         .filter('path', 'eq', path)
         .limit(1)
         .maybeSingle()
@@ -225,12 +243,39 @@ async function generateEmbeddings() {
         throw fetchPageError
       }
 
+      type Singular<T> = T extends any[] ? undefined : T
+
       // We use checksum to determine if this page & its sections need to be regenerated
       if (existingPage?.checksum === checksum) {
+        const existingParentPage = existingPage?.parentPage as Singular<
+          typeof existingPage.parentPage
+        >
+
+        // If parent page changed, update it
+        if (existingParentPage?.path !== parentPath) {
+          console.log(`Parent page has changed for '${path}'. Updating to '${parentPath}'...`)
+          const { error: fetchParentPageError, data: parentPage } = await supabaseClient
+            .from('page')
+            .select()
+            .filter('path', 'eq', parentPath)
+            .limit(1)
+            .maybeSingle()
+
+          if (fetchParentPageError) {
+            throw fetchParentPageError
+          }
+
+          const { error: updatePageError } = await supabaseClient
+            .from('page')
+            .update({ parent_page_id: parentPage?.id })
+            .filter('id', 'eq', existingPage.id)
+
+          if (updatePageError) {
+            throw updatePageError
+          }
+        }
         continue
       }
-
-      console.log({ checksum, path, meta })
 
       if (existingPage) {
         console.log(
@@ -247,11 +292,30 @@ async function generateEmbeddings() {
         }
       }
 
+      const { error: fetchParentPageError, data: parentPage } = await supabaseClient
+        .from('page')
+        .select()
+        .filter('path', 'eq', parentPath)
+        .limit(1)
+        .maybeSingle()
+
+      if (fetchParentPageError) {
+        throw fetchParentPageError
+      }
+
       // Create/update page record. Intentionally clear checksum until we
       // have successfully generated all page sections.
       const { error: upsertPageError, data: page } = await supabaseClient
         .from('page')
-        .upsert({ checksum: null, path, meta }, { onConflict: 'path' })
+        .upsert(
+          {
+            checksum: null,
+            path,
+            meta,
+            parent_page_id: parentPage?.id,
+          },
+          { onConflict: 'path' }
+        )
         .select()
         .limit(1)
         .single()
