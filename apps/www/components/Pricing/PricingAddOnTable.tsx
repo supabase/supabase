@@ -1,7 +1,7 @@
 import { Collapsible, IconChevronUp } from 'ui'
 import classNames from 'classnames'
 import { Fragment, useMemo, useState } from 'react'
-import { Check } from './PricingTableRow'
+import { Check } from './PricingIcons'
 
 interface PricingAddOnTableProps {
   pricing: {
