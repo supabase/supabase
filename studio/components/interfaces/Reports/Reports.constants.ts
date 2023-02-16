@@ -62,8 +62,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM
-          edge_logs t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -79,13 +78,12 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM
-          edge_logs t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
         WHERE
-          f3.status_code >= 400
+          response.status_code >= 400
         ${generateRexepWhere(filters, false)}
         GROUP BY
           timestamp
