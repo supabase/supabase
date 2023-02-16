@@ -49,12 +49,12 @@ export default function Extensions() {
           <div className="lg:sticky top-24">
             <h3 className="text-sm text-scale-1100">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
-              {tags.map((tag) => (
+              {tags.sort().map((tag) => (
                 <li key={tag}>
                   <label
                     htmlFor={tag}
-                    className={`text-sm text-scale-900 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
-                      filters.includes(tag) ? 'bg-slate-300 ' : ''
+                    className={`text-sm text-scale-1000 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
+                      filters.includes(tag) ? 'bg-slate-400 ' : ''
                     }`}
                   >
                     <span className="flex items-center gap-1">
@@ -95,9 +95,9 @@ export default function Extensions() {
               )
               .map((extension) => (
                 <Link passHref href={`/guides/database/extensions/${extension.name}`}>
-                  <a>
+                  <a target="_blank" className="no-underline">
                     <GlassPanel title={extension.name} background={false} key={extension.name}>
-                      <p className=" mt-4">
+                      <p className="mt-4">
                         {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                       </p>
                     </GlassPanel>
