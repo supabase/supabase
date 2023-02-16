@@ -38,7 +38,7 @@ const generateRexepWhere = (filters: ReportFilterItem[], prepend = true) => {
   const conditions = filters
     .map((filter) => {
       const splitKey = filter.key.split('.')
-      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length-1]].join('.')
+      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       if (filter.compare === 'matches') {
         return `REGEXP_CONTAINS(${normalizedKey}, '${filter.value}')`
       } else if (filter.compare === 'is') {

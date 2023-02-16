@@ -4,7 +4,10 @@ import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 import { Presets, ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { ReportsLayout } from 'components/layouts'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import {
+  PRESET_CONFIG,
+  REPORTS_DATEPICKER_HELPERS,
+} from 'components/interfaces/Reports/Reports.constants'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
@@ -16,10 +19,23 @@ import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useParams } from 'hooks'
 export const ApiReport: NextPageWithLayout = () => {
+  const { ref: projectRef } = useParams()
   const report = useApiReport()
-  const handleDatepickerChange = (value: DatePickerToFrom) => {}
 
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
+  const tier = subscription?.tier
+
+  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
+    report.mergeParams({
+      iso_timestamp_start: from || '',
+      iso_timestamp_end: to || '',
+    })
+  }
+
+  console.log('tier', tier)
   return (
     <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <ReportHeader
@@ -35,6 +51,10 @@ export const ApiReport: NextPageWithLayout = () => {
         datepickerTo={report.params.totalRequests.iso_timestamp_end}
         onAddFilter={report.addFilter}
         filters={report.filters}
+        datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
+          ...helper,
+          disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
+        }))}
       />
 
       <ReportWidget
@@ -115,7 +135,7 @@ const useApiReport = () => {
       hookHandler.runQuery()
     })
   }
-  const handleSetParams = (params: LogsEndpointParams) => {
+  const handleSetParams = (params: Partial<LogsEndpointParams>) => {
     activeHooks.forEach(([_hookData, hookHandler]) => {
       hookHandler.setParams?.((prev) => ({ ...prev, ...params }))
     })
@@ -132,7 +152,7 @@ const useApiReport = () => {
       errorCounts: errorCounts[0].params,
       responseSpeed: responseSpeed[0].params,
     },
-    setParams: handleSetParams,
+    mergeParams: handleSetParams,
     filters,
     addFilter,
     removeFilter,
