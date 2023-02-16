@@ -44,6 +44,7 @@ For our purposes, we’ll assume that the SemVer type is a critical component of
 
 To that end, we’ll store each component of the version as a separate field on a [composite type](https://www.postgresql.org/docs/current/rowtypes.html).
 
+{/* prettier-ignore */}
 ```sql
 create type semver_components as (
     major int,
@@ -56,6 +57,7 @@ create type semver_components as (
 
 We can create an instance of this type in SQL by casting a tuple as the `semver_components` type.
 
+{/* prettier-ignore */}
 ```sql
 select
     (1, 2, 3, array['beta', '1'], array['meta'])::semver_components
@@ -64,6 +66,7 @@ select
 
 Unfortunately, our definition is far too permissive.
 
+{/* prettier-ignore */}
 ```sql
 select
     (null, -500, null, array['?'], array[''])::semver_components
@@ -86,6 +89,7 @@ We need to add some validation rules to meet our “make invalid states unrepres
 
 Let's codify some SemVer rules, layer them on the `semver_components` type, and give the new domain a friendly name.
 
+{/* prettier-ignore */}
 ```sql
 create domain semver
     as semver_components
@@ -109,6 +113,7 @@ create domain semver
 
 which references a helper function:
 
+{/* prettier-ignore */}
 ```sql
 create or replace function semver_elements_match_regex(
     parts text[],
@@ -137,6 +142,7 @@ $$;
 
 Now, if we repeat our positive and negative test cases using the `semver` type (vs `semver_components`) we still accept valid states:
 
+{/* prettier-ignore */}
 ```sql
 -- Success Case
 select
@@ -146,6 +152,7 @@ select
 
 while invalid states are rejected with an error:
 
+{/* prettier-ignore */}
 ```sql
 -- Failure Case
 select
@@ -158,6 +165,7 @@ select
 
 Our validation doesn’t have to be called manually. The `semver` domain can be used anywhere you’d use the `semver_components` type and the validations are automatically applied.
 
+{/* prettier-ignore */}
 ```sql
 -- A table with a semver column
 create table package_version(
@@ -188,6 +196,7 @@ We’re 48 lines of SQL in and have solved for making invalid states unrepresent
 
 Now that our data type is well constrained, you might notice that selecting values from a `semver` typed column returns a tuple, rather than the SemVer string we’re used to seeing.
 
+{/* prettier-ignore */}
 ```sql
 select
     *
@@ -205,6 +214,7 @@ For example: `(2,0,0,"{rc,1}",)` vs `2.0.0-rc.1`
 
 We could work around that problem with some [custom casts](https://www.postgresql.org/docs/current/sql-createcast.html), but I’d recommend keeping everything explicit with a function call.
 
+{/* prettier-ignore */}
 ```sql
 create or replace function semver_to_text(semver)
     returns text
@@ -226,6 +236,7 @@ $$;
 
 Which allows us to query the `package_version` table and retrieve a string representation of the data.
 
+{/* prettier-ignore */}
 ```sql
 select
     id,
@@ -243,6 +254,7 @@ id | package_name |   ver
 
 Or, better yet, use a [generated column](https://www.postgresql.org/docs/current/ddl-generated-columns.html)
 
+{/* prettier-ignore */}
 ```sql
 create table package_version(
     id bigserial primary key,
