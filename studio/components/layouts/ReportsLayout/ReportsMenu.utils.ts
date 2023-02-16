@@ -24,7 +24,7 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
     ...(productReports
       ? [
           {
-            title: 'API Performance',
+            title: 'API',
             items: [
               {
                 name: 'Overview',
