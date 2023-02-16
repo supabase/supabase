@@ -74,7 +74,7 @@ export const renderResponseSpeed = (
     <BarChart
       size="small"
       highlightedValue={lastAvg}
-      format=" ms"
+      format="ms"
       minimalHeader
       className="w-full h-36"
       data={transformedData}
