@@ -9,7 +9,7 @@ import { ReportFilterItem } from './Reports.types'
 interface Props {
   filters: ReportFilterItem[]
   onAddFilter: (filter: ReportFilterItem) => void
-  onRemoveFilter: (filter: ReportFilterItem) => void
+  onRemoveFilters: (filters: ReportFilterItem[]) => void
   onDatepickerChange: React.ComponentProps<typeof DatePickers>['onChange']
   datepickerTo?: string
   datepickerFrom?: string
@@ -70,10 +70,10 @@ const PRODUCT_FILTERS = [
 const ReportFilterBar: React.FC<Props> = ({
   filters,
   onAddFilter,
-  onRemoveFilter,
   onDatepickerChange,
   datepickerTo = '',
   datepickerFrom = '',
+  onRemoveFilters
 }) => {
   const filterKeys = ['request.path', 'request.host', 'response.status_code']
   const [showAdder, setShowAdder] = useState(false)
@@ -95,23 +95,22 @@ const ReportFilterBar: React.FC<Props> = ({
   }
 
   const handleProductFilterChange = async (
-    productFilter: null | typeof PRODUCT_FILTERS[number]
+    nextProductFilter: null | typeof PRODUCT_FILTERS[number]
   ) => {
-    setCurrentProductFilter(productFilter)
-    if (productFilter) {
-      await onRemoveFilter({
-        key: productFilter.filterKey,
+    const toRemove = PRODUCT_FILTERS.map(productFilter=>({
+      key: productFilter.filterKey,
+      compare: 'matches',
+      value: productFilter.filterValue,
+    }) as ReportFilterItem)
+    onRemoveFilters(toRemove)
+    if (nextProductFilter) {
+      onAddFilter({
+        key: nextProductFilter.filterKey,
         compare: 'matches',
-        value: productFilter.filterValue,
+        value: nextProductFilter.filterValue,
       })
     }
-    if (productFilter !== null) {
-      await onAddFilter({
-        key: productFilter.filterKey,
-        compare: 'matches',
-        value: productFilter.filterValue,
-      })
-    }
+    setCurrentProductFilter(nextProductFilter)
   }
 
   return (
@@ -172,7 +171,7 @@ const ReportFilterBar: React.FC<Props> = ({
         {filters
           .filter(
             (filter) =>
-              filter.value !== currentProductFilter?.filterValue &&
+              filter.value !== currentProductFilter?.filterValue ||
               filter.key !== currentProductFilter?.filterKey
           )
           .map((filter) => (
@@ -183,7 +182,7 @@ const ReportFilterBar: React.FC<Props> = ({
                 size="tiny"
                 className="!p-0 h-6 w-6 flex flex-row justify-center items-center"
                 onClick={() => {
-                  onRemoveFilter(filter)
+                  onRemoveFilters([filter])
                 }}
                 icon={<IconX size="tiny" className="text-scale-1100" />}
               >
