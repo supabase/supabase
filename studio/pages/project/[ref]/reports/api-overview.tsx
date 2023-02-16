@@ -1,8 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-
 import { NextPageWithLayout } from 'types'
-import { Presets, ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
+import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { ReportsLayout } from 'components/layouts'
 import {
   PRESET_CONFIG,
@@ -35,7 +33,6 @@ export const ApiReport: NextPageWithLayout = () => {
     })
   }
 
-  console.log('tier', tier)
   return (
     <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <ReportHeader
