@@ -8,9 +8,9 @@
       <lastBuildDate>Mon, 13 Feb 2023 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/flutter-real-time-game</guid>
+  <guid>https://supabase.com/blog/flutter-real-time-multiplayer-game</guid>
   <title>How to build a real-time multiplayer game with Flutter Flame</title>
-  <link>https://supabase.com/blog/flutter-real-time-game</link>
+  <link>https://supabase.com/blog/flutter-real-time-multiplayer-game</link>
   <description>Build a real-time multiplayer game using Flutter, Flame, and Supabase realtime.</description>
   <pubDate>Mon, 13 Feb 2023 16:04:00 +0000</pubDate>
 </item>
