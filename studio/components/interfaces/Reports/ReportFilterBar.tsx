@@ -73,16 +73,23 @@ const ReportFilterBar: React.FC<Props> = ({
   onDatepickerChange,
   datepickerTo = '',
   datepickerFrom = '',
-  onRemoveFilters
+  onRemoveFilters,
 }) => {
-  const filterKeys = ['request.path', 'request.host', 'response.status_code']
+  const filterKeys = [
+    'request.path',
+    'request.method',
+    'request.search',
+    'request.headers.x_client_info',
+    'request.headers.user_agent',
+    'response.status_code',
+  ]
   const [showAdder, setShowAdder] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | typeof PRODUCT_FILTERS[number]
   >(null)
   const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
     key: filterKeys[0],
-    compare: 'is',
+    compare: 'matches',
     value: '',
   })
 
@@ -97,11 +104,14 @@ const ReportFilterBar: React.FC<Props> = ({
   const handleProductFilterChange = async (
     nextProductFilter: null | typeof PRODUCT_FILTERS[number]
   ) => {
-    const toRemove = PRODUCT_FILTERS.map(productFilter=>({
-      key: productFilter.filterKey,
-      compare: 'matches',
-      value: productFilter.filterValue,
-    }) as ReportFilterItem)
+    const toRemove = PRODUCT_FILTERS.map(
+      (productFilter) =>
+        ({
+          key: productFilter.filterKey,
+          compare: 'matches',
+          value: productFilter.filterValue,
+        } as ReportFilterItem)
+    )
     onRemoveFilters(toRemove)
     if (nextProductFilter) {
       onAddFilter({
@@ -220,7 +230,7 @@ const ReportFilterBar: React.FC<Props> = ({
                   setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
                 }}
                 label="Attribute Filter"
-                defaultValue={'request.host'}
+                defaultValue={'request.path'}
               >
                 {filterKeys.map((key) => (
                   <Select.Option key={key} value={key}>
