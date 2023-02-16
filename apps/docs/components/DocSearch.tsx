@@ -48,6 +48,7 @@ export function SearchProvider({ children }: any) {
     <>
       <Head>
         <link rel="preconnect" href={`https://${APP_ID}-dsn.algolia.net`} crossOrigin="true" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
       </Head>
       <SearchContext.Provider
         // @ts-ignore
