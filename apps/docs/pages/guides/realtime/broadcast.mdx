@@ -1,0 +1,135 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'broadcast',
+  title: 'Broadcast',
+  description: "Getting started with Realtime's Broadcast feature",
+}
+
+Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where a client publishes messages to a channel with a unique identifier. For example, a user could send a message to a channel with id `room-1`.
+
+Other clients can elect to receive the message in real-time by subscribing to the channel with id `room-1`. If these clients are online and subscribed then they will receive the message.
+
+Broadcast works by connecting your client to the nearest Realtime server, which will communicate with other servers to relay messages to other clients.
+
+A common use-case is sharing a user's cursor position with other clients in an online game.
+
+## Listen to Messages
+
+You can get started with Broadcast by creating a client and listening to a channel's messages:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+
+supabase
+  .channel('test')
+  .on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
+  .subscribe()
+```
+
+## Send Messages
+
+You can create another client and send messages to other clients:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+
+supabase.channel('test').subscribe((status) => {
+  if (status === 'SUBSCRIBED') {
+    channel.send({
+      type: 'broadcast',
+      event: 'supa',
+      payload: { org: 'supabase' },
+    })
+  }
+})
+```
+
+In order for clients to successfully send and receive mesages to one another, they must both specify the same `event`.
+
+We recommend that the client has successfully subscribed to the channel prior to sending messages.
+
+### Self-Send Messages
+
+You can also choose for a client to receive messages that it sent:
+
+```js
+// Supabase client setup
+
+supabase
+  .channel('test', {
+    config: {
+      broadcast: {
+        self: true,
+      },
+    },
+  })
+  .on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      channel.send({
+        type: 'broadcast',
+        event: 'supa',
+        payload: { org: 'supabase' },
+      })
+    }
+  })
+```
+
+### Acknowledge Messages
+
+You can ensure that Realtime's servers received your message by:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('receipt', {
+  config: {
+    broadcast: { ack: true },
+  },
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const resp = await channel.send({
+      type: 'broadcast',
+      event: 'latency',
+      payload: {},
+    })
+    console.log(resp)
+  }
+})
+```
+
+If `ack` is not set to `true`, Realtime servers will not acknowledge that it received the sent message and `send` promise resolves immediately.
+
+## Client-Side Rate Limit
+
+There is a default client-side rate limit that enables you to send 10 messages per second, or one message every 100 milliseconds. You can customize this when creating the client:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY,
+  {
+    realtime: {
+      params: {
+        eventsPerSecond: 20
+      }
+    }
+  }
+```
+
+By setting `eventsPerSecond` to 20, you can send one message every 50 milliseconds on a per client basis.
+
+Learn more by visiting the [Rate Limits](/docs/guides/realtime/rate-limits) section.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

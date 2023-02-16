@@ -234,16 +234,32 @@ const ResultsDropdown = observer(() => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    Telemetry.sendEvent('sql_editor', 'sql_download_csv', '')
+    Telemetry.sendEvent(
+      { category: 'sql_editor', action: 'sql_download_csv', label: '' },
+      ui.googleAnalyticsProps
+    )
   }
 
   function onCopyAsMarkdown() {
     if (navigator) {
       copyToClipboard(sqlEditorStore.activeTab.markdownData, () => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
-        Telemetry.sendEvent('sql_editor', 'sql_copy_as_markdown', '')
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
+          ui.googleAnalyticsProps
+        )
       })
     }
+  }
+
+  const formatDataForCSV = (data = []) => {
+    return data.map((row) => {
+      const formattedRow = { ...row }
+      Object.keys(row).forEach((key) => {
+        if (typeof row[key] === 'object') formattedRow[key] = JSON.stringify(row[key])
+      })
+      return formattedRow
+    })
   }
 
   return (
@@ -263,7 +279,7 @@ const ResultsDropdown = observer(() => {
       <CSVLink
         ref={csvRef}
         className="hidden"
-        data={sqlEditorStore.activeTab?.csvData || ''}
+        data={formatDataForCSV(sqlEditorStore.activeTab?.csvData || '')}
         filename={`supabase_${sqlEditorStore.projectRef}_${sqlEditorStore.activeTab.name}`}
       />
     </Dropdown>
@@ -367,7 +383,7 @@ const Results = ({ results }) => {
       <div className="group sb-grid-select-cell__formatter overflow-hidden">
         <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
 
-        {row[column] && (
+        {row[column] != undefined && (
           <Button
             type="outline"
             icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}

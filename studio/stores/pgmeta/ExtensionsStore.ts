@@ -1,5 +1,5 @@
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import { PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { IRootStore } from '../RootStore'
 
 export default class ExtensionsStore extends PostgresMetaInterface<PostgresColumn> {
@@ -12,5 +12,10 @@ export default class ExtensionsStore extends PostgresMetaInterface<PostgresColum
     options?: { identifier: string }
   ) {
     super(rootStore, dataUrl, headers, options)
+  }
+
+  // loadBySchema is not supported in this store
+  async loadBySchema(schema: string) {
+    return []
   }
 }

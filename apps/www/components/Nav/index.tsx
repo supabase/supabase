@@ -11,7 +11,7 @@ import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
 
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
@@ -180,7 +180,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement />
+      {/* <Announcement /> */}
       <div className="sticky top-0 z-50">
         <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
         <nav className="border-scale-400 border-b backdrop-blur-sm">

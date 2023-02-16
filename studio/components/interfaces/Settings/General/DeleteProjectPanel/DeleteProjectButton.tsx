@@ -4,12 +4,11 @@ import { Button, Input } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions, useFlag } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { delete_, post } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { generateFeedbackMessage } from 'components/interfaces/Billing/ExitSurvey/ExitSurvey.utils'
 
 interface Props {
   type?: 'danger' | 'default'
@@ -18,13 +17,10 @@ interface Props {
 const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
   const router = useRouter()
   const { app, ui } = useStore()
-  const enablePermissions = useFlag('enablePermissions')
 
   const project = ui.selectedProject
   const projectRef = project?.ref
   const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
-
-  const isOwner = ui.selectedOrganization?.is_owner
   const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
 
   const [isOpen, setIsOpen] = useState(false)
@@ -39,9 +35,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'projects')
-    : isOwner
+  const canDeleteProject = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const toggle = () => {
     if (loading) return
@@ -85,12 +79,11 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
 
     // Submit exit survey to Hubspot for paid projects
     if (!isFree) {
-      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey [Delete]',
-        tags: ['dashboard-exitsurvey'],
-        category: 'Billing',
-        message: generateFeedbackMessage(selectedReasons, cancellationMessage),
+	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+	additionalFeedback: cancellationMessage,
+	exitAction: 'delete',
       })
       if (feedbackRes.error) throw feedbackRes.error
     }

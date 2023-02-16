@@ -21,12 +21,15 @@ import utc from 'dayjs/plugin/utc'
 import Prism from 'prism-react-renderer/prism'
 
 import Head from 'next/head'
+import Script from 'next/script'
+
 import { AppPropsWithLayout } from 'types'
 
 import { useEffect, useState } from 'react'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
+import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { StoreProvider } from 'hooks'
 import { GOTRUE_ERRORS } from 'lib/constants'
 import { auth } from 'lib/gotrue'
@@ -95,7 +98,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useAutoAuthRedirect()
+  useAutoAuthRedirect(queryClient)
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -107,8 +110,21 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <Head>
               <title>Supabase</title>
               <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
             </Head>
+
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}', { 'send_page_view': false });
+              `}
+            </Script>
 
             <PageTelemetry>
               <RouteValidationWrapper>
@@ -116,6 +132,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               </RouteValidationWrapper>
             </PageTelemetry>
 
+            <HCaptchaLoadedStore />
             <PortalToast />
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
           </FlagProvider>

@@ -77,3 +77,19 @@ export const unHighlightSelectedTocItems = () => {
   const currentActiveItem = document.querySelector('.toc-menu .toc__menu-item--active')
   currentActiveItem?.classList.remove('toc__menu-item--active')
 }
+
+export const highlightSelectedNavItem = (id: string) => {
+  const navMenuItems = document.querySelectorAll('.function-link-item a')
+
+  // find any currently active items and remove them
+  const currentActiveItems = document.querySelectorAll('.function-link-list .text-brand-900')
+  currentActiveItems.forEach((item) => item.classList.remove('text-brand-900'))
+
+  // Add active class to the current item
+  navMenuItems.forEach((item) => {
+    // @ts-ignore
+    if (item.href.split('/').at(-1) === id) {
+      item.classList.add('text-brand-900')
+    }
+  })
+}

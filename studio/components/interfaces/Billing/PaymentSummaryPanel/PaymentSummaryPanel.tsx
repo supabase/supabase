@@ -1,36 +1,39 @@
-import { FC, useState } from 'react'
+import { FC, useRef, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
-import { DatabaseAddon } from '../AddOns/AddOns.types'
+import { SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
+import { StripeSubscription } from '../Subscription/Subscription.types'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
 interface Props {
   isRefreshingPreview: boolean
+  currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
 
   currentPlan: any
   currentAddons: {
-    computeSize: DatabaseAddon
-    pitrDuration: DatabaseAddon
-    customDomains: DatabaseAddon
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
+    supportPlan?: SubscriptionAddon
   }
 
   selectedPlan?: any
   selectedAddons: {
-    computeSize: DatabaseAddon
-    pitrDuration: DatabaseAddon
-    customDomains: DatabaseAddon
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
   }
 
   isSpendCapEnabled: boolean
@@ -39,8 +42,11 @@ interface Props {
   isLoadingPaymentMethods: boolean
   onSelectPaymentMethod: (method: any) => void
   onSelectAddNewPaymentMethod: () => void
+  beforeConfirmPayment: () => Promise<boolean>
   onConfirmPayment: () => void
   isSubmitting: boolean
+
+  captcha: React.ReactNode
 }
 
 // Use case of this panel is actually only for upgrading from Free to Pro
@@ -53,6 +59,7 @@ interface Props {
 const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
   isSpendCapEnabled,
+  currentSubscription,
   subscriptionPreview,
 
   currentPlan,
@@ -66,17 +73,18 @@ const PaymentSummaryPanel: FC<Props> = ({
   isLoadingPaymentMethods,
   onSelectPaymentMethod,
   onSelectAddNewPaymentMethod,
+  beforeConfirmPayment,
   onConfirmPayment,
   isSubmitting,
+  captcha,
 }) => {
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
-  const isOwner = ui.selectedOrganization?.is_owner
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canUpdatePaymentMethods = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
-    : isOwner
+  const canUpdatePaymentMethods = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
@@ -108,7 +116,16 @@ const PaymentSummaryPanel: FC<Props> = ({
     } else return plan.name
   }
 
-  const validateOrder = () => {
+  const getAddonPriceFromSubscription = (
+    key: 'computeSize' | 'pitrDuration' | 'customDomains' | 'supportPlan'
+  ) => {
+    return (
+      ((currentSubscription?.addons ?? []).find((addon) => addon.prod_id === currentAddons[key]?.id)
+        ?.unit_amount ?? 0) / 100
+    ).toFixed(2)
+  }
+
+  const validateOrder = async () => {
     const error = validateSubscriptionUpdatePayload(selectedAddons)
     if (error) {
       return ui.setNotification({
@@ -117,16 +134,23 @@ const PaymentSummaryPanel: FC<Props> = ({
         message: error,
       })
     } else {
-      isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
-        ? setShowConfirmModal(true)
-        : onConfirmPayment()
+      // [Joshen] We're validating captcha before subsequent actions as there's an issue
+      // with the hcaptcha overlay and the modal component, such that clicking on the hcaptcha closes
+      // both the hcaptcha overlay and the modal. Need to figure that out first, then we can validate
+      // the hcaptcha within onConfirmPayment()
+      const hasValidCaptcha = await beforeConfirmPayment()
+      if (hasValidCaptcha) {
+        isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
+          ? setShowConfirmModal(true)
+          : onConfirmPayment()
+      }
     }
   }
 
   return (
     <>
       <div
-        className="w-full space-y-8 border-l bg-panel-body-light px-6 py-10 dark:bg-panel-body-dark lg:px-12 overflow-y-auto"
+        className="w-full px-6 py-10 space-y-8 overflow-y-auto border-l bg-panel-body-light dark:bg-panel-body-dark lg:px-12"
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
@@ -155,7 +179,9 @@ const PaymentSummaryPanel: FC<Props> = ({
         {/* Add on details */}
         {projectRegion !== 'af-south-1' && (
           <div className="space-y-1">
-            <p className="text-sm">Selected add-ons</p>
+            <p className="text-sm text-scale-1100">Selected add-ons</p>
+
+            {/* Compute size */}
             <div className="flex items-center justify-between">
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
@@ -165,7 +191,7 @@ const PaymentSummaryPanel: FC<Props> = ({
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                ${(getProductPrice(currentAddons.computeSize).unit_amount / 100).toFixed(2)}
+                ${getAddonPriceFromSubscription('computeSize')}
               </p>
             </div>
             {isChangingComputeSize && (
@@ -176,6 +202,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
+
+            {/* PITR Duration */}
             {currentAddons.pitrDuration?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
@@ -190,7 +218,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  ${(getProductPrice(currentAddons.pitrDuration).unit_amount / 100).toFixed(2)}
+                  ${getAddonPriceFromSubscription('pitrDuration')}
                 </p>
               </div>
             )}
@@ -202,6 +230,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                 </p>
               </div>
             )}
+
+            {/* Custom Domains */}
             {currentAddons.customDomains?.id !== undefined && (
               <div className="flex items-center justify-between">
                 <p
@@ -216,7 +246,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
                   } text-sm`}
                 >
-                  ${(getProductPrice(currentAddons.customDomains).unit_amount / 100).toFixed(2)}
+                  ${getAddonPriceFromSubscription('customDomains')}
                 </p>
               </div>
             )}
@@ -226,6 +256,14 @@ const PaymentSummaryPanel: FC<Props> = ({
                 <p className="text-sm">
                   ${(getProductPrice(selectedAddons.customDomains).unit_amount / 100).toFixed(2)}
                 </p>
+              </div>
+            )}
+
+            {/* Support Plan */}
+            {currentAddons.supportPlan !== undefined && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{currentAddons.supportPlan?.name}</p>
+                <p className="text-sm">${getAddonPriceFromSubscription('supportPlan')}</p>
               </div>
             )}
 
@@ -267,7 +305,7 @@ const PaymentSummaryPanel: FC<Props> = ({
           </div>
         )}
 
-        <div className="h-px w-full bg-scale-600" />
+        <div className="w-full h-px bg-scale-600" />
 
         <PaymentTotal
           subscriptionPreview={subscriptionPreview}
@@ -279,12 +317,12 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="space-y-2">
           <p className="text-sm">Select payment method</p>
           {isLoadingPaymentMethods ? (
-            <div className="flex items-center space-x-4 rounded-md border border-scale-700 bg-scale-400 px-4 py-2">
+            <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-scale-700 bg-scale-400">
               <IconLoader className="animate-spin" size={14} />
               <p className="text-sm text-scale-1100">Retrieving payment methods</p>
             </div>
           ) : paymentMethods.length === 0 ? (
-            <div className="flex items-center justify-between rounded-md border border-dashed bg-scale-100 px-4 py-2">
+            <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-scale-100">
               <div className="flex items-center space-x-4 text-scale-1100">
                 <IconAlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm">No saved payment methods</p>
@@ -311,9 +349,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                       ].join(' ')}
                     >
                       <span className="text-xs text-scale-1200">
-                        {enablePermissions
-                          ? 'You need additional permissions to add new payment methods to this organization'
-                          : 'Only organization owners can add new payment methods'}
+                        You need additional permissions to add new payment methods to this
+                        organization
                       </span>
                     </div>
                   </Tooltip.Content>
@@ -345,17 +382,19 @@ const PaymentSummaryPanel: FC<Props> = ({
                 )
               })}
               <div
-                className="group flex cursor-pointer items-center space-x-2 py-2 px-3 transition hover:bg-scale-500"
+                className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-scale-500"
                 onClick={onSelectAddNewPaymentMethod}
               >
                 <IconPlus size={16} />
-                <p className="text-scale-1000 transition group-hover:text-scale-1200">
+                <p className="transition text-scale-1000 group-hover:text-scale-1200">
                   Add new payment method
                 </p>
               </div>
             </Listbox>
           )}
         </div>
+
+        <div className="self-center">{captcha}</div>
 
         <div className="flex items-center justify-end">
           <Tooltip.Root delayDuration={0}>

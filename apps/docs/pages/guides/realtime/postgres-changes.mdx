@@ -1,0 +1,190 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'postgres-changes',
+  title: 'Postgres Changes',
+  description: "Getting started with Realtime's Postgres Changes feature",
+}
+
+Realtime's Postgres Changes feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
+
+Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
+
+Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
+
+Postgres Changes works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
+
+```sql
+GRANT SELECT ON "private_schema"."table" TO authenticated;
+```
+
+<Admonition type="caution">
+  We strongly encourage you to enable RLS and create policies for tables in private schemas.
+  Otherwise, any role you grant access to will have unfettered read access to the table.
+</Admonition>
+
+## Replication Setup
+
+You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
+
+```sql
+begin;
+  -- remove the supabase_realtime publication
+  drop publication if exists supabase_realtime;
+
+  -- re-create the supabase_realtime publication with no tables
+  create publication supabase_realtime;
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table messages;
+```
+
+### Full `old` Record
+
+By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record,
+you can set the `replica identity` of your table to `full`:
+
+```sql
+alter table messages replica identity full;
+```
+
+## Schema Changes
+
+To listen to all changes in the `public` schema:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+
+/*
+  Channel name can be any string.
+  Event name can can be one of:
+    - INSERT
+    - UPDATE
+    - DELETE
+    - *
+*/
+const channel = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+## Table Changes
+
+To listen to changes on a table in the `public` schema:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('table-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+## Filter Changes
+
+To listen to changes when a column's value in a table matches a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('value-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=eq.hey',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+## Combination Changes
+
+To listen to different events and schema/tables/filters combinations with the same channel:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=eq.bye',
+    },
+    (payload) => console.log(payload)
+  )
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'users',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+## Custom Tokens
+
+You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
+In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
+
+The `apikey` in `headers` must be either the `anon` or `service_role` token that Supabase signed.
+This will authenticate your request in the API gateway.
+
+<Admonition type="caution">
+  Do not expose the `service_role` token on the client because the role is authorized to bypass
+  row-level security.
+</Admonition>
+
+The `apikey` in `params` can be your custom token signed with the JWT secret of your Supabase project.
+This is forwarded to the Realtime server and it will verify your custom token and use its claims to authorize database changes
+when RLS is enabled.
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
+  realtime: {
+    headers: {
+      apikey: 'supabase-signed-token',
+    },
+    params: {
+      apikey: 'your-custom-token',
+    },
+  },
+})
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

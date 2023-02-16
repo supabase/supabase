@@ -73,7 +73,6 @@ function Select({
     useFormContext()
 
   if (values && !value) value = values[id]
-
   function handleBlurEvent(e: React.FocusEvent<HTMLSelectElement>) {
     if (handleBlur) handleBlur(e)
     if (onBlur) onBlur(e)
@@ -126,6 +125,7 @@ function Select({
         <select
           id={id}
           name={name}
+          defaultValue={defaultValue}
           autoComplete={autoComplete}
           autoFocus={autofocus}
           className={classes.join(' ')}

@@ -613,10 +613,8 @@ values
     sql: `
 --
 -- For use with:
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list
+-- https://github.com/supabase/examples-archive/tree/main/supabase-js-v1/todo-list
 --
 
 create table todos (
@@ -812,7 +810,7 @@ create publication supabase_realtime
     sql: `
 -- Create a table for public profiles
 create table profiles (
-  id uuid references auth.users not null primary key,
+  id uuid references auth.users on delete cascade not null primary key,
   updated_at timestamp with time zone,
   username text unique,
   full_name text,

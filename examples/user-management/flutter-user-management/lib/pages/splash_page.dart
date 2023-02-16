@@ -9,7 +9,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  bool _redicrectCalled = false;
+  bool _redirectCalled = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -18,11 +18,11 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _redirect() async {
     await Future.delayed(Duration.zero);
-    if (_redicrectCalled || !mounted) {
+    if (_redirectCalled || !mounted) {
       return;
     }
 
-    _redicrectCalled = true;
+    _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
       Navigator.of(context).pushReplacementNamed('/account');
