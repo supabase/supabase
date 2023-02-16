@@ -19,6 +19,7 @@ import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Sett
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'hooks'
+import { isEqual } from 'lodash'
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const report = useApiReport()
@@ -111,8 +112,11 @@ const useApiReport = () => {
     setFilters((prev) => prev.filter((f) => f !== filter))
   }
   const removeFilters = (toRemove: ReportFilterItem[]) => {
-    setFilters((prev) => prev.filter((f) => toRemove.includes(f)))
+    setFilters((prev) => {
+      return prev.filter((f) => !toRemove.find((r) => isEqual(f, r)))
+    })
   }
+  console.log('filters', filters)
 
   useEffect(() => {
     // update sql for each query
