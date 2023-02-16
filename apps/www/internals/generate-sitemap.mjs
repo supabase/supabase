@@ -15,6 +15,7 @@ async function generate() {
     'pages/*/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
+    '_case-studies/*.mdx',
     '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
@@ -23,6 +24,9 @@ async function generate() {
     '!pages/api',
     '!pages/404.js',
   ])
+
+  const blogUrl = 'blog'
+  const caseStudiesUrl = 'case-studies'
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -33,7 +37,8 @@ async function generate() {
             const path = page
               .replace('pages', '')
               // add a `/` for blog posts
-              .replace('_blog', '/blog')
+              .replace('_blog', `/${blogUrl}`)
+              .replace('_case-studies', `/${caseStudiesUrl}`)
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
@@ -49,15 +54,18 @@ async function generate() {
 
             if (route === '/alternatives/[slug]') return null
             if (route === '/partners/[slug]') return null
+            if (route === '/case-studies/[slug]') return null
+            if (route === '/launch-week/ticket-image') return null
 
             /**
              * Blog based urls
+             * handle removal of dates in filename
              */
-            if (route.includes('/blog/')) {
+            if (route.includes(`/${blogUrl}/`)) {
               /**
                * remove directory from route
                */
-              const _route = route.replace('/blog/', '')
+              const _route = route.replace(`/${blogUrl}/`, '')
               /**
                * remove the date from the file name
                */
@@ -65,7 +73,7 @@ async function generate() {
               /**
                * reconsruct the route
                */
-              route = '/blog/' + substring
+              route = `/${blogUrl}/` + substring
             }
 
             return `
