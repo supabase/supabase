@@ -13,6 +13,7 @@ const FlagProvider: FC = ({ children }) => {
 
   const { Provider } = FlagContext
   const [store, setStore] = useState({})
+  const [client, setClient] = useState<configcat.IConfigCatClient>()
 
   useEffect(() => {
     // [Joshen] getFlags get triggered everytime the tab refocuses but this should be okay
@@ -23,16 +24,21 @@ const FlagProvider: FC = ({ children }) => {
   }, [profile])
 
   const getFlags = async (user?: User) => {
+    let configcatClient = client
+    if (!configcatClient) {
+      configcatClient = configcat.getClient(
+        process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
+        configcat.PollingMode.AutoPoll,
+        { pollIntervalSeconds: 10 }
+      )
+      setClient(configcatClient)
+    }
+
     const flagStore: any = {}
-    const client = configcat.getClient(
-      process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-      configcat.PollingMode.AutoPoll,
-      { pollIntervalSeconds: 10 }
-    )
     const flagValues =
       user !== undefined
-        ? await client.getAllValuesAsync(new configcat.User(user.primary_email))
-        : await client.getAllValuesAsync()
+        ? await configcatClient.getAllValuesAsync(new configcat.User(user.primary_email))
+        : await configcatClient.getAllValuesAsync()
     flagValues.forEach((item: any) => {
       flagStore[item.settingKey] = item.settingValue
     })
