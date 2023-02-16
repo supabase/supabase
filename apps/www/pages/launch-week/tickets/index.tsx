@@ -4,16 +4,14 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
-import { createClient, Session } from '@supabase/supabase-js'
+import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
 import { useTheme } from '~/components/Providers'
 
 export default function TicketHome() {
   const { isDarkMode } = useTheme()
 
-  const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-  )
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
   const { query } = useRouter()
@@ -26,10 +24,28 @@ export default function TicketHome() {
   }
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, supaSession) => {
-      setSession(supaSession)
-    })
+    if (!supabase) {
+      setSupabase(
+        createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+      )
+    }
   }, [])
+
+  useEffect(() => {
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((event, session) => {
+        setSession(session)
+      })
+
+      return () => subscription.unsubscribe()
+    }
+  }, [supabase])
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
@@ -64,12 +80,14 @@ export default function TicketHome() {
             <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
           </div>
 
-          <TicketContainer
-            supabase={supabase}
-            session={session}
-            defaultUserData={defaultUserData}
-            defaultPageState="ticket"
-          />
+          {supabase && (
+            <TicketContainer
+              supabase={supabase}
+              session={session}
+              defaultUserData={defaultUserData}
+              defaultPageState="ticket"
+            />
+          )}
         </SectionContainer>
       </DefaultLayout>
     </>

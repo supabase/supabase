@@ -90,8 +90,11 @@ export default function Ticket({
               </p>
             ) : golden ? (
               <>
-                You got a Golden ticket. This means you’re in, and you also won a Supabase sticker
-                pack!
+                <p>
+                  You got a Golden ticket. This means you’re in, and you also won a Supabase sticker
+                  pack!
+                </p>
+                <p>Referrals: {referrals}</p>
               </>
             ) : username ? (
               <>

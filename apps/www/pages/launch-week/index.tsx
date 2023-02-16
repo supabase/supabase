@@ -6,7 +6,7 @@ import _days from '~/components/LaunchWeek/lw6_days.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import { createClient, Session } from '@supabase/supabase-js'
+import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
@@ -40,10 +40,7 @@ export default function launchweek() {
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
 
-  const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-  )
-
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [creators, setCreators] = useState<any>([])
   const [activeCreator, setActiveCreator] = useState<any>(null)
@@ -57,12 +54,29 @@ export default function launchweek() {
   }
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session)
-    })
-
-    getCreators()
+    if (!supabase) {
+      setSupabase(
+        createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+      )
+    }
   }, [])
+
+  useEffect(() => {
+    if (supabase) {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((event, session) => {
+        setSession(session)
+      })
+
+      getCreators()
+
+      return () => subscription.unsubscribe()
+    }
+  }, [supabase])
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
@@ -1259,12 +1273,14 @@ export default function launchweek() {
         <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24 mb-40">
           {process.env.NEXT_PUBLIC_LW_STARTED && (
             <div className={classNames(styleUtils.appear, styleUtils['appear-second'])}>
-              <TicketContainer
-                supabase={supabase}
-                session={session}
-                defaultUserData={defaultUserData}
-                defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
-              />
+              {supabase && (
+                <TicketContainer
+                  supabase={supabase}
+                  session={session}
+                  defaultUserData={defaultUserData}
+                  defaultPageState={query.ticketNumber ? 'ticket' : 'registration'}
+                />
+              )}
             </div>
           )}
         </SectionContainer>
