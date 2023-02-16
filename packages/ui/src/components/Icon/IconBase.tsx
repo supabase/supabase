@@ -15,6 +15,7 @@ export interface IconBaseProps {
   background?: 'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'
   src?: React.ReactNode
   icon?: any
+  onClick?: (event: React.MouseEvent) => void
 }
 
 interface StringMap {
