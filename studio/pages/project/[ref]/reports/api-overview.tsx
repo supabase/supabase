@@ -29,11 +29,11 @@ export const ApiReport: NextPageWithLayout = () => {
       />
 
       <ReportFilterBar
+        onRemoveFilters={report.removeFilters}
         onDatepickerChange={handleDatepickerChange}
         datepickerFrom={report.params.totalRequests.iso_timestamp_start}
         datepickerTo={report.params.totalRequests.iso_timestamp_end}
         onAddFilter={report.addFilter}
-        onRemoveFilter={report.removeFilter}
         filters={report.filters}
       />
 
@@ -93,6 +93,9 @@ const useApiReport = () => {
   const removeFilter = (filter: ReportFilterItem) => {
     setFilters((prev) => prev.filter((f) => f !== filter))
   }
+  const removeFilters = (toRemove: ReportFilterItem[]) => {
+    setFilters((prev) => prev.filter((f) => toRemove.includes(f)))
+  }
 
   useEffect(() => {
     // update sql for each query
@@ -133,6 +136,7 @@ const useApiReport = () => {
     filters,
     addFilter,
     removeFilter,
+    removeFilters,
     isLoading,
     refresh: handleRefresh,
   }
