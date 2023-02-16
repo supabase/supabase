@@ -16,6 +16,9 @@ export interface IconBaseProps {
   src?: React.ReactNode
   icon?: any
   onClick?: (event: React.MouseEvent) => void
+  style?: React.CSSProperties
+  width?: number
+  height?: number
 }
 
 interface StringMap {
