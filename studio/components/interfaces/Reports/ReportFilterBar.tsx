@@ -13,6 +13,7 @@ interface Props {
   onDatepickerChange: React.ComponentProps<typeof DatePickers>['onChange']
   datepickerTo?: string
   datepickerFrom?: string
+  datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
 }
 
 const PRODUCT_FILTERS = [
@@ -74,6 +75,7 @@ const ReportFilterBar: React.FC<Props> = ({
   datepickerTo = '',
   datepickerFrom = '',
   onRemoveFilters,
+  datepickerHelpers,
 }) => {
   const filterKeys = [
     'request.path',
@@ -130,7 +132,7 @@ const ReportFilterBar: React.FC<Props> = ({
           onChange={onDatepickerChange}
           to={datepickerTo}
           from={datepickerFrom}
-          helpers={REPORTS_DATEPICKER_HELPERS}
+          helpers={datepickerHelpers}
         />
         <Dropdown
           size="small"

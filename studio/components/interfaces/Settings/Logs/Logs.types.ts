@@ -134,4 +134,5 @@ export interface DatetimeHelper {
   calcTo: () => string
   calcFrom: () => string
   default?: boolean
+  disabled?: boolean
 }
