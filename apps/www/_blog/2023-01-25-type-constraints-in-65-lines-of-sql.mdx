@@ -1,9 +1,9 @@
 ---
-title: Type Constraints in 50 lines of SQL
+title: Type Constraints in 65 lines of SQL
 description: Creating validated data types in Postgres
 author: oli_rice
-image:
-thumb:
+image: 2023-jan/semver-thumb.jpg
+thumb: 2023-jan/semver-thumb.jpg
 tags:
   - postgres
   - planetpg
@@ -11,14 +11,14 @@ date: '2023-01-25'
 toc_depth: 3
 ---
 
-PostgreSQL has a rich and extensible type system. Beyond defining custom enums and composite types, we can:
+PostgreSQL has a rich and extensible type system. Beyond [enums](https://www.postgresql.org/docs/current/datatype-enum.html) and [composite](https://www.postgresql.org/docs/current/rowtypes.html) types, we can:
 
 - apply data validation rules
 - override comparison operators like `=` / `+` / `-`
 - create custom aggregations
 - define casting rules between types
 
-until our types are indistinguishable from built-ins. In this article we’ll focus on validation and ergonomics, and touch on a few other concepts.
+With a little effort, a user-defined type can feel indistinguishable from a built-in. In this article we focus on validation and ergonomics while quickly touching on a few other concepts.
 
 To illustrate, we’ll create an `semver` data type to represent [Semantic Versioning](https://semver.org) values. We’ll then add validation rules to make invalid states unrepresentable.
 
@@ -28,7 +28,9 @@ A (very) loose primer on SemVer:
 
 SemVer is a specification for representing software versions that communicate information about backwards compatibility. The type is typically represented as a string with 5 components.
 
-<IMAGE HERE>
+![image](/images/blog/2023-jan/semver-spec.png)
+
+Where `pre-release` and `metadata` are optional.
 
 The intent of each component is outside the scope of this article but, as an example, incrementing the major version number notifies users that the release includes at least one backwards incompatible change.
 
@@ -36,7 +38,7 @@ For a concise representation of the full spec, [check out the grammar](https://s
 
 ## SQL
 
-For our purposes, we’ll assume that our SemVer type is a major component of the application we’re building that we need to query flexibly and efficiently.
+For our purposes, we’ll assume that the SemVer type is a critical component of the application that needs to be queried flexibly and efficiently.
 
 ### Storing Components
 
@@ -76,11 +78,11 @@ Our data type has no problem accepting invalid components. To list a few of the 
 - Pre-release elements must only include characters [A-z0-9]
 - Build metadata elements may not be empty strings
 
-We need to add some validation to meet our “make invalid states unrepresentable” goal.
+We need to add some validation rules to meet our “make invalid states unrepresentable” goal.
 
 ### Validation
 
-[Domains](https://www.postgresql.org/docs/current/sql-createdomain.html) are the Postgres’s solution for optionally layering constraints over a data type. Domains are to types what check constraints are to tables. If you’re not familiar with check constraints, you can think of them as equivalent to zod/pydantic in javascript/python.
+[Domains](https://www.postgresql.org/docs/current/sql-createdomain.html) are Postgres’ solution for optionally layering constraints over a data type. Domains are to types what [check constraints](https://www.postgresql.org/docs/current/ddl-constraints.html) are to tables. If you’re not familiar with check constraints, you can think of them as equivalent to zod/pydantic in javascript/python.
 
 Let's codify some SemVer rules, layer them on the `semver_components` type, and give the new domain a friendly name.
 
@@ -88,12 +90,21 @@ Let's codify some SemVer rules, layer them on the `semver_components` type, and 
 create domain semver
     as semver_components
     check (
-        (value).major is not null and (value).major >= 0     -- major: non-null positive integer
-        and (value).minor is not null and (value).minor >= 0 -- minor: non-null positive integer
-        and (value).patch is not null and (value).patch >= 0 -- patch: non-null positive integer
-        and semver_elements_match_regex((value).pre_release, '^[A-z0-9]{1,255}$')
-                and semver_elements_match_regex((value).build_metadata, '^[A-z0-9\.]{1,255}$')
-        );
+        -- major: non-null positive integer
+        (value).major is not null and (value).major >= 0
+        -- minor: non-null positive integer
+        and (value).minor is not null and (value).minor >= 0
+        -- patch: non-null positive integer
+        and (value).patch is not null and (value).patch >= 0
+        and semver_elements_match_regex(
+            (value).pre_release,
+            '^[A-z0-9]{1,255}$'
+        )
+        and semver_elements_match_regex(
+            (value).build_metadata,
+            '^[A-z0-9\.]{1,255}$'
+        )
+    );
 ```
 
 which references a helper function:
@@ -107,16 +118,15 @@ returns bool
 language sql
 as $$
     -- validates that *parts* nullable array of non-empty strings
-  -- where each element of *parts* matches *regex*
+    -- where each element of *parts* matches *regex*
     select
         $1 is null
         or (
             (
-                select
-                    (
-                        bool_and(pr_arr.elem is not null)
-                        and bool_and(pr_arr.elem ~ $2)
-                    )
+                select (
+                    bool_and(pr_arr.elem is not null)
+                    and bool_and(pr_arr.elem ~ $2)
+                )
                 from
                     unnest($1) pr_arr(elem)
             )
@@ -125,7 +135,7 @@ as $$
 $$;
 ```
 
-Now, if we repeat our positive an negative test cases using the `semver` type (vs `semver_components`) we still accept valid states:
+Now, if we repeat our positive and negative test cases using the `semver` type (vs `semver_components`) we still accept valid states:
 
 ```sql
 -- Success Case
@@ -172,7 +182,7 @@ values
 
 Good stuff!
 
-We’re 37 lines of SQL in and have solved for making invalid states unrepresentable. Now lets think about ergonomics.
+We’re 48 lines of SQL in and have solved for making invalid states unrepresentable. Now lets think about ergonomics.
 
 ### Displaying
 
@@ -220,7 +230,7 @@ Which allows us to query the `package_version` table and retrieve a string repre
 select
     id,
     package_name,
-    semver_to_text(package_semver) as ver -- cast to as text
+    semver_to_text(package_semver) as ver -- cast as text
 from
     package_version
 /*
@@ -242,7 +252,7 @@ create table package_version(
 );
 ```
 
-so the text representation persisted along with the `semver` type and incurs no query/filter penalty.
+so the text representation is persisted along with the `semver` type and incurs no query/filter penalty.
 
 ### Other Tricks
 
@@ -260,7 +270,7 @@ Aligning the right parts of your business’ logic with the database can dramati
 
 ### Conclusion
 
-I’ll be the first to admit that building out performant and ergonomic custom data types in Postgres involves a lot of ceremony.
+Admittedly, building performant and ergonomic custom data types in Postgres involves a lot of ceremony.
 
 That said, in cases where:
 
