@@ -1,4 +1,4 @@
-import { IconTwitter } from '@supabase/ui'
+import { IconTwitter } from 'ui'
 import Image from 'next/image'
 
 interface TweetCard {

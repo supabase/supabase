@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconCode, Button, Popover } from '@supabase/ui'
+import { IconCode, Button, Popover } from 'ui'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'

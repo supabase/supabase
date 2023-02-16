@@ -15,7 +15,7 @@ import InvestorData from 'data/Investors'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Button, Card, Space } from '@supabase/ui'
+import { Button, Card, Space } from 'ui'
 import { NextSeo } from 'next-seo'
 
 type Props = {}

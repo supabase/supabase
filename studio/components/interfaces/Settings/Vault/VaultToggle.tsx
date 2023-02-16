@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useParams, useStore } from 'hooks'

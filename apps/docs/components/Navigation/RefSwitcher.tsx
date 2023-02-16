@@ -1,14 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Badge,
-  Dropdown,
-  GlassPanel,
-  IconChevronDown,
-  IconChevronRight,
-  Popover,
-} from '@supabase/ui'
+import { Badge, Dropdown, GlassPanel, IconChevronDown, IconChevronRight, Popover } from 'ui'
 
 import { references } from './NavigationMenu/NavigationMenu.constants'
 

@@ -1,6 +1,6 @@
 import { FC, useState, useMemo, useCallback } from 'react'
 import { isEqual } from 'lodash'
-import { Button, IconPlus, IconFilter, Popover } from '@supabase/ui'
+import { Button, IconPlus, IconFilter, Popover } from 'ui'
 import update from 'immutability-helper'
 import { useUrlState } from 'hooks'
 

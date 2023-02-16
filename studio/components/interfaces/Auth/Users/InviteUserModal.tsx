@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Modal, Input, IconPlus, IconMail, Form } from '@supabase/ui'
+import { Button, Modal, Input, IconPlus, IconMail, Form } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'

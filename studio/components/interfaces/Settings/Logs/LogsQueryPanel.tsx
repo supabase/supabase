@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -14,7 +14,7 @@ import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
 import { checkPermissions, useStore } from 'hooks'
-import { IconBookOpen } from '@supabase/ui'
+import { IconBookOpen } from 'ui'
 
 interface Props {
   templates?: LogTemplate[]

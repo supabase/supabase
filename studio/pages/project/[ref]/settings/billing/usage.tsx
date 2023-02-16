@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
-import { IconArrowRight, Loading } from '@supabase/ui'
+import { IconArrowRight, Loading } from 'ui'
 
 import { Project, NextPageWithLayout } from 'types'
 import { useProjectSubscription, useStore } from 'hooks'

@@ -1,4 +1,4 @@
-import { Collapsible, IconChevronUp } from '@supabase/ui'
+import { Collapsible, IconChevronUp } from 'ui'
 import classNames from 'classnames'
 import { Fragment, useMemo, useState } from 'react'
 import { Check } from './PricingTableRow'

@@ -10,7 +10,7 @@ import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 
 interface Props {}
 

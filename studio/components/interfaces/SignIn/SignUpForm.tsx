@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import { useRef, useState } from 'react'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { Alert, Button, Form, IconEye, IconEyeOff, Input } from '@supabase/ui'
+import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

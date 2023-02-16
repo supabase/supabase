@@ -1,6 +1,6 @@
 import React, { useState, FC } from 'react'
 import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input, IconHelpCircle, IconExternalLink } from '@supabase/ui'
+import { Button, IconSearch, Input, IconHelpCircle, IconExternalLink } from 'ui'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'

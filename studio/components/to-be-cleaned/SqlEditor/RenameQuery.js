@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-import { Button, Form, Input, Modal } from '@supabase/ui'
+import { Button, Form, Input, Modal } from 'ui'
 
 const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
   const { ui, content: contentStore } = useStore()

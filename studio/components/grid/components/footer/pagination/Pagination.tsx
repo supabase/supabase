@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from '@supabase/ui'
+import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from 'ui'
 import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'

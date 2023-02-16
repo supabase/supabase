@@ -13,7 +13,7 @@ import {
   Alert,
   IconEdit,
   IconTrash,
-} from '@supabase/ui'
+} from 'ui'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'

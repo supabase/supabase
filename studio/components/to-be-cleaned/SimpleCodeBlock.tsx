@@ -10,7 +10,7 @@ import Highlight, { defaultProps } from 'prism-react-renderer'
 import defaultTheme from 'prism-react-renderer/themes/palenight'
 import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/

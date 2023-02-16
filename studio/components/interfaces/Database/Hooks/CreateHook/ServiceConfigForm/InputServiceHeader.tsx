@@ -1,6 +1,6 @@
 import { FC, useContext, FormEvent } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, IconTrash, Button } from '@supabase/ui'
+import { Input, IconTrash, Button } from 'ui'
 import { CreateHookContext } from '../'
 
 interface Props {

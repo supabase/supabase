@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { Button, IconClock } from '@supabase/ui'
+import { Button, IconClock } from 'ui'
 import { useStore } from 'hooks'
 import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'

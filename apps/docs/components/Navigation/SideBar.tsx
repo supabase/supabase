@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { IconChevronRight, IconArrowLeft } from '@supabase/ui'
+import { IconChevronRight, IconArrowLeft } from 'ui'
 import { REFERENCES } from './Navigation.constants'
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -41,9 +41,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       : undefined
 
   return (
-    <div
-      className="sticky hidden h-screen px-6 py-8 overflow-y-scroll border-r dark:bg-scale-200 dark:border-scale-400 sidebar-width top-16 sidebar-menu-container lg:block"
-    >
+    <div className="sticky hidden h-screen px-6 py-8 overflow-y-scroll border-r dark:bg-scale-200 dark:border-scale-400 sidebar-width top-16 sidebar-menu-container lg:block">
       {isInReferencePages && (
         <>
           <Link href="/reference">

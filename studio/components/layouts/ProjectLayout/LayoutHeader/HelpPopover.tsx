@@ -6,7 +6,7 @@ import {
   Popover,
   IconBookOpen,
   IconActivity,
-} from '@supabase/ui'
+} from 'ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 import Link from 'next/link'

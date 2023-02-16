@@ -16,7 +16,7 @@ import {
   IconExternalLink,
   IconLoader,
   IconHelpCircle,
-} from '@supabase/ui'
+} from 'ui'
 
 import { useParams, useStore } from 'hooks'
 import { ServerOption, Wrapper } from './Wrappers.types'

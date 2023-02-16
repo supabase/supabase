@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from '@supabase/ui'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
 import { useStore } from 'hooks'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'

@@ -2,7 +2,7 @@ import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
 import { useRouter } from 'next/router'
-import { Button, Form, Input } from '@supabase/ui'
+import { Button, Form, Input } from 'ui'
 
 const ResetPasswordForm = () => {
   const { ui } = useStore()

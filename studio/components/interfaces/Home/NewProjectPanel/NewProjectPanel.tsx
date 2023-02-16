@@ -2,14 +2,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import SVG from 'react-inlinesvg'
 import { useRouter } from 'next/router'
-import {
-  Button,
-  IconKey,
-  IconArchive,
-  IconExternalLink,
-  IconCode,
-  IconActivity,
-} from '@supabase/ui'
+import { Button, IconKey, IconArchive, IconExternalLink, IconCode, IconActivity } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import APIKeys from './APIKeys'

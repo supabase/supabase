@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Form, Input } from '@supabase/ui'
+import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions, useParams } from 'hooks'

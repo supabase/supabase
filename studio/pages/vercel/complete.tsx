@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
-import { Button, IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from 'ui'
 
 const PageContext = createContext(null)
 function IntegrationComplete() {

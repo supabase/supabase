@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { FC, Fragment, useState } from 'react'
-import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink } from '@supabase/ui'
+import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink } from 'ui'
 
 import SecretRow from './SecretRow'
 import EditSecretModal from './EditSecretModal'

@@ -1,4 +1,4 @@
-import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from '@supabase/ui'
+import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from 'ui'
 import { useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'

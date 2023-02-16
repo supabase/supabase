@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from '@supabase/ui'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { checkPermissions, useOrganizationDetail, useParams, useStore } from 'hooks'

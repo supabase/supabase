@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Modal, Button, IconPauseCircle } from '@supabase/ui'
+import { Modal, Button, IconPauseCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Project } from 'types'

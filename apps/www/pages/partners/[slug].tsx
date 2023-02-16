@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'

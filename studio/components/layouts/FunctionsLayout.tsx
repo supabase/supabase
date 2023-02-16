@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconCode } from '@supabase/ui'
+import { IconCode } from 'ui'
 
 import { checkPermissions, useStore, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'

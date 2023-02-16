@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 
-import { IconDatabase, Tabs } from '@supabase/ui'
+import { IconDatabase, Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 import Options from '~/components/Options'

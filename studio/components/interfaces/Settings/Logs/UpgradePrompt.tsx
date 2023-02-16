@@ -1,4 +1,4 @@
-import { Button, Modal } from '@supabase/ui'
+import { Button, Modal } from 'ui'
 
 import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'

@@ -1,5 +1,5 @@
 import { NewspaperIcon } from '@heroicons/react/outline'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'

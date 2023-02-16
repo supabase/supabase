@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconGlobe, IconTerminal } from '@supabase/ui'
+import { IconGlobe, IconTerminal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'

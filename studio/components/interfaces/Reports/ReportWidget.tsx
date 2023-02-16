@@ -1,11 +1,11 @@
-import { Button, Dropdown, IconMoreVertical } from '@supabase/ui'
+import { Button, Dropdown, IconMoreVertical } from 'ui'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconHelpCircle } from '@supabase/ui'
+import { IconHelpCircle } from 'ui'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]

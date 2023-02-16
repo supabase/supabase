@@ -1,15 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import {
-  Checkbox,
-  Input,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
-  Button,
-} from '@supabase/ui'
+import { Checkbox, Input, IconX, IconMenu, Popover, IconLink, IconSettings, Button } from 'ui'
 import { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'

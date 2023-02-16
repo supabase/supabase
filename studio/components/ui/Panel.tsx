@@ -1,4 +1,4 @@
-import { Loading } from '@supabase/ui'
+import { Loading } from 'ui'
 import React, { ReactNode } from 'react'
 
 interface Props {

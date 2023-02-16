@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { Modal, Form, Input, IconHelpCircle, Button, IconEyeOff, IconEye } from '@supabase/ui'
+import { Modal, Form, Input, IconHelpCircle, Button, IconEyeOff, IconEye } from 'ui'
 
 import { useStore } from 'hooks'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'

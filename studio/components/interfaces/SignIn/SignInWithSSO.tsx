@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconLock } from '@supabase/ui'
+import { Button, IconLock } from 'ui'
 
 const SignInWithSSO = () => {
   return (

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconExternalLink, IconTrash } from '@supabase/ui'
+import { Button, IconExternalLink, IconTrash } from 'ui'
 
 import { useStore } from 'hooks'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'

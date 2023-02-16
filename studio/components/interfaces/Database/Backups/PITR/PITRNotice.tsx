@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconCalendar } from '@supabase/ui'
+import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
 import { useParams, useProjectSubscription } from 'hooks'
 import { getPITRRetentionDuration } from './PITR.utils'

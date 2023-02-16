@@ -1,4 +1,4 @@
-import { Popover } from '@supabase/ui'
+import { Popover } from 'ui'
 import { useState, useCallback } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 

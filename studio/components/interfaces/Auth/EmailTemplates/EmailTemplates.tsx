@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'

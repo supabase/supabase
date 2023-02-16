@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Loading } from '@supabase/ui'
+import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

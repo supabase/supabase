@@ -1,13 +1,6 @@
 import { FC, useRef, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Listbox,
-  IconLoader,
-  Button,
-  IconPlus,
-  IconAlertCircle,
-  IconCreditCard,
-} from '@supabase/ui'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

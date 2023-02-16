@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from '@supabase/ui'
+import { Button, IconAlertCircle } from 'ui'
 
 import { useStore } from 'hooks'
 import { Timezone } from './PITR.types'

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 
 import { NextPageWithLayout } from 'types'
 import { useParams, useStore } from 'hooks'

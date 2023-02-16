@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import { Button, IconArrowRight } from '@supabase/ui'
+import { Button, IconArrowRight } from 'ui'
 
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'

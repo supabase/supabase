@@ -14,7 +14,7 @@ import { useTheme } from '~/components/Providers'
 import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
-import { Accordion, Badge, IconExternalLink } from '@supabase/ui'
+import { Accordion, Badge, IconExternalLink } from 'ui'
 import { WeekDayProps } from '~/components/LaunchWeek/types'
 
 import styles from './launchWeek.module.css'

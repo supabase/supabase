@@ -1,17 +1,7 @@
 import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import {
-  Button,
-  Input,
-  SidePanel,
-  IconTrash,
-  Radio,
-  IconPlus,
-  Toggle,
-  Modal,
-  Listbox,
-} from '@supabase/ui'
+import { Button, Input, SidePanel, IconTrash, Radio, IconPlus, Toggle, Modal, Listbox } from 'ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 

@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { SupabaseClient } from '~/lib/supabase'
 import Link from 'next/link'
 

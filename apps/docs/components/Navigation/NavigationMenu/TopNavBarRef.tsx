@@ -2,10 +2,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from '@supabase/ui'
+import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
 import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 
 import { getPageType } from '~/lib/helpers'
 

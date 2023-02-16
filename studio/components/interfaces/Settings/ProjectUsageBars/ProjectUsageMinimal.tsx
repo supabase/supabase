@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Loading } from '@supabase/ui'
+import { Loading } from 'ui'
 
 import { useProjectSubscription, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'

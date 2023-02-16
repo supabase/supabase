@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from '@supabase/ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'

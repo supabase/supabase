@@ -10,7 +10,7 @@ import {
   IconColumns,
   Listbox,
   IconLock,
-} from '@supabase/ui'
+} from 'ui'
 
 import { partition } from 'lodash'
 

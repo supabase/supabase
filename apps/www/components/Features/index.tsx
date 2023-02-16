@@ -1,4 +1,4 @@
-import { Button, Badge, IconArrowRight } from '@supabase/ui'
+import { Button, Badge, IconArrowRight } from 'ui'
 import SectionHeader from 'components/UI/SectionHeader'
 import Solutions from 'data/Solutions.json'
 import Link from 'next/link'

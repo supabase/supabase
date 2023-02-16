@@ -1,13 +1,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-  IconHelpCircle,
-  IconRefreshCw,
-} from '@supabase/ui'
+import { Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
 
 import { useStore } from 'hooks'
 import { ProjectSettingsResponse } from 'data/config/project-settings-query'

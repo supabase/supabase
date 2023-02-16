@@ -1,7 +1,7 @@
 import { createContext, useEffect, useContext, useState, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, Select } from '@supabase/ui'
+import { Button, Input, Select } from 'ui'
 import { runInAction } from 'mobx'
 
 import { API_URL } from 'lib/constants'

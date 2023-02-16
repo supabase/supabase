@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconAlertCircle, IconExternalLink } from '@supabase/ui'
+import { Button, IconAlertCircle, IconExternalLink } from 'ui'
 import InformationBox from 'components/ui/InformationBox'
 import { FC } from 'react'
 

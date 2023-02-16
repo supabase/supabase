@@ -1,4 +1,4 @@
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 
 export type DNSRecordProps = {
   type: string

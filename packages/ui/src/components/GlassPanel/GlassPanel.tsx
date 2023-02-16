@@ -1,4 +1,4 @@
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 import * as React from 'react'
 
 interface Props {

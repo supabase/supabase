@@ -7,12 +7,12 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from '@supabase/ui'
+} from 'ui'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
 import dayjs from 'dayjs'
-import { ButtonProps } from '@supabase/ui'
+import { ButtonProps } from 'ui'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
 export interface DatePickerProps {

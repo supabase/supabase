@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'

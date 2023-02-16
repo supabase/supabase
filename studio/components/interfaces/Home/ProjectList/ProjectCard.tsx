@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconPauseCircle } from '@supabase/ui'
+import { Badge, IconLoader, IconPauseCircle } from 'ui'
 
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'

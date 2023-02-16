@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckCircle } from '@supabase/ui'
+import { Button, IconCheckCircle } from 'ui'
 
 interface Props {
   title: string

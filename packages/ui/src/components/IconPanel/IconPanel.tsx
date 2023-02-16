@@ -1,4 +1,4 @@
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 import * as React from 'react'
 import { ChevronRight } from 'react-feather'
 

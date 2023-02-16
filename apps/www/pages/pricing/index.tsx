@@ -1,5 +1,5 @@
 import { ServerIcon, SupportIcon } from '@heroicons/react/outline'
-import { Accordion, Button, IconCheck } from '@supabase/ui'
+import { Accordion, Button, IconCheck } from 'ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'

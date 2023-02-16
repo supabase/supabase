@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft } from '@supabase/ui'
+import { Button, IconArrowLeft } from 'ui'
 
 export function BackButton({ onClick }: { onClick: () => void }) {
   return (

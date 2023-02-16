@@ -1,6 +1,6 @@
 import { FC, Fragment } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconExternalLink } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 import { Action, ActionReason, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'

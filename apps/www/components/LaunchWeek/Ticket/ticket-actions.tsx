@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-import { IconDownload, IconLinkedin, IconTwitter } from '@supabase/ui'
+import { IconDownload, IconLinkedin, IconTwitter } from 'ui'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 import LoadingDots from './loading-dots'
 

@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Image from 'next/image'
 import SVG from 'react-inlinesvg'
-import { Button, IconMessageCircle } from '@supabase/ui'
+import { Button, IconMessageCircle } from 'ui'
 
 interface Props {}
 

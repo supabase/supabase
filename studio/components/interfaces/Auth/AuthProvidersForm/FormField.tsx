@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from '@supabase/ui'
+import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
 import { Enum } from './AuthProvidersForm.types'
 
 interface Props {

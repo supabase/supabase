@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, Divider, IconX } from '@supabase/ui'
+import { Button, Divider, IconX } from 'ui'
 
 import { LogData, QueryType } from './Logs.types'
 

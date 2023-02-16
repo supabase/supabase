@@ -2,7 +2,7 @@ import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { withAuth, useFlag, usePlatformStatus } from 'hooks'

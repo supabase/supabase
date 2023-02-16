@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input, Listbox, Modal, IconPlus } from '@supabase/ui'
+import { Input, Listbox, Modal, IconPlus } from 'ui'
 import { useStore } from 'hooks'
 
 interface Props {

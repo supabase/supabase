@@ -2,7 +2,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'

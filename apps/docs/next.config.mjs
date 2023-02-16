@@ -84,6 +84,6 @@ const nextConfig = {
 // next.config.js
 export default () => {
   // const plugins = [withMDX]/
-  const plugins = [withTM(['@supabase/ui', 'common']), withMDX, withYaml]
+  const plugins = [withTM(['ui', 'common']), withMDX, withYaml]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }

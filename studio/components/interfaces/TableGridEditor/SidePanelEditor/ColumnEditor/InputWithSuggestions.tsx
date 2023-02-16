@@ -6,7 +6,7 @@
 // the component over to the UI library
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from '@supabase/ui'
+import { Button, Dropdown, IconList, Input } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Suggestion } from './ColumnEditor.types'
 

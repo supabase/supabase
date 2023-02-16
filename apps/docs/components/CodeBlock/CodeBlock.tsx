@@ -2,7 +2,7 @@ import { FC } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from '@supabase/ui'
+import { Button, IconCheck, IconCopy } from 'ui'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
@@ -13,7 +13,7 @@ import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 
 import { useState } from 'react'
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 
 interface Props {
   title?: string

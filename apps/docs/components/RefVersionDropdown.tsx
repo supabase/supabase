@@ -1,4 +1,4 @@
-import { Badge, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Badge, Dropdown, IconChevronDown } from 'ui'
 import { useRouter } from 'next/router'
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 

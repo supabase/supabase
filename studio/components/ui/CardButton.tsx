@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { IconChevronRight } from '@supabase/ui'
+import { IconChevronRight } from 'ui'
 import Link from 'next/link'
 
 interface Props {

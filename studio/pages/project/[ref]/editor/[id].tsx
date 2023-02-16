@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from '@supabase/ui'
+import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'

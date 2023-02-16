@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import _announcement from '~/data/Announcement.json'
-import { IconChevronRight, IconX } from '@supabase/ui'
+import { IconChevronRight, IconX } from 'ui'
 import { useRouter } from 'next/router'
 
 interface AnnouncementProps {

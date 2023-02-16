@@ -1,14 +1,7 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Button,
-  Dropdown,
-  IconTrash,
-  IconMail,
-  IconMoreHorizontal,
-  IconShieldOff,
-} from '@supabase/ui'
+import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOff } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'

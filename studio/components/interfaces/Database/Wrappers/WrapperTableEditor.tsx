@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from '@supabase/ui'
+import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from 'ui'
 import { useStore } from 'hooks'
 import { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'

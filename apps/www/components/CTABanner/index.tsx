@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 const CTABanner = (props: any) => {
   const { darkerBg } = props

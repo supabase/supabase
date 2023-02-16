@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { useStore, withAuth } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { IconX } from '@supabase/ui'
+import { IconX } from 'ui'
 
 import BaseLayout from 'components/layouts'
 

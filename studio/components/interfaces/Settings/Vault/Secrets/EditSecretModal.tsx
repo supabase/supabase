@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 import { FC, useState, useEffect } from 'react'
-import { Modal, Form, Input, Button, IconEyeOff, IconEye } from '@supabase/ui'
+import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
 
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'

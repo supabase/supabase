@@ -10,7 +10,7 @@ import { formatNotificationCTAText, formatNotificationText } from './Notificatio
 import NotificationActions from './NotificationActions'
 import { get, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Button, IconX } from '@supabase/ui'
+import { Button, IconX } from 'ui'
 
 interface Props {
   notification: Notification

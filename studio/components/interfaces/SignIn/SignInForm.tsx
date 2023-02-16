@@ -5,7 +5,7 @@ import { auth } from 'lib/gotrue'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { useSWRConfig } from 'swr'
-import { Button, Form, Input } from '@supabase/ui'
+import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
 const signInSchema = object({

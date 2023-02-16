@@ -1,7 +1,7 @@
 import React, { FC, useState, useMemo, useCallback } from 'react'
 import { isEqual } from 'lodash'
 import update from 'immutability-helper'
-import { Button, IconList, IconChevronDown, Popover } from '@supabase/ui'
+import { Button, IconList, IconChevronDown, Popover } from 'ui'
 import { useUrlState } from 'hooks'
 
 import SortRow from './SortRow'

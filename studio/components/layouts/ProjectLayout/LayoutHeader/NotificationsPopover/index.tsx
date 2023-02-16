@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Alert, Button, IconBell, Popover, IconArrowRight } from '@supabase/ui'
+import { Alert, Button, IconBell, Popover, IconArrowRight } from 'ui'
 import {
   Notification,
   NotificationStatus,

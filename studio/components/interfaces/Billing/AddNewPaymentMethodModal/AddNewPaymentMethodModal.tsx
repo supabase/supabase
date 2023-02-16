@@ -3,7 +3,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { FC, useCallback, useEffect, useState } from 'react'
 
-import { Modal } from '@supabase/ui'
+import { Modal } from 'ui'
 import { useStore } from 'hooks'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { post } from 'lib/common/fetch'

@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'

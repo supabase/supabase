@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { Badge, IconAlertCircle, Radio, Button } from '@supabase/ui'
+import { Badge, IconAlertCircle, Radio, Button } from 'ui'
 
 import { useFlag, useParams, useStore } from 'hooks'
 import { SubscriptionAddon } from './AddOns.types'

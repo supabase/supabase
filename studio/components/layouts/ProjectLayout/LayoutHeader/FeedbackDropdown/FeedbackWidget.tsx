@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, FC } from 'react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { toPng } from 'html-to-image'
-import { Button, Input, Popover, IconCamera, IconX } from '@supabase/ui'
+import { Button, Input, Popover, IconCamera, IconX } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

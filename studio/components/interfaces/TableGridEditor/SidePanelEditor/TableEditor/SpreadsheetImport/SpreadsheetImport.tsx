@@ -1,6 +1,6 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
+import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../../ActionBar'

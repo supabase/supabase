@@ -1,5 +1,5 @@
-import { Button, IconDownloadCloud } from '@supabase/ui'
-import { ButtonProps } from '@supabase/ui'
+import { Button, IconDownloadCloud } from 'ui'
+import { ButtonProps } from 'ui'
 import { flattenDeep } from 'lodash'
 import React, { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'

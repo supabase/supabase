@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import * as yup from 'yup'
-import { Button, Form, IconExternalLink, Input } from '@supabase/ui'
+import { Button, Form, IconExternalLink, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

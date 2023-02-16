@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from '@supabase/ui'
+import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from 'ui'
 
 import {
   FormActions,

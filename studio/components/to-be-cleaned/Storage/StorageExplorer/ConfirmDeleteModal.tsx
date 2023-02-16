@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Button, Alert } from '@supabase/ui'
+import { Modal, Button, Alert } from 'ui'
 
 interface Props {
   visible: boolean

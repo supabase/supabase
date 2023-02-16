@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { Button, IconRefreshCw, IconCheck } from '@supabase/ui'
+import { Button, IconRefreshCw, IconCheck } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
 import { Filter, Sort } from 'components/grid/types'
 import { useDispatch, useTrackedState } from 'components/grid/store'

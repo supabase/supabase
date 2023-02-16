@@ -1,5 +1,5 @@
 import TabMarkup from 'data/AdminAccess.json'
-import { Tabs as SBTabs, Button } from '@supabase/ui'
+import { Tabs as SBTabs, Button } from 'ui'
 
 type Props = {
   tabId: string

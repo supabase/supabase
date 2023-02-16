@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconPlus } from '@supabase/ui'
+import { Button, Dropdown, IconPlus } from 'ui'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

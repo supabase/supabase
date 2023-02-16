@@ -4,7 +4,7 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from '@supabase/ui'
+import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
 const forgotPasswordSchema = object({

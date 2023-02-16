@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 import Link from 'next/link'
 import Controller from './launch-controller.json'
 

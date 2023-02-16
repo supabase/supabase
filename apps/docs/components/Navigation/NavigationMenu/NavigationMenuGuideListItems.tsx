@@ -1,9 +1,9 @@
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { IconChevronLeft } from '@supabase/ui'
+import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 

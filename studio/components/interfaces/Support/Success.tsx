@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, useState } from 'react'
-import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input } from '@supabase/ui'
+import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input } from 'ui'
 
 import Divider from 'components/ui/Divider'
 import { CATEGORY_OPTIONS } from './Support.constants'

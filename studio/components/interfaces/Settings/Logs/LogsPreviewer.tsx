@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconRewind, Button } from '@supabase/ui'
+import { IconRewind, Button } from 'ui'
 
 import {
   LogTable,

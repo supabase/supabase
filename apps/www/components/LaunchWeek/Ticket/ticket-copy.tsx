@@ -4,7 +4,7 @@ import { SITE_URL } from '~/lib/constants'
 import styleUtils from './utils.module.css'
 // import IconCopy from '~/components/LaunchWeek/Ticket/icons/icon-copy'
 import styles from './ticket-copy.module.css'
-import { IconCopy, IconCheck } from '@supabase/ui'
+import { IconCopy, IconCheck } from 'ui'
 
 type Props = {
   username: string

@@ -1,15 +1,7 @@
 import Link from 'next/link'
 import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
-import {
-  Alert,
-  Button,
-  IconEdit,
-  IconHelpCircle,
-  IconKey,
-  IconTrash,
-  IconExternalLink,
-} from '@supabase/ui'
+import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
 
 import {
   PostgresTable,

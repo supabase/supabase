@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconInfo, IconHelpCircle, IconAlertTriangle } from '@supabase/ui'
+import { IconInfo, IconHelpCircle, IconAlertTriangle } from 'ui'
 
 interface Props {
   type: 'note' | 'tip' | 'info' | 'caution' | 'danger'

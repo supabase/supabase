@@ -1,6 +1,6 @@
 import specFile from '~/../../spec/transforms/auth_v1_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 
 // @ts-ignore
 import CodeBlock from '~/components/CodeBlock/CodeBlock'

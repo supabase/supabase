@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft } from '@supabase/ui'
+import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
 // @ts-expect-error

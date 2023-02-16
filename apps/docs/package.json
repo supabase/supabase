@@ -69,7 +69,7 @@
     "remark-gfm": "^3.0.1",
     "remark-slug": "^7.0.1",
     "shiki": "^0.11.1",
-    "@supabase/ui": "*",
+    "ui": "*",
     "valtio": "^1.7.6"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import ButtonCard from './ButtonCard'
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 
 const Frameworks = () => {
   const { isDarkMode } = useTheme()

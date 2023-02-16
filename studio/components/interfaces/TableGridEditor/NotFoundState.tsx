@@ -1,6 +1,6 @@
 import InformationBox from 'components/ui/InformationBox'
 import { FC } from 'react'
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 
 interface Props {
   id: string | number

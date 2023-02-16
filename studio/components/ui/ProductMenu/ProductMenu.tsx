@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, Menu } from '@supabase/ui'
+import { Badge, Menu } from 'ui'
 import ProductMenuItem from './ProductMenuItem'
 import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 

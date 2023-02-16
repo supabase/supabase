@@ -1,4 +1,4 @@
-import { Button, IconExternalLink } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 

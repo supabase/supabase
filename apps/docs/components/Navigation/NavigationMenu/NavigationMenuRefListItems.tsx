@@ -1,12 +1,12 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft } from '@supabase/ui'
+import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
 import { find } from 'lodash'
 import Image from 'next/image'
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'

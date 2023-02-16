@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 
 import { useParams, useStore } from 'hooks'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'

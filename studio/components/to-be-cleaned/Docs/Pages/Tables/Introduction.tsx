@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import Link from 'next/link'
-import { Button, IconDownload, IconExternalLink } from '@supabase/ui'
+import { Button, IconDownload, IconExternalLink } from 'ui'
 import { useParams, useStore } from 'hooks'
 import { API_ADMIN_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'

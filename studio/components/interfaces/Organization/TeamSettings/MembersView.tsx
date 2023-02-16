@@ -2,7 +2,7 @@ import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState, FC, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from '@supabase/ui'
+import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from 'ui'
 
 import { Member, Role } from 'types'
 import { useStore, useOrganizationDetail, useParams } from 'hooks'

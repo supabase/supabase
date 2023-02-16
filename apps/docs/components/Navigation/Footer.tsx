@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconGitHub, IconTwitter } from '@supabase/ui'
+import { Button, IconGitHub, IconTwitter } from 'ui'
 import footerData from '~/data/footer.json'
-import { useTheme } from '@supabase/ui'
+import { useTheme } from 'ui'
 
 const Footer = () => {
   const { isDarkMode } = useTheme()

@@ -6,7 +6,7 @@ import LoadingDots from './loading-dots'
 import styleUtils from './utils.module.css'
 import styles from './form.module.css'
 import useEmailQueryParam from '~/components/LaunchWeek/Ticket/hooks/use-email-query-param'
-import { IconLoader } from '@supabase/ui'
+import { IconLoader } from 'ui'
 // import Captcha, { useCaptcha } from './captcha'
 
 type FormState = 'default' | 'loading' | 'error'

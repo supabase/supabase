@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'

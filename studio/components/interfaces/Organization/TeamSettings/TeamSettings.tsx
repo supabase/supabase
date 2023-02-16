@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch } from '@supabase/ui'
+import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore, useFlag, useOrganizationRoles, useOrganizationDetail, useParams } from 'hooks'

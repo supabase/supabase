@@ -1,6 +1,6 @@
-import { Button, ButtonProps } from '@supabase/ui'
+import { Button, ButtonProps } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
-import { IconClipboard } from '@supabase/ui'
+import { IconClipboard } from 'ui'
 import { useEffect, useState } from 'react'
 
 export interface CopyButtonProps extends ButtonProps {

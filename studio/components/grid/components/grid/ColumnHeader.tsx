@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconKey, IconLink, IconLock } from '@supabase/ui'
+import { IconKey, IconLink, IconLock } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { XYCoord } from 'dnd-core'

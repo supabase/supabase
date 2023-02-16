@@ -1,5 +1,5 @@
 import { FC, memo } from 'react'
-import { Button, Input, IconChevronDown, IconX } from '@supabase/ui'
+import { Button, Input, IconChevronDown, IconX } from 'ui'
 
 import { Filter, FilterOperator } from 'components/grid/types'
 import { DropdownControl } from 'components/grid/components/common'

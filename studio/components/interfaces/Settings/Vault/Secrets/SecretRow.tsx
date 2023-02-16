@@ -11,7 +11,7 @@ import {
   IconKey,
   IconMoreVertical,
   IconLoader,
-} from '@supabase/ui'
+} from 'ui'
 import { VaultSecret } from 'types'
 import { useParams, useStore } from 'hooks'
 import Link from 'next/link'

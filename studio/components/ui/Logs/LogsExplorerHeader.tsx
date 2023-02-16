@@ -1,4 +1,4 @@
-import { IconList } from '@supabase/ui'
+import { IconList } from 'ui'
 
 interface Props {
   subtitle?: string

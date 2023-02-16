@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Form, Input } from '@supabase/ui'
+import { Form, Input } from 'ui'
 import { boolean, number, object, string } from 'yup'
 
 import {

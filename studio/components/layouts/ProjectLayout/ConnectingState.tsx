@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from '@supabase/ui'
+import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from 'ui'
 
 import { Project } from 'types'
 import { useStore } from 'hooks'

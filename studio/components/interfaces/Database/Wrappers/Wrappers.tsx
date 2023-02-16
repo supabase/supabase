@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconExternalLink } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'

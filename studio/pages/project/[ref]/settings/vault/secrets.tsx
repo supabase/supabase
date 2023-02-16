@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 
 import { useParams, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'

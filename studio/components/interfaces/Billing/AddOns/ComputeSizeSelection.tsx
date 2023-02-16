@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Badge, Button, IconExternalLink, Radio } from '@supabase/ui'
+import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
 import { useFlag, useParams } from 'hooks'
 import { getProductPrice } from '../Billing.utils'

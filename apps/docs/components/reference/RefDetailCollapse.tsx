@@ -1,6 +1,6 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import React from 'react'
-import { IconChevronRight } from '@supabase/ui'
+import { IconChevronRight } from 'ui'
 
 const RefDetailCollapse: React.FC<{ id: string; label: string; defaultOpen?: boolean }> = ({
   defaultOpen = true,

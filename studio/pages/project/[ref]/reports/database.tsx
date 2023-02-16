@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
-import { IconArrowRight } from '@supabase/ui'
+import { IconArrowRight } from 'ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
