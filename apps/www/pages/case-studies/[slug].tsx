@@ -74,7 +74,7 @@ function CaseStudyPage(props: any) {
   //               src={`${post.logo}`}
   //               alt={`${post.title} logo`}
   //               objectFit="scale-down"
-  //               objectPosition="centre"
+  //               objectPosition="center"
   //               className="
   //                     bg-no-repeat
   //                     dark:brightness-200
