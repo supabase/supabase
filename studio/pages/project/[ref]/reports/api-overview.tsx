@@ -116,7 +116,6 @@ const useApiReport = () => {
       return prev.filter((f) => !toRemove.find((r) => isEqual(f, r)))
     })
   }
-  console.log('filters', filters)
 
   useEffect(() => {
     // update sql for each query
