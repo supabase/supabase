@@ -1,6 +1,5 @@
 import { Button, IconChevronRight } from 'ui'
 import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
-import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import Table from 'components/to-be-cleaned/Table'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
@@ -10,6 +9,7 @@ import { PathsDatum, StatusCodesDatum } from '../Reports.types'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps } from '../ReportWidget'
 import AreaChart from 'components/ui/Charts/AreaChart'
+import BarChart from 'components/ui/Charts/BarChart'
 
 export const renderTotalRequests = (
   props: ReportWidgetProps<{
@@ -21,7 +21,7 @@ export const renderTotalRequests = (
     return acc + datum.count
   }, 0)
   return (
-    <AreaChart
+    <BarChart
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -45,45 +45,44 @@ export const renderErrorCounts = (
   }, 0)
   return (
     <BarChart
-      chartSize="small"
+      size="small"
+      minimalHeader
       highlightedValue={total}
-      wrapperClassName="w-full h-36"
+      className="w-full h-36"
       data={props.data}
-      attribute="count"
+      yAxisKey="count"
       xAxisKey="timestamp"
       displayDateInUtc
-      label=""
-      minimalHeader
-      customDateFormat={DATETIME_FORMAT}
-      noDataMessage={'No errors yet'}
     />
   )
 }
 
 export const renderResponseSpeed = (
-  props : ReportWidgetProps<{
+  props: ReportWidgetProps<{
     timestamp: string
     avg: number
     quantiles: number[]
   }>
 ) => {
-  const transformedData = props.data.map(datum=>({
+  const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
-    median: datum.quantiles[49]
+    median: datum.quantiles[49],
   }))
   const lastAvg = props.data[props.data.length - 1]?.avg
-  return   <AreaChart
-    size="small"
-    highlightedValue={lastAvg}
-    format=" ms"
-    minimalHeader
-    className="w-full h-36"
-    data={transformedData}
-    yAxisKey="avg"
-    xAxisKey="timestamp"
-    displayDateInUtc
-  />
+  return (
+    <BarChart
+      size="small"
+      highlightedValue={lastAvg}
+      format=" ms"
+      minimalHeader
+      className="w-full h-36"
+      data={transformedData}
+      yAxisKey="avg"
+      xAxisKey="timestamp"
+      displayDateInUtc
+    />
+  )
 }
 
 // export const renderUserAgents = (
