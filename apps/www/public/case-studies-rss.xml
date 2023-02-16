@@ -5,35 +5,35 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Invalid Date</lastBuildDate>
+      <lastBuildDate>Mon, 13 Feb 2023 16:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/case-studies/xendit</guid>
   <title>Xendit use Supabase and create a full solution shipped to production in less than one week.</title>
   <link>https://supabase.com/case-studies/xendit</link>
   <description>As a payment processor, Xendit are responsible for verifying that all transactions are legal.</description>
-  <pubDate>Invalid Date</pubDate>
+  <pubDate>Mon, 13 Feb 2023 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/case-studies/replenysh</guid>
-  <title>Replenysh</title>
+  <title>Replenysh uses Supabase to implement OTP in less than 24 hours</title>
   <link>https://supabase.com/case-studies/replenysh</link>
-  <description>Two months of building</description>
-  <pubDate>Invalid Date</pubDate>
+  <description>With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.</description>
+  <pubDate>Mon, 13 Feb 2023 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/case-studies/mobbin</guid>
   <title>How Mobbin migrated 200,000 users from Firebase for a better authentication experience.</title>
   <link>https://supabase.com/case-studies/mobbin</link>
   <description>Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.</description>
-  <pubDate>Invalid Date</pubDate>
+  <pubDate>Mon, 13 Feb 2023 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/case-studies/epsilon3</guid>
   <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
   <link>https://supabase.com/case-studies/epsilon3</link>
   <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
-  <pubDate>Invalid Date</pubDate>
+  <pubDate>Mon, 13 Feb 2023 16:04:00 +0000</pubDate>
 </item>
 
     </channel>
