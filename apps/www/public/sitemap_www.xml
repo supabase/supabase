@@ -31,6 +31,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/case-studies</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/changelog</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
