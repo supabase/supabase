@@ -42,12 +42,17 @@ For automatic disk resizing, and avoid your database entering read-only mode, yo
 
 If you are on Pro or Enterprise, database storage expands automatically. Usually the disk is expanded to be 50% larger. For every automatic database storage expansion, it will not auto expand for another 6 hours.
 
-During this 6 hour period, if you reach 95% of the disk space, your project will enter read-only mode. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
-Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
-
-If you intend to import a lot of data into your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new).
+If you intend to import a lot of data into your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new), otherwise your project might enter a ['read-only' mode](#paid-tier-project-read-only-mode).
 
 If you need more than 1024TB of disk size or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+
+#### Paid tier project 'read-only' mode
+
+During the 6 hour period after an automatic resize, your database will not automatically resize until after 6 hours.
+If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
 
 ### Increasing available disk size
 
