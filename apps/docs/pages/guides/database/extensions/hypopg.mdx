@@ -7,11 +7,10 @@ export const meta = {
 }
 
 `HypoPG` is PostgreSQL extension for creating hypothetical/virtual indexes. HypoPG allows users to rapidly create hypothetical/virtual indexes that have no resource cost (CPU, disk, memory) that are visible to the PostgreSQL query planner.
-That allows users to quickly search for an index to improve a slow query without waiting for them to build.
 
-## Usage
+The motivation for HypoPG is to allow users to quickly search for an index to improve a slow query without consuming server resources or waiting for them to build.
 
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -40,14 +39,14 @@ drop extension if exists hypopg;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
 
 </TabPanel>
 </Tabs>
 
 ### Speeding up a query
 
-Given the following table and a simple query to select from the table by id:
+Given the following table and a simple query to select from the table by `id`:
 
 {/* prettier-ignore */}
 ```sql
