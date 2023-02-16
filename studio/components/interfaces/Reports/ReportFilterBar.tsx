@@ -1,4 +1,4 @@
-import { keyBy } from 'lodash'
+import { IconBox, IconCode, IconDatabase, IconKey, IconZap, IconZapOff } from '@supabase/ui'
 import React from 'react'
 import { useState } from 'react'
 import { Dropdown, Popover, Button, IconPlus, IconChevronDown, Select, Input, IconX } from 'ui'
@@ -10,11 +10,76 @@ interface Props {
   filters: ReportFilterItem[]
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilter: (filter: ReportFilterItem) => void
+  onDatepickerChange: React.ComponentProps<typeof DatePickers>['onChange']
+  datepickerTo?: string
+  datepickerFrom?: string
 }
 
-const ReportFilterBar: React.FC<Props> = ({ filters, onAddFilter, onRemoveFilter }) => {
-  const filterKeys = ['request.path', 'request.host' , 'response.status_code']
+const PRODUCT_FILTERS = [
+  {
+    key: 'rest',
+    filterKey: 'request.path',
+    filterValue: '/rest',
+    label: 'REST',
+    description: 'Requests made to PostgREST',
+    icon: IconDatabase,
+  },
+  {
+    key: 'auth',
+    filterKey: 'request.path',
+    filterValue: '/auth',
+    label: 'Auth',
+    description: 'Authentication and authorization requests',
+    icon: IconKey,
+  },
+  {
+    key: 'storage',
+    filterKey: 'request.path',
+    filterValue: '/storage',
+    label: 'Storage',
+    description: 'Storage asset requests',
+    icon: IconBox,
+  },
+  {
+    key: 'realtime',
+    filterKey: 'request.path',
+    filterValue: '/realtime',
+    label: 'Realtime',
+    description: 'Realtime connection requests',
+    icon: IconZapOff,
+  },
+  // TODO: support functions once union parsing is fixed
+  // {
+  //   key: 'functions',
+  //   filterKey: 'request.host',
+  //   filterValue: '.functions.',
+  //   label: 'Edge Functions',
+  //   description: 'Edge function calls',
+  //   icon: IconCode,
+  // },
+  {
+    key: 'graphql',
+    filterKey: 'request.path',
+    filterValue: '/graphql',
+    label: 'GraphQL',
+    description: 'Requests made to pg_graphql',
+    icon: IconCode,
+  },
+]
+
+const ReportFilterBar: React.FC<Props> = ({
+  filters,
+  onAddFilter,
+  onRemoveFilter,
+  onDatepickerChange,
+  datepickerTo = '',
+  datepickerFrom = '',
+}) => {
+  const filterKeys = ['request.path', 'request.host', 'response.status_code']
   const [showAdder, setShowAdder] = useState(false)
+  const [currentProductFilter, setCurrentProductFilter] = useState<
+    null | typeof PRODUCT_FILTERS[number]
+  >(null)
   const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
     key: filterKeys[0],
     compare: 'is',
@@ -30,67 +95,68 @@ const ReportFilterBar: React.FC<Props> = ({ filters, onAddFilter, onRemoveFilter
   }
 
   const handleProductFilterChange = async (
-    filterToRemove: ReportFilterItem | null,
-    key: string
+    productFilter: null | typeof PRODUCT_FILTERS[number]
   ) => {
-    if (filterToRemove) {
-      await onRemoveFilter(filterToRemove)
-    }
-    if (key !== 'all') {
-      await onAddFilter({
-        key: 'request.path',
+    setCurrentProductFilter(productFilter)
+    if (productFilter) {
+      await onRemoveFilter({
+        key: productFilter.filterKey,
         compare: 'matches',
-        value: `/${key}/`,
+        value: productFilter.filterValue,
+      })
+    }
+    if (productFilter !== null) {
+      await onAddFilter({
+        key: productFilter.filterKey,
+        compare: 'matches',
+        value: productFilter.filterValue,
       })
     }
   }
-  const getPathFilterMatchValue = (filter: ReportFilterItem) => {
-    return [...String(filter.value).matchAll(/\/(storage|realtime|auth|functions)\//g)]
-  }
-  const currentProductFilter =
-    filters.find((filter) => {
-      const matches = getPathFilterMatchValue(filter)
-      if (filter.key == 'request.path' && matches.length > 0) {
-        return true
-      } else {
-        return false
-      }
-    }) || null
 
-  const currentProductFilterKey = currentProductFilter
-    ? getPathFilterMatchValue(currentProductFilter)[0][1]
-    : 'all'
   return (
     <div>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
+        <DatePickers
+          onChange={onDatepickerChange}
+          to={datepickerTo}
+          from={datepickerFrom}
+          helpers={REPORTS_DATEPICKER_HELPERS}
+        />
         <Dropdown
           size="small"
           side="bottom"
           align="start"
           overlay={
             <>
-              <Dropdown.Item onClick={() => handleProductFilterChange(currentProductFilter, 'all')}>
-                All
+              <Dropdown.Item onClick={() => handleProductFilterChange(null)}>
+                All Requests
               </Dropdown.Item>
               <Dropdown.Separator />
-              {[
-                { key: 'rest', label: 'REST' },
-                { key: 'auth', label: 'Auth' },
-                { key: 'storage', label: 'Storage' },
-                { key: 'realtime', label: 'Realtime' },
-                { key: 'functions', label: 'Functions' },
-                { key: 'graphql', label: 'GraphQL' },
-              ].map(({ key, label }) => (
-                <Dropdown.Item
-                  key={key}
-                  disabled={key === currentProductFilterKey}
-                  onClick={() => handleProductFilterChange(currentProductFilter, key)}
-                >
-                  <span className={[key === currentProductFilterKey ? 'font-bold' : ''].join(' ')}>
-                    {label}
-                  </span>
-                </Dropdown.Item>
-              ))}
+              {PRODUCT_FILTERS.map((productFilter) => {
+                const Icon = productFilter.icon
+                return (
+                  <Dropdown.Item
+                    key={productFilter.key}
+                    disabled={productFilter.key === currentProductFilter?.key}
+                    onClick={() => handleProductFilterChange(productFilter)}
+                    className="hover:bg-scale-600"
+                    icon={<Icon size={24} />}
+                  >
+                    <span
+                      className={[
+                        productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
+                        'inline-block',
+                      ].join(' ')}
+                    >
+                      {productFilter.label}
+                    </span>
+                    <span className=" text-left text-scale-1000 inline-block">
+                      {productFilter.description}
+                    </span>
+                  </Dropdown.Item>
+                )
+              })}
             </>
           }
         >
@@ -100,18 +166,15 @@ const ReportFilterBar: React.FC<Props> = ({ filters, onAddFilter, onRemoveFilter
             className="inline-flex flex-row gap-2"
             iconRight={<IconChevronDown size={14} />}
           >
-            {currentProductFilterKey === 'all'
-              ? 'All'
-              : `${currentProductFilterKey
-                  .slice(0, 1)
-                  .toUpperCase()}${currentProductFilterKey.slice(
-                  1,
-                  currentProductFilterKey.length
-                )}`}
+            {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
           </Button>
         </Dropdown>
         {filters
-          .filter((filter) => filter !== currentProductFilter)
+          .filter(
+            (filter) =>
+              filter.value !== currentProductFilter?.filterValue &&
+              filter.key !== currentProductFilter?.filterKey
+          )
           .map((filter) => (
             <div className="text-xs rounded border border-scale-1100 bg-scale-500 px-1 h-7 flex flex-row justify-center gap-1 items-center">
               {filter.key} {filter.compare} {filter.value}
