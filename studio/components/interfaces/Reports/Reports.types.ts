@@ -26,13 +26,13 @@ export type MetaQueryResponse = any & { error: ResponseError }
 export type BaseReportParams = typeof DEFAULT_QUERY_PARAMS & { sql?: string } & unknown
 export interface PresetConfig {
   title: string
-  queries: BaseQueries
+  queries: BaseQueries<string>
 }
-export type BaseQueries = Record<string, Query>
+export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
-export interface Query {
-  queryType: 'db' | "logs"
-  sql: ((filters: ReportFilterItem[]) => string)
+export interface ReportQuery {
+  queryType: 'db' | 'logs'
+  sql: (filters: ReportFilterItem[]) => string
 }
 
 export interface StatusCodesDatum {
