@@ -8,7 +8,7 @@ import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 
