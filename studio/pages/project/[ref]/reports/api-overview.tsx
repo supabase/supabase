@@ -14,24 +14,24 @@ import {
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import { LogsEndpointParams } from 'components/interfaces/Settings/Logs'
+import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
+  const handleDatepickerChange = (value: DatePickerToFrom) => {}
 
   return (
     <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <ReportHeader
         title="API Performance"
-        onDatepickerChange={(value) => console.log(value)}
-        datepickerFrom={report.params.totalRequests.iso_timestamp_start}
-        datepickerTo={report.params.totalRequests.iso_timestamp_end}
         isLoading={report.isLoading}
         onRefresh={report.refresh}
       />
 
       <ReportFilterBar
+        onDatepickerChange={handleDatepickerChange}
+        datepickerFrom={report.params.totalRequests.iso_timestamp_start}
+        datepickerTo={report.params.totalRequests.iso_timestamp_end}
         onAddFilter={report.addFilter}
         onRemoveFilter={report.removeFilter}
         filters={report.filters}
