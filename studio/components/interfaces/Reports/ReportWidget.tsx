@@ -1,14 +1,14 @@
 import { Button, Dropdown, IconMoreVertical } from 'ui'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
-import { useRouter } from 'next/router'
+import { NextRouter, useRouter } from 'next/router'
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IconHelpCircle } from '@supabase/ui'
 
 export interface ReportWidgetProps<T = any> {
-  data: T[] 
+  data: T[]
   title: string
   description?: string
   tooltip?: string
@@ -16,6 +16,7 @@ export interface ReportWidgetProps<T = any> {
   renderer: (props: ReportWidgetProps) => React.ReactNode
   params: BaseReportParams | LogsEndpointParams
   isLoading: boolean
+  router: NextRouter
 }
 
 const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
@@ -32,26 +33,25 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
         <div className="flex flex-row items-start justify-between">
           <div className="gap-2">
             <div className="flex flex-row gap-2">
-
-            <h3 className="w-full h-6">{props.title}</h3>{' '}
-            {props?.tooltip && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <IconHelpCircle className="text-scale-900" size="tiny" />
-                </Tooltip.Trigger>
-                <Tooltip.Content side="top">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">{props.tooltip}</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
-            )}
+              <h3 className="w-full h-6">{props.title}</h3>{' '}
+              {props?.tooltip && (
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <IconHelpCircle className="text-scale-900" size="tiny" />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content side="top">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">{props.tooltip}</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              )}
             </div>
             <p className="text-sm text-scale-1100">{props.description}</p>
           </div>
@@ -86,7 +86,9 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           </Dropdown>
         </div>
 
-        <LoadingOpacity className="w-full" active={props.isLoading}>{props.data === undefined ? null : props.renderer(props)}</LoadingOpacity>
+        <LoadingOpacity className="w-full" active={props.isLoading}>
+          {props.data === undefined ? null : props.renderer(props)}
+        </LoadingOpacity>
       </Panel.Content>
     </Panel>
   )

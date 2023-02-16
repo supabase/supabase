@@ -20,9 +20,11 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'hooks'
 import { isEqual } from 'lodash'
+import { useRouter } from 'next/router'
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const report = useApiReport()
+  const router = useRouter()
 
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
@@ -61,6 +63,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Total Requests"
         data={report.data.totalRequests || []}
         renderer={renderTotalRequests}
+        router={router}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -69,6 +72,7 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={renderErrorCounts}
+        router={router}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -77,6 +81,7 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={renderResponseSpeed}
+        router={router}
       />
     </div>
   )
