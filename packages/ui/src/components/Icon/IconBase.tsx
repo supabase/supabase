@@ -19,6 +19,7 @@ export interface IconBaseProps {
   style?: React.CSSProperties
   width?: number
   height?: number
+  id?: string
 }
 
 interface StringMap {
