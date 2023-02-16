@@ -98,7 +98,7 @@ const ReportFilterBar: React.FC<Props> = ({
   const resetFilterValues = () => {
     setAddFilterValues({
       key: filterKeys[0],
-      compare: 'is',
+      compare: 'matches',
       value: '',
     })
   }
