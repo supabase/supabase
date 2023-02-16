@@ -23,11 +23,14 @@ This value is also reported in the [database settings page](https://app.supabase
 ## Database storage management
 
 Supabase uses network-attached storage to balance performance with scalability.
-For Pro and Enterprise projects, disk size expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the disk size.
-Disk size expansion can only occur once every six hours.
-Pro projects can store up to 1024TB.
 
-### Free tier project 'read-only' mode at 95% disk size use
+For Pro and Enterprise tier projects, [disk size expands ~1.5x automatically](#paid-tier-automatic-disk-resizing) (e.g., 8GB -> 12GB) when you reach 90% of the disk size. Disk size expansion can only occur once every six hours.
+
+For Free tier projects, the database will enter ['read only' mode when you reach 95% disk space](#free-tier-project-read-only-mode).
+
+Pro and enterprise tier projects can store up to 1024TB.
+
+### Free tier project 'read-only' mode
 
 Free tier projects enter read-only mode when you reach 95% of the disk size.
 In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
@@ -37,11 +40,9 @@ For automatic disk resizing, and avoid your database entering read-only mode, yo
 
 ### Paid tier automatic disk resizing
 
-If you are on Pro or Enterprise, database storage expands automatically. Usually the disk is expanded to be 50% larger.
+If you are on Pro or Enterprise, database storage expands automatically. Usually the disk is expanded to be 50% larger. For every automatic database storage expansion, it will not auto expand for another 6 hours.
 
-However, you may also encounter this error if you fill the database faster than it can expand. For every automatic database storage expansion, it will not auto expand for another 6 hours.
-
-During this 6 hour period, if you reach 95% of the disk space, your project may enter read-only mode. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+During this 6 hour period, if you reach 95% of the disk space, your project will enter read-only mode. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
 Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
 
 If you intend to import a lot of data into your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new).
