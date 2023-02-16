@@ -298,7 +298,7 @@ const NavigationMenu = () => {
         id={'reference_self_hosting_realtime'}
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
-        lib="self-hosting-auth"
+        lib="self-hosting-realtime"
       />
     </div>
   )
