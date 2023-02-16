@@ -1,3 +1,5 @@
+import { AreaProps } from 'recharts'
+
 export interface CommonChartProps<D>
   extends Pick<
     HeaderType<D>,
@@ -9,8 +11,18 @@ export interface CommonChartProps<D>
     | 'minimalHeader'
     | 'displayDateInUtc'
   > {
-  title?: string;
+  title?: string
   className?: string
+  isLoading?: boolean
+  size?: 'small' | 'normal' | 'large'
+}
+
+export interface StackedChartProps<D> extends CommonChartProps<D> {
+  xAxisKey: string
+  xAxisFormatAsDate?: boolean
+  dateFormat?: string
+  yAxisKey: string
+  stackKey: string
 }
 
 export type HeaderType<D> = {
@@ -18,7 +30,7 @@ export type HeaderType<D> = {
   focus: number | null
   format?: string
   highlightedValue?: number | string
-  highlightedLabel?:  string
+  highlightedLabel?: string
   data: D[]
   customDateFormat?: string
   label: string

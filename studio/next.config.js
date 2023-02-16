@@ -7,10 +7,21 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // this is required to use shared packages in the packages directory
 const withTM = require('next-transpile-modules')(['ui', 'common'])
 
+// Required for nextjs standalone build
+const path = require('path')
+
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
+const csp = [
+  "frame-ancestors 'none';",
+  // IS_PLATFORM
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? 'upgrade-insecure-requests;' : '',
+]
+  .filter(Boolean)
+  .join(' ')
 
 const nextConfig = {
   async redirects() {
@@ -76,6 +87,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/database/api-logs',
+        destination: '/project/:ref/logs/edge-logs',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database/postgres-logs',
         destination: '/project/:ref/logs/postgres-logs',
         permanent: true,
@@ -110,6 +126,11 @@ const nextConfig = {
         destination: '/project/:ref/logs/explorer',
         permanent: true,
       },
+      {
+        source: '/org/:slug/settings',
+        destination: '/org/:slug/general',
+        permanent: true,
+      },
     ]
   },
   async headers() {
@@ -120,6 +141,14 @@ const nextConfig = {
           {
             key: 'X-Frame-Options',
             value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: csp,
           },
           {
             key: 'Referrer-Policy',
@@ -139,6 +168,11 @@ const nextConfig = {
   },
   images: {
     domains: ['github.com'],
+  },
+  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  experimental: {
+    outputStandalone: true,
+    outputFileTracingRoot: path.join(__dirname, '../../'),
   },
 }
 

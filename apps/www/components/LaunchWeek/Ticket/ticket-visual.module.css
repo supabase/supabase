@@ -1,0 +1,187 @@
+.visual {
+  position: relative;
+  transform: translateZ(0);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* background-color: black; */
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+
+  background-color: rgba(0, 0, 0, 1);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+
+  /* background: linear-gradient(#fff000, var(--gold-secondary)); */
+  border: 1px solid #1c5f52;
+  animation: blank-svg-shadow 2s ease-in-out infinite alternate;
+
+  background-image: url('/images/launchweek/regular-ticket-background.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.visual--gold {
+  /* border: 10px solid;
+  border-image-slice: 1;
+  border-width: 2px;
+  border-radius: 16px; */
+  background-color: linear-gradient(#fff000, #dea513);
+  background-color: #dea513;
+  border: 1px solid rgba(255, 255, 0, 0.629);
+  animation: svg-shadow 2s ease-in-out infinite alternate;
+  background-image: url('/images/launchweek/gold-ticket-background.png');
+  /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
+  /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
+}
+
+@media (max-width: 768px) {
+  .visual {
+    background-size: cover;
+
+    background-image: url('/images/launchweek/2x-regular-ticket-background.jpg');
+  }
+
+  .visual--gold {
+    background-image: url('/images/launchweek/2x-gold-ticket-background.jpg');
+  }
+}
+
+/* .svg-shadow {
+} */
+
+@keyframes svg-shadow {
+  from {
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #d99f0c) drop-shadow(0 0 6px #d99f0c);
+  }
+
+  to {
+    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
+  }
+}
+
+@keyframes blank-svg-shadow {
+  from {
+    filter: drop-shadow(0 0 2px #1c5f52) drop-shadow(0 0 4px #1c5f52) drop-shadow(0 0 6px #1c5f52);
+  }
+
+  to {
+    filter: drop-shadow(0 0 3px #1c5f52) drop-shadow(0 0 6px #1c5f52) drop-shadow(0 0 9px #1c5f52);
+  }
+}
+
+.horizontal-ticket {
+  display: none;
+}
+
+.vertical-ticket {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .horizontal-ticket {
+    display: flex;
+  }
+
+  .vertical-ticket {
+    display: none;
+  }
+}
+
+.logo {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  /* padding: 46px 29px;/ */
+}
+
+.logo img {
+  /* margin-top: 64px; */
+  margin-top: calc(64px * var(--size));
+  margin-left: calc(32px * var(--size));
+  margin-left: calc(32px * var(--size));
+  /* width: 272px; */
+  width: calc(272px * var(--size));
+}
+
+@media (min-width: 768px) {
+  .logo img {
+    margin-top: calc(32px * var(--size));
+    /* width: 280px; */
+    width: calc(280px * var(--size));
+    margin-left: calc(160px * var(--size));
+  }
+}
+
+.profile {
+  z-index: 1;
+  position: absolute;
+  top: 90px;
+  width: 100%;
+  padding: 46px 29px;
+}
+
+@media (min-width: 768px) {
+  .profile {
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 65px;
+  }
+}
+
+.info {
+  z-index: 1;
+  position: absolute;
+  bottom: 40px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* padding: calc(46px * var(--size)) calc(29px * var(--size)); */
+}
+
+@media (min-width: 768px) {
+  .info {
+    bottom: 0;
+    /* padding: 0 calc(160px * var(--size)) calc(44px * var(--size))
+      calc(63px * var(--size)); */
+  }
+}
+
+.ticket-number-wrapper {
+  position: absolute;
+  bottom: 40px;
+  right: 0;
+}
+
+@media (min-width: 768px) {
+  .ticket-number-wrapper {
+    bottom: 0;
+  }
+}
+
+.ticket-number {
+  font-size: calc(40px * var(--size));
+  line-height: 1;
+  width: calc(330px * var(--size));
+  text-align: center;
+  background-clip: text;
+}
+
+.ticket-number-golden {
+  color: var(--gold-primary);
+}
+
+@media (min-width: 768px) {
+  .ticket-number {
+    transform: rotate(90deg) translateY(calc(100px * var(--size)));
+    transform-origin: bottom right;
+  }
+
+  .ticket-number-golden {
+    color: var(--gold-accent);
+  }
+}

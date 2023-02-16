@@ -33,10 +33,9 @@ const examples = [
     href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
   },
   {
-    name: 'OpenGraph Image Generation',
-    description:
-      'Generate Open Graph images with Deno and Supabase Edge Functions, no framework needed.',
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/opengraph',
+    name: 'Open Graph Image Generation',
+    description: 'Generate Open Graph images with Deno and Supabase Edge Functions.',
+    href: '/guides/functions/examples/og-image',
   },
   {
     name: 'OG Image Generation & Storage CDN Caching',

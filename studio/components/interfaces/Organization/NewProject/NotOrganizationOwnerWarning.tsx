@@ -1,12 +1,8 @@
 import { IconAlertCircle } from 'ui'
-
-import { useFlag } from 'hooks'
 import InformationBox from 'components/ui/InformationBox'
 
 // [Joshen] This can just use NoPermission component i think
 const NotOrganizationOwnerWarning = () => {
-  const enablePermissions = useFlag('enablePermissions')
-
   return (
     <div className="mt-4">
       <InformationBox
@@ -17,9 +13,7 @@ const NotOrganizationOwnerWarning = () => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              {enablePermissions
-                ? 'Contact your organization owner or adminstrator to create a new project.'
-                : 'Only the organization owner can create new projects. Contact your organization owner to create a new project for this organization.'}
+              Contact your organization owner or adminstrator to create a new project.
             </p>
           </div>
         }

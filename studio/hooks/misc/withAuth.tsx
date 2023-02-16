@@ -1,14 +1,22 @@
-import { ComponentType, useEffect } from 'react'
 import Head from 'next/head'
 import { NextRouter, useRouter } from 'next/router'
+import { ComponentType, useEffect } from 'react'
 
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfile, useStore, usePermissions } from 'hooks'
-import Error500 from '../../pages/500'
+import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { NextPageWithLayout } from 'types'
+import Error500 from '../../pages/500'
 
-const PLATFORM_ONLY_PAGES = ['reports', 'settings']
+const PLATFORM_ONLY_PAGES = [
+  'reports',
+  'settings',
+  'auth/providers',
+  'auth/templates',
+  'auth/url-configuration',
+]
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -23,51 +31,46 @@ export function withAuth<T>(
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
-    const page = router.pathname.split('/')[3]
+    const page = router.pathname.split('/').slice(3).join('/')
 
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
-    const returning =
-      app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
-    const { profile, isLoading, error } = useProfile(returning)
     const {
-      permissions,
-      isLoading: isPermissionLoading,
-      mutate: mutatePermissions,
-    } = usePermissions(profile, returning)
+      data: profile,
+      isLoading,
+      error,
+    } = useProfileQuery({
+      onSuccess(profile) {
+        ui.setProfile(profile)
 
-    const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
+        if (!app.organizations.isInitialized) app.organizations.load()
+        if (!app.projects.isInitialized) app.projects.load()
+      },
+    })
+
+    usePermissionsQuery({
+      onSuccess(permissions) {
+        ui.setPermissions(permissions)
+      },
+    })
+
+    const isAccessingBlockedPage =
+      !IS_PLATFORM &&
+      PLATFORM_ONLY_PAGES.some((platformOnlyPage) => page.startsWith(platformOnlyPage))
     const isRedirecting =
       isAccessingBlockedPage ||
       checkRedirectTo(isLoading, router, profile, error, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // This should run before redirecting
-      if (!isLoading) {
-        if (!profile) {
-          ui.setProfile(undefined)
-        } else if (returning !== 'minimal') {
-          ui.setProfile(profile)
-
-          if (!app.organizations.isInitialized) app.organizations.load()
-          if (!app.projects.isInitialized) app.projects.load()
-          mutatePermissions()
-        }
-      }
-
-      if (!isPermissionLoading) {
-        ui.setPermissions(permissions)
-      }
-
       // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
+    }, [isRedirecting, redirectTo])
 
     useEffect(() => {
-      if (!isLoading && router.isReady) {
+      if (router.isReady) {
         if (ref) {
           rootStore.setProjectRef(Array.isArray(ref) ? ref[0] : ref)
         }
@@ -84,11 +87,13 @@ export function withAuth<T>(
         <Head>
           {/* This script will quickly (before the main JS loads) redirect the user
           to the login page if they are guaranteed (no token at all) to not be logged in. */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
-            }}
-          />
+          {IS_PLATFORM && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
+              }}
+            />
+          )}
         </Head>
         <WrappedComponent {...props} />
       </>
@@ -105,7 +110,7 @@ export function withAuth<T>(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/sign-in'
+  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/projects'
 }
 
 function checkRedirectTo(

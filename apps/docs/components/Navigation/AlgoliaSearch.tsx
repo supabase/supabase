@@ -86,7 +86,7 @@ const AlgoliaSearch: FC<Props> = ({}) => {
         },
       },
       onSelect({ item, setQuery, setIsOpen, refresh }) {
-        console.log('onSelect', item.url)
+        //console.log('onSelect', item.url)
       },
       // @ts-ignore
       getSources({ query }) {

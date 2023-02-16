@@ -1,18 +1,25 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import type { AppProps } from 'next/app'
-import { post } from 'lib/fetchWrappers'
-import { ThemeProvider } from '../components/Providers'
-import { SearchProvider } from '~/components/DocSearch'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { ThemeProvider } from 'common/Providers'
 import { DefaultSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { AppPropsWithLayout } from 'types'
+import ClippyProvider from '~/components/Clippy/ClippyProvider'
+import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
-import '../styles/main.scss?v=1.0.0'
-import '../styles/docsearch.scss'
+import SiteLayout from '~/layouts/SiteLayout'
+import { post } from '~/lib/fetchWrappers'
 import '../styles/algolia-search.scss'
+import '../styles/ch.scss'
+import '../styles/docsearch.scss'
+import '../styles/main.scss?v=1.0.0'
+import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const [supabase] = useState(() => createBrowserSupabaseClient())
 
   function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
@@ -24,7 +31,22 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     function handleRouteChange(url: string) {
+      /*
+       * handle telemetry
+       */
       telemetry(url)
+      /*
+       * handle "scroll to top" behaviour on route change
+       */
+      if (document) {
+        // do not scroll to top for reference docs
+        if (!url.includes('reference/')) {
+          // scroll container div to top
+          const container = document.getElementById('docs-content-container')
+          // check container exists (only avail on new docs)
+          if (container) container.scrollTop = 0
+        }
+      }
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -63,11 +85,17 @@ function MyApp({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <ThemeProvider>
-        <SearchProvider>
-          <Component {...pageProps} />
-        </SearchProvider>
-      </ThemeProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <ThemeProvider>
+          <SearchProvider>
+            <ClippyProvider>
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+            </ClippyProvider>
+          </SearchProvider>
+        </ThemeProvider>
+      </SessionContextProvider>
     </>
   )
 }

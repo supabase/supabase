@@ -1,19 +1,18 @@
+import Link from 'next/link'
 import { FC } from 'react'
-import { useRouter } from 'next/router'
 import { Badge, IconAlertCircle, Radio, Button } from 'ui'
 
-import { useFlag, useStore } from 'hooks'
-import { DatabaseAddon } from './AddOns.types'
+import { useFlag, useParams, useStore } from 'hooks'
+import { SubscriptionAddon } from './AddOns.types'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import InformationBox from 'components/ui/InformationBox'
 import { getSemanticVersion } from './AddOns.utils'
-import Link from 'next/link'
 
 interface Props {
-  pitrDurationOptions: DatabaseAddon[]
-  currentPitrDuration?: DatabaseAddon
-  selectedPitrDuration?: DatabaseAddon
+  pitrDurationOptions: SubscriptionAddon[]
+  currentPitrDuration?: SubscriptionAddon
+  selectedPitrDuration?: SubscriptionAddon
   onSelectOption: (option: any) => void
 }
 
@@ -24,12 +23,14 @@ const PITRDurationSelection: FC<Props> = ({
   onSelectOption,
 }) => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  const projectRegion = ui.selectedProject?.region ?? ''
+
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  const canUsePITR = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') >= 141044
+  const sufficientPgVersion = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') >= 141044
+  const isDisabledForRegion = ['ap-northeast-2'].includes(projectRegion)
 
   return (
     <div className="space-y-4">
@@ -41,7 +42,7 @@ const PITRDurationSelection: FC<Props> = ({
         <p className="text-sm text-scale-1100">
           Restore your database from a specific point in time
         </p>
-        {canUsePITR && (
+        {sufficientPgVersion && !isDisabledForRegion && !currentPitrDuration?.isLocked && (
           <div className="mt-2">
             <InformationBox
               icon={<IconAlertCircle strokeWidth={2} />}
@@ -53,7 +54,7 @@ const PITRDurationSelection: FC<Props> = ({
       </div>
       {addonUpdateDisabled ? (
         <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
-      ) : !canUsePITR ? (
+      ) : !sufficientPgVersion ? (
         <InformationBox
           hideCollapse
           defaultVisibility
@@ -63,6 +64,50 @@ const PITRDurationSelection: FC<Props> = ({
               <p className="text-sm leading-normal">Reach out to us if you're interested!</p>
               <Link
                 href={`/support/new?ref=${ref}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+              >
+                <a>
+                  <Button type="default">Contact support</Button>
+                </a>
+              </Link>
+            </div>
+          }
+          icon={<IconAlertCircle strokeWidth={2} />}
+        />
+      ) : currentPitrDuration?.isLocked ? (
+        <div
+          className={[
+            'flex items-center justify-between block w-full rounded px-4 py-3',
+            'border border-scale-600 bg-scale-100 dark:border-scale-500 dark:bg-scale-400',
+          ].join(' ')}
+        >
+          <div className="space-y-3">
+            <h5 className="text-sm text-scale-1200">
+              Your project currently has {currentPitrDuration.name} included
+            </h5>
+            <p className="text-sm text-scale-1100">
+              If you would like to change your PITR duration, do reach out to us
+            </p>
+          </div>
+          <div className="">
+            <Link href={`/support/new?ref=${ref}&category=sales&subject=Change%20PITR%20duration`}>
+              <a>
+                <Button>Contact us</Button>
+              </a>
+            </Link>
+          </div>
+        </div>
+      ) : isDisabledForRegion ? (
+        <InformationBox
+          hideCollapse
+          defaultVisibility
+          title={`PITR is not available for your project's region (${projectRegion})`}
+          description={
+            <div className="flex items-center justify-between m-1">
+              <p className="text-sm leading-normal">
+                Reach out to us if you're interested! We'll see what we can do for you.
+              </p>
+              <Link
+                href={`/support/new?ref=${ref}&category=sales&subject=Enquiry%20on%20PITR%20for%20project%20in%20${projectRegion}`}
               >
                 <a>
                   <Button type="default">Contact support</Button>

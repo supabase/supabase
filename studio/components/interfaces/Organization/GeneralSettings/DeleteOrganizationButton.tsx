@@ -7,14 +7,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useStore, checkPermissions } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { PageContext } from 'pages/org/[slug]/settings'
 
 const DeleteOrganizationButton = observer(() => {
-  const PageState: any = useContext(PageContext)
   const router = useRouter()
-  const { ui } = useStore()
+  const { app, ui } = useStore()
 
-  const { slug: orgSlug, name: orgName } = PageState.organization
+  const { slug: orgSlug, name: orgName } = ui.selectedOrganization || {}
 
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
@@ -49,7 +47,7 @@ const DeleteOrganizationButton = observer(() => {
       })
       setSubmitting(false)
     } else {
-      PageState.onOrgDeleted(PageState.organization)
+      app.onOrgDeleted(ui.selectedOrganization)
       setSubmitting(false)
       router.push('/')
       ui.setNotification({
@@ -62,7 +60,7 @@ const DeleteOrganizationButton = observer(() => {
   return (
     <>
       <div className="mt-2">
-        <Button onClick={() => setIsOpen(true)} type="danger">
+        <Button loading={!orgSlug} onClick={() => setIsOpen(true)} type="danger">
           Delete organization
         </Button>
       </div>

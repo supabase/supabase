@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { Checkbox, Input, IconX, IconMenu, Popover, IconLink, IconSettings, Button } from 'ui'
-import { PostgresType } from '@supabase/postgres-meta'
+import type { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
@@ -71,7 +71,7 @@ const Column: FC<Props> = ({
             size="small"
             title={column.name}
             disabled={hasImportContent}
-            placeholder="Column name"
+            placeholder="column_name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}

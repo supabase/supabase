@@ -9,6 +9,8 @@ export const meta = {
 
 This submodule provides convenience helpers for implementing user authentication in Remix applications.
 
+> Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for a full example.
+
 ## Install the Remix helper library
 
 <Tabs
@@ -50,7 +52,13 @@ SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-## Loader
+## Server-side
+
+The Supabase client can now be used server-side - in loaders and actions - by calling the `createServerClient` function.
+
+### Loader
+
+Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -59,8 +67,6 @@ SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
   defaultActiveId="js"
 >
 <TabPanel id="js" label="JavaScript">
-
-Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
 ```jsx
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
@@ -95,17 +101,17 @@ export const loader = async ({ request }) => {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Loader functions run on the server immediately before the component is rendered. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
-
 ```jsx
-import { LoaderFunction, json } from '@remix-run/node' // change this import to whatever runtime you are using
+import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-export const loader: LoaderFunction = async ({ request }: { request: Request }) => {
+import type { LoaderArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+
+export const loader = async ({ request }: LoaderArgs) => {
   const response = new Response()
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     { request, response }
   )
 
@@ -125,7 +131,9 @@ export const loader: LoaderFunction = async ({ request }: { request: Request }) 
 </TabPanel>
 </Tabs>
 
-## Action
+### Action
+
+Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -134,8 +142,6 @@ export const loader: LoaderFunction = async ({ request }: { request: Request }) 
   defaultActiveId="js"
 >
 <TabPanel id="js" label="JavaScript">
-
-Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
 
 ```jsx
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
@@ -166,18 +172,18 @@ export const action = async ({ request }) => {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
-
 ```jsx
-import { ActionFunction, json } from '@remix-run/node' // change this import to whatever runtime you are using
+import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-export const action: ActionFunction = async ({ request }: { request: Request }) => {
+import type { ActionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+
+export const action = async ({ request }: ActionArgs) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     { request, response }
   )
 
@@ -213,10 +219,22 @@ The session contains a user property.
 const user = session?.user
 ```
 
-> This is the recommended way for accessing the logged in user. There is also a `getUser()` function but this does not refresh the session if it has expired.
+Or, if you don't need the session, you can call the `getUser()` function.
+
+```jsx
+const {
+  data: { user },
+} = await supabaseClient.auth.getUser()
+```
 
 ## Client-side
 
+We still need to use Supabase client-side for things like authentication and realtime subscriptions. Anytime we use Supabase client-side it needs to be a single instance.
+
+### Creating a singleton Supabase client
+
+Since our environment variables are not available client-side, we need to plumb them through from the loader.
+
 <Tabs
   scrollable
   size="small"
@@ -224,658 +242,474 @@ const user = session?.user
   defaultActiveId="js"
 >
 <TabPanel id="js" label="JavaScript">
-
-In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.jsx` route and attach them to the `window`.
 
 ```jsx title=app/root.jsx
 export const loader = () => {
-  const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
-  return json({
-    env: {
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    },
-  })
-}
-```
-
-> These may not be stored in `process.env` for environments other than Node.
-
-Next, we call the `useLoaderData` hook in our component to get the `env` object.
-
-```jsx title=app/root.jsx
-const { env } = useLoaderData()
-```
-
-And then, add a `<script>` tag to attach these environment variables to the `window`. This should be placed immediately before the `<Scripts />` component in `app/root.jsx`
-
-```jsx title=app/root.jsx
-<script
-  dangerouslySetInnerHTML={{
-    __html: `window.env = ${JSON.stringify(env)}`,
-  }}
-/>
-```
-
-Full example for Node:
-
-```jsx title=app/root.jsx
-import { json } from '@remix-run/node' // change this import to whatever runtime you are using
-import {
-  Form,
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-} from '@remix-run/react'
-import { createBrowserClient, createServerClient } from '@supabase/auth-helpers-remix'
-
-export const meta = () => ({
-  charset: 'utf-8',
-  title: 'New Remix App',
-  viewport: 'width=device-width,initial-scale=1',
-})
-
-export const loader = () => {
-  const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
-  return json({
-    env: {
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    },
-  })
-}
-
-export default function App() {
-  const { env } = useLoaderData()
-
-  return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.env = ${JSON.stringify(env)}`,
-          }}
-        />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  )
-}
-```
-
-Now we can call `createBrowserClient` in our components to fetch data client-side, or subscribe to realtime events - changes in the database.
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-In order to use the Supabase client in the browser - fetching data in `useEffect` or subscribing to realtime events - we need to do a little more plumbing. Remix does not include a way to make environment variables available to the browser, so we need to pipe them through from a `loader` function in our `root.tsx` route and attach them to the `window`.
-
-```jsx title=app/root.tsx
-export const loader = () => {
-  const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
-  return json({
-    env: {
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    },
-  })
-}
-```
-
-> These may not be stored in `process.env` for environments other than Node.
-
-Next, we call the `useLoaderData` hook in our component to get the `env` object.
-
-```jsx title=app/root.tsx
-const { env } = useLoaderData()
-```
-
-And then, add a `<script>` tag to attach these environment variables to the `window`. This should be placed immediately before the `<Scripts />` component in `app/root.tsx`
-
-```jsx title=app/root.tsx
-<script
-  dangerouslySetInnerHTML={{
-    __html: `window.env = ${JSON.stringify(env)}`,
-  }}
-/>
-```
-
-Full example for Node:
-
-```jsx title=app/root.tsx
-import { json, MetaFunction, LoaderFunction } from '@remix-run/node' // change this import to whatever runtime you are using
-import {
-  Form,
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-} from '@remix-run/react'
-import { createBrowserClient, createServerClient } from '@supabase/auth-helpers-remix'
-
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'New Remix App',
-  viewport: 'width=device-width,initial-scale=1',
-})
-
-export const loader: LoaderFunction = () => {
-  const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env
-  return json({
-    env: {
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-    },
-  })
-}
-
-export default function App() {
-  const { env } = useLoaderData()
-
-  return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.env = ${JSON.stringify(env)}`,
-          }}
-        />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  )
-}
-```
-
-Now we can call `createBrowserClient` in our components to fetch data client-side, or subscribe to realtime events - changes in the database.
-
-</TabPanel>
-</Tabs>
-
-## Authentication
-
-Now that authentication is based on cookies, users can sign in and out server-side with actions.
-
-Given this Remix `<Form />` component.
-
-```jsx
-<Form method="post">
-  <input type="text" name="email" />
-  <input type="password" name="password" />
-  <button type="submit">Go!</button>
-</Form>
-```
-
-### Signing Up
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
->
-<TabPanel id="js" label="JavaScript">
-
-Any of the [supported authentication strategies from `supabase-js`](/docs/reference/javascript/auth-signup) will work server-side. This is how you would handle simple `email` and `password` auth.
-
-```jsx
-export const action = async ({ request }) => {
-  const { email, password } = Object.fromEntries(await request.formData())
-  const response = new Response()
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    { request, response }
-  )
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-  })
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { data, error },
-    {
-      headers: response.headers,
-    }
-  )
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-Any of the [supported authentication strategies from `supabase-js`](/docs/reference/javascript/auth-signup) will work server-side. This is how you would handle simple `email` and `password` auth.
-
-```jsx
-export const action: ActionFunction = async ({
-  request
-}: {
-  request: Request;
-}) => {
-  const { email, password } = Object.fromEntries(await request.formData());
-  const response = new Response();
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: String(registerEmail),
-    password: String(registerPassword)
-  });
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { data, error },
-    {
-      headers: response.headers
-    }
-  );
-};
-```
-
-</TabPanel>
-</Tabs>
-
-### Login
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
->
-<TabPanel id="js" label="JavaScript">
-
-Any of the [supported authentication strategies from `supabase-js`](/docs/reference/javascript/auth-signinwithpassword) will work server-side. This is how you would handle simple `email` and `password` auth.
-
-```jsx
-export const action = async ({ request }) => {
-  const { email, password } = Object.fromEntries(await request.formData())
-  const response = new Response()
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    { request, response }
-  )
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: String(loginEmail),
-    password: String(loginPassword),
-  })
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { data, error },
-    {
-      headers: response.headers,
-    }
-  )
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-Any of the [supported authentication strategies from `supabase-js`](/docs/reference/javascript/auth-signinwithpassword) will work server-side. This is how you would handle simple `email` and `password` auth.
-
-```jsx
-export const action: ActionFunction = async ({
-  request
-}: {
-  request: Request;
-}) => {
-  const { email, password } = Object.fromEntries(await request.formData());
-  const response = new Response();
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: String(loginEmail),
-    password: String(loginPassword)
-  });
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { data, error },
-    {
-      headers: response.headers
-    }
-  );
-};
-```
-
-</TabPanel>
-</Tabs>
-
-### Logout
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
->
-<TabPanel id="js" label="JavaScript">
-
-```jsx
-export const action = async ({ request }) => {
-  const { email, password } = Object.fromEntries(await request.formData())
-  const response = new Response()
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    { request, response }
-  )
-
-  const { error } = await supabaseClient.auth.signOut()
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { error },
-    {
-      headers: response.headers,
-    }
-  )
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```jsx
-export const action: ActionFunction = async ({
-  request
-}: {
-  request: Request;
-}) => {
-  const { email, password } = Object.fromEntries(await request.formData());
-  const response = new Response();
-
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
-  const { error } = await supabaseClient.auth.signOut();
-
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { error },
-    {
-      headers: response.headers
-    }
-  );
-};
-```
-
-</TabPanel>
-</Tabs>
-
-## Subscribe to realtime events
-
-```jsx
-import { createBrowserClient } from '@supabase/auth-helpers-remix'
-import { useState, useEffect } from 'react'
-
-export default function SubscribeToRealtime() {
-  const [data, setData] = useState([])
-
-  useEffect(() => {
-    const supabaseClient = createBrowserClient(
-      window.env.SUPABASE_URL,
-      window.env.SUPABASE_ANON_KEY
-    )
-    const channel = supabaseClient
-      .channel('test')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'test' }, (payload) => {
-        setData((data) => [...data, payload.new])
-      })
-      .subscribe()
-
-    return () => {
-      supabaseClient.removeChannel(channel)
-    }
-  }, [session])
-
-  return <pre>{JSON.stringify({ data }, null, 2)}</pre>
-}
-```
-
-> Note: `window.env` is not automatically populated by Remix. Check out the "Client-side" instructions above to configure this.
-
-In this example we are listening to `INSERT` events on the `test` table. Anytime new rows are added to Supabase's `test` table, our UI will automatically update new data.
-
-## Merge server and client state on realtime events
-
-```jsx
-import { json, LoaderFunction } from '@remix-run/node';
-import { useLoaderData, useNavigate } from '@remix-run/react';
-import {
-  createServerClient,
-  createBrowserClient
-} from '@supabase/auth-helpers-remix';
-import { useEffect } from 'react';
-import { Database } from '../../db_types';
-
-// this route demonstrates how to subscribe to realtime updates
-// and synchronize data between server and client
-export const loader: LoaderFunction = async ({
-  request
-}: {
-  request: Request;
-}) => {
-  const response = new Response();
-  const supabaseClient = createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
-  const {
-    data: { session }
-  } = await supabaseClient.auth.getSession();
-
-  const { data, error } = await supabaseClient.from('test').select('*');
-
-  if (error) {
-    throw error;
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
   }
 
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
-  return json(
-    { data, session },
-    {
-      headers: response.headers
-    }
-  );
-};
-
-export default function SubscribeToRealtime() {
-  const { data, session } = useLoaderData();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Note: window.env is not automatically populated by Remix
-    // Check out the [example in this repo](../root.tsx) or
-    // [Remix docs](https://remix.run/docs/en/v1/guides/envvars#browser-environment-variables) for more info
-    const supabaseClient = createBrowserClient<Database>(
-      window.env.SUPABASE_URL,
-      window.env.SUPABASE_ANON_KEY
-    );
-    // make sure you have enabled `Replication` for your table to receive realtime events
-    // https://supabase.com/docs/guides/database/replication
-    const channel = supabaseClient
-      .channel('test')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'test' },
-        (payload: any) => {
-          // you could manually merge the `payload` with `data` here
-          // the `navigate` trick below causes all active loaders to be called again
-          // this handles inserts, updates and deletes, keeping everything in sync
-          // which feels more remix-y than manually merging state
-          // https://sergiodxa.com/articles/automatic-revalidation-in-remix
-          navigate('.', { replace: true });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabaseClient.removeChannel(channel);
-    };
-  }, [session]);
-
-  return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      <pre>{JSON.stringify({ data }, null, 2)}</pre>
-    </div>
-  );
+  return json({ env })
 }
 ```
 
-> Note: `window.env` is not automatically populated by Remix. Check out the "Client-side" instructions above to configure this.
+> These may not be stored in `process.env` for environments other than Node.
 
-## Usage with TypeScript
+Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the `createServerClient` or `createBrowserClient` functions to get enhanced type safety and auto completion:
+```jsx title=app/root.jsx
+const { env } = useLoaderData()
+```
 
-### Server-side
+We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
 
-```ts
-import { createServerClient } from '@supabase/auth-helpers-remix'
-import { Database } from '../../db_types'
+```jsx title=app/root.jsx
+const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
+```
 
-export const loader = async ({ request }) => {
-  const response = new Response()
+And then we can share this instance across our application with Outlet Context.
 
-  const supabaseClient = createServerClient<Database>(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    { request, response }
-  )
+```jsx title=app/root.jsx
+<Outlet context={{ supabase }} />
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/root.tsx
+export const loader = ({}: LoaderArgs) => {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  }
+
+  return json({ env })
 }
 ```
 
-### Client-side
+> These may not be stored in `process.env` for environments other than Node.
 
-```ts
-import { createBrowserClient } from '@supabase/auth-helpers-remix'
-import { Database } from '../../db_types'
+Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-const supabaseClient = createBrowserClient<Database>(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+```tsx title=app/root.tsx
+const { env } = useLoaderData<typeof loader>()
+```
+
+We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
+
+```tsx title=app/root.tsx
+const [supabase] = useState(() =>
+  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
 )
 ```
 
-## Server-side data fetching to OAuth APIs using `provider_token`
+And then we can share this instance across our application with Outlet Context.
 
-When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted in the auth cookie and can be accessed within the session object. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user.
+```tsx title=app/root.tsx
+<Outlet context={{ supabase }} />
+```
 
-```js
-import { json, LoaderFunction, redirect } from '@remix-run/node'; // change this import to whatever runtime you are using
-import { useLoaderData } from '@remix-run/react';
-import { createServerClient, User } from '@supabase/auth-helpers-remix';
-import { Database } from '../../db_types';
+</TabPanel>
+</Tabs>
 
-export const loader: LoaderFunction = async ({
-  request
-}: {
-  request: Request;
-}) => {
-  const response = new Response();
+### Syncing server and client state
 
-  const supabaseClient = createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
+Since authentication happens client-side, we need to tell Remix to re-call all active loaders when the user signs in or out.
 
-  const {
-    data: { session }
-  } = await supabaseClient.auth.getSession();
+Remix does this automatically when an action completes. Let's create an empty action.
 
-  if (!session) {
-    // there is no session, therefore, we are redirecting
-    // to the landing page. we still need to return
-    // response.headers to attach the set-cookie header
-    return redirect('/', {
-      headers: response.headers
-    });
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/routes/handle-supabase-auth.jsx
+export const action = () => null
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/routes/handle-supabase-auth.tsx
+export const action = () => null
+```
+
+</TabPanel>
+
+</Tabs>
+
+Now to determine when to submit a post request to this action, we need to compare the server and client state for the user's access token.
+
+Let's pipe that through from our loader.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/root.jsx
+export const loader = async ({ request }) => {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
   }
 
-  // Retrieve provider_token & logged in user's third-party id from metadata
-  const { provider_token, user } = session;
-  const userId = user.user_metadata.user_name;
+  const response = new Response()
 
-  const allRepos = await (
-    await fetch(`https://api.github.com/search/repositories?q=user:${userId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `token ${provider_token}`
-      }
-    })
-  ).json();
+  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    request,
+    response,
+  })
 
-  // in order for the set-cookie header to be set,
-  // headers must be returned as part of the loader response
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
   return json(
-    { user, allRepos },
     {
-      headers: response.headers
+      env,
+      session,
+    },
+    {
+      headers: response.headers,
     }
-  );
-};
-
-export default function ProtectedPage() {
-  // by fetching the user in the loader, we ensure it is available
-  // for first SSR render - no flashing of incorrect state
-  const { user, allRepos } = useLoaderData<{ user: User; allRepos: any }>();
-
-  return <pre>{JSON.stringify({ user, allRepos }, null, 2)}</pre>;
+  )
 }
 ```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/root.tsx
+export const loader = async ({ request }: LoaderArgs) => {
+  const env = {
+    SUPABASE_URL: process.env.SUPABASE_URL!,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+  }
+
+  const response = new Response()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    request,
+    response,
+  })
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return json(
+    {
+      env,
+      session,
+    },
+    {
+      headers: response.headers,
+    }
+  )
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+And then use a `fetcher` to simulate submitting a form to our action, inside the `onAuthStateChange` hook.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/root.jsx
+const { env, session } = useLoaderData()
+const fetcher = useFetcher()
+
+const [supabase] = useState(() =>
+  createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+)
+
+const serverAccessToken = session?.access_token
+
+useEffect(() => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.access_token !== serverAccessToken) {
+      // server and client are out of sync.
+      // Remix recalls active loaders after actions complete
+      fetcher.submit(null, {
+        method: 'post',
+        action: '/handle-supabase-auth',
+      })
+    }
+  })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [serverAccessToken, supabase, fetcher])
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/root.tsx
+const { env, session } = useLoaderData<typeof loader>()
+const fetcher = useFetcher()
+
+const [supabase] = useState(() =>
+  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+)
+
+const serverAccessToken = session?.access_token
+
+useEffect(() => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.access_token !== serverAccessToken) {
+      // server and client are out of sync.
+      // Remix recalls active loaders after actions complete
+      fetcher.submit(null, {
+        method: 'post',
+        action: '/handle-supabase-auth',
+      })
+    }
+  })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [serverAccessToken, supabase, fetcher])
+```
+
+</TabPanel>
+
+</Tabs>
+
+> Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for full implementation example
+
+### Authentication
+
+Now we can use our outlet context to access our single instance of Supabase and use any of the [supported authentication strategies from `supabase-js`](/docs/reference/javascript/auth-signup).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/components/login.jsx
+export default function Login() {
+  const { supabase } = useOutletContext()
+
+  const handleEmailLogin = async () => {
+    await supabase.auth.signInWithPassword({
+      email: 'jon@supabase.com',
+      password: 'password',
+    })
+  }
+
+  const handleGitHubLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    })
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
+
+  return (
+    <>
+      <button onClick={handleEmailLogin}>Email Login</button>
+      <button onClick={handleGitHubLogin}>GitHub Login</button>
+      <button onClick={handleLogout}>Logout</button>
+    </>
+  )
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/components/login.tsx
+export default function Login() {
+  const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>()
+
+  const handleEmailLogin = async () => {
+    await supabase.auth.signInWithPassword({
+      email: 'jon@supabase.com',
+      password: 'password',
+    })
+  }
+
+  const handleGitHubLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    })
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
+
+  return (
+    <>
+      <button onClick={handleEmailLogin}>Email Login</button>
+      <button onClick={handleGitHubLogin}>GitHub Login</button>
+      <button onClick={handleLogout}>Logout</button>
+    </>
+  )
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+### Subscribe to realtime events
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/routes/realtime.jsx
+import { useLoaderData, useOutletContext } from '@remix-run/react'
+import { createServerClient } from '@supabase/auth-helpers-remix'
+import { json } from '@remix-run/node'
+import { useEffect, useState } from 'react'
+
+export const loader = async ({ request }) => {
+  const response = new Response()
+  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    request,
+    response,
+  })
+
+  const { data } = await supabase.from('posts').select()
+
+  return json({ serverPosts: data ?? [] }, { headers: response.headers })
+}
+
+export default function Index() {
+  const { serverPosts } = useLoaderData()
+  const [posts, setPosts] = useState(serverPosts)
+  const { supabase } = useOutletContext()
+
+  useEffect(() => {
+    setPosts(serverPosts)
+  }, [serverPosts])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('*')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>
+        setPosts([...posts, payload.new])
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, posts, setPosts])
+
+  return <pre>{JSON.stringify(posts, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/routes/realtime.tsx
+import { useLoaderData, useOutletContext } from '@remix-run/react'
+import { createServerClient } from '@supabase/auth-helpers-remix'
+import { json } from '@remix-run/node'
+import { useEffect, useState } from 'react'
+
+import type { SupabaseClient } from '@supabase/auth-helpers-remix'
+import type { Database } from 'db_types'
+
+type Post = Database['public']['Tables']['posts']['Row']
+
+import type { LoaderArgs } from '@remix-run/node'
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const response = new Response()
+  const supabase = createServerClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    {
+      request,
+      response,
+    }
+  )
+
+  const { data } = await supabase.from('posts').select()
+
+  return json({ serverPosts: data ?? [] }, { headers: response.headers })
+}
+
+export default function Index() {
+  const { serverPosts } = useLoaderData<typeof loader>()
+  const [posts, setPosts] = useState(serverPosts)
+  const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>()
+
+  useEffect(() => {
+    setPosts(serverPosts)
+  }, [serverPosts])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('*')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>
+        setPosts([...posts, payload.new as Post])
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, posts, setPosts])
+
+  return <pre>{JSON.stringify(posts, null, 2)}</pre>
+}
+```
+
+> `Database` is a TypeScript definitions file [generated by the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types).
+
+</TabPanel>
+
+</Tabs>
+
+> Ensure you have [enabled replication](https://app.supabase.com/project/_/database/replication) on the table you are subscribing to.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
