@@ -7,8 +7,10 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
 import { memo, useEffect } from 'react'
+import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { IS_PLATFORM } from '~/lib/constants'
 
 const levelsData = {
   home: {
@@ -29,7 +31,7 @@ const levelsData = {
   },
   functions: {
     icon: '/docs/img/icons/menu/functions',
-    name: 'Functions',
+    name: 'Edge Functions',
   },
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
@@ -38,6 +40,10 @@ const levelsData = {
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
+  },
+  supabase_cli: {
+    icon: '/docs/img/icons/menu/reference-cli',
+    name: 'Supabase CLI',
   },
   platform: {
     icon: '/docs/img/icons/menu/platform',
@@ -70,6 +76,14 @@ const levelsData = {
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
     name: 'Dart Reference v0.0',
+  },
+  reference_csharp_v0: {
+    icon: '/docs/img/icons/menu/reference-csharp',
+    name: 'C# Reference v0.0',
+  },
+  reference_python_v2: {
+    icon: '/docs/img/icons/menu/reference-python',
+    name: 'Python Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -322,11 +336,13 @@ const SiteLayout = ({ children }) => {
           </div>
           <div className="grow px-5 max-w-7xl mx-auto py-16">
             {children}
-            <FooterHelpCallout />
             <Footer />
           </div>
           <MobileMenuBackdrop />
         </Container>
+        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
+          {IS_PLATFORM && <Clippy />}
+        </div>
       </div>
     </main>
   )

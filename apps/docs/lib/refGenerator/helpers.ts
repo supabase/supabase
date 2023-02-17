@@ -218,6 +218,12 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
   operationId: string
   operation: string
   responseList: []
+  description?: string
+  parameters?: []
+  responses?: {}
+  security?: []
+  summary?: string
+  tags?: []
 }
 
 export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {

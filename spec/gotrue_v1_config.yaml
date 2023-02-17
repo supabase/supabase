@@ -40,7 +40,7 @@ parameters:
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     required: true
     description: |
-     The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
   - id: 'GOTRUE_URI_ALLOW_LIST' # {string} A unique identifier for this param.
     title: 'auth.additional_redirect_urls' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters

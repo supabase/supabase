@@ -15,6 +15,7 @@ const CliGlobalFlagsHandler = () => {
             return (
               <Param
                 {...flag}
+                id={`${spec.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
               ></Param>
             )

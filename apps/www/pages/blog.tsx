@@ -19,16 +19,23 @@ export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
-  // @ts-ignore
-  const planetPgPosts = allPostsData.filter((post) => post.tags.includes('planetpg'))
-  const planetPgrss = generateRss(planetPgPosts)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
 
-  // create separate feed for just posts promoted in PlanetPG
-  fs.writeFileSync('./public/planetpg-rss.xml', planetPgrss)
+  // generate a series of rss feeds for each author (for PlanetPG)
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
+  const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
+
+  uniquePlanetPgAuthors.forEach((author) => {
+    const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
+    if (authorPosts.length > 0) {
+      const authorRss = generateRss(authorPosts, author)
+      fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
+    }
+  })
 
   return {
     props: {
@@ -93,6 +100,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
         <div className="overflow-hidden py-12">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
@@ -158,6 +166,7 @@ function FeaturedThumb(blog: PostTypes) {
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
               objectFit="cover"
+              alt="blog thumbnail"
             />
           </div>
           <div className="flex flex-col space-y-2">
