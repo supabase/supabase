@@ -732,7 +732,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
 })
 
 const InputDefinition: FC = observer(({}) => {
-  const _localState = useContext(CreateFunctionContext)
+  const _localState = useContext(CreateFunctionContext) as CreateFunctionStore
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
@@ -740,9 +740,11 @@ const InputDefinition: FC = observer(({}) => {
         <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
-        <p className="text-sm text-scale-1100">
-          Change the language in the Advanced Settings below.
-        </p>
+        {!_localState.isEditing && (
+          <p className="text-sm text-scale-1100">
+            Change the language in the Advanced Settings below.
+          </p>
+        )}
       </div>
       <div className="h-40 border dark:border-dark">
         <SqlEditor
