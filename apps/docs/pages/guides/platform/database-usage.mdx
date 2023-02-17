@@ -40,7 +40,11 @@ For [disk auto-scaling](paid-tier-disk-auto-scaling), and avoid your database en
 Pro and Enterprise have disk auto-scaling. Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB).
 Auto-scaling can only take place once every 6 hours.
 
+<Admonition type="caution">
+
 If you intend to import a lot of data into your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new), otherwise your project might enter a ['read-only' mode](#paid-tier-project-read-only-mode).
+
+</Admonition>
 
 If you need more than 1024TB of disk size or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
