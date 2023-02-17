@@ -1,11 +1,8 @@
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,
-  Area,
   XAxis,
-  YAxis,
   Tooltip,
-  ResponsiveContainer,
   Bar,
   Cell,
 } from 'recharts'
