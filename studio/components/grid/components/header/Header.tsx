@@ -222,14 +222,14 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           try {
             if (filters.length === 0) {
               await truncateRows({
-                projectRef: project?.ref,
-                connectionString: project?.connectionString,
+                projectRef: project.ref,
+                connectionString: project.connectionString,
                 table,
               })
             } else {
               await deleteAllRows({
-                projectRef: project?.ref,
-                connectionString: project?.connectionString,
+                projectRef: project.ref,
+                connectionString: project.connectionString,
                 table,
                 filters,
               })

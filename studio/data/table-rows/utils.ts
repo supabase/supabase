@@ -1,4 +1,5 @@
-import { Filter, SupaTable } from 'components/grid'
+import { Filter, ServiceError, SupaTable } from 'components/grid'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { isNumericalColumn } from 'components/grid/utils'
 
 /**
@@ -13,4 +14,15 @@ export function formatFilterValue(table: SupaTable, filter: Filter) {
     else return Number(filter.value)
   }
   return filter.value
+}
+
+export function getPrimaryKeys({ table }: { table: SupaTable }): {
+  primaryKeys?: string[]
+  error?: ServiceError
+} {
+  const pkColumns = table.columns.filter((x) => x.isPrimaryKey)
+  if (!pkColumns || pkColumns.length == 0) {
+    return { error: { message: ERROR_PRIMARY_KEY_NOTFOUND } }
+  }
+  return { primaryKeys: pkColumns.map((x) => x.name) }
 }

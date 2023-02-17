@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { Query, ServiceError, SupaRow, SupaTable } from 'components/grid'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import { Query, SupaRow, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { getPrimaryKeys } from './utils'
 
 export type TableRowDeleteVariables = {
   projectRef: string
@@ -67,15 +67,4 @@ export const useTableRowDeleteMutation = ({
       ...options,
     }
   )
-}
-
-function getPrimaryKeys({ table }: { table: SupaTable }): {
-  primaryKeys?: string[]
-  error?: ServiceError
-} {
-  const pkColumns = table.columns.filter((x) => x.isPrimaryKey)
-  if (!pkColumns || pkColumns.length == 0) {
-    return { error: { message: ERROR_PRIMARY_KEY_NOTFOUND } }
-  }
-  return { primaryKeys: pkColumns.map((x) => x.name) }
 }

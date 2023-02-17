@@ -67,8 +67,7 @@ const SidePanelEditor: FC<Props> = ({
     onComplete: Function
   ) => {
     if (!project || selectedTable === undefined) {
-      // TODO(alaister): should we have an error state here?
-      return
+      return console.error('no project or table selected')
     }
 
     let saveRowError = false
