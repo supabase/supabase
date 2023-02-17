@@ -33,6 +33,7 @@ export const BarChart = () => (
       { title: 'Value format', props: { format: 'c' } },
       { title: 'Minimal Value format', props: { minimalHeader: true, format: 'c' } },
       { title: 'No data', props: { data: [] } },
+      { title: 'onBarClick', props: { onBarClick: console.log } },
     ].map(({ title, props }) => (
       <div className="w-72 h-72">
         <ExampleName>{title}</ExampleName>
