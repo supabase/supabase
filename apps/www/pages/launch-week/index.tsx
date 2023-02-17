@@ -200,7 +200,7 @@ export default function launchweek() {
             <div className="flex justify-center">
               <img
                 src={`/images/launchweek/${
-                  isDarkMode ? 'launchweek-logo--dark.svg' : 'launchweek-logo--lights.svg'
+                  isDarkMode ? 'launchweek-logo--dark.svg' : 'launchweek-logo--light.svg'
                 }`}
                 className="flex w-40 lg:w-80"
                 alt="Launch Week logo"
