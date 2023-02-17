@@ -1,7 +1,7 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
-import { Filter, Query, SupaRow, SupaTable } from 'components/grid'
-import { isNumericalColumn } from 'components/grid/utils'
+import { Filter, Query, SupaTable } from 'components/grid'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { formatFilterValue } from './utils'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -82,18 +82,4 @@ export const useTableRowsCountPrefetch = ({
       { table: { name: table?.name, schema: table?.schema }, ...args },
     ],
   })
-}
-
-/**
- * temporary fix until we implement a better filter UI
- * which validate input value base on the column type
- */
-function formatFilterValue(table: SupaTable, filter: Filter) {
-  const column = table.columns.find((x) => x.name == filter.column)
-  if (column && isNumericalColumn(column.format)) {
-    const numberValue = Number(filter.value)
-    if (Number.isNaN(numberValue)) return filter.value
-    else return Number(filter.value)
-  }
-  return filter.value
 }

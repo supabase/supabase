@@ -28,13 +28,12 @@ const RowContextMenu = ({ table }: RowContextMenuProps) => {
         const { props } = p
         const { rowIdx } = props
         const row = state.rows[rowIdx]
-        if (!row) return
-        if (!project) return
+        if (!row || !project) return
 
         try {
           await deleteRows({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
+            projectRef: project.ref,
+            connectionString: project.connectionString,
             table,
             rows: [row],
           })
