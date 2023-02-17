@@ -15,7 +15,7 @@ export const renderTotalRequests = (
       size="small"
       minimalHeader
       highlightedValue={total}
-      className="w-full h-36"
+      className="w-full h-42"
       data={props.data}
       yAxisKey="count"
       xAxisKey="timestamp"
@@ -38,7 +38,7 @@ export const renderErrorCounts = (
       size="small"
       minimalHeader
       highlightedValue={total}
-      className="w-full h-36"
+      className="w-full h-42"
       data={props.data}
       yAxisKey="count"
       xAxisKey="timestamp"
@@ -66,7 +66,7 @@ export const renderResponseSpeed = (
       highlightedValue={lastAvg}
       format="ms"
       minimalHeader
-      className="w-full h-36"
+      className="w-full h-42"
       data={transformedData}
       yAxisKey="avg"
       xAxisKey="timestamp"
