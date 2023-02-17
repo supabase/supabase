@@ -91,7 +91,7 @@ Make sure you _NEVER_ expose this publicly. But it can be used on the server-sid
 
 Users can pass in metadata on sign up. User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table.
 
-Here's an example of how to add metadata fields on signup: 
+Here's an example of how to add metadata fields on signup:
 
 ```
 const { data, error } = await supabase.auth.signUp(
@@ -111,7 +111,9 @@ const { data, error } = await supabase.auth.signUp(
 To view the metadata:
 
 ```js
-const { data: { user } } = await supabase.auth.getUser()
+const {
+  data: { user },
+} = await supabase.auth.getUser()
 let metadata = user.user_metadata
 ```
 
