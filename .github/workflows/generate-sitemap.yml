@@ -1,0 +1,55 @@
+name: Generate Sitemap
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+        working-directory: ./
+
+      - name: Build www sitemap
+        run: npm run build
+        working-directory: ./apps/www
+
+      - name: Build docs sitemap
+        run: npm run build
+        working-directory: ./apps/docs
+
+      - name: Show working directory
+        run: git status
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: |
+            apps/www/**/*.xml
+            apps/docs/**/*.xml
+          base:
+            master
+          title:
+            Generate Sitemap
+          branch:
+            generate-sitemap
+          commit-message:
+            'docs: generate sitemap'
+

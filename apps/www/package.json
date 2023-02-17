@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next --port 3000",
     "build": "next build",
+    "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "export": "next export",
     "start": "next start",
     "typecheck": "tsc",
