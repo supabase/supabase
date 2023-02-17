@@ -1,0 +1,4 @@
+.graphiqlContainer .graphiqlSessions {
+  margin-left: var(--px-16);
+  margin-right: 0;
+}
