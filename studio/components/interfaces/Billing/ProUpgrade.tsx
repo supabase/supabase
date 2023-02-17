@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -50,8 +50,6 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
-  const isCustomDomainsEnabled = useFlag('customDomains')
-  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -177,6 +175,7 @@ const ProUpgrade: FC<Props> = ({
   }
 
   const onConfirmPayment = async () => {
+    setIsSubmitting(true)
     const payload = formSubscriptionUpdatePayload(
       currentSubscription,
       selectedTier,
@@ -231,13 +230,13 @@ const ProUpgrade: FC<Props> = ({
       >
         <div className="flex-grow mt-10">
           <div className="relative space-y-4">
-            <div className="px-32 mx-auto space-y-4 2xl:min-w-5xl">
+            <div className="relative px-32 mx-auto space-y-4 2xl:max-w-5xl">
               <BackButton onClick={() => onSelectBack()} />
               <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
             </div>
 
             <div
-              className="px-32 pb-8 mx-auto space-y-8 overflow-y-auto 2xl:min-w-5xl"
+              className="px-32 pb-8 mx-auto space-y-8 overflow-y-auto 2xl:max-w-5xl"
               style={{ height: 'calc(100vh - 9rem - 57px)' }}
             >
               <div className="space-y-2">
@@ -289,32 +288,24 @@ const ProUpgrade: FC<Props> = ({
                       <SupportPlan currentOption={currentAddons.supportPlan} />
                     </>
                   )}
-                  {isCustomDomainsEnabled && customDomainOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <CustomDomainSelection
-                        options={customDomainOptions}
-                        currentOption={
-                          isManagingProSubscription ? currentAddons.customDomains : undefined
-                        }
-                        selectedOption={selectedAddons.customDomains}
-                        onSelectOption={setSelectedCustomDomainOption}
-                      />
-                    </>
-                  )}
-                  {isPITRSelfServeEnabled && pitrDurationOptions.length > 0 && (
-                    <>
-                      <Divider light />
-                      <PITRDurationSelection
-                        pitrDurationOptions={pitrDurationOptions}
-                        currentPitrDuration={
-                          isManagingProSubscription ? currentAddons.pitrDuration : undefined
-                        }
-                        selectedPitrDuration={selectedAddons.pitrDuration}
-                        onSelectOption={setSelectedPITRDuration}
-                      />
-                    </>
-                  )}
+                  <Divider light />
+                  <CustomDomainSelection
+                    options={customDomainOptions}
+                    currentOption={
+                      isManagingProSubscription ? currentAddons.customDomains : undefined
+                    }
+                    selectedOption={selectedAddons.customDomains}
+                    onSelectOption={setSelectedCustomDomainOption}
+                  />
+                  <Divider light />
+                  <PITRDurationSelection
+                    pitrDurationOptions={pitrDurationOptions}
+                    currentPitrDuration={
+                      isManagingProSubscription ? currentAddons.pitrDuration : undefined
+                    }
+                    selectedPitrDuration={selectedAddons.pitrDuration}
+                    onSelectOption={setSelectedPITRDuration}
+                  />
                   <Divider light />
                   <ComputeSizeSelection
                     computeSizes={computeSizes || []}
@@ -403,7 +394,7 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Database space</p>
+                    <p className="w-[50%] text-sm">Database size</p>
                     <p className="w-[25%] text-sm">8GB</p>
                     <p className="w-[25%] text-sm">$0.125/GB</p>
                   </div>

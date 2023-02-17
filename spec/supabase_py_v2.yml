@@ -1,0 +1,504 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-py
+  title: Supabase Client
+  description: |
+
+    Supabase Python(Community).
+
+  definition: ../../spec/enrichments/tsdoc_v2/combined.json
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_py_v2.yml
+  slugPrefix: '/'
+  libraries:
+    - name: 'Python'
+      id: 'py'
+      version: '0.0.1'
+
+functions:
+  - id: initializing
+    description: |
+      You can initialize a new Supabase client using the `create_client()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: create-client
+        name: create_client()
+        code: |
+          ```
+          import os
+          from supabase import create_client, Client
+
+          url: str = os.environ.get("SUPABASE_URL")
+          key: str = os.environ.get("SUPABASE_KEY")
+          supabase: Client = create_client(url, key)
+          ```
+      - id: with-timeout-option
+        name: With timeout option
+        code: |
+          ```
+          import os
+          from supabase import create_client, Client
+
+          url: str = os.environ.get("SUPABASE_URL")
+          key: str = os.environ.get("SUPABASE_KEY")
+          supabase: Client = create_client(url, key, options={'timeout': 10})
+          ```
+
+  - id: sign-up
+    title: 'sign_up()'
+    notes: |
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - **Confirm email** determines if users need to confirm their email address after signing up.
+        - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+        - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - If sign_up() is called for an existing confirmed user:
+          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
+    examples:
+      - id: signup
+        name: Sign up
+        code: |
+          ```
+          res = supabase.auth.sign_up({
+            "email": 'example@email.com',
+            "password": 'example-password',
+          })
+          ```
+      - id: sign-up-with-additional-user-metadata
+        name: Sign up with additional user metadata
+        code: |
+          ```
+          res = supabase.auth.sign_up({
+            "email": 'example@email.com',
+            "password": 'example-password',
+            "options": {
+              "data": {
+                "first_name": 'John',
+                "age": 27,
+              }
+            }
+          })
+          ```
+  - id: sign-in-with-password
+    title: 'sign_in_with_password'
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - id: sign-in-with-email-and-password
+        name: Sign in with email and password
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+          ```
+      - id: sign-in-with-phone-and-password
+        name: Sign in with phone and password
+        isSpotlight: false
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_password({"phone": "+1234566", password": "testsupabasenow"})
+          # After receiving a SMS with a OTP.
+          data = supabase.auth.verify_otp({
+            "phone": '+13334445555',
+            "token": '123456',
+          })
+          ```
+  - id: sign-in-with-otp
+    title: 'sign_in_with_otp'
+    notes: |
+      - Requires either an email or phone number.
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If the user doesn't exist, `sign_in_with_otp()` will signup the user instead. To restrict this behavior, you can set `should_create_user` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+    examples:
+      - id: sign-in-with-email
+        name: Sign in with email
+        isSpotlight: true
+        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_otp({
+            "email": 'example@email.com',
+            "options": {
+              "email_redirect_to": 'https://example.com/welcome'
+            }
+          })
+          ```
+      - id: sign-in-with-sms-otp
+        name: Sign in with SMS OTP
+        isSpotlight: false
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_otp({
+            phone: '+13334445555',
+          })
+          ```
+  - id: sign-in-with-oauth
+    title: 'sign_in_with_oauth'
+    notes: |
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    examples:
+      - id: sign-in-using-a-third-party-provider
+        name: Sign in using a third-party provider
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github'
+          })
+          ```
+      - id: sign-in-using-a-third-party-provider-with-redirect
+        name: Sign in using a third-party provider with redirect
+        isSpotlight: false
+        description: |
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github',
+            "options": {
+              "redirect_to": 'https://example.com/welcome'
+            }
+          })
+          ```
+      - id: sign-in-with-scopes
+        name: Sign in with scopes
+        isSpotlight: false
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
+        code: |
+          ```
+          data = supabase.auth.sign_in_with_oauth({
+            "provider": 'github',
+            "options": {
+              "scopes": 'repo gist notifications'
+            }
+          })
+          oauth_token = data.session.provider_token # use to access provider API
+          ```
+  - id: sign-out
+    title: 'sign_out()'
+    notes: |
+      - In order to use the `signOut()` method, the user needs to be signed in first.
+    examples:
+      - id: sign-out
+        name: Sign out
+        code: |
+          ```
+          res = supabase.auth.sign_out()
+          ```
+  - id: verify-otp
+    title: 'verify_otp'
+    notes: |
+      - The `verify_otp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verify_otp` to sign up / sign-in a user.
+    examples:
+      - id: verify-sms-one-time-password
+        name: Verify SMS One-Time Password (OTP)
+        code: |
+          ```
+          res = supabase.auth.verify_otp(phone, token)
+          ```
+  - id: get-user
+    title: 'get_user'
+    notes: |
+      - This method gets the user object from the current session.
+      - Fetches the user object from the database instead of local session.
+    examples:
+      - id: get-the-logged-in-user-with-the-current-existing-session
+        name: Get the logged in user with the current existing session
+        isSpotlight: true
+        code: |
+          ```
+          data = supabase.auth.get_user()
+          ```
+      - id: get-the-logged-in-user-with-a-custom-access-token-jwt
+        name: Get the logged in user with a custom access token jwt
+        isSpotlight: false
+        code: |
+          ```
+          data = supabase.auth.get_user(jwt)
+          ```
+
+  - id: get-session
+    title: 'get_session'
+    examples:
+      - id: get-session
+        name: Get the session data
+        code: |
+          ```
+          res = supabase.auth.get_session()
+          ```
+
+  - id: set-session
+    title: 'set_session()'
+    notes: |
+      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - The refresh token can only be used once to obtain a new session.
+      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
+    examples:
+      - id: set-session
+        name: Refresh the session
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        code: |
+          ```
+          res = supabase.auth.set_session({"access_token": access_token, "refresh_token": refresh_token)
+          ```
+  - id: refresh-session
+    title: 'refresh_session()'
+    notes: |
+      - This method will refresh the session whether the current one is expired or not.
+      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
+    examples:
+      - id: refresh-session
+        name: Refresh session using the current session
+        code: |
+          ```
+          res = supabase.auth.refresh_session()
+          ```
+  - id: select
+    title: 'Fetch data: select()'
+    notes: |
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    examples:
+      - id: getting-your-data
+        name: Getting your data
+        code: |
+          ```
+          r = supabase
+          .from('countries')
+          .select("*").execute()
+          ```
+      - id: selecting-specific-columns
+        name: Selecting specific columns
+        code: |
+          ```
+          r = await supabase
+          .from('countries')
+          .select('name').execute()
+          ```
+
+  - id: invoke
+    title: 'invoke()'
+    description: |
+      Invoke a Supabase Function.
+    notes: |
+      - Requires an Authorization header.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+    examples:
+      - id: invoke-function
+        name: Basic invocation
+        description:
+        code: |
+          ```
+          func = supabase.functions()
+          @asyncio.coroutine
+          async def test_func(loop):
+            resp = await func.invoke("hello-world",invoke_options={'body':{}})
+            return resp
+
+          loop = asyncio.get_event_loop()
+          resp = loop.run_until_complete(test_func(loop))
+          loop.close()
+          ```
+
+  - id: list-buckets
+    title: 'list_buckets()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: list-buckets
+        name: List buckets
+        code: |
+          ```
+          res = supabase.storage().list_buckets()
+          ```
+
+  - id: get-bucket
+    title: 'get_bucket()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: get-bucket
+        name: Get bucket
+        code: |
+          ```
+          res = supabase.storage().get_bucket(name)
+          ```
+
+  - id: create-bucket
+    title: 'create_bucket()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `insert`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-bucket
+        name: Create bucket
+        code: |
+          ```
+          res = supabase.storage().create_bucket(name)
+          ```
+
+  - id: empty-bucket
+    title: 'empty_bucket()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: `select` and `delete`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: empty-bucket
+        name: Empty bucket
+        code: |
+          ```
+          res = supabase.storage().empty_bucket(name)
+          ```
+  - id: delete-bucket
+    title: 'delete_bucket()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `delete`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: delete-bucket
+        name: Delete bucket
+        code: |
+          ```
+          res = supabase.storage().delete_bucket(name)
+          ```
+
+  - id: from-upload
+    title: 'from_.upload()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-file
+        name: Upload file using filepath
+        code: |
+          ```
+          with open(source, 'rb+') as f:
+            res = supabase.storage().from_('bucket').upload(destination, os.path.abspath(source))
+          ```
+  - id: from-move
+    title: 'from_.move()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: move-file
+        name: Move file
+        code: |
+          ```
+          res = supabase.storage().from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
+          ```
+
+  - id: from-create-signed-url
+    title: 'from_.create_signed_url()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        code: |
+          ```
+          res = supabase.storage().from_(bucket_name).create_signed_url(filepath, expiry_duration)
+          ```
+
+  - id: from-get-public-url
+    title: 'from_.get_public_url()'
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: get-public-url
+        name: Returns the URL for an asset in a public bucket
+        code: |
+          ```
+          res = supabase.storage().from_(bucket_name).get_public_url('test/avatar1.jpg')
+          ```
+
+  - id: from-download
+    title: 'from_.download()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: download-file
+        name: Download file
+        code: |
+          ```
+          with open(destination, 'wb+') as f:
+            res = supabase.storage().from_(bucket_name).download(source)
+            f.write(res)
+          ```
+
+  - id: from-remove
+    title: 'from_.remove()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `delete` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: delete-file
+        name: Delete file
+        code: |
+          ```
+          res = supabase.storage().from_('test').remove('test.jpg')
+          ```
+  - id: from-list
+    title: 'from_.list()'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: list-files
+        name: List files in a bucket
+        code: |
+          ```
+          res = supabase.storage().from_('test').list()
+          ```
+  - id: subscribe
+    title: on().subscribe()
+    notes: |
+      - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community) repository.

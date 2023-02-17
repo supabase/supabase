@@ -103,6 +103,7 @@ class QueryTab extends Tab {
       this.finishExecuting(undefined, response.error)
     } else {
       this.finishExecuting(response)
+      // TODO: missing ga props
       post(`${API_URL}/telemetry/event`, { category: 'sql_editor', action: 'sql_query_run' })
     }
   }
