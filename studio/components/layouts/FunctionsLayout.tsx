@@ -106,6 +106,26 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                       </h1>
                     </Link>
                     <p className="mt-1 text-scale-1000">Beta</p>
+                    {name && (
+                      <div className="mt-1.5 flex items-center space-x-4">
+                        <span className="text-scale-1000">
+                          <svg
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            fill="none"
+                            shapeRendering="geometricPrecision"
+                          >
+                            <path d="M16 3.549L7.12 20.600"></path>
+                          </svg>
+                        </span>
+                        <h5 className="text-lg text-scale-1200">{name}</h5>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -127,27 +147,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                     </Link>
                   </div>
                 </div>
-
-                {/* {name && (
-                  <>
-                    <span className="text-scale-800 dark:text-scale-700">
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="16"
-                        height="16"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                        shapeRendering="geometricPrecision"
-                      >
-                        <path d="M16 3.549L7.12 20.600"></path>
-                      </svg>
-                    </span>
-                    <h5 className="text-2xl text-scale-1200">{name}</h5>
-                  </>
-                )} */}
               </div>
             </div>
             {item && <FunctionsNav item={item} />}
