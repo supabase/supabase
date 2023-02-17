@@ -90,12 +90,6 @@ const BarChart: React.FC<BarChartProps> = ({
           }}
           onMouseLeave={() => setFocusDataIndex(null)}
         >
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0.8} />
-              <stop offset="95%" stopColor={CHART_COLORS.GREEN_1} stopOpacity={0} />
-            </linearGradient>
-          </defs>
           <XAxis
             dataKey={xAxisKey}
             interval={data.length - 2}
@@ -118,19 +112,15 @@ const BarChart: React.FC<BarChartProps> = ({
               <Cell
                 key={`cell-${index}`}
                 className={`transition-all duration-300 ${onDatumClick ? 'cursor-pointer' : ''}`}
-                fill={focusDataIndex !== index ? CHART_COLORS.GREEN_1 : CHART_COLORS.GREEN_2}
+                fill={
+                  focusDataIndex === index || focusDataIndex === null
+                    ? CHART_COLORS.GREEN_1
+                    : CHART_COLORS.GREEN_2
+                }
                 enableBackground={12}
               />
             ))}
           </Bar>
-
-          <Area
-            type="monotone"
-            dataKey={yAxisKey}
-            stroke={CHART_COLORS.GREEN_1}
-            fillOpacity={1}
-            fill="url(#colorUv)"
-          />
         </RechartBarChart>
       </Container>
       {data && (
