@@ -57,17 +57,18 @@ Regular operation (read-write mode) is automatically re-enabled once usage is be
 
 ### Increasing available disk size
 
-1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your quota and expand your disk size automatically.
+If your project is on the free tier, you can [Upgrade to the Pro or Enterprise tier](https://app.supabase.com/project/_/settings/billing/subscription) so that your disk size can start to [auto scale](#paid-tier-disk-auto-scaling) beyond 8GB.
 
-2. Delete data from your project's database to lower its disk usage.
-   If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
+For Free tier projects that do not wish to upgrade, or Pro tier projects that are nearing their disk size limit, you can increase available disk size by deleting data from your project's database to lower its disk usage.
 
-   ```sql
-   SET
-     default_transaction_read_only = 'off';
-   ```
+If your free tier project database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
 
-   This allows you to delete data from within the session.
+```sql
+SET
+  default_transaction_read_only = 'off';
+```
+
+This allows you to delete data from within the session.
 
 ### Preoccupied Space
 
