@@ -7,7 +7,7 @@ thumb: 2023-jan/semver-thumb.jpg
 tags:
   - postgres
   - planetpg
-date: '2023-01-25'
+date: '2023-02-17'
 toc_depth: 3
 ---
 
@@ -28,7 +28,7 @@ A (very) loose primer on SemVer:
 
 SemVer is a specification for representing software versions that communicate information about backwards compatibility. The type is typically represented as a string with 5 components.
 
-![image](/images/blog/2023-jan/semver-spec.png)
+![image](/images/blog/2023-jan/semver-spec.jpg)
 
 Where `pre-release` and `metadata` are optional.
 
@@ -205,8 +205,8 @@ from
 /*
 id | package_name |    package_semver
 -------------------------------------
- 1 | supabase-js, |         (2,2,3,,)
- 1 | supabase-js, | (2,0,0,"{rc,1}",)
+ 1 | supabase-js  |         (2,2,3,,)
+ 2 | supabase-js  | (2,0,0,"{rc,1}",)
 */
 ```
 
@@ -247,8 +247,8 @@ from
 /*
 id | package_name |   ver
 ------------------------------
- 1 | supabase-js, |      2.2.3
- 1 | supabase-js, | 2.0.0-rc.1
+ 1 | supabase-js  |      2.2.3
+ 2 | supabase-js  | 2.0.0-rc.1
 */
 ```
 
