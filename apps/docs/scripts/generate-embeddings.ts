@@ -109,6 +109,7 @@ type Meta = ReturnType<typeof extractMetaExport>
 
 type Section = {
   content: string
+  heading?: string
   slug?: string
 }
 
@@ -160,9 +161,14 @@ function processMdxForSearch(content: string): ProcessedMdx {
 
   const sections = sectionTrees.map((tree) => {
     const [firstNode] = tree.children
+
+    const heading = firstNode.type === 'heading' ? toString(firstNode) : undefined
+    const slug = heading ? slugger.slug(heading) : undefined
+
     return {
       content: toMarkdown(tree),
-      slug: firstNode.type === 'heading' ? slugger.slug(toString(firstNode)) : undefined,
+      heading,
+      slug,
     }
   })
 
@@ -340,7 +346,7 @@ async function generateEmbeddings() {
       }
 
       console.log(`Adding ${sections.length} page sections (with embeddings) for '${path}'`)
-      for (const { content, slug } of sections) {
+      for (const { slug, heading, content } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
         const input = content.replace(/\n/g, ' ')
 
@@ -364,6 +370,7 @@ async function generateEmbeddings() {
             .insert({
               page_id: page.id,
               slug,
+              heading,
               content,
               token_count: embeddingResponse.data.usage.total_tokens,
               embedding: responseData.embedding,
