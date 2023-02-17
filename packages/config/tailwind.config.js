@@ -12,6 +12,7 @@ module.exports = ui({
     './pages/**/*.{tsx,mdx}',
     './docs/**/*.{tsx,mdx}',
     './_blog/*.mdx',
+    '!./node_modules',
     // purge styles from supabase ui theme
   ],
   darkMode: 'class',

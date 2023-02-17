@@ -36,9 +36,8 @@ const constellation = [
 
 export default function launchweek() {
   const { isDarkMode } = useTheme()
-
-  const title = 'Launch Week 7'
-  const description = 'Supabase Launch Week 6 | 3-7 April 2023'
+  const title = 'Launch Week 6'
+  const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
 
   const [supabase] = useState(() =>
@@ -129,7 +128,7 @@ export default function launchweek() {
               Blog post
               <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                 <img
-                  src="/images/launchweek/icons-blogpost.svg"
+                  src="/images/launchweek/six/icons-blogpost.svg"
                   className="w-4 h-4"
                   alt="blog post icon"
                 />
@@ -144,7 +143,7 @@ export default function launchweek() {
                 Docs
                 <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                   <img
-                    src="/images/launchweek/icons-docs.svg"
+                    src="/images/launchweek/six/icons-docs.svg"
                     className="w-4 h-4"
                     alt="docs icon"
                   />
@@ -160,7 +159,7 @@ export default function launchweek() {
                 Video
                 <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                   <img
-                    src="/images/launchweek/video-icon.svg"
+                    src="/images/launchweek/six/video-icon.svg"
                     className="w-4 h-4"
                     alt="video icon"
                   />
@@ -184,7 +183,7 @@ export default function launchweek() {
           url: `https://supabase.com/launch-week`,
           images: [
             {
-              url: `${SITE_ORIGIN}/images/launchweek/launch-week-6.jpg`,
+              url: `${SITE_ORIGIN}/images/launchweek/six/launch-week-6.jpg`,
             },
           ],
         }}
@@ -198,15 +197,12 @@ export default function launchweek() {
               'flex flex-col justify-center gap-3'
             )}
           >
-            <h1 className="flex gap-[24px] justify-center font-normal uppercase text-[32px] items-center">
-              <span className="tracking-[4px]">Launch week</span>
-              <span className="flex justify-center items-center text-white text-[20px] font-bold w-10 h-10 px-2 bg-gradient-to-t from-[#76a8911c] to-[#CB88FF] rounded-lg">
-                7
-              </span>
-            </h1>
-            <p className="text-scale-1100 text-sm text-center">
-              April 13rd – 7th at 6 AM PT | 9 AM ET
-            </p>
+            <div className="flex justify-center">
+              <h1>
+                Launch Week <span>7</span>
+              </h1>
+            </div>
+            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
           </div>
         </SectionContainer>
         <div
@@ -243,7 +239,7 @@ export default function launchweek() {
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex min-w-[150px]">
                     <img
-                      src={`/images/launchweek/antcopplecall.png`}
+                      src={`/images/launchweek/six/antcopplecall.png`}
                       className="brightness-125"
                       alt="Ant & Copple"
                       width={120}
@@ -262,7 +258,7 @@ export default function launchweek() {
                         Watch video
                         <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                           <img
-                            src="/images/launchweek/video-icon.svg"
+                            src="/images/launchweek/six/video-icon.svg"
                             className="w-3 h-3"
                             alt="video icon"
                           />
@@ -276,7 +272,7 @@ export default function launchweek() {
                         Read blogpost
                         <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                           <img
-                            src="/images/launchweek/icons-blogpost.svg"
+                            src="/images/launchweek/six/icons-blogpost.svg"
                             className="w-3 h-3"
                             alt="blog post icon"
                           />
@@ -292,7 +288,7 @@ export default function launchweek() {
                 <div className="relative flex items-center mb-4 sm:mb-0">
                   <div className="flex min-w-[150px]">
                     <img
-                      src={`/images/launchweek/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
+                      src={`/images/launchweek/six/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
                       alt="Outro icon"
                       width={110}
                       height={80}
@@ -310,7 +306,7 @@ export default function launchweek() {
                         Read blogpost
                         <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                           <img
-                            src="/images/launchweek/icons-blogpost.svg"
+                            src="/images/launchweek/six/icons-blogpost.svg"
                             className="w-3 h-3"
                             alt="blog post icon"
                           />
@@ -363,7 +359,7 @@ export default function launchweek() {
                           }}
                         ></div>
                         <div
-                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:dark:bg-[url('/images/launchweek/docs-update-bg.png')] after:bg-[url('/images/launchweek/docs-update-bg-light.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
+                          className={`flex flex-col flex-1 items-center gap-5 lg:items-start lg:justify-between border rounded-xl h-full relative overflow-hidden after:opacity- after:absolute after:bg-no-repeat after:bg-[center_bottom] lg:after:bg-[right_15%_top_100px] xl:after:bg-[right_15%_top_60px] after:bg-[length:300px_180px] after:lg:bg-[length:450px_300px] after:xl:bg-[length:528px_367px] after:dark:bg-[url('/images/launchweek/six/docs-update-bg.png')] after:bg-[url('/images/launchweek/six/docs-update-bg-light.png')] after:top-0 after:right-0 after:bottom-0 after:left-0 p-14 text-2xl before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0 before:border-[#1f3536] before:-z-10 !px-3 sm:!px-14`}
                         >
                           <div className="flex items-center relative z-10 justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                             <span>{day1.description}</span>
@@ -400,7 +396,7 @@ export default function launchweek() {
                     {day2.steps.length > 0 && (
                       <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                         <div
-                          className={`relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center bg-no-repeat bg-[url('/images/launchweek/image-processing-bg-light-alt.png')] xs:bg-[url('/images/launchweek/image-processing-bg-light.png')] dark:bg-[url('/images/launchweek/image-processing-bg-alt.png')] xs:dark:bg-[url('/images/launchweek/image-processing-bg.png')] bg-[right_30px_top_35px] lg:bg-[top_25px_right_25px] bg-contain`}
+                          className={`relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center bg-no-repeat bg-[url('/images/launchweek/six/image-processing-bg-light-alt.png')] xs:bg-[url('/images/launchweek/six/image-processing-bg-light.png')] dark:bg-[url('/images/launchweek/six/image-processing-bg-alt.png')] xs:dark:bg-[url('/images/launchweek/six/image-processing-bg.png')] bg-[right_30px_top_35px] lg:bg-[top_25px_right_25px] bg-contain`}
                         >
                           <div
                             className="top-0 absolute group-hover/2:scale-105 opacity-60 group-hover/2:opacity-100 w-full h-full -z-10 transition-all duration-500"
@@ -419,7 +415,7 @@ export default function launchweek() {
                           <SectionButtons docs={day2.steps[0].docs} blog={day2.steps[0].blog} />
                         </div>
                         <div
-                          className={`relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/cdn-caching-bg-light.png')] dark:bg-[url('/images/launchweek/cdn-caching-bg.png')] bg-[top_170px_center] lg:bg-[center_bottom] bg-contain`}
+                          className={`relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-[url('/images/launchweek/six/cdn-caching-bg-light.png')] dark:bg-[url('/images/launchweek/six/cdn-caching-bg.png')] bg-[top_170px_center] lg:bg-[center_bottom] bg-contain`}
                         >
                           <div
                             className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
@@ -467,8 +463,8 @@ export default function launchweek() {
                             <Image
                               src={
                                 isDarkMode
-                                  ? '/images/launchweek/mfa-dark.png'
-                                  : '/images/launchweek/mfa-light.png'
+                                  ? '/images/launchweek/six/mfa-dark.png'
+                                  : '/images/launchweek/six/mfa-light.png'
                               }
                               alt="MFA"
                               layout="fill"
@@ -481,8 +477,8 @@ export default function launchweek() {
                             <Image
                               src={
                                 isDarkMode
-                                  ? '/images/launchweek/mfa-dark-hover.png'
-                                  : '/images/launchweek/mfa-light-hover.png'
+                                  ? '/images/launchweek/six/mfa-dark-hover.png'
+                                  : '/images/launchweek/six/mfa-light-hover.png'
                               }
                               alt="MFA"
                               layout="fill"
@@ -528,8 +524,8 @@ export default function launchweek() {
                             <Image
                               src={
                                 isDarkMode
-                                  ? '/images/launchweek/wrappers-visual.svg'
-                                  : '/images/launchweek/wrappers-visual-light.svg'
+                                  ? '/images/launchweek/six/wrappers-visual.svg'
+                                  : '/images/launchweek/six/wrappers-visual-light.svg'
                               }
                               alt="Wrappers"
                               layout="fill"
@@ -545,8 +541,8 @@ export default function launchweek() {
                             <Image
                               src={
                                 isDarkMode
-                                  ? '/images/launchweek/wrappers-visual-hover.svg'
-                                  : '/images/launchweek/wrappers-visual-hover-light.svg'
+                                  ? '/images/launchweek/six/wrappers-visual-hover.svg'
+                                  : '/images/launchweek/six/wrappers-visual-hover-light.svg'
                               }
                               alt="Wrappers"
                               layout="fill"
@@ -597,8 +593,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/vault-visual.svg'
-                                    : '/images/launchweek/vault-visual-light.svg'
+                                    ? '/images/launchweek/six/vault-visual.svg'
+                                    : '/images/launchweek/six/vault-visual-light.svg'
                                 }
                                 alt="Vault"
                                 layout="fill"
@@ -614,8 +610,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/vault-visual-hover.svg'
-                                    : '/images/launchweek/vault-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/vault-visual-hover.svg'
+                                    : '/images/launchweek/six/vault-visual-hover-light.svg'
                                 }
                                 alt="Vault"
                                 layout="fill"
@@ -641,8 +637,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/TCE-visual.svg'
-                                    : '/images/launchweek/TCE-visual-light.svg'
+                                    ? '/images/launchweek/six/TCE-visual.svg'
+                                    : '/images/launchweek/six/TCE-visual-light.svg'
                                 }
                                 alt="TCE"
                                 layout="fill"
@@ -658,8 +654,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/TCE-visual-hover.svg'
-                                    : '/images/launchweek/TCE-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/TCE-visual-hover.svg'
+                                    : '/images/launchweek/six/TCE-visual-hover-light.svg'
                                 }
                                 alt="TCE"
                                 layout="fill"
@@ -690,8 +686,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/community-visual.svg'
-                                    : '/images/launchweek/community-visual-light.svg'
+                                    ? '/images/launchweek/six/community-visual.svg'
+                                    : '/images/launchweek/six/community-visual-light.svg'
                                 }
                                 alt="Community"
                                 layout="fill"
@@ -707,8 +703,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/community-visual-hover.svg'
-                                    : '/images/launchweek/community-visual-light-hover.svg'
+                                    ? '/images/launchweek/six/community-visual-hover.svg'
+                                    : '/images/launchweek/six/community-visual-light-hover.svg'
                                 }
                                 alt="Community"
                                 layout="fill"
@@ -728,7 +724,7 @@ export default function launchweek() {
                                       Blog post
                                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                                         <img
-                                          src="/images/launchweek/icons-blogpost.svg"
+                                          src="/images/launchweek/six/icons-blogpost.svg"
                                           className="w-4 h-4"
                                           alt="blog post icon"
                                         />
@@ -742,7 +738,7 @@ export default function launchweek() {
                                       Flutterflow
                                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                                         <img
-                                          src="/images/launchweek/video-icon.svg"
+                                          src="/images/launchweek/six/video-icon.svg"
                                           className="w-4 h-4"
                                           alt="video icon"
                                         />
@@ -758,7 +754,7 @@ export default function launchweek() {
                                       OneSignal
                                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                                         <img
-                                          src="/images/launchweek/video-icon.svg"
+                                          src="/images/launchweek/six/video-icon.svg"
                                           className="w-4 h-4"
                                           alt="video icon"
                                         />
@@ -772,7 +768,7 @@ export default function launchweek() {
                                       NextAuth
                                       <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
                                         <img
-                                          src="/images/launchweek/video-icon.svg"
+                                          src="/images/launchweek/six/video-icon.svg"
                                           className="w-4 h-4"
                                           alt="video icon"
                                         />
@@ -795,8 +791,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PgGraphql-visual.svg'
-                                    : '/images/launchweek/PgGraphql-visual-light.svg'
+                                    ? '/images/launchweek/six/PgGraphql-visual.svg'
+                                    : '/images/launchweek/six/PgGraphql-visual-light.svg'
                                 }
                                 alt="PgGraphql"
                                 layout="fill"
@@ -812,8 +808,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PgGraphql-visual-hover.svg'
-                                    : '/images/launchweek/PgGraphql-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/PgGraphql-visual-hover.svg'
+                                    : '/images/launchweek/six/PgGraphql-visual-hover-light.svg'
                                 }
                                 alt="PgGraphql"
                                 layout="fill"
@@ -842,8 +838,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/custom-domains-visual.svg'
-                                    : '/images/launchweek/custom-domains-visual-light.svg'
+                                    ? '/images/launchweek/six/custom-domains-visual.svg'
+                                    : '/images/launchweek/six/custom-domains-visual-light.svg'
                                 }
                                 alt="Custom Domains"
                                 layout="fill"
@@ -859,8 +855,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/custom-domains-visual-hover.svg'
-                                    : '/images/launchweek/custom-domains-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/custom-domains-visual-hover.svg'
+                                    : '/images/launchweek/six/custom-domains-visual-hover-light.svg'
                                 }
                                 alt="Custom Domains"
                                 layout="fill"
@@ -889,8 +885,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PITR-visual.svg'
-                                    : '/images/launchweek/PITR-visual-light.svg'
+                                    ? '/images/launchweek/six/PITR-visual.svg'
+                                    : '/images/launchweek/six/PITR-visual-light.svg'
                                 }
                                 alt="PITR"
                                 layout="fill"
@@ -906,8 +902,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PITR-visual-hover.svg'
-                                    : '/images/launchweek/PITR-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/PITR-visual-hover.svg'
+                                    : '/images/launchweek/six/PITR-visual-hover-light.svg'
                                 }
                                 alt="PITR"
                                 layout="fill"
@@ -936,8 +932,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/pg_crdt-visual.svg'
-                                    : '/images/launchweek/pg_crdt-visual-light.svg'
+                                    ? '/images/launchweek/six/pg_crdt-visual.svg'
+                                    : '/images/launchweek/six/pg_crdt-visual-light.svg'
                                 }
                                 alt="pg_crdt"
                                 layout="fill"
@@ -953,8 +949,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/pg_crdt-visual-hover.svg'
-                                    : '/images/launchweek/pg_crdt-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/pg_crdt-visual-hover.svg'
+                                    : '/images/launchweek/six/pg_crdt-visual-hover-light.svg'
                                 }
                                 alt="pg_crdt"
                                 layout="fill"
@@ -983,8 +979,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/postgres-visual.svg'
-                                    : '/images/launchweek/postgres-visual-light.svg'
+                                    ? '/images/launchweek/six/postgres-visual.svg'
+                                    : '/images/launchweek/six/postgres-visual-light.svg'
                                 }
                                 alt="postgres"
                                 layout="fill"
@@ -1000,8 +996,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/postgres-visual-hover.svg'
-                                    : '/images/launchweek/postgres-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/postgres-visual-hover.svg'
+                                    : '/images/launchweek/six/postgres-visual-hover-light.svg'
                                 }
                                 alt="postgres"
                                 layout="fill"
@@ -1030,8 +1026,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PostgREST11-visual.svg'
-                                    : '/images/launchweek/PostgREST11-visual-light.svg'
+                                    ? '/images/launchweek/six/PostgREST11-visual.svg'
+                                    : '/images/launchweek/six/PostgREST11-visual-light.svg'
                                 }
                                 alt="PostgREST11"
                                 layout="fill"
@@ -1047,8 +1043,8 @@ export default function launchweek() {
                               <Image
                                 src={
                                   isDarkMode
-                                    ? '/images/launchweek/PostgREST11-visual-hover.svg'
-                                    : '/images/launchweek/PostgREST11-visual-hover-light.svg'
+                                    ? '/images/launchweek/six/PostgREST11-visual-hover.svg'
+                                    : '/images/launchweek/six/PostgREST11-visual-hover-light.svg'
                                 }
                                 alt="PostgREST11"
                                 layout="fill"
@@ -1162,7 +1158,7 @@ export default function launchweek() {
                 <a target="_blank" rel="noopener noreferrer" className="self-end">
                   <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                     <img
-                      src="/images/launchweek/link.svg"
+                      src="/images/launchweek/six/link.svg"
                       className="absolute top-[16px] right-[10px] text-brand-900"
                       alt="link icon"
                     />
@@ -1175,7 +1171,7 @@ export default function launchweek() {
                 <a target="_blank" rel="noopener noreferrer">
                   <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                     <img
-                      src="/images/launchweek/link.svg"
+                      src="/images/launchweek/six/link.svg"
                       className="absolute top-[16px] right-[10px] text-brand-900"
                       alt="link icon"
                     />
@@ -1190,7 +1186,7 @@ export default function launchweek() {
                 <a target="_blank" rel="noopener noreferrer" className="self-end">
                   <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                     <img
-                      src="/images/launchweek/link.svg"
+                      src="/images/launchweek/six/link.svg"
                       className="absolute top-[16px] right-[10px] text-brand-900"
                       alt="link icon"
                     />
@@ -1203,7 +1199,7 @@ export default function launchweek() {
                 <a target="_blank" rel="noopener noreferrer">
                   <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                     <img
-                      src="/images/launchweek/link.svg"
+                      src="/images/launchweek/six/link.svg"
                       className="absolute top-[16px] right-[10px] text-brand-900"
                       alt="link icon"
                     />
@@ -1216,7 +1212,7 @@ export default function launchweek() {
                 <a target="_blank" rel="noopener noreferrer" className="self-end">
                   <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
                     <img
-                      src="/images/launchweek/link.svg"
+                      src="/images/launchweek/six/link.svg"
                       className="absolute top-[16px] right-[10px] text-brand-900"
                       alt="link icon"
                     />
@@ -1236,7 +1232,7 @@ export default function launchweek() {
           )}
         >
           <div
-            className={`flex-1 bg-[url('/images/launchweek/orbit.svg')] bg-auto bg-no-repeat bg-bottom relative min-h-[360px]`} //grid grid-cols-5 grid-rows-5
+            className={`flex-1 bg-[url('/images/launchweek/six/orbit.svg')] bg-auto bg-no-repeat bg-bottom relative min-h-[360px]`} //grid grid-cols-5 grid-rows-5
           >
             {creators.map((creator: any, index: number) => {
               return (
