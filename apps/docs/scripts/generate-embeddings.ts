@@ -3,10 +3,12 @@ import { createHash } from 'crypto'
 import dotenv from 'dotenv'
 import { ObjectExpression } from 'estree'
 import { readdir, readFile, stat } from 'fs/promises'
+import GithubSlugger from 'github-slugger'
 import { Content, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, MdxjsEsm } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
+import { toString } from 'mdast-util-to-string'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
@@ -105,10 +107,15 @@ function splitTreeBy(tree: Root, predicate: (node: Content) => boolean) {
 
 type Meta = ReturnType<typeof extractMetaExport>
 
+type Section = {
+  content: string
+  slug?: string
+}
+
 type ProcessedMdx = {
   checksum: string
   meta: Meta
-  sections: string[]
+  sections: Section[]
 }
 
 /**
@@ -149,7 +156,15 @@ function processMdxForSearch(content: string): ProcessedMdx {
 
   const sectionTrees = splitTreeBy(mdTree, (node) => node.type === 'heading')
 
-  const sections = sectionTrees.map((tree) => toMarkdown(tree))
+  const slugger = new GithubSlugger()
+
+  const sections = sectionTrees.map((tree) => {
+    const [firstNode] = tree.children
+    return {
+      content: toMarkdown(tree),
+      slug: firstNode.type === 'heading' ? slugger.slug(toString(firstNode)) : undefined,
+    }
+  })
 
   return {
     checksum,
@@ -325,9 +340,9 @@ async function generateEmbeddings() {
       }
 
       console.log(`Adding ${sections.length} page sections (with embeddings) for '${path}'`)
-      for (const section of sections) {
+      for (const { content, slug } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
-        const input = section.replace(/\n/g, ' ')
+        const input = content.replace(/\n/g, ' ')
 
         try {
           const configuration = new Configuration({ apiKey: process.env.OPENAI_KEY })
@@ -348,7 +363,8 @@ async function generateEmbeddings() {
             .from('page_section')
             .insert({
               page_id: page.id,
-              content: section,
+              slug,
+              content,
               token_count: embeddingResponse.data.usage.total_tokens,
               embedding: responseData.embedding,
             })
