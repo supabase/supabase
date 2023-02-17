@@ -293,7 +293,7 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 
 ```ts
 import type { Actions } from './$types'
-import { fail, redirect } from '@sveltejs/kit'
+import { fail, invalid, redirect } from '@sveltejs/kit'
 import { getSupabase } from '@supabase/auth-helpers-sveltekit'
 import { AuthApiError } from '@supabase/supabase-js'
 
