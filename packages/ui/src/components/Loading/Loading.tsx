@@ -5,15 +5,13 @@ import { IconLoader } from './../../../index'
 interface Props {
   children: React.ReactNode
   active: boolean
-  className?: string
-  contentClassName?: string
 }
-export default function Loading({ children, active, className, contentClassName }: Props) {
+export default function Loading({ children, active }: Props) {
   const __styles = styleHandler('loading')
 
-  let classNames = [__styles.base, className]
+  let classNames = [__styles.base]
 
-  let contentClasses = [__styles.content.base, contentClassName]
+  let contentClasses = [__styles.content.base]
 
   if (active) {
     contentClasses.push(__styles.content.active)
