@@ -1,6 +1,5 @@
-import EdgeFunctionsList from './EdgeFunctionsList'
-import FunctionsListItem from './FunctionsListItem'
+import EdgeFunctionDetails from './EdgeFunctionDetails'
 import FunctionsEmptyState from './FunctionsEmptyState'
 import TerminalInstructions from './TerminalInstructions'
 
-export { EdgeFunctionsList, FunctionsListItem, FunctionsEmptyState, TerminalInstructions }
+export { EdgeFunctionDetails, FunctionsEmptyState, TerminalInstructions }
