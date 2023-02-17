@@ -1,9 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
-import { GraphiQL } from 'graphiql'
-import 'graphiql/graphiql.css'
 
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
+import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useParams, useStore } from 'hooks'
