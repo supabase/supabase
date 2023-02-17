@@ -1,23 +1,24 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk, values } from 'lodash'
+import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
 
-import {
+import type {
   PostgresColumn,
   PostgresTable,
   PostgresRelationship,
   PostgresPrimaryKey,
+  PostgresSchema,
 } from '@supabase/postgres-meta'
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { timeout } from 'lib/helpers'
-import { ResponseError } from 'types'
+import { ResponseError, SchemaView } from 'types'
 
 import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
-import SchemaStore, { ISchemaStore } from './SchemaStore'
+import SchemaStore from './SchemaStore'
 import TableStore, { ITableStore } from './TableStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
@@ -41,6 +42,7 @@ import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
 import ForeignTableStore from './ForeignTableStore'
+import ViewStore from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -51,7 +53,8 @@ export interface IMetaStore {
   openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  schemas: ISchemaStore
+  schemas: IPostgresMetaInterface<PostgresSchema>
+  views: IPostgresMetaInterface<SchemaView>
   foreignTables: IPostgresMetaInterface<Partial<PostgresTable>>
 
   hooks: IPostgresMetaInterface<any>
@@ -132,6 +135,7 @@ export default class MetaStore implements IMetaStore {
   tables: TableStore
   columns: ColumnStore
   schemas: SchemaStore
+  views: ViewStore
   foreignTables: ForeignTableStore
 
   hooks: HooksStore
@@ -184,6 +188,7 @@ export default class MetaStore implements IMetaStore {
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
+    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
     this.foreignTables = new ForeignTableStore(
       this.rootStore,
       `${this.baseUrl}/foreign-tables`,
@@ -493,21 +498,20 @@ export default class MetaStore implements IMetaStore {
     }
   ) {
     const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
-    const sourceTableName = duplicateTable.name
+    const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
     const duplicatedTableName = payload.name
 
     // The following query will copy the structure of the table along with indexes, constraints and
     // triggers. However, foreign key constraints are not duplicated over - has to be done separately
     const table = await this.rootStore.meta.query(
-      `CREATE TABLE "${duplicatedTableName}" (LIKE "${sourceTableName}" INCLUDING ALL);`
+      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`
     )
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
     const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
-      // @ts-ignore, but might need to investigate, sounds bad:
-      // Type instantiation is excessively deep and possibly infinite
+      // @ts-ignore
       relationships.map(async (relationship: PostgresRelationship) => {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
@@ -520,7 +524,7 @@ export default class MetaStore implements IMetaStore {
     // Duplicate rows if needed
     if (isDuplicateRows) {
       const rows = await this.rootStore.meta.query(
-        `INSERT INTO "${duplicatedTableName}" SELECT * FROM ${sourceTableName};`
+        `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`
       )
       if (rows.error) throw rows.error
 
@@ -530,7 +534,7 @@ export default class MetaStore implements IMetaStore {
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
-          `SELECT setval('${duplicatedTableName}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${sourceTableName}"));`
+          `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`
         )
         if (identity.error) throw identity.error
       })
@@ -538,7 +542,7 @@ export default class MetaStore implements IMetaStore {
 
     await this.tables.load()
     const tables = this.tables.list()
-    const duplicatedTable = find(tables, { name: duplicatedTableName })
+    const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
@@ -902,6 +906,9 @@ export default class MetaStore implements IMetaStore {
 
     this.schemas.setUrl(`${this.baseUrl}/schemas`)
     this.schemas.setHeaders(this.headers)
+
+    this.views.setUrl(`${this.baseUrl}/views`)
+    this.views.setHeaders(this.headers)
 
     this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
     this.foreignTables.setHeaders(this.headers)

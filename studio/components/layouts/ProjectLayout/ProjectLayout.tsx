@@ -70,7 +70,7 @@ const ProjectLayout = ({
 
 export const ProjectLayoutWithAuth = withAuth(observer(ProjectLayout))
 
-export default ProjectLayout
+export default observer(ProjectLayout)
 
 interface MenuBarWrapperProps {
   isLoading: boolean

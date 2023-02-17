@@ -244,7 +244,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -4992,7 +4992,7 @@ functions:
     title: 'on().subscribe()'
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
@@ -5010,8 +5010,8 @@ functions:
             })
             .subscribe()
           ```
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         js: |
           ```js
           supabase
@@ -5021,8 +5021,8 @@ functions:
             })
             .subscribe()
           ```
-      - id: listening-to-inserts
-        name: Listening to inserts
+      - id: listen-to-inserts
+        name: Listen to inserts
         js: |
           ```js
           supabase
@@ -5032,8 +5032,8 @@ functions:
             })
             .subscribe()
           ```
-      - id: listening-to-updates
-        name: Listening to updates
+      - id: listen-to-updates
+        name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening to:
@@ -5050,8 +5050,8 @@ functions:
             })
             .subscribe()
           ```
-      - id: listening-to-deletes
-        name: Listening to deletes
+      - id: listen-to-deletes
+        name: Listen to deletes
         description: |
           By default, Supabase does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
@@ -5068,8 +5068,8 @@ functions:
             })
             .subscribe()
           ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
@@ -5080,7 +5080,7 @@ functions:
             .subscribe()
           ```
       - id: listening-to-row-level-changes
-        name: Listening to row level changes
+        name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.

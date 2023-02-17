@@ -2,13 +2,15 @@ import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
 import { Modal } from 'ui'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditValue } from './RowEditor/RowEditor.types'
 
 interface Props {
   selectedSchema: string
@@ -16,7 +18,8 @@ interface Props {
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
-  sidePanelKey?: 'row' | 'column' | 'table'
+  selectedValueForJsonEdit?: JsonEditValue
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -34,6 +37,7 @@ const SidePanelEditor: FC<Props> = ({
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
   sidePanelKey,
   isDuplicating = false,
   closePanel,
@@ -113,6 +117,22 @@ const SidePanelEditor: FC<Props> = ({
     }
   }
 
+  const onSaveJSON = async (value: string | number) => {
+    if (selectedTable === undefined || selectedValueForJsonEdit === undefined) return
+
+    try {
+      const { row, column } = selectedValueForJsonEdit
+      const payload = { [column]: JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error: any) {}
+  }
+
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     foreignKey: Partial<PostgresRelationship> | undefined,
@@ -144,8 +164,8 @@ const SidePanelEditor: FC<Props> = ({
       closePanel()
     }
 
-    if (configuration.isEncrypted) {
-      await meta.schemas.loadViews(selectedTable?.schema ?? '')
+    if (configuration.isEncrypted && selectedTable?.schema) {
+      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
@@ -286,6 +306,15 @@ const SidePanelEditor: FC<Props> = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+      />
+      <JsonEdit
+        visible={sidePanelKey === 'json'}
+        column={selectedValueForJsonEdit?.column ?? ''}
+        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+        backButtonLabel="Cancel"
+        applyButtonLabel="Save changes"
+        closePanel={onClosePanel}
+        onSaveJSON={onSaveJSON}
       />
       <ConfirmationModal
         visible={isClosingPanel}

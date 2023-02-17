@@ -1,17 +1,23 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { Wrapper } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { FDW } from './fdws-query'
 
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string
-  wrapper: Wrapper
+  wrapper: FDW
+  wrapperMeta: WrapperMeta
 }
 
-export const getDeleteFDWSql = ({ wrapper }: Pick<FDWDeleteVariables, 'wrapper'>) => {
-  const encryptedOptions = wrapper.server.options.filter((option) => option.encrypted)
+export const getDeleteFDWSql = ({
+  wrapper,
+  wrapperMeta,
+}: Pick<FDWDeleteVariables, 'wrapper' | 'wrapperMeta'>) => {
+  const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
@@ -26,24 +32,25 @@ export const getDeleteFDWSql = ({ wrapper }: Pick<FDWDeleteVariables, 'wrapper'>
   const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
 
   const sql = /* SQL */ `
-    begin;
-
     drop foreign data wrapper if exists ${wrapper.name} cascade;
 
     ${deleteEncryptedSecretsSql}
-
-    commit;
   `
 
   return sql
 }
 
-export async function deleteFDW({ projectRef, connectionString, wrapper }: FDWDeleteVariables) {
+export async function deleteFDW({
+  projectRef,
+  connectionString,
+  wrapper,
+  wrapperMeta,
+}: FDWDeleteVariables) {
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
 
-  const sql = getDeleteFDWSql({ wrapper })
+  const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
