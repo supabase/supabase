@@ -205,7 +205,7 @@ export default function launchweek() {
               </span>
             </h1>
             <p className="text-scale-1100 text-sm text-center">
-              April 13rd – 7th at 6 AM PT | 9 AM ET
+              April 3rd – 7th at 6 AM PT | 9 AM ET
             </p>
           </div>
         </SectionContainer>
