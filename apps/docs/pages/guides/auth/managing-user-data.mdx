@@ -93,7 +93,7 @@ Users can pass in metadata on sign up. User metadata is stored on the `raw_user_
 
 Here's an example of how to add metadata fields on signup:
 
-```
+```js
 const { data, error } = await supabase.auth.signUp(
   {
     email: 'example@email.com',
@@ -108,7 +108,7 @@ const { data, error } = await supabase.auth.signUp(
 )
 ```
 
-To view the metadata:
+User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
 
 ```js
 const {
