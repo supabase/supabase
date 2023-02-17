@@ -15,7 +15,7 @@ import ChartHeader from './ChartHeader'
 import { Datum, CommonChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
 import ChartNoData from './NoDataPlaceholder'
-import { numberFormatter } from './Charts.utils'
+import { numberFormatter, useChartSize } from './Charts.utils'
 dayjs.extend(utc)
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
@@ -42,14 +42,8 @@ const BarChart: React.FC<BarChartProps> = ({
   size = 'normal',
   onDatumClick,
 }) => {
+  const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-
-  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
-  const chartHeight = {
-    tiny: 76,
-    small: 96,
-    normal: 160,
-  }[size as string] as number
 
   if (data.length === 0) return <ChartNoData className={className} />
 
@@ -78,7 +72,7 @@ const BarChart: React.FC<BarChartProps> = ({
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
       />
-      <ResponsiveContainer width="100%" height={chartHeight}>
+      <Container>
         <RechartBarChart
           data={data}
           margin={{
@@ -138,7 +132,7 @@ const BarChart: React.FC<BarChartProps> = ({
             fill="url(#colorUv)"
           />
         </RechartBarChart>
-      </ResponsiveContainer>
+      </Container>
       {data && (
         <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
