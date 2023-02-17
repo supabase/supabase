@@ -313,7 +313,7 @@ export const actions: Actions = {
 
     if (error) {
       if (error instanceof AuthApiError && error.status === 400) {
-        return fail(400, {
+        return invalid(400, {
           error: 'Invalid credentials.',
           values: {
             email,
