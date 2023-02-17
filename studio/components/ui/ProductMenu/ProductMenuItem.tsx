@@ -34,11 +34,11 @@ const ProductMenuItem: FC<Props> = ({
       <div className="flex w-full items-center justify-between gap-1">
         <div
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
-          className={'flex items-center gap-2 truncate w-full ' + textClassName}
+          className={'flex items-center gap-2 w-full' + textClassName}
         >
-          {name}{' '}
+          <span className="truncate">{name}{' '}</span>
           {label !== undefined && (
-            <span className="text-orange-800 text-xs font-normal">{label}</span>
+            <span className="text-orange-800 text-xs font-normal truncate">{label}</span>
           )}
         </div>
         {action}
