@@ -59,24 +59,6 @@ Although [industry best practices](https://cheatsheetseries.owasp.org/cheatsheet
 
 Enabling some form of abuse protection for your project, such as setting adequate per-IP rate-limiting or a Turing test system like CAPTCHA, can partially mitigate or make large scale user enumeration attacks inefficient.
 
-### Guarantees
-
-Supabase Auth provides conditional guarantees that strike the right balance between user experience, system performance, privacy, and security for both hobby and enterprise projects. However, it's difficult to give consistent guarantees across all users and authentication methods.
-
-**No guarantees.**
-
-Supabase Auth may leak information about the existence of any account that has an associated password and where the password is a viable login mechanism. Supabase Auth may also leak information about the existence of any account through a side-channel if email or phone passwordless authentication is used.
-
-**Weak guarantees.**
-
-Supabase Auth is not likely to divulge information about the existence of any account in the system provided the account is accessible through only one social login provider, and no other social login providers are enabled for the project. However, any attempts to use multiple social login providers for an account, especially those that do not offer guarantees about the verification status of the email address, may lead to leaking of information about the existence or blocking measures applied to a user account.
-
-**Stronger guarantees.**
-
-Supabase Auth will not leak information about users with accounts accessible through enterprise-level identity providers via the SAML or OIDC protocols, provided that no account linking has taken place on those accounts with social login providers or with password and passwordless authentication.
-
-If your application has high privacy requirements, we recommend that your users obfuscate their email address by using virtual email addresses (e.g., `user+obfuscation@example.com`) or use a trusted social login provider.
-
 ## Access and refresh tokens
 
 A successful user login triggers Supabase Auth to issue an access and refresh token.
