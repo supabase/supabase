@@ -5,88 +5,77 @@ export const meta = {
   description: 'Important information about security and privacy when using Supabase Auth.',
 }
 
-Supabase's priority is to help you build secure applications. This guide sheds some light on the measures we take to secure Supabase Auth and provides some guidance on building secure applications.
+Supabase's priority is to help you build secure applications. This guide sheds light on the measures we take to secure Supabase Auth and provides guidance for building secure applications.
 
 <Admonition type="note">
   {' '}
-  To report a security vulnerability with Supabase Auth or any other Supabase service, email [security@supabase.com](mailto:security@supabase.com).
-  Review the [security.txt](https://supabase.com/.well-known/security.txt) policy for a list of vulnerabilities
-  that are in scope.{' '}
+  To report a security vulnerability with Supabase Auth or any other Supabase service, follow the instructions outlined in our [security.txt](https://supabase.com/.well-known/security.txt).{' '}
 </Admonition>
 
 ## Credentials
 
-Credentials such as email addresses, phone numbers, passwords, and one-time passwords are always sent to Supabase Auth as `POST` requests over TLS. This prevents them from being logged as part of the URL in HTTP request logs. An exception to this rule is magic links, which encode a short-lived, difficult-to-guess code in a URL. This URL sends a `GET` request to Supabase Auth and the code can only be used once.
+Supabase Auth always receives credentials such as email addresses, phone numbers, passwords, and one-time passwords as `POST` requests over TLS. This method ensures that the credentials are not logged as part of the URL in HTTP request logs. Magic links are an exception to this rule. They use a URL to encode a short-lived, hard-to-guess code, which sends a `GET` request to Supabase Auth. The code can only be used once.
 
-Passwords are stored in your project's database hashed with the [bcrypt](https://en.wikipedia.org/wiki/Bcrypt) password hashing function at a difficulty level of 10.
+Passwords are hashed using the [bcrypt](https://en.wikipedia.org/wiki/Bcrypt) password hashing function with a difficulty level of 10. The hashed passwords are stored in your project's database.
 
-Unlike other authentication services, Supabase Auth stores each project's user information in isolated Postgres databases. This means that security incidents involving other projects will not result in an incident in your project.
+Supabase Auth stores each project's user information in isolated Postgres databases. Therefore, security incidents involving other projects will not affect your project.
 
-Social login (e.g., Login with GitHub) often uses the OAuth authorization protocol. Supabase Auth does not store the token issued by the provider, but makes it available to your browser's app if you need further access to it. Each subsequent sign-in with OAuth updates the user's identifying information in Supabase Auth.
+Social logins (e.g., Login with GitHub) often use the OAuth authorization protocol. Supabase Auth does not store the token issued by the provider. However, it makes the token available to your browser's app if you need further access to it. Each subsequent sign-in with OAuth updates the user's identifying information in Supabase Auth.
 
 ### Automatic linking
 
-Users with the same email address across different social login providers get one single user account in Supabase Auth. We believe this is the most common behavior for modern applications.
+When users have the same email address across different social login providers, they only get one single user account in Supabase Auth. We believe this is the most common behavior for modern applications.
 
 <Admonition type="warn">
-  Not all social login providers can be trusted! Some providers allow social login with your
-  application even if the user's email address is not confirmed. This has the unintended side-effect
-  that attackers could abuse such a social login provider to gain access to a legitimate user's
-  account. Always make sure to verify the behavior of social login providers and whether the user's
-  email address is confirmed.
+  Not all social login providers can be trusted! Some providers allow social login with your application even if the user's email address is not confirmed. This can have the unintended side-effect of allowing attackers to abuse a social login provider to gain access to a legitimate user's account. Always verify the behavior of social login providers to determine whether user email addresses are confirmed before allowing social login access.
 </Admonition>
 
-### Magic links
+### Passwordless Sign-in with Magic Links
 
-Supabase Auth provides passwordless sign-in with magic links. Magic links are URLs that contains a single-use, difficult-to-guess code. By default, this URL is
-hosted by the Supabase Auth server and immediately redirects back to your app.
+Supabase Auth offers passwordless sign-in with magic links. These links are URLs that contain a single-use, hard-to-guess code. By default, the URL is hosted by the Supabase Auth server and immediately redirects back to your app.
 
-Be aware that email messages are inherently insecure, although the default SMTP settings from Supabase Auth always attempt to deliver email messages via TLS to the receiving server. There are a number of email clients, enterprise and end-user security software, which inspect email messages for malware. Often this software will visit links in messages (sometimes multiple times) in an attempt to scan for viruses. Unfortunately, this has the effect of signing up a user without their knowledge or express consent. Furthermore, it does give out an access and refresh token to this software which could be used maliciously.
+However, it's important to note that email messages are inherently insecure, even though the default SMTP settings from Supabase Auth attempt to deliver email messages via TLS to the receiving server. Some email clients, enterprise and end-user security software inspect email messages for malware. Often this software will visit links in messages (sometimes multiple times) in an attempt to scan for viruses. Unfortunately, this has the effect of signing up a user without their knowledge or express consent. It also provides an access and refresh token to this software, which could be used maliciously.
 
-We do not recommend using magic link sign-in with the default settings for applications requiring a high level of authentication security. You can prevent this type of issue by modifying the magic link email template to point to your application where you can present the user with a button that leads to the magic link URL.
+We do not recommend using magic link sign-in with the default settings for applications that require a high level of authentication security. To prevent this issue, you can modify the magic link email template to point to your application. This way, you can present the user with a button that leads to the magic link URL.
 
-## User information
+## User Account Information
 
 Supabase Auth stores user account information in your project's database. This information is provided by your application or collected from third-party identity providers.
 
-Email addresses, phone numbers, and other personally identifiable information is not encrypted in your project's database. If you need to store encrypted data for users, check out Supabase Vault as an easy and safe way to achieve this.
+However, it's important to note that email addresses, phone numbers, and other personally identifiable information are not encrypted in your project's database. If you need to store encrypted data for users, we recommend using Supabase Vault. It's a secure and straightforward way to achieve this.
 
-### User enumeration protection
+### Protection Against User Enumeration
 
-User enumeration is a technique where third-parties gather information about the existence of accounts on a system. The use of this technique does not indicate malicious behavior, but it may be used as part of such an effort.
+User enumeration is a technique used by third-parties to gather information about the existence of accounts on a system. Although this technique does not necessarily indicate malicious behavior, it may be used as part of such an effort.
 
-Although [industry best practices](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages) ask for applications to mask the existence of accounts in their system to unauthorized parties, this is easier said than done, especially when dealing with a system using email and password login. Below are some examples where applications typically fail to mask the existence of an account.
+Although [industry best practices](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages) recommend masking the existence of accounts in a system to unauthorized parties, this can be challenging to achieve, particularly when dealing with a system using email and password login. The following are some examples of where applications typically fail to mask the existence of an account:
 
 1. **Side-channel leak via password hashing.**  
-   Even if an application returns ambiguous messages such as "Email or password not correct." the login request will have a significantly longer duration if the account exists. This is because password-hashing functions take hundreds of milliseconds to compare a stored password hash with the provided and possibly incorrect password. A typical solution to this problem is making all login requests have an equal and long duration to obfuscate the fact. However, this is only a half-way solution since attackers can intentionally overload a system and still gather information from the side-channel.
+   Even if an application returns ambiguous messages such as "Email or password not correct," the login request will take longer if the account exists. This is because password-hashing functions take hundreds of milliseconds to compare a stored password hash with the provided password. One solution is making all login requests have an equal and long duration to obfuscate the fact. However, this is only a partial solution as attackers can intentionally overload a system and still gather information from the side-channel.
 2. **Side-channel leak via email or SMS.**  
-   With passwordless login or flows such as forgot password, information about whether an account exists in the system can leak even if the application returns an ambigouous message such as "If you have an account an email has been sent." This is because the final part of the request handling needs to send an email message or SMS using a third-party system and requests last longer when an account exists. Sometimes applications add per-account rate-limiting to stop abuse, but this can exacerbate the problem as rate-limiting counts toward accounts that exist, not those that do not. Thus attackers can intentionally trigger rate-limits and gather information that way.
+   With passwordless login or flows such as forgot password, information about whether an account exists in the system can leak even if the application returns an ambiguous message such as "If you have an account an email has been sent." This is because the final part of the request handling needs to send an email message or SMS using a third-party system, and requests last longer when an account exists. Sometimes applications add per-account rate-limiting to stop abuse, but this can exacerbate the problem as rate-limiting counts toward accounts that exist, not those that do not. Thus attackers can intentionally trigger rate-limits and gather information that way.
 3. **Account creation vs. login.**  
    Applications often obfuscate login requests, but not account creation requests, which can leak information and confuse legitimate users. Login flows typically show a message like "Email or password is not correct," whereas sign-up flows usually show "an account with this email address already exists." The problem compounds if the user has both a social login and a password-based login. In this situation, you can tell the user that there is already an account and redirect to the social login provider (which again leaks the information) or return a server error (still leaks the information).
 
-Large scale user enumeration attacks can be partially mitigated or made inefficient by enabling some form of abuse protection for your project, such as setting adequate per-IP rate limiting or a Turing test system like CAPTCHA.
+Enabling some form of abuse protection for your project, such as setting adequate per-IP rate-limiting or a Turing test system like CAPTCHA, can partially mitigate or make large scale user enumeration attacks inefficient.
 
 ### Guarantees
 
-It's difficult to give consistent guarantees across all users and authentication methods. Supabase Auth provides conditional guarantees which strike the right balance between user experience, system performance, privacy, and security both for hobby and enterprise projects.
+Supabase Auth provides conditional guarantees that strike the right balance between user experience, system performance, privacy, and security for both hobby and enterprise projects. However, it's difficult to give consistent guarantees across all users and authentication methods.
 
 **No guarantees.**
 
-Supabase Auth is likely to leak information about the existence of any account that has an associated password and the password is a viable login mechanism for that account. To make it easier for users, Supabase Auth may directly communicate with users about the existence of their account or correctness of their password.
-
-Supabase Auth is also likely to leak information about the existence of any account through a side-channel if email or phone passwordless authentication is used. To make it easier for users, Supabase Auth may directly communicate with users about the existence of their account, any blocking measures, or rate-limiting applied to their account.
+Supabase Auth may leak information about the existence of any account that has an associated password and where the password is a viable login mechanism. Supabase Auth may also leak information about the existence of any account through a side-channel if email or phone passwordless authentication is used.
 
 **Weak guarantees.**
 
-Supabase Auth is not likely to divulge information about the existence of any account in the system provided the account is accessible through one and only one social login provider, and no other social login providers are enabled for the project.
-
-Any attempts to use multiple social login providers for an account, especially ones that do not offer guarantees about the verification status of the email address, may lead to leaking of information about the existence or blocking measures applied to a user account.
+Supabase Auth is not likely to divulge information about the existence of any account in the system provided the account is accessible through only one social login provider, and no other social login providers are enabled for the project. However, any attempts to use multiple social login providers for an account, especially those that do not offer guarantees about the verification status of the email address, may lead to leaking of information about the existence or blocking measures applied to a user account.
 
 **Stronger guarantees.**
 
 Supabase Auth will not leak information about users with accounts accessible through enterprise-level identity providers via the SAML or OIDC protocols, provided that no account linking has taken place on those accounts with social login providers or with password and passwordless authentication.
 
-If your application has high privacy requirements, your users should obfuscate their email address by using virtual email addresses (e.g., `user+obfuscation@example.com` if allowed by their email address provider) or use a trusted social login provider.
+If your application has high privacy requirements, we recommend that your users obfuscate their email address by using virtual email addresses (e.g., `user+obfuscation@example.com`) or use a trusted social login provider.
 
 ## Access and refresh tokens
 
