@@ -1,5 +1,5 @@
 import type { CreateCompletionResponse } from 'openai'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
@@ -54,6 +54,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const eventSourceRef = useRef<SSE>()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
@@ -110,10 +111,14 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
     eventSource.stream()
 
+    eventSourceRef.current = eventSource
+
     setIsLoading(true)
   }, [])
 
   function handleResetPrompt() {
+    eventSourceRef.current?.close()
+    eventSourceRef.current = undefined
     setQuery('')
     setAnswer(undefined)
     setIsResponding(false)
