@@ -92,18 +92,16 @@ Make sure you _NEVER_ expose this publicly. But it can be used on the server-sid
 You can assign metadata to users on sign up:
 
 ```js
-const { data, error } = await supabase.auth.signUp(
-  {
-    email: 'example@email.com',
-    password: 'example-password',
-    options: {
-      data: {
-        first_name: 'John',
-        age: 27,
-      }
-    }
-  }
-)
+const { data, error } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+  options: {
+    data: {
+      first_name: 'John',
+      age: 27,
+    },
+  },
+})
 ```
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
