@@ -179,24 +179,24 @@ We base our security recommendations on the assumption that the end-user's devic
   prominent.](https://developer.chrome.com/docs/devtools/console/api/#styling_console_output_with_css)
 </Admonition>
 
-## Abuse protection
+## Abuse Protection
 
-Your Supabase Auth server uses industry standard denial of service and bot protection, which is not configurable. However, this protection is there to ensure reliability of Auth and other Supabase services and is not meant as a general abuse protection.
+Your Supabase Auth server uses industry-standard denial of service and bot protection, which is not configurable. However, this protection is in place to ensure the reliability of Auth and other Supabase services and is not intended as a general abuse protection.
 
-Your project's Auth server does have built-in IP-based rate limiting. Do note that IP-based rate limiting can often trigger false-positives. What may appear to be a rate-limit breach, could actually mean legitimate users attempting to use your app at the same time. We've commonly seen this in the following scenarios:
+Your project's Auth server does have built-in IP-based rate limiting. However, note that IP-based rate limiting can often result in false positives. This means that legitimate users attempting to use your app at the same time may trigger what appears to be a rate-limit breach. We commonly see this in the following scenarios:
 
 1. **IPv4 with NAT.**  
-   There's a worldwide shortage of IPv4 addresses which forces internet service providers to use a technique called NAT (Network Address Translation) to share one IP address with many (sometimes thousands) end users.
+   Due to the worldwide shortage of IPv4 addresses, internet service providers use a technique called NAT (Network Address Translation) to share one IP address with many end-users.
 2. **Corporate users.**  
-   Corporations often route office internet traffic through one or more IPv4 addresses. If you are building an enterprise application this may be a common occurrence, for example if many employees sign in at once in common hours of the day.
+   Corporations often route office internet traffic through one or more IPv4 addresses. This may be common in enterprise applications where many employees sign in at once during common hours of the day.
 3. **Internet security software.**  
-   Some end-users use internet security software which routes or inspects internet traffic via centralized servers before showing the content to the user. Supabase Auth will then rate-limit based on the IP address of the server, and can cause multiple users of the same software have a degraded experience.
+   Some end-users use internet security software which routes or inspects internet traffic via centralized servers before showing the content to the user. This means that Supabase Auth will rate-limit based on the IP address of the server, causing multiple users of the same software to have a degraded experience.
 4. **VPN.**  
-   Some end users use Virtual Private Networks to protect their internet connection or to access content from other geographical locations. This means that Supabase Auth could trigger rate-limit protection since many VPN users share one IPv4 address.
+   Some end-users use Virtual Private Networks to protect their internet connection or to access content from other geographical locations. This means that Supabase Auth could trigger rate-limit protection since many VPN users share one IPv4 address.
 
-Because of these common cases, rate-limit protection per IP address is quite generous but is not effective at distributed attacks.
+Due to these common cases, rate-limit protection per IP address is quite generous but is not effective against distributed attacks.
 
-Supabase Auth does support using a [Turing test](https://en.wikipedia.org/wiki/CAPTCHA) in the form of a CAPTCHA via the [hCaptcha](https://www.hcaptcha.com) service to identify humans vs. robots. You can enable this protection in your project's dashboard.
+Supabase Auth supports using a [Turing test](https://en.wikipedia.org/wiki/CAPTCHA) in the form of a CAPTCHA via the [hCaptcha](https://www.hcaptcha.com) service to distinguish humans from robots. You can enable this protection in your project's dashboard.
 
 <Admonition type="tip">
   The [W3C does not recommend the use of CAPTCHA](https://www.w3.org/TR/turingtest/) or other Turing
@@ -205,29 +205,28 @@ Supabase Auth does support using a [Turing test](https://en.wikipedia.org/wiki/C
 
 ## Redirect URLs
 
-Supabase Auth lets you redirect back to different URLs on susccessful authentication. Your client app can specify the URL to redirect back to using the `redirectTo` parameter.
+Supabase Auth allows you to redirect back to different URLs on successful authentication. Your client app can specify the URL to redirect back to using the `redirectTo` parameter.
 
-Given that in sophisticated attacks this parameter may come from a malicious source, Supabase Auth implements an allow list which will be consulted prior to sending a redirect response. Should the redirect parameter not fall in the URL allow list, the Site URL is used.
+In sophisticated attacks, this parameter may come from a malicious source. To mitigate this risk, Supabase Auth implements an allow list which is consulted prior to sending a redirect response. If the redirect parameter does not fall in the URL allow list, the Site URL is used.
 
 The allow list can be a simple list of exactly matching URLs, but it also supports wildcard characters to match them as a pattern.
 
 <Admonition type="tip">
-  You can configure the URL allow list in the [Authentication General Settings
-  page](https://app.supabase.com/project/_/auth/settings) under Redirect URLs.
+  You can configure the URL allow list in the [Authentication General Settings page](https://app.supabase.com/project/_/auth/settings) under Redirect URLs.
 </Admonition>
 
-Because wildcard patterns are also supported, you need to be careful when using them, as you may be opening up your application to a larger attack surface. Here are some examples of do's and don'ts.
+However, when using wildcard patterns, you need to be careful as you may be opening up your application to a larger attack surface. Here are some do's and don'ts:
 
-**Dont's.**
+**Don'ts:**
 
 - `**`  
   This pattern would match any redirect URL.
 - `com.mobile.app.*://**`  
-  This pattern would match any iOS application with a package name that starts with `com.mobile.app.`. An attacker can use this to call on those apps in a user's device.
+  This pattern would match any iOS application with a package name that starts with `com.mobile.app.` An attacker can use this to call on those apps on a user's device.
 - `https://*.com/**`  
   This pattern would match any URL on the `.com` domain name. An attacker can use this to redirect back to any website they control.
 
-**Dos.**
+**Do's:**
 
 - `https://app.example.com/**`  
   This is the recommended form for most project use cases on the web. Any redirects to the `app.example.com` domain will be allowed with any path. If your project needs to support multiple such domains, add multiple entries like this.
