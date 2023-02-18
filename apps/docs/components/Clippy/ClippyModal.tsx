@@ -9,7 +9,6 @@ import clippyImage from '../../public/img/clippy.png'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
-import Link from 'next/link'
 import {
   Button,
   IconAlertCircle,
@@ -21,7 +20,6 @@ import {
   Modal,
 } from 'ui'
 import components from '~/components'
-import { useClippy } from './ClippyProvider'
 import SearchResult, { SearchResultType } from './SearchResult'
 
 type Props = {
@@ -61,7 +59,6 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const [hasError, setHasError] = useState(false)
   const eventSourceRef = useRef<SSE>()
   const supabaseClient = useSupabaseClient()
-  const { close } = useClippy()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
@@ -162,7 +159,6 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setIsResponding(false)
     setHasError(false)
   }
-
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
       <div
@@ -174,7 +170,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             className="w-full"
             size="xlarge"
             autoFocus
-            placeholder="Ask me anything about Supabase"
+            placeholder="Search documentation"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             icon={<IconSearch size="small" />}
@@ -226,26 +222,28 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           </div>
         )}
         {results.length > 0 && (
-          <div className="flex flex-col gap-3 overflow-y-auto">
+          <div className="flex flex-col gap-3 overflow-y-auto px-4 py-4 rounded-lg bg-scale-200">
             {results.map((page) => {
               const pageSections = page.sections.filter((section) => !!section.heading)
               return (
-                <div className="flex flex-col gap-3">
-                  <Link href={`${page.path}`}>
-                    <SearchResult type={SearchResultType.Document} title={page.meta.title} />
-                  </Link>
+                <div key={page.id} className="flex flex-col gap-3">
+                  <SearchResult
+                    href={`${page.path}`}
+                    type={SearchResultType.Document}
+                    title={page.meta.title}
+                  />
                   {pageSections.length > 0 && (
                     <div className="flex flex-row">
-                      <div className="border bg-scale-600 rounded-xl self-stretch p-0.5 ml-4 mr-4"></div>
+                      <div className="border bg-scale-300 rounded-xl self-stretch p-[1px] ml-4 mr-4"></div>
                       <div className="flex flex-col gap-3 items-stretch grow">
                         {pageSections.map((section) => (
-                          <Link href={`${page.path}#${section.slug}`}>
-                            <SearchResult
-                              type={SearchResultType.Section}
-                              title={section.heading}
-                              chip={page.meta.title}
-                            />
-                          </Link>
+                          <SearchResult
+                            key={section.id}
+                            href={`${page.path}#${section.slug}`}
+                            type={SearchResultType.Section}
+                            title={section.heading}
+                            chip={page.meta.title}
+                          />
                         ))}
                       </div>
                     </div>
