@@ -21,6 +21,7 @@ import {
   Modal,
 } from 'ui'
 import components from '~/components'
+import { useClippy } from './ClippyProvider'
 
 type Props = {
   onClose?: () => void
@@ -59,6 +60,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const [hasError, setHasError] = useState(false)
   const eventSourceRef = useRef<SSE>()
   const supabaseClient = useSupabaseClient()
+  const { close } = useClippy()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
@@ -224,7 +226,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               return (
                 <div className="flex flex-col gap-3">
                   <Link href={`${page.path}`}>
-                    <a className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm">
+                    <a
+                      className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm"
+                      onClick={close}
+                    >
                       <div className="w-6 h-6 flex items-center justify-center mr-4 rounded-md bg-scale-700">
                         <svg width="14" height="10" fill="none">
                           <path
@@ -250,7 +255,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                       <div className="flex flex-col gap-3 items-stretch grow">
                         {pageSections.map((section) => (
                           <Link href={`${page.path}#${section.slug}`}>
-                            <a className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm">
+                            <a
+                              className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm"
+                              onClick={close}
+                            >
                               <div className="w-6 h-6 flex items-center justify-center mr-4 text-brand-1100 rounded-md bg-scale-700">
                                 <svg width="12" height="12" fill="none">
                                   <path
