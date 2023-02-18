@@ -74,8 +74,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
   const handleSearchConfirm = useCallback(
     async (query: string) => {
-      setHasError(false)
+      setResults([])
       setAnswer(undefined)
+      setIsResponding(false)
+      setHasError(false)
       setIsLoading(true)
 
       const { error, data: pageSections } = await supabaseClient.functions.invoke('search', {
@@ -99,8 +101,10 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   )
 
   const handleClippyConfirm = useCallback(async (query: string) => {
-    setHasError(false)
+    setResults([])
     setAnswer(undefined)
+    setIsResponding(false)
+    setHasError(false)
     setIsLoading(true)
 
     const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
@@ -153,6 +157,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     eventSourceRef.current?.close()
     eventSourceRef.current = undefined
     setQuery('')
+    setResults([])
     setAnswer(undefined)
     setIsResponding(false)
     setHasError(false)
