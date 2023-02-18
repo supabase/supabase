@@ -294,6 +294,32 @@ functions:
           .select('name').execute()
           ```
 
+  - id: insert
+    title: 'Create data: insert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
+    examples:
+      - id: create-a-record
+        name: Create a record
+        code: |
+          ```
+          data, count = supabase
+          .table('countries')
+          .insert({"id": 1, "name": "Denmark"})
+          .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Denmark'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
   - id: invoke
     title: 'invoke()'
     description: |
