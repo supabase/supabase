@@ -6,8 +6,10 @@ import { SSE } from 'sse.js'
 import clippyImageDark from '../../public/img/clippy-dark.png'
 import clippyImage from '../../public/img/clippy.png'
 
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
+import Link from 'next/link'
 import {
   Button,
   IconAlertCircle,
@@ -51,10 +53,12 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   const { isDarkMode } = useTheme()
   const [query, setQuery] = useState('')
   const [answer, setAnswer] = useState('')
+  const [results, setResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
   const eventSourceRef = useRef<SSE>()
+  const supabaseClient = useSupabaseClient()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
@@ -65,7 +69,33 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     ? 'Clippy has failed you'
     : undefined
 
-  const handleConfirm = useCallback(async (query: string) => {
+  const handleSearchConfirm = useCallback(
+    async (query: string) => {
+      setHasError(false)
+      setAnswer(undefined)
+      setIsLoading(true)
+
+      const { error, data: pageSections } = await supabaseClient.functions.invoke('search', {
+        body: { query },
+      })
+
+      setIsLoading(false)
+
+      if (error) {
+        setIsLoading(false)
+        setIsResponding(false)
+        setHasError(true)
+        console.error(error)
+        return
+      }
+
+      setResults(pageSections)
+      console.log(pageSections)
+    },
+    [supabaseClient]
+  )
+
+  const handleClippyConfirm = useCallback(async (query: string) => {
     setHasError(false)
     setAnswer(undefined)
     setIsLoading(true)
@@ -143,7 +173,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             onKeyDown={(e) => {
               switch (e.key) {
                 case 'Enter':
-                  handleConfirm(query)
+                  handleSearchConfirm(query)
                   return
                 default:
                   return
@@ -164,7 +194,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           )}
         </div>
 
-        {!isLoading && !answer && !hasError && (
+        {!isLoading && !answer && !hasError && results.length === 0 && (
           <div className="">
             <div className="mt-2">
               <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
@@ -176,7 +206,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                       className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
                       onClick={() => {
                         setQuery(question)
-                        handleConfirm(question)
+                        handleClippyConfirm(question)
                       }}
                     >
                       {question}
@@ -185,6 +215,67 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                 ))}
               </ul>
             </div>
+          </div>
+        )}
+        {results.length > 0 && (
+          <div className="flex flex-col gap-3 overflow-y-auto">
+            {results.map((page) => {
+              const pageSections = page.sections.filter((section) => !!section.heading)
+              return (
+                <div className="flex flex-col gap-3">
+                  <Link href={`${page.path}`}>
+                    <a className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm">
+                      <div className="w-6 h-6 flex items-center justify-center mr-4 rounded-md bg-scale-700">
+                        <svg width="14" height="10" fill="none">
+                          <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M3.5 0c1.093 0 2.117.27 3 .743V10a6.344 6.344 0 0 0-3-.743c-1.093 0-2.617.27-3.5.743V.743C.883.27 2.407 0 3.5 0Z"
+                            fill="hsla(153, 60%, 85%, 1)"
+                          />
+                          <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M10.5 0c1.093 0 2.617.27 3.5.743V10c-.883-.473-2.407-.743-3.5-.743s-2.117.27-3 .743V.743a6.344 6.344 0 0 1 3-.743Z"
+                            fill="hsla(153, 60%, 45%, 1)"
+                          />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col gap-2 items-start">{page.meta.title}</div>
+                    </a>
+                  </Link>
+                  {pageSections.length > 0 && (
+                    <div className="flex flex-row">
+                      <div className="border bg-scale-600 rounded-xl self-stretch p-0.5 ml-4 mr-4"></div>
+                      <div className="flex flex-col gap-3 items-stretch grow">
+                        {pageSections.map((section) => (
+                          <Link href={`${page.path}#${section.slug}`}>
+                            <a className="flex flex-row items-center bg-scale-500 hover:bg-scale-700 transition p-4 rounded-md border border-scale-600 text-sm">
+                              <div className="w-6 h-6 flex items-center justify-center mr-4 text-brand-1100 rounded-md bg-scale-700">
+                                <svg width="12" height="12" fill="none">
+                                  <path
+                                    d="M3.75 1v10M8.25 1v10M1 3.75h10M1 8.25h10"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                  />
+                                </svg>
+                              </div>
+                              <div className="flex flex-col gap-2 items-start">
+                                <div className="rounded-xl bg-scale-700 pl-3 pr-3 pt-0.5 pb-0.5 text-xs text-scale-1100">
+                                  {page.meta.title}
+                                </div>
+                                <div>{section.heading}</div>
+                              </div>
+                            </a>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
         {answer && (
