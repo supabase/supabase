@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-
+import { useRouter } from 'next/router'
 import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
@@ -19,8 +19,11 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
-  const [open, setOpen] = useState(false)
 
+  const { pathname } = useRouter()
+  const isLauchWeekPage = pathname.includes('launch-week')
+
+  const [open, setOpen] = useState(false)
   const [openProduct, setOpenProduct] = useState(false)
   const [openDevelopers, setOpenDevelopers] = useState(false)
 
@@ -160,6 +163,7 @@ const Nav = () => {
         px-1
         text-sm font-medium
         transition-colors
+        ${isLauchWeekPage ? '!text-white' : ''}
                 ` + props.active
       }
       onClick={props.onClick}
@@ -172,7 +176,7 @@ const Nav = () => {
             (props.active && ' rotate-180 transform transition-all duration-100')
           }
         >
-          <IconChevronDown size={14} strokeWidth={2} />
+          <IconChevronDown size={14} strokeWidth={2} className="text-white" />
         </div>
       </>
     </div>
@@ -182,8 +186,16 @@ const Nav = () => {
     <>
       {/* <Announcement /> */}
       <div className="sticky top-0 z-50">
-        <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
-        <nav className="border-scale-400 border-b backdrop-blur-sm">
+        <div
+          className={`${
+            isLauchWeekPage ? '' : 'bg-scale-200'
+          } absolute top-0 h-full w-full opacity-80`}
+        ></div>
+        <nav
+          className={`border-scale-400 backdrop-blur-sm border-b ${
+            isLauchWeekPage ? 'border-[#be9eea]' : ''
+          }`}
+        >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="relative mx-auto flex h-16 justify-between lg:container lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
@@ -193,7 +205,13 @@ const Nav = () => {
                   <Link href="/" as="/">
                     <a className="block h-6 w-auto">
                       <Image
-                        src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                        src={
+                          isLauchWeekPage
+                            ? supabaseLogoWordmarkDark
+                            : isDarkMode
+                            ? supabaseLogoWordmarkDark
+                            : supabaseLogoWordmarkLight
+                        }
                         width={124}
                         height={24}
                         alt="Supabase Logo"
@@ -218,6 +236,7 @@ const Nav = () => {
                         text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium
+                        ${isLauchWeekPage ? '!text-white' : ''}
                       `}
                     >
                       Pricing
@@ -229,6 +248,7 @@ const Nav = () => {
                         text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium
+                        ${isLauchWeekPage ? '!text-white' : ''}
                       `}
                     >
                       Blog
@@ -247,7 +267,7 @@ const Nav = () => {
                   icon={
                     <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className="text-scale-900 flex h-3 w-3 items-center justify-center
+                        className={`text-scale-900 flex h-3 w-3 items-center justify-center
 
                       transition-all
                       group-hover:h-4
@@ -256,14 +276,16 @@ const Nav = () => {
                       group-focus:h-4
                       group-focus:w-4
 
-                      group-focus:text-yellow-900"
+                      group-focus:text-yellow-900
+                      ${isLauchWeekPage ? '!text-white' : ''}
+                      `}
                       >
                         <IconStar strokeWidth={2} />
                       </div>
                     </div>
                   }
                 >
-                  Star us on GitHub
+                  <span className={isLauchWeekPage ? '!text-white' : ''}>Star us on GitHub</span>
                 </Button>
 
                 <Link href="https://app.supabase.com/">

@@ -1,3 +1,11 @@
+.bg-lw7 {
+  background: linear-gradient(135.19deg, #c9aaf3 -0.85%, #ab89da 27.17%, #8e6fa0 76.71%);
+}
+
+.bg-lw7-black-transition {
+  background: linear-gradient(0.39deg, #1c1c1c 53.84%, rgba(28, 28, 28, 0) 88.21%);
+}
+/*
 .mask {
   mask-image: radial-gradient(black, transparent);
 }
@@ -22,4 +30,4 @@
   .community_wrappers > span > img {
     object-fit: contain !important;
   }
-}
+} */

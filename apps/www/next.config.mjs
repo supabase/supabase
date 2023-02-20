@@ -44,6 +44,7 @@ const nextConfig = {
       's3-us-west-2.amazonaws.com',
       'user-images.githubusercontent.com',
       'pbs.twimg.com',
+      'placekitten.com',
     ],
   },
   async headers() {
