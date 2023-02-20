@@ -3,7 +3,17 @@ import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, IconGlobe, IconTerminal, IconMinimize2, IconMaximize2, Button, Modal } from 'ui'
+import {
+  Alert,
+  IconGlobe,
+  IconTerminal,
+  IconMinimize2,
+  IconMaximize2,
+  IconCheck,
+  IconClipboard,
+  Button,
+  Modal,
+} from 'ui'
 
 import { useStore, useParams, checkPermissions } from 'hooks'
 import Panel from 'components/ui/Panel'
@@ -19,6 +29,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
   const router = useRouter()
   const { functions, ui } = useStore()
   const { ref: projectRef, id } = useParams()
+  const [isCopied, setIsCopied] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [selectedFunction, setSelectedFunction] = useState<any>(null)
@@ -31,11 +42,6 @@ const EdgeFunctionDetails: FC<Props> = () => {
   }, [functions.isLoaded, ui.selectedProject])
 
   const { data: settings } = useProjectApiQuery({ projectRef })
-  const functionUrl = `https://${projectRef}.functions.supabase.co/${selectedFunction?.slug}`
-
-  // get the .co or .net TLD from the restUrl
-  const restUrl = ui.selectedProject?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -50,6 +56,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
     'functions',
     ...endpointSections.slice(1),
   ].join('.')
+  const functionUrl = `https://${functionsEndpoint}/${selectedFunction?.slug}`
 
   const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -140,9 +147,9 @@ const EdgeFunctionDetails: FC<Props> = () => {
 
   const invokeCommands: any = [
     {
-      command: `curl -L -X POST 'https://${projectRef}.functions.supabase.${restUrlTld}/${
-        selectedFunction?.slug
-      }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}' --data '{"name":"Functions"}'`,
+      command: `curl -L -X POST '${functionUrl}' -H 'Authorization: Bearer ${
+        anonKey ?? '[YOUR ANON KEY]'
+      }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello function',
       jsx: () => {
         return (
@@ -169,6 +176,33 @@ const EdgeFunctionDetails: FC<Props> = () => {
           <div className="flex items-center">
             <p className="text-sm text-scale-1000 w-[130px]">Endpoint URL</p>
             <p className="text-sm text-scale-1200">{functionUrl}</p>
+            <button
+              type="button"
+              className="text-scale-900 hover:text-scale-1200 transition ml-2"
+              onClick={(event: any) => {
+                function onCopy(value: any) {
+                  setIsCopied(true)
+                  navigator.clipboard.writeText(value).then()
+                  setTimeout(function () {
+                    setIsCopied(false)
+                  }, 3000)
+                }
+                event.stopPropagation()
+                onCopy(functionUrl)
+              }}
+            >
+              {isCopied ? (
+                <div className="text-brand-900">
+                  <IconCheck size={14} strokeWidth={3} />
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="block">
+                    <IconClipboard size={14} strokeWidth={1.5} />
+                  </div>
+                </div>
+              )}
+            </button>
           </div>
 
           <div className="flex items-center">
