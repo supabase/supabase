@@ -969,4 +969,63 @@ GRANT ALL ON TABLE next_auth.verification_tokens TO postgres;
 GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;
 `.trim(),
   },
+  {
+    id: 16,
+    type: 'template',
+    title: 'Most frequently invoked',
+    description: 'Top 10 most frequently called queries in your database.',
+    sql: `select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    statements.rows / statements.calls as avg_rows
+
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    statements.calls desc
+  limit
+    10;`,
+  },
+  {
+    id: 17,
+    type: 'template',
+    title: 'Most time consuming',
+    description: 'Top 10 most time consuming queries in your database.',
+    sql: `SELECT
+auth.rolname,
+interval '1 millisecond' * statements.total_exec_time AS total_exec_time,
+to_char((statements.total_exec_time/sum(statements.total_exec_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_exec_time,
+to_char(statements.calls, 'FM999G999G999G990') AS ncalls,
+statements.query AS query
+FROM pg_stat_statements as statements
+INNER JOIN pg_authid AS auth ON statements.userid = auth.oid
+ORDER BY total_exec_time DESC
+LIMIT 10;`,
+  },
+  {
+    id: 18,
+    type: 'template',
+    title: 'Slowest execution time',
+    description: 'Top 10 slowest queries based on execution time. ',
+    sql: `select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    statements.rows / statements.calls as avg_rows
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    max_time desc
+  limit
+    10;`,
+  },
 ]
