@@ -26,7 +26,7 @@ const EdgeFunctionsRow: FC<Props> = ({ fn }) => {
       key={fn.id}
       className={[
         'border border-scale-500 border-t-0 first:rounded-t first:border-t last:rounded-b',
-        'bg-scale-100 dark:bg-scale-300 py-6 px-6 flex items-center justify-between',
+        'bg-scale-100 dark:bg-scale-300 py-4 px-6 flex items-center justify-between',
         'hover:border-t hover:-mt-[1px] first:!mt-0 cursor-pointer',
         'hover:bg-scale-200 dark:hover:bg-scale-500 hover:border-scale-500 dark:hover:border-scale-700',
       ].join(' ')}
