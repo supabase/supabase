@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'apps/www/**'
+      - 'apps/docs/**'
 
 jobs:
   build:
@@ -12,7 +15,6 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +40,7 @@ jobs:
       - name: Show working directory
         run: git status
 
-      - name: Create Pull Request
+      - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
           add-paths: |
@@ -51,5 +53,5 @@ jobs:
           branch:
             generate-sitemap
           commit-message:
-            'docs: generate sitemap'
+            'www / docs: generate sitemap'
 
