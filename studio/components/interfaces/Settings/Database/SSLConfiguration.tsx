@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useParams, useStore } from 'hooks'
+import { useParams, useStore, useFlag } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconExternalLink, IconLoader, Alert } from 'ui'
+import { Button, IconDownload, Toggle, IconLoader, Alert } from 'ui'
 import {
   FormHeader,
   FormPanel,
@@ -19,6 +19,8 @@ const SSLConfiguration = () => {
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const sslEnforcement = useFlag('sslEnforcement')
+
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
     projectRef: ref,
@@ -77,7 +79,7 @@ const SSLConfiguration = () => {
         </div> */}
       </div>
       <FormPanel>
-        {hasAccessToSSLEnforcement && (
+        {sslEnforcement && hasAccessToSSLEnforcement && (
           <FormSection
             header={
               <FormSectionLabel
