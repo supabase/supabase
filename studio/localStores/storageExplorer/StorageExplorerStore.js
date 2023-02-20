@@ -1,14 +1,14 @@
 import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import { find, compact, isEqual, isNil, has, some, chunk, get, uniq } from 'lodash'
+import { find, compact, isEqual, isNil, has, some, chunk, uniq } from 'lodash'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
 
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { patch, post, delete_ } from 'lib/common/fetch'
+import { get, patch, post, delete_ } from 'lib/common/fetch'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
@@ -377,8 +377,8 @@ class StorageExplorerStore {
       this.selectedFilePreview = { ...file, previewUrl: 'loading' }
       const cachedPreview = find(this.filePreviewCache, { id: file.id })
 
-      const fetchedAt = get(cachedPreview, ['fetchedAt'], null)
-      const expiresIn = get(cachedPreview, ['expiresIn'], null)
+      const fetchedAt = cachedPreview?.fetchedAt ?? null
+      const expiresIn = cachedPreview?.expiresIn ?? null
       const existsInCache = fetchedAt !== null && expiresIn !== null
       const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
 
@@ -487,10 +487,10 @@ class StorageExplorerStore {
   }
 
   fetchBuckets = async () => {
-    const { data: buckets, error } = await this.supabaseClient.storage.listBuckets()
-    if (error) return this.ui.setNotification({ message: error.message, category: 'error' })
+    const res = await get(`${this.endpoint}/buckets`)
+    if (res.error) return this.ui.setNotification({ category: 'error', message: res.error.message })
 
-    const formattedBuckets = buckets.map((bucket) => {
+    const formattedBuckets = res.map((bucket) => {
       return { ...bucket, type: STORAGE_ROW_TYPES.BUCKET, status: STORAGE_ROW_STATUS.READY }
     })
     this.buckets = formattedBuckets
@@ -614,7 +614,8 @@ class StorageExplorerStore {
 
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
-    const topLevelFolders = get(this.columns, [derivedColumnIndex, 'items'], [])
+    // const topLevelFolders = get(this.columns, [derivedColumnIndex, 'items'], [])
+    const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
     const formattedFilesToUpload = filesToUpload.map((file) => {
@@ -661,7 +662,7 @@ class StorageExplorerStore {
       const fileOptions = { cacheControl: '3600' }
       const metadata = { mimetype: file.type, size: file.size }
 
-      const isWithinFolder = get(file, ['path'], '').split('/').length > 1
+      const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
@@ -1090,7 +1091,7 @@ class StorageExplorerStore {
 
   downloadFile = async (file, showToast = true, returnBlob = false) => {
     const fileName = file.name
-    const fileMimeType = get(file, ['metadata', 'mimetype'], null)
+    const fileMimeType = file?.metadata?.mimetype ?? null
 
     const toastId = showToast
       ? this.ui.setNotification({ category: 'loading', message: `Retrieving ${fileName}...` })
