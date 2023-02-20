@@ -191,7 +191,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   return (
     <div className="sb-grid">
       <Header
-        projectRef={project?.ref}
         table={table}
         sorts={sorts}
         filters={filters}

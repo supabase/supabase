@@ -1,19 +1,20 @@
 import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
+import { useParams } from 'hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
 
 export type RefreshButtonProps = {
-  projectRef?: string
   table: SupaTable
 }
 
-const RefreshButton = ({ projectRef, table }: RefreshButtonProps) => {
+const RefreshButton = ({ table }: RefreshButtonProps) => {
+  const { ref } = useParams()
   const queryClient = useQueryClient()
 
-  const queryKey = sqlKeys.query(projectRef, [table.schema, table.name])
+  const queryKey = sqlKeys.query(ref, [table.schema, table.name])
 
   const loading = useIsFetching({ queryKey }) > 0
 

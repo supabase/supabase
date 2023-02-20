@@ -24,7 +24,6 @@ import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 const MAX_EXPORT_ROW_COUNT = 500000
 
 export type HeaderProps = {
-  projectRef?: string
   table: SupaTable
   sorts: Sort[]
   filters: Filter[]
@@ -33,15 +32,7 @@ export type HeaderProps = {
   headerActions?: ReactNode
 }
 
-const Header = ({
-  projectRef,
-  table,
-  sorts,
-  filters,
-  onAddColumn,
-  onAddRow,
-  headerActions,
-}: HeaderProps) => {
+const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
@@ -50,12 +41,7 @@ const Header = ({
       {selectedRows.size > 0 ? (
         <RowHeader table={table} sorts={sorts} filters={filters} />
       ) : (
-        <DefaultHeader
-          table={table}
-          projectRef={projectRef}
-          onAddColumn={onAddColumn}
-          onAddRow={onAddRow}
-        />
+        <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
       )}
       <div className="sb-grid-header__inner">{headerActions}</div>
     </div>
@@ -65,18 +51,17 @@ const Header = ({
 export default Header
 
 type DefaultHeaderProps = {
-  projectRef?: string
   table: SupaTable
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader = ({ projectRef, table, onAddColumn, onAddRow }: DefaultHeaderProps) => {
+const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton projectRef={projectRef} table={table} />
+        <RefreshButton table={table} />
         <FilterDropdown />
         <SortPopover />
       </div>
