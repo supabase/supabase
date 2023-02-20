@@ -11,6 +11,7 @@ import clippyImage from '../../../public/img/clippy.png'
 
 import { getPageType } from '~/lib/helpers'
 import { useClippy } from '~/components/Clippy/ClippyProvider'
+import { IS_PLATFORM } from '~/lib/constants'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -118,15 +119,17 @@ const TopNavBarRef: FC = () => {
             </div>
           </SearchButton>
 
-          <div className="flex cursor-pointer order-1 lg:order-2">
-            <Image
-              onClick={openClippy}
-              width={26}
-              height={29}
-              src={isDarkMode ? clippyImageDark : clippyImage}
-              alt="Clippy"
-            />
-          </div>
+          {IS_PLATFORM && (
+            <div className="flex cursor-pointer order-1 lg:order-2">
+              <Image
+                onClick={openClippy}
+                width={26}
+                height={29}
+                src={isDarkMode ? clippyImageDark : clippyImage}
+                alt="Clippy"
+              />
+            </div>
+          )}
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button
