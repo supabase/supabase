@@ -1,41 +1,44 @@
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
+import { useRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { IconCheck, IconClipboard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconUpload, IconCheck, IconClipboard } from 'ui'
 
 import { useParams, useStore } from 'hooks'
+import Table from 'components/to-be-cleaned/Table'
 import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 
 interface Props {
-  fn: EdgeFunctionsResponse
+  function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsRow: FC<Props> = ({ fn }) => {
+const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   const router = useRouter()
-  const { ref } = useParams()
   const { ui } = useStore()
+  const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
+  // get the .co or .net TLD from the restUrl
   const restUrl = ui.selectedProject?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-  const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+  const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${item.slug}`
 
   return (
-    <div
-      key={fn.id}
-      className={[
-        'border border-scale-500 border-t-0 first:rounded-t first:border-t last:rounded-b',
-        'bg-scale-100 dark:bg-scale-300 py-4 px-6 flex items-center justify-between',
-        'hover:border-t hover:-mt-[1px] first:!mt-0 cursor-pointer',
-        'hover:bg-scale-200 dark:hover:bg-scale-500 hover:border-scale-500 dark:hover:border-scale-700',
-      ].join(' ')}
-      onClick={() => router.push(`/project/${ref}/functions/${fn.id}`)}
+    <Table.tr
+      key={item.id}
+      onClick={() => {
+        router.push(`/project/${ref}/functions/${item.id}`)
+      }}
     >
-      <div className="space-y-1">
-        <p className="text-sm">{fn.name}</p>
-        <div className="flex items-center space-x-2">
-          <p className="text-sm text-scale-1000">{functionUrl}</p>
+      <Table.td className="">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-scale-1200">{item.name}</p>
+        </div>
+      </Table.td>
+      <Table.td className="">
+        <div className="text-xs text-scale-1100 flex gap-2 items-center truncate">
+          <p className="font-mono truncate hidden md:inline">{functionUrl}</p>
           <button
             type="button"
             className="text-scale-900 hover:text-scale-1200 transition"
@@ -64,29 +67,15 @@ const EdgeFunctionsRow: FC<Props> = ({ fn }) => {
             )}
           </button>
         </div>
-      </div>
-      <div className="space-y-1 flex flex-col items-end">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <p className="text-sm">Deployment {fn.version}</p>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">Deployment history coming soon</span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
+      </Table.td>
+      <Table.td className="hidden 2xl:table-cell">
+        <p className="text-scale-1100">{dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}</p>
+      </Table.td>
+      <Table.td className="lg:table-cell">
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <div className="flex items-center space-x-2">
-              <IconUpload size={14} strokeWidth={1.5} className="text-scale-1000" />
-              <p className="text-sm text-scale-1000">{dayjs(fn.updated_at).fromNow()}</p>
+              <p className="text-sm text-scale-1000">{dayjs(item.updated_at).fromNow()}</p>
             </div>
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom">
@@ -98,14 +87,17 @@ const EdgeFunctionsRow: FC<Props> = ({ fn }) => {
               ].join(' ')}
             >
               <span className="text-xs text-scale-1200">
-                Last updated on {dayjs(fn.updated_at).format('DD MMM, YYYY HH:mm')}
+                Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
               </span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
-      </div>
-    </div>
+      </Table.td>
+      <Table.td className="lg:table-cell">
+        <p className="text-scale-1100">{item.version}</p>
+      </Table.td>
+    </Table.tr>
   )
 }
 
-export default EdgeFunctionsRow
+export default observer(EdgeFunctionsListItem)
