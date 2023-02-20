@@ -31,9 +31,9 @@ const Wrappers = () => {
 
   const isWrappersEnabled =
     wrappersExtension !== undefined &&
-    wrappersExtension?.installed_version !== null &&
+    wrappersExtension.installed_version !== null &&
     vaultExtension !== undefined &&
-    vaultExtension?.installed_version !== null
+    vaultExtension.installed_version !== null
 
   return (
     <div>

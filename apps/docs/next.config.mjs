@@ -53,6 +53,7 @@ const nextConfig = {
       'github.com',
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
+      'weweb-changelog.ghost.io',
     ],
   },
   experimental: {
