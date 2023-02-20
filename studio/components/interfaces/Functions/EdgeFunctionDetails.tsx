@@ -59,7 +59,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
       await deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
       ui.setNotification({
         category: 'success',
-        message: `Succesfully deleted "${selectedFunction.name}"`,
+        message: `Successfully deleted "${selectedFunction.name}"`,
       })
       router.push(`/project/${projectRef}/functions`)
     } catch (error: any) {
