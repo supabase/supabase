@@ -221,6 +221,10 @@ async function walk(dir: string, parentPath?: string): Promise<WalkEntry[]> {
 }
 
 async function generateEmbeddings() {
+  // TODO: use better CLI lib like yargs
+  const args = process.argv.slice(2)
+  const shouldRefresh = args.includes('--refresh')
+
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.SUPABASE_SERVICE_ROLE_KEY ||
@@ -241,7 +245,12 @@ async function generateEmbeddings() {
     .filter(({ path }) => !ignoredFiles.includes(path))
 
   console.log(`Discovered ${markdownFiles.length} pages`)
-  console.log('Checking which pages are new or have changed')
+
+  if (!shouldRefresh) {
+    console.log('Checking which pages are new or have changed')
+  } else {
+    console.log('Refresh flag set, re-generating all pages')
+  }
 
   for (const markdownFile of markdownFiles) {
     const path = markdownFile.path.replace(/^pages/, '').replace(/\.mdx?$/, '')
@@ -267,14 +276,14 @@ async function generateEmbeddings() {
       type Singular<T> = T extends any[] ? undefined : T
 
       // We use checksum to determine if this page & its sections need to be regenerated
-      if (existingPage?.checksum === checksum) {
+      if (!shouldRefresh && existingPage?.checksum === checksum) {
         const existingParentPage = existingPage?.parentPage as Singular<
           typeof existingPage.parentPage
         >
 
         // If parent page changed, update it
         if (existingParentPage?.path !== parentPath) {
-          console.log(`Parent page has changed for '${path}'. Updating to '${parentPath}'...`)
+          console.log(`[${path}] Parent page has changed. Updating to '${parentPath}'...`)
           const { error: fetchParentPageError, data: parentPage } = await supabaseClient
             .from('page')
             .select()
@@ -299,9 +308,13 @@ async function generateEmbeddings() {
       }
 
       if (existingPage) {
-        console.log(
-          `Docs have changed for '${path}', removing old page sections and their embeddings`
-        )
+        if (!shouldRefresh) {
+          console.log(
+            `[${path}] Docs have changed, removing old page sections and their embeddings`
+          )
+        } else {
+          console.log(`[${path}] Refresh flag set, removing old page sections and their embeddings`)
+        }
 
         const { error: deletePageSectionError } = await supabaseClient
           .from('page_section')
@@ -345,7 +358,7 @@ async function generateEmbeddings() {
         throw upsertPageError
       }
 
-      console.log(`Adding ${sections.length} page sections (with embeddings) for '${path}'`)
+      console.log(`[${path}] Adding ${sections.length} page sections (with embeddings)`)
       for (const { slug, heading, content } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
         const input = content.replace(/\n/g, ' ')
