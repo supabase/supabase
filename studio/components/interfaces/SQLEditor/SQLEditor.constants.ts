@@ -973,15 +973,24 @@ GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;
     id: 16,
     type: 'template',
     title: 'Most frequently invoked',
-    description: 'Top 10 most frequently called queries in your database.',
-    sql: `select
+    description: 'Most frequently called queries in your database.',
+    sql: `-- Most frequently called queries
+
+-- A limit of 100 has been added below
+select
     auth.rolname,
     statements.query,
     statements.calls,
+    -- -- Postgres 13, 14, 15
     statements.total_exec_time + statements.total_plan_time as total_time,
     statements.min_exec_time + statements.min_plan_time as min_time,
     statements.max_exec_time + statements.max_plan_time as max_time,
     statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
     statements.rows / statements.calls as avg_rows
 
   from pg_stat_statements as statements
@@ -989,43 +998,59 @@ GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;
   order by
     statements.calls desc
   limit
-    10;`,
+    100;`,
   },
   {
     id: 17,
     type: 'template',
     title: 'Most time consuming',
-    description: 'Top 10 most time consuming queries in your database.',
-    sql: `SELECT
-auth.rolname,
-interval '1 millisecond' * statements.total_exec_time AS total_exec_time,
-to_char((statements.total_exec_time/sum(statements.total_exec_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_exec_time,
-to_char(statements.calls, 'FM999G999G999G990') AS ncalls,
-statements.query AS query
-FROM pg_stat_statements as statements
-INNER JOIN pg_authid AS auth ON statements.userid = auth.oid
-ORDER BY total_exec_time DESC
-LIMIT 10;`,
+    description: 'Aggregate time spent on a query type.',
+    sql: `-- Most time consuming queries
+
+-- A limit of 100 has been added below
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    total_time desc
+  limit
+    100;`,
   },
   {
     id: 18,
     type: 'template',
     title: 'Slowest execution time',
-    description: 'Top 10 slowest queries based on execution time. ',
-    sql: `select
+    description: 'Slowest queries based on max execution time.',
+    sql: `-- Slowest queries by max execution time
+
+-- A limit of 100 has been added below
+
+select
     auth.rolname,
     statements.query,
     statements.calls,
+    -- -- Postgres 13, 14, 15
     statements.total_exec_time + statements.total_plan_time as total_time,
     statements.min_exec_time + statements.min_plan_time as min_time,
     statements.max_exec_time + statements.max_plan_time as max_time,
     statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   order by
     max_time desc
   limit
-    10;`,
-  },
+    100;`,
+  }
 ]
