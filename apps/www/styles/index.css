@@ -659,3 +659,36 @@ launch week
 
   -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 1), transparent);
 }
+
+/* Text with a gradient background */
+[class*='gradient-text-'] {
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[class*='gradient-text-']::selection {
+  background-color: var(--colors-brand9);
+  background-clip: unset;
+  -webkit-text-fill-color: white;
+}
+
+@layer utilities {
+  .gradient-text-brand-100 {
+    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+  }
+  .gradient-text-brand-500 {
+    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+  }
+
+  .gradient-text-scale-100 {
+    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
+  }
+
+  .gradient-text-scale-500 {
+    background-image: -webkit-linear-gradient(
+      45deg,
+      var(--colors-scale10) 0%,
+      var(--colors-scale12) 100%
+    );
+  }
+}

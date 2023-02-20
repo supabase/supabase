@@ -1,10 +1,16 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+<<<<<<< HEAD
 import { checkPermissions, useParams, useStore } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconDownload, Toggle, IconExternalLink, IconLoader, Alert } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+=======
+import { useParams, useStore, useFlag } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, IconDownload, Toggle, IconLoader, Alert } from 'ui'
+>>>>>>> bb5d57da53dbdacb4c51df21a8c357d864ba7a0e
 import {
   FormHeader,
   FormPanel,
@@ -21,6 +27,8 @@ const SSLConfiguration = () => {
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const sslEnforcement = useFlag('sslEnforcement')
+
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
     projectRef: ref,
@@ -66,13 +74,11 @@ const SSLConfiguration = () => {
     }
   }
 
-  if (!hasAccessToSSLEnforcement) return <></>
-
   return (
     <div>
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
-        <div className="flex items-center space-x-2 mb-6">
+        {/* <div className="flex items-center space-x-2 mb-6">
           <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
             <a target="_blank">
               <Button type="default" icon={<IconExternalLink />}>
@@ -80,72 +86,55 @@ const SSLConfiguration = () => {
               </Button>
             </a>
           </Link>
-        </div>
+        </div> */}
       </div>
       <FormPanel>
-        <FormSection
-          header={
-            <FormSectionLabel
-              className="lg:col-span-7"
-              description={
-                <div className="space-y-4">
-                  <p className="text-sm text-scale-1000">
-                    Reject non-SSL connections to your database
-                  </p>
-                  {!sslEnforcementConfiguration?.appliedSuccessfully && (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="SSL enforcement was not updated successfully"
-                    >
-                      Please try updating again, or contact{' '}
-                      <Link href="/support/new">
-                        <a target="_blank" className="underline">
-                          support
-                        </a>
-                      </Link>{' '}
-                      if this error persists
-                    </Alert>
-                  )}
-                </div>
-              }
-            >
-              Enforce SSL on incoming connections
-            </FormSectionLabel>
-          }
-        >
-          <FormSectionContent loading={false} className="lg:!col-span-5">
-            <div className="flex items-center justify-end mt-2.5 space-x-2">
-              {(isLoading || isSubmitting) && (
-                <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Toggle
-                    checked={isEnforced}
-                    disabled={!canUpdateSSLEnforcement || isLoading || isSubmitting}
-                    onChange={toggleSSLEnforcement}
-                  />
-                </Tooltip.Trigger>
-                {!canUpdateSSLEnforcement && (
-                  <Tooltip.Content align="center" side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200 w-[250px]',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to update SSL configurations
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+        {sslEnforcement && hasAccessToSSLEnforcement && (
+          <FormSection
+            header={
+              <FormSectionLabel
+                className="lg:col-span-7"
+                description={
+                  <div className="space-y-4">
+                    <p className="text-sm text-scale-1000">
+                      Reject non-SSL connections to your database
+                    </p>
+                    {!sslEnforcementConfiguration?.appliedSuccessfully && (
+                      <Alert
+                        withIcon
+                        variant="warning"
+                        title="SSL enforcement was not updated successfully"
+                      >
+                        Please try updating again, or contact{' '}
+                        <Link href="/support/new">
+                          <a target="_blank" className="underline">
+                            support
+                          </a>
+                        </Link>{' '}
+                        if this error persists
+                      </Alert>
+                    )}
+                  </div>
+                }
+              >
+                Enforce SSL on incoming connections
+              </FormSectionLabel>
+            }
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-5">
+              <div className="flex items-center justify-end mt-2.5 space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
                 )}
-              </Tooltip.Root>
-            </div>
-          </FormSectionContent>
-        </FormSection>
+                <Toggle
+                  checked={isEnforced}
+                  disabled={isLoading || isSubmitting}
+                  onChange={toggleSSLEnforcement}
+                />
+              </div>
+            </FormSectionContent>
+          </FormSection>
+        )}
 
         <div className="grid grid-cols-1 items-center lg:grid-cols-2 p-8">
           <div className="space-y-2">

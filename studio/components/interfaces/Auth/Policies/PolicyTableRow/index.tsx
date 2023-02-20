@@ -26,7 +26,9 @@ const PolicyTableRow: FC<Props> = ({
   onSelectDeletePolicy = () => {},
 }) => {
   const { meta } = useStore()
-  const policies = meta.policies.list((x: PostgresPolicy) => x.table === table.name)
+  const policies = meta.policies.list(
+    (policy: PostgresPolicy) => policy.schema === table.schema && policy.table === table.name
+  )
 
   return (
     <Panel
