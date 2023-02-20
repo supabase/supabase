@@ -74,6 +74,13 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
               },
             ]
           : []),
+        {
+          name: 'Insights',
+          key: 'insights',
+          url: `/project/${ref}/database/insights`,
+          items: [],
+          label: 'NEW',
+        },
       ],
     },
   ]
