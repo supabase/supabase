@@ -190,7 +190,7 @@ export const Content = () => {
             <Table
               head={
                 <>
-                  <Table.th className="table-cell">source</Table.th>
+                  {/* <Table.th className="table-cell">source</Table.th> */}
                   <Table.th className="table-cell">rolname</Table.th>
                   <Table.th className="table-cell">ncalls</Table.th>
                   <Table.th className="table-cell">prop_exec_time</Table.th>
@@ -203,7 +203,7 @@ export const Content = () => {
                   QueryMostTimeConsumingData[0].data.map((item, i) => {
                     return (
                       <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="whitespace-nowrap flex gap-3 items-center text-scale-1200">
+                        {/* <Table.td className="whitespace-nowrap flex gap-3 items-center text-scale-1200">
                           {item.query.includes('-- source: dashboard') ? (
                             <>
                               <IconMonitor size={12} /> Dashboard
@@ -213,7 +213,7 @@ export const Content = () => {
                               <IconGlobe size={12} /> API
                             </>
                           )}
-                        </Table.td>
+                        </Table.td> */}
                         <Table.td className="table-cell whitespace-nowrap">
                           {item.rolname}{' '}
                         </Table.td>
