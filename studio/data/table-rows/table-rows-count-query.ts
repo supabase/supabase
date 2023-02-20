@@ -66,6 +66,18 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
     }
   )
 
+/**
+ * useTableRowsCountPrefetch is used for prefetching the table rows count. For example, starting a query loading before a page is navigated to.
+ *
+ * @example
+ * const prefetch = useTableRowsCountPrefetch({ ...args })
+ *
+ * return (
+ *   <Link onMouseEnter={() => prefetch()}>
+ *     Start loading on hover
+ *   </Link>
+ * )
+ */
 export const useTableRowsCountPrefetch = ({
   projectRef,
   connectionString,

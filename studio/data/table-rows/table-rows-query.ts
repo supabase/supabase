@@ -97,6 +97,18 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
     }
   )
 
+/**
+ * useTableRowsPrefetch is used for prefetching table rows. For example, starting a query loading before a page is navigated to.
+ *
+ * @example
+ * const prefetch = useTableRowsPrefetch({ projectRef })
+ *
+ * return (
+ *   <Link onMouseEnter={() => prefetch()}>
+ *     Start loading on hover
+ *   </Link>
+ * )
+ */
 export const useTableRowsPrefetch = ({
   projectRef,
   connectionString,
