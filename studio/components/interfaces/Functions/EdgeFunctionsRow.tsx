@@ -58,7 +58,7 @@ const EdgeFunctionsRow: FC<Props> = ({ fn }) => {
             ) : (
               <div className="relative">
                 <div className="block">
-                  <IconClipboard size={14} />
+                  <IconClipboard size={14} strokeWidth={1.5} />
                 </div>
               </div>
             )}
