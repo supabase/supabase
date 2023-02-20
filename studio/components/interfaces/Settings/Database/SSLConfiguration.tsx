@@ -1,16 +1,10 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-<<<<<<< HEAD
-import { checkPermissions, useParams, useStore } from 'hooks'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconExternalLink, IconLoader, Alert } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-=======
-import { useParams, useStore, useFlag } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconDownload, Toggle, IconLoader, Alert } from 'ui'
->>>>>>> bb5d57da53dbdacb4c51df21a8c357d864ba7a0e
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions, useParams, useStore, useFlag } from 'hooks'
 import {
   FormHeader,
   FormPanel,
