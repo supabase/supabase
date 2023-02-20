@@ -13,6 +13,8 @@ import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-function
 
 interface Props {}
 
+// [Joshen] Next - additional configs: Verify jwt + import maps
+
 const EdgeFunctionDetails: FC<Props> = () => {
   const router = useRouter()
   const { functions, ui } = useStore()
