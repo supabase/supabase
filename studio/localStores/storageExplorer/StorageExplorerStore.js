@@ -7,7 +7,8 @@ import { createClient } from '@supabase/supabase-js'
 
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { IS_PLATFORM } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { patch, post, delete_ } from 'lib/common/fetch'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
@@ -71,6 +72,8 @@ class StorageExplorerStore {
 
   /* Supabase client */
   supabaseClient = null
+  /* [Joshen] Move towards using API */
+  endpoint = ''
 
   /* FE to toggle page level modals */
   showCreateBucketModal = false
@@ -99,6 +102,7 @@ class StorageExplorerStore {
 
   initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
     this.projectRef = projectRef
+    this.endpoint = `${API_URL}/storage/${projectRef}`
     this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
@@ -456,26 +460,21 @@ class StorageExplorerStore {
   createBucket = async (bucketName, isPublic = false) => {
     if (isNil(this.supabaseClient)) {
       return this.ui.setNotification({
-        message: 'Failed to initialize supabase client, try refreshing your browser.',
         category: 'error',
+        message: 'Failed to initialize supabase client, try refreshing your browser.',
       })
     }
 
-    const { data, error } = await this.supabaseClient.storage.createBucket(bucketName, {
-      public: isPublic,
-    })
-    if (error) {
-      this.ui.setNotification({
-        message: error.message,
-        category: 'error',
-      })
+    const res = await post(`${this.endpoint}/buckets`, { id: bucketName, public: isPublic })
+    if (res.error) {
+      this.ui.setNotification({ category: 'error', message: res.error.message })
       this.closeCreateBucketModal()
       return undefined
+    } else {
+      await this.fetchBuckets()
+      this.closeCreateBucketModal()
+      return res
     }
-
-    await this.fetchBuckets()
-    this.closeCreateBucketModal()
-    return data
   }
 
   openBucket = async (bucket) => {
@@ -503,15 +502,15 @@ class StorageExplorerStore {
     // hence delete bucket and empty bucket are coupled tightly here
     const { id, name: bucketName } = bucket
 
-    const { error: emptyBucketError } = await this.supabaseClient.storage.emptyBucket(id)
-    if (emptyBucketError) {
-      this.ui.setNotification({ message: emptyBucketError.message, category: 'error' })
+    const emptyBucketRes = await post(`${this.endpoint}/buckets/${id}/empty`, {})
+    if (emptyBucketRes.error) {
+      this.ui.setNotification({ category: 'error', message: emptyBucketRes.error.message })
       return false
     }
 
-    const { error: deleteBucketError } = await this.supabaseClient.storage.deleteBucket(id)
-    if (deleteBucketError) {
-      this.ui.setNotification({ message: deleteBucketError.message, category: 'error' })
+    const deleteBucketRes = await delete_(`${this.endpoint}/buckets/${id}`)
+    if (deleteBucketRes.error) {
+      this.ui.setNotification({ category: 'error', message: deleteBucketRes.error.message })
       return false
     }
 
@@ -527,13 +526,9 @@ class StorageExplorerStore {
   }
 
   toggleBucketPublic = async (bucket) => {
-    const { name: bucketName } = bucket
-
-    const { data, error } = await this.supabaseClient.storage.updateBucket(bucketName, {
-      public: !bucket.public,
-    })
-    if (error) {
-      this.ui.setNotification({ message: error.message, category: 'error' })
+    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, { public: !bucket.public })
+    if (res.error) {
+      this.ui.setNotification({ category: 'error', message: res.error.message })
       return this.closeToggleBucketPublicModal()
     }
 
