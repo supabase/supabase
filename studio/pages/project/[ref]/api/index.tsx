@@ -10,7 +10,7 @@ import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
+import LangSelector from 'components/interfaces/Docs/LangSelector'
 
 const PageContext = createContext(null)
 
@@ -78,11 +78,6 @@ const DocView: FC<any> = observer(({}) => {
     ? apiService.defaultApiKey
     : undefined
   const swaggerUrl = data?.autoApiService?.restUrl
-
-  const canReadServiceKey = checkPermissions(
-    PermissionAction.READ,
-    'service_api_keys.service_role_key'
-  )
 
   const {
     data: jsonSchema,
