@@ -83,34 +83,6 @@ export default function IndexPage() {
       additional: '',
       cta: 'Get Started',
     },
-    // {
-    //   name: 'Team',
-    //   nameBadge: 'New',
-    //   costUnit: 'per month per org',
-    //   href: 'https://app.supabase.com/new/new-project',
-    //   from: true,
-    //   priceLabel: 'Starting from',
-    //   priceMonthly: 599,
-    //   description: 'For scaling teams with permissions & access controls',
-    //   warning: '+ any additional usage',
-    //   features: [
-    //     'Usage-based pricing',
-    //     'Organization member roles (ABAC)',
-    //     'SOC2',
-    //     'Priority email support & SLAs',
-    //     '14 day backups',
-    //     '100,000 monthly active users included',
-    //     'Standardized Security Questionnaire',
-    //     'SSO for Supabase Dashboard',
-    //     '1 XS compute instance',
-    //     '28 day log retention',
-    //   ],
-    //   scale: '',
-    //   shutdown: '',
-    //   preface: 'The following features will apply to all projects within the organization:',
-    //   additional: '',
-    //   cta: 'Get Started',
-    // },
     {
       name: 'Enterprise',
       href: 'https://forms.supabase.com/enterprise',
@@ -900,7 +872,7 @@ export default function IndexPage() {
                 and our team of experts will be able to help.
               </p>
               <p className="p text-center">
-                For enterprise enquries,
+                For enterprise enquries,{' '}
                 <a
                   target="_blank"
                   href="https://app.supabase.com/support/new"
