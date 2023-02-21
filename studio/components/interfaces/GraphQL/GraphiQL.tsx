@@ -44,9 +44,10 @@ import styles from './graphiql.module.css'
 export type GraphiQLProps = {
   fetcher: Fetcher
   theme?: 'dark' | 'light'
+  apiKey?: string
 }
 
-const GraphiQL = ({ fetcher, theme = 'dark' }: GraphiQLProps) => {
+const GraphiQL = ({ fetcher, theme = 'dark', apiKey }: GraphiQLProps) => {
   // Ensure props are correct
   if (typeof fetcher !== 'function') {
     throw new TypeError(
@@ -55,7 +56,7 @@ const GraphiQL = ({ fetcher, theme = 'dark' }: GraphiQLProps) => {
   }
 
   return (
-    <GraphiQLProvider fetcher={fetcher}>
+    <GraphiQLProvider fetcher={fetcher} defaultHeaders={JSON.stringify({ apiKey }, null, 2)}>
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )

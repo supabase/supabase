@@ -46,9 +46,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
     return createGraphiQLFetcher({
       url: graphqlUrl,
       fetch,
-      ...(anonKey && { headers: { apikey: anonKey } }),
     })
-  }, [graphqlUrl, anonKey])
+  }, [graphqlUrl])
 
   if (isProjectSettingsLoading || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
@@ -70,7 +69,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
           <div className="mb-6">
             <h1 className="text-2xl mt-8 mb-2">Enable the GraphQL Extension</h1>
             <h2 className="text-scale-1100 text-sm">
-              Toggle the switch below to enable the GraphQL extension. Then you can use the GraphQL
+              Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
             </h2>
           </div>
@@ -81,7 +80,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={ui.theme} />
+  return <GraphiQL fetcher={fetcher} theme={ui.theme} apiKey={anonKey} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
