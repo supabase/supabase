@@ -38,7 +38,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
 
         // disabled
         // level !== 'home' && level !== id ? '-ml-8' : '',
-        !active ? 'opacity-0 invisible absolute' : '',
+        !active ? 'opacity-0 hidden absolute' : '',
       ].join(' ')}
     >
       <NavigationMenuGuideListItems id={id} />
