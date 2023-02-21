@@ -127,8 +127,8 @@ export default function IndexPage() {
         `Private Slack channel`,
         `Uptime SLA`,
       ],
-      priceLabel: 'Custom quotas',
-      priceMonthly: 'Exclusive pricing',
+      priceLabel: '',
+      priceMonthly: 'Contact us',
       preface: 'These apply to all projects within the organization:',
       scale: '',
       shutdown: '',
@@ -750,13 +750,15 @@ export default function IndexPage() {
                             <>
                               <span
                                 className={`text-scale-1200 ${
-                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl max-w-[75%]'
+                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                 }`}
                               >
                                 {tier.name !== 'Enterprise' && '$'}
                                 {tier.priceMonthly}
                               </span>
-                              <p className="p text-xs mt-1">per project per month</p>
+                              {tier.priceMonthly && !isNaN(Number(tier.priceMonthly)) && (
+                                <p className="p text-xs mt-1">per project per month</p>
+                              )}
                             </>
 
                             {tier.warning && (
