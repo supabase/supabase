@@ -553,6 +553,7 @@ export const functions = {
           url: '/guides/functions/examples/connect-to-postgres',
           items: [],
         },
+        { name: 'Discord Bot', url: '/guides/functions/examples/discord-bot', items: [] },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
         { name: 'OpenAI', url: '/guides/functions/examples/openai', items: [] },
