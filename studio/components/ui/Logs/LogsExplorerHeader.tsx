@@ -1,11 +1,14 @@
-import { IconList } from 'ui'
+import Link from 'next/link'
+import { FC } from 'react'
+import { Button, IconExternalLink, IconList } from 'ui'
+import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
 
 interface Props {
   subtitle?: string
 }
 
-const LogsExplorerHeader: React.FC<Props> = ({ subtitle }) => (
-  <div className={['flex flex-col gap-8 transition-all pb-6'].join(' ')}>
+const LogsExplorerHeader: FC<Props> = ({ subtitle }) => (
+  <div className={['flex items-center gap-8 transition-all pb-6 justify-between'].join(' ')}>
     <div className="flex items-center gap-3">
       <div
         className="flex h-6 w-6 items-center justify-center rounded border
@@ -16,8 +19,15 @@ const LogsExplorerHeader: React.FC<Props> = ({ subtitle }) => (
       </div>
 
       <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
-      {subtitle && <span className="text-2xl text-scale-1100">{subtitle}</span>}
+      {subtitle && <span className="text-2xl text-scale-1000">{subtitle}</span>}
     </div>
+    <Link href={LOGS_EXPLORER_DOCS_URL}>
+      <a>
+        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          Documentation
+        </Button>
+      </a>
+    </Link>
   </div>
 )
 export default LogsExplorerHeader
