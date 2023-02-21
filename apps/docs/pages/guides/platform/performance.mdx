@@ -118,7 +118,7 @@ Applications with lower cache hit rates generally perform more poorly since they
 
 You can view your cache and index hit rate by executing the following query:
 
-```
+```sql
 select
   'index hit rate' as name,
   (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) * 100 as ratio
