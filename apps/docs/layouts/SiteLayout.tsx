@@ -10,6 +10,7 @@ import { memo, useEffect } from 'react'
 import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { IS_PLATFORM } from '~/lib/constants'
 
 const levelsData = {
   home: {
@@ -340,7 +341,7 @@ const SiteLayout = ({ children }) => {
           <MobileMenuBackdrop />
         </Container>
         <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
-          <Clippy />
+          {IS_PLATFORM && <Clippy />}
         </div>
       </div>
     </main>
