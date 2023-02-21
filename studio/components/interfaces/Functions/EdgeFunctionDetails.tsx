@@ -222,7 +222,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
           </div>
 
           <div className="flex items-center">
-            <span className="text-sm text-scale-1000 w-[130px]">Deployment</span>
+            <span className="text-sm text-scale-1000 w-[130px]">Deployments</span>
             <div className="text-sm text-scale-1200">{selectedFunction?.version}</div>
           </div>
 

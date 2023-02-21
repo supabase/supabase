@@ -38,7 +38,7 @@ const PageLayout: NextPageWithLayout = () => {
             <Table.th>URL</Table.th>
             <Table.th className="hidden 2xl:table-cell">Created</Table.th>
             <Table.th className="lg:table-cell">Last updated</Table.th>
-            <Table.th className="lg:table-cell">Deployment</Table.th>
+            <Table.th className="lg:table-cell">Deployments</Table.th>
           </>
         }
         body={
