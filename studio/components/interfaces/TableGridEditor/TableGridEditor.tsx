@@ -6,7 +6,7 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { SchemaView } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore, useParams } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -19,6 +19,7 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import Introduction from 'components/to-be-cleaned/Docs/Pages/Tables/Introduction'
 
 interface Props {
   /** Theme for the editor */
@@ -69,10 +70,9 @@ const TableGridEditor: FC<Props> = ({
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const { query } = router
-  const { page } = query
-
+  const { ref: projectRef } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
-  const projectRef = ui.selectedProject?.ref
+
   const tables = meta.tables.list()
 
   const { data: settings } = useProjectApiQuery({ projectRef: projectRef })
@@ -330,7 +330,7 @@ const TableGridEditor: FC<Props> = ({
                       autoApiService={autoApiService}
                       selectedLang={selectedLang}
                       showApiKey={true}
-                      page={page}
+                      page="table-editor"
                     />
 
                     {jsonSchema?.definitions && (
@@ -341,7 +341,7 @@ const TableGridEditor: FC<Props> = ({
                         resources={resources}
                         definitions={jsonSchema.definitions}
                         paths={jsonSchema.paths}
-                        showApiKey={true}
+                        showApiKey={showApiKey.key}
                         refreshDocs={refreshDocs}
                       />
                     )}
