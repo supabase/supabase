@@ -1,4 +1,5 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import SVG from 'react-inlinesvg'
 import { IconBook, IconBookOpen } from 'ui'
 
 export const generateDocsMenu = (
@@ -56,6 +57,25 @@ export const generateDocsMenu = (
         ...functions.map((fn) => {
           return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
         }),
+      ],
+    },
+    {
+      title: 'GraphQL',
+      items: [
+        {
+          name: 'GraphiQL',
+          key: 'graphiql',
+          url: `/project/${ref}/api/graphiql`,
+          icon: (
+            <SVG
+              src="/img/graphql.svg"
+              style={{ width: `${16}px`, height: `${16}px` }}
+              className="text-scale-1200"
+              preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+            />
+          ),
+          items: [],
+        },
       ],
     },
     {

@@ -3,7 +3,7 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit'
 
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { ProjectLayoutWithAuth } from 'components/layouts'
+import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useParams, useStore } from 'hooks'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -84,8 +84,6 @@ const GraphiQLPage: NextPageWithLayout = () => {
   return <GraphiQL fetcher={fetcher} theme={ui.theme} />
 }
 
-GraphiQLPage.getLayout = (page) => (
-  <ProjectLayoutWithAuth title="GraphiQL">{page}</ProjectLayoutWithAuth>
-)
+GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
 
 export default observer(GraphiQLPage)

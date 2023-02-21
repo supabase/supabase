@@ -14,6 +14,8 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const { data, isLoading, error } = meta.openApi
 
   const getPage = () => {
+    if (router.pathname.endsWith('graphiql')) return 'graphiql'
+
     const { page, resource } = router.query
     if (!page && !resource) return 'introduction'
     return (page || resource || '') as string
