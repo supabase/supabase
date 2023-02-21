@@ -1,14 +1,14 @@
 import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import { find, compact, isEqual, isNil, has, some, chunk, uniq } from 'lodash'
+import { find, compact, isEqual, has, some, chunk, uniq } from 'lodash'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
 
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { get, patch, post, delete_, constructHeaders } from 'lib/common/fetch'
+import { get, patch, post, delete_ } from 'lib/common/fetch'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
@@ -16,7 +16,6 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { uuidv4 } from 'lib/helpers'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -959,17 +958,18 @@ class StorageExplorerStore {
       const fileMimeType = file.metadata?.mimetype ?? null
       return () => {
         return new Promise(async (resolve) => {
-          const { data, error } = await this.supabaseClient.storage
-            .from(this.selectedBucket.name)
-            .download(`${file.prefix}/${file.name}`)
-
+          const res = await post(
+            `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`,
+            { path: `${file.prefix}/${file.name}` }
+          )
           progress = progress + 1 / files.length
 
-          if (!error) {
+          if (!res.error) {
+            const blob = await res.blob()
             resolve({
               name: file.name,
               prefix: file.prefix,
-              blob: new Blob([data], { type: fileMimeType }),
+              blob: new Blob([blob], { type: fileMimeType }),
             })
           } else {
             resolve(false)
@@ -1092,26 +1092,9 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-
-    // TODO: need refactoring
-    // We need to update the post util method to support other content type other than json
-    const requestId = uuidv4()
-    const headers = await constructHeaders(requestId)
-    const res = await fetch(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`, {
-      method: 'POST',
-      body: JSON.stringify({
-        path: formattedPathToFile,
-      }),
-      credentials: 'include',
-      referrerPolicy: 'no-referrer-when-downgrade',
-      headers,
+    const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`, {
+      path: formattedPathToFile,
     })
-
-    console.log({ res: res })
-
-    // const { data, error } = await this.supabaseClient.storage
-    //   .from(this.selectedBucket.name)
-    //   .download(formattedPathToFile)
 
     if (!res.error) {
       const blob = await res.blob()
