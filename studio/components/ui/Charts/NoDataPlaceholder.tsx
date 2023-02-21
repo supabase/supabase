@@ -1,4 +1,4 @@
-import { IconBarChart2 } from '@supabase/ui'
+import { IconBarChart2 } from 'ui'
 
 interface Props {
   title?: string
