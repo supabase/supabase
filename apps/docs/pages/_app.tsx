@@ -10,6 +10,7 @@ import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { post } from '~/lib/fetchWrappers'
+import { IS_PLATFORM } from '~/lib/constants'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -19,7 +20,8 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
-  const [supabase] = useState(() => createBrowserSupabaseClient())
+
+  const [supabase] = useState(() => (IS_PLATFORM ? createBrowserSupabaseClient() : undefined))
 
   function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
@@ -85,7 +87,19 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           cardType: 'summary_large_image',
         }}
       />
-      <SessionContextProvider supabaseClient={supabase}>
+      {IS_PLATFORM ? (
+        <SessionContextProvider supabaseClient={supabase}>
+          <ThemeProvider>
+            <SearchProvider>
+              <ClippyProvider>
+                <SiteLayout>
+                  <Component {...pageProps} />
+                </SiteLayout>
+              </ClippyProvider>
+            </SearchProvider>
+          </ThemeProvider>
+        </SessionContextProvider>
+      ) : (
         <ThemeProvider>
           <SearchProvider>
             <ClippyProvider>
@@ -95,7 +109,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             </ClippyProvider>
           </SearchProvider>
         </ThemeProvider>
-      </SessionContextProvider>
+      )}
     </>
   )
 }
