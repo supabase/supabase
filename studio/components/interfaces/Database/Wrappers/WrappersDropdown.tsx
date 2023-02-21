@@ -16,7 +16,7 @@ interface Props {
 
 const WrapperDropdown: FC<Props> = ({ buttonText = 'Add wrapper', align = 'end' }) => {
   const { ref } = useParams()
-  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   if (!canManageWrappers) {
     return (
