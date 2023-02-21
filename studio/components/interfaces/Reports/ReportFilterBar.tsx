@@ -1,7 +1,19 @@
-import { IconBox, IconCode, IconDatabase, IconKey, IconZap, IconZapOff } from '@supabase/ui'
-import React from 'react'
-import { useState } from 'react'
-import { Dropdown, Popover, Button, IconPlus, IconChevronDown, Select, Input, IconX } from 'ui'
+import { FC, useState, ComponentProps } from 'react'
+import {
+  Dropdown,
+  Popover,
+  Button,
+  IconPlus,
+  IconChevronDown,
+  Select,
+  Input,
+  IconX,
+  IconKey,
+  IconBox,
+  IconCode,
+  IconDatabase,
+  IconZapOff,
+} from 'ui'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import { ReportFilterItem } from './Reports.types'
@@ -10,7 +22,7 @@ interface Props {
   filters: ReportFilterItem[]
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onDatepickerChange: React.ComponentProps<typeof DatePickers>['onChange']
+  onDatepickerChange: ComponentProps<typeof DatePickers>['onChange']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
@@ -30,7 +42,7 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/auth',
     label: 'Auth',
-    description: 'Authentication and authorization requests',
+    description: 'Auth and authorization requests',
     icon: IconKey,
   },
   {
@@ -68,7 +80,7 @@ const PRODUCT_FILTERS = [
   },
 ]
 
-const ReportFilterBar: React.FC<Props> = ({
+const ReportFilterBar: FC<Props> = ({
   filters,
   onAddFilter,
   onDatepickerChange,
@@ -152,19 +164,19 @@ const ReportFilterBar: React.FC<Props> = ({
                     disabled={productFilter.key === currentProductFilter?.key}
                     onClick={() => handleProductFilterChange(productFilter)}
                     className="hover:bg-scale-600"
-                    icon={<Icon size={24} />}
+                    icon={<Icon size={20} className="mr-2" />}
                   >
-                    <span
+                    <p
                       className={[
                         productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
                         'inline-block',
                       ].join(' ')}
                     >
                       {productFilter.label}
-                    </span>
-                    <span className=" text-left text-scale-1000 inline-block">
+                    </p>
+                    <p className=" text-left text-scale-1000 inline-block w-[180px]">
                       {productFilter.description}
-                    </span>
+                    </p>
                   </Dropdown.Item>
                 )
               })}
@@ -189,16 +201,14 @@ const ReportFilterBar: React.FC<Props> = ({
           .map((filter) => (
             <div
               key={`${filter.key}-${filter.compare}-${filter.value}`}
-              className="text-xs rounded border border-scale-1100 bg-scale-500 px-1 h-7 flex flex-row justify-center gap-1 items-center"
+              className="text-xs rounded border border-scale-1000 bg-scale-500 px-2 h-7 flex flex-row justify-center gap-1 items-center"
             >
               {filter.key} {filter.compare} {filter.value}
               <Button
                 type="text"
                 size="tiny"
-                className="!p-0 h-6 w-6 flex flex-row justify-center items-center"
-                onClick={() => {
-                  onRemoveFilters([filter])
-                }}
+                className="!p-0 !space-x-0"
+                onClick={() => onRemoveFilters([filter])}
                 icon={<IconX size="tiny" className="text-scale-1100" />}
               >
                 <span className="sr-only">Remove</span>

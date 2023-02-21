@@ -21,6 +21,7 @@ import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscrip
 import { useParams } from 'hooks'
 import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
+
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const report = useApiReport()
