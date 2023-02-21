@@ -12,7 +12,7 @@ import {
   TerminalInstructions,
 } from 'components/interfaces/Functions'
 
-const FunctionsList = ({ functions }: { functions: Function[] }) => {
+const EdgeFunctionsList = ({ functions }: { functions: Function[] }) => {
   return (
     <>
       <div className="flex flex-col gap-3 py-6">
@@ -53,7 +53,7 @@ const PageLayout: NextPageWithLayout = () => {
   return hasFunctions ? (
     <div className="py-6">
       <TerminalInstructions closable />
-      <FunctionsList functions={functions.list()} />
+      <EdgeFunctionsList functions={functions.list()} />
     </div>
   ) : (
     <FunctionsEmptyState />
