@@ -1,5 +1,14 @@
-import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, IconInfo, Loading, IconExternalLink } from 'ui'
+import { FC, useEffect, useState } from 'react'
+import {
+  Badge,
+  Button,
+  IconAlertCircle,
+  IconInfo,
+  Loading,
+  IconExternalLink,
+  Alert,
+  IconBookOpen,
+} from 'ui'
 
 import { useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
@@ -11,6 +20,9 @@ import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.cons
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Link from 'next/link'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 interface Props {
   projectRef?: string
@@ -21,8 +33,10 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
   const router = useRouter()
 
-  const subscriptionTier = ui.selectedProject?.subscription_tier
+  const { project } = useProjectContext()
+  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
 
+  const subscriptionTier = ui.selectedProject?.subscription_tier
   const projectHasNoLimits =
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.TEAM ||
@@ -59,6 +73,20 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
       />
     )
   }
+  // [Terry]
+  // temporary solution to check if project is in read only mode
+  // until we get an api endpoint for this
+
+  async function checkForReadOnlyMode() {
+    const sql = `show default_transaction_read_only;`
+    const connectionString = project?.connectionString
+    const { result: readOnlyStatus } = await executeSql({ projectRef, connectionString, sql })
+    if (readOnlyStatus[0]?.default_transaction_read_only === 'on') setIsReadOnlyMode(true)
+  }
+
+  useEffect(() => {
+    checkForReadOnlyMode()
+  })
 
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
@@ -127,7 +155,6 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                       <th className="p-3 text-xs font-medium leading-4 text-left text-gray-400" />
                     </tr>
                   </thead>
-
                   {/* Line items */}
                   {usage === undefined ? (
                     <div className="px-4 pt-1 pb-4 w-96">
@@ -253,6 +280,44 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                     </tbody>
                   )}
                 </table>
+
+                {!isReadOnlyMode && product.title === 'Database' && (
+                  <div className="p-6">
+                    <Alert title="Database in read-only mode" variant="warning" withIcon>
+                      <div className="grid gap-4">
+                        {isPaidTier ? (
+                          <p>
+                            Your disk has reached 90% capacity. For Pro and Enterprise projects,
+                            disk size expands ~1.5x automatically (e.g., 8GB to 12GB), but can only
+                            occur <u>once every six hours</u>.{' '}
+                          </p>
+                        ) : (
+                          <p>
+                            This project is on the Free tier. Consider{' '}
+                            <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                              <a className="underline">upgrading</a>
+                            </Link>{' '}
+                            to resume service as usual.
+                          </p>
+                        )}
+
+                        <p>
+                          <Button
+                            type="default"
+                            icon={<IconBookOpen size={14} strokeWidth={1.5} />}
+                          >
+                            <a
+                              target="_blank"
+                              href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
+                            >
+                              Database storage management
+                            </a>
+                          </Button>
+                        </p>
+                      </div>
+                    </Alert>
+                  </div>
+                )}
               </div>
             )
           })}
