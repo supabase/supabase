@@ -618,7 +618,7 @@ export default {
     disabled: 'opacity-50',
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-scale-600',
+    chevron: 'h-5 w-5 text-scale-800',
   },
 
   /*
@@ -1113,7 +1113,7 @@ export default {
       },
     },
 
-    responsive: 'md:grid md:grid-cols-12 md:gap-x-4',
+    responsive: 'md:grid md:grid-cols-12',
     non_responsive: 'grid grid-cols-12 gap-2',
 
     labels_horizontal_layout: 'flex flex-row space-x-2 justify-between col-span-12',
@@ -1147,13 +1147,13 @@ export default {
       },
     },
     label_before: {
-      base: 'text-scale-500 ',
+      base: 'text-scale-1000 ',
       size: {
         ...defaults.size.text,
       },
     },
     label_after: {
-      base: 'text-scale-500',
+      base: 'text-scale-1000',
       size: {
         ...defaults.size.text,
       },
@@ -1482,6 +1482,7 @@ export default {
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
+      z-50
     `,
     separator: `
       w-full

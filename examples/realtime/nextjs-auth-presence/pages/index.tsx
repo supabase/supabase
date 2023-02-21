@@ -45,7 +45,7 @@ const HomePage: NextPage = () => {
     <>
       <button onClick={() => supabaseClient.auth.signOut()}>Sign out</button>
 
-      <p> List of Currenly Logged in Users: </p>
+      <p> List of Currently Logged in Users: </p>
       {Object.keys(userState).map((key) => (
         <p key={key}>Hi {key}</p>
       ))}

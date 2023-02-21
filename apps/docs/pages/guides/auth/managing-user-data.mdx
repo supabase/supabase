@@ -87,6 +87,32 @@ If you need to fetch a full list of user profiles, we supply a `service_key` whi
 
 Make sure you _NEVER_ expose this publicly. But it can be used on the server-side to fetch all of the profiles.
 
+## Accessing User Metadata
+
+You can assign metadata to users on sign up:
+
+```js
+const { data, error } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+  options: {
+    data: {
+      first_name: 'John',
+      age: 27,
+    },
+  },
+})
+```
+
+User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+let metadata = user.user_metadata
+```
+
 ## Advanced techniques
 
 ### Using triggers

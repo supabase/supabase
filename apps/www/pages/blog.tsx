@@ -166,6 +166,7 @@ function FeaturedThumb(blog: PostTypes) {
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
               objectFit="cover"
+              alt="blog thumbnail"
             />
           </div>
           <div className="flex flex-col space-y-2">
