@@ -319,7 +319,7 @@ export default function IndexPage() {
                               </p>
                               <p
                                 className={`mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1 ${
-                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl max-w-[75%]'
+                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                 }`}
                               >
                                 {tier.name !== 'Enterprise' && '$'}
