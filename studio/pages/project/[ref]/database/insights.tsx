@@ -152,11 +152,12 @@ export const Content = () => {
         </p>
         <div className="flex flex-row gap-16">
           <div>
-            {QueryHitRateData[0]?.data[0]?.name}
+            {isLoadedQueryHitRateData && QueryHitRateData[0]?.data[0]?.name}
             <div className="flex items-center gap-6">
               <div className="flex items-baseline">
                 <h1 className="text-5xl">
-                  {(QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
+                  {isLoadedQueryHitRateData &&
+                    (QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
                 </h1>
                 <span className="text-3xl">%</span>
               </div>
@@ -166,11 +167,12 @@ export const Content = () => {
             </div>
           </div>
           <div>
-            {QueryHitRateData[0]?.data[1]?.name}
+            {isLoadedQueryHitRateData && QueryHitRateData[0]?.data[1]?.name}
             <div className="flex items-center gap-6">
               <div className="flex items-baseline">
                 <h1 className="text-5xl">
-                  {(QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
+                  {isLoadedQueryHitRateData &&
+                    (QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
                 </h1>
                 <span className="text-3xl">%</span>
               </div>
