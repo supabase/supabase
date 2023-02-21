@@ -756,7 +756,7 @@ export default function IndexPage() {
                                 {tier.name !== 'Enterprise' && '$'}
                                 {tier.priceMonthly}
                               </span>
-                              {tier.priceMonthly && !isNaN(Number(tier.priceMonthly)) && (
+                              {tier.name !== 'Enterprise' && (
                                 <p className="p text-xs mt-1">per project per month</p>
                               )}
                             </>
