@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-sveltekit',
-  title: 'Quickstart: SvelteKit',
+  title: 'Build a User Management App with SvelteKit',
   description: 'Learn how to use Supabase in your SvelteKit App.',
-  sidebar_label: 'SvelteKit',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -51,12 +50,12 @@ These variables will be exposed on the browser, and that's completely fine since
 
 ```js title=src/lib/supabaseClient.ts
 import { createClient } from '@supabase/auth-helpers-sveltekit'
-import { env } from '$env/dynamic/public'
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 
-export const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
 ```
 
-Optionally, update `src/routes/style.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+Optionally, update `src/routes/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
 ### Supabase Auth Helpers
 
@@ -438,12 +437,7 @@ And then we can add the widget to the Account page:
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

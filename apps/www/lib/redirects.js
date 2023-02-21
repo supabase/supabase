@@ -1829,6 +1829,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/api',
+    destination: '/docs/guides/database/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/database/api/generating-types',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1841,5 +1851,10 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/examples',
     destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/v0/rpc',
+    destination: '/docs/reference/javascript/rpc',
   },
 ]
