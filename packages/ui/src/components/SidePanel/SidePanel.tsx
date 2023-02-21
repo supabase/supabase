@@ -67,7 +67,12 @@ const SidePanel = ({
       <Button disabled={loading} type="default" onClick={() => (onCancel ? onCancel() : null)}>
         {cancelText}
       </Button>
-      <Button loading={loading} onClick={() => (onConfirm ? onConfirm() : null)}>
+      <Button
+        htmlType="submit"
+        disabled={loading}
+        loading={loading}
+        onClick={() => (onConfirm ? onConfirm() : null)}
+      >
         {confirmText}
       </Button>
     </div>

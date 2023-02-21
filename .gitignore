@@ -4,6 +4,7 @@ node_modules
 out
 .docz
 tmp
+.swp
 
 coverage
 allure-results
