@@ -12,7 +12,13 @@ services:
     image: supabase/studio:20230216-e731b77
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -53,10 +59,19 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.47.0
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9999/health"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -102,7 +117,8 @@ services:
     container_name: supabase-rest
     image: postgrest/postgrest:v10.1.2
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     restart: unless-stopped
     environment:
@@ -116,10 +132,17 @@ services:
     container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.5.1
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "printf \\0 > /dev/tcp/localhost/4000"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -143,18 +166,69 @@ services:
     command: >
       sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
 
+  logs:
+    container_name: supabase-logs
+    image: supabase/logflare:1.0.0
+    healthcheck:
+      test:
+        [
+
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4000/health"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    ports:
+      - ${LOGFLARE_HTTP_PORT}:4000/tcp
+    volumes:
+      - type: bind
+        source: ${PWD}/gcloud.json
+        target: /opt/app/rel/logflare/bin/gcloud.json
+        read_only: true
+    environment:
+      PHX_STATIC: PATH=/opt/app/rel/logflare/bin/priv/static
+      MY_POD_IP: 127.0.0.1
+      DB_USERNAME: supabase_admin
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_HOSTNAME: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      LOGFLARE_SINGLE_TENANT: true
+      GOOGLE_PROJECT_ID: logflare-dev-238720
+      GOOGLE_PROJECT_NUMBER: 1023172132421
+
   storage:
     container_name: supabase-storage
     image: supabase/storage-api:v0.28.2
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
       rest:
         condition: service_started
       imgproxy:
         condition: service_started
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status" ]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5000/status"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -197,7 +271,8 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.60.7
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     restart: unless-stopped
     environment:
