@@ -1,11 +1,14 @@
-import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts'
+import { serve } from 'std/server'
+import puppeteer from 'puppeteer'
 
 serve(async (req) => {
   try {
+    console.log(`wss://chrome.browserless.io?token=${Deno.env.get('PUPPETEER_BROWSERLESS_IO_KEY')}`)
     // Visit browserless.io to get your free API token
     const browser = await puppeteer.connect({
-      browserWSEndpoint: 'wss://chrome.browserless.io?token=YOUR_API_TOKEN',
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${Deno.env.get(
+        'PUPPETEER_BROWSERLESS_IO_KEY'
+      )}`,
     })
     const page = await browser.newPage()
 
@@ -17,7 +20,7 @@ serve(async (req) => {
     return new Response(screenshot, { headers: { 'Content-Type': 'image/png' } })
   } catch (e) {
     console.error(e)
-    return new Response(JSON.stringify(`Error occurred when generating the screenshot`), {
+    return new Response(JSON.stringify({ error: e.message }), {
       headers: { 'Content-Type': 'application/json' },
       status: 500,
     })

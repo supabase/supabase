@@ -8,7 +8,7 @@ Generate Open Graph images with Deno and Supabase Edge Functions, no framework n
 ## Run locally
 
 ```bash
-supabase functions serve opengraph --no-verify-jwt
+supabase functions serve --no-verify-jwt
 ```
 
 Navigate to http://localhost:54321/functions/v1/opengraph
