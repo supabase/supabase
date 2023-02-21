@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run prettier
         run: |-
           npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run prettier
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
