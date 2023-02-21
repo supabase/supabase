@@ -81,7 +81,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} />
+  return <GraphiQL fetcher={fetcher} theme={ui.theme} />
 }
 
 GraphiQLPage.getLayout = (page) => (

@@ -38,14 +38,15 @@ import {
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
 import 'graphiql/graphiql.css'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import styles from './graphiql.module.css'
 
 export type GraphiQLProps = {
   fetcher: Fetcher
+  theme?: 'dark' | 'light'
 }
 
-const GraphiQL = ({ fetcher }: GraphiQLProps) => {
+const GraphiQL = ({ fetcher, theme = 'dark' }: GraphiQLProps) => {
   // Ensure props are correct
   if (typeof fetcher !== 'function') {
     throw new TypeError(
@@ -55,12 +56,16 @@ const GraphiQL = ({ fetcher }: GraphiQLProps) => {
 
   return (
     <GraphiQLProvider fetcher={fetcher}>
-      <GraphiQLInterface />
+      <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )
 }
 
-export function GraphiQLInterface() {
+type GraphiQLInterfaceProps = {
+  theme: 'dark' | 'light'
+}
+
+export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -71,7 +76,10 @@ export function GraphiQLInterface() {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const { theme, setTheme } = useTheme()
+  const { setTheme } = useTheme()
+  useEffect(() => {
+    setTheme(theme)
+  }, [theme])
 
   const PluginContent = pluginContext?.visiblePlugin?.content
 
