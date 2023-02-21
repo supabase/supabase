@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { NextSeo } from 'next-seo'
 
 import _days from '~/components/LaunchWeek/lw6_days.json'
@@ -10,7 +9,7 @@ import { createClient, Session } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import classNames from 'classnames'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import { SITE_ORIGIN } from '~/lib/constants'
@@ -19,6 +18,7 @@ import { WeekDayProps } from '~/components/LaunchWeek/types'
 
 import styles from './launchWeek.module.css'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const days = _days as WeekDayProps[]
 const constellation = [
@@ -122,33 +122,51 @@ export default function launchweek() {
   const SectionButtons = ({ blog, docs, video }) => {
     return (
       <div className="flex gap-2 z-10">
-        <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-            Blog post
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <img src="/images/launchweek/icons-blogpost.svg" className="w-4 h-4"></img>
-            </div>
-          </div>
-        </a>
-        {docs && (
-          <a href={docs} target="_blank" rel="noopener">
+        <Link href={blog}>
+          <a target="_blank" rel="noopener">
             <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Docs
+              Blog post
               <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <img src="/images/launchweek/icons-docs.svg" className="w-4 h-4"></img>
+                <img
+                  src="/images/launchweek/icons-blogpost.svg"
+                  className="w-4 h-4"
+                  alt="blog post icon"
+                />
               </div>
             </div>
           </a>
+        </Link>
+        {docs && (
+          <Link href={docs}>
+            <a target="_blank" rel="noopener">
+              <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                Docs
+                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                  <img
+                    src="/images/launchweek/icons-docs.svg"
+                    className="w-4 h-4"
+                    alt="docs icon"
+                  />
+                </div>
+              </div>
+            </a>
+          </Link>
         )}
         {video && (
-          <a href={video} target="_blank" rel="noopener">
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Video
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <img src="/images/launchweek/video-icon.svg" className="w-4 h-4"></img>
+          <Link href={video}>
+            <a target="_blank" rel="noopener">
+              <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                Video
+                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                  <img
+                    src="/images/launchweek/video-icon.svg"
+                    className="w-4 h-4"
+                    alt="video icon"
+                  />
+                </div>
               </div>
-            </div>
-          </a>
+            </a>
+          </Link>
         )}
       </div>
     )
@@ -181,12 +199,11 @@ export default function launchweek() {
           >
             <div className="flex justify-center">
               <img
-                src="/images/launchweek/launchweek-logo--light.svg"
-                className="flex w-40 dark:hidden lg:w-80"
-              />
-              <img
-                src="/images/launchweek/launchweek-logo--dark.svg"
-                className="hidden w-40 dark:flex lg:w-80"
+                src={`/images/launchweek/${
+                  isDarkMode ? 'launchweek-logo--dark.svg' : 'launchweek-logo--light.svg'
+                }`}
+                className="flex w-40 lg:w-80"
+                alt="Launch Week logo"
               />
             </div>
             <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
@@ -228,9 +245,10 @@ export default function launchweek() {
                     <img
                       src={`/images/launchweek/antcopplecall.png`}
                       className="brightness-125"
+                      alt="Ant & Copple"
                       width={120}
                       height={80}
-                    ></img>
+                    />
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
@@ -238,22 +256,34 @@ export default function launchweek() {
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
-                  <a href={'https://youtu.be/-BG9XptyCKI'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
-                      Watch video
-                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <img src="/images/launchweek/video-icon.svg" className="w-3 h-3"></img>
+                  <Link href="https://youtu.be/-BG9XptyCKI">
+                    <a target="_blank" rel="noopener">
+                      <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[130px]">
+                        Watch video
+                        <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                          <img
+                            src="/images/launchweek/video-icon.svg"
+                            className="w-3 h-3"
+                            alt="video icon"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                  <a href={'/blog/who-we-hire'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
-                      Read blogpost
-                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <img src="/images/launchweek/icons-blogpost.svg" className="w-3 h-3"></img>
+                    </a>
+                  </Link>
+                  <Link href="/blog/who-we-hire">
+                    <a target="_blank" rel="noopener">
+                      <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
+                        Read blogpost
+                        <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                          <img
+                            src="/images/launchweek/icons-blogpost.svg"
+                            className="w-3 h-3"
+                            alt="blog post icon"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </a>
+                    </a>
+                  </Link>
                 </div>
               </div>
             </SectionContainer>
@@ -263,9 +293,10 @@ export default function launchweek() {
                   <div className="flex min-w-[150px]">
                     <img
                       src={`/images/launchweek/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
+                      alt="Outro icon"
                       width={110}
                       height={80}
-                    ></img>
+                    />
                   </div>
                   <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                     <span className="text-black dark:text-white mr-2">Wrap Up</span>
@@ -273,14 +304,20 @@ export default function launchweek() {
                   </div>
                 </div>
                 <div className="flex gap-2 z-10">
-                  <a href={'/blog/launch-week-6-wrap-up'} target="_blank" rel="noopener">
-                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
-                      Read blogpost
-                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                        <img src="/images/launchweek/icons-blogpost.svg" className="w-3 h-3"></img>
+                  <Link href="/blog/launch-week-6-wrap-up">
+                    <a target="_blank" rel="noopener">
+                      <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2 min-w-[142px]">
+                        Read blogpost
+                        <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                          <img
+                            src="/images/launchweek/icons-blogpost.svg"
+                            className="w-3 h-3"
+                            alt="blog post icon"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </a>
+                    </a>
+                  </Link>
                 </div>
               </div>
             </SectionContainer>
@@ -433,6 +470,7 @@ export default function launchweek() {
                                   ? '/images/launchweek/mfa-dark.png'
                                   : '/images/launchweek/mfa-light.png'
                               }
+                              alt="MFA"
                               layout="fill"
                               objectFit="cover"
                               quality={100}
@@ -446,6 +484,7 @@ export default function launchweek() {
                                   ? '/images/launchweek/mfa-dark-hover.png'
                                   : '/images/launchweek/mfa-light-hover.png'
                               }
+                              alt="MFA"
                               layout="fill"
                               objectFit="cover"
                               quality={100}
@@ -492,6 +531,7 @@ export default function launchweek() {
                                   ? '/images/launchweek/wrappers-visual.svg'
                                   : '/images/launchweek/wrappers-visual-light.svg'
                               }
+                              alt="Wrappers"
                               layout="fill"
                               objectFit="cover"
                               quality={100}
@@ -508,6 +548,7 @@ export default function launchweek() {
                                   ? '/images/launchweek/wrappers-visual-hover.svg'
                                   : '/images/launchweek/wrappers-visual-hover-light.svg'
                               }
+                              alt="Wrappers"
                               layout="fill"
                               objectFit="cover"
                               quality={100}
@@ -559,6 +600,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/vault-visual.svg'
                                     : '/images/launchweek/vault-visual-light.svg'
                                 }
+                                alt="Vault"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -575,6 +617,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/vault-visual-hover.svg'
                                     : '/images/launchweek/vault-visual-hover-light.svg'
                                 }
+                                alt="Vault"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -601,6 +644,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/TCE-visual.svg'
                                     : '/images/launchweek/TCE-visual-light.svg'
                                 }
+                                alt="TCE"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -617,6 +661,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/TCE-visual-hover.svg'
                                     : '/images/launchweek/TCE-visual-hover-light.svg'
                                 }
+                                alt="TCE"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -648,6 +693,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/community-visual.svg'
                                     : '/images/launchweek/community-visual-light.svg'
                                 }
+                                alt="Community"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -664,6 +710,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/community-visual-hover.svg'
                                     : '/images/launchweek/community-visual-light-hover.svg'
                                 }
+                                alt="Community"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -675,68 +722,64 @@ export default function launchweek() {
                             </div>
                             <div className="flex flex-col md:flex-row gap-4 md:gap-2 z-10 ">
                               <div className="flex gap-4 md:gap-2">
-                                <a
-                                  href={'/blog/launch-week-6-community-day'}
-                                  target="_blank"
-                                  rel="noopener"
-                                >
-                                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                                    Blog post
-                                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                                      <img
-                                        src="/images/launchweek/icons-blogpost.svg"
-                                        className="w-4 h-4"
-                                      ></img>
+                                <Link href="/blog/launch-week-6-community-day">
+                                  <a target="_blank" rel="noopener">
+                                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                                      Blog post
+                                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                                        <img
+                                          src="/images/launchweek/icons-blogpost.svg"
+                                          className="w-4 h-4"
+                                          alt="blog post icon"
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
-                                </a>
-                                <a
-                                  href={'https://www.youtube.com/watch?v=hw9Q-NjASbU'}
-                                  target="_blank"
-                                  rel="noopener"
-                                >
-                                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                                    Flutterflow
-                                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                                      <img
-                                        src="/images/launchweek/video-icon.svg"
-                                        className="w-4 h-4"
-                                      ></img>
+                                  </a>
+                                </Link>
+                                <Link href="https://www.youtube.com/watch?v=hw9Q-NjASbU">
+                                  <a target="_blank" rel="noopener">
+                                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                                      Flutterflow
+                                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                                        <img
+                                          src="/images/launchweek/video-icon.svg"
+                                          className="w-4 h-4"
+                                          alt="video icon"
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
-                                </a>
+                                  </a>
+                                </Link>
                               </div>
                               <div className="flex gap-4 md:gap-2">
-                                <a
-                                  href={'https://www.youtube.com/watch?v=mw0DLwItue4'}
-                                  target="_blank"
-                                  rel="noopener"
-                                >
-                                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                                    OneSignal
-                                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                                      <img
-                                        src="/images/launchweek/video-icon.svg"
-                                        className="w-4 h-4"
-                                      ></img>
+                                <Link href="https://www.youtube.com/watch?v=mw0DLwItue4">
+                                  <a target="_blank" rel="noopener">
+                                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                                      OneSignal
+                                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                                        <img
+                                          src="/images/launchweek/video-icon.svg"
+                                          className="w-4 h-4"
+                                          alt="video icon"
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
-                                </a>
-                                <a
-                                  href={'https://www.youtube.com/watch?v=EdYQ9fF-hz4'}
-                                  target="_blank"
-                                  rel="noopener"
-                                >
-                                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                                    NextAuth
-                                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                                      <img
-                                        src="/images/launchweek/video-icon.svg"
-                                        className="w-4 h-4"
-                                      ></img>
+                                  </a>
+                                </Link>
+                                <Link href="https://www.youtube.com/watch?v=EdYQ9fF-hz4">
+                                  <a target="_blank" rel="noopener">
+                                    <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+                                      NextAuth
+                                      <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                                        <img
+                                          src="/images/launchweek/video-icon.svg"
+                                          className="w-4 h-4"
+                                          alt="video icon"
+                                        />
+                                      </div>
                                     </div>
-                                  </div>
-                                </a>
+                                  </a>
+                                </Link>
                               </div>
                             </div>
                           </div>
@@ -755,6 +798,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PgGraphql-visual.svg'
                                     : '/images/launchweek/PgGraphql-visual-light.svg'
                                 }
+                                alt="PgGraphql"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -771,6 +815,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PgGraphql-visual-hover.svg'
                                     : '/images/launchweek/PgGraphql-visual-hover-light.svg'
                                 }
+                                alt="PgGraphql"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -800,6 +845,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/custom-domains-visual.svg'
                                     : '/images/launchweek/custom-domains-visual-light.svg'
                                 }
+                                alt="Custom Domains"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -816,6 +862,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/custom-domains-visual-hover.svg'
                                     : '/images/launchweek/custom-domains-visual-hover-light.svg'
                                 }
+                                alt="Custom Domains"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -845,6 +892,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PITR-visual.svg'
                                     : '/images/launchweek/PITR-visual-light.svg'
                                 }
+                                alt="PITR"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -861,6 +909,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PITR-visual-hover.svg'
                                     : '/images/launchweek/PITR-visual-hover-light.svg'
                                 }
+                                alt="PITR"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -890,6 +939,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/pg_crdt-visual.svg'
                                     : '/images/launchweek/pg_crdt-visual-light.svg'
                                 }
+                                alt="pg_crdt"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -906,6 +956,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/pg_crdt-visual-hover.svg'
                                     : '/images/launchweek/pg_crdt-visual-hover-light.svg'
                                 }
+                                alt="pg_crdt"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -935,6 +986,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/postgres-visual.svg'
                                     : '/images/launchweek/postgres-visual-light.svg'
                                 }
+                                alt="postgres"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -951,6 +1003,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/postgres-visual-hover.svg'
                                     : '/images/launchweek/postgres-visual-hover-light.svg'
                                 }
+                                alt="postgres"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -980,6 +1033,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PostgREST11-visual.svg'
                                     : '/images/launchweek/PostgREST11-visual-light.svg'
                                 }
+                                alt="PostgREST11"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -996,6 +1050,7 @@ export default function launchweek() {
                                     ? '/images/launchweek/PostgREST11-visual-hover.svg'
                                     : '/images/launchweek/PostgREST11-visual-hover-light.svg'
                                 }
+                                alt="PostgREST11"
                                 layout="fill"
                                 objectFit="cover"
                                 quality={100}
@@ -1039,14 +1094,11 @@ export default function launchweek() {
               The traditional parallel Hackathon is back! Build a new open source project with
               Supabase and you can win $1500 in GitHub sponsorships and a coveted Supabase Darkmode
               Keyboard! For more info check the{' '}
-              <a
-                href="https://supabase.com/blog/launch-week-6-hackathon"
-                target="_blank"
-                rel="nooper noreferrer"
-                className="text-brand-900"
-              >
-                blog post
-              </a>
+              <Link href="https://supabase.com/blog/launch-week-6-hackathon">
+                <a target="_blank" rel="nooper noreferrer" className="text-brand-900">
+                  blog post
+                </a>
+              </Link>
               .
             </p>
           </div>
@@ -1074,27 +1126,27 @@ export default function launchweek() {
                     or if you just want to chill and watch people build, come and join us!
                   </p>
                   <div></div>
-                  <a
-                    href="https://discord.supabase.com/"
-                    rel="noopener noreferrer"
-                    className="text-brand-900 flex items-center"
-                    target="_blank"
-                  >
-                    Join our Discord <IconExternalLink size="small" className="inline-block ml-2" />
-                  </a>
+                  <Link href="https://discord.supabase.com/">
+                    <a
+                      rel="noopener noreferrer"
+                      className="text-brand-900 flex items-center"
+                      target="_blank"
+                    >
+                      Join our Discord{' '}
+                      <IconExternalLink size="small" className="inline-block ml-2" />
+                    </a>
+                  </Link>
                 </div>
               </div>
               <div className={'flex flex-col'}>
                 <h3 className="text-lg text-black dark:text-white mb-2">Submission</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
                   Submit your project through{' '}
-                  <a
-                    className="text-brand-900"
-                    href="https://www.madewithsupabase.com/launch-week-6"
-                    target="_blank"
-                  >
-                    madewithsupabase.com
-                  </a>
+                  <Link href="https://www.madewithsupabase.com/launch-week-6">
+                    <a className="text-brand-900" target="_blank">
+                      madewithsupabase.com
+                    </a>
+                  </Link>
                   . All submissions must be open source and publically available. Submissions close
                   Monday 19th Dec 00:01 AM PT.
                 </p>
@@ -1106,75 +1158,73 @@ export default function launchweek() {
                 'flex basis-1/3 flex-col px-5'
               )}
             >
-              <a
-                href="https://github.com/psteinroe/supabase-cache-helpers"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="self-end"
-              >
-                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
-                  <img
-                    src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
-                  ></img>
-                  <h3 className="text-black dark:text-white">Supabase Cache Helpers</h3>
-                  <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
-                </div>
-              </a>
-              <a
-                href="https://github.com/pheralb/superui"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
-                  <img
-                    src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
-                  ></img>
-                  <h3 className="text-black dark:text-white">Super UI</h3>
-                  <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
-                </div>
-              </a>
-              <a
-                href="https://github.com/Myzel394/quid_faciam_hodie"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="self-end"
-              >
-                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
-                  <img
-                    src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
-                  ></img>
-                  <h3 className="text-black dark:text-white">Quid Faciam Hodie?</h3>
-                  <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
-                </div>
-              </a>
-              <a href="https://github.com/laznic/hotdogs" target="_blank" rel="noopener noreferrer">
-                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
-                  <img
-                    src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
-                  ></img>
-                  <h3 className="text-black dark:text-white">That Hot Dog Game</h3>
-                  <p className="text-slate-1000 text-xs">Previous Winner: Most Fun/Interesting</p>
-                </div>
-              </a>
-              <a
-                href="https://github.com/vvidday/repo-watch"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="self-end"
-              >
-                <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
-                  <img
-                    src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
-                  ></img>
-                  <h3 className="text-black dark:text-white">RepoWatch</h3>
-                  <p className="text-slate-1000 text-xs">Previous Winner Best Realtime Project</p>
-                </div>
-              </a>
+              <Link href="https://github.com/psteinroe/supabase-cache-helpers">
+                <a target="_blank" rel="noopener noreferrer" className="self-end">
+                  <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                    <img
+                      src="/images/launchweek/link.svg"
+                      className="absolute top-[16px] right-[10px] text-brand-900"
+                      alt="link icon"
+                    />
+                    <h3 className="text-black dark:text-white">Supabase Cache Helpers</h3>
+                    <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="https://github.com/pheralb/superui">
+                <a target="_blank" rel="noopener noreferrer">
+                  <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                    <img
+                      src="/images/launchweek/link.svg"
+                      className="absolute top-[16px] right-[10px] text-brand-900"
+                      alt="link icon"
+                    />
+                    <h3 className="text-black dark:text-white">Super UI</h3>
+                    <p className="text-slate-1000 text-xs">
+                      Previous Best Overall Project Runner Up
+                    </p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="https://github.com/Myzel394/quid_faciam_hodie">
+                <a target="_blank" rel="noopener noreferrer" className="self-end">
+                  <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                    <img
+                      src="/images/launchweek/link.svg"
+                      className="absolute top-[16px] right-[10px] text-brand-900"
+                      alt="link icon"
+                    />
+                    <h3 className="text-black dark:text-white">Quid Faciam Hodie?</h3>
+                    <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="https://github.com/laznic/hotdogs">
+                <a target="_blank" rel="noopener noreferrer">
+                  <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                    <img
+                      src="/images/launchweek/link.svg"
+                      className="absolute top-[16px] right-[10px] text-brand-900"
+                      alt="link icon"
+                    />
+                    <h3 className="text-black dark:text-white">That Hot Dog Game</h3>
+                    <p className="text-slate-1000 text-xs">Previous Winner: Most Fun/Interesting</p>
+                  </div>
+                </a>
+              </Link>
+              <Link href="https://github.com/vvidday/repo-watch">
+                <a target="_blank" rel="noopener noreferrer" className="self-end">
+                  <div className="border border-slate-400 dark:border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-white dark:bg-[#121212] w-fit relative max-w-[250px]">
+                    <img
+                      src="/images/launchweek/link.svg"
+                      className="absolute top-[16px] right-[10px] text-brand-900"
+                      alt="link icon"
+                    />
+                    <h3 className="text-black dark:text-white">RepoWatch</h3>
+                    <p className="text-slate-1000 text-xs">Previous Winner Best Realtime Project</p>
+                  </div>
+                </a>
+              </Link>
             </div>
           </div>
         </SectionContainer>
@@ -1202,12 +1252,15 @@ export default function launchweek() {
                 >
                   <div className="relative group">
                     <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
-                    <a href={creator.link} target="_blank" rel="noopener">
-                      <img
-                        className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
-                        src={creator.profile_picture}
-                      />
-                    </a>
+                    <Link href={creator.link}>
+                      <a target="_blank" rel="noopener">
+                        <img
+                          className="relative rounded-full w-12 h-12 border border-brand-900 hover:shadow-md"
+                          src={creator.profile_picture}
+                          alt={`${creator.first_name} ${creator.last_name} avatar`}
+                        />
+                      </a>
+                    </Link>
                   </div>
                 </div>
               )
@@ -1227,12 +1280,14 @@ export default function launchweek() {
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
-              <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand-900 flex items-center mt-2">
-                  See all the content
-                  <IconExternalLink size="small" className="inline-block ml-1" />
-                </div>
-              </a>
+              <Link href="/blog/the-supabase-content-storm">
+                <a rel="noopener" target="_blank">
+                  <div className="text-brand-900 flex items-center mt-2">
+                    See all the content
+                    <IconExternalLink size="small" className="inline-block ml-1" />
+                  </div>
+                </a>
+              </Link>
             </p>
             {activeCreator !== null && (
               <div className="lg:max-w-[50%] min-h-[120px]">

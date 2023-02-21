@@ -24,7 +24,7 @@ This value is also reported in the [database settings page](https://app.supabase
 
 Supabase uses network-attached storage to balance performance with scalability.
 For Pro and Enterprise projects, disk size expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the disk size.
-Automatic disk size expansion can only occur once every six hours.
+Disk size expansion can only occur once every six hours.
 Pro projects can store up to 1024TB.
 
 All projects enter read-only mode when you reach 95% of the disk size. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
