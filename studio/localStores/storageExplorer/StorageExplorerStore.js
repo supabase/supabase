@@ -8,7 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { get, patch, post, delete_ } from 'lib/common/fetch'
+import { get, patch, post, delete_, constructHeaders } from 'lib/common/fetch'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
@@ -16,6 +16,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
+import { uuidv4 } from 'lib/helpers'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -1092,48 +1093,59 @@ class StorageExplorerStore {
       .join('/')
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
 
-    const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`, {
-      path: formattedPathToFile,
+    // TODO: need refactoring
+    // We need to update the post util method to support other content type other than json
+    const requestId = uuidv4()
+    const headers = await constructHeaders(requestId)
+    const res = await fetch(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`, {
+      method: 'POST',
+      body: JSON.stringify({
+        path: formattedPathToFile,
+      }),
+      credentials: 'include',
+      referrerPolicy: 'no-referrer-when-downgrade',
+      headers,
     })
+
     console.log({ res: res })
 
     // const { data, error } = await this.supabaseClient.storage
     //   .from(this.selectedBucket.name)
     //   .download(formattedPathToFile)
 
-    // if (!res.error) {
-    //   const blob = res
-    //   const newBlob = new Blob([blob], { type: fileMimeType })
+    if (!res.error) {
+      const blob = await res.blob()
+      const newBlob = new Blob([blob], { type: fileMimeType })
 
-    //   if (returnBlob) return { name: fileName, blob: newBlob }
+      if (returnBlob) return { name: fileName, blob: newBlob }
 
-    //   const blobUrl = window.URL.createObjectURL(newBlob)
-    //   const link = document.createElement('a')
-    //   link.href = blobUrl
-    //   link.setAttribute('download', `${fileName}`)
-    //   document.body.appendChild(link)
-    //   link.click()
-    //   link.parentNode.removeChild(link)
-    //   window.URL.revokeObjectURL(blob)
-    //   if (toastId) {
-    //     this.ui.setNotification({
-    //       id: toastId,
-    //       category: 'success',
-    //       message: `Downloading ${fileName}`,
-    //     })
-    //   }
-    //   return true
-    // } else {
-    //   if (toastId) {
-    //     this.ui.setNotification({
-    //       error: error,
-    //       id: toastId,
-    //       category: 'error',
-    //       message: `Failed to download ${fileName}`,
-    //     })
-    //   }
-    //   return false
-    // }
+      const blobUrl = window.URL.createObjectURL(newBlob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.setAttribute('download', `${fileName}`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
+      window.URL.revokeObjectURL(blob)
+      if (toastId) {
+        this.ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Downloading ${fileName}`,
+        })
+      }
+      return true
+    } else {
+      if (toastId) {
+        this.ui.setNotification({
+          error: error,
+          id: toastId,
+          category: 'error',
+          message: `Failed to download ${fileName}`,
+        })
+      }
+      return false
+    }
   }
 
   renameFile = async (file, newName, columnIndex) => {
