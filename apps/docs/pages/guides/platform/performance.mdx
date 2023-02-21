@@ -132,7 +132,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are <99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](https://supabase.com/docs/guides/platform/compute-add-ons) is easy and can be done from your [project dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](https://supabase.com/docs/guides/platform/compute-add-ons) is easy and can be done from your [project dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
 
 
 ### Optimizing poor performing queries
