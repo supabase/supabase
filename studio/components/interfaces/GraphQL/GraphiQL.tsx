@@ -215,12 +215,12 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             <div
               role="tabpanel"
               id="graphiql-session"
-              className="graphiql-session"
+              className={clsx('graphiql-session', styles.graphiqlSession)}
               aria-labelledby={`graphiql-session-tab-${editorContext.activeTabIndex}`}
             >
               <div ref={editorResize.firstRef}>
                 <div
-                  className={`graphiql-editors${
+                  className={`graphiql-editors ${styles.graphiqlEditors}${
                     editorContext.tabs.length === 1 ? ' full-height' : ''
                   }`}
                 >
