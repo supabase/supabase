@@ -2258,6 +2258,9 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+        description: |
+          When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
+          to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
