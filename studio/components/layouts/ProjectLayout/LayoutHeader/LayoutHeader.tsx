@@ -11,19 +11,43 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { Badge } from 'ui'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+
+import { useEffect, useState } from 'react'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
 
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
+
+  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
+
+  // [Terry]
+  // temporary solution to check if project is in read only mode
+  // until we get an api endpoint for this
+  async function checkForReadOnlyMode() {
+    const sql = `show default_transaction_read_only;`
+    const connectionString = project?.connectionString
+    const { result: readOnlyStatus } = await executeSql({ projectRef, connectionString, sql })
+    if (readOnlyStatus[0]?.default_transaction_read_only === 'on') setIsReadOnlyMode(true)
+  }
+
+  useEffect(() => {
+    checkForReadOnlyMode()
+  })
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
+
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+
   const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
@@ -62,6 +86,20 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 </span>
                 {/* Project Dropdown */}
                 <ProjectDropdown />
+
+                {/* [Terry] Temporary until we figure out how we want to display this permanently */}
+                {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
+                {!isReadOnlyMode && (
+                  <div className="ml-2">
+                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
+                      <a>
+                        <Badge color="red">
+                          Project limits exceeded. Project in read-only mode.
+                        </Badge>
+                      </a>
+                    </Link>
+                  </div>
+                )}
 
                 {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
                 {/* {showOverUsageBadge && (
