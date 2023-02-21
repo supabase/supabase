@@ -136,7 +136,7 @@ export default function IndexPage() {
       name: 'Point in Time Recovery',
       heroImg: 'addons-pitr-hero',
       icon: 'pitr-upgrade',
-      price: 'Starts from $5',
+      price: 'Starts from $100',
       description: 'Roll back to any specific point in time and ensure that data is not lost.',
       leftCtaText: 'Documentation',
       leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
