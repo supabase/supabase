@@ -17,9 +17,10 @@ import { GeneralContent, ResourceContent } from '../Docs'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
-import LangSelector from 'components/to-be-cleaned/Docs/LangSelector'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import Introduction from 'components/to-be-cleaned/Docs/Pages/Tables/Introduction'
+import LangSelector from '../Docs/LangSelector'
+import GeneratingTypes from '../Docs/GeneratingTypes'
 
 interface Props {
   /** Theme for the editor */
@@ -70,7 +71,7 @@ const TableGridEditor: FC<Props> = ({
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const { query } = router
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, page } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
   const tables = meta.tables.list()
@@ -330,8 +331,10 @@ const TableGridEditor: FC<Props> = ({
                       autoApiService={autoApiService}
                       selectedLang={selectedLang}
                       showApiKey={true}
-                      page="table-editor"
+                      page={page}
                     />
+
+                    <GeneratingTypes selectedLang={selectedLang} />
 
                     {jsonSchema?.definitions && (
                       <ResourceContent
