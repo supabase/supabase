@@ -44,13 +44,21 @@ You can authenticate your users in several ways:
 
 We provide a suite of Providers and login methods, as well as [Auth helpers](/docs/guides/auth/auth-helpers/).
 
+#### Social Auth
+
 <div className="container" style={{ padding: 0 }}>
-  <AuthProviders />
+  <AuthProviders type="social" />
+</div>
+
+#### Phone Auth
+
+<div className="container" style={{ padding: 0 }}>
+  <AuthProviders type="phone" />
 </div>
 
 ### Configure third-party providers
 
-You can enable third-party providers with the click of a button by navigating to Authentication > Settings > Auth Providers and inputting your `Client ID` and `Secret` for each.
+You can enable third-party providers with the click of a button by navigating to Authentication > Providers > Auth Providers and inputting your `Client ID` and `Secret` for each.
 
 ![OAuth Logins.](/docs/img/supabase-oauth-logins.png)
 

@@ -19,6 +19,7 @@ import {
   Modal,
 } from 'ui'
 import components from '~/components'
+import { IS_PLATFORM } from '~/lib/constants'
 
 type Props = {
   onClose?: () => void
@@ -30,14 +31,13 @@ const questions = [
   'How do I connect to my database?',
   'How do I run migrations? ',
   'How do I listen to changes in a table?',
-  'How do I setup authentication?',
+  'How do I set up authentication?',
 ]
 
 function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/$/, '')
-  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
-  if (isPlatform) {
+  if (IS_PLATFORM) {
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
     return `${schemeAndProjectId}.functions.${domain}.${tld}`
   } else {
@@ -45,7 +45,7 @@ function getEdgeFunctionUrl() {
   }
 }
 
-const edgeFunctionUrl = getEdgeFunctionUrl()
+const edgeFunctionUrl = IS_PLATFORM ? getEdgeFunctionUrl() : undefined
 
 const ClippyModal: FC<Props> = ({ onClose }) => {
   const { isDarkMode } = useTheme()
@@ -123,7 +123,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   return (
     <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
       <div
-        className={`mx-auto max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
+        className={`mx-auto max-h-[50vh] lg:max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -165,19 +165,22 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
 
               <ul className="text-sm mt-4 text-scale-1100 grid md:flex gap-4 flex-wrap max-w-3xl">
-                {questions.map((question) => (
-                  <li>
-                    <button
-                      className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
-                      onClick={() => {
-                        setQuery(question)
-                        handleConfirm(question)
-                      }}
-                    >
-                      {question}
-                    </button>
-                  </li>
-                ))}
+                {questions.map((question) => {
+                  const key = question.replace(/\s+/g, '_')
+                  return (
+                    <li key={key}>
+                      <button
+                        className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
+                        onClick={() => {
+                          setQuery(question)
+                          handleConfirm(question)
+                        }}
+                      >
+                        {question}
+                      </button>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           </div>
@@ -237,7 +240,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
           <div className="flex justify-between items-center py-2 text-xs">
             <div className="flex items-centerp gap-1 pt-3 pb-1">
               <span>Powered by OpenAI.</span>
-              <a href="/blog/clippy" className="underline">
+              <a href="/blog/chatgpt-supabase-docs" className="underline">
                 Read the blog post
               </a>
             </div>

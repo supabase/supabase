@@ -10,7 +10,7 @@ import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { post } from '~/lib/fetchWrappers'
-import FlagProvider from 'components/Flag/FlagProvider'
+import { IS_PLATFORM } from '~/lib/constants'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -20,7 +20,8 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
-  const [supabase] = useState(() => createBrowserSupabaseClient())
+
+  const [supabase] = useState(() => (IS_PLATFORM ? createBrowserSupabaseClient() : undefined))
 
   function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
@@ -63,30 +64,30 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <FlagProvider>
-        <Favicons />
-        <DefaultSeo
-          title={SITE_TITLE}
-          description={SITE_DESCRIPTION}
-          openGraph={{
-            type: 'website',
-            url: 'https://supabase.com/docs',
-            site_name: SITE_TITLE,
-            images: [
-              {
-                url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
-                width: 800,
-                height: 600,
-                alt: 'Supabase Og Image',
-              },
-            ],
-          }}
-          twitter={{
-            handle: '@supabase',
-            site: '@supabase',
-            cardType: 'summary_large_image',
-          }}
-        />
+      <Favicons />
+      <DefaultSeo
+        title={SITE_TITLE}
+        description={SITE_DESCRIPTION}
+        openGraph={{
+          type: 'website',
+          url: 'https://supabase.com/docs',
+          site_name: SITE_TITLE,
+          images: [
+            {
+              url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
+              width: 800,
+              height: 600,
+              alt: 'Supabase Og Image',
+            },
+          ],
+        }}
+        twitter={{
+          handle: '@supabase',
+          site: '@supabase',
+          cardType: 'summary_large_image',
+        }}
+      />
+      {IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>
             <SearchProvider>
@@ -98,7 +99,17 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             </SearchProvider>
           </ThemeProvider>
         </SessionContextProvider>
-      </FlagProvider>
+      ) : (
+        <ThemeProvider>
+          <SearchProvider>
+            <ClippyProvider>
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+            </ClippyProvider>
+          </SearchProvider>
+        </ThemeProvider>
+      )}
     </>
   )
 }

@@ -19,7 +19,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api</loc>
+    <loc>https://supabase.com/docs/guides/database/api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -109,7 +109,25 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/generating-types</loc>
+    <loc>https://supabase.com/docs/new/auth</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/reference/index</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/tutorials/nextjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/database/api/generating-types</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

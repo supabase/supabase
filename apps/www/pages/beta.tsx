@@ -966,6 +966,7 @@ const Beta = (props: Props) => {
     <Layout hideHeader={true}>
       <Head>
         <title>{site_title}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
         <meta name="og:title" property="og:title" content={site_title} />
         <meta name="twitter:site" content={site_title} />
         <meta name="twitter:text:title" content={site_title} />
