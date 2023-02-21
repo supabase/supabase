@@ -899,6 +899,17 @@ export default function IndexPage() {
                 </a>{' '}
                 and our team of experts will be able to help.
               </p>
+              <p className="p text-center">
+                For enterprise enquries,
+                <a
+                  target="_blank"
+                  href="https://app.supabase.com/support/new"
+                  className="transition text-brand-900 hover:text-brand-1000"
+                >
+                  you can contact the team here
+                </a>
+                .
+              </p>
             </div>
           </div>
         </div>
