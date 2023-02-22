@@ -40,7 +40,7 @@ export const AreaChart = () => (
       { title: 'Minimal Value format', props: { minimalHeader: true, format: 'c' } },
       { title: 'No data', props: { data: [] } },
     ].map(({ title, props }) => (
-      <div className="w-72 h-72">
+      <div className="w-72 h-72" key={title}>
         <ExampleName>{title}</ExampleName>
         <div className="w-full h-full mt-4">
           <Chart {...PROPS} {...props} />
