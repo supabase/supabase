@@ -109,8 +109,7 @@ const DatabaseUsage: FC<any> = () => {
                     {usage?.disk_volume_size_gb && (
                       <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
                     )}
-
-                    {isPaidTier && <Badge>Auto-Scaling</Badge>}
+                    <Badge>Auto-Scaling</Badge>
                   </div>
 
                   <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
