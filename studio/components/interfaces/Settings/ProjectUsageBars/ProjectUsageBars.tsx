@@ -85,8 +85,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   }
 
   useEffect(() => {
-    checkForReadOnlyMode()
-  })
+    if (projectRef) checkForReadOnlyMode()
+  }, [projectRef])
 
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
@@ -289,19 +289,27 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         {isPaidTier ? (
                           <>
                             <p>
-                              For Pro and Enterprise projects, Disk Size expands ~1.5x automatically
+                              For Pro and Enterprise projects,{' '}
+                              <a href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling">
+                                Disk Size expands ~1.5x automatically
+                              </a>
                               (e.g., 8GB to 12GB) when it reaches 90% capacity, but can only occur{' '}
                               <u>once every six hours</u>.
                             </p>
                             <p>
                               If the disk size has already expanded within 6 hours, and then reaches
-                              95% capacity, your disk will enter read only mode until it can resize
-                              again after 6 hours.
+                              95% capacity,{' '}
+                              <a href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-project-read-only-mode">
+                                your disk will enter read only mode
+                              </a>{' '}
+                              until it can resize again after 6 hours.
                             </p>
                             <p>
                               If you require help or need your disk changed so you can delete data,
                               <Link
-                                href={`/support/new?ref=${projectRef}&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
+                                href={`/support/new?ref=${
+                                  projectRef ? projectRef : ''
+                                }&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
                               >
                                 <a className="underline">you can contact the support team</a>
                               </Link>
@@ -312,14 +320,18 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           <p>
                             This project is on the Free tier. Your disk size cannot auto scale.
                             Consider{' '}
-                            <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                            <Link
+                              href={`/project/${
+                                projectRef ? projectRef : ''
+                              }/settings/billing/subscription`}
+                            >
                               <a className="underline">upgrading this project</a>
                             </Link>{' '}
                             to resume service as usual.
                           </p>
                         )}
 
-                        <p>
+                        {/* <p>
                           <Button
                             type="default"
                             icon={<IconBookOpen size={14} strokeWidth={1.5} />}
@@ -331,7 +343,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                               Database storage management
                             </a>
                           </Button>
-                        </p>
+                        </p> */}
                       </div>
                     </Alert>
                   </div>

@@ -37,8 +37,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   }
 
   useEffect(() => {
-    checkForReadOnlyMode()
-  })
+    if (projectRef) checkForReadOnlyMode()
+  }, [projectRef])
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
