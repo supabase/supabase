@@ -38,24 +38,26 @@ export const ApiReport: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
+    <div className="flex flex-col gap-4 px-5 py-6 h-full mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <ReportHeader title="API" isLoading={report.isLoading} onRefresh={report.refresh} />
-
-      <ReportFilterBar
-        onRemoveFilters={report.removeFilters}
-        onDatepickerChange={handleDatepickerChange}
-        datepickerFrom={report.params.totalRequests.iso_timestamp_start}
-        datepickerTo={report.params.totalRequests.iso_timestamp_end}
-        onAddFilter={report.addFilter}
-        filters={report.filters}
-        datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-          ...helper,
-          disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
-        }))}
-      />
-      <div className="h-2 w-full">
-        <ShimmerLine active={report.isLoading} />
+      <div className="w-full flex flex-col gap-1">
+        <ReportFilterBar
+          onRemoveFilters={report.removeFilters}
+          onDatepickerChange={handleDatepickerChange}
+          datepickerFrom={report.params.totalRequests.iso_timestamp_start}
+          datepickerTo={report.params.totalRequests.iso_timestamp_end}
+          onAddFilter={report.addFilter}
+          filters={report.filters}
+          datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
+            ...helper,
+            disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
+          }))}
+        />
+        <div className="h-2 w-full">
+          <ShimmerLine active={report.isLoading} />
+        </div>
       </div>
+
       <ReportWidget
         isLoading={report.isLoading}
         params={report.params.totalRequests}
