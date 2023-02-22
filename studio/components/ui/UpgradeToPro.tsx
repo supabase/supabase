@@ -2,8 +2,11 @@ import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { useStore } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
+
+import { checkPermissions, useStore, useFlag, useParams } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   icon?: ReactNode
@@ -14,7 +17,15 @@ interface Props {
 
 const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
   const { ui } = useStore()
+  const { ref } = useParams()
   const tier = ui.selectedProject?.subscription_tier
+
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const isEnterprise = tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   return (
     <div
@@ -33,13 +44,52 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
               <p className="text-sm text-scale-1100">{secondaryText}</p>
             </div>
           </div>
-          <Link href={`/project/${projectRef}/settings/billing/update`}>
-            <a>
-              <Button type="primary">
-                {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Modify subscription'}
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
+                <Link
+                  href={
+                    isEnterprise
+                      ? `/project/${ref}/settings/billing/update/enterprise`
+                      : `/project/${ref}/settings/billing/update`
+                  }
+                >
+                  <a>
+                    {tier === PRICING_TIER_PRODUCT_IDS.FREE
+                      ? 'Upgrade to Pro'
+                      : 'Modify subscription'}
+                  </a>
+                </Link>
               </Button>
-            </a>
-          </Link>
+            </Tooltip.Trigger>
+            {!canUpdateSubscription || projectUpdateDisabled ? (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'border border-scale-200 text-center', //border
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    {projectUpdateDisabled ? (
+                      <>
+                        Subscription changes are currently disabled.
+                        <br />
+                        Our engineers are working on a fix.
+                      </>
+                    ) : !canUpdateSubscription ? (
+                      'You need additional permissions to amend subscriptions'
+                    ) : (
+                      ''
+                    )}
+                  </span>
+                </div>
+              </Tooltip.Content>
+            ) : (
+              <></>
+            )}
+          </Tooltip.Root>
         </div>
       </div>
     </div>
