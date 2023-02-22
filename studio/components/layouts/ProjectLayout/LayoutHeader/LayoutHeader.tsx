@@ -38,6 +38,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   useEffect(() => {
     if (projectRef) checkForReadOnlyMode()
+    else setIsReadOnlyMode(false)
   }, [projectRef])
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
@@ -89,7 +90,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
                 {/* [Terry] Temporary until we figure out how we want to display this permanently */}
                 {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
-                {!isReadOnlyMode && (
+                {isReadOnlyMode && (
                   <div className="ml-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
