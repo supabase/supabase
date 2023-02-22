@@ -91,7 +91,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
   const featureFootnotes: Record<string, JSX.Element> = {
-    db_size: (
+    db_size: isPaidTier ? (
       <div className="flex justify-between items-center">
         <div className="flex flex-row space-x-4 text-scale-1000">
           {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
@@ -105,6 +105,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
           </a>
         </Button>
       </div>
+    ) : (
+      <></>
     ),
   }
 
@@ -284,108 +286,114 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                 {!isReadOnlyMode && product.title === 'Database' && (
                   <div className="p-6">
                     <Alert title={'Database is in read-only mode'} variant="danger" withIcon>
-                      <div className="grid gap-4">
-                        <p>
-                          Your disk has reached 95% capacity and has entered{' '}
-                          <a
-                            href={`https://supabase.com/docs/guides/platform/database-usage#${
-                              isPaidTier
-                                ? 'paid-tier-disk-auto-scaling'
-                                : 'free-tier-project-read-only-mode'
-                            }`}
-                            className="underline transition hover:text-scale-1200"
-                          >
-                            read-only mode
-                          </a>
-                          .
-                        </p>
+                      <p>
                         {isPaidTier ? (
                           <>
-                            <p>
-                              For Pro and Enterprise projects,{' '}
-                              <a
-                                href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling"
-                                className="underline transition hover:text-scale-1200"
-                              >
-                                Disk Size expands automatically
-                              </a>{' '}
-                              when it reaches 90% capacity, but can only occur{' '}
-                              <u>once every six hours</u>.
-                            </p>
-                            <p>
-                              If the disk size has already expanded and then reaches 95% capacity
-                              within 6 hours, then{' '}
-                              <a
-                                href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-project-read-only-mode"
-                                className="underline transition hover:text-scale-1200"
-                              >
-                                your disk will enter read-only mode
-                              </a>{' '}
-                              until it can resize again after 6 hours.
-                            </p>
-                            <p>
-                              If you require help or need your disk changed so you can delete data,
-                              <Link
-                                href={`/support/new?ref=${
-                                  projectRef ? projectRef : ''
-                                }&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
-                              >
-                                <a className="underline transition hover:text-scale-1200">
-                                  you can contact the support team
-                                </a>
-                              </Link>
-                              .
-                            </p>
-                          </>
-                        ) : (
-                          <p>
-                            This project is on the Free tier. Your disk size cannot auto scale to
-                            avoid read-only mode. You can either{' '}
+                            Your disk has reached 95% capacity and has entered{' '}
                             <a
-                              href="https://supabase.com/docs/guides/platform/database-usage#increasing-available-disk-size"
+                              href={`https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling`}
                               className="underline transition hover:text-scale-1200"
                             >
-                              reduce your disk usage
+                              read-only mode
+                            </a>
+                            .
+                          </>
+                        ) : (
+                          <>
+                            You have exceeded the 500mb Database size limit and your project is now
+                            in{' '}
+                            <a
+                              href={`https://supabase.com/docs/guides/platform/database-usage#free-tier-project-read-only-mode`}
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              read-only mode
+                            </a>
+                            .
+                          </>
+                        )}
+                      </p>
+                      {isPaidTier ? (
+                        <>
+                          <p>
+                            For Pro and Enterprise projects,{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling"
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              Disk Size expands automatically
                             </a>{' '}
-                            or{' '}
+                            when it reaches 90% capacity, but can only occur once every six hours.
+                            If the disk size has already expanded and then reaches 95% capacity
+                            within 6 hours, then{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-project-read-only-mode"
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              your disk will enter read-only mode
+                            </a>{' '}
+                            until it can resize again after 6 hours.
+                          </p>
+                          <p className="mt-2">
+                            If you require help or need your disk changed to read/write mode so you
+                            can delete data,{' '}
                             <Link
-                              href={`/project/${
+                              href={`/support/new?ref=${
                                 projectRef ? projectRef : ''
-                              }/settings/billing/subscription`}
+                              }&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
                             >
                               <a className="underline transition hover:text-scale-1200">
-                                upgrade your project
+                                you can contact the support team
                               </a>
                             </Link>
                             .
                           </p>
-                        )}
-
+                        </>
+                      ) : (
                         <p>
-                          {!isPaidTier ? (
-                            <Button type="danger">
-                              <a
-                                target="_blank"
-                                href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
-                              >
-                                Upgrade this project
-                              </a>
-                            </Button>
-                          ) : (
-                            <Button
-                              type="danger"
-                              icon={<IconBookOpen size={14} strokeWidth={1.5} />}
-                            >
-                              <a
-                                target="_blank"
-                                href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
-                              >
-                                Database storage management
-                              </a>
-                            </Button>
-                          )}
+                          You can either{' '}
+                          <a
+                            href="https://supabase.com/docs/guides/platform/database-usage#increasing-available-disk-size"
+                            className="underline transition hover:text-scale-1200"
+                          >
+                            reduce your disk usage below 500mb
+                          </a>{' '}
+                          or{' '}
+                          <Link
+                            href={`/project/${
+                              projectRef ? projectRef : ''
+                            }/settings/billing/subscription`}
+                          >
+                            <a className="underline transition hover:text-scale-1200">
+                              upgrade your project
+                            </a>
+                          </Link>
+                          .
                         </p>
-                      </div>
+                      )}
+
+                      {!isPaidTier ? (
+                        <Button type="danger" className="mt-3">
+                          <a
+                            target="_blank"
+                            href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
+                          >
+                            Upgrade this project
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button
+                          type="danger"
+                          icon={<IconBookOpen size={14} strokeWidth={1.5} />}
+                          className="mt-3"
+                        >
+                          <a
+                            target="_blank"
+                            href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
+                          >
+                            Database storage management docs
+                          </a>
+                        </Button>
+                      )}
                     </Alert>
                   </div>
                 )}
