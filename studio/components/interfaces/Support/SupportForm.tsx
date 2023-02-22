@@ -376,7 +376,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
             {!isDisabled ? (
               <>
-                {['Performance'].includes(values.category) ? (
+                {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
                     projectRef={values.projectRef}

@@ -3,10 +3,11 @@ import { Button } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { useTheme } from '../Providers'
+import { useTheme } from 'common/Providers'
 
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
@@ -120,7 +121,14 @@ function AuthWidgetSection() {
                 match your brand and aesthetic
               </p>
               <div className="mb-4 flex items-center space-x-2">
-                <img className="m-0 w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
+                <div className="m-0 w-8 flex items-center">
+                  <Image
+                    src={`${basePath}/images/product/auth/react-icon.svg`}
+                    alt="react icon"
+                    width="100%"
+                    height="100%"
+                  />
+                </div>
                 <small>React only. Other frameworks coming soon.</small>
               </div>
             </div>
@@ -204,14 +212,22 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <img
-                      src="/images/auth-ui/small--light.svg"
-                      className="hidden  w-4 text-red-900 dark:block"
-                    />
-                    <img
-                      src="/images/auth-ui/small--dark.svg"
-                      className="block  w-4 text-red-900 dark:hidden"
-                    />
+                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                      <Image
+                        src="/images/auth-ui/small--light.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
+                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                      <Image
+                        src="/images/auth-ui/small--dark.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
                   </button>
                   <button
                     onClick={() => setRadius('10px')}
@@ -222,14 +238,22 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <img
-                      src="/images/auth-ui/medium--light.svg"
-                      className="hidden  w-4 text-red-900 dark:block"
-                    />
-                    <img
-                      src="/images/auth-ui/medium--dark.svg"
-                      className="block  w-4 text-red-900 dark:hidden"
-                    />
+                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                      <Image
+                        src="/images/auth-ui/medium--light.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
+                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                      <Image
+                        src="/images/auth-ui/medium--dark.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
                   </button>
                   <button
                     onClick={() => setRadius('32px')}
@@ -240,14 +264,22 @@ function AuthWidgetSection() {
                         : '',
                     ].join(' ')}
                   >
-                    <img
-                      src="/images/auth-ui/large--dark.svg"
-                      className="hidden  w-4 text-red-900 dark:block"
-                    />
-                    <img
-                      src="/images/auth-ui/large--light.svg"
-                      className="block  w-4 text-red-900 dark:hidden"
-                    />
+                    <div className="m-0 w-4 items-center flex text-red-900 dark:hidden">
+                      <Image
+                        src="/images/auth-ui/large--light.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
+                    <div className="m-0 w-4 items-center hidden text-red-900 dark:flex">
+                      <Image
+                        src="/images/auth-ui/large--dark.svg"
+                        alt="react icon"
+                        width="100%"
+                        height="100%"
+                      />
+                    </div>
                   </button>
                 </div>
               </div>

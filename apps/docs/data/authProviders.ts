@@ -107,7 +107,7 @@ const authProviders = [
     supporter: 'MessageBird',
     platform: true,
     selfHosted: true,
-    authType: 'phone'
+    authType: 'phone',
   },
   {
     name: 'Notion',
