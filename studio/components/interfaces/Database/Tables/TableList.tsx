@@ -12,10 +12,11 @@ import {
   IconLock,
   IconCheck,
 } from 'ui'
-
 import { partition } from 'lodash'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
@@ -38,8 +39,8 @@ const TableList: FC<Props> = ({
   onOpenTable = () => {},
 }) => {
   const { meta } = useStore()
-
   const [filterString, setFilterString] = useState<string>('')
+  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const schemas: PostgresSchema[] = meta.schemas.list()
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
@@ -120,9 +121,32 @@ const TableList: FC<Props> = ({
         </div>
         {!isLocked && (
           <div>
-            <Button icon={<IconPlus />} onClick={() => onAddTable()}>
-              New table
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  disabled={!canUpdateTables}
+                  icon={<IconPlus />}
+                  onClick={() => onAddTable()}
+                >
+                  New table
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateTables && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to create tables
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         )}
       </div>
@@ -183,7 +207,62 @@ const TableList: FC<Props> = ({
                     >
                       {x.columns.length} columns
                     </Button>
-                    <Button
+
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          type="text"
+                          icon={<IconEdit3 />}
+                          style={{ padding: 5 }}
+                          disabled={!canUpdateTables || isLocked}
+                          onClick={() => onEditTable(x)}
+                        />
+                      </Tooltip.Trigger>
+                      {!canUpdateTables && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to edit tables
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
+
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          type="text"
+                          icon={<IconTrash />}
+                          style={{ padding: 5 }}
+                          disabled={!canUpdateTables || isLocked}
+                          onClick={() => onDeleteTable(x)}
+                        />
+                      </Tooltip.Trigger>
+                      {!canUpdateTables && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to delete tables
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
+
+                    {/* <Button
                       type="text"
                       icon={<IconEdit3 />}
                       style={{ padding: 5 }}
@@ -196,7 +275,7 @@ const TableList: FC<Props> = ({
                       style={{ padding: 5 }}
                       disabled={isLocked}
                       onClick={() => onDeleteTable(x)}
-                    />
+                    /> */}
                   </div>
                 </Table.td>
               </Table.tr>

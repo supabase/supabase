@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useParams, useStore } from 'hooks'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconExternalLink, IconLoader, Alert } from 'ui'
+import { Button, IconDownload, Toggle, IconLoader, Alert } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions, useParams, useStore, useFlag } from 'hooks'
 import {
   FormHeader,
   FormPanel,
@@ -19,11 +21,15 @@ const SSLConfiguration = () => {
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const sslEnforcement = useFlag('sslEnforcement')
+
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
     projectRef: ref,
   })
   const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
+
+  const canUpdateSSLEnforcement = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -77,7 +83,7 @@ const SSLConfiguration = () => {
         </div> */}
       </div>
       <FormPanel>
-        {hasAccessToSSLEnforcement && (
+        {sslEnforcement && hasAccessToSSLEnforcement && (
           <FormSection
             header={
               <FormSectionLabel
