@@ -56,8 +56,5 @@
     "functions",
     "database",
     "auth"
-  ],
-  "overrides": {
-    "pgsql-parser": "13.4.0"
-  }
+  ]
 }
