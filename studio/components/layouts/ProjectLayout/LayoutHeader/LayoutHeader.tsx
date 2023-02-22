@@ -11,11 +11,9 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
 import { Badge } from 'ui'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-
-import { useEffect, useState } from 'react'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
@@ -24,22 +22,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
 
-  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
-
-  // [Terry]
-  // temporary solution to check if project is in read only mode
-  // until we get an api endpoint for this
-  async function checkForReadOnlyMode() {
-    const sql = `show default_transaction_read_only;`
-    const connectionString = project?.connectionString
-    const { result: readOnlyStatus } = await executeSql({ projectRef, connectionString, sql })
-    if (readOnlyStatus[0]?.default_transaction_read_only === 'on') setIsReadOnlyMode(true)
-  }
-
-  useEffect(() => {
-    if (projectRef) checkForReadOnlyMode()
-    else setIsReadOnlyMode(false)
-  }, [projectRef])
+  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
