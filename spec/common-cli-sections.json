@@ -239,7 +239,7 @@
       },
       {
         "id": "supabase-functions-serve",
-        "title": "Serve a function",
+        "title": "Serve functions locally",
         "slug": "supabase-functions-serve",
         "type": "cli-command"
       },

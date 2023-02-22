@@ -16,6 +16,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
@@ -44,6 +45,7 @@ import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 dart(Prism)
 
