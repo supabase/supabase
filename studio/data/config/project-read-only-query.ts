@@ -38,6 +38,7 @@ export const useProjectReadOnlyQuery = (
       select(data) {
         return data.result[0]?.default_transaction_read_only === 'on'
       },
+      enabled: typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
       ...options,
     }
   )
