@@ -13,15 +13,20 @@ export interface ReportWidgetProps<T = any> {
   description?: string
   tooltip?: string
   className?: string
-  renderer: (props: ReportWidgetProps) => React.ReactNode
+  renderer: (props: ReportWidgetRendererProps) => React.ReactNode
   params: BaseReportParams | LogsEndpointParams
   isLoading: boolean
+}
+
+export interface ReportWidgetRendererProps extends ReportWidgetProps {
   router: NextRouter
+  projectRef: string
 }
 
 const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   const router = useRouter()
   const { ref } = router.query
+  const projectRef = ref as string
 
   return (
     <Panel
@@ -64,7 +69,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                 className="px-1"
                 onClick={() => {
                   router.push({
-                    pathname: `/project/${ref}/logs/explorer`,
+                    pathname: `/project/${projectRef}/logs/explorer`,
                     query: {
                       q: props.params?.sql,
                       its: props.params.iso_timestamp_start,
@@ -89,7 +94,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
         </div>
 
         <LoadingOpacity className="w-full" active={props.isLoading}>
-          {props.data === undefined ? null : props.renderer(props)}
+          {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
         </LoadingOpacity>
       </Panel.Content>
     </Panel>
