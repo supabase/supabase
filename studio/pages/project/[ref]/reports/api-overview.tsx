@@ -92,7 +92,8 @@ const useApiReport = () => {
   const activeHooks = [totalRequests, errorCounts, responseSpeed]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
-    if (filters.includes(filter)) return
+    // use a deep equal when comparing objects.
+    if (filters.some((f) => isEqual(f, filter))) return
     setFilters((prev) =>
       [...prev, filter].sort((a, b) => {
         const keyA = a.key.toLowerCase()
@@ -107,9 +108,7 @@ const useApiReport = () => {
       })
     )
   }
-  const removeFilter = (filter: ReportFilterItem) => {
-    setFilters((prev) => prev.filter((f) => f !== filter))
-  }
+  const removeFilter = (filter: ReportFilterItem) => removeFilters([filter])
   const removeFilters = (toRemove: ReportFilterItem[]) => {
     setFilters((prev) => {
       return prev.filter((f) => !toRemove.find((r) => isEqual(f, r)))
