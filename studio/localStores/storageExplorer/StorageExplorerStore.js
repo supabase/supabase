@@ -317,6 +317,13 @@ class StorageExplorerStore {
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
 
+    if (!/^[a-zA-Z0-9_-]*$/.test(formattedName)) {
+      return this.ui.setNotification({
+        message: 'Folder name contains invalid special characters',
+        category: 'error',
+        duration: 8000,
+      })
+    }
     /**
      * todo: move this to a util file, as renameFolder() uses same logic
      */
@@ -1485,7 +1492,7 @@ class StorageExplorerStore {
         .list(formattedPathToFolder, options)
       folderContents = folderContents.concat(data)
       options.offset += options.limit
-      if (data.length < options.limit) {
+      if ((data || []).length < options.limit) {
         break
       }
     }

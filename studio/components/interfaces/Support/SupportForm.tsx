@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState, FC, ChangeEvent, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
@@ -16,19 +17,19 @@ import {
 } from 'ui'
 import { CLIENT_LIBRARIES } from 'common/constants'
 
-import { Organization, Project } from 'types'
+import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
 import { post, get } from 'lib/common/fetch'
+import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading'
 import MultiSelect from 'components/ui/MultiSelect'
+import InformationBox from 'components/ui/InformationBox'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
-import InformationBox from 'components/ui/InformationBox'
-import Link from 'next/link'
 
 const MAX_ATTACHMENTS = 5
 
@@ -165,6 +166,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       affectedServices: selectedServices
         .map((service) => service.replace(/ /g, '_').toLowerCase())
         .join(';'),
+      browserInformation: detectBrowser(),
     }
 
     if (values.projectRef !== 'no-project') {
@@ -374,7 +376,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
             {!isDisabled ? (
               <>
-                {['Performance'].includes(values.category) ? (
+                {['Performance'].includes(values.category) && isFreeProject ? (
                   <DisabledStateForFreeTier
                     category={selectedCategory?.label ?? ''}
                     projectRef={values.projectRef}

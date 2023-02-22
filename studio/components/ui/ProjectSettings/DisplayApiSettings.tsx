@@ -1,33 +1,37 @@
-import { useRouter } from 'next/router'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
-import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
 
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { checkPermissions, useJwtSecretUpdateStatus } from 'hooks'
 import Panel from 'components/ui/Panel'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { checkPermissions, useParams } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 
 const DisplayApiSettings = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsQuery({ projectRef: ref as string })
+  } = useProjectSettingsQuery({ projectRef })
   const {
-    jwtSecretUpdateStatus,
+    data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  }: any = useJwtSecretUpdateStatus(ref)
+  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service
-  const apiKeys = settings?.autoApiService.service_api_keys ?? []
+  const apiService = (settings?.services ?? []).find(
+    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  )
+  const apiKeys = apiService?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
@@ -45,14 +49,14 @@ const DisplayApiSettings = () => {
       }
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading || isApiKeysEmpty
@@ -84,10 +88,10 @@ const DisplayApiSettings = () => {
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="bg-red-900 text-xs text-white">{'secret'}</code>
+                      <code className="bg-red-900 text-xs text-white">secret</code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-xs text-code">{'public'}</code>}
+                  {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                 </>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}

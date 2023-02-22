@@ -253,7 +253,7 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="csharp"
         spec={spec_csharp_v0}
-       />
+      />
 
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}
@@ -262,7 +262,6 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="python"
         spec={spec_python_v2}
-
       />
       {/* // Tools */}
       <NavigationMenuRefList
@@ -299,7 +298,7 @@ const NavigationMenu = () => {
         id={'reference_self_hosting_realtime'}
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
-        lib="self-hosting-auth"
+        lib="self-hosting-realtime"
       />
     </div>
   )

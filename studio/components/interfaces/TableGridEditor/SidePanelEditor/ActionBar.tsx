@@ -36,7 +36,13 @@ const ActionBar: FC<ActionBarProps> = ({
 
   return (
     <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
-      <Button size="small" type="default" htmlType="button" onClick={closePanel}>
+      <Button
+        size="small"
+        type="default"
+        htmlType="button"
+        onClick={closePanel}
+        disabled={isRunning || loading}
+      >
         {backButtonLabel}
       </Button>
 
@@ -47,8 +53,8 @@ const ActionBar: FC<ActionBarProps> = ({
         <Button
           size="small"
           onClick={onSelectApply}
-          disabled={disableApply || isRunning}
-          loading={isRunning}
+          disabled={disableApply || isRunning || loading}
+          loading={isRunning || loading}
         >
           {applyButtonLabel}
         </Button>

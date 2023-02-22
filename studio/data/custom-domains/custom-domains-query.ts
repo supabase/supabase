@@ -39,6 +39,9 @@ type Ssl = {
     txt_name: string
     txt_value: string
   }[]
+  validation_errors?: {
+    message: string
+  }[]
 }
 
 type OwnershipVerification = {

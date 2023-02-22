@@ -4,35 +4,34 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
-import { User } from 'types'
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const { ui } = useStore()
-  const { profile } = ui
 
   useEffect(() => {
-    function handleRouteChange() {
-      handlePageTelemetry(profile)
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
     }
+
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events, profile])
+  }, [router.events])
 
   useEffect(() => {
     /**
      * Send page telemetry on first page load
-     * if there asPath is defined, then this isn't needed
+     * if the route is not ready. Don't need to send it will be picked up by router.event above
      */
-    if (router.route === '/' && router.asPath === '/') {
-      handlePageTelemetry(profile)
+    if (router.isReady) {
+      handlePageTelemetry(router.route)
     }
   }, [])
 
-  const handlePageTelemetry = (profile?: User) => {
+  const handlePageTelemetry = async (route?: string) => {
     if (IS_PLATFORM) {
       /**
        * Get referrer from browser
@@ -48,6 +47,11 @@ const PageTelemetry: FC = ({ children }) => {
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
         title: document.title,
+        route,
+        ga: {
+          screen_resolution: ui.googleAnalyticsProps?.screenResolution,
+          language: ui.googleAnalyticsProps?.language,
+        },
       })
     }
   }
