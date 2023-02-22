@@ -85,7 +85,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
 
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
-  const featureFootnotes: Record<string, JSX.Element> = {
+  const featureFootnotes: Record<string, JSX.Element | null> = {
     db_size: isPaidTier ? (
       <div className="flex justify-between items-center">
         <div className="flex flex-row space-x-4 text-scale-1000">
@@ -99,9 +99,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
           </a>
         </Button>
       </div>
-    ) : (
-      <></>
-    ),
+    ) : null,
   }
 
   return (
