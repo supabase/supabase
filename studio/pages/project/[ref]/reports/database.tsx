@@ -103,24 +103,25 @@ const DatabaseUsage: FC<any> = () => {
                 />
               </div>
 
-              <div className="flex justify-between items-center mt-3">
-                <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
-                  {usage?.disk_volume_size_gb && (
-                    <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
-                  )}
+              {isPaidTier && (
+                <div className="flex justify-between items-center mt-3">
+                  <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    {usage?.disk_volume_size_gb && (
+                      <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
+                    )}
+                    <Badge>Auto-Scaling</Badge>
+                  </div>
 
-                  {isPaidTier && <Badge>Auto-Scaling</Badge>}
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                    <a
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/platform/database-usage"
+                    >
+                      What is disk size?
+                    </a>
+                  </Button>
                 </div>
-
-                <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-                  <a
-                    target="_blank"
-                    href="https://supabase.com/docs/guides/platform/database-usage"
-                  >
-                    What is disk size?
-                  </a>
-                </Button>
-              </div>
+              )}
             </Panel.Content>
             <Panel.Content>
               <div className="space-y-1">
