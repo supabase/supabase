@@ -42,6 +42,13 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/reports/database`,
           items: [],
         },
+        {
+          name: 'Query Insights',
+          key: 'insights',
+          url: `/project/${ref}/reports/insights`,
+          items: [],
+          label: 'NEW',
+        },
       ],
     },
   ]
