@@ -1,16 +1,29 @@
-import { FC, useEffect } from 'react'
-import { Badge, Button, IconAlertCircle, IconInfo, Loading, IconExternalLink } from 'ui'
+import Link from 'next/link'
+import { FC, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Badge,
+  Button,
+  IconAlertCircle,
+  IconInfo,
+  Loading,
+  IconExternalLink,
+  Alert,
+  IconBookOpen,
+} from 'ui'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useRouter } from 'next/router'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface Props {
   projectRef?: string
@@ -21,8 +34,14 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
   const router = useRouter()
 
-  const subscriptionTier = ui.selectedProject?.subscription_tier
+  const { project } = useProjectContext()
+  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
+  const subscriptionTier = ui.selectedProject?.subscription_tier
   const projectHasNoLimits =
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.TEAM ||
@@ -59,11 +78,25 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
       />
     )
   }
+  // [Terry]
+  // temporary solution to check if project is in read only mode
+  // until we get an api endpoint for this
+
+  async function checkForReadOnlyMode() {
+    const sql = `show default_transaction_read_only;`
+    const connectionString = project?.connectionString
+    const { result: readOnlyStatus } = await executeSql({ projectRef, connectionString, sql })
+    if (readOnlyStatus[0]?.default_transaction_read_only === 'on') setIsReadOnlyMode(true)
+  }
+
+  useEffect(() => {
+    if (projectRef) checkForReadOnlyMode()
+  }, [projectRef])
 
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
   const featureFootnotes: Record<string, JSX.Element> = {
-    db_size: (
+    db_size: isPaidTier ? (
       <div className="flex justify-between items-center">
         <div className="flex flex-row space-x-4 text-scale-1000">
           {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
@@ -77,6 +110,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
           </a>
         </Button>
       </div>
+    ) : (
+      <></>
     ),
   }
 
@@ -127,7 +162,6 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                       <th className="p-3 text-xs font-medium leading-4 text-left text-gray-400" />
                     </tr>
                   </thead>
-
                   {/* Line items */}
                   {usage === undefined ? (
                     <div className="px-4 pt-1 pb-4 w-96">
@@ -148,14 +182,16 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           usageElement = (
                             <div className="flex items-center justify-between">
                               <span>Not included in {planName} tier</span>
-                              <Button
-                                size="tiny"
-                                onClick={() =>
-                                  router.push(`/project/${projectRef}/settings/billing/update`)
-                                }
-                              >
-                                Upgrade to Pro
-                              </Button>
+                              {canUpdateSubscription && (
+                                <Button
+                                  size="tiny"
+                                  onClick={() =>
+                                    router.push(`/project/${projectRef}/settings/billing/update`)
+                                  }
+                                >
+                                  Upgrade to Pro
+                                </Button>
+                              )}
                             </div>
                           )
                         } else if (showUsageExceedMessage) {
@@ -253,6 +289,121 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                     </tbody>
                   )}
                 </table>
+
+                {!isReadOnlyMode && product.title === 'Database' && (
+                  <div className="p-6">
+                    <Alert title={'Database is in read-only mode'} variant="danger" withIcon>
+                      <p>
+                        {isPaidTier ? (
+                          <>
+                            Your disk has reached 95% capacity and has entered{' '}
+                            <a
+                              href={`https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling`}
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              read-only mode
+                            </a>
+                            .
+                          </>
+                        ) : (
+                          <>
+                            You have exceeded the 500mb Database size limit and your project is now
+                            in{' '}
+                            <a
+                              href={`https://supabase.com/docs/guides/platform/database-usage#free-tier-project-read-only-mode`}
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              read-only mode
+                            </a>
+                            .
+                          </>
+                        )}
+                      </p>
+                      {isPaidTier ? (
+                        <>
+                          <p>
+                            For Pro and Enterprise projects,{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-disk-auto-scaling"
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              Disk Size expands automatically
+                            </a>{' '}
+                            when it reaches 90% capacity, but can only occur once every six hours.
+                            If the disk size has already expanded and then reaches 95% capacity
+                            within 6 hours, then{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/platform/database-usage#paid-tier-project-read-only-mode"
+                              className="underline transition hover:text-scale-1200"
+                            >
+                              your disk will enter read-only mode
+                            </a>{' '}
+                            until it can resize again after 6 hours.
+                          </p>
+                          <p className="mt-2">
+                            If you require help or need your disk changed to read/write mode so you
+                            can delete data,{' '}
+                            <Link
+                              href={`/support/new?ref=${
+                                projectRef ? projectRef : ''
+                              }&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
+                            >
+                              <a className="underline transition hover:text-scale-1200">
+                                you can contact the support team
+                              </a>
+                            </Link>
+                            .
+                          </p>
+                        </>
+                      ) : (
+                        <p>
+                          You can either{' '}
+                          <a
+                            href="https://supabase.com/docs/guides/platform/database-usage#increasing-available-disk-size"
+                            className="underline transition hover:text-scale-1200"
+                          >
+                            reduce your disk usage below 500mb
+                          </a>{' '}
+                          or{' '}
+                          <Link
+                            href={`/project/${
+                              projectRef ? projectRef : ''
+                            }/settings/billing/subscription`}
+                          >
+                            <a className="underline transition hover:text-scale-1200">
+                              upgrade your project
+                            </a>
+                          </Link>
+                          .
+                        </p>
+                      )}
+
+                      {!isPaidTier ? (
+                        <Button type="danger" className="mt-3">
+                          <a
+                            target="_blank"
+                            href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
+                          >
+                            Upgrade this project
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button
+                          type="danger"
+                          icon={<IconBookOpen size={14} strokeWidth={1.5} />}
+                          className="mt-3"
+                        >
+                          <a
+                            target="_blank"
+                            href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
+                          >
+                            Database storage management docs
+                          </a>
+                        </Button>
+                      )}
+                    </Alert>
+                  </div>
+                )}
               </div>
             )
           })}
