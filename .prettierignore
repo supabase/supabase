@@ -4,3 +4,7 @@ node_modules
 package-lock.json
 docker*
 apps/**/out
+# prettier-plugin-sql-cst only supports sqlite syntax
+**/supabase/migrations/*.sql
+apps/www/schema.sql
+examples/slack-clone/nextjs-slack-clone/full-schema.sql
