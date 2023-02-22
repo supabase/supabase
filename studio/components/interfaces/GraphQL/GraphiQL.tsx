@@ -522,39 +522,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
           />
         </div>
 
-        {/* <div className="graphiql-dialog-section">
-          <div>
-            <div className="graphiql-dialog-section-title">Theme</div>
-            <div className="graphiql-dialog-section-caption">
-              Adjust how the interface looks like.
-            </div>
-          </div>
-          <div>
-            <ButtonGroup>
-              <Button
-                type="button"
-                className={theme === null ? 'active' : ''}
-                onClick={() => setTheme(null)}
-              >
-                System
-              </Button>
-              <Button
-                type="button"
-                className={theme === 'light' ? 'active' : ''}
-                onClick={() => setTheme('light')}
-              >
-                Light
-              </Button>
-              <Button
-                type="button"
-                className={theme === 'dark' ? 'active' : ''}
-                onClick={() => setTheme('dark')}
-              >
-                Dark
-              </Button>
-            </ButtonGroup>
-          </div>
-        </div> */}
         {storageContext ? (
           <div className="graphiql-dialog-section">
             <div>
