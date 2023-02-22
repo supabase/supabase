@@ -11,7 +11,11 @@ Database size refers to the _monthly average storage usage_, as reported by Post
 - "Database size" is the total size of used storage from your database.
 - "Disk size" describes the size of the underlying available storage.
 
-This SQL query will show the size of your Postgres database:
+## Database space management
+
+### Database size
+
+This SQL query will show the current size of your Postgres database:
 
 ```sql
 select
@@ -20,9 +24,37 @@ from
   pg_database;
 ```
 
-This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
+This value is reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
 
-## Database storage management
+Database Space is consumed primarily by your data, indexes, and materialized views. You can reduce your disk size by removing any of these and running a Vacuum operation.
+
+<Admonition type="note">
+
+Depending on your billing tier, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+
+</Admonition>
+
+### Vacuum operations
+
+Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. They are marked as "removed" until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your database may not immediately reduce the reported disk usage.
+
+<Admonition type="note">
+
+Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
+
+</Admonition>
+
+Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
+It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
+the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
+or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
+
+### Preoccupied Space
+
+New Supabase projects have a database size of ~40-60mb. This space includes pre-installed extensions, schemas, and default Postgres data. Additional database size is used when installing extensions, even if those extensions are inactive.
+
+## Disk management
 
 Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing tier.
 
@@ -87,29 +119,6 @@ SET
 ```
 
 This allows you to delete data from within the session.
-
-## Preoccupied Space
-
-New Supabase projects have a database size of ~40-60mb. This space includes pre-installed extensions, schemas, and default Postgres data.
-
-Additional database size is used when installing additional extensions, even if those extensions are inactive.
-
-## Vacuum operations
-
-Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. Instead, they are internally marked as removed until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed.
-As a result, deleting data from your database may not immediately reduce the reported disk usage.
-
-<Admonition type="note">
-
-Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
-
-</Admonition>
-
-Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
-However, it can be necessary to either [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
-the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
-or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
-For example, running a manual vacuum after deleting large amounts of data from your DB could help reduce the reported disk usage by Postgres.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
