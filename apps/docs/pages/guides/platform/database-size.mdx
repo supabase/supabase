@@ -6,10 +6,12 @@ export const meta = {
   description: 'Understanding how database size applies to your subscription.',
 }
 
-Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily.
-Database size is the total size of used storage from your database, whereas disk size describes the size of the underlying available storage.
+Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
 
-For an instantaneous live view of the DB size, you can execute in Postgres:
+- "Database size" is the total size of used storage from your database.
+- "Disk size" describes the size of the underlying available storage.
+
+This SQL query will show the size of your Postgres database:
 
 ```sql
 select
@@ -22,22 +24,16 @@ This value is also reported in the [database settings page](https://app.supabase
 
 ## Database storage management
 
-Supabase uses network-attached storage to balance performance with scalability.
+Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing tier.
 
-### Free tier project
+### Free Tier
 
-For [**Free tier projects**](#free-tier-project), the database can enter ['read only' mode when you exceed the 500mb limit](#free-tier-project-read-only-mode).
-
-#### Free tier project 'read-only' mode
-
-Free tier projects can enter read-only mode when exceeding the 500mb database size limit.
+[Free Tier](#free-tier-project) projects will enter ['read only'](#free-tier-project-read-only-mode) mode when you exceed the 500mb limit.
 
 In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
 Regular operation (read-write mode) is automatically re-enabled once database storage is below the 500mb database size limit.
 
 #### Increasing available database space
-
-The Free Tier has a 500mb Database size limit.
 
 - If you are in [read-only](#free-tier-project-read-only-mode) mode:
 
@@ -92,12 +88,11 @@ SET
 
 This allows you to delete data from within the session.
 
-### Preoccupied Space
+## Preoccupied Space
 
-When launching a new project, your database size will be roughly ~40-60mb.
-The space is used up by preinstalled extensions, schema/data used by our services that are offered with each project and default Postgres data.
+New Supabase projects have a database size of ~40-60mb. This space includes pre-installed extensions, schemas, and default Postgres data.
 
-When installing additional extensions, even if you don't actively use them, additional database size is used.
+Additional database size is used when installing additional extensions, even if those extensions are inactive.
 
 ## Vacuum operations
 
