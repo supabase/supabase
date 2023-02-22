@@ -100,8 +100,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
       <div className="flex justify-between items-center">
         <div className="flex flex-row space-x-4 text-scale-1000">
           {usage?.disk_volume_size_gb && <span>Disk Size: {usage.disk_volume_size_gb} GB</span>}
-
-          {isPaidTier && <Badge>Auto-Scaling</Badge>}
+          <Badge>Auto-Scaling</Badge>
         </div>
 
         <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
@@ -290,7 +289,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   )}
                 </table>
 
-                {!isReadOnlyMode && product.title === 'Database' && (
+                {isReadOnlyMode && product.title === 'Database' && (
                   <div className="p-6">
                     <Alert title={'Database is in read-only mode'} variant="danger" withIcon>
                       <p>
