@@ -60,7 +60,6 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Total Requests"
         data={report.data.totalRequests || []}
         renderer={renderTotalRequests}
-        router={router}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -69,7 +68,6 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={renderErrorCounts}
-        router={router}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -78,7 +76,6 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={renderResponseSpeed}
-        router={router}
       />
     </div>
   )
