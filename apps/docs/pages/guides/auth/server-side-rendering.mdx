@@ -162,7 +162,7 @@ use this potentially stale information to render a page.
 
 ### No session on the server side with Next.js route prefetching?
 
-When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can cause server-side requests to be sent out before the browser-side has had a chance to process the access and refresh tokens. This means that those requests may not have any cookies set, and your server code will render unauthenticated content.
+When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can send server-side requests before the browser processes the access and refresh tokens. This means that those requests may not have any cookies set and your server code will render unauthenticated content.
 
 To go around this problem you can always redirect users back to one specific page after sign-in, where you will not be using any route prefetching magic from Next.js, and then once the Supabase client library running in the browser has had a chance to obtain the access and refresh tokens from the URL fragment, take the user to regular Next.js pages which can use prefetching.
 
