@@ -23,27 +23,56 @@ This value is also reported in the [database settings page](https://app.supabase
 ## Database storage management
 
 Supabase uses network-attached storage to balance performance with scalability.
-For Pro and Enterprise projects, disk size expands ~1.5x automatically (e.g., 8GB -> 12GB) when you reach 90% of the disk size.
-Disk size expansion can only occur once every six hours.
-Pro projects can store up to 1024TB.
 
-All projects enter read-only mode when you reach 95% of the disk size. In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
-Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
+- For **Free tier projects**, the database can enter ['read only' mode when you exceed the 500mb limit](#free-tier-project-read-only-mode).
+- For **Pro and Enterprise tier projects**, your [disk size expands automatically](#paid-tier-disk-auto-scaling).
 
-If you need more than 1024TB of disk size or require multiple storage expansions in a short period of time, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+### Free tier project 'read-only' mode
 
-### Increasing available disk size
+Free tier projects can enter read-only mode when exceeding the 500mb database size limit.
 
-1. [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to increase your quota and expand your disk size automatically.
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+Regular operation (read-write mode) is automatically re-enabled once database storage is below the 500mb database size limit.
 
-2. Delete data from your project's database to lower its disk usage. If your database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
+For more database storage and avoid your database entering read-only mode when exceeding the limit, you can [upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription).
 
-   ```sql
-   SET
-     default_transaction_read_only = 'off';
-   ```
+### Paid tier disk auto-scaling
 
-   This allows you to delete data from within the session.
+Pro and Enterprise have disk auto-scaling. Database storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB).
+Auto-scaling can only take place once every 6 hours.
+
+<Admonition type="caution">
+
+If you intend to import a lot of data into your database that would require multiple storage expansions then [reach out to our team](https://app.supabase.com/support/new), otherwise your project might enter a ['read-only' mode](#paid-tier-project-read-only-mode).
+
+</Admonition>
+
+You may require multiple storage expansions in a short period of time. For example, you need to upload more than 1.5x the current size of your database storage. This will lead to your database entering a [read-only mode](#paid-tier-project-read-only-mode). You can avoid this by [contacting the support team](https://app.supabase.com/support/new) so that your database can be resized to a sufficient amount before you start uploading to it.
+
+If you need more than 1024TB of disk size, you can [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+
+### Paid tier project 'read-only' mode
+
+Database storage expands, at most, once every 6 hours.
+If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`.
+Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size, or when the database automatically resizes after the 6 hour period.
+
+### Increasing available database space
+
+If your project is on the free tier, you can [Upgrade to the Pro or Enterprise tier](https://app.supabase.com/project/_/settings/billing/subscription) so that you can start to use more than 500mb.
+
+For Pro and Enterprise tier projects that are [nearing their disk size limit](#paid-tier-project-read-only-mode), you can increase available disk size by deleting data from your project's database to lower its disk usage.
+
+If your project database is already in read-only mode, run the following command to change the transaction mode to read-write for your session:
+
+```sql
+SET
+  default_transaction_read_only = 'off';
+```
+
+This allows you to delete data from within the session.
 
 ### Preoccupied Space
 
