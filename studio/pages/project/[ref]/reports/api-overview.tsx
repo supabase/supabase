@@ -21,11 +21,11 @@ import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscrip
 import { useParams } from 'hooks'
 import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
+import ShimmerLine from 'components/ui/ShimmerLine'
 
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const report = useApiReport()
-  const router = useRouter()
 
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
@@ -53,7 +53,9 @@ export const ApiReport: NextPageWithLayout = () => {
           disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
         }))}
       />
-
+      <div className="h-2 w-full">
+        <ShimmerLine active={report.isLoading} />
+      </div>
       <ReportWidget
         isLoading={report.isLoading}
         params={report.params.totalRequests}
