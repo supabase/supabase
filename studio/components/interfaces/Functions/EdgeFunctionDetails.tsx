@@ -56,7 +56,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
     'functions',
     ...endpointSections.slice(1),
   ].join('.')
-  const functionUrl = `https://${functionsEndpoint}/${selectedFunction?.slug}`
+  const functionUrl = `${apiService?.protocol}://${functionsEndpoint}/${selectedFunction?.slug}`
 
   const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
