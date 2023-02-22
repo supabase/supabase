@@ -1,17 +1,9 @@
-import { FC, useState, ReactNode } from 'react'
-import {
-  Button,
-  IconDownload,
-  IconPlus,
-  IconX,
-  IconTrash,
-  Dropdown,
-  IconColumns,
-  IconChevronDown,
-} from 'ui'
 import { saveAs } from 'file-saver'
+import { FC, useState, ReactNode } from 'react'
+import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -80,6 +72,9 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({
 }) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
+  // [Joshen] Using this logic to block both column and row creation/update/delete
+  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
@@ -91,71 +86,73 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({
         <>
           <div className="h-[20px] w-px border-r border-scale-600"></div>
           <div className="flex items-center gap-2">
-            <Dropdown
-              side="bottom"
-              align="start"
-              size="medium"
-              overlay={[
-                ...(onAddRow !== undefined
-                  ? [
-                      <Dropdown.Item
-                        key="add-row"
-                        className="group"
-                        onClick={onAddRow}
-                        disabled={onAddRow === undefined}
-                        icon={
-                          <div className="-mt-2 pr-1.5">
-                            <div className="border border-scale-1000 w-[15px] h-[4px]" />
-                            <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
-                            <div
-                              className={[
-                                'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
-                              ].join(' ')}
-                            />
+            {canCreateColumns && (
+              <Dropdown
+                side="bottom"
+                align="start"
+                size="medium"
+                overlay={[
+                  ...(onAddRow !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-row"
+                          className="group"
+                          onClick={onAddRow}
+                          disabled={onAddRow === undefined}
+                          icon={
+                            <div className="-mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[15px] h-[4px]" />
+                              <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert row</p>
+                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
                           </div>
-                        }
-                      >
-                        <div className="">
-                          <p>Insert row</p>
-                          <p className="text-scale-1000">Insert a new row into {table.name}</p>
-                        </div>
-                      </Dropdown.Item>,
-                    ]
-                  : []),
-                ...(onAddColumn !== undefined
-                  ? [
-                      <Dropdown.Item
-                        key="add-column"
-                        className="group"
-                        onClick={onAddColumn}
-                        disabled={onAddColumn === undefined}
-                        icon={
-                          <div className="flex -mt-2 pr-1.5">
-                            <div className="border border-scale-1000 w-[4px] h-[15px]" />
-                            <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
-                            <div
-                              className={[
-                                'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
-                              ].join(' ')}
-                            />
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onAddColumn !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-column"
+                          className="group"
+                          onClick={onAddColumn}
+                          disabled={onAddColumn === undefined}
+                          icon={
+                            <div className="flex -mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[4px] h-[15px]" />
+                              <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
+                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert column</p>
+                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
                           </div>
-                        }
-                      >
-                        <div className="">
-                          <p>Insert column</p>
-                          <p className="text-scale-1000">Insert a new column into {table.name}</p>
-                        </div>
-                      </Dropdown.Item>,
-                    ]
-                  : []),
-              ]}
-            >
-              <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
-                Insert
-              </Button>
-            </Dropdown>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                ]}
+              >
+                <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                  Insert
+                </Button>
+              </Dropdown>
+            )}
           </div>
         </>
       )}
