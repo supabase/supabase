@@ -187,7 +187,11 @@ export default {
     chevron: {
       base: `
         text-scale-900
-        rotate-0 group-state-open:rotate-180
+        rotate-0
+        group-state-open:rotate-180
+        group-data-[state=open]:rotate-180
+        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        transition-transform duration-300
         duration-200
       `,
       align: {
