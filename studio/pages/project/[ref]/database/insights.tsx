@@ -11,7 +11,7 @@ import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useEffect, useState } from 'react'
 import Table from 'components/to-be-cleaned/Table'
 
-const limit = 10
+const limit = 50
 
 const QueryMostFrequentlyInvoked = `
 -- Most frequently called queries
@@ -182,22 +182,14 @@ export const Content = () => {
             </div>
           </div>
         </div>
-        {/* Hit rate */}
-        {/* <div className="w-full h-4 bg-scale-400 relative rounded-full overflow-hidden">
-          <div
-            style={{ width: QueryHitRateData[0]?.data[0]?.ratio * 100 + '%' }}
-            className={`bg-brand-900 h-4 absolute`}
-          ></div>
-        </div> */}
       </div>
 
       <div className="mx-auto flex flex-col">
         <div className="px-16">
           <h4 className="mb-4 text-2xl">Query analysis</h4>
           <p className="text-scale-1100 text-sm py-2 mb-6 max-w-2xl">
-            For normal operations of Postgres and performance, you'll want to have your Postgres
-            cache hit ratio about 99%. If you see your cache hit ratio below that, you probably need
-            to look at moving to an instance with larger memory.
+            PLACEHOLDER We have outlined some query scenarios to check and allow you to analyze
+            wether queries are behaving how you expect
           </p>
         </div>
         <Tabs
@@ -206,14 +198,16 @@ export const Content = () => {
           size="medium"
           listClassNames="px-16"
           addOnAfter={
-            <Button
-              type="default"
-              onClick={() => {
-                useDbQuery(`SELECT pg_stat_statements_reset();`)
-              }}
-            >
-              Reset all insights
-            </Button>
+            <div className="w-full flex justify-end">
+              <Button
+                type="default"
+                onClick={() => {
+                  useDbQuery(`SELECT pg_stat_statements_reset();`)
+                }}
+              >
+                Reset analysis
+              </Button>
+            </div>
           }
         >
           <Tabs.Panel
@@ -222,10 +216,6 @@ export const Content = () => {
             label="Most time consuming"
             className="px-16 text-sm max-w-none"
           >
-            <p className="">
-              This measures the aggregate time spend by a query on somethong spmetong.
-            </p>
-            <p>This measures the aggregate time spend by a query on somethong spmetong.</p>
             <Table
               head={
                 <>
@@ -267,10 +257,6 @@ export const Content = () => {
             label="Most frequently used"
             className="px-16 text-sm max-w-none"
           >
-            <p className="">
-              This measures the aggregate time spend by a query on somethong spmetong.
-            </p>
-            <p>This measures the aggregate time spend by a query on somethong spmetong.</p>
             <Table
               head={
                 <>
@@ -325,10 +311,6 @@ export const Content = () => {
             label="Slowest execution time"
             className="px-16 text-sm max-w-none"
           >
-            <p className="">
-              This measures the aggregate time spend by a query on somethong spmetong.
-            </p>
-            <p>This measures the aggregate time spend by a query on somethong spmetong.</p>
             <Table
               head={
                 <>
