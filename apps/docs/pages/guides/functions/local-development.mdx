@@ -10,7 +10,7 @@ You can run your Edge Function locally using [`supabase functions serve`](/docs/
 
 ```bash
 supabase start # start the supabase stack
-supabase functions serve hello-world # start the Function watcher
+supabase functions serve # start the Functions watcher
 ```
 
 The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
@@ -20,7 +20,7 @@ The `functions serve` command has hot-reloading capabilities. It will watch for 
 While serving your local Edge Function, you can invoke it using curl:
 
 ```bash
-curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
+curl --request POST 'http://localhost:54321/functions/v1/function-name' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
@@ -37,7 +37,7 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
 )
 
-const { data, error } = await supabase.functions.invoke('hello-world', {
+const { data, error } = await supabase.functions.invoke('function-name', {
   body: { name: 'Functions' },
 })
 ```

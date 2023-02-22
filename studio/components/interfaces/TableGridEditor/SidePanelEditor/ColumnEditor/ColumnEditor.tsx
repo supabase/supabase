@@ -191,7 +191,7 @@ const ColumnEditor: FC<Props> = ({
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
-            placeholder='column_name'
+            placeholder="column_name"
             error={errors.name}
             value={columnFields?.name ?? ''}
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
@@ -224,30 +224,37 @@ const ColumnEditor: FC<Props> = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Data Type</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <ColumnType
-            value={columnFields?.format ?? ''}
-            layout="vertical"
-            enumTypes={enumTypes}
-            error={errors.format}
-            disabled={!isUndefined(columnFields?.foreignKey)}
+        header={
+          <FormSectionLabel
+            className="lg:!col-span-4"
             description={
               <Link href="https://supabase.com/docs/guides/database/tables#data-types">
                 <a target="_blank" rel="noreferrer">
                   <Button
                     as="span"
-                    type="text"
-                    size="small"
-                    className="text-scale-1000 hover:text-scale-1200"
+                    type="default"
+                    size="tiny"
+                    // className="text-scale-1000 hover:text-scale-1200"
                     icon={<IconExternalLink size={14} strokeWidth={2} />}
                   >
-                    Learn more about data types
+                    About data types
                   </Button>
                 </a>
               </Link>
             }
+          >
+            Data Type
+          </FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <ColumnType
+            showRecommendation
+            value={columnFields?.format ?? ''}
+            layout="vertical"
+            enumTypes={enumTypes}
+            error={errors.format}
+            disabled={!isUndefined(columnFields?.foreignKey)}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {isUndefined(columnFields.foreignKey) && (
@@ -368,7 +375,6 @@ const ColumnEditor: FC<Props> = ({
       )}
 
       <ForeignKeySelector
-        tables={tables}
         column={columnFields}
         visible={isEditingRelation}
         closePanel={() => setIsEditingRelation(false)}

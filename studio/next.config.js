@@ -7,6 +7,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // this is required to use shared packages in the packages directory
 const withTM = require('next-transpile-modules')(['ui', 'common'])
 
+// Required for nextjs standalone build
+const path = require('path')
+
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
@@ -165,6 +168,11 @@ const nextConfig = {
   },
   images: {
     domains: ['github.com'],
+  },
+  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  experimental: {
+    outputStandalone: true,
+    outputFileTracingRoot: path.join(__dirname, '../../'),
   },
 }
 
