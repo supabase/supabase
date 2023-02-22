@@ -290,7 +290,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   )}
                 </table>
 
-                {!isReadOnlyMode && product.title === 'Database' && (
+                {isReadOnlyMode && product.title === 'Database' && (
                   <div className="p-6">
                     <Alert title={'Database is in read-only mode'} variant="danger" withIcon>
                       <p>
