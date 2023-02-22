@@ -61,4 +61,4 @@ jobs:
         run: npm ci
       - name: Run prettier
         run: |-
-          npx prettier -c '**/*.sql'
+          npx prettier -c '*.sql'
