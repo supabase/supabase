@@ -93,7 +93,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   <div className="ml-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
-                        <Badge color="red">Project is in read-only mode.</Badge>
+                        <Badge color="red">Project is in read-only mode</Badge>
                       </a>
                     </Link>
                   </div>
