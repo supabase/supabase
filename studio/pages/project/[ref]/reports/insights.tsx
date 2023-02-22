@@ -1,10 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 import { ReportsLayout } from 'components/layouts'
-import { Button, IconcheckAlert, Tabs, Accordion } from 'ui'
+import { Button, Tabs, Accordion } from 'ui'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import Table from 'components/to-be-cleaned/Table'
-import { IconAlertCircle, IconCheckCircle } from '@supabase/ui'
+import { IconAlertCircle, IconCheckCircle, IconCopy } from '@supabase/ui'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import CopyButton from 'components/ui/CopyButton'
 
 const limit = 50
 
@@ -89,6 +92,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
   const QueryMostTimeConsumingData = useDbQuery(QueryMostTimeConsuming)
   const QuerySlowestExecutionTimeData = useDbQuery(QuerySlowestExecutionTime)
   const QueryHitRateData = useDbQuery(QueryHitRate)
+  const { project } = useProjectContext()
 
   const isLoadedQueryMostFrequentlyInvokedData =
     QueryMostFrequentlyInvokedData &&
@@ -153,6 +157,14 @@ const DatabaseExtensions: NextPageWithLayout = () => {
   const tableHitRate = QueryHitRateData[0]?.data[1]?.ratio
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
+
+  const resetPgStatStatements = () => {
+    executeSql({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      sql: `SELECT pg_stat_statements_reset();`,
+    })
+  }
   return (
     <div className="my-8 px-16 flex flex-col gap-8 justify-start">
       <h1 className="text-3xl">Insights</h1>
@@ -219,169 +231,179 @@ const DatabaseExtensions: NextPageWithLayout = () => {
       </Accordion>
 
       <div className="flex flex-col">
-        <h4 className="mb-4 text-2xl">Query analysis</h4>
-        <p className="text-scale-1100 text-sm py-2 mb-6 max-w-2xl">
-          PLACEHOLDER We have outlined some query scenarios to check and allow you to analyze wether
-          queries are behaving how you expect
-        </p>
+        <h4 className="mb-4 text-2xl">Query Analysis</h4>
+        <Tabs
+          scrollable
+          type="underlined"
+          size="medium"
+          addOnAfter={
+            <div className="w-full flex justify-end">
+              <Button type="default" onClick={resetPgStatStatements}>
+                Reset analysis
+              </Button>
+            </div>
+          }
+        >
+          <Tabs.Panel key={1} id="1" label="Most time consuming" className="text-sm max-w-none">
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    <Table.th className="table-cell">Role</Table.th>
+                    <Table.th className="table-cell">Time Consumed</Table.th>
+                    <Table.th className="table-cell">Calls</Table.th>
+                    <Table.th className="table-cell">Total Time</Table.th>
+                    <Table.th className="table-cell">Query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQueryMostTimeConsumingData ? (
+                    QueryMostTimeConsumingData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.prop_total_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.total_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="relative table-cell whitespace-nowrap">
+                            <p className="w-96 block truncate font-mono">{item.query}</p>
+                            <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
+          </Tabs.Panel>
+          <Tabs.Panel key={2} id="2" label="Most frequent" className="text-sm max-w-none">
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    {/* <Table.th className="table-cell">source</Table.th> */}
+                    <Table.th className="table-cell">Role</Table.th>
+                    <Table.th className="table-cell">Avg. Roles</Table.th>
+                    <Table.th className="table-cell">Calls</Table.th>
+                    <Table.th className="table-cell">Max Time</Table.th>
+                    <Table.th className="table-cell">Mean Time</Table.th>
+                    <Table.th className="table-cell">Min Time</Table.th>
+                    <Table.th className="table-cell">Total Time</Table.th>
+                    <Table.th className="table-cell">Query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQueryMostFrequentlyInvokedData ? (
+                    QueryMostFrequentlyInvokedData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.avg_rows}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.max_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.mean_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.min_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.total_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="relative table-cell whitespace-nowrap">
+                            <p className="w-64 block truncate font-mono ">{item.query}</p>
+                            <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
+          </Tabs.Panel>
+          <Tabs.Panel key={3} id="3" label="Slowest execution time" className="text-sm max-w-none">
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    <Table.th className="table-cell">Role</Table.th>
+                    <Table.th className="table-cell">Avg Rows</Table.th>
+                    <Table.th className="table-cell">Calls</Table.th>
+                    <Table.th className="table-cell">Max Time</Table.th>
+                    <Table.th className="table-cell">Mean Time</Table.th>
+                    <Table.th className="table-cell">Min Time</Table.th>
+                    <Table.th className="table-cell">Total Time</Table.th>
+                    <Table.th className="table-cell">Query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQuerySlowestExecutionTimeData ? (
+                    QuerySlowestExecutionTimeData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.avg_rows}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.max_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.mean_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.min_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.total_time.toFixed(2)}ms
+                          </Table.td>
+                          <Table.td className="relative table-cell whitespace-nowrap">
+                            <p className="w-64 block truncate font-mono">{item.query}</p>
+                            <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
+          </Tabs.Panel>
+        </Tabs>
       </div>
-      <Tabs
-        scrollable
-        type="underlined"
-        size="medium"
-        addOnAfter={
-          <div className="w-full flex justify-end">
-            <Button
-              type="default"
-              onClick={() => {
-                useDbQuery(`SELECT pg_stat_statements_reset();`)
-              }}
-            >
-              Reset analysis
-            </Button>
-          </div>
-        }
-      >
-        <Tabs.Panel key={1} id="1" label="Most time consuming" className="text-sm max-w-none">
-          <div className="thin-scrollbars max-w-full overflow-scroll">
-            <Table
-              head={
-                <>
-                  <Table.th className="table-cell">rol name</Table.th>
-                  <Table.th className="table-cell">prop_total_time</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell w-[200px]">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQueryMostTimeConsumingData ? (
-                  QueryMostTimeConsumingData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.prop_total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="w-[200px] table-cell whitespace-nowrap truncate">
-                          <p className="truncate">{item.query}</p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
-          </div>
-        </Tabs.Panel>
-        <Tabs.Panel key={2} id="2" label="Most frequently used" className="text-sm max-w-none">
-          <div className="thin-scrollbars max-w-full overflow-scroll">
-            <Table
-              head={
-                <>
-                  {/* <Table.th className="table-cell">source</Table.th> */}
-                  <Table.th className="table-cell">rolname</Table.th>
-                  <Table.th className="table-cell">avg_rows</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">max_time</Table.th>
-                  <Table.th className="table-cell">mean_time</Table.th>
-                  <Table.th className="table-cell">min_time</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQueryMostFrequentlyInvokedData ? (
-                  QueryMostFrequentlyInvokedData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.avg_rows}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.max_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.mean_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.min_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.query}
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
-          </div>
-        </Tabs.Panel>
-        <Tabs.Panel key={3} id="3" label="Slowest execution time" className="text-sm max-w-none">
-          <div className="thin-scrollbars max-w-full overflow-scroll">
-            <Table
-              head={
-                <>
-                  <Table.th className="table-cell">rolname</Table.th>
-                  <Table.th className="table-cell">avg_rows</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">max_time</Table.th>
-                  <Table.th className="table-cell">mean_time</Table.th>
-                  <Table.th className="table-cell">min_time</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQuerySlowestExecutionTimeData ? (
-                  QuerySlowestExecutionTimeData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.avg_rows}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.max_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.mean_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.min_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.query}
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
-          </div>
-        </Tabs.Panel>
-      </Tabs>
+    </div>
+  )
+}
+
+const QueryActions = ({ sql, className }: { sql: string; className: string }) => {
+  if (sql.includes('insufficient privilege')) return null
+
+  return (
+    <div className={[className, 'flex justify-center items-center'].join(' ')}>
+      <CopyButton type="default" text={sql} bounceIconOnCopy />
     </div>
   )
 }
