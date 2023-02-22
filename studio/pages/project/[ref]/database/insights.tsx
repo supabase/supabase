@@ -216,40 +216,44 @@ export const Content = () => {
             label="Most time consuming"
             className="px-16 text-sm max-w-none"
           >
-            <Table
-              head={
-                <>
-                  <Table.th className="table-cell">rol name</Table.th>
-                  <Table.th className="table-cell">prop_total_time</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell w-[200px]">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQueryMostTimeConsumingData ? (
-                  QueryMostTimeConsumingData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.prop_total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="w-[200px] table-cell whitespace-nowrap truncate">
-                          <p className="truncate">{item.query}</p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    <Table.th className="table-cell">rol name</Table.th>
+                    <Table.th className="table-cell">prop_total_time</Table.th>
+                    <Table.th className="table-cell">calls</Table.th>
+                    <Table.th className="table-cell">total_time</Table.th>
+                    <Table.th className="table-cell w-[200px]">query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQueryMostTimeConsumingData ? (
+                    QueryMostTimeConsumingData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.prop_total_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.total_time}
+                          </Table.td>
+                          <Table.td className="w-[200px] table-cell whitespace-nowrap truncate">
+                            <p className="truncate">{item.query}</p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
           </Tabs.Panel>
           <Tabs.Panel
             key={2}
@@ -257,53 +261,57 @@ export const Content = () => {
             label="Most frequently used"
             className="px-16 text-sm max-w-none"
           >
-            <Table
-              head={
-                <>
-                  {/* <Table.th className="table-cell">source</Table.th> */}
-                  <Table.th className="table-cell">rolname</Table.th>
-                  <Table.th className="table-cell">avg_rows</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">max_time</Table.th>
-                  <Table.th className="table-cell">mean_time</Table.th>
-                  <Table.th className="table-cell">min_time</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQueryMostFrequentlyInvokedData ? (
-                  QueryMostFrequentlyInvokedData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.avg_rows}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.max_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.mean_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.min_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.query}
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    {/* <Table.th className="table-cell">source</Table.th> */}
+                    <Table.th className="table-cell">rolname</Table.th>
+                    <Table.th className="table-cell">avg_rows</Table.th>
+                    <Table.th className="table-cell">calls</Table.th>
+                    <Table.th className="table-cell">max_time</Table.th>
+                    <Table.th className="table-cell">mean_time</Table.th>
+                    <Table.th className="table-cell">min_time</Table.th>
+                    <Table.th className="table-cell">total_time</Table.th>
+                    <Table.th className="table-cell">query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQueryMostFrequentlyInvokedData ? (
+                    QueryMostFrequentlyInvokedData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.avg_rows}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.max_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.mean_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.min_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.total_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.query}
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
           </Tabs.Panel>
           <Tabs.Panel
             key={3}
@@ -311,52 +319,56 @@ export const Content = () => {
             label="Slowest execution time"
             className="px-16 text-sm max-w-none"
           >
-            <Table
-              head={
-                <>
-                  <Table.th className="table-cell">rolname</Table.th>
-                  <Table.th className="table-cell">avg_rows</Table.th>
-                  <Table.th className="table-cell">calls</Table.th>
-                  <Table.th className="table-cell">max_time</Table.th>
-                  <Table.th className="table-cell">mean_time</Table.th>
-                  <Table.th className="table-cell">min_time</Table.th>
-                  <Table.th className="table-cell">total_time</Table.th>
-                  <Table.th className="table-cell">query</Table.th>
-                </>
-              }
-              body={
-                isLoadedQuerySlowestExecutionTimeData ? (
-                  QuerySlowestExecutionTimeData[0].data.map((item, i) => {
-                    return (
-                      <Table.tr key={i} hoverable className="relative">
-                        <Table.td className="table-cell whitespace-nowrap">{item.rolname}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.avg_rows}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
-                        <Table.td className="table-cell whitespace-nowrap">
-                          {item.max_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.mean_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.min_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.total_time}
-                        </Table.td>
-                        <Table.td className="table-cell whitespace-nowrap truncate">
-                          {item.query}
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  })
-                ) : (
-                  <></>
-                )
-              }
-            />
+            <div className="thin-scrollbars max-w-full overflow-scroll">
+              <Table
+                head={
+                  <>
+                    <Table.th className="table-cell">rolname</Table.th>
+                    <Table.th className="table-cell">avg_rows</Table.th>
+                    <Table.th className="table-cell">calls</Table.th>
+                    <Table.th className="table-cell">max_time</Table.th>
+                    <Table.th className="table-cell">mean_time</Table.th>
+                    <Table.th className="table-cell">min_time</Table.th>
+                    <Table.th className="table-cell">total_time</Table.th>
+                    <Table.th className="table-cell">query</Table.th>
+                  </>
+                }
+                body={
+                  isLoadedQuerySlowestExecutionTimeData ? (
+                    QuerySlowestExecutionTimeData[0].data.map((item, i) => {
+                      return (
+                        <Table.tr key={i} hoverable className="relative">
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.rolname}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.avg_rows}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">{item.calls}</Table.td>
+                          <Table.td className="table-cell whitespace-nowrap">
+                            {item.max_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.mean_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.min_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.total_time}
+                          </Table.td>
+                          <Table.td className="table-cell whitespace-nowrap truncate">
+                            {item.query}
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    })
+                  ) : (
+                    <></>
+                  )
+                }
+              />
+            </div>
           </Tabs.Panel>
         </Tabs>
       </div>
