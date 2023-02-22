@@ -281,21 +281,39 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                   )}
                 </table>
 
-                {!isReadOnlyMode && product.title === 'Database' && (
+                {isReadOnlyMode && product.title === 'Database' && (
                   <div className="p-6">
                     <Alert title="Database in read-only mode" variant="warning" withIcon>
                       <div className="grid gap-4">
+                        <p>Your disk has reached 95% capacity and has entered Read Only mode.</p>
                         {isPaidTier ? (
-                          <p>
-                            Your disk has reached 90% capacity. For Pro and Enterprise projects,
-                            disk size expands ~1.5x automatically (e.g., 8GB to 12GB), but can only
-                            occur <u>once every six hours</u>.{' '}
-                          </p>
+                          <>
+                            <p>
+                              For Pro and Enterprise projects, Disk Size expands ~1.5x automatically
+                              (e.g., 8GB to 12GB) when it reaches 90% capacity, but can only occur{' '}
+                              <u>once every six hours</u>.
+                            </p>
+                            <p>
+                              If the disk size has already expanded within 6 hours, and then reaches
+                              95% capacity, your disk will enter read only mode until it can resize
+                              again after 6 hours.
+                            </p>
+                            <p>
+                              If you require help or need your disk changed so you can delete data,
+                              <Link
+                                href={`/support/new?ref=${projectRef}&category=Database_unresponsive&Subject=Read%20only%20mode%20issue`}
+                              >
+                                <a className="underline">you can contact the support team</a>
+                              </Link>
+                              .
+                            </p>
+                          </>
                         ) : (
                           <p>
-                            This project is on the Free tier. Consider{' '}
+                            This project is on the Free tier. Your disk size cannot auto scale.
+                            Consider{' '}
                             <Link href={`/project/${projectRef}/settings/billing/subscription`}>
-                              <a className="underline">upgrading</a>
+                              <a className="underline">upgrading this project</a>
                             </Link>{' '}
                             to resume service as usual.
                           </p>
