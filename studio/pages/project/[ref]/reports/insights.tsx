@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 import { ReportsLayout } from 'components/layouts'
-import { Button, Tabs, Accordion } from 'ui'
+import { Button, Tabs, Accordion, IconInfo } from 'ui'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import Table from 'components/to-be-cleaned/Table'
-import { IconAlertCircle, IconCheckCircle, IconCopy } from '@supabase/ui'
+import { IconAlertCircle, IconCheckCircle } from '@supabase/ui'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CopyButton from 'components/ui/CopyButton'
@@ -153,8 +153,8 @@ const DatabaseExtensions: NextPageWithLayout = () => {
     </div>
   )
 
-  const indexHitRate = QueryHitRateData[0]?.data[0]?.ratio
-  const tableHitRate = QueryHitRateData[0]?.data[1]?.ratio
+  const indexHitRate = QueryHitRateData[0]?.data?.[0]?.ratio
+  const tableHitRate = QueryHitRateData[0]?.data?.[1]?.ratio
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
@@ -176,7 +176,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
       >
         <Accordion.Item
           header={
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row gap-2 items-center p-2">
               <span className="text-xl">Index Efficiency</span>
               {showIndexWarning ? warnAlert : checkAlert}
             </div>
@@ -185,44 +185,46 @@ const DatabaseExtensions: NextPageWithLayout = () => {
           className="flex flex-row gap-8"
         >
           {isLoadedQueryHitRateData && (
-            <div className="flex flex-row flex-wrap px-8 py-4">
-              <div className="w-1/2">
-                Index Hit Rate
-                <div className="flex items-center gap-2">
-                  {indexHitRate >= 0.99
-                    ? checkAlert
-                    : indexHitRate >= 0.95
-                    ? warnAlert
-                    : dangerAlert}
-                  <div className="flex items-baseline">
-                    <span className="text-3xl">
-                      {(QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
-                    </span>
-                    <span className="text-xl">%</span>
+            <div>
+              <div className="flex flex-row px-8 py-4 gap-8">
+                <div className="w-1/2 bg-slate-200 rounded-md p-4">
+                  Index Hit Rate
+                  <div className="flex items-center gap-2">
+                    {indexHitRate >= 0.99
+                      ? checkAlert
+                      : indexHitRate >= 0.95
+                      ? warnAlert
+                      : dangerAlert}
+                    <div className="flex items-baseline">
+                      <span className="text-3xl">
+                        {(QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
+                      </span>
+                      <span className="text-xl">%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="w-1/2">
-                {QueryHitRateData[0]?.data[1]?.name == 'table hit rate' && 'Table Hit Rate'}
-                <div className="flex items-center gap-2">
-                  {tableHitRate >= 0.99
-                    ? checkAlert
-                    : tableHitRate >= 0.95
-                    ? warnAlert
-                    : dangerAlert}
-                  <div className="flex items-baseline">
-                    <span className="text-3xl">
-                      {(QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
-                    </span>
-                    <span className="text-xl">%</span>
+                <div className="w-1/2 bg-slate-200 rounded-md p-4">
+                  {QueryHitRateData[0]?.data[1]?.name == 'table hit rate' && 'Table Hit Rate'}
+                  <div className="flex items-center gap-2">
+                    {tableHitRate >= 0.99
+                      ? checkAlert
+                      : tableHitRate >= 0.95
+                      ? warnAlert
+                      : dangerAlert}
+                    <div className="flex items-baseline">
+                      <span className="text-3xl">
+                        {(QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
+                      </span>
+                      <span className="text-xl">%</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="w-full pt-4 m-0">
-                <p className="text-scale-1100 text-sm m-0 p-0">
-                  To best performance, ensure that the cache hit rate ratios above 99%. Consider
-                  upgrading to an instance wiht more memory if the ratios dip below 95%.
+              <div className="px-8 pt-4 m-0">
+                <p className="text-scale-1100 text-sm max-w-2xl">
+                  For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
+                  Consider upgrading to an instance with more memory if the ratios dip below 95%.
                 </p>
               </div>
             </div>
@@ -237,7 +239,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
           type="underlined"
           size="medium"
           addOnAfter={
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end mr-4">
               <Button type="default" onClick={resetPgStatStatements}>
                 Reset analysis
               </Button>
@@ -261,7 +263,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                     QueryMostTimeConsumingData[0].data.map((item, i) => {
                       return (
                         <Table.tr key={i} hoverable className="relative">
-                          <Table.td className="table-cell whitespace-nowrap">
+                          <Table.td className="table-cell whitespace-nowrap w-36">
                             {item.rolname}
                           </Table.td>
                           <Table.td className="table-cell whitespace-nowrap">
@@ -271,7 +273,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                           <Table.td className="table-cell whitespace-nowrap">
                             {item.total_time.toFixed(2)}ms
                           </Table.td>
-                          <Table.td className="relative table-cell whitespace-nowrap">
+                          <Table.td className="relative table-cell whitespace-nowrap w-36">
                             <p className="w-96 block truncate font-mono">{item.query}</p>
                             <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
                           </Table.td>
@@ -306,7 +308,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                     QueryMostFrequentlyInvokedData[0].data.map((item, i) => {
                       return (
                         <Table.tr key={i} hoverable className="relative">
-                          <Table.td className="table-cell whitespace-nowrap">
+                          <Table.td className="table-cell whitespace-nowrap w-28">
                             {item.rolname}
                           </Table.td>
                           <Table.td className="table-cell whitespace-nowrap">
@@ -325,8 +327,8 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                           <Table.td className="table-cell whitespace-nowrap truncate">
                             {item.total_time.toFixed(2)}ms
                           </Table.td>
-                          <Table.td className="relative table-cell whitespace-nowrap">
-                            <p className="w-64 block truncate font-mono ">{item.query}</p>
+                          <Table.td className="relative table-cell whitespace-nowrap  w-24">
+                            <p className="w-48 block truncate font-mono ">{item.query}</p>
                             <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
                           </Table.td>
                         </Table.tr>
@@ -359,7 +361,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                     QuerySlowestExecutionTimeData[0].data.map((item, i) => {
                       return (
                         <Table.tr key={i} hoverable className="relative">
-                          <Table.td className="table-cell whitespace-nowrap">
+                          <Table.td className="table-cell whitespace-nowrap w-24">
                             {item.rolname}
                           </Table.td>
                           <Table.td className="table-cell whitespace-nowrap">
@@ -379,8 +381,11 @@ const DatabaseExtensions: NextPageWithLayout = () => {
                             {item.total_time.toFixed(2)}ms
                           </Table.td>
                           <Table.td className="relative table-cell whitespace-nowrap">
-                            <p className="w-64 block truncate font-mono">{item.query}</p>
-                            <QueryActions sql={item.query} className="absolute inset-y-0 right-0" />
+                            <p className="w-48 block truncate font-mono">{item.query}</p>
+                            <QueryActions
+                              sql={'item.query'}
+                              className="absolute inset-y-0 right-0"
+                            />
                           </Table.td>
                         </Table.tr>
                       )
@@ -402,8 +407,8 @@ const QueryActions = ({ sql, className }: { sql: string; className: string }) =>
   if (sql.includes('insufficient privilege')) return null
 
   return (
-    <div className={[className, 'flex justify-center items-center'].join(' ')}>
-      <CopyButton type="default" text={sql} bounceIconOnCopy />
+    <div className={[className, 'flex justify-center items-center mr-4'].join(' ')}>
+      <CopyButton type="default" text={sql} />
     </div>
   )
 }
