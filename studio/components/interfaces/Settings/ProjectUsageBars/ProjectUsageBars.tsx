@@ -1,4 +1,8 @@
+import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Badge,
   Button,
@@ -10,19 +14,16 @@ import {
   IconBookOpen,
 } from 'ui'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
-import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useRouter } from 'next/router'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Link from 'next/link'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   projectRef?: string
@@ -35,6 +36,10 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
 
   const { project } = useProjectContext()
   const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const subscriptionTier = ui.selectedProject?.subscription_tier
   const projectHasNoLimits =
@@ -177,14 +182,16 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           usageElement = (
                             <div className="flex items-center justify-between">
                               <span>Not included in {planName} tier</span>
-                              <Button
-                                size="tiny"
-                                onClick={() =>
-                                  router.push(`/project/${projectRef}/settings/billing/update`)
-                                }
-                              >
-                                Upgrade to Pro
-                              </Button>
+                              {canUpdateSubscription && (
+                                <Button
+                                  size="tiny"
+                                  onClick={() =>
+                                    router.push(`/project/${projectRef}/settings/billing/update`)
+                                  }
+                                >
+                                  Upgrade to Pro
+                                </Button>
+                              )}
                             </div>
                           )
                         } else if (showUsageExceedMessage) {

@@ -8,19 +8,18 @@ import TemplateEditor from './TemplateEditor'
 const EmailTemplates = observer(() => {
   return (
     <div>
-      <div className='flex justify-between items-center'>
+      <div className="flex justify-between items-center">
         <FormHeader
           title="Email Templates"
           description="Customize the emails that will be sent out to your users."
         />
-        <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-          <a
-            target="_blank"
-            href="https://supabase.com/docs/guides/auth/auth-email-templates"
-          >
-            Email Templates Documentation
-          </a>
-        </Button>
+        <div className="mb-6">
+          <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <a target="_blank" href="https://supabase.com/docs/guides/auth/auth-email-templates">
+              Documentation
+            </a>
+          </Button>
+        </div>
       </div>
       <FormPanel>
         <Tabs

@@ -67,6 +67,10 @@ const TableGridEditor: FC<Props> = ({
   const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
 
+  const isReadOnly =
+    !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
+    !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
   const getEncryptedColumns = async (table: any) => {
     const columns = await vault.listEncryptedColumns(table.schema, table.name)
     setEncryptedColumns(columns)
@@ -170,7 +174,7 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={canUpdateTables && canEditViaTableEditor}
+        editable={!isReadOnly && canUpdateTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
