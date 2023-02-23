@@ -103,7 +103,7 @@ class StorageExplorerStore {
   initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
     this.projectRef = projectRef
     this.endpoint = `${API_URL}/storage/${projectRef}`
-    this.initializeSupabaseClient(serviceKey, url, protocol)
+    if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
   /* Methods which are commonly used + For better readability */

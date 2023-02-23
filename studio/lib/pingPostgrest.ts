@@ -46,6 +46,7 @@ const getApiKey = async (
   timeout = DEFAULT_TIMEOUT_MILLISECONDS
 ): Promise<string | undefined> => {
   const response = await getWithTimeout(`${API_URL}/props/project/${projectRef}/api`, { timeout })
+  console.log('getApiKey', response)
   if (response.error || response.autoApiService.service_api_keys.length === 0) return undefined
   return response.autoApiService.defaultApiKey
 }
