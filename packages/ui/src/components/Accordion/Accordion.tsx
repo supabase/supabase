@@ -37,14 +37,13 @@ interface AccordionProps {
   defaultActiveId?: (string | number)[]
   icon?: React.ReactNode
   iconPosition?: Align
-  bordered: boolean
   onChange?: (item: string | string[]) => void
   openBehaviour: 'single' | 'multiple'
   type: Type
   size: Size
   defaultValue?: string | string[] | undefined
-  justified: Boolean
-  chevronAlign: Align
+  justified?: Boolean
+  chevronAlign?: Align
 }
 
 function Accordion({
@@ -58,8 +57,8 @@ function Accordion({
   type = 'default',
   // size, // TO DO
   defaultValue = undefined,
-  justified = true,
-  chevronAlign,
+  justified = false,
+  chevronAlign = 'left',
 }: AccordionProps) {
   // const [currentItems, setCurrentItems] = useState(defaultValue || [])
 
