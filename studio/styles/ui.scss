@@ -224,8 +224,38 @@
     @apply border-b flex border-scale-500;
   }
 
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--client-libraries {
+    flex-direction: column;
+    margin-bottom: 40px;
+
+    .text,
+    .code {
+      width: 100%;
+      max-width: none;
+    }
+    .code {
+      margin-bottom: 20px;
+    }
+  }
+
   .doc-section article:first-child {
     @apply prose prose-docs prose-sm max-w-none;
+  }
+
+  &.Docs--table-editor .doc-section__table-name {
+    @apply mt-12;
   }
 
   .text {
@@ -239,7 +269,7 @@
     a {
       @apply transition;
     }
-    
+
     a:hover {
       @apply text-brand-1000;
     }
@@ -269,6 +299,9 @@
     .is-highlighted {
       @apply text-brand-900;
     }
+  }
+  .codeblock-container + .codeblock-container {
+    @apply mt-12;
   }
 }
 
