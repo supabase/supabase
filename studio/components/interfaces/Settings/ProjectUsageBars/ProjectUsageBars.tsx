@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -22,7 +22,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import InformationBox from 'components/ui/InformationBox'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
@@ -35,7 +35,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const router = useRouter()
 
   const { project } = useProjectContext()
-  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false)
+  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const canUpdateSubscription = checkPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
@@ -78,24 +82,10 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
       />
     )
   }
-  // [Terry]
-  // temporary solution to check if project is in read only mode
-  // until we get an api endpoint for this
-
-  async function checkForReadOnlyMode() {
-    const sql = `show default_transaction_read_only;`
-    const connectionString = project?.connectionString
-    const { result: readOnlyStatus } = await executeSql({ projectRef, connectionString, sql })
-    if (readOnlyStatus[0]?.default_transaction_read_only === 'on') setIsReadOnlyMode(true)
-  }
-
-  useEffect(() => {
-    if (projectRef) checkForReadOnlyMode()
-  }, [projectRef])
 
   const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
 
-  const featureFootnotes: Record<string, JSX.Element> = {
+  const featureFootnotes: Record<string, JSX.Element | null> = {
     db_size: isPaidTier ? (
       <div className="flex justify-between items-center">
         <div className="flex flex-row space-x-4 text-scale-1000">
@@ -109,9 +99,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
           </a>
         </Button>
       </div>
-    ) : (
-      <></>
-    ),
+    ) : null,
   }
 
   return (
