@@ -10,9 +10,9 @@ The Supabase platform automatically optimizes your Postgres database to take adv
 
 ## Examining Query Performance
 
-A major cause of poor database performance is unoptimized queries. The techniques on this page can help you identify and understand queries that take the most time and resources from your database.
+Unoptimized queries are a major cause of poor database performance. The techniques on this page can help you identify and understand queries that take the most time and resources from your database.
 
-Database performance is a large topic and many factors can contribute, but some of the most common causes of poor performance include:
+Database performance is a large topic and many factors can contribute. Some of the most common causes of poor performance include:
 
 * An inefficiently designed schema
 * Inefficiently designed queries
@@ -26,9 +26,9 @@ Thankfully there are solutions to all these issues, which we will cover in the f
 
 ### Postgres Cumulative Statistics system
 
-Postgres itself collects lots of data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has [the pg_stat_statements extension](https://www.postgresql.org/docs/14/pgstatstatements.html) enabled by default. This extension records query execution performance details and is the best way to find queries that take the most time to execute. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
+Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
 
-It is easy to use `pg_stat_statements` and other Postgres statistics tables to get a wealth of information about your database. Here are some example queries to get you started.
+Here are some example queries to get you started.
 
 Most frequently called queries:
 
@@ -57,9 +57,16 @@ limit
   100;
 ```
 
-This query will show you statistics about queries ordered by the number of times they have been called. It shows the role that ran the query, the number of times it has been called, the average number of rows returned, the cumulative total time the query has spent running as well as the min, max and mean query times.
+This query shows:
 
-This can provide useful information about queries that you are running often. You should try and ensure that any queries that are being called often are performant and have good mean exeuction times. Queries which are showing as having high max or mean times and are being called often can be good candidates for optimisation.
+- query statistics, ordered by the number of times each query has been executed
+- the role that ran the query
+- the number of times it has been called
+- the average number of rows returned
+- the cumulative total time the query has spent running 
+- the min, max and mean query times.
+
+This provides useful information about the queries you run most frequently. Queries that have high `max_time` or `mean_time` times and are being called often can be good candidates for optimization.
 
 Slowest queries by execution time:
 
