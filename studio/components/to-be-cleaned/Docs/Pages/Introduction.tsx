@@ -42,10 +42,10 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
             documentation will change too.
           </p>
           <p>
-            <b>Please note:</b> if you make changes to a field (column) name or type, the API
-            interface for those fields will change correspondingly. Therefore, please make sure to
-            update your API implementation accordingly whenever you make changes to your Supabase
-            schema from the graphical interface.
+            <b>Note:</b> if you make changes to a field (column) name or type, the API interface for
+            those fields will change correspondingly. Therefore, please make sure to update your API
+            implementation accordingly whenever you make changes to your Supabase schema from the
+            graphical interface.
           </p>
 
           <div className="not-prose mb-6">
@@ -91,8 +91,8 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
       </div>
 
       <h2 className="doc-heading">Client Libraries</h2>
-      <div className="doc-section">
-        <article className="text ">
+      <div className="doc-section doc-section--client-libraries">
+        <article className="text">
           <p>Your API consists of both a RESTful interface and a Realtime interface.</p>
           <p>
             For interacting with the Realtime streams, we provide client libraries that handle the

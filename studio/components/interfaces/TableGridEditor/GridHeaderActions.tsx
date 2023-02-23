@@ -70,7 +70,9 @@ const GridHeaderActions: FC<Props> = ({
           </Tooltip.Content>
         </Tooltip.Root>
       )}
-      <RenderAPIPreviewToggle />
+      <div className="mt-[1px]">
+        <RenderAPIPreviewToggle />
+      </div>
       <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
         <a>
           <Button
