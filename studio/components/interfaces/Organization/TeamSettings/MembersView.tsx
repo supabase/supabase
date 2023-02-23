@@ -5,15 +5,14 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from 'ui'
 
 import { Member, Role } from 'types'
-import { useStore, useOrganizationDetail, useParams } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useStore, useParams } from 'hooks'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -32,10 +31,8 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
 
   const user = ui.profile
 
-  const { mutateOrgMembers } = useOrganizationDetail(slug ?? '')
   const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
-  const [loading, setLoading] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
@@ -61,36 +58,35 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
     return roles.find((x: any) => x.id === id)?.name
   }
 
-  const handleRoleChange = async () => {
-    if (!selectedMember) return
-
-    setLoading(true)
-    const { gotrue_id, newRoleId } = selectedMember
-    const response = await patch(`${API_URL}/organizations/${slug}/members/${gotrue_id}`, {
-      role_id: newRoleId,
-    })
-
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
-      })
-    } else {
-      const updatedMembers = members.map((member: Member) => {
-        if (member.gotrue_id === selectedMember.gotrue_id) {
-          return { ...member, role_ids: [newRoleId] }
-        } else {
-          return member
-        }
-      })
-      mutateOrgMembers(updatedMembers)
+  const { isLoading, mutate } = useOrganizationMemberUpdateMutation({
+    onSuccess() {
       ui.setNotification({
         category: 'success',
         message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
       })
+    },
+    onError() {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
+      })
+    },
+  })
+
+  const handleRoleChange = async () => {
+    if (!selectedMember) return
+
+    const { gotrue_id, newRoleId } = selectedMember
+
+    if (!slug) {
+      throw new Error('slug is required')
+    }
+    if (!gotrue_id) {
+      throw new Error('gotrue_id is required')
     }
 
-    setLoading(false)
+    mutate({ slug, gotrueId: gotrue_id, roleId: newRoleId })
+
     setUserRoleChangeModalVisible(false)
   }
 
@@ -145,7 +141,7 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
+                              <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
                             ) : isEmailUser ? (
@@ -157,7 +153,7 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
                                 src={`https://github.com/${x.username}.png?size=80`}
                                 width="40"
                                 height="40"
-                                className="rounded-full border"
+                                className="border rounded-full"
                               />
                             )}
                           </div>
@@ -312,8 +308,8 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
                 block
                 type="warning"
                 size="medium"
-                disabled={loading}
-                loading={loading}
+                disabled={isLoading}
+                loading={isLoading}
                 onClick={() => handleRoleChange()}
               >
                 Confirm

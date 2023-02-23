@@ -7,8 +7,10 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import FooterHelpCallout from '~/components/FooterHelpCallout'
 
 import { memo, useEffect } from 'react'
+import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { IS_PLATFORM } from '~/lib/constants'
 
 const levelsData = {
   home: {
@@ -334,11 +336,13 @@ const SiteLayout = ({ children }) => {
           </div>
           <div className="grow px-5 max-w-7xl mx-auto py-16">
             {children}
-            <FooterHelpCallout />
             <Footer />
           </div>
           <MobileMenuBackdrop />
         </Container>
+        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
+          {IS_PLATFORM && <Clippy />}
+        </div>
       </div>
     </main>
   )

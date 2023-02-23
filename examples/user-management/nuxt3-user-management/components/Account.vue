@@ -74,10 +74,11 @@ async function updateProfile() {
     }
 }
 
+const supabaseAuth = useSupabaseAuthClient()
 async function signOut() {
     try {
         loading.value = true
-        let { error } = await supabase.auth.signOut()
+        let { error } = await supabaseAuth.auth.signOut()
         if (error) throw error
     } catch (error) {
         alert(error.message)

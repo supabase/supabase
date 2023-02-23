@@ -13,9 +13,107 @@ info:
   libraries:
     - name: 'C#'
       id: 'csharp'
-      version: '0.0.1'
+      version: '0.8.0'
 
 functions:
+  - id: initializing
+    title: Initializing
+    description: |
+      Initializing a new client is pretty straightforward. Find your project url and public key from the
+      admin panel and pass it into your client initialization function.
+
+      `supabase-csharp` is heavily dependent on Models deriving from `BaseModel`. To interact with the API, one must have the associated model (see example) specified.
+
+      Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
+
+    examples:
+      - id: csharp-init-standard
+        name: Standard
+        code: |
+          ```c#
+          var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+          var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+
+          var options = new Supabase.SupabaseOptions
+          {
+              AutoConnectRealtime = true
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+          ```
+      - id: csharp-init-maui
+        name: Dependency Injection (Maui-like)
+        code: |
+          ```c#
+          public static MauiApp CreateMauiApp()
+          {
+                // ...
+                var builder = MauiApp.CreateBuilder();
+
+                var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+                var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+                var options = new SupabaseOptions
+                {
+                  AutoRefreshToken = true,
+                  AutoConnectRealtime = true,
+                  SessionHandler = new SupabaseSessionHandler()
+                };
+
+                // Note the creation as a singleton.
+                builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+          }
+          ```
+      - id: csharp-init-showing-models
+        name: With Models Example
+        code: |
+          ```c#
+          // Given the following Model representing the Supabase Database (Message.cs)
+          [Table("messages")]
+          public class Message : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("username")]
+              public string UserName { get; set; }
+
+              [Column("channel_id")]
+              public int ChannelId { get; set; }
+
+              public override bool Equals(object obj)
+              {
+                  return obj is Message message &&
+                          Id == message.Id;
+              }
+
+              public override int GetHashCode()
+              {
+                  return HashCode.Combine(Id);
+              }
+          }
+
+          void Initialize()
+          {
+              // Get All Messages
+              var response = await client.Table<Message>().Get();
+              List<Message> models = response.Models;
+
+              // Insert
+              var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+              await client.Table<Message>().Insert();
+
+              // Update
+              var model = response.Models.First();
+              model.UserName = "elrhomariyounes";
+              await model.Update();
+
+              // Delete
+              await response.Models.Last().Delete();
+
+              // etc.
+          }
+          ```
   - id: sign-up
     title: 'SignUp()'
     description: |
@@ -283,7 +381,9 @@ functions:
       Performs vertical filtering with SELECT.
     title: 'Fetch data: Select()'
     notes: |
-      - **Column Names must match names in database, not names specified on model properties.**
+      - **LINQ expressions do not currently support parsing embedded resource columns. For these cases, `string` will need to be used.**
+      - **When using string Column Names to select, they must match names in database, not names specified on model properties.**
+      - Additional information on modeling + querying Joins and Inner Joins can be found [in the `postgrest-csharp README`](https://github.com/supabase-community/postgrest-csharp/blob/master/README.md#foreign-keys-join-tables-and-relationships)
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `From()` can be combined with [Modifiers](/docs/reference/csharp/using-modifiers)
       - `From()` can be combined with [Filters](/docs/reference/csharp/using-filters)
@@ -294,6 +394,23 @@ functions:
         isSpotlight: true
         code: |
           ```c#
+          // Given the following Model (City.cs)
+          [Table("cities")]
+          class City : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("name")]
+              public string Name { get; set; }
+
+              [Column("country_id")]
+              public int CountryId { get; set; }
+
+              //... etc.
+          }
+
+          // A result can be fetched like so.
           var result = await supabase.From<City>().Get();
           var cities = result.Models
           ```
@@ -302,6 +419,23 @@ functions:
         description: You can select specific fields from your tables.
         code: |
           ```c#
+          // Given the following Model (Movie.cs)
+          [Table("movies")]
+          class Movie : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("name")]
+              public string Name { get; set; }
+
+              [Column("created_at")]
+              public DateTime CreatedAt { get; set; }
+
+              //... etc.
+          }
+
+          // A result can be fetched like so.
           var result = await supabase
             .From<Movie>()
             .Select(x => new object[] {x.Name, x.CreatedAt})
@@ -313,7 +447,7 @@ functions:
         code: |
           ```c#
           var data = await supabase
-            .From<Products>()
+            .From<Transactions>()
             .Select("id, supplier:supplier_id(name), purchaser:purchaser_id(name)")
             .Get();
           ```
@@ -432,14 +566,14 @@ functions:
       - `Update()` is typically called using a model as an argument or from a hydrated model.
     examples:
       - id: updating-your-data-with-filter
-        name: Update your data
+        name: Update your data using Filter
         isSpotlight: true
         code: |
           ```c#
           var update = await supabase
             .From<City>()
             .Where(x => x.Name == "Auckland")
-            .Set(x => new KeyValuePair<object, object>(x.Name, "Middle Earth"))
+            .Set(x => x.Name, "Middle Earth")
             .Update();
           ```
       - id: updating-your-data
@@ -556,13 +690,68 @@ functions:
           ```
 
   - id: subscribe
+    title: 'Realtime.Channel'
     description: |
       Subscribe to realtime changes in your database.
-    title: 'From<Model>().On()'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```c#
+          class CursorBroadcast : BaseBroadcast 
+          {
+              [JsonProperty("cursorX")]
+              public int CursorX {get; set;}
+
+              [JsonProperty("cursorY")]
+              public int CursorY {get; set;}
+          }
+
+          var channel = supabase.Realtime.Channel("any");
+          var broadcast = channel.Register<CursorBroadcast>();
+
+          broadcast.OnBroadcast += (sender, _) => 
+          {
+            var data = broadcast.Current();
+          };
+
+          await channel.Subscribe();
+
+          // Send a broadcast
+          await broadcast.Send("cursor", new CursorBroadcast { CursorX = 123, CursorY = 456 });
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```c#
+            class UserPresence : BasePresence 
+            {
+                [JsonProperty("cursorX")]
+                public bool IsTyping {get; set;}
+
+                [JsonProperty("onlineAt")]
+                public DateTime OnlineAt {get; set;}
+            }
+
+            var channel = supabase.Realtime.Channel("any");
+            var presenceKey = Guid.NewGuid().ToString();
+            var presence = channel.Register<UserPresence>(presenceKey);
+
+            presence.OnSync += (sender, _) => 
+            {
+              var state = presence.CurrentState;
+            };
+
+            await channel.Subscribe();
+
+            // Send a presence update
+            await presence.Track(new UserPresence { IsTyping = false, OnlineAt = DateTime.Now });
+          ```
       - id: listening-to-a-specific-table
         name: Listening to a specific table
         isSpotlight: true
@@ -570,7 +759,7 @@ functions:
           ```c#
           await supabase.From<City>().On(ChannelEventType.All, (sender, args) =>
           {
-              Debug.WriteLine(args.Response.Payload);
+              Debug.WriteLine(args.Response.Payload.Data);
           });
           ```
       - id: listen-to-all-database-changes
@@ -579,9 +768,9 @@ functions:
           ```c#
           var channel = supabase.Realtime.Channel("realtime", "public", "*");
 
-          channel.OnMessage += (sender, args) =>
+          channel.OnPostgresChanges += (sender, args) =>
           {
-              Debug.WriteLine(args.Response.Payload);
+              Debug.WriteLine(args.Response.Payload.Data);
           };
 
           await channel.Subscribe();
@@ -592,7 +781,7 @@ functions:
           ```c#
           await supabase.From<City>().On(ChannelEventType.Insert, (sender, args) =>
           {
-              Debug.WriteLine(args.Response.Payload);
+              Debug.WriteLine(args.Response.Payload.Data);
           });
           ```
       - id: listening-to-updates
@@ -608,7 +797,7 @@ functions:
           ```c#
           await supabase.From<City>().On(ChannelEventType.Update, (sender, args) =>
           {
-              Debug.WriteLine(args.Response.Payload);
+              Debug.WriteLine(args.Response.Payload.Data);
           });
           ```
       - id: listening-to-deletes
@@ -624,7 +813,7 @@ functions:
           ```c#
           await supabase.From<City>().On(ChannelEventType.Delete, (sender, args) =>
           {
-              Debug.WriteLine(args.Response.Payload);
+              Debug.WriteLine(args.Response.Payload.Data);
           });
           ```
       - id: listening-to-row-level-changes
@@ -675,93 +864,6 @@ functions:
           ```c#
           var channels = supabase.Realtime.Subscriptions;
           ```
-
-  # - id: stream
-  #   description: |
-  #     Notifies of data at the queried table.
-  #   title: 'stream()'
-  #   notes: |
-  #     - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
-  #     - Takes a list of primary key columns as its argument.
-  #   examples:
-  #     - id: listening-to-a-specific-table
-  #       name: Listening to a specific table
-  #       isSpotlight: true
-  #       code: |
-  #         ```dart
-  #         supabase.from('countries')
-  #           .stream(primaryKey: ['id'])
-  #           .listen((List<Map<String, dynamic>> data) {
-  #           // Do something awesome with the data
-  #         });
-  #         ```
-  #     - id: listening-to-a-specific-rows-within-a-table
-  #       name: Listening to a specific rows within a table
-  #       description: |
-  #         You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-  #         This syntax is the as how you can filter data in Realtime
-  #       code: |
-  #         ```dart
-  #         supabase.from('countries')
-  #           .stream(primaryKey: ['id'])
-  #           .eq('id', '120')
-  #           .listen((List<Map<String, dynamic>> data) {
-  #           // Do something awesome with the data
-  #         });
-  #         ```
-  #     - id: with-order
-  #       name: With `order()`
-  #       code: |
-  #         ```dart
-  #         supabase.from('countries')
-  #           .stream(primaryKey: ['id'])
-  #           .order('name', ascending: true)
-  #           .listen((List<Map<String, dynamic>> data) {
-  #           // Do something awesome with the data
-  #         });
-  #         ```
-  #     - id: with-limit
-  #       name: With `limit()`
-  #       code: |
-  #         ```dart
-  #         supabase.from('countries')
-  #           .stream(primaryKey: ['id'])
-  #           .order('name', ascending: true)
-  #           .limit(10)
-  #           .listen((List<Map<String, dynamic>> data) {
-  #           // Do something awesome with the data
-  #         });
-  #         ```
-  #     - id: using-stream-with-stream-builder
-  #       name: Using `stream()` with `StreamBuilder`
-  #       description: |
-  #         When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
-  #       code: |
-  #         ```dart
-  #         final supabase = Supabase.instance.client;
-
-  #         class MyWidget extends StatefulWidget {
-  #           const MyWidget({Key? key}) : super(key: key);
-
-  #           @override
-  #           State<MyWidget> createState() => _MyWidgetState();
-  #         }
-
-  #         class _MyWidgetState extends State<MyWidget> {
-  #           // Persist the stream in a local variable to prevent refetching upon rebuilds
-  #           final _stream = supabase.from('countries').stream(primaryKey: ['id']);
-
-  #           @override
-  #           Widget build(BuildContext context) {
-  #             return StreamBuilder(
-  #               stream: _stream,
-  #               builder: (context, snapshot) {
-  #                 // Return your widget with the data from the snapshot
-  #               },
-  #             );
-  #           }
-  #         }
-  #         ```
 
   - id: list-buckets
     description: |
@@ -1043,7 +1145,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
+            .Select(x => new object[] { x.Name, x.CountryId })
             .Limit(10)
             .Get();
           ```
@@ -1069,8 +1171,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Order("id", Ordering.Descending)
+            .Select(x => new object[] { x.Name, x.CountryId })
+            .Order(x => x.Id, Ordering.Descending)
             .Get();
           ```
       - id: with-embedded-resources
@@ -1079,7 +1181,7 @@ functions:
           ```c#
            var result = await supabase.From<Country>()
             .Select("name, cities(name)")
-            .Filter("name", Operator.Equals, "United States")
+            .Filter(x => x.Name == "United States")
             .Order("cities", "name", Ordering.Descending)
             .Get();
           ```
@@ -1111,7 +1213,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
+            .Select(x => new object[] { x.Name, x.CountryId })
             .Offset(25)
             .Get();
           ```
@@ -1127,7 +1229,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
+            .Select(x => new object[] { x.Name, x.CountryId })
             .Single();
           ```
 
@@ -1138,19 +1240,15 @@ functions:
 
       Filters can be used on `Select()`, `Update()`, and `Delete()` queries.
 
-      If a Database function returns a table response, you can also apply filters.
+      **Note: LINQ expressions do not currently support parsing embedded resource columns. For these cases, `string` will need to be used.**
     examples:
       - id: applying-filters
         name: Applying Filters
-        description: |
-          Filters must be applied after any of `Select()`, `Update()`, `Upsert()`,
-          `Delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/csharp/using-modifiers).
         code: |
           ```c#
           var result = await supabase.From<City>()
-                .Select("name, country_id")
-                .Filter("name", Operator.Equals, "The Shire")
+                .Select(x => new object[] { x.Name, x.CountryId })
+                .Where(x => x.Name == "The Shire")
                 .Single();
           ```
       - id: filter-by-value-within-json-column
@@ -1171,26 +1269,9 @@ functions:
               (1, 'Michael', '{ "postcode": 90210 }'),
               (2, 'Jane', null);
             ```
-        response: |
-          ```json
-          {
-            "data": [
-              {
-                "id": 1,
-                "name": "Michael",
-                "address": {
-                  "postcode": 90210
-                }
-              }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
             .Filter("address->postcode", Operator.Equals, 90210)
             .Get();
           ```
@@ -1203,46 +1284,7 @@ functions:
             .Filter("cities.name", Operator.Equals, "Bali")
             .Get();
           ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-            create table
-              cities (
-                id int8 primary key,
-                country_id int8 not null references countries,
-                name text
-              );
 
-            insert into
-              countries (id, name)
-            values
-              (1, 'Germany'),
-              (2, 'Indonesia');
-            insert into
-              cities (id, country_id, name)
-            values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
-            ```
-          response: |
-            ```json
-            {
-              "data": [
-                {
-                  "name": "Indonesia",
-                  "cities": [
-                    {
-                      "name": "Bali"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
   - id: or
     title: Or()
     description: |
@@ -1253,33 +1295,17 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var filters = new List<QueryFilter>
-          {
-              new QueryFilter("id", Operator.Equals, 20),
-              new QueryFilter("id", Operator.Equals, 30)
-          };
-
           var result = await supabase.From<Country>()
-            .Or(filters)
+            .Where(x => x.Id == 20 || x.Id == 30)
             .Get();
           ```
       - id: use-or-with-and
         name: Use `or` with `and`
         code: |
           ```c#
-          var filters = new List<QueryFilter>
-          {
-              new QueryFilter("id", Operator.Equals, 20),
-              new QueryFilter("id", Operator.Equals, 30),
-              new QueryFilter(Operator.And, new List<QueryFilter>
-              {
-                  new QueryFilter("name", Operator.Equals, "New Zealand"),
-                  new QueryFilter("name", Operator.Equals, "France")
-              })
-          };
-
           var result = await supabase.From<Country>()
-            .Or(filters)
+            .Where(x => x.Population > 300000 || x.BirthRate < 0.6)
+            .Where(x => x.Name != "Mordor")
             .Get();
           ```
 
@@ -1294,8 +1320,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<Country>()
-            .Select("id, name")
-            .Not("name", Operator.Equals, "Paris")
+            .Select(x => new object[] { x.Name, x.CountryId })
+            .Where(x => x.Name != "Paris")
             .Get();
           ```
 
@@ -1342,16 +1368,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Filter("name", Operator.Equals, "Bali")
+            .Where(x => x.Name == "Bali")
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```dart
-          await supabase.From<City>()
-            .Filter("name", Operator.Equals, "Bali")
-            .Delete();
           ```
 
   - id: neq
@@ -1365,17 +1383,9 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("name", Operator.NotEqual, "Bali")
+            .Select(x => new object[] { x.Name, x.CountryId })
+            .Where(x => x.Name != "Bali")
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("name", Operator.NotEqual, "Bali")
-            .Delete();
           ```
 
   - id: gt
@@ -1389,17 +1399,9 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("country_id", Operator.GreaterThan, 250)
+            .Select(x => new object[] { x.Name, x.CountryId })
+            .Where(x => x.CountryId > 250)
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("country_id", Operator.GreaterThan, 250)
-            .Delete();
           ```
 
   - id: gte
@@ -1413,17 +1415,9 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("country_id", Operator.GreaterThanOrEqual, 250)
+            .Select(x => new object[] { x.Name, x.CountryId })
+            .Where(x => x.CountryId >= 250)
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("country_id", Operator.GreaterThanOrEqual, 250)
-            .Delete();
           ```
 
   - id: lt
@@ -1438,23 +1432,14 @@ functions:
           ```c#
           var result = await supabase.From<City>()
             .Select("name, country_id")
-            .Filter("country_id", Operator.LessThan, 250)
+            .Where(x => x.CountryId < 250)
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("country_id", Operator.LessThan, 250)
-            .Delete();
           ```
 
   - id: lte
     title: Operator.LessThanOrEqual
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
         name: With `Select()`
@@ -1462,17 +1447,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("country_id", Operator.LessThanOrEqual, 250)
+            .Where(x => x.CountryId <= 250)
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("country_id", Operator.LessThanOrEqual, 250)
-            .Delete();
           ```
 
   - id: like
@@ -1486,17 +1462,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("name", Operator.Like, "%la%")
+            .Filter(x => x.Name, Operator.Like, "%la%")
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("name", Operator.Like, "%la%")
-            .Delete();
           ```
 
   - id: ilike
@@ -1510,16 +1477,8 @@ functions:
         code: |
           ```c#
           await supabase.From<City>()
-            .Filter("name", Operator.ILike, "%la%")
-            .Delete();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-           await supabase.From<City>()
-            .Filter("name", Operator.ILike, "%la%")
-            .Delete();
+            .Filter(x => x.Name, Operator.ILike, "%la%")
+            .Get();
           ```
 
   - id: is
@@ -1533,17 +1492,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("name", Operator.Is, null)
+            .Where(x => x.Name == null
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("name", Operator.Is, null)
-            .Delete();
           ```
 
   - id: in
@@ -1557,17 +1507,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id")
-            .Filter("name", Operator.In, new List<object> { "Rio de Janiero", "San Francisco" })
+            .Filter(x => x.Name, Operator.In, new List<object> { "Rio de Janiero", "San Francisco" })
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("name", Operator.In, new List<object> { "Rio de Janiero", "San Francisco" })
-            .Delete();
           ```
 
   - id: contains
@@ -1579,17 +1520,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id, main_exports")
-            .Filter("main_exports", Operator.Contains, new List<object> { "oil", "fish" })
+            .Filter(x => x.MainExports, Operator.Contains, new List<object> { "oil", "fish" })
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("main_exports", Operator.Contains, new List<object> { "oil", "fish" })
-            .Delete();
           ```
 
   - id: contained-by
@@ -1601,17 +1533,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Select("name, country_id, main_exports")
-            .Filter("main_exports", Operator.ContainedIn, new List<object> { "oil", "fish" })
+            .Filter(x => x.MainExports, Operator.ContainedIn, new List<object> { "oil", "fish" })
             .Get();
-          ```
-      - id: with-delete
-        name: With `Delete()`
-        code: |
-          ```c#
-          await supabase.From<City>()
-            .Filter("main_exports", Operator.ContainedIn, new List<object> { "oil", "fish" })
-            .Delete();
           ```
 
   - id: text-search
@@ -1624,8 +1547,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<Quote>()
-            .Select("catchphrase")
-            .Filter("catchphrase", Operator.FTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Select(x => x.Catchphrase)
+            .Filter(x => x.Catchphrase, Operator.FTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
             .Get();
           ```
       - id: basic-normalization
@@ -1634,8 +1557,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<Quote>()
-            .Select("catchphrase")
-            .Filter("catchphrase", Operator.PLFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Select(x => x.Catchphrase)
+            .Filter(x => x.Catchphrase, Operator.PLFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
             .Get();
           ```
       - id: full-normalization
@@ -1644,8 +1567,8 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<Quote>()
-            .Select("catchphrase")
-            .Filter("catchphrase", Operator.PHFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Select(x => x.Catchphrase)
+            .Filter(x => x.Catchphrase, Operator.PHFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
             .Get();
           ```
       - id: web-search
@@ -1663,7 +1586,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<Quote>()
-            .Select("catchphrase")
-            .Filter("catchphrase", Operator.WFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
+            .Select(x => x.Catchphrase)
+            .Filter(x => x.Catchphrase, Operator.WFTS, new FullTextSearchConfig("'fat' & 'cat", "english"))
             .Get();
           ```
