@@ -230,6 +230,26 @@
     }
   }
 
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--client-libraries {
+    flex-direction: column;
+    margin-bottom: 40px;
+
+    .text,
+    .code {
+      width: 100%;
+      max-width: none;
+    }
+    .code {
+      margin-bottom: 20px;
+    }
+  }
+
   .doc-section article:first-child {
     @apply prose prose-docs prose-sm max-w-none;
   }

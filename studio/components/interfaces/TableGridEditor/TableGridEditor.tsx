@@ -18,7 +18,6 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
-import Introduction from 'components/to-be-cleaned/Docs/Pages/Tables/Introduction'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
 
@@ -70,8 +69,7 @@ const TableGridEditor: FC<Props> = ({
 }) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
-  const { query } = router
-  const { ref: projectRef, page } = useParams()
+  const { ref: projectRef, page, id } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
   const tables = meta.tables.list()
@@ -126,11 +124,6 @@ const TableGridEditor: FC<Props> = ({
     : undefined
   const swaggerUrl = settings?.autoApiService?.restUrl
 
-  const canReadServiceKey = checkPermissions(
-    PermissionAction.READ,
-    'service_api_keys.service_role_key'
-  )
-
   const {
     data: jsonSchema,
     error: jsonSchemaError,
@@ -156,7 +149,7 @@ const TableGridEditor: FC<Props> = ({
   }, [selectedTable?.id])
 
   if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(router.query.id)} />
+    return <NotFoundState id={Number(id)} />
   }
 
   const tableId = selectedTable?.id
@@ -344,7 +337,7 @@ const TableGridEditor: FC<Props> = ({
                       <ResourceContent
                         autoApiService={autoApiService}
                         selectedLang={selectedLang}
-                        resourceId={tables.find((table) => table.id === Number(query.id))?.name}
+                        resourceId={tables.find((table) => table.id === Number(id))?.name}
                         resources={resources}
                         definitions={jsonSchema.definitions}
                         paths={jsonSchema.paths}

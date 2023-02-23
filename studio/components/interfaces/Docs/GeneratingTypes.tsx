@@ -69,18 +69,27 @@ export default function GeneratingTypes({ selectedLang }: Props) {
             application within <code>src/index.ts</code>.
           </p>
         </article>
-        <article className={`code ${selectedLang === 'js' ? 'flex items-center' : ''}`}>
-          {selectedLang === 'js' && (
-            <Button
-              type="default"
-              disabled={isGeneratingTypes}
-              loading={isGeneratingTypes}
-              icon={<IconDownload strokeWidth={1.5} />}
-              onClick={generateTypes}
-            >
-              Generate and download types
-            </Button>
-          )}
+        <article
+          className={`code ${selectedLang === 'js' ? 'flex items-center justify-center' : ''}`}
+        >
+          <div className="grid gap-2">
+            <p className="text-center">
+              {selectedLang === 'js' && (
+                <Button
+                  type="default"
+                  disabled={isGeneratingTypes}
+                  loading={isGeneratingTypes}
+                  icon={<IconDownload strokeWidth={1.5} />}
+                  onClick={generateTypes}
+                >
+                  Generate and download types
+                </Button>
+              )}
+            </p>
+            <p className="text-xs text-scale-1100 bg-scale-200 p-4 mt-2">
+              Remember to re-generate and download this file as you make changes to your tables.
+            </p>
+          </div>
           <CodeSnippet selectedLang={selectedLang} snippet={localSnippets.cliLogin()} />
           <CodeSnippet
             selectedLang={selectedLang}
