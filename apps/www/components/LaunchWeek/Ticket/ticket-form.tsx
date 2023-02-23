@@ -57,7 +57,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           fetch(`/launch-week/tickets/${username}`).catch((_) => {})
           // Prefetch ticket og image.
           fetch(
-            `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
+            `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
               username ?? ''
             )}`
           ).catch((_) => {})
