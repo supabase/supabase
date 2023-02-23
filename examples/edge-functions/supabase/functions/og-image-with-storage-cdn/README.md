@@ -9,7 +9,7 @@ Generate Open Graph images with Deno and Supabase Edge Functions and cache the g
 ## Run locally
 
 ```bash
-supabase functions serve og-image-with-storage-cdn --no-verify-jwt
+supabase functions serve --no-verify-jwt
 ```
 
 Navigate to http://localhost:54321/functions/v1/og-image-with-storage-cdn?ticketNumber=3524&username=thorwebdev&name=Thor%20%E9%9B%B7%E7%A5%9E%20Schaeff

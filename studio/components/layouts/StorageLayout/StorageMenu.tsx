@@ -1,12 +1,15 @@
 import { FC } from 'react'
 import Link from 'next/link'
+import { find } from 'lodash'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useParams } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
 
+import { useParams } from 'hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface Props {}
 
@@ -30,22 +33,47 @@ const StorageMenu: FC<Props> = () => {
     openToggleBucketPublicModal,
   } = storageExplorerStore || {}
 
+  const { data: settings, isLoading } = useProjectApiQuery({ projectRef: ref })
+  const apiService = settings?.autoApiService
+  const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
+  const canAccessStorage = !isLoading && apiService && serviceKey !== undefined
+
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
       <div className="mb-6 px-2">
-        <Button
-          block
-          type="default"
-          icon={
-            <div className="text-scale-900">
-              <IconEdit size={14} />
-            </div>
-          }
-          style={{ justifyContent: 'start' }}
-          onClick={openCreateBucketModal}
-        >
-          New bucket
-        </Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger className="w-full">
+            <Button
+              block
+              type="default"
+              icon={
+                <div className="text-scale-900">
+                  <IconEdit size={14} />
+                </div>
+              }
+              disabled={!canAccessStorage}
+              style={{ justifyContent: 'start' }}
+              onClick={openCreateBucketModal}
+            >
+              New bucket
+            </Button>
+          </Tooltip.Trigger>
+          {!canAccessStorage && (
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to create buckets
+                </span>
+              </div>
+            </Tooltip.Content>
+          )}
+        </Tooltip.Root>
       </div>
       <div className="space-y-6">
         <div className="">
