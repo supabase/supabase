@@ -30,7 +30,7 @@ Postgres collects data about its own operations using the [cumulative statistics
 
 Here are some example queries to get you started.
 
-Most frequently called queries:
+#### Most frequently called queries:
 
 ```sql
 select
@@ -68,7 +68,7 @@ This query shows:
 
 This provides useful information about the queries you run most frequently. Queries that have high `max_time` or `mean_time` times and are being called often can be good candidates for optimization.
 
-Slowest queries by execution time:
+#### Slowest queries by execution time:
 
 ```sql
 select
@@ -96,7 +96,7 @@ from pg_stat_statements as statements
 
 This query will show you statistics about queries ordered by the maximum execution time. It is similar to the query above ordered by calls, but this one highlights outliers that may have high executions times. Queries which have high or mean execution times are good candidates for optimisation.
 
-Most time consuming queries:
+#### Most time consuming queries:
 
 ```sql
 select
