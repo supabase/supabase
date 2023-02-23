@@ -120,7 +120,7 @@ class StorageExplorerStore {
     this.supabaseClient = createClient(
       `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
-      {
+      { 
         auth: {
           persistSession: false,
           autoRefreshToken: false,
