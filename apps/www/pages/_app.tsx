@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from './../lib/fetchWrapper'
-import { ThemeProvider } from '~/components/Providers'
+import { ThemeProvider } from 'common/Providers'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -38,7 +38,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <Meta />
       <DefaultSeo

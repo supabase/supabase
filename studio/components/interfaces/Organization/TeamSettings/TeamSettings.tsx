@@ -3,13 +3,15 @@ import { observer } from 'mobx-react-lite'
 import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore, useFlag, useOrganizationRoles, useOrganizationDetail, useParams } from 'hooks'
+import { useStore, useParams } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -18,8 +20,11 @@ const TeamSettings = () => {
   const user = ui.profile
   const isOwner = ui.selectedOrganization?.is_owner
 
-  const { members } = useOrganizationDetail(slug || '')
-  const { roles } = useOrganizationRoles(slug)
+  const { data: detailData } = useOrganizationDetailQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+
+  const members = detailData?.members ?? []
+  const roles = rolesData?.roles ?? []
 
   const { rolesAddable } = getRolesManagementPermissions(roles)
 

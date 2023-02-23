@@ -4,6 +4,7 @@ export const meta = {
   id: 'examples-github-actions',
   title: 'GitHub Actions',
   description: 'Deploying Edge Functions with GitHub Actions.',
+  video: 'https://www.youtube.com/v/l2KlzGrhB6w',
 }
 
 <div class="video-container">
@@ -31,8 +32,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PROJECT_ID: zdtdtxajzydjqzuktnqx
+      SUPABASE_ACCESS_TOKEN: YOUR_SUPABASE_ACCESS_TOKEN
+      PROJECT_ID: YOUR_SUPABASE_PROJECT_ID
 
     steps:
       - uses: actions/checkout@v3

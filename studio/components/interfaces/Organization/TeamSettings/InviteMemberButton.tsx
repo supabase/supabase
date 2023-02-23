@@ -1,15 +1,15 @@
 import { isNil } from 'lodash'
-import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
 
 import { Member, User, Role } from 'types'
-import { checkPermissions, useOrganizationDetail, useStore } from 'hooks'
+import { checkPermissions, useParams, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
 interface Props {
   user: User
@@ -20,11 +20,9 @@ interface Props {
 
 const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAddable = [] }) => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useParams()
 
   const [isOpen, setIsOpen] = useState(false)
-  const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
   const canInviteMembers = roles.some(({ id: role_id }) =>
     checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
@@ -37,7 +35,13 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
     role: string().required('Role is required'),
   })
 
+  const { mutateAsync } = useOrganizationMemberInviteCreateMutation()
+
   const onInviteMember = async (values: any, { setSubmitting, resetForm }: any) => {
+    if (!slug) {
+      throw new Error('slug is required')
+    }
+
     const existingMember = members.find(
       (member) => member.primary_email === values.email.toLowerCase()
     )
@@ -59,33 +63,27 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
 
     setSubmitting(true)
 
-    const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
-      invited_email: values.email.toLowerCase(),
-      owner_id: user.id,
-      role_id: roleId,
-    })
+    try {
+      const response = await mutateAsync({
+        slug,
+        invitedEmail: values.email.toLowerCase(),
+        ownerId: user.id,
+        roleId,
+      })
 
-    if (response.error) {
+      if (isNil(response)) {
+        ui.setNotification({ category: 'error', message: 'Failed to add member' })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
+
+        setIsOpen(!isOpen)
+        resetForm({ initialValues: { ...initialValues, role: roleId } })
+      }
+    } catch (error: any) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to add member: ${response.error.message}`,
+        message: `Failed to add member: ${error.message}`,
       })
-    } else if (isNil(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to add member' })
-    } else {
-      const newMember: Member = {
-        id: 0,
-        invited_id: response.invited_id,
-        invited_at: response.invited_at,
-        primary_email: response.invited_email,
-        username: response.invited_email[0],
-        role_ids: [response.role_id],
-      }
-      mutateOrgMembers([...members, newMember])
-      ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
-
-      setIsOpen(!isOpen)
-      resetForm({ initialValues: { ...initialValues, role: roleId } })
     }
 
     setSubmitting(false)
@@ -130,8 +128,14 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
             useEffect(() => {
               if (roles) {
                 resetForm({
-                  values: { ...initialValues, role: roles[0].id },
-                  initialValues: { ...initialValues, role: roles[0].id },
+                  values: {
+                    ...initialValues,
+                    role: roles.find((role) => role.name === 'Developer')?.id,
+                  },
+                  initialValues: {
+                    ...initialValues,
+                    role: roles.find((role) => role.name === 'Developer')?.id,
+                  },
                 })
               }
             }, [roles])
@@ -147,7 +151,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
                       <div className="space-y-2">
                         {roles && (
                           <Select
-                            defaultValue={roles.find((role) => role.name === 'Developer')?.id}
+                            id="role"
                             name="role"
                             label="Member role"
                             error={

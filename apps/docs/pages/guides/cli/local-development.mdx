@@ -4,6 +4,7 @@ export const meta = {
   id: 'local-development',
   title: 'Local Development',
   description: 'How to use Supabase on your local development machine.',
+  video: 'https://www.youtube.com/v/vyHyYpvjaks',
 }
 
 Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
@@ -151,10 +152,11 @@ Database changes are managed through "migrations." Database migrations are a com
 For this guide, create a table called `employees`. In Supabase Studio, navigate to the **SQL Editor** page and run the following SQL command:
 
 ```sql
-create table employees (
-	id integer primary key generated always as identity,
-	name text
-);
+create table
+  employees (
+    id integer primary key generated always as identity,
+    name text
+  );
 ```
 
 <Admonition type="note">
@@ -176,8 +178,9 @@ This creates a new migration named `supabase/migrations/<timestamp>_create_emplo
 Use the seed script in `supabase/seed.sql` (created with [`supabase init`](/docs/reference/cli/usage#supabase-init)) to add sample data to the table.
 
 ```sql
--- in supabase/seed.sql
-insert into public.employees (name)
+ -- in supabase/seed.sql
+insert into
+  public.employees (name)
 values
   ('Erlich Bachman'),
   ('Richard Hendricks'),
@@ -197,9 +200,9 @@ You should now see the contents of `employees` in Studio.
 Use the [`reset`](/docs/reference/cli/usage#supabase-db-reset) command to revert any changes to the local database.
 
 ```sql
--- run on local database to make a change
-alter table employees
-  add department text default 'Hooli';
+ -- run on local database to make a change
+alter table
+  employees add department text default 'Hooli';
 ```
 
 Run the following command to reset the local database:
@@ -256,10 +259,6 @@ The local development environment is not as feature-complete as the Supabase Pla
 - The Functions interface is coming soon.
 - Logs are not supported through the interface (however you can access them through the Docker containers).
 - You cannot update your project settings in the Dashboard—this must be done using the CLI.
-
-```
-
-```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

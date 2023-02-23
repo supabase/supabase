@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconGitHub, IconTwitter } from '~/../../packages/ui'
+import { Button, IconGitHub, IconTwitter, IconYoutube } from '~/../../packages/ui'
 import footerData from '~/data/footer.json'
 import { useTheme } from 'common/Providers'
 
@@ -20,6 +20,16 @@ const Footer = () => {
           ))}
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            type="text"
+            as="a"
+            // @ts-ignore
+            href="https://youtube.com/c/supabase"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <IconYoutube size={16} />
+          </Button>
           <Button
             type="text"
             as="a"

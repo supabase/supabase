@@ -29,17 +29,28 @@ const FormSection = ({
 }
 
 const FormSectionLabel = ({
-  className = '',
   children,
+  className = '',
+  description,
 }: {
-  className?: string
   children: React.ReactNode | string
+  className?: string
+  description?: React.ReactNode
 }) => {
-  return (
-    <label className={`text-scale-1200 col-span-12 text-sm lg:col-span-5 ${className}`}>
-      {children}
-    </label>
-  )
+  if (description !== undefined) {
+    return (
+      <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
+        <label className="text-scale-1200 text-sm">{children}</label>
+        {description}
+      </div>
+    )
+  } else {
+    return (
+      <label className={`text-scale-1200 col-span-12 text-sm lg:col-span-5 ${className}`}>
+        {children}
+      </label>
+    )
+  }
 }
 
 const Shimmer = () => (

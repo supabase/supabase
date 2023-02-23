@@ -17,6 +17,7 @@ export interface SupabaseGridProps {
    */
   table: SupaTable | string
   /**
+   *
    * run sql query
    */
   onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
@@ -25,9 +26,6 @@ export interface SupabaseGridProps {
    * Optional react node to display in grid header
    */
   headerActions?: React.ReactNode
-  /**
-   * enable table editor
-   */
   editable?: boolean
   /**
    * props to config grid view
@@ -65,10 +63,17 @@ export interface SupabaseGridProps {
    * show edit row button if available
    */
   onEditRow?: (row: SupaRow) => void
-  /**
-   * error handler
-   */
   onError?: (error: any) => void
+  /**
+   * Toggle api preview panel open
+   */
+  apiPreviewPanelOpen?: boolean
+  setApiPreviewPanelOpen?: () => void
+  /**
+   * Refresh the docs after a change is made to the table
+   */
+  refreshDocs: () => void
+  onExpandJSONEditor: (column: string, row: SupaRow) => void
 }
 
 export interface SupabaseGridRef {
