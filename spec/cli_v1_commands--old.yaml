@@ -380,12 +380,12 @@ commands:
       ```
   - id: supabase-functions-serve
     title: supabase functions serve
-    summary: Serve a Function locally
+    summary: Serve Functions locally
     tags: []
     links: []
     usage: |-
       ```sh
-      supabase functions serve <Function name> [flags]
+      supabase functions serve [flags]
       ```
     subcommands: []
     options: |-

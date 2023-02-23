@@ -6,6 +6,12 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
+    value: 'Dashboard_bug',
+    label: 'Dashboard bug',
+    description: 'Issues with the Supabase dashboard',
+    query: undefined,
+  },
+  {
     value: 'Database_unresponsive',
     label: 'Database unresponsive',
     description: 'Issues with connecting to your database',
@@ -30,7 +36,7 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
-    value: 'Abuse',
+    value: 'Problem',
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
     query: undefined,
