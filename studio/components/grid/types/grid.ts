@@ -64,6 +64,15 @@ export interface SupabaseGridProps {
    */
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
+  /**
+   * Toggle api preview panel open
+   */
+  apiPreviewPanelOpen?: boolean
+  setApiPreviewPanelOpen?: () => void
+  /**
+   * Refresh the docs after a change is made to the table
+   */
+  refreshDocs: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
 }
 

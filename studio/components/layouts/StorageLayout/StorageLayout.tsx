@@ -40,6 +40,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     buckets,
   } = storageExplorerStore || {}
 
+  // [Joshen] At the moment, without the service key, we won't be able to pull any data from storage
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
   const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')

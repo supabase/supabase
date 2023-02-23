@@ -281,18 +281,360 @@ functions:
         name: Getting your data
         code: |
           ```
-          r = supabase
-          .from('countries')
-          .select("*").execute()
+          response = supabase.table('countries').select("*").execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
+                            {'id': 2, 'name': 'Albania'},
+                            {'id': 3, 'name': 'Algeria'}],
+                      count=None)
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
           ```
-          r = await supabase
-          .from('countries')
-          .select('name').execute()
+          response = supabase.table('countries').select('name').execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Afghanistan'},
+                            {'name': 'Albania'},
+                            {'name': 'Algeria'}],
+                      count=None)
+          ```
+      - id: query-foreign-tables
+        name: Query foreign tables
+        description: |
+          If your database has foreign key relationships, you can query related tables too.
+        code: |
+          ```
+          response = supabase.table('countries').select('name, cities(name)').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Germany', 'cities': [{'name': 'Munich'}]},
+                            {'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}],
+                      count=None)
+          ```
+      - id: query-foreign-tables-through-a-join-table
+        name: Query foreign tables through a join table
+        code: |
+          ```
+          response = supabase.table('users').select('name, teams(name)').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+                -- both foreign keys must be part of a composite primary key
+                primary key (user_id, team_id)
+              );
+
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            ```
+        response: |
+          ```
+          APIResponse(data=[
+                            {'name': 'Kiran', 'teams': [{'name': 'Green'}, {'name': 'Blue'}]},
+                            {'name': 'Evan', 'teams': [{'name': 'Blue'}]}
+                           ],
+                      count=None)
+          ```
+        description: |
+          If you're in a situation where your tables are **NOT** directly
+          related, but instead are joined by a _join table_, you can still use
+          the `select()` method to query the related data. The join table needs
+          to have the foreign keys as part of its composite primary key.
+        hideCodeBlock: true
+      - id: query-the-same-foreign-table-multiple-times
+        name: Query the same foreign table multiple times
+        code: |
+          ```
+          response = supabase.table('messages').select('content,from:sender_id(name),to:receiver_id(name)').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+             create table
+             users (id int8 primary key, name text);
+
+             create table
+               messages (
+                 sender_id int8 not null references users,
+                 receiver_id int8 not null references users,
+                 content text
+               );
+
+             insert into
+               users (id, name)
+             values
+               (1, 'Kiran'),
+               (2, 'Evan');
+
+             insert into
+               messages (sender_id, receiver_id, content)
+             values
+               (1, 2, '👋');
+             ```
+        response: |
+          ```
+          APIResponse(data=[{'content': '👋',
+                            'from': {'name': 'Kiran'},
+                            'to': {'name': 'Evan'}}
+                           ],
+                      count=None)
+          ```
+        description: |
+          If you need to query the same foreign table twice, use the name of the
+          joined column to identify which join to use. You can also give each
+          column an alias.
+        hideCodeBlock: true
+      - id: filtering-through-foreign-tables
+        name: Filtering through foreign tables
+        code: |
+          ```
+          response = supabase.table('cities').select('name, countries(*)').eq('countries.name', 'Estonia').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Bali', 'countries': None},
+                            {'name': 'Munich', 'countries': None}],
+                      count=None)
+          ```
+        description: |
+          NOT WORKING CURRENTLY
+          If the filter on a foreign table's column is not satisfied, the foreign
+          table returns `[]` or `null` but the parent table is not filtered out.
+          If you want to filter out the parent table rows, use the `!inner` hint
+        hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```
+          response = supabase.table('countries').select('*, cities(count)').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "name" text, 
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name) 
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values 
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Germany', 'cities': [{'count': 1}]},
+                            {'id': 2, 'name': 'Indonesia', 'cities': [{'count': 1}]}],
+                      count=None) 
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
+      - id: querying-with-count-option
+        name: Querying with count option
+        code: |
+          ```
+          response = supabase.table('countries').select('*', count='exact').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Germany'},
+                            {'id': 2, 'name': 'Indonesia'}],
+                      count=2)
+          ```
+        description: |
+          You can get the number of rows by using the
+          *count* parameter in the select query.
+        hideCodeBlock: true
+      - id: querying-json-data
+        name: Querying JSON data
+        code: |
+          ```
+          response = supabase.table('users').select('id, name, address->city').execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Avdotya', 'city': 'Saint Petersburg'}], count=None)
+          ```
+        description: |
+          You can select and filter data inside of
+          [JSON](/docs/guides/database/json) columns. Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          querying JSON data.
+        hideCodeBlock: true
+
+  - id: insert
+    title: 'Create data: insert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
+    examples:
+      - id: create-a-record
+        name: Create a record
+        code: |
+          ```
+          data, count = supabase
+          .table('countries')
+          .insert({"id": 1, "name": "Denmark"})
+          .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Denmark'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
 
   - id: invoke
     title: 'invoke()'
