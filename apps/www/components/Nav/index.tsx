@@ -196,8 +196,8 @@ const Nav = () => {
           } absolute top-0 h-full w-full opacity-80`}
         ></div>
         <nav
-          className={`border-scale-400 backdrop-blur-sm border-b ${
-            isLauchWeekPage ? 'border-[#be9eea]' : ''
+          className={`border-scale-400 border-b ${
+            isLauchWeekPage ? 'border-[#be9eea]' : ' backdrop-blur-sm'
           }`}
         >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
