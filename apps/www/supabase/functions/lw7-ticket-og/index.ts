@@ -6,6 +6,6 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
 import { handler } from './handler.tsx'
 
-console.log(`Function "launchweek-ticket-og" up and running!`)
+console.log(`Function "lw7-ticket-og" up and running!`)
 
 serve(handler)

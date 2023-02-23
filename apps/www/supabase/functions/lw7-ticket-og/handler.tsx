@@ -4,9 +4,18 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
-const BACKGROUND_SHAPE = `${STORAGE_URL}/lw7_ticket_shape.png`
-const BACKGROUND_IMAGE_STD = `${STORAGE_URL}/lw7_ticket_regular.png`
-const BACKGROUND_IMAGE_GOLDEN = `${STORAGE_URL}/lw7_ticket_gold.png`
+const BACKGROUND = {
+  REG: {
+    BG: `${STORAGE_URL}/reg_bg.png?v=3`,
+    AI: `${STORAGE_URL}/reg_ai.png?v=3`,
+    TICKET: `${STORAGE_URL}/reg_ticket.png?v=3`,
+  },
+  GOLD: {
+    BG: `${STORAGE_URL}/gold_bg.png?v=3`,
+    AI: `${STORAGE_URL}/gold_ai.png?v=3`,
+    TICKET: `${STORAGE_URL}/gold_ticket.png?v=3`,
+  },
+}
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
@@ -44,7 +53,7 @@ export async function handler(req: Request) {
 
     // TODO: reenable storage
     // Try to get image from Supabase Storage CDN.
-    // const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
+    // const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
     // if (storageResponse.ok) return storageResponse
 
     // Get ticket data
@@ -55,7 +64,7 @@ export async function handler(req: Request) {
       .maybeSingle()
     if (error) console.log(error.message)
 
-    const { name = 'Testr Test', ticketNumber = 1234 } = data ?? {}
+    const { name = 'Marijana Šimag', ticketNumber = 99347892 } = data ?? {}
     const golden = data?.golden ?? false
 
     // Else, generate image ad upload to storage.
@@ -71,7 +80,7 @@ export async function handler(req: Request) {
               width: '1200px',
               height: '630px',
               backgroundColor: '#000',
-              color: '#fff',
+              color: '#F8F9FA',
               fontFamily: '"Circular"',
               overflow: 'hidden',
               display: 'flex',
@@ -79,7 +88,7 @@ export async function handler(req: Request) {
               justifyContent: 'center',
             }}
           >
-            {/* Background image color  */}
+            {/* Background gradient  */}
             <img
               width="1200"
               height="630"
@@ -89,111 +98,99 @@ export async function handler(req: Request) {
                 left: '0',
                 zIndex: '-9000',
               }}
-              src={golden ? BACKGROUND_IMAGE_GOLDEN : BACKGROUND_IMAGE_STD}
+              src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
             />
-            {/* Background image overlay  */}
+            {/* Background ai  */}
             <img
-              width="1200"
-              height="630"
+              width="1027"
+              height="520"
+              style={{
+                borderRadius: '8px',
+                position: 'absolute',
+                top: '55',
+                left: '87',
+                zIndex: '-8000',
+              }}
+              src={golden ? BACKGROUND['GOLD']['AI'] : BACKGROUND['REG']['AI']}
+            />
+            {/* Background ticket  */}
+            <img
+              width="1089"
+              height="586"
               style={{
                 position: 'absolute',
-                top: '0',
-                left: '0',
-                zIndex: '-9000',
+                top: '22',
+                left: '56',
+                zIndex: '-7000',
               }}
-              src={BACKGROUND_SHAPE}
+              src={golden ? BACKGROUND['GOLD']['TICKET'] : BACKGROUND['REG']['TICKET']}
             />
             {/* GitHub Avatar image */}
             <img
-              width="200"
-              height="200"
+              width="166"
+              height="166"
               style={{
                 position: 'absolute',
-                top: '215',
-                left: '155',
-                borderRadius: 100,
+                top: '210',
+                left: '484',
+                borderRadius: 83,
               }}
-              src={`https://github.com/${username}.png`}
+              src={`https://github.com/${username}.png?v=3`}
             />
             {/* Name & username */}
             <div
               style={{
+                // border: '3px solid red',
                 display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: '215',
-                left: '400',
-                width: '550',
+                top: '350',
+                left: '210',
+                width: '727',
                 height: '200',
                 overflow: 'hidden',
                 textOverflow: 'clip',
+                textAlign: 'center',
               }}
             >
-              <div
+              <p
                 style={{
-                  display: 'flex',
-                  color: 'transparent',
-                  backgroundImage:
-                    'linear-gradient(90deg, #F8F9FA 1.73%, rgba(248, 249, 250, 0.5) 100%)',
-                  backgroundClip: 'text',
+                  // border: '3px solid green',
+                  margin: '0',
+                  fontSize: '60px',
+                  lineHeight: '60px',
                 }}
               >
-                <p
-                  style={{
-                    fontSize: '60px',
-                    lineHeight: '60px',
-                  }}
-                >
-                  {name ?? username}
-                </p>
-              </div>
-              {/* Username and supaverified checkmark */}
+                {name ?? username}
+              </p>
+
+              {/* Username */}
               <div
                 style={{
+                  // border: '3px solid blue',/
+                  color: '#EDEDED',
                   display: 'flex',
                   fontSize: '25',
-                  color: golden ? '#fff' : '#A0A0A0',
+                  marginTop: '10px',
                 }}
               >
                 <span>{`@${username}`}</span>
               </div>
             </div>
-            {/* Date  */}
-            <p
-              style={{
-                position: 'absolute',
-                top: '520',
-                left: '400',
-                fontSize: '22',
-                color: golden ? '#fff' : '#A0A0A0',
-              }}
-            >
-              December 12th 2022
-            </p>
-            {/* URL  */}
-            <p
-              style={{
-                position: 'absolute',
-                top: '520',
-                left: '680',
-                fontSize: '22',
-                color: golden ? '#fff' : '#A0A0A0',
-              }}
-            >
-              supabase.com/launch-week
-            </p>
           </div>
           {/* Ticket No  */}
           <div
             style={{
-              color: '#fff',
+              // border: '3px solid red',
+              color: '#F8F9FA',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'absolute',
               bottom: '225',
-              right: '-165',
+              right: '-130',
               width: '575',
               height: '175',
               transform: 'rotate(90deg)',
