@@ -36,7 +36,7 @@ export default function TicketShare({ username, ticketNumber, name, golden, refe
     return <Error statusCode={404} />
   }
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
     username ?? ''
   )}`
 
