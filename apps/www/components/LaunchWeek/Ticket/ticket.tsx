@@ -56,8 +56,38 @@ export default function Ticket({
   // golden = true
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-8 2xl:gap-16">
-      <div ref={divRef} className="flex flex-col gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16">
+      <div className={cn(styles['ticket-visual-wrapper'], 'col-span-8')}>
+        <div
+          ref={ticketRef}
+          className={cn(styles['ticket-visual'], styleUtils.appear, styleUtils['appear-fourth'])}
+        >
+          <TicketVisual
+            username={username ?? undefined}
+            name={name ?? undefined}
+            ticketNumber={ticketNumber ?? undefined}
+            ticketGenerationState={ticketGenerationState}
+            golden={golden}
+          />
+        </div>
+        {!sharePage && (
+          <>
+            {username ? (
+              <div className="flex flex-col gap-6 py-16">
+                <div>
+                  <TicketCopy username={username} />
+                </div>
+                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
+                  <TicketActions username={username} golden={golden} />
+                </div>
+              </div>
+            ) : (
+              <div className={styles['ticket-actions-placeholder']} />
+            )}
+          </>
+        )}
+      </div>
+      <div ref={divRef} className="flex flex-col gap-6 col-span-4">
         <div
           className={`
           text-scale-1200
@@ -68,6 +98,7 @@ export default function Ticket({
           gap-3
           `}
         >
+          col1
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
@@ -79,11 +110,11 @@ export default function Ticket({
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
-                Claim your unique Ticket!
+                Generate your ticket. Win the SupaKeyboard.
               </p>
             )}
           </h1>
-          <h2 className="text-base dark:text-scale-1000 max-w-[520px]">
+          <h2 className="text-base max-w-[520px]">
             {sharePage ? (
               <p>
                 Join {name ?? 'us'} on {DATE}.
@@ -103,49 +134,19 @@ export default function Ticket({
               </>
             ) : (
               <>
-                Generate a unique ticket image with your GitHub profile, cause a few of the lucky
-                attendees will get a limited edition Supabase goodie bag. Make sure you don't skip
-                your chance.
+                We have some fantastic swag up for grabs, including 3x limited edition mechanical
+                keyboard that you won't want to miss.
               </>
             )}
           </h2>
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
+          col2
           <TicketForm
             defaultUsername={username ?? undefined}
             setTicketGenerationState={setTicketGenerationState}
           />
         </div>
-      </div>
-      <div className={styles['ticket-visual-wrapper']}>
-        <div
-          ref={ticketRef}
-          className={cn(styles['ticket-visual'], styleUtils.appear, styleUtils['appear-fourth'])}
-        >
-          <TicketVisual
-            username={username ?? undefined}
-            name={name ?? undefined}
-            ticketNumber={ticketNumber ?? undefined}
-            ticketGenerationState={ticketGenerationState}
-            golden={golden}
-          />
-        </div>
-        {!sharePage && (
-          <>
-            {username ? (
-              <div className="flex flex-col gap-6 py-16">
-                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
-                  <TicketActions username={username} golden={golden} />
-                </div>
-                <div>
-                  <TicketCopy username={username} />
-                </div>
-              </div>
-            ) : (
-              <div className={styles['ticket-actions-placeholder']} />
-            )}
-          </>
-        )}
       </div>
     </div>
   )
