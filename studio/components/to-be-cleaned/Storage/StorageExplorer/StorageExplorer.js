@@ -30,14 +30,10 @@ const StorageExplorer = observer(({ bucket }) => {
     selectedItemsToMove,
     clearSelectedItemsToMove,
     view,
-    setView,
-    setSortBy,
-    setSortByOrder,
     currentBucketName,
     openBucket,
 
     loadExplorerPreferences,
-    addNewFolderPlaceholder,
     fetchFolderContents,
     fetchMoreFolderContents,
     deleteFolder,
@@ -116,10 +112,6 @@ const StorageExplorer = observer(({ bucket }) => {
 
   /** File manipulation methods */
 
-  const onSelectCreateFolder = (columnIndex = -1) => {
-    addNewFolderPlaceholder(columnIndex)
-  }
-
   const onFilesUpload = async (event, columnIndex = -1) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
@@ -158,12 +150,6 @@ const StorageExplorer = observer(({ bucket }) => {
     clearSelectedItems()
   }
 
-  const onChangeView = (view) => setView(view)
-
-  const onChangeSortBy = (sortBy) => setSortBy(sortBy)
-
-  const onChangeSortByOrder = (sortByOrder) => setSortByOrder(sortByOrder)
-
   return (
     <div
       ref={storageExplorerRef}
@@ -191,10 +177,6 @@ const StorageExplorer = observer(({ bucket }) => {
           onFilesUpload={onFilesUpload}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-          onSelectCreateFolder={onSelectCreateFolder}
-          onChangeView={onChangeView}
-          onChangeSortBy={onChangeSortBy}
-          onChangeSortByOrder={onChangeSortByOrder}
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }
