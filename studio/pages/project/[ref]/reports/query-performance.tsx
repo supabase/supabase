@@ -58,26 +58,26 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const HeaderText = `This report will help you identify and understand queries that take the most time and resources
-  from your database. You can read more about [query performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance)
-  in the docs.
+  const HeaderText = `This report identifies and explains queries that consume the most time and resources from your database. To learn more about query performance, read the [guide on examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
 
-  You may also want to reset this analysis when you are optimizing your queries. This analysis is based on the \`extensions.pg_stat_statements\` table, which will be cleared when you reset analysis below.
-  `
+If you're optimizing your queries, consider resetting this analysis. 
+It's based on the \`pg_stat_statements\` table, which is cleared when you reset the analysis.
+`
 
-  const TimeConsumingHelperText = `This report will show you statistics about queries ordered by the cumulative total execution time. 
-  It shows the total time the query has spent running as well as the proportion of total execution time the query has taken up.
-  `
+  const TimeConsumingHelperText = `This report presents statistics about queries ordered by their cumulative total execution time. 
 
-  const MostFrequentHelperText = `This report is ordered by the number of times each query has been executed.
+  It displays the total time a query has spent running and the proportion of total execution time the query has consumed.
+`
 
-This provides useful information about the queries you run most frequently. Queries that have high max_time or mean_time times and are being called often can be good candidates for optimization.
-  `
+  const MostFrequentHelperText = `This report lists queries in order of their execution count, providing insights into the most frequently executed queries. 
 
-  const SlowestExecutionHelperText = `This report will show you statistics about queries ordered by the maximum execution time. 
+  Pay attention to queries with high max_time or mean_time values that are called frequently, as they may benefit from optimization.
+`
 
-  It is similar to the 'Most freqeunt' report ordered by calls, but this one highlights outliers that may have high executions times. Queries which have high or mean execution times are good candidates for optimisation.
-  `
+  const SlowestExecutionHelperText = `This report displays statistics about queries ordered by their maximum execution time, allowing you to identify outliers with high execution times. While similar to the 'Most frequent' report ordered by calls, this report specifically highlights queries with long execution times that may benefit from optimization. 
+  
+  Keep an eye out for queries with high or mean execution times, as they are often good candidates for optimization.
+`
 
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
   const helperTextClassNames = 'prose text-sm max-w-3xl text-scale-1000'
@@ -149,7 +149,7 @@ This provides useful information about the queries you run most frequently. Quer
         </Accordion>
       )}
 
-      <ReactMarkdown className="prose text-sm text-scale-1000" children={HeaderText} />
+      <ReactMarkdown className={helperTextClassNames} children={HeaderText} />
 
       <div className="mb-8">
         <Button type="default" onClick={() => setShowResetgPgStatStatements(true)}>
