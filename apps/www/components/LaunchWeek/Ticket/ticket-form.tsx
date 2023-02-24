@@ -15,10 +15,10 @@ type TicketGenerationState = 'default' | 'loading'
 
 type Props = {
   defaultUsername?: string
-  setTicketGenerationState: React.Dispatch<React.SetStateAction<TicketGenerationState>>
+  setTicketGenerationState: (ticketGenerationState: TicketGenerationState) => void
 }
 
-export default function Form({ defaultUsername = '', setTicketGenerationState }: Props) {
+export default function TicketForm({ defaultUsername = '', setTicketGenerationState }: Props) {
   const [username, setUsername] = useState(defaultUsername)
   const [formState, setFormState] = useState<FormState>('default')
   const [errorMsg] = useState('')
@@ -109,7 +109,7 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
           },
         })
       }}
-      className="flex flex-col items-center xl:block"
+      className="flex flex-col items-center xl:block wayfinding--connect-with-github-form"
     >
       <div className="flex flex-col gap-3">
         <div>
@@ -119,12 +119,12 @@ export default function Form({ defaultUsername = '', setTicketGenerationState }:
             disabled={formState === 'loading' || Boolean(session)}
           >
             <span className={`${username && 'text-scale-900'}`}>
-              {session ? 'Done!' : 'Connect with GitHub'}
+              {session ? '<check>Connect with GitHub' : 'Connect with GitHub'}
             </span>
             {session ? <span className={ticketFormStyles.checkIcon}></span> : null}
           </button>
         </div>
-        {!session && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>}
+        {/* {!session && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>} */}
       </div>
     </form>
   )

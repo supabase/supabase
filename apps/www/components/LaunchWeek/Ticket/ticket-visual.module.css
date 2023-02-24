@@ -1,22 +1,18 @@
 .visual {
-  position: relative;
   transform: translateZ(0);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* background-color: black; */
+  background-image: linear-gradient(154.77deg, #cb88ff 29.4%, rgba(255, 255, 255, 0) 120.47%);
   border: 2px solid rgba(0, 0, 0, 0.1);
   border-radius: 16px;
 
-  background-color: rgba(0, 0, 0, 1);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 
   /* background: linear-gradient(#fff000, var(--gold-secondary)); */
-  border: 1px solid #1c5f52;
-  animation: blank-svg-shadow 2s ease-in-out infinite alternate;
+  border: 1px solid #b07ada;
+  /* animation: blank-svg-shadow 2s ease-in-out infinite alternate; */
+  animation: 2s ease-in-out infinite alternate;
 
-  background-image: url('/images/launchweek/regular-ticket-background.png');
+  /* background-image: url('/images/launchweek/regular-ticket-background.png'); */
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -62,11 +58,11 @@
 
 @keyframes blank-svg-shadow {
   from {
-    filter: drop-shadow(0 0 2px #1c5f52) drop-shadow(0 0 4px #1c5f52) drop-shadow(0 0 6px #1c5f52);
+    filter: drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55);
   }
 
   to {
-    filter: drop-shadow(0 0 3px #1c5f52) drop-shadow(0 0 6px #1c5f52) drop-shadow(0 0 9px #1c5f52);
+    filter: drop-shadow(0 0 3px #bada55) drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55);
   }
 }
 
@@ -148,40 +144,5 @@
     bottom: 0;
     /* padding: 0 calc(160px * var(--size)) calc(44px * var(--size))
       calc(63px * var(--size)); */
-  }
-}
-
-.ticket-number-wrapper {
-  position: absolute;
-  bottom: 40px;
-  right: 0;
-}
-
-@media (min-width: 768px) {
-  .ticket-number-wrapper {
-    bottom: 0;
-  }
-}
-
-.ticket-number {
-  font-size: calc(40px * var(--size));
-  line-height: 1;
-  width: calc(330px * var(--size));
-  text-align: center;
-  background-clip: text;
-}
-
-.ticket-number-golden {
-  color: var(--gold-primary);
-}
-
-@media (min-width: 768px) {
-  .ticket-number {
-    transform: rotate(90deg) translateY(calc(100px * var(--size)));
-    transform-origin: bottom right;
-  }
-
-  .ticket-number-golden {
-    color: var(--gold-accent);
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-import { IconDownload, IconLinkedin, IconTwitter } from 'ui'
+import { IconCheckCircle, IconDownload, IconGitHub, IconLinkedin, IconTwitter } from 'ui'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 import LoadingDots from './loading-dots'
 
@@ -48,6 +48,19 @@ export default function TicketActions({ username, golden = false }: Props) {
 
   return (
     <>
+      <ActionStyle>
+        <a
+          href={tweetUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+          className="flex items-center gap-2"
+        >
+          <div className="text-scale-900">
+            <IconCheckCircle size={12} strokeWidth={1.5} />
+          </div>
+          Connect with github
+        </a>
+      </ActionStyle>
       <ActionStyle>
         <a
           href={tweetUrl}

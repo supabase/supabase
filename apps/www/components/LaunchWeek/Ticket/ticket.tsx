@@ -56,35 +56,43 @@ export default function Ticket({
   // golden = true
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16">
-      <div className={cn(styles['ticket-visual-wrapper'], 'col-span-8')}>
+    <div
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl"
+      id="wayfinding--ticket-visual-wrapper-container"
+    >
+      <div
+        className={cn(styles['ticket-visual-wrapper'], 'col-span-8')}
+        id="wayfinding--ticket-visual-wrapper"
+      >
         <div
           ref={ticketRef}
           className={cn(
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            'wayfinding--ticket-visual-outer-container'
+            'relative mx-2 rounded-xl'
           )}
+          id="wayfinding--ticket-visual-outer-container"
         >
           <TicketVisual
             username={username ?? undefined}
             name={name ?? undefined}
             ticketNumber={ticketNumber ?? undefined}
             ticketGenerationState={ticketGenerationState}
+            setTicketGenerationState={setTicketGenerationState}
             golden={golden}
           />
         </div>
         {!sharePage && (
           <>
             {username ? (
-              <div className="flex flex-col gap-6 py-16">
+              <div className="flex flex-col gap-6 py-4 mx-8">
                 <div>
                   <TicketCopy username={username} />
                 </div>
-                <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
+                {/* <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className={styles['ticket-actions-placeholder']} />
@@ -103,7 +111,6 @@ export default function Ticket({
           gap-3
           `}
         >
-          col1
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
             {sharePage ? (
               name ? (
@@ -149,11 +156,7 @@ export default function Ticket({
           </h2>
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
-          col2
-          <TicketForm
-            defaultUsername={username ?? undefined}
-            setTicketGenerationState={setTicketGenerationState}
-          />
+          {username && <TicketActions username={username} golden={golden} />}
         </div>
       </div>
     </div>

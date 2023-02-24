@@ -59,11 +59,11 @@
 }
 
 .ticket-visual {
-  position: relative;
-  border-radius: calc(16px * var(--size));
+  /* position: relative;
+  border-radius: calc(16px * var(--size)); */
   /* overflow: hidden; */
-  width: 330px;
-  margin: 0 auto;
+  /* width: 330px; */
+  /* margin: 0 auto; */
 }
 
 /* .ticket-visual:before,
@@ -92,7 +92,7 @@
 
 @media (min-width: 768px) {
   .ticket-visual {
-    width: 650px;
+    /* width: 650px; */
   }
 
   .ticket-visual:before {

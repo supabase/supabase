@@ -2,10 +2,11 @@ import styles from './ticket-visual.module.css'
 import TicketProfile from './ticket-profile'
 import TicketNumber from './ticket-number'
 import TicketMono from './ticket-mono'
-import TicketInfo from './ticket-info'
+import TicketInfoFooter from './ticket-info-footer'
 import TicketMonoMobile from './ticket-mono-mobile'
 import cn from 'classnames'
 import { useRouter } from 'next/router'
+import { DATE } from '~/lib/constants'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   ticketNumber?: number
   username?: string
   ticketGenerationState?: TicketGenerationState
+  setTicketGenerationState: (ticketGenerationState: TicketGenerationState) => void
   golden?: boolean
 }
 
@@ -23,6 +25,7 @@ export default function TicketVisual({
   username,
   ticketNumber,
   ticketGenerationState = 'default',
+  setTicketGenerationState,
   golden = false,
 }: Props) {
   // golden = true
@@ -36,12 +39,28 @@ export default function TicketVisual({
         className={[
           styles.visual,
           golden ? styles['visual--gold'] : '',
-          'wayfinding--ticket-visual-inner-container',
+          'flex  relative flex-col justify-between rounded-xl bg-black ',
         ].join(' ')}
         style={{
           ['--size' as string]: size,
         }}
+        id="wayfinding--ticket-visual-inner-container"
       >
+        <div className="flex w-full justify-center pt-4" id="wayfinding--ticket-header">
+          <div className="flex items-center gap-6">
+            <img src={`/images/launchweek/ticket-header-logo.svg`} />
+            <span className="text-white text-xs">{DATE}</span>
+            {/*<div id="wayfinding--TicketInfo-container">
+               <TicketInfoFooter
+                golden={golden}
+                logoTextSecondaryColor={
+                  ticketNumber ? (golden ? '#F2C94C' : 'var(--brand)') : undefined
+                }
+              />
+            </div>*/}
+          </div>
+        </div>
+
         <div className={cn(styles['horizontal-ticket'], 'wayfinding--TicketMono-container')}>
           <TicketMono golden={golden} />
         </div>
@@ -50,40 +69,21 @@ export default function TicketVisual({
           <TicketMonoMobile golden={golden} />
         </div>
 
-        <div className={styles.logo}>
-          <img src={`/images/launchweek/ticket-logo-${golden ? 'light' : 'dark'}.svg`} />
-        </div>
-
-        <div className={`${styles.profile} wayfinding--TicketProfile-container`}>
+        <div
+          className="absolute top-[90px] w-full lg:top-1/2 flex justify-center"
+          id="wayfinding--TicketProfile-container"
+        >
           <TicketProfile
             name={name}
             username={username}
             size={size}
             ticketGenerationState={ticketGenerationState}
+            setTicketGenerationState={setTicketGenerationState}
             golden={golden}
           />
         </div>
-        <div className={`${styles.info} wayfinding--TicketInfo-container`}>
-          <TicketInfo
-            golden={golden}
-            logoTextSecondaryColor={
-              ticketNumber ? (golden ? '#F2C94C' : 'var(--brand)') : undefined
-            }
-          />
-        </div>
-        {ticketNumber && (
-          <div className={`${styles['ticket-number-wrapper']} dark:text-white`}>
-            <div
-              className={`${cn(styles['ticket-number'], {
-                [styles['ticket-number-golden']]: golden,
-              })} bg-gradient-to-r  from-white via-white wayfinding--ticket-number ${
-                golden ? 'to-[#ffe8af]' : 'to-slate-900'
-              }`}
-            >
-              <TicketNumber number={ticketNumber} />
-            </div>
-          </div>
-        )}
+
+        {ticketNumber && <TicketNumber number={ticketNumber} />}
       </div>
     </>
   )
