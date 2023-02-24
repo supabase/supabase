@@ -37,8 +37,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     queryHitRate,
   ])
 
-  console.log('ziinc mostFrequentlyInvoked', mostFrequentlyInvoked)
-
   const checkAlert = (
     <div className="w-5 h-5 text-brand-1400 text-brand-900 flex items-center justify-center">
       <IconCheckCircle strokeWidth={2} size={16} />
