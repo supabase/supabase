@@ -60,8 +60,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [router.events])
 
   const SITE_TITLE = 'Supabase Documentation'
-  const SITE_DESCRIPTION = 'The open source Firebase alternative.'
-  const { basePath } = useRouter()
 
   return (
     <>
@@ -69,11 +67,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Head>
         <meta
           property="og:image"
-          content={'https://supabase.com${basePath}/img/supabase-og-image.png'}
+          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
         />
         <meta
           name="twitter:image"
-          content={'https://supabase.com${basePath}/img/supabase-og-image.png'}
+          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
         />
       </Head>
       <DefaultSeo
