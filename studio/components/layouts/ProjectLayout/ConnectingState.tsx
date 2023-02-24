@@ -40,7 +40,6 @@ const ConnectingState: FC<Props> = ({ project }) => {
     const result = await pingPostgrest(project.restUrl!, project.ref, {
       kpsVersion: project.kpsVersion,
     })
-    console.log('testProjectConnection', result)
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
