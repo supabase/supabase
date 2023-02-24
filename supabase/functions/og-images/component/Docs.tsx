@@ -36,13 +36,13 @@ const Docs = (props: Props) => {
                 <div tw="w-[50px] h-[50px] bg-[#164430] rounded-md flex items-center justify-center">
                     <img src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${type.toLowerCase()}.svg`} width="80%" height="80%" />
                 </div>
-                <span tw="text-[36px] text-[#ededed] ml-[16px]">{type}</span>
+                <span tw="text-[36px] text-[#ededed] ml-[16px]">{type.substring(0, 1).toUpperCase() + title.substring(1)}</span>
             </>
           )}
         </div>
         <div tw="flex flex-col">
           <div tw="flex flex-col absolute left-[64px] top-[154px] w-[1072px]">
-            <h1 tw="my-0 mb-2 text-[60px]">{!title ? 'Supabase' : title.substring(0, 1).toUpperCase() + title.substring(1)}</h1>
+            <h1 tw="my-0 mb-2 text-[60px]">{!title ? 'Supabase' : title}</h1>
             <p tw="my-0 mt-2 text-[40px] text-[#f2fff9] opacity-50">{description}</p>
           </div>
           <div tw="flex flex-row items-center justify-center absolute left-[64px] top-[500px]">
