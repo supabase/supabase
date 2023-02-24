@@ -64,10 +64,18 @@ const Layout: FC<Props> = (props) => {
 
   const hasTableOfContents = tocList.length > 0
 
+  // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
-
+  const ogPageTypeSplit = ogPageType.split(' ')
+  // capitalize each word for page type
+  ogPageTypeSplit
+    .map((word) => {
+      return word[0].toUpperCase() + word.substring(1)
+    })
+    .join(' ')
+  // open graph image url constructor
   const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
-    ogPageType ? `&type=${ogPageType}` : ''
+    ogPageTypeSplit ? `&type=${ogPageTypeSplit}` : ''
   }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
     props.meta?.description
   )}`
