@@ -87,6 +87,7 @@ const Layout: FC<Props> = (props) => {
         <meta name="description" content={props.meta?.description} />
         <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:image" content={ogImageUrl} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <NextSeo
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
