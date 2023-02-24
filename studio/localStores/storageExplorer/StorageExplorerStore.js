@@ -1,19 +1,7 @@
 import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import {
-  find,
-  compact,
-  isEqual,
-  isNil,
-  has,
-  some,
-  chunk,
-  get,
-  uniq,
-  uniqBy,
-  findIndex,
-} from 'lodash'
+import { find, compact, isEqual, has, some, chunk, get, uniq, uniqBy, findIndex } from 'lodash'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
 
@@ -124,7 +112,7 @@ class StorageExplorerStore {
     this.supabaseClient = createClient(
       `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
-      { 
+      {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
