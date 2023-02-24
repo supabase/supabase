@@ -12,18 +12,34 @@ import {
 } from 'ui'
 
 import { useParams } from 'hooks'
-import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { post } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'
 import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 
 interface Props {}
 
-const ProjectUpgradeAlert: FC<Props> = () => {
+const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const { ref } = useParams()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
+  const formId = 'project-upgrade-form'
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
+  const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
+
+  const initialValues = { version: data?.target_upgrade_versions?.[0] ?? 0 }
+
+  const onConfirmUpgrade = async (values: any, { setSubmitting, resetForm }: any) => {
+    setSubmitting(true)
+
+    // const response = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
+    //   target_version: values.version,
+    // })
+
+    setSubmitting(true)
+  }
 
   return (
     <>
@@ -40,13 +56,14 @@ const ProjectUpgradeAlert: FC<Props> = () => {
         </Button>
       </Alert>
       <Modal
+        hideFooter
         visible={showUpgradeModal}
         onCancel={() => setShowUpgradeModal(false)}
         header={<h3>Upgrade project's Postgres</h3>}
-        hideFooter
       >
-        <Form id="project-upgrade-form" initialValues={{}} onSubmit={() => {}}>
-          {({ isSubmitting }: { isSubmitting: boolean }) => {
+        <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
+          {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+            console.log({ values, isSubmitting })
             return (
               <>
                 <div className="py-6">
@@ -54,7 +71,8 @@ const ProjectUpgradeAlert: FC<Props> = () => {
                     <div className="space-y-4">
                       <p className="text-sm">
                         All of your project's services, such as GoTrue, PostgREST, Supautils, and
-                        all database extensions will be upgraded as well.
+                        all database extensions will be upgraded as well, and this action cannot be
+                        undone.
                       </p>
                       {(data?.potential_breaking_changes ?? []).length > 0 && (
                         <InformationBox
@@ -100,6 +118,7 @@ const ProjectUpgradeAlert: FC<Props> = () => {
                         id="version"
                         name="version"
                         label="Select the version of Postgres to upgrade to"
+                        descriptionText={`Your project's Postgres will be upgraded from ${currentPgVersion} to ${values.version}`}
                       >
                         {data?.target_upgrade_versions.map((version: number) => (
                           <Listbox.Option key={version} value={version} label={`${version}`}>
@@ -118,7 +137,7 @@ const ProjectUpgradeAlert: FC<Props> = () => {
                   >
                     Cancel
                   </Button>
-                  <Button disabled={isSubmitting} loading={isSubmitting}>
+                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
                     Confirm upgrade
                   </Button>
                 </div>
