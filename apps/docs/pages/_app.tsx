@@ -67,11 +67,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Head>
         <meta
           property="og:image"
-          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
+          content={`https://supabase.com${router.basePath}/img/supabase-og-image.png`}
         />
         <meta
           name="twitter:image"
-          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
+          content={`https://supabase.com${router.basePath}/img/supabase-og-image.png`}
         />
       </Head>
       <DefaultSeo
