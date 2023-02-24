@@ -72,8 +72,8 @@ const Layout: FC<Props> = (props) => {
         description={props.meta?.description ? props.meta?.description : props.meta?.title}
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
         openGraph={{
-          title: props.meta?.title,
-          description: props.meta?.description,
+          title: props.meta?.title || 'Supabase Docs',
+          description: props.meta?.description || null,
           url: `https://supabase.com/docs${asPath}`,
           type: 'article',
           videos: props.meta?.video && [
