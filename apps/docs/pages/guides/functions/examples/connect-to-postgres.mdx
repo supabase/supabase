@@ -4,6 +4,7 @@ export const meta = {
   id: 'examples-postgres-on-the-edge',
   title: 'Connect to Postgres',
   description: 'Connecting to Postgres from Edge Functions.',
+  video: 'https://www.youtube.com/v/cl7EuF1-RsY',
 }
 
 <div class="video-container">
@@ -19,7 +20,7 @@ Supabase Edge Functions allow you to go beyond HTTP and can connect to your Post
 
 ```ts index.ts
 import * as postgres from 'https://deno.land/x/postgres@v0.14.2/mod.ts'
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
 // Get the connection string from the environment variable "DATABASE_URL"
 const databaseUrl = Deno.env.get('DATABASE_URL')!

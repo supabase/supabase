@@ -71,6 +71,7 @@ const RowIcon = ({ view, status, fileType, mimeType }: any) => {
 }
 
 interface Props {
+  index: number
   item: any
   view: string
   columnIndex: number
@@ -80,6 +81,7 @@ interface Props {
 }
 
 const FileExplorerRow: FC<Props> = ({
+  index: itemIndex,
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
@@ -108,6 +110,7 @@ const FileExplorerRow: FC<Props> = ({
     downloadFile,
     downloadFolder,
     copyFileURLToClipboard,
+    selectRangeItems,
   } = storageExplorerStore
 
   const isPublic = selectedBucket.public
@@ -133,11 +136,18 @@ const FileExplorerRow: FC<Props> = ({
     await fetchFolderContents(folder.id, folder.name, columnIndex)
   }
 
-  const onCheckItem = (item: any) => {
-    if (find(selectedItems, item) === undefined) {
-      setSelectedItems(selectedItems.concat([item]))
+  const onCheckItem = (isShiftKeyHeld: boolean) => {
+    // Select a range if shift is held down
+    if (isShiftKeyHeld && selectedItems.length !== 0) {
+      selectRangeItems(columnIndex, itemIndex)
+      return
+    }
+    if (find(selectedItems, (item: any) => itemWithColumnIndex.id === item.id) !== undefined) {
+      setSelectedItems(
+        selectedItems.filter((selectedItem: any) => itemWithColumnIndex.id !== selectedItem.id)
+      )
     } else {
-      setSelectedItems(selectedItems.filter((selectedItem: any) => item.id !== selectedItem.id))
+      setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
     closeFilePreview()
   }
@@ -381,7 +391,7 @@ const FileExplorerRow: FC<Props> = ({
               checked={isSelected}
               onChange={(event) => {
                 event.stopPropagation()
-                onCheckItem(itemWithColumnIndex)
+                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
               }}
             />
           </div>

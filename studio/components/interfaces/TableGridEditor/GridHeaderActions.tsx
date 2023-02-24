@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
+import { Button, IconAlertCircle, IconCode, IconLock } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconLock } from 'ui'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -9,9 +9,17 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   table: PostgresTable
+  apiPreviewPanelOpen: boolean
+  setApiPreviewPanelOpen: (apiPreviewPanelOpen: boolean) => void
+  refreshDocs: () => void
 }
 
-const GridHeaderActions: FC<Props> = ({ table }) => {
+const GridHeaderActions: FC<Props> = ({
+  table,
+  apiPreviewPanelOpen,
+  setApiPreviewPanelOpen,
+  refreshDocs,
+}) => {
   const { ui, meta } = useStore()
   const projectRef = ui.selectedProject?.ref
   const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
@@ -19,6 +27,24 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
   const isReadOnly =
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
+  function handlePreviewToggle() {
+    setApiPreviewPanelOpen(!apiPreviewPanelOpen)
+    refreshDocs()
+  }
+
+  const RenderAPIPreviewToggle = () => {
+    return (
+      <Button
+        size="tiny"
+        type="default"
+        icon={<IconCode size={14} strokeWidth={2} />}
+        onClick={handlePreviewToggle}
+      >
+        API Quickstart
+      </Button>
+    )
+  }
 
   return (
     <div className="flex items-center space-x-3">
@@ -44,6 +70,9 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
           </Tooltip.Content>
         </Tooltip.Root>
       )}
+      <div className="mt-[1px]">
+        <RenderAPIPreviewToggle />
+      </div>
       <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
         <a>
           <Button

@@ -1,0 +1,27 @@
+.graphiqlContainer .graphiqlSessions {
+  margin: 0;
+  border-radius: 0;
+}
+
+.graphiqlContainer .graphiqlSession {
+  padding: 0;
+}
+
+.graphiqlContainer .graphiqlEditors {
+  border-radius: 0;
+}
+
+.graphiqlContainer .graphiqlEditors:global(.full-height) {
+  margin-top: calc(0px - var(--session-header-height));
+}
+
+/* Colors */
+:global(body.graphiql-dark) .graphiqlContainer {
+  --color-base: 0, 0%, 11%;
+  --color-primary: 153, 50%, 50%;
+}
+
+:global(body.graphiql-light) .graphiqlContainer {
+  --color-base: 210, 17%, 98%;
+  --color-primary: 153, 50%, 50%;
+}
