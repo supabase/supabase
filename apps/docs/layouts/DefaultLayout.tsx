@@ -35,13 +35,10 @@ const Layout: FC<Props> = (props: Props) => {
           {asPath === '/' ? 'Supabase Docs' : `${props.meta?.title} | Supabase Docadsdsds`}
         </title>
         <meta name="description" content={props.meta?.description} />
-        <meta
-          property="og:image"
-          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
-        />
+        <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} />
         <meta
           name="twitter:image"
-          content={`https://supabase.com${basePath}/img/supabase-og-image.png`}
+          content={`https://supabase.com/docs/img/supabase-og-image.png`}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
