@@ -33,29 +33,28 @@ export default function TicketVisual({
   return (
     <>
       <div
-        className={[styles.visual, golden ? styles['visual--gold'] : ''].join(' ')}
-        // className={`rounded-2xl shadow-xl shadow-brand-500`}
+        className={[
+          styles.visual,
+          golden ? styles['visual--gold'] : '',
+          'wayfinding--ticket-visual-inner-container',
+        ].join(' ')}
         style={{
           ['--size' as string]: size,
         }}
       >
-        <div className={styles['horizontal-ticket']}>
-          {/* {username ? <TicketColored golden={golden} /> : <TicketMono golden={golden} />} */}
-
+        <div className={cn(styles['horizontal-ticket'], 'wayfinding--TicketMono-container')}>
           <TicketMono golden={golden} />
         </div>
+
         <div className={styles['vertical-ticket']}>
-          {/* {username ? (
-            <TicketColoredMobile golden={golden} />
-          ) : (
-            <TicketMonoMobile golden={golden} />
-          )} */}
           <TicketMonoMobile golden={golden} />
         </div>
+
         <div className={styles.logo}>
           <img src={`/images/launchweek/ticket-logo-${golden ? 'light' : 'dark'}.svg`} />
         </div>
-        <div className={styles.profile}>
+
+        <div className={`${styles.profile} wayfinding--TicketProfile-container`}>
           <TicketProfile
             name={name}
             username={username}
@@ -64,7 +63,7 @@ export default function TicketVisual({
             golden={golden}
           />
         </div>
-        <div className={styles.info}>
+        <div className={`${styles.info} wayfinding--TicketInfo-container`}>
           <TicketInfo
             golden={golden}
             logoTextSecondaryColor={
@@ -77,7 +76,7 @@ export default function TicketVisual({
             <div
               className={`${cn(styles['ticket-number'], {
                 [styles['ticket-number-golden']]: golden,
-              })} bg-gradient-to-r  from-white via-white ${
+              })} bg-gradient-to-r  from-white via-white wayfinding--ticket-number ${
                 golden ? 'to-[#ffe8af]' : 'to-slate-900'
               }`}
             >

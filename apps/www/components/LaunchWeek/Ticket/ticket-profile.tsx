@@ -12,6 +12,8 @@ type Props = {
   golden?: boolean
 }
 
+// The middle part of the ticket
+// avatar / Yourn Name / Username
 export default function TicketProfile({
   name,
   username,
@@ -20,7 +22,12 @@ export default function TicketProfile({
   golden = false,
 }: Props) {
   return (
-    <div className={styles.profile}>
+    <div
+      className={cn(
+        styles.profile,
+        'wayfinding--skeleton-container wayfinding--ticket profile.tsx'
+      )}
+    >
       <span
         className={cn(styles.skeleton, styles.wrapper, styles.inline, styles.rounded, {
           [styles.show]: ticketGenerationState === 'loading',
