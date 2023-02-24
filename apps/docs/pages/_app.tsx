@@ -64,28 +64,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <Favicons />
-      <Head>
-        <meta
-          property="og:image"
-          content={`https://supabase.com${router.basePath}/img/supabase-og-image.png`}
-        />
-        <meta
-          name="twitter:image"
-          content={`https://supabase.com${router.basePath}/img/supabase-og-image.png`}
-        />
-      </Head>
-      <DefaultSeo
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/docs',
-          site_name: SITE_TITLE,
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
       {IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>
