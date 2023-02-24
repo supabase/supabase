@@ -66,8 +66,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <DefaultSeo
-        title={SITE_TITLE}
-        description={SITE_DESCRIPTION}
         openGraph={{
           type: 'website',
           url: 'https://supabase.com/docs',

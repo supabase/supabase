@@ -1,5 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { FC } from 'react'
 import components from '~/components'
 import TableOfContents from '~/components/TableOfContents'
@@ -12,14 +13,20 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
+  const { asPath } = useRouter()
+
   const hasTableOfContents =
     props.toc !== undefined &&
     props.toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
 
+  console.log('asPath', asPath)
+
   return (
     <>
       <Head>
-        <title>{props.meta?.title} | Supabase Docs</title>
+        <title>
+          {asPath === '/' ? 'Supabase Docs' : `${props.meta?.title} | Supabase Docadsdsds`}
+        </title>
         <meta name="description" content={props.meta?.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/docs/favicon.ico" />

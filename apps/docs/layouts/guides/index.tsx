@@ -1,5 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
@@ -67,13 +68,13 @@ const Layout: FC<Props> = (props) => {
 
   return (
     <>
+      <Head>
+        <title>{props.meta?.title} | Supabase Docs</title>
+        <meta name="description" content={props.meta?.description} />
+      </Head>
       <NextSeo
-        title={`${props.meta?.title} | Supabase Docs`}
-        description={props.meta?.description ? props.meta?.description : props.meta?.title}
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
         openGraph={{
-          title: props.meta?.title,
-          description: props.meta?.description,
           url: `https://supabase.com/docs${asPath}`,
           type: 'article',
           videos: props.meta?.video && [
