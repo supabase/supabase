@@ -66,11 +66,19 @@ const Layout: FC<Props> = (props) => {
 
   const ogPageType = asPath.split('/')[2]
 
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+    ogPageType ? `&type=${ogPageType}` : ''
+  }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
+    props.meta?.description
+  )}`
+
   return (
     <>
       <Head>
         <title>{props.meta?.title} | Supabase Docs</title>
         <meta name="description" content={props.meta?.description} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta name="twitter:image" content={ogImageUrl} />
       </Head>
       <NextSeo
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
