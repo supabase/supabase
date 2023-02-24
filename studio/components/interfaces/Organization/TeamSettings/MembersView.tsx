@@ -233,9 +233,7 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
                         )}
                       </Table.td>
                       <Table.td>
-                        {!memberIsUser && (
-                          <MemberActions members={members} member={x} roles={roles} />
-                        )}
+                        {!memberIsUser && <MemberActions member={x} roles={roles} />}
                       </Table.td>
                     </Table.tr>
                   </Fragment>

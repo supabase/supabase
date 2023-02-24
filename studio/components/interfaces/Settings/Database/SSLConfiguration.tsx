@@ -122,7 +122,7 @@ const SSLConfiguration = () => {
                 )}
                 <Toggle
                   checked={isEnforced}
-                  disabled={isLoading || isSubmitting}
+                  disabled={isLoading || isSubmitting || !canUpdateSSLEnforcement}
                   onChange={toggleSSLEnforcement}
                 />
               </div>
