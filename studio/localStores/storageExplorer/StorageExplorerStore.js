@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast'
 import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
-import { find, compact, isEqual, has, some, chunk, get, uniq, uniqBy, findIndex } from 'lodash'
+import { find, compact, isEqual, has, some, chunk, uniq, uniqBy, findIndex } from 'lodash'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
 
@@ -607,7 +607,6 @@ class StorageExplorerStore {
 
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
-    // const topLevelFolders = get(this.columns, [derivedColumnIndex, 'items'], [])
     const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
