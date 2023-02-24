@@ -8,8 +8,12 @@ import { IconAlertCircle, IconCheckCircle } from '@supabase/ui'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CopyButton from 'components/ui/CopyButton'
+import { useFlag } from 'hooks'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useState } from 'react'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
-const limit = 50
+const limit = 10
 
 const QueryMostFrequentlyInvoked = `
 -- Most frequently called queries
@@ -87,12 +91,15 @@ select
   from pg_statio_user_tables;
 `
 
-const DatabaseExtensions: NextPageWithLayout = () => {
+const QueryPerformanceReport: NextPageWithLayout = () => {
   const QueryMostFrequentlyInvokedData = useDbQuery(QueryMostFrequentlyInvoked)
   const QueryMostTimeConsumingData = useDbQuery(QueryMostTimeConsuming)
   const QuerySlowestExecutionTimeData = useDbQuery(QuerySlowestExecutionTime)
   const QueryHitRateData = useDbQuery(QueryHitRate)
   const { project } = useProjectContext()
+  const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
+
+  const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
 
   const isLoadedQueryMostFrequentlyInvokedData =
     QueryMostFrequentlyInvokedData &&
@@ -158,94 +165,113 @@ const DatabaseExtensions: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const resetPgStatStatements = () => {
-    executeSql({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      sql: `SELECT pg_stat_statements_reset();`,
-    })
-  }
   return (
-    <div className="my-8 px-16 flex flex-col gap-8 justify-start">
-      <h1 className="text-3xl">Insights</h1>
+    <>
+      <h1 className="text-4xl">Query performance</h1>
 
-      <Accordion
-        openBehaviour="multiple"
-        chevronAlign="right"
-        className=" border p-2 bg-scale-300 rounded"
-      >
-        <Accordion.Item
-          header={
-            <div className="flex flex-row gap-2 items-center p-2">
-              <span className="text-xl">Index Efficiency</span>
-              {showIndexWarning ? warnAlert : checkAlert}
-            </div>
-          }
-          id="1"
-          className="flex flex-row gap-8"
+      {tableIndexEfficiencyEnabled && (
+        <Accordion
+          openBehaviour="multiple"
+          chevronAlign="right"
+          className=" border p-2 bg-scale-300 rounded"
         >
-          {isLoadedQueryHitRateData && (
-            <div>
-              <div className="flex flex-row px-8 py-4 gap-8">
-                <div className="w-1/2 bg-slate-200 rounded-md p-4">
-                  Index Hit Rate
-                  <div className="flex items-center gap-2">
-                    {indexHitRate >= 0.99
-                      ? checkAlert
-                      : indexHitRate >= 0.95
-                      ? warnAlert
-                      : dangerAlert}
-                    <div className="flex items-baseline">
-                      <span className="text-3xl">
-                        {(QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
-                      </span>
-                      <span className="text-xl">%</span>
+          <Accordion.Item
+            header={
+              <div className="flex flex-row gap-2 items-center p-2">
+                <span className="text-xl">Index Efficiency</span>
+                {showIndexWarning ? warnAlert : checkAlert}
+              </div>
+            }
+            id="1"
+            className="flex flex-row gap-8"
+          >
+            {isLoadedQueryHitRateData && (
+              <div>
+                <div className="flex flex-row px-8 py-4 gap-8">
+                  <div className="w-1/2 bg-slate-200 rounded-md p-4">
+                    Index Hit Rate
+                    <div className="flex items-center gap-2">
+                      {indexHitRate >= 0.99
+                        ? checkAlert
+                        : indexHitRate >= 0.95
+                        ? warnAlert
+                        : dangerAlert}
+                      <div className="flex items-baseline">
+                        <span className="text-3xl">
+                          {(QueryHitRateData[0]?.data[0]?.ratio * 100).toFixed(2)}
+                        </span>
+                        <span className="text-xl">%</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="w-1/2 bg-slate-200 rounded-md p-4">
-                  {QueryHitRateData[0]?.data[1]?.name == 'table hit rate' && 'Table Hit Rate'}
-                  <div className="flex items-center gap-2">
-                    {tableHitRate >= 0.99
-                      ? checkAlert
-                      : tableHitRate >= 0.95
-                      ? warnAlert
-                      : dangerAlert}
-                    <div className="flex items-baseline">
-                      <span className="text-3xl">
-                        {(QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
-                      </span>
-                      <span className="text-xl">%</span>
+                  <div className="w-1/2 bg-slate-200 rounded-md p-4">
+                    {QueryHitRateData[0]?.data[1]?.name == 'table hit rate' && 'Table Hit Rate'}
+                    <div className="flex items-center gap-2">
+                      {tableHitRate >= 0.99
+                        ? checkAlert
+                        : tableHitRate >= 0.95
+                        ? warnAlert
+                        : dangerAlert}
+                      <div className="flex items-baseline">
+                        <span className="text-3xl">
+                          {(QueryHitRateData[0]?.data[1]?.ratio * 100).toFixed(2)}
+                        </span>
+                        <span className="text-xl">%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div className="px-8 pt-4 m-0">
+                  <p className="text-scale-1100 text-sm max-w-2xl">
+                    For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
+                    Consider upgrading to an instance with more memory if the ratios dip below 95%.
+                  </p>
+                </div>
               </div>
-              <div className="px-8 pt-4 m-0">
-                <p className="text-scale-1100 text-sm max-w-2xl">
-                  For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
-                  Consider upgrading to an instance with more memory if the ratios dip below 95%.
-                </p>
-              </div>
-            </div>
-          )}
-        </Accordion.Item>
-      </Accordion>
+            )}
+          </Accordion.Item>
+        </Accordion>
+      )}
+
+      <ConfirmModal
+        danger
+        visible={showResetgPgStatStatements}
+        title="Reset query performance"
+        description={`This will reset the extensions.pg_stat_statements table that is used to calculate query performance.`}
+        buttonLabel="Clear table"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setShowResetgPgStatStatements(true)}
+        onSelectConfirm={async () => {
+          try {
+            await executeSql({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              sql: `SELECT pg_stat_statements_reset();`,
+            })
+            setShowResetgPgStatStatements(false)
+          } catch (error) {
+            console.error(error)
+          }
+        }}
+      />
+
+      <ReactMarkdown className="prose text-sm dark:dark-prose">
+        Unoptimized queries are a major cause of poor database performance. The techniques on this
+        page can help you identify and understand queries that take the most time and resources from
+        your database. You can read more about [query
+        performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance)
+        in our docs.
+      </ReactMarkdown>
+
+      <div className="w-full flex justify-end">
+        <Button type="default" onClick={() => setShowResetgPgStatStatements(true)}>
+          Reset analysis
+        </Button>
+      </div>
 
       <div className="flex flex-col">
-        <h4 className="mb-4 text-2xl">Query Analysis</h4>
-        <Tabs
-          scrollable
-          type="underlined"
-          size="medium"
-          addOnAfter={
-            <div className="w-full flex justify-end mr-4">
-              <Button type="default" onClick={resetPgStatStatements}>
-                Reset analysis
-              </Button>
-            </div>
-          }
-        >
+        <Tabs type="underlined" size="medium">
           <Tabs.Panel key={1} id="1" label="Most time consuming" className="text-sm max-w-none">
             <div className="thin-scrollbars max-w-full overflow-scroll">
               <Table
@@ -399,7 +425,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
           </Tabs.Panel>
         </Tabs>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -413,6 +439,8 @@ const QueryActions = ({ sql, className }: { sql: string; className: string }) =>
   )
 }
 
-DatabaseExtensions.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
+QueryPerformanceReport.getLayout = (page) => (
+  <ReportsLayout title="Query performance">{page}</ReportsLayout>
+)
 
-export default observer(DatabaseExtensions)
+export default observer(QueryPerformanceReport)
