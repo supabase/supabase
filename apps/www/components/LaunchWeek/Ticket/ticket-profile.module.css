@@ -106,7 +106,7 @@
 .skeleton {
   display: flex;
   align-items: center;
-  border-radius: 5px;
+  border-radius: 25px;
 }
 
 .skeleton.loaded {

@@ -60,7 +60,12 @@ export default function Ticket({
       <div className={cn(styles['ticket-visual-wrapper'], 'col-span-8')}>
         <div
           ref={ticketRef}
-          className={cn(styles['ticket-visual'], styleUtils.appear, styleUtils['appear-fourth'])}
+          className={cn(
+            styles['ticket-visual'],
+            styleUtils.appear,
+            styleUtils['appear-fourth'],
+            'wayfinding--ticket-visual-outer-container'
+          )}
         >
           <TicketVisual
             username={username ?? undefined}
@@ -109,8 +114,9 @@ export default function Ticket({
             ) : golden ? (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
-              <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">
-                Generate your ticket. Win the SupaKeyboard.
+              <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                Generate your ticket. Win the{' '}
+                <span className="gradient-text-purple-500">SupaKeyboard</span>.
               </p>
             )}
           </h1>
@@ -127,15 +133,17 @@ export default function Ticket({
                 </p>
                 <p>Referrals: {referrals}</p>
               </>
-            ) : username ? (
-              <>
-                <p>Here is your unique ticket image for bragging on socials!</p>
-                <p>Referrals: {referrals}</p>
-              </>
             ) : (
               <>
-                We have some fantastic swag up for grabs, including 3x limited edition mechanical
-                keyboard that you won't want to miss.
+                <p>
+                  We have some fantastic swag up for grabs, including 3x limited edition mechanical
+                  keyboard that you won't want to miss.
+                </p>
+                {username && (
+                  <p>
+                    {`<<<<`} Referrals: {referrals} {`>>>>`}
+                  </p>
+                )}
               </>
             )}
           </h2>

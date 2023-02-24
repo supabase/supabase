@@ -10,7 +10,7 @@ export default function TicketInfo({
   golden = false,
 }) {
   return (
-    <div className={styles.info}>
+    <div className={`${styles.info} wayfinding--TicketInfo-footer`}>
       <div
         className={`${cn(styles.date, { [styles['date-golden']]: golden })} text-sm mr-4 ${
           golden && '!text-white'
