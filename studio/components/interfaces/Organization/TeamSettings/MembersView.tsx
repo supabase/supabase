@@ -191,6 +191,7 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
                                     value={r.id}
                                     label={r.name}
                                     disabled={disableRoleEdit}
+                                    className="w-36"
                                   >
                                     {r.name}
                                   </Listbox.Option>
