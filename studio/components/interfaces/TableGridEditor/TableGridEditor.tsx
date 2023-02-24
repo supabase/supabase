@@ -128,11 +128,7 @@ const TableGridEditor: FC<Props> = ({
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
 
