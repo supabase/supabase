@@ -99,15 +99,6 @@ const Layout: FC<Props> = (props) => {
             modifiedTime: new Date().toISOString(),
             authors: ['Supabase'],
           },
-          images: [
-            {
-              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
-                ogPageType ? `&type=${ogPageType}` : ''
-              }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
-                props.meta?.description
-              )}`,
-            },
-          ],
         }}
       />
       <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
