@@ -1,8 +1,3 @@
-.profile {
-  display: flex;
-  align-items: center;
-}
-
 .image {
   width: 60px;
   height: 60px;
@@ -21,12 +16,12 @@
   flex: 1;
   margin-left: 10px;
 }
-
+/*
 @media (min-width: 768px) {
   .text {
     margin-left: calc(15px * var(--size));
   }
-}
+} */
 
 .name {
   font-size: 24px;
@@ -102,12 +97,12 @@
     background-position: -200% 0;
   }
 }
-
+/*
 .skeleton {
   display: flex;
   align-items: center;
   border-radius: 25px;
-}
+} */
 
 .skeleton.loaded {
   width: unset !important;
