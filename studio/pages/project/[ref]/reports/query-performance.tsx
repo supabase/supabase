@@ -58,13 +58,11 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const text = `This report will help you identify and understand queries that take the most time and resources
-  from your database.
+  const HeaderText = `This report will help you identify and understand queries that take the most time and resources
+  from your database. You can read more about [query performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance)
+  in the docs.
 
-  You can read more about [query performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance)
-  in our docs.
-
-  You may also want to reset this analysis when you are optimizing your queries. This analysis is based on the extensions.pg_stat_statements table, so this table will be cleared when resetting.
+  You may also want to reset this analysis when you are optimizing your queries. This analysis is based on the \`extensions.pg_stat_statements\` table, which will be cleared when you reset analysis below.
   `
 
   const TimeConsumingHelperText = `This report will show you statistics about queries ordered by the cumulative total execution time. 
@@ -151,7 +149,7 @@ This provides useful information about the queries you run most frequently. Quer
         </Accordion>
       )}
 
-      <ReactMarkdown className="prose text-sm text-scale-1000" children={text} />
+      <ReactMarkdown className="prose text-sm text-scale-1000" children={HeaderText} />
 
       <div className="mb-8">
         <Button type="default" onClick={() => setShowResetgPgStatStatements(true)}>
