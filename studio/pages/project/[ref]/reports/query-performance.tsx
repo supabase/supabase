@@ -30,7 +30,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const slowestExecutionTime = hooks.slowestExecutionTime()
   const queryHitRate = hooks.queryHitRate()
 
-  const { isLoading, Layout } = usePresetReport([
+  const { isLoading, Layout, handleRefresh } = usePresetReport([
     mostFrequentlyInvoked,
     mostTimeConsuming,
     slowestExecutionTime,
@@ -179,6 +179,7 @@ This provides useful information about the queries you run most frequently. Quer
               sql: `SELECT pg_stat_statements_reset();`,
             })
             setShowResetgPgStatStatements(false)
+            handleRefresh()
           } catch (error) {
             console.error(error)
           }
