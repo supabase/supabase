@@ -58,10 +58,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const HeaderText = `This report identifies and explains queries that consume the most time and resources from your database. To learn more about query performance, read the [guide on examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
+  const HeaderText = `These reports identify the queries that consume the most time and database resources. It relies on the \`pg_stat_statements\` table.
 
-If you're optimizing your queries, consider resetting this analysis. 
-It's based on the \`pg_stat_statements\` table, which is cleared when you reset the analysis.
+  Consider resetting the analysis after optimising your queries. To learn more about query performance, read the [guide on examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
 `
 
   const TimeConsumingHelperText = `This report presents statistics about queries ordered by their cumulative total execution time. 
@@ -80,7 +79,7 @@ It's based on the \`pg_stat_statements\` table, which is cleared when you reset 
 `
 
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
-  const helperTextClassNames = 'prose text-sm max-w-3xl text-scale-1000'
+  const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
 
   return (
     <Layout title="Query Performance" showDatePickers={false}>
