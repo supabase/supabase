@@ -217,7 +217,7 @@ limit 100
   group by 
     r.path, r.method
   order by
-    timestamp desc
+    num_requests desc
   limit 100
 `,
     for: ['api'],
