@@ -20,6 +20,9 @@ import {
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useContextMenu } from 'react-contexify'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions } from 'hooks'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
@@ -97,6 +100,7 @@ const FileExplorerRow: FC<Props> = ({
     addNewFolder,
     renameFolder,
     renameFile,
+    selectedBucket,
     setSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
@@ -109,11 +113,13 @@ const FileExplorerRow: FC<Props> = ({
     selectRangeItems,
   } = storageExplorerStore
 
+  const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = find(selectedItems, item) !== undefined
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
+  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const onSelectFile = async (columnIndex: number, file: any) => {
     popColumnAtIndex(columnIndex)
@@ -197,77 +203,109 @@ const FileExplorerRow: FC<Props> = ({
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
-          {
-            name: 'Rename',
-            icon: <IconEdit size="tiny" />,
-            onClick: () => setSelectedItemToRename(itemWithColumnIndex),
-          },
-          {
-            name: 'Download',
-            icon: <IconDownload size="tiny" />,
-            onClick: () => downloadFolder(itemWithColumnIndex),
-          },
-          { name: 'Separator', icon: undefined, onClick: undefined },
-          {
-            name: 'Delete',
-            icon: <IconTrash2 size="tiny" />,
-            onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
-          },
-        ]
-      : [
-          ...(!item.isCorrupted
+          ...(canUpdateFiles
             ? [
-                {
-                  name: 'Get URL',
-                  icon: <IconClipboard size="tiny" />,
-                  children: [
-                    {
-                      name: 'Expire in 1 week',
-                      onClick: async () =>
-                        await copyFileURLToClipboard(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK),
-                    },
-                    {
-                      name: 'Expire in 1 month',
-                      onClick: async () =>
-                        await copyFileURLToClipboard(
-                          itemWithColumnIndex,
-                          URL_EXPIRY_DURATION.MONTH
-                        ),
-                    },
-                    {
-                      name: 'Expire in 1 year',
-                      onClick: async () =>
-                        await copyFileURLToClipboard(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR),
-                    },
-                    {
-                      name: 'Custom expiry',
-                      onClick: async () => setSelectedFileCustomExpiry(itemWithColumnIndex),
-                    },
-                  ],
-                },
                 {
                   name: 'Rename',
                   icon: <IconEdit size="tiny" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
-                {
-                  name: 'Move',
-                  icon: <IconMove size="tiny" />,
-                  onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
-                },
-                {
-                  name: 'Download',
-                  icon: <IconDownload size="tiny" />,
-                  onClick: async () => await downloadFile(itemWithColumnIndex),
-                },
-                { name: 'Separator', icon: undefined, onClick: undefined },
               ]
             : []),
           {
-            name: 'Delete',
-            icon: <IconTrash2 size="tiny" />,
-            onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+            name: 'Download',
+            icon: <IconDownload size="tiny" />,
+            onClick: () => downloadFolder(itemWithColumnIndex),
           },
+          ...(canUpdateFiles
+            ? [
+                { name: 'Separator', icon: undefined, onClick: undefined },
+                {
+                  name: 'Delete',
+                  icon: <IconTrash2 size="tiny" />,
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+              ]
+            : []),
+        ]
+      : [
+          ...(!item.isCorrupted
+            ? [
+                ...(isPublic
+                  ? [
+                      {
+                        name: 'Get URL',
+                        icon: <IconClipboard size="tiny" />,
+                        onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
+                      },
+                    ]
+                  : [
+                      {
+                        name: 'Get URL',
+                        icon: <IconClipboard size="tiny" />,
+                        children: [
+                          {
+                            name: 'Expire in 1 week',
+                            onClick: async () =>
+                              await copyFileURLToClipboard(
+                                itemWithColumnIndex,
+                                URL_EXPIRY_DURATION.WEEK
+                              ),
+                          },
+                          {
+                            name: 'Expire in 1 month',
+                            onClick: async () =>
+                              await copyFileURLToClipboard(
+                                itemWithColumnIndex,
+                                URL_EXPIRY_DURATION.MONTH
+                              ),
+                          },
+                          {
+                            name: 'Expire in 1 year',
+                            onClick: async () =>
+                              await copyFileURLToClipboard(
+                                itemWithColumnIndex,
+                                URL_EXPIRY_DURATION.YEAR
+                              ),
+                          },
+                          {
+                            name: 'Custom expiry',
+                            onClick: async () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                          },
+                        ],
+                      },
+                    ]),
+                ...(canUpdateFiles
+                  ? [
+                      {
+                        name: 'Rename',
+                        icon: <IconEdit size="tiny" />,
+                        onClick: () => setSelectedItemToRename(itemWithColumnIndex),
+                      },
+                      {
+                        name: 'Move',
+                        icon: <IconMove size="tiny" />,
+                        onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
+                      },
+                      {
+                        name: 'Download',
+                        icon: <IconDownload size="tiny" />,
+                        onClick: async () => await downloadFile(itemWithColumnIndex),
+                      },
+                      { name: 'Separator', icon: undefined, onClick: undefined },
+                    ]
+                  : []),
+              ]
+            : []),
+          ...(canUpdateFiles
+            ? [
+                {
+                  name: 'Delete',
+                  icon: <IconTrash2 size="tiny" />,
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+              ]
+            : []),
         ]
 
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'

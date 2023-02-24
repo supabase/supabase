@@ -14,6 +14,10 @@ import {
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
@@ -107,6 +111,7 @@ const PreviewPane = () => {
   const mimeType = file.metadata ? file.metadata.mimetype : null
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
+  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <>
@@ -238,15 +243,35 @@ const PreviewPane = () => {
                 </Dropdown>
               )}
             </div>
-            <Button
-              type="outline"
-              shadow={false}
-              size="tiny"
-              icon={<IconTrash2 size={16} strokeWidth={2} />}
-              onClick={() => setSelectedItemsToDelete([file])}
-            >
-              Delete file
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="outline"
+                  disabled={!canUpdateFiles}
+                  shadow={false}
+                  size="tiny"
+                  icon={<IconTrash2 size={16} strokeWidth={2} />}
+                  onClick={() => setSelectedItemsToDelete([file])}
+                >
+                  Delete file
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateFiles && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to delete this file
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
       </Transition>
