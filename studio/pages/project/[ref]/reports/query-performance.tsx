@@ -58,24 +58,27 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const HeaderText = `These reports identify the queries that consume the most time and database resources. It relies on the \`pg_stat_statements\` table.
+  const HeaderText = `Identify the queries that consume the most time and database resources.
 
-  Consider resetting the analysis after optimising your queries. To learn more about query performance, read the [guide on examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
+  It relies on the \`pg_stat_statements\` table. Read more about [examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
+
+  Consider resetting the analysis after optimising any queries.
+
 `
 
-  const TimeConsumingHelperText = `This report presents statistics about queries ordered by their cumulative total execution time. 
+  const TimeConsumingHelperText = `This table lists queries ordered by their cumulative total execution time.
 
   It displays the total time a query has spent running and the proportion of total execution time the query has consumed.
 `
 
-  const MostFrequentHelperText = `This report lists queries in order of their execution count, providing insights into the most frequently executed queries. 
+  const MostFrequentHelperText = `This table lists queries in order of their execution count, providing insights into the most frequently executed queries.
 
   Pay attention to queries with high max_time or mean_time values that are called frequently, as they may benefit from optimization.
 `
 
-  const SlowestExecutionHelperText = `This report displays statistics about queries ordered by their maximum execution time, allowing you to identify outliers with high execution times. While similar to the 'Most frequent' report ordered by calls, this report specifically highlights queries with long execution times that may benefit from optimization. 
-  
-  Keep an eye out for queries with high or mean execution times, as they are often good candidates for optimization.
+  const SlowestExecutionHelperText = `This table lists queries ordered by their maximum execution time. It shows outliers with high execution times. Queries with long execution times may benefit from optimization.
+
+  Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
 
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
@@ -161,7 +164,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         visible={showResetgPgStatStatements}
         title="Reset query performance analysis"
         description={
-          'This will reset the `extensions.pg_stat_statements` table that is used to calculate query performance.'
+          'This will reset the `extensions.pg_stat_statements` table that is used to calculate query performance. This data will repopulate immediately after.'
         }
         buttonLabel="Clear table"
         buttonLoadingLabel="Deleting"
