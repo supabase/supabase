@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { isEmpty } from 'lodash'
 import {
   Button,
@@ -97,6 +96,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
 const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
+    downloadFile,
     selectedBucket,
     selectedFilePreview: file,
     copyFileURLToClipboard,
@@ -181,17 +181,14 @@ const PreviewPane = () => {
 
             {/* Actions */}
             <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
-              <Link href={`${file.previewUrl}&download`}>
-                <a>
-                  <Button
-                    type="default"
-                    icon={<IconDownload size={16} strokeWidth={2} />}
-                    disabled={file.isCorrupted}
-                  >
-                    Download
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                type="default"
+                icon={<IconDownload size={16} strokeWidth={2} />}
+                disabled={file.isCorrupted}
+                onClick={async () => await downloadFile(file)}
+              >
+                Download
+              </Button>
               {selectedBucket.public ? (
                 <Button
                   type="outline"
