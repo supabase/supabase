@@ -1,17 +1,18 @@
+import { partition } from 'lodash'
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { Button, Input, IconPlus, IconSearch, IconX, Badge } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
 import RoleRow from './RoleRow'
-import DeleteRoleModal from './DeleteRoleModal'
 import { SUPABASE_ROLES } from './Roles.constants'
-import { partition } from 'lodash'
 import CreateRolePanel from './CreateRolePanel'
+import DeleteRoleModal from './DeleteRoleModal'
 
 interface Props {
   onSelectRole: (role: any) => void
@@ -25,6 +26,8 @@ const RolesList: FC<Props> = ({}) => {
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+
+  const canUpdateRoles = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
 
   useEffect(() => {
     const getMaxConnectionLimit = async () => {
@@ -149,13 +152,31 @@ const RolesList: FC<Props> = ({}) => {
                 </div>
               </Tooltip.Content>
             </Tooltip.Root>
-            <Button
-              type="primary"
-              icon={<IconPlus size="tiny" />}
-              onClick={() => setIsCreatingRole(true)}
-            >
-              Add role
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="primary"
+                  disabled={!canUpdateRoles}
+                  icon={<IconPlus size="tiny" />}
+                  onClick={() => setIsCreatingRole(true)}
+                >
+                  Add role
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateRoles && (
+                <Tooltip.Content align="start" side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200 text-xs',
+                    ].join(' ')}
+                  >
+                    You need additional permissions to add a new role
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
 
@@ -184,7 +205,12 @@ const RolesList: FC<Props> = ({}) => {
               </div>
             )}
             {otherRoles.map((role: PostgresRole, i: number) => (
-              <RoleRow key={role.id} role={role} onSelectDelete={setSelectedRoleToDelete} />
+              <RoleRow
+                key={role.id}
+                disabled={!canUpdateRoles}
+                role={role}
+                onSelectDelete={setSelectedRoleToDelete}
+              />
             ))}
           </div>
         </div>

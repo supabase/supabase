@@ -5,7 +5,7 @@ This example shows how you can write functions using Oak server middleware (http
 ## Run locally
 
 ```bash
-supabase functions serve oak-server
+supabase functions serve --no-verify-jwt
 ```
 
 Use cURL or Postman to make a POST request to http://localhost:54321/functions/v1/oak-server.
@@ -20,5 +20,5 @@ Use cURL or Postman to make a POST request to http://localhost:54321/functions/v
 ## Deploy
 
 ```bash
-supabase functions deploy oak-server
+supabase functions deploy oak-server --no-verify-jwt
 ```
