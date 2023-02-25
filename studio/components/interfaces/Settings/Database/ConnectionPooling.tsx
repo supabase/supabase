@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
@@ -12,6 +12,7 @@ import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { Input } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {}
 
@@ -127,6 +128,11 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
   ({ projectRef, bouncerInfo, connectionInfo }) => {
     const { ui } = useStore()
 
+    const canUpdateConnectionPoolingConfiguration = checkPermissions(
+      PermissionAction.UPDATE,
+      'projects'
+    )
+
     const [updates, setUpdates] = useState<any>({
       pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
       pool_mode: bouncerInfo.pool_mode || 'transaction',
@@ -198,6 +204,8 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           onChangeModel={(model: any) => setUpdates(model)}
           onSubmit={(model: any) => updateConfig(model)}
           onReset={() => setUpdates(bouncerInfo)}
+          disabled={!canUpdateConnectionPoolingConfiguration}
+          disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
             <ToggleField name="pgbouncer_enabled" />

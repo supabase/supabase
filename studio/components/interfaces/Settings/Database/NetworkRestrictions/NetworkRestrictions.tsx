@@ -1,8 +1,10 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { FC, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useParams } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
 import Panel from 'components/ui/Panel'
 import { FormPanel, FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -12,6 +14,62 @@ import DisallowAllModal from './DisallowAllModal'
 import AllowAllModal from './AllowAllModal'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 
+const AllowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) => void }> = ({
+  disabled,
+  onClick,
+}) => (
+  <Tooltip.Root delayDuration={0}>
+    <Tooltip.Trigger>
+      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
+        Allow all access
+      </Button>
+    </Tooltip.Trigger>
+    {disabled && (
+      <Tooltip.Content align="center" side="bottom">
+        <Tooltip.Arrow className="radix-tooltip-arrow" />
+        <div
+          className={[
+            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+            'border border-scale-200 w-[250px]',
+          ].join(' ')}
+        >
+          <span className="text-xs text-scale-1200">
+            You need additional permissions to update network restrictions
+          </span>
+        </div>
+      </Tooltip.Content>
+    )}
+  </Tooltip.Root>
+)
+
+const DisallowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) => void }> = ({
+  disabled,
+  onClick,
+}) => (
+  <Tooltip.Root delayDuration={0}>
+    <Tooltip.Trigger>
+      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
+        Restrict all access
+      </Button>
+    </Tooltip.Trigger>
+    {disabled && (
+      <Tooltip.Content align="center" side="bottom">
+        <Tooltip.Arrow className="radix-tooltip-arrow" />
+        <div
+          className={[
+            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+            'border border-scale-200 w-[250px]',
+          ].join(' ')}
+        >
+          <span className="text-xs text-scale-1200">
+            You need additional permissions to update network restrictions
+          </span>
+        </div>
+      </Tooltip.Content>
+    )}
+  </Tooltip.Root>
+)
+
 const NetworkRestrictions = ({}) => {
   const { ref } = useParams()
 
@@ -20,6 +78,8 @@ const NetworkRestrictions = ({}) => {
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
+
+  const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config.dbAllowedCidrs ?? []
@@ -48,7 +108,31 @@ const NetworkRestrictions = ({}) => {
                 </Button>
               </a>
             </Link>
-            <Button onClick={() => setIsAddingAddress(true)}>Add restriction</Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  disabled={!canUpdateNetworkRestrictions}
+                  onClick={() => setIsAddingAddress(true)}
+                >
+                  Add restriction
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateNetworkRestrictions && (
+                <Tooltip.Content align="center" side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200 w-[250px]',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to update network restrictions
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
         {isLoading ? (
@@ -75,12 +159,14 @@ const NetworkRestrictions = ({}) => {
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button type="default" onClick={() => setIsAllowingAll(true)}>
-                    Allow all access
-                  </Button>
-                  <Button type="default" onClick={() => setIsDisallowingAll(true)}>
-                    Restrict all access
-                  </Button>
+                  <AllowAllAccessButton
+                    disabled={!canUpdateNetworkRestrictions}
+                    onClick={setIsAllowingAll}
+                  />
+                  <DisallowAllAccessButton
+                    disabled={!canUpdateNetworkRestrictions}
+                    onClick={setIsDisallowingAll}
+                  />
                 </div>
               </div>
             </Panel.Content>
@@ -101,9 +187,10 @@ const NetworkRestrictions = ({}) => {
                   </div>
                 </div>
                 <div>
-                  <Button type="default" onClick={() => setIsDisallowingAll(true)}>
-                    Restrict all access
-                  </Button>
+                  <DisallowAllAccessButton
+                    disabled={!canUpdateNetworkRestrictions}
+                    onClick={setIsDisallowingAll}
+                  />
                 </div>
               </div>
             ) : isDisallowedAll ? (
@@ -125,9 +212,10 @@ const NetworkRestrictions = ({}) => {
                   </div>
                 </div>
                 <div>
-                  <Button type="default" onClick={() => setIsAllowingAll(true)}>
-                    Allow all access
-                  </Button>
+                  <AllowAllAccessButton
+                    disabled={!canUpdateNetworkRestrictions}
+                    onClick={setIsAllowingAll}
+                  />
                 </div>
               </div>
             ) : (
@@ -146,12 +234,14 @@ const NetworkRestrictions = ({}) => {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button type="default" onClick={() => setIsAllowingAll(true)}>
-                      Allow all access
-                    </Button>
-                    <Button type="default" onClick={() => setIsDisallowingAll(true)}>
-                      Restrict all access
-                    </Button>
+                    <AllowAllAccessButton
+                      disabled={!canUpdateNetworkRestrictions}
+                      onClick={setIsAllowingAll}
+                    />
+                    <DisallowAllAccessButton
+                      disabled={!canUpdateNetworkRestrictions}
+                      onClick={setIsDisallowingAll}
+                    />
                   </div>
                 </div>
                 {restrictedIps.map((ip) => {

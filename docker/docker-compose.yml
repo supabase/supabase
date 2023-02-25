@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230127-6bfd87b
+    image: supabase/studio:20230216-e731b77
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
@@ -50,7 +50,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.40.1
+    image: supabase/gotrue:v2.47.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -99,7 +99,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v9.0.1.20220717
+    image: postgrest/postgrest:v10.1.2
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -113,7 +113,7 @@ services:
 
   realtime:
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.1.0
+    image: supabase/realtime:v2.5.1
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -144,7 +144,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.26.1
+    image: supabase/storage-api:v0.28.2
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -193,7 +193,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.59.0
+    image: supabase/postgres-meta:v0.60.7
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -209,7 +209,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.106
+    image: supabase/postgres:15.1.0.42-rc2
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

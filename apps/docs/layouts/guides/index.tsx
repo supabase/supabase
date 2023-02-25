@@ -1,5 +1,6 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
@@ -63,17 +64,27 @@ const Layout: FC<Props> = (props) => {
 
   const hasTableOfContents = tocList.length > 0
 
+  // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
+  // open graph image url constructor
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+    ogPageType ? `&type=${ogPageType}` : ''
+  }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
+    props.meta?.description
+  )}`
 
   return (
     <>
+      <Head>
+        <title>{props.meta?.title} | Supabase Docs</title>
+        <meta name="description" content={props.meta?.description} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta name="twitter:image" content={ogImageUrl} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
       <NextSeo
-        title={`${props.meta?.title} | Supabase Docs`}
-        description={props.meta?.description ? props.meta?.description : props.meta?.title}
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
         openGraph={{
-          title: props.meta?.title,
-          description: props.meta?.description,
           url: `https://supabase.com/docs${asPath}`,
           type: 'article',
           videos: props.meta?.video && [
@@ -90,15 +101,6 @@ const Layout: FC<Props> = (props) => {
             modifiedTime: new Date().toISOString(),
             authors: ['Supabase'],
           },
-          images: [
-            {
-              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
-                ogPageType ? `&type=${ogPageType}` : ''
-              }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
-                props.meta?.description
-              )}`,
-            },
-          ],
         }}
       />
       <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>

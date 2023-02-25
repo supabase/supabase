@@ -761,10 +761,10 @@ commands:
     flags: []
   - id: supabase-functions-serve
     title: supabase functions serve
-    summary: Serve a Function locally
+    summary: Serve all functions locally
     tags: []
     links: []
-    usage: supabase functions serve <Function name> [flags]
+    usage: supabase functions serve [flags]
     subcommands: []
     flags:
       - id: env-file
