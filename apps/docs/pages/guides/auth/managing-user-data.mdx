@@ -40,7 +40,7 @@ You may delete users directly or via the management console at Authentication > 
 
 <Admonition type="caution">
 Please ensure that users do not own any objects before attempting to delete them. If a deletion attempt is made on an owned object, the `storage.objects` table  will raise an error as it contains a foreign key reference to the `auth.users` table.You can individually delete objects using the GUI and you can also empty all objects in a bucket by calling the `.storage.emptyBucket('<bucket_name>')` method in the JavaScript SDK.
-<Admonition type="caution">
+</Admonition type="caution">
 
 ## Public access
 
