@@ -38,6 +38,10 @@ Primary keys are **guaranteed not to change**. Columns, indices, constraints or 
 
 You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do considering making use of a Row Level Security policy as described below.
 
+<Admonition type="caution">
+Please ensure that users do not own any users before attempting to delete them. The `storage.objects` table contains a foreign key reference to the `auth.users` table which will raise an error if a deletion attempt is made on an owned object. To rectify this, you should <consult storage team on recommended solutions>
+<Admonition type="caution">
+
 ## Public access
 
 Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies.
