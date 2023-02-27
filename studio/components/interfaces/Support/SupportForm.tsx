@@ -38,9 +38,9 @@ interface Props {
 }
 
 const SupportForm: FC<Props> = ({ setSentCategory }) => {
-  const { ui, app } = useStore()
   const router = useRouter()
-  const { ref, subject, category } = router.query
+  const { ui, app } = useStore()
+  const { ref, subject, category, message } = router.query
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -108,7 +108,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     organizationSlug: initialOrganizationSlug,
     library: 'no-library',
     subject: subject ?? '',
-    message: '',
+    message: message || '',
     allowSupportAccess: false,
   }
 

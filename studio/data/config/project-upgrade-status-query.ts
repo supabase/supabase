@@ -19,7 +19,8 @@ export type ProjectUpgradingStatusResponse = {
     progress?: DatabaseUpgradeProgress
     status: DatabaseUpgradeStatus
     initiated_at: string
-  }
+    target_version: number
+  } | null
 }
 
 export async function getProjectUpgradingStatus(
