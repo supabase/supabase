@@ -1,11 +1,13 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
+import type { PostgresTable } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import type { PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   selectedTable: PostgresTable
@@ -30,6 +32,7 @@ const ColumnList: FC<Props> = ({
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
   const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
+  const canUpdateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <>
@@ -58,9 +61,32 @@ const ColumnList: FC<Props> = ({
           </div>
           {!isLocked && (
             <div>
-              <Button icon={<IconPlus />} onClick={() => onAddColumn()}>
-                New column
-              </Button>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    disabled={!canUpdateColumns}
+                    icon={<IconPlus />}
+                    onClick={() => onAddColumn()}
+                  >
+                    New column
+                  </Button>
+                </Tooltip.Trigger>
+                {!canUpdateColumns && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to create columns
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </div>
           )}
         </div>
@@ -103,20 +129,59 @@ const ColumnList: FC<Props> = ({
                 </Table.td>
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">
-                    <Button
-                      onClick={() => onEditColumn(x)}
-                      icon={<IconEdit3 />}
-                      style={{ padding: 5 }}
-                      type="text"
-                      disabled={isLocked}
-                    />
-                    <Button
-                      onClick={() => onDeleteColumn(x)}
-                      icon={<IconTrash />}
-                      style={{ padding: 5 }}
-                      type="text"
-                      disabled={isLocked}
-                    />
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          onClick={() => onEditColumn(x)}
+                          icon={<IconEdit3 />}
+                          style={{ padding: 5 }}
+                          type="text"
+                          disabled={!canUpdateColumns || isLocked}
+                        />
+                      </Tooltip.Trigger>
+                      {!canUpdateColumns && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to edit columns
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
+
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          onClick={() => onDeleteColumn(x)}
+                          icon={<IconTrash />}
+                          style={{ padding: 5 }}
+                          type="text"
+                          disabled={!canUpdateColumns || isLocked}
+                        />
+                      </Tooltip.Trigger>
+                      {!canUpdateColumns && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to delete columns
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </Table.td>
               </Table.tr>
