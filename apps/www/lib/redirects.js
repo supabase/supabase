@@ -1857,4 +1857,9 @@ module.exports = [
     source: '/docs/reference/javascript/v0/rpc',
     destination: '/docs/reference/javascript/rpc',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/database-usage',
+    destination: '/docs/guides/platform/database-size',
+  },
 ]
