@@ -50,7 +50,7 @@ const Layout: FC<Props> = (props: Props) => {
       <Head>
         <title>{props.meta?.title} | Supabase</title>
         <meta name="description" content={props.meta?.description} />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/docs/favicon.ico" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={props.meta?.title} />

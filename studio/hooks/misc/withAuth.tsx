@@ -50,6 +50,7 @@ export function withAuth<T>(
     })
 
     usePermissionsQuery({
+      enabled: IS_PLATFORM,
       onSuccess(permissions) {
         ui.setPermissions(permissions)
       },

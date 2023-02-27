@@ -36,7 +36,6 @@ interface SettingsProps {
 
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
-  const projectTier = ui.selectedProject?.subscription_tier
 
   const {
     data: subscription,
