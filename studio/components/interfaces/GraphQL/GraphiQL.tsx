@@ -1,11 +1,9 @@
 /* Based on https://github.com/graphql/graphiql/blob/main/packages/graphiql/src/components/GraphiQL.tsx */
 
 import {
-  Button,
   ChevronDownIcon,
   ChevronUpIcon,
   CopyIcon,
-  Dialog,
   ExecuteButton,
   GraphiQLProvider,
   HeaderEditor,
@@ -15,7 +13,6 @@ import {
   QueryEditor,
   ReloadIcon,
   ResponseEditor,
-  SettingsIcon,
   Spinner,
   Tab,
   Tabs,
@@ -29,10 +26,8 @@ import {
   useMergeQuery,
   usePluginContext,
   usePrettifyEditors,
-  useSchemaContext,
-  useStorageContext,
-  useTheme,
-  VariableEditor,
+  useSchemaContext, useTheme,
+  VariableEditor
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
@@ -69,7 +64,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
-  const storageContext = useStorageContext()
   const pluginContext = usePluginContext()
 
   const copy = useCopyQuery()
@@ -116,8 +110,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         : 'variables'
     }
   )
-  const [showDialog, setShowDialog] = useState<'settings' | null>(null)
-  const [clearStorageStatus, setClearStorageStatus] = useState<'success' | 'error' | null>(null)
 
   const toolbar = (
     <>
@@ -403,66 +395,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               />
             </UnStyledButton>
           </Tooltip>
-          <Tooltip label="Open settings dialog">
-            <UnStyledButton
-              type="button"
-              onClick={() => setShowDialog('settings')}
-              aria-label="Open settings dialog"
-            >
-              <SettingsIcon aria-hidden="true" />
-            </UnStyledButton>
-          </Tooltip>
         </div>
       </div>
-      <Dialog
-        isOpen={showDialog === 'settings'}
-        onDismiss={() => {
-          setShowDialog(null)
-          setClearStorageStatus(null)
-        }}
-      >
-        <div className="graphiql-dialog-header">
-          <div className="graphiql-dialog-title">Settings</div>
-          <Dialog.Close
-            onClick={() => {
-              setShowDialog(null)
-              setClearStorageStatus(null)
-            }}
-          />
-        </div>
-
-        {storageContext ? (
-          <div className="graphiql-dialog-section">
-            <div>
-              <div className="graphiql-dialog-section-title">Clear storage</div>
-              <div className="graphiql-dialog-section-caption">
-                Remove all locally stored data and start fresh.
-              </div>
-            </div>
-            <div>
-              <Button
-                type="button"
-                state={clearStorageStatus || undefined}
-                disabled={clearStorageStatus === 'success'}
-                onClick={() => {
-                  try {
-                    storageContext?.clear()
-                    setClearStorageStatus('success')
-                  } catch {
-                    setClearStorageStatus('error')
-                  }
-                }}
-              >
-                {clearStorageStatus === 'success'
-                  ? 'Cleared data'
-                  : clearStorageStatus === 'error'
-                  ? 'Failed'
-                  : 'Clear data'}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </Dialog>
     </div>
   )
 }
