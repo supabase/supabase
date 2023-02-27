@@ -2,6 +2,7 @@ import { makeObservable, observable, action, computed } from 'mobx'
 import { compact } from 'lodash'
 import { UTILITY_TAB_TYPES } from './SqlEditorStore'
 import MarkdownTable from 'markdown-table'
+import { stripIndent } from 'common-tags'
 
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
@@ -90,19 +91,18 @@ class QueryTab extends Tab {
     const tables = await this.meta.tables.loadBySchema('public')
 
     const createTableQueries = tables.map((table) => {
-      return `CREATE TABLE "${table.schema}"."${table.name}"
-(
-${table.columns
-  .map(
-    (column) =>
-      `    ${column.name} ${column.data_type} ${!column.is_nullable ? ' NOT NULL' : 'NULL'}`
-  )
-  .join(',\n')}
-);
-`
+      return stripIndent`
+        CREATE TABLE "${table.schema}"."${table.name}"
+        (
+        ${table.columns
+          .map(
+            (column) =>
+              `    ${column.name} ${column.data_type} ${!column.is_nullable ? 'NOT NULL' : 'NULL'}`
+          )
+          .join(',\n')}
+        );
+      `
     })
-
-    console.log({ tables, createTableQueries })
 
     const response = await fetch('/api/natural-language', {
       method: 'POST',

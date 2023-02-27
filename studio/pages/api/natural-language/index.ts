@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import apiWrapper from 'lib/api/apiWrapper'
 import { post } from 'lib/common/fetch'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -20,14 +21,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query, tables } = req.body
 
-  const prompt = `Given the following PostgreSQL tables:
-${tables}
+  const prompt = stripIndent`
+    Given the following PostgreSQL tables:
+    ${tables}
 
-Generate a SQL query based on the following natural language prompt:
-${query}
+    Generate a SQL query based on the following natural language prompt:
+    ${query}
 
-SQL query:
-`
+    SQL query:
+  `
 
   const completionOptions = {
     model: 'text-davinci-003',
