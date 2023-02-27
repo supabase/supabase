@@ -1,19 +1,20 @@
+import { useEffect, useMemo, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 
+import { NextPageWithLayout } from 'types'
+import { useParams, useStore } from 'hooks'
+import { API_URL } from 'lib/constants'
+import { getAccessToken } from 'lib/common/fetch'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
-import { useParams, useStore } from 'hooks'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useEffect, useMemo } from 'react'
-import { NextPageWithLayout } from 'types'
-import { IconAlertCircle } from 'ui'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
+  const [accessToken, setAccessToken] = useState<string>()
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
@@ -24,42 +25,22 @@ const GraphiQLPage: NextPageWithLayout = () => {
       meta.schemas.load()
       meta.extensions.load()
     }
+
+    const fetchAccessToken = async () => {
+      const accessToken = await getAccessToken()
+      setAccessToken(accessToken)
+    }
+    fetchAccessToken()
   }, [ui.selectedProject?.ref])
 
-  const {
-    data: settings,
-    isError: isProjectSettingsError,
-    isLoading: isProjectSettingsLoading,
-  } = useProjectApiQuery({
-    projectRef,
-  })
-
-  const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : undefined
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
-
-  const graphqlUrl = `https://${endpoint}/graphql/v1`
+  const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
 
   const fetcher = useMemo(() => {
-    return createGraphiQLFetcher({
-      url: graphqlUrl,
-      fetch,
-    })
+    return createGraphiQLFetcher({ url: graphqlUrl, fetch })
   }, [graphqlUrl])
 
-  if (isProjectSettingsLoading || (isExtensionsLoading && !pgGraphqlExtension)) {
+  if (!accessToken || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
-  }
-
-  if (isProjectSettingsError) {
-    return (
-      <div className="py-8 flex items-center justify-center space-x-2">
-        <IconAlertCircle size={16} strokeWidth={1.5} />
-        <p className="text-sm text-scale-1100">Failed to retrieve API keys</p>
-      </div>
-    )
   }
 
   if (pgGraphqlExtension?.installed_version === null) {
@@ -80,7 +61,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={ui.theme} apiKey={anonKey} />
+  return <GraphiQL fetcher={fetcher} theme={ui.theme} accessToken={accessToken} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
