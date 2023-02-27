@@ -57,7 +57,7 @@ export default function Ticket({
 
   return (
     <div
-      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl"
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[420px]"
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
@@ -70,7 +70,7 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            'relative mx-2 rounded-xl'
+            'relative mx-2 rounded-xl h-[390px]'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
@@ -122,8 +122,8 @@ export default function Ticket({
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
               <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                Generate your ticket. Win the{' '}
-                <span className="gradient-text-purple-500">SupaKeyboard</span>.
+                Generate your ticket. <br />
+                Win the <span className="gradient-text-purple-500">SupaKeyboard</span>.
               </p>
             )}
           </h1>
