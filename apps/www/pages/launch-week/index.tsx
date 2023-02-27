@@ -6,7 +6,7 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
-import { useTheme } from 'ui'
+import { IconArrowDown, useTheme } from 'ui'
 import classNames from 'classnames'
 import styles from './launchWeek.module.css'
 import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
@@ -103,7 +103,13 @@ export default function TicketHome() {
                 defaultPageState="ticket"
               />
             )}
+            <div>
+              <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
+                More about the prizes <IconArrowDown w={10} h={12} />
+              </a>
+            </div>
           </SectionContainer>
+
           <div className="mt-24 relative h-[640px] overflow-hidden">
             <div className="-ml-[24rem] -mr-[24rem]">
               <Image src="/images/launchweek/seven/lw-7-bg.svg" layout="fill" objectFit="cover" />
@@ -116,7 +122,7 @@ export default function TicketHome() {
               <h2 className="text-4xl mt-2">
                 Get your <span className="gradient-text-purple-500">winning ticket</span>
               </h2>
-              <p className="mt-4 radial-gradient-text-scale-500">
+              <p className="mt-4 radial-gradient-text-scale-500" id="lw-7-prizes">
                 Mark your calendars for April 9th and join us on Discord for Launch Week 7's final
                 day to find out if you're one of the lucky winners. Get sharing!
               </p>
