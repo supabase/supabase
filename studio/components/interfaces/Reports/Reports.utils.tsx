@@ -64,16 +64,24 @@ export const usePresetReport = (hooks: PresetHookResult[]) => {
   }
   const isLoading = data.map((datum) => datum.isLoading).some((v) => v)
 
-  const Layout: React.FC<{ title: string }> = ({ title, children }) => (
+  const Layout: React.FC<{ title: string; showDatePickers?: boolean }> = ({
+    title,
+    showDatePickers = true,
+    children,
+  }) => (
     <div className="flex flex-col gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
       <h1 className="text-2xl text-scale-1200">{title}</h1>
       <div className="flex flex-row justify-between">
-        <DatePickers
-          onChange={handleDatepickerChange}
-          to={data[0]?.params?.iso_timestamp_end || ''}
-          from={data[0]?.params?.iso_timestamp_start || ''}
-          helpers={REPORTS_DATEPICKER_HELPERS}
-        />
+        <div>
+          {showDatePickers && (
+            <DatePickers
+              onChange={handleDatepickerChange}
+              to={data[0]?.params?.iso_timestamp_end || ''}
+              from={data[0]?.params?.iso_timestamp_start || ''}
+              helpers={REPORTS_DATEPICKER_HELPERS}
+            />
+          )}
+        </div>
         <Button
           type="default"
           size="tiny"
