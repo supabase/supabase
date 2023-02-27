@@ -18,7 +18,7 @@ export async function getProjectJsonSchema(
     throw new Error('projectRef is required')
   }
 
-  const url = `${API_URL}/projects/${projectRef}/open-api`
+  const url = `${API_URL}/projects/${projectRef}/api/rest`
   const response = await get(url, { signal })
   if (response.error) throw response.error
   return response as ProjectJsonSchemaResponse
