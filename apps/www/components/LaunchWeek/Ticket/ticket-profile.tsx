@@ -66,7 +66,7 @@ export default function TicketProfile({
                 [styles.show]: ticketGenerationState === 'loading',
               })} text-4xl bg-gradient-to-r ${
                 golden ? 'to-[#ffe8af]' : 'to-slate-900'
-              } from-white via-white bg-clip-text text-transparent`}
+              } from-white via-white bg-clip-text text-transparent text-center`}
             >
               {name || username || 'Your Name'}
             </span>
@@ -82,12 +82,11 @@ export default function TicketProfile({
           className={cn(styles.username, { [styles['username-golden']]: golden })}
           id="wayfinder--username--container"
         >
-          <span
-            className={cn(styles.skeleton, styles.wrapper, {
-              [styles.show]: ticketGenerationState === 'loading',
-            })}
-          >
-            <span className={`${golden ? 'text-white' : 'text-scale-1100'}`}>
+          <p className="text-center w-full">
+            <span
+              className={`${golden ? 'text-white' : 'text-scale-1100'}`}
+              id="wayfinding--twitter-handle"
+            >
               {/* <GithubIcon
                 color={golden ? 'var(--gold-primary)' : 'var(--secondary-color)'}
                 size={20 * size}
@@ -103,7 +102,7 @@ export default function TicketProfile({
                 className="ml-2"
               />
             )} */}
-          </span>
+          </p>
         </div>
       </div>
     </div>
