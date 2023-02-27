@@ -12,7 +12,6 @@ export async function get<T = any>(
     const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'GET',
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
@@ -37,7 +36,6 @@ export async function getWithTimeout<T = any>(
     const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'GET',
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
