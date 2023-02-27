@@ -109,6 +109,12 @@ const TableGridEditor: FC<Props> = ({
     setEncryptedColumns(columns)
   }
 
+  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
+    onError(error) {
+      onError(error)
+    },
+  })
+
   function getResourcesFromJsonSchema(value: any) {
     const { paths } = value || {}
     const functionPath = 'rpc/'
@@ -157,6 +163,7 @@ const TableGridEditor: FC<Props> = ({
     }
   }, [selectedTable?.id])
 
+  // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
   }
@@ -245,12 +252,6 @@ const TableGridEditor: FC<Props> = ({
       message: error?.details ?? error?.message ?? error,
     })
   }
-
-  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
-    onError(error) {
-      onError(error)
-    },
-  })
 
   const updateTableRow = (previousRow: any, updatedData: any) => {
     if (!project) return
