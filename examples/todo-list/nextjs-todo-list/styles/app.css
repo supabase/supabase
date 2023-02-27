@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.1.8 | MIT License | https://tailwindcss.com
+! tailwindcss v3.2.7 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -30,6 +30,7 @@
 2. Prevent adjustments of font size after orientation changes in iOS.
 3. Use a more readable tab size.
 4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
 */
 
 html {
@@ -44,6 +45,8 @@ html {
   /* 3 */
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   /* 4 */
+  font-feature-settings: normal;
+  /* 5 */
 }
 
 /*
@@ -410,6 +413,12 @@ video {
   height: auto;
 }
 
+/* Make elements with the HTML hidden attribute stay hidden by default */
+
+[hidden] {
+  display: none;
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -504,26 +513,6 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
-.absolute {
-  position: absolute;
-}
-
-.relative {
-  position: relative;
-}
-
-.inset-0 {
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-}
-
-.my-3 {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
 .mx-4 {
   margin-left: 1rem;
   margin-right: 1rem;
@@ -534,51 +523,25 @@ video {
   margin-bottom: 0.5rem;
 }
 
-.mx-1\.5 {
-  margin-left: 0.375rem;
-  margin-right: 0.375rem;
-}
-
-.mx-1 {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
-}
-
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .mb-1 {
   margin-bottom: 0.25rem;
 }
 
-.mt-3 {
-  margin-top: 0.75rem;
-}
-
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-
-.mr-1 {
-  margin-right: 0.25rem;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.mt-12 {
-  margin-top: 3rem;
+.mb-12 {
+  margin-bottom: 3rem;
 }
 
 .ml-2 {
   margin-left: 0.5rem;
 }
 
-.mb-12 {
-  margin-bottom: 3rem;
+.mt-12 {
+  margin-top: 3rem;
 }
 
 .block {
@@ -589,36 +552,32 @@ video {
   display: flex;
 }
 
-.h-full {
-  height: 100%;
-}
-
 .h-4 {
   height: 1rem;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .min-h-screen {
   min-height: 100vh;
 }
 
-.w-full {
-  width: 100%;
-}
-
-.w-3\/4 {
-  width: 75%;
-}
-
 .w-4 {
   width: 1rem;
 }
 
-.min-w-full {
-  min-width: 100%;
+.w-full {
+  width: 100%;
 }
 
 .min-w-0 {
   min-width: 0px;
+}
+
+.min-w-full {
+  min-width: 100%;
 }
 
 .max-w-sm {
@@ -659,16 +618,12 @@ video {
   white-space: nowrap;
 }
 
-.rounded-md {
-  border-radius: 0.375rem;
-}
-
 .rounded {
   border-radius: 0.25rem;
 }
 
-.border {
-  border-width: 1px;
+.rounded-md {
+  border-radius: 0.375rem;
 }
 
 .border-2 {
@@ -677,34 +632,6 @@ video {
 
 .border-b {
   border-bottom-width: 1px;
-}
-
-.border-t {
-  border-top-width: 1px;
-}
-
-.border-red-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(252 165 165 / var(--tw-border-opacity));
-}
-
-.border-green-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(134 239 172 / var(--tw-border-opacity));
-}
-
-.border-blue-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(37 99 235 / var(--tw-border-opacity));
-}
-
-.border-transparent {
-  border-color: transparent;
-}
-
-.border-gray-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(209 213 219 / var(--tw-border-opacity));
 }
 
 .bg-gray-200 {
@@ -722,19 +649,8 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-gray-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
-}
-
-.bg-green-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 252 231 / var(--tw-bg-opacity));
-}
-
-.bg-blue-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(37 99 235 / var(--tw-bg-opacity));
+.p-2 {
+  padding: 0.5rem;
 }
 
 .p-4 {
@@ -745,38 +661,9 @@ video {
   padding: 1.25rem;
 }
 
-.p-2 {
-  padding: 0.5rem;
-}
-
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-.px-1 {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
-}
-
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 
 .py-4 {
@@ -796,13 +683,9 @@ video {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
 }
 
 .text-base {
@@ -810,14 +693,9 @@ video {
   line-height: 1.5rem;
 }
 
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .font-medium {
@@ -833,40 +711,9 @@ video {
   color: rgb(185 28 28 / var(--tw-text-opacity));
 }
 
-.text-red-400 {
-  --tw-text-opacity: 1;
-  color: rgb(248 113 113 / var(--tw-text-opacity));
-}
-
-.text-green-500 {
-  --tw-text-opacity: 1;
-  color: rgb(34 197 94 / var(--tw-text-opacity));
-}
-
-.text-blue-600 {
-  --tw-text-opacity: 1;
-  color: rgb(37 99 235 / var(--tw-text-opacity));
-}
-
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity));
-}
-
 .shadow {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.shadow-sm {
-  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
@@ -948,11 +795,9 @@ video {
   transition-duration: 150ms;
 }
 
-/* Your own custom utilities */
-
 html,
 body,
-#app {
+#__next {
   height: 100vh;
   min-height: 100vh;
 }
@@ -968,24 +813,9 @@ h1 {
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
 }
 
-.hover\:bg-blue-200:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(191 219 254 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-blue-500:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-gray-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
-}
-
-.focus\:border-blue-700:focus {
-  --tw-border-opacity: 1;
-  border-color: rgb(29 78 216 / var(--tw-border-opacity));
 }
 
 .focus\:bg-gray-200:focus {
@@ -996,11 +826,6 @@ h1 {
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-}
-
-.active\:bg-blue-700:active {
-  --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 640px) {
