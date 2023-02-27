@@ -47,7 +47,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
-    : undefined
+    : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
   const endpointSections = endpoint.split('.')

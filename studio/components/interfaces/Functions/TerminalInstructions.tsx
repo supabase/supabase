@@ -23,7 +23,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
-    : undefined
+    : '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
   const endpointSections = endpoint.split('.')

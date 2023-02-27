@@ -62,7 +62,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   It relies on the \`pg_stat_statements\` table. Read more about [examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
 
-  Consider resetting the analysis after optimising any queries.
+  Consider resetting the analysis after optimizing any queries.
 
 `
 
