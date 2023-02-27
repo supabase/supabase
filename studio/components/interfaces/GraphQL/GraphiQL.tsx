@@ -139,12 +139,19 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     }
   }
 
+  const hasSingleTab = editorContext.tabs.length === 1
+
   return (
     <div className={clsx('graphiql-container', styles.graphiqlContainer)}>
       <div className="graphiql-main">
         <div ref={pluginResize.firstRef} style={{ minWidth: 0 }}>
           <div className={clsx('graphiql-sessions', styles.graphiqlSessions)}>
-            <div className="graphiql-session-header">
+            <div
+              className={clsx(
+                'graphiql-session-header',
+                !hasSingleTab && styles.graphiqlSessionHeader
+              )}
+            >
               <Tabs aria-label="Select active operation">
                 {editorContext.tabs.length > 1 ? (
                   <>
@@ -186,7 +193,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 ) : null}
               </Tabs>
               <div className="graphiql-session-header-right">
-                {editorContext.tabs.length === 1 ? (
+                {hasSingleTab ? (
                   <div className={clsx('graphiql-add-tab-wrapper', styles.graphiqlAddTabWrapper)}>
                     <Tooltip label="Add tab">
                       <UnStyledButton
@@ -210,12 +217,17 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             >
               <div ref={editorResize.firstRef}>
                 <div
-                  className={`graphiql-editors ${styles.graphiqlEditors}${
-                    editorContext.tabs.length === 1 ? ' full-height' : ''
-                  }`}
+                  className={clsx(
+                    'graphiql-editors',
+                    styles.graphiqlEditors,
+                    hasSingleTab && 'full-height'
+                  )}
                 >
                   <div ref={editorToolsResize.firstRef}>
-                    <section className="graphiql-query-editor" aria-label="Query Editor">
+                    <section
+                      className={clsx('graphiql-query-editor', styles.graphiqlQueryEditor)}
+                      aria-label="Query Editor"
+                    >
                       <div className="graphiql-query-editor-wrapper">
                         <QueryEditor />
                       </div>
@@ -309,10 +321,19 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 </div>
               </div>
               <div ref={editorResize.dragBarRef}>
-                <div className="graphiql-horizontal-drag-bar" />
+                <div
+                  className={clsx('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
+                />
               </div>
               <div ref={editorResize.secondRef}>
-                <div className="graphiql-response">
+                <div
+                  className={clsx(
+                    'graphiql-response',
+                    hasSingleTab
+                      ? styles.graphiqlResponseSingleTab
+                      : styles.graphiqlResponseMultiTab
+                  )}
+                >
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
                 </div>
@@ -322,7 +343,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         </div>
 
         <div ref={pluginResize.dragBarRef}>
-          {pluginContext?.visiblePlugin ? <div className="graphiql-horizontal-drag-bar" /> : null}
+          {pluginContext?.visiblePlugin ? (
+            <div
+              className={clsx('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
+            />
+          ) : null}
         </div>
 
         <div
@@ -336,7 +361,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
           <div className="graphiql-plugin">{PluginContent ? <PluginContent /> : null}</div>
         </div>
       </div>
-      <div className="graphiql-sidebar">
+      <div className={clsx('graphiql-sidebar', styles.graphiqlSidebar)}>
         <div className="graphiql-sidebar-section">
           {pluginContext?.plugins.map((plugin) => {
             const isVisible = plugin === pluginContext.visiblePlugin

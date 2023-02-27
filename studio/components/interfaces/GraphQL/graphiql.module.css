@@ -15,8 +15,34 @@
   margin-top: calc(0px - var(--session-header-height));
 }
 
+.graphiqlContainer .graphiqlQueryEditor {
+  @apply border-b border-scale-500;
+}
+
+.graphiqlContainer .graphiqlSessionHeader {
+  background-color: hsl(var(--color-base));
+  @apply border-b border-scale-500;
+}
+
+.graphiqlContainer .graphiqlResponseSingleTab {
+  margin-top: calc(24px - var(--session-header-height));
+}
+
+.graphiqlContainer .graphiqlResponseMultiTab {
+  padding-top: 16px;
+}
+
+.graphiqlContainer .graphiqlSidebar {
+  @apply border-l border-scale-500;
+}
+
+.graphiqlHorizontalDragBar {
+  @apply border-l border-scale-500;
+}
+
 .graphiqlAddTabWrapper {
   padding: var(--px-12);
+  @apply z-10;
 }
 
 /* Colors */
