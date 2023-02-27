@@ -26,12 +26,12 @@ import {
   useMergeQuery,
   usePluginContext,
   usePrettifyEditors,
-  useSchemaContext, useTheme,
-  VariableEditor
+  useSchemaContext,
+  useTheme,
+  VariableEditor,
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
-import 'graphiql/graphiql.css'
 import { useEffect, useState } from 'react'
 import styles from './graphiql.module.css'
 

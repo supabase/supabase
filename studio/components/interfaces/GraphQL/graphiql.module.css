@@ -45,7 +45,8 @@
   @apply z-10;
 }
 
-/* Colors */
+/* Variables */
+
 :global(body.graphiql-dark) .graphiqlContainer {
   --color-base: 0, 0%, 11%;
   --color-primary: 153, 50%, 50%;
@@ -54,4 +55,9 @@
 :global(body.graphiql-light) .graphiqlContainer {
   --color-base: 210, 17%, 98%;
   --color-primary: 153, 50%, 50%;
+}
+
+.graphiqlContainer {
+  --font-family: theme(fontFamily.sans);
+  --font-family-mono: theme(fontFamily.mono);
 }
