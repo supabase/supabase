@@ -122,17 +122,12 @@ const TableGridEditor: FC<Props> = ({
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = settings?.autoApiService?.restUrl
 
   const {
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
 
