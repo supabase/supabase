@@ -103,11 +103,11 @@ export async function handler(req: Request) {
             {/* Background ai  */}
             <img
               width="1027"
-              height="520"
+              height="524"
               style={{
                 borderRadius: '8px',
                 position: 'absolute',
-                top: '55',
+                top: '53',
                 left: '87',
                 zIndex: '-8000',
               }}
@@ -155,25 +155,36 @@ export async function handler(req: Request) {
                 textAlign: 'center',
               }}
             >
-              <p
+              <div
                 style={{
                   // border: '3px solid green',
-                  margin: '0',
-                  fontSize: '60px',
-                  lineHeight: '60px',
+                  display: 'flex',
+                  color: 'transparent',
+                  backgroundImage:
+                    'linear-gradient(180deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
+                  backgroundClip: 'text',
                 }}
               >
-                {name ?? username}
-              </p>
+                <p
+                  style={{
+                    margin: '0',
+                    fontSize: '50px',
+                    lineHeight: '65px',
+                  }}
+                >
+                  {name ?? username}
+                </p>{' '}
+              </div>
 
               {/* Username */}
               <div
                 style={{
                   // border: '3px solid blue',/
                   color: '#EDEDED',
+                  opacity: 0.8,
                   display: 'flex',
-                  fontSize: '25',
-                  marginTop: '10px',
+                  fontSize: '20',
+                  marginTop: '0px',
                 }}
               >
                 <span>{`@${username}`}</span>
@@ -194,11 +205,12 @@ export async function handler(req: Request) {
               width: '575',
               height: '175',
               transform: 'rotate(90deg)',
+              opacity: 0.8,
             }}
           >
             <p
               style={{
-                fontSize: '70',
+                fontSize: '60',
               }}
             >
               {`No ${prefix}${ticketNumber}`}
