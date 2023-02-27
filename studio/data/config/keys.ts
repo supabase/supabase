@@ -6,5 +6,7 @@ export const configKeys = {
     ['projects', projectRef, 'jwt-secret-updating-status'] as const,
   storage: (projectRef: string | undefined) => ['projects', projectRef, 'storage'] as const,
   upgradeEligibility: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'upgradeEligibility'] as const,
+    ['projects', projectRef, 'upgrade-eligibility'] as const,
+  upgradeStatus: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'upgrade-status'] as const,
 }

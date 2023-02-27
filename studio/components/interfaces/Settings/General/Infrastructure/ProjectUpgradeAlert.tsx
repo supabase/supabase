@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import {
   Alert,
@@ -11,9 +12,9 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useParams } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'
 import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
@@ -21,6 +22,8 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 interface Props {}
 
 const ProjectUpgradeAlert: FC<Props> = ({}) => {
+  const router = useRouter()
+  const { app, ui } = useStore()
   const { ref } = useParams()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
@@ -34,11 +37,24 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const onConfirmUpgrade = async (values: any, { setSubmitting, resetForm }: any) => {
     setSubmitting(true)
 
-    // const response = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
-    //   target_version: values.version,
-    // })
-
-    setSubmitting(true)
+    const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
+      target_version: values.version,
+    })
+    if (res.error) {
+      ui.setNotification({
+        category: 'error',
+        error: res.error,
+        message: `Failed to upgrade: ${res.error.message}`,
+      })
+      setSubmitting(false)
+    } else {
+      const projectId = ui.selectedProject?.id
+      if (projectId !== undefined) {
+        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.UPGRADING)
+        ui.setNotification({ category: 'success', message: 'Upgrading project' })
+        router.push(`/project/${ref}`)
+      }
+    }
   }
 
   return (
@@ -63,7 +79,6 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
           {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
-            console.log({ values, isSubmitting })
             return (
               <>
                 <div className="py-6">
