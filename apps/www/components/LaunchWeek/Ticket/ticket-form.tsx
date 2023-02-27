@@ -9,6 +9,9 @@ import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 import LoadingDots from './loading-dots'
 import formStyles from './form.module.css'
 import ticketFormStyles from './ticket-form.module.css'
+import { Button, IconCheck, IconCheckCircle, IconLoader } from 'ui'
+
+console.log('SITE_ORIGIN', SITE_ORIGIN)
 
 type FormState = 'default' | 'loading' | 'error'
 type TicketGenerationState = 'default' | 'loading'
@@ -103,7 +106,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
         await supabase.auth.signInWithOAuth({
           provider: 'github',
           options: {
-            redirectTo: `${SITE_ORIGIN}/launch-week/tickets${
+            redirectTo: `${SITE_ORIGIN}/launch-week/${
               userData.username ? '?referral=' + userData.username : ''
             }`,
           },
@@ -113,16 +116,26 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
     >
       <div className="flex flex-col gap-3">
         <div>
-          <button
-            type="submit"
-            className="rounded-full bg-scale-400 py-1 px-3 border border-scale-500 dark:text-white text-sm mb-1 transition-all ease-out hover:bg-scale-500"
+          <Button
+            type="secondary"
+            htmlType="submit"
             disabled={formState === 'loading' || Boolean(session)}
           >
             <span className={`${username && 'text-scale-900'}`}>
-              {session ? '<check>Connect with GitHub' : 'Connect with GitHub'}
+              {session ? (
+                <>
+                  <IconCheckCircle />
+                  Connect with Github
+                </>
+              ) : (
+                <span className="flex items-center gap-2">
+                  {formState === 'loading' && <IconLoader size={14} className="animate-spin" />}
+                  Connect with Github
+                </span>
+              )}
             </span>
             {session ? <span className={ticketFormStyles.checkIcon}></span> : null}
-          </button>
+          </Button>
         </div>
         {/* {!session && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>} */}
       </div>

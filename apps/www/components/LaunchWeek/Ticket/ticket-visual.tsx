@@ -60,17 +60,15 @@ export default function TicketVisual({
             </div>*/}
           </div>
         </div>
-
         <div className={cn(styles['horizontal-ticket'], 'wayfinding--TicketMono-container')}>
           <TicketMono golden={golden} />
         </div>
-
         <div className={styles['vertical-ticket']}>
           <TicketMonoMobile golden={golden} />
         </div>
 
         <div
-          className="absolute top-[90px] w-full lg:top-1/2 flex justify-center"
+          className="absolute top-[90px] lg:-translate-y-1/2  w-full lg:top-1/2 flex justify-center"
           id="wayfinding--TicketProfile-container"
         >
           <TicketProfile
@@ -82,7 +80,6 @@ export default function TicketVisual({
             golden={golden}
           />
         </div>
-
         {ticketNumber && <TicketNumber number={ticketNumber} />}
       </div>
     </>
