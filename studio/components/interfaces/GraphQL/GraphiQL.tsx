@@ -9,7 +9,6 @@ import {
   ExecuteButton,
   GraphiQLProvider,
   HeaderEditor,
-  KeyboardShortcutIcon,
   MergeIcon,
   PlusIcon,
   PrettifyIcon,
@@ -117,7 +116,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         : 'variables'
     }
   )
-  const [showDialog, setShowDialog] = useState<'settings' | 'short-keys' | null>(null)
+  const [showDialog, setShowDialog] = useState<'settings' | null>(null)
   const [clearStorageStatus, setClearStorageStatus] = useState<'success' | 'error' | null>(null)
 
   const logo = <GraphiQLLogo />
@@ -389,15 +388,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               />
             </UnStyledButton>
           </Tooltip>
-          <Tooltip label="Open short keys dialog">
-            <UnStyledButton
-              type="button"
-              onClick={() => setShowDialog('short-keys')}
-              aria-label="Open short keys dialog"
-            >
-              <KeyboardShortcutIcon aria-hidden="true" />
-            </UnStyledButton>
-          </Tooltip>
           <Tooltip label="Open settings dialog">
             <UnStyledButton
               type="button"
@@ -409,102 +399,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
           </Tooltip>
         </div>
       </div>
-      <Dialog isOpen={showDialog === 'short-keys'} onDismiss={() => setShowDialog(null)}>
-        <div className="graphiql-dialog-header">
-          <div className="graphiql-dialog-title">Short Keys</div>
-          <Dialog.Close onClick={() => setShowDialog(null)} />
-        </div>
-        <div className="graphiql-dialog-section">
-          <div>
-            <table className="graphiql-table">
-              <thead>
-                <tr>
-                  <th>Short key</th>
-                  <th>Function</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">F</code>
-                  </td>
-                  <td>Search in editor</td>
-                </tr>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">K</code>
-                  </td>
-                  <td>Search in documentation</td>
-                </tr>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">Enter</code>
-                  </td>
-                  <td>Execute query</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">P</code>
-                  </td>
-                  <td>Prettify editors</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">M</code>
-                  </td>
-                  <td>Merge fragments definitions into operation definition</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">C</code>
-                  </td>
-                  <td>Copy query</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">R</code>
-                  </td>
-                  <td>Re-fetch schema using introspection</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              The editors use{' '}
-              <a
-                href="https://codemirror.net/5/doc/manual.html#keymaps"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                CodeMirror Key Maps
-              </a>{' '}
-              that add more short keys. This instance of Graph<em>i</em>QL uses <code>sublime</code>
-              .
-            </p>
-          </div>
-        </div>
-      </Dialog>
       <Dialog
         isOpen={showDialog === 'settings'}
         onDismiss={() => {
