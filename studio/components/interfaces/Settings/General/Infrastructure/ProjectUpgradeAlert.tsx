@@ -29,7 +29,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const initialValues = { version: data?.target_upgrade_versions?.[0] ?? 0 }
+  const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
 
   const onConfirmUpgrade = async (values: any, { setSubmitting, resetForm }: any) => {
     setSubmitting(true)
@@ -120,9 +120,16 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                         label="Select the version of Postgres to upgrade to"
                         descriptionText={`Your project's Postgres will be upgraded from ${currentPgVersion} to ${values.version}`}
                       >
-                        {data?.target_upgrade_versions.map((version: number) => (
-                          <Listbox.Option key={version} value={version} label={`${version}`}>
-                            {version}
+                        {data?.target_upgrade_versions.map((version) => (
+                          <Listbox.Option
+                            key={version.postgres_version}
+                            value={version.postgres_version}
+                            label={`${version.postgres_version} (${
+                              version.app_version.split('supabase-postgres-')[1]
+                            })`}
+                          >
+                            {version.postgres_version} (
+                            {version.app_version.split('supabase-postgres-')[1]})
                           </Listbox.Option>
                         ))}
                       </Listbox>

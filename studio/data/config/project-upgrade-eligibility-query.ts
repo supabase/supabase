@@ -10,7 +10,7 @@ export type ProjectUpgradeEligibilityResponse = {
   eligible: boolean
   current_app_version: string
   latest_app_version: string
-  target_upgrade_versions: number[]
+  target_upgrade_versions: { postgres_version: number; app_version: string }[]
   requires_manual_intervention: string | null
   potential_breaking_changes: string[]
 }
