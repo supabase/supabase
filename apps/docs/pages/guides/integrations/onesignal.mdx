@@ -8,7 +8,7 @@ export const meta = {
   video: 'https://www.youtube.com/v/mw0DLwItue4',
 }
 
-[OneSignal](https://onesignal.com/) is a tool that allows you to send messages across different channels such as the following to keep your users engaged. 
+[OneSignal](https://onesignal.com/) is a tool that allows you to send messages across different channels such as the following to keep your users engaged.
 
 - Push notifications
 - SMS
@@ -35,7 +35,6 @@ We will create a simple ordering app and use Supabase Database Webhooks in conju
 You can find the complete example app along with the edge functions code to send the notifications [here](https://github.com/supabase-community/onesignal).
 
 ![Ordering app UI](/docs/img/guides/integrations/onesignal/app-ui.png)
-
 
 ## Step 1: Getting started
 
@@ -80,8 +79,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 const Home: NextPage = () => {
   const [user, setUser] = useState<User | null>(null)
 
-  const [oneSignalInitialized, setOneSignalInitialized] =
-    useState<boolean>(false)
+  const [oneSignalInitialized, setOneSignalInitialized] = useState<boolean>(false)
 
   /**
    * Initializes OneSignal SDK for a given Supabase User ID
@@ -123,9 +121,7 @@ const Home: NextPage = () => {
     const { price } = Object.fromEntries(new FormData(event.currentTarget))
     if (typeof price !== 'string') return
 
-    const { error } = await supabase
-      .from('orders')
-      .insert({ price: Number(price) })
+    const { error } = await supabase.from('orders').insert({ price: Number(price) })
     if (error) {
       alert(error.message)
     }
@@ -142,15 +138,13 @@ const Home: NextPage = () => {
 
     initialize()
 
-    const authListener = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        const user = session?.user ?? null
-        setUser(user)
-        if (user) {
-          initializeOneSignal(user.id)
-        }
+    const authListener = supabase.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user ?? null
+      setUser(user)
+      if (user) {
+        initializeOneSignal(user.id)
       }
-    )
+    })
 
     return () => {
       authListener.data.subscription.unsubscribe()
@@ -175,10 +169,7 @@ const Home: NextPage = () => {
               <option value="200">$200</option>
               <option value="300">$300</option>
             </select>
-            <button
-              type="submit"
-              className="py-1 px-4 text-lg bg-green-400 rounded"
-            >
+            <button type="submit" className="py-1 px-4 text-lg bg-green-400 rounded">
               Place an Order
             </button>
           </form>
@@ -190,10 +181,7 @@ const Home: NextPage = () => {
               name="email"
               placeholder="Email"
             />
-            <button
-              type="submit"
-              className="py-1 px-4 text-lg bg-green-400 rounded"
-            >
+            <button type="submit" className="py-1 px-4 text-lg bg-green-400 rounded">
               Send Magic Link
             </button>
           </form>
@@ -211,7 +199,7 @@ There is quite a bit of stuff going on here, but basically, it’s creating a si
 Notice that inside the `initializeOneSignal()` function, we are setting the Supabase user ID as an [external user ID of OneSignal](https://documentation.onesignal.com/docs/external-user-ids). This allows us to later send push notifications to the user using their Supabase user ID from the backend, which is very handy.
 
 ```tsx
-await OneSignal.setExternalUserId(uid);
+await OneSignal.setExternalUserId(uid)
 ```
 
 The front-end side of things is done here. Let’s get into the backend.
@@ -237,7 +225,7 @@ supabase functions new notify
 Replace the contents of `supabase/functions/notify/index.ts` with the following
 
 ```tsx
-import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import * as OneSignal from 'https://esm.sh/@onesignal/node-onesignal@1.0.0-beta7'
 
 const _OnesignalAppId_ = Deno.env.get('ONESIGNAL_APP_ID')!
@@ -263,12 +251,9 @@ serve(async (req) => {
     }
     const onesignalApiRes = await onesignal.createNotification(notification)
 
-    return new Response(
-      JSON.stringify({ onesignalResponse: onesignalApiRes }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return new Response(JSON.stringify({ onesignalResponse: onesignalApiRes }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (err) {
     console.error('Failed to create OneSignal notification', err)
     return new Response('Server error.', {
@@ -295,7 +280,6 @@ ONESIGNAL_REST_API_KEY=YOUR_ONESIGNAL_REST_API_KEY
 
 ![Where to find OneSignal User Auth Key](/docs/img/guides/integrations/onesignal/onesignal-api-key.png)
 
-
 Once your environment variables are filled in, you can run the following command to set the environment variable.
 
 ```bash
@@ -313,35 +297,35 @@ supabase functions deploy notify --no-verify-jwt
 Finally, we get to set up the database! Run the following SQL to set up the `orders` table.
 
 ```sql
-create table if not exists public.orders (
-    id uuid not null primary key default uuid_generate_v4(),
-    created_at timestamptz not null default now(),
-    user_id uuid not null default auth.uid(),
+create table
+  if not exists public.orders (
+    id uuid not null primary key default uuid_generate_v4 (),
+    created_at timestamptz not null default now (),
+    user_id uuid not null default auth.uid (),
     price int8 not null
-);
+  );
 ```
 
 As you can see, the `orders` table has 4 columns and 3 of them have default values. That means all we need to send from the front-end app is the price. That is why our insert statement looked very simple.
 
 ```tsx
 const { error } = await supabase.from('orders').insert({
-      price: 100,
-    })
+  price: 100,
+})
 ```
 
 Let’s also set up the webhook so that whenever a new row is inserted in the `orders` table, it calls the edge function. Go to `Database > Webhooks` and create a new Database Webhook. The table should be set to `orders` and Events should be inserted. The type should be HTTP Request, the HTTP method should be POST, and the URL should be the URL of your edge function. Hit confirm to save the webhook configuration.
 
 ![Supabase Webhooks configuration](/docs/img/guides/integrations/onesignal/webhook.png)
 
-At this point, the app should be complete! Run your app locally with `npm run dev`, or deploy your app to a hosting service and see how you receive a push notification when you place an order! 
+At this point, the app should be complete! Run your app locally with `npm run dev`, or deploy your app to a hosting service and see how you receive a push notification when you place an order!
 Remember that if you decide to deploy your app to a hosting service, you would need to create another OneSignal app configured for your local address.
 
 ![Ordering app UI](/docs/img/guides/integrations/onesignal/app-ui.png)
 
-
 ## Resources
 
-This particular example was using Next.js, but you can apply the same principles to implement send push notification, SMS, Emails, and in-app-notifications  on other platforms as well. 
+This particular example was using Next.js, but you can apply the same principles to implement send push notification, SMS, Emails, and in-app-notifications on other platforms as well.
 
 - [OneSignal + Flutter + Supabase example](https://github.com/OneSignalDevelopers/onesignal-supabase-sample-integration-supabase)
 - [OneSignal Mobile Quickstart](https://documentation.onesignal.com/docs/mobile-sdk-setup)

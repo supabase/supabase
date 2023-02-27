@@ -1,6 +1,6 @@
-import 'https://deno.land/x/xhr@0.3.0/mod.ts'
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0'
+import 'xhr_polyfill'
+import { serve } from 'std/server'
+import { CreateCompletionRequest } from 'openai'
 
 serve(async (req) => {
   const { query } = await req.json()
