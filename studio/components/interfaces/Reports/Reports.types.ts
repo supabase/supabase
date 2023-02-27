@@ -4,6 +4,7 @@ import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 export enum Presets {
   API = 'api',
   AUTH = 'auth',
+  QUERY_PERFORMANCE = 'query_performance',
 }
 
 export interface QueryDataBase {
