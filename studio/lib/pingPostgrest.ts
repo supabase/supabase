@@ -46,7 +46,7 @@ export default pingPostgrest
  * @return true if there's no error else false
  */
 async function pingOpenApi(ref: string, timeout?: number) {
-  const { error } = await headWithTimeout(`${API_URL}/projects/${ref}/open-api`, [], {
+  const { error } = await headWithTimeout(`${API_URL}/projects/${ref}/api/rest`, [], {
     timeout: timeout ?? DEFAULT_TIMEOUT_MILLISECONDS,
   })
   return error === undefined
