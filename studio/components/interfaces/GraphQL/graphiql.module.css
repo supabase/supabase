@@ -15,6 +15,10 @@
   margin-top: calc(0px - var(--session-header-height));
 }
 
+.graphiqlAddTabWrapper {
+  padding: var(--px-12);
+}
+
 /* Colors */
 :global(body.graphiql-dark) .graphiqlContainer {
   --color-base: 0, 0%, 11%;

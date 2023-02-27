@@ -37,7 +37,7 @@ import {
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
 import 'graphiql/graphiql.css'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './graphiql.module.css'
 
 export type GraphiQLProps = {
@@ -119,8 +119,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const [showDialog, setShowDialog] = useState<'settings' | null>(null)
   const [clearStorageStatus, setClearStorageStatus] = useState<'success' | 'error' | null>(null)
 
-  const logo = <GraphiQLLogo />
-
   const toolbar = (
     <>
       <ToolbarButton onClick={() => prettify()} label="Prettify query (Shift-Ctrl-P)">
@@ -140,13 +138,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
       pluginResize.setHiddenElement(null)
     }
   }
-
-  const modifier =
-    window.navigator.platform.toLowerCase().indexOf('mac') === 0 ? (
-      <code className="graphiql-key">Cmd</code>
-    ) : (
-      <code className="graphiql-key">Ctrl</code>
-    )
 
   return (
     <div className={clsx('graphiql-container', styles.graphiqlContainer)}>
@@ -196,7 +187,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               </Tabs>
               <div className="graphiql-session-header-right">
                 {editorContext.tabs.length === 1 ? (
-                  <div className="graphiql-add-tab-wrapper">
+                  <div className={clsx('graphiql-add-tab-wrapper', styles.graphiqlAddTabWrapper)}>
                     <Tooltip label="Add tab">
                       <UnStyledButton
                         type="button"
@@ -209,7 +200,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                     </Tooltip>
                   </div>
                 ) : null}
-                {logo}
               </div>
             </div>
             <div
@@ -451,27 +441,5 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     </div>
   )
 }
-
-// Configure the UI by providing this Component as a child of GraphiQL.
-function GraphiQLLogo<TProps>(props: PropsWithChildren<TProps>) {
-  return (
-    <div className="graphiql-logo">
-      {props.children || (
-        <a
-          className="graphiql-logo-link"
-          href="https://github.com/graphql/graphiql"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Graph
-          <em>i</em>
-          QL
-        </a>
-      )}
-    </div>
-  )
-}
-
-GraphiQLLogo.displayName = 'GraphiQLLogo'
 
 export default GraphiQL
