@@ -174,9 +174,9 @@ If you want to learn more about Prisma, check out the [docs](https://www.prisma.
 
 ### Missing grants
 
-If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to reset your database schema. If you chose yes, it will delete the public schema and recreate it. The default grants are missing after this.
+If your database schema is out of sync from your migration history, `prisma migrate dev` will detect a migration history conflict or a [schema drift](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development#schema-drift). When `prisma migrate dev` detects the drift, it might ask to to reset your database schema. If you choose yes, it will delete the `public` schema along with the default grants defined in your database.
 
- If you run into this problem, create a draft migration using `prisma migrate dev --create-only`, and add the following helper SQL:
+If you run into this problem, create a draft migration using `prisma migrate dev --create-only`, and add the following helper SQL:
 
 ```sql
 grant usage on schema public to postgres, anon, authenticated, service_role;
