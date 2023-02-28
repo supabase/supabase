@@ -5,9 +5,11 @@ author: simon_grimm
 image: WIP
 thumb: WIP
 tags:
-  - postgres
-  - planetpg
-date: '2023-02-17'
+  - ionic
+  - postgis
+  - geoqueries
+  - storage
+date: '2023-02-28'
 toc_depth: 3
 ---
 
@@ -15,7 +17,7 @@ Does your app need to handle geo data like latitude, longitude, or distance betw
 
 Then Supabase got you covered again as you can unlock all of this with the **PostGIS** extension!
 
-![Supabase Postgis app Ionic](./supabase-gis.png)
+![Supabase Postgis app Ionic](/images/blog/2023-02-28-geoqueries-postgis/supabase-gis.png)
 
 In this tutorial you will learn to:
 
@@ -37,7 +39,7 @@ To get started we need a new Supabase project. If you don't have a Supabase acco
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
-![Supabase new project](./supabase-project-setup.png)
+![Supabase new project](/images/blog/2023-02-28-geoqueries-postgis/supabase-project-setup.png)
 
 After a minute your project should be ready, and we can configure our tables and extensions with SQL.
 
@@ -64,7 +66,7 @@ create extension postgis with schema extensions;
 
 You can now find this and many other extensions under **Database** -> **Extensions**:
 
-![Supabase extensions](./supabase-extensions.png)
+![Supabase extensions](/images/blog/2023-02-28-geoqueries-postgis/supabase-extensions.png)
 
 It's as easy as that, and we can now create the rest of our table structure.
 
@@ -405,7 +407,7 @@ At this point, you can already log the values, but we can also quickly display t
 
 If you open the modal, you should now see a list like this after your position was loaded:
 
-![Ionic nearby list](./ionic-nearby.png)
+![Ionic nearby list](/images/blog/2023-02-28-geoqueries-postgis/ionic-nearby.png)
 
 It looks so easy - but so many things are already coming together at this point:
 
@@ -578,7 +580,7 @@ The view is not really special and simply holds a bunch of input fields that are
 
 As a result, you should have a clean input modal:
 
-![Ionic add store](./ionic-inputs.png)
+![Ionic add store](/images/blog/2023-02-28-geoqueries-postgis/ionic-inputs.png)
 
 Give your storage inserter a try and add some places around you - they should be available in your nearby list immediately!
 
@@ -735,7 +737,7 @@ capacitor-google-map {
 
 Now the map should fill the whole screen.
 
-![Capacitor antive map](./capacitor-map.png)
+![Capacitor antive map](/images/blog/2023-02-28-geoqueries-postgis/capacitor-map.png)
 
 This brings us to the last missing piece…
 
@@ -910,7 +912,7 @@ That means we also need the real ID of that object, and so we create an array `a
 
 At this point, you should be able to see markers on your map. If you can't see them, zoom out and you might find them.
 
-![Ionic map with marker](./ionic-map-marker.png)
+![Ionic map with marker](/images/blog/2023-02-28-geoqueries-postgis/ionic-map-marker.png)
 
 To wrap this up, let's take a look at one more cool Supabase feature.
 
@@ -1039,7 +1041,7 @@ This will now be used to trigger an **inline modal**, so we don't need to come u
 
 Because we also used `breakpoints` and the `initialBreakpoint` properties of the modal we get this nice bottom sheet modal UI whenever we click on a marker:
 
-![Ionic marker modal with image](./ionic-marker-with-image.png)
+![Ionic marker modal with image](/images/blog/2023-02-28-geoqueries-postgis/ionic-marker-with-image.png)
 
 And with that, we have finished our Ionic app with Supabase geo-queries using PostGIS!
 
