@@ -108,7 +108,7 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="users-table-container mt-4 overflow-visible px-6">
+      <section className="thin-scrollbars mt-4 overflow-visible px-6">
         <div className="section-block--body relative overflow-x-auto rounded">
           <div className="inline-block min-w-full align-middle">
             <UsersList />
