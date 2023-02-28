@@ -1,0 +1,49 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'pgsodium',
+  title: 'pgsodium: Encryption Features',
+  description: 'Encryption library for PostgreSQL',
+}
+
+[pgsodium](https://github.com/michelp/pgsodium) is a PostgreSQL extension which provides SQL access to libsodium's high-level cryptographic algorithms. It also enables some Postgres specific features including:
+
+- [Server Key Management](https://github.com/michelp/pgsodium#server-key-management)
+- [Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption)
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pgsodium" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+{/* prettier-ignore */}
+```sql
+-- Enable the "pgsodium" extension
+create extension pgsodium;
+
+-- Disable the "pgsodium" extension
+drop extension if exists pgsodium;
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- Official [`pgsodium` documentation](https://github.com/michelp/pgsodium)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -200,6 +200,28 @@ limit 100
 `,
     for: ['database'],
   },
+  {
+    label: 'Storage Object Requests',
+    description: 'Number of requests done on Storage Objects',
+    mode: 'custom',
+    searchString: `select
+    r.method as http_verb,
+    r.path as filepath,
+    count(*) as num_requests
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) AS r
+    cross join unnest(r.headers) AS h
+  where
+    path like '%rest/v1/object%'
+  group by 
+    r.path, r.method
+  order by
+    num_requests desc
+  limit 100
+`,
+    for: ['api'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {

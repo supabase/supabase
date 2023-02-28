@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconKey } from 'ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
@@ -11,6 +10,7 @@ import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import LangSelector from 'components/interfaces/Docs/LangSelector'
 
 const PageContext = createContext(null)
 
@@ -77,22 +77,12 @@ const DocView: FC<any> = observer(({}) => {
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = data?.autoApiService?.restUrl
-
-  const canReadServiceKey = checkPermissions(
-    PermissionAction.READ,
-    'service_api_keys.service_role_key'
-  )
 
   const {
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
@@ -104,7 +94,7 @@ const DocView: FC<any> = observer(({}) => {
 
   if (error || jsonSchemaError)
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-scale-1000">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
@@ -113,7 +103,7 @@ const DocView: FC<any> = observer(({}) => {
     )
   if (!data || !jsonSchema || !PageState.jsonSchema)
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
@@ -129,81 +119,17 @@ const DocView: FC<any> = observer(({}) => {
   const PAGE_KEY: any = resource || rpc || page || 'index'
 
   return (
-    <div className="Docs h-full w-full overflow-y-auto" key={PAGE_KEY}>
+    <div className="w-full h-full overflow-y-auto Docs Docs--api-page" key={PAGE_KEY}>
       <div className="Docs--inner-wrapper">
-        <div className="sticky top-0 z-40 flex w-full flex-row-reverse ">
-          <div className="bg-scale-100 dark:bg-scale-300" style={{ width: '50%' }}>
-            <div className="z-0 flex ">
-              <button
-                type="button"
-                onClick={() => setSelectedLang('js')}
-                className={`${
-                  selectedLang == 'js'
-                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
-              >
-                JavaScript
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedLang('bash')}
-                className={`${
-                  selectedLang == 'bash'
-                    ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
-                    : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-                } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
-              >
-                Bash
-              </button>
-              {selectedLang == 'bash' && (
-                <div className="flex">
-                  <div className="flex items-center gap-2 p-1 pl-2 text-xs text-scale-900">
-                    <IconKey size={12} strokeWidth={1.5} />
-                    <span>Project API key :</span>
-                  </div>
-                  <Dropdown
-                    align="end"
-                    side="bottom"
-                    className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
-                    overlay={
-                      <>
-                        <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
-                          hide
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          key="anon"
-                          onClick={() =>
-                            setShowApiKey({
-                              key: anonKey,
-                              name: 'anon (public)',
-                            })
-                          }
-                        >
-                          anon (public)
-                        </Dropdown.Item>
-                        {canReadServiceKey && (
-                          <Dropdown.Item
-                            key="service"
-                            onClick={() =>
-                              setShowApiKey({
-                                key: autoApiService.serviceApiKey,
-                                name: 'service_role (secret)',
-                              })
-                            }
-                          >
-                            service_role (secret)
-                          </Dropdown.Item>
-                        )}
-                      </>
-                    }
-                  >
-                    <Button type="default">{showApiKey.name}</Button>
-                  </Dropdown>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="sticky top-0 z-40 flex flex-row-reverse w-full ">
+          <LangSelector
+            selectedLang={selectedLang}
+            setSelectedLang={setSelectedLang}
+            showApiKey={showApiKey}
+            setShowApiKey={setShowApiKey}
+            apiKey={anonKey}
+            autoApiService={autoApiService}
+          />
         </div>
         <div className="">
           {resource ? (

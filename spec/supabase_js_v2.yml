@@ -356,6 +356,7 @@ functions:
     notes: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
+      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -2257,6 +2258,9 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+        description: |
+          When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
+          to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
