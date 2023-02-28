@@ -38,17 +38,9 @@ export default function TicketActions({ username, golden = false }: Props) {
     }
   }, [downloadUrl])
 
-  const ActionStyle = ({ children }: any) => {
-    return (
-      <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-sm mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
-        {children}
-      </div>
-    )
-  }
-
   return (
-    <>
-      <ActionStyle>
+    <div className="grid gap-1">
+      <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
         <a
           href={tweetUrl}
           rel="noopener noreferrer"
@@ -56,58 +48,49 @@ export default function TicketActions({ username, golden = false }: Props) {
           className="flex items-center justify-center gap-2"
         >
           <div className="text-scale-900">
-            <IconCheckCircle size={12} strokeWidth={1.5} />
+            <IconCheckCircle size={10} strokeWidth={1} />
           </div>
           Connect with Github
         </a>
-      </ActionStyle>
-      <ActionStyle>
+      </div>
+      <div
+        className={`rounded-md ${
+          userData.sharedOnTwitter ? 'bg-[#E6E8EB]' : ''
+        }  text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
+      >
         <a
           href={tweetUrl}
           rel="noopener noreferrer"
           target="_blank"
           className="flex items-center justify-center gap-2"
         >
-          <div className="text-scale-900">
-            <IconTwitter size={12} strokeWidth={1.5} />
-          </div>
-          Tweet it
+          {userData.sharedOnTwitter && (
+            <div className="text-scale-900">
+              <IconCheckCircle size={10} strokeWidth={1} />
+            </div>
+          )}
+          Share on Twitter
         </a>
-      </ActionStyle>
-      <ActionStyle>
+      </div>
+      <div
+        className={`rounded-md ${
+          userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
+        }   py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3] hover:text-scale-500`}
+      >
         <a
           href={linkedInUrl}
           rel="noopener noreferrer"
           target="_blank"
           className="flex items-center justify-center gap-2"
         >
-          <div className="text-scale-900">
-            <IconLinkedin size={12} strokeWidth={1.5} />
-          </div>
+          {userData.sharedOnLinkedIn && (
+            <div className="text-scale-900">
+              <IconCheckCircle size={10} strokeWidth={1} />
+            </div>
+          )}
           Share on Linkedin
         </a>
-      </ActionStyle>
-      <ActionStyle>
-        <a
-          href={loading ? undefined : downloadUrl}
-          onClick={(e) => {
-            if (imgReady) return
-
-            e.preventDefault()
-            downloadLink.current = e.currentTarget
-            // Wait for the image download to finish
-            setLoading(true)
-          }}
-          download="ticket.png"
-          className="flex items-center justify-center gap-2"
-        >
-          <div className="text-scale-900">
-            <IconDownload size={12} strokeWidth={1.5} />
-          </div>
-          Download
-          {loading ? <LoadingDots size={4} /> : <>{/* <IconDownload width={24} /> Download */}</>}
-        </a>
-      </ActionStyle>
-    </>
+      </div>
+    </div>
   )
 }
