@@ -7,6 +7,7 @@ import TicketMonoMobile from './ticket-mono-mobile'
 import cn from 'classnames'
 import { useRouter } from 'next/router'
 import { DATE } from '~/lib/constants'
+import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -28,6 +29,7 @@ export default function TicketVisual({
   setTicketGenerationState,
   golden = false,
 }: Props) {
+  const { session } = useConfData()
   // golden = true
 
   const router = useRouter()
@@ -39,6 +41,7 @@ export default function TicketVisual({
         className={[
           styles.visual,
           golden ? styles['visual--gold'] : '',
+          session ? styles['visual--logged-in'] : '',
           'flex  relative flex-col justify-between rounded-xl bg-black ',
         ].join(' ')}
         style={{

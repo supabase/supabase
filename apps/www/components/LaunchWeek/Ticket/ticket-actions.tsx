@@ -40,7 +40,7 @@ export default function TicketActions({ username, golden = false }: Props) {
 
   const ActionStyle = ({ children }: any) => {
     return (
-      <div className="rounded-full bg-white dark:bg-scale-400 dark:hover:bg-scale-500 py-1 px-3 border border-scale-500 dark:text-white text-sm mb-1 transition-all ease-out hover:bg-scale-500">
+      <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-sm mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
         {children}
       </div>
     )
@@ -53,12 +53,12 @@ export default function TicketActions({ username, golden = false }: Props) {
           href={tweetUrl}
           rel="noopener noreferrer"
           target="_blank"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2"
         >
           <div className="text-scale-900">
             <IconCheckCircle size={12} strokeWidth={1.5} />
           </div>
-          Connect with github
+          Connect with Github
         </a>
       </ActionStyle>
       <ActionStyle>
@@ -66,7 +66,7 @@ export default function TicketActions({ username, golden = false }: Props) {
           href={tweetUrl}
           rel="noopener noreferrer"
           target="_blank"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2"
         >
           <div className="text-scale-900">
             <IconTwitter size={12} strokeWidth={1.5} />
@@ -79,7 +79,7 @@ export default function TicketActions({ username, golden = false }: Props) {
           href={linkedInUrl}
           rel="noopener noreferrer"
           target="_blank"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2"
         >
           <div className="text-scale-900">
             <IconLinkedin size={12} strokeWidth={1.5} />
@@ -99,7 +99,7 @@ export default function TicketActions({ username, golden = false }: Props) {
             setLoading(true)
           }}
           download="ticket.png"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2"
         >
           <div className="text-scale-900">
             <IconDownload size={12} strokeWidth={1.5} />

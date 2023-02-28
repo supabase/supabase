@@ -31,6 +31,11 @@
   /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
 }
 
+.visual--logged-in {
+  background-image: url('/images/launchweek/seven/lw-7-bg.svg');
+  background-size: cover;
+}
+
 @media (max-width: 768px) {
   .visual {
     background-size: cover;
