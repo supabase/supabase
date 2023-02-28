@@ -55,14 +55,16 @@ export default function TicketActions({ username, golden = false }: Props) {
       </div>
       <div
         className={`rounded-md ${
-          userData.sharedOnTwitter ? 'bg-[#E6E8EB]' : ''
+          userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
         }  text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
       >
         <a
           href={tweetUrl}
           rel="noopener noreferrer"
           target="_blank"
-          className="flex items-center justify-center gap-2"
+          className={`flex items-center justify-center gap-2 ${
+            userData.sharedOnTwitter ? 'text-scale-500' : 'text-white hover:text-scale-500'
+          }`}
         >
           {userData.sharedOnTwitter && (
             <div className="text-scale-900">
@@ -75,13 +77,15 @@ export default function TicketActions({ username, golden = false }: Props) {
       <div
         className={`rounded-md ${
           userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
-        }   py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3] hover:text-scale-500`}
+        }  text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
       >
         <a
           href={linkedInUrl}
           rel="noopener noreferrer"
           target="_blank"
-          className="flex items-center justify-center gap-2"
+          className={`flex items-center justify-center gap-2 ${
+            userData.sharedOnLinkedIn ? 'text-scale-500' : 'text-white hover:text-scale-500'
+          }`}
         >
           {userData.sharedOnLinkedIn && (
             <div className="text-scale-900">

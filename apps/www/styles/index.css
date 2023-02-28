@@ -696,6 +696,10 @@ launch week
     background-image: -webkit-linear-gradient(45deg, #902dfb 17%, #d87bf5 97%);
   }
 
+  .gradient-text-gold-500 {
+    background-image: -webkit-linear-gradient(45deg, #e4b641 100%, #f5bf0069 41%);
+  }
+
   .radial-gradient-text-scale-500 {
     background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.35) 100%);
   }
