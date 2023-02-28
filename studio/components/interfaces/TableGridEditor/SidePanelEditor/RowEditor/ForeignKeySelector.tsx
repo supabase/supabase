@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SidePanel, IconLoader, IconXCircle } from 'ui'
 import type { PostgresRelationship } from '@supabase/postgres-meta'
 
@@ -7,13 +7,13 @@ import InputField from './InputField'
 import { RowField } from './RowEditor.types'
 import { generateRowFieldsWithoutColumnMeta } from './RowEditor.utils'
 
-interface Props {
+export interface ForeignKeySelectorProps {
   visible: boolean
   referenceRow?: { loading: boolean; foreignKey: any; row: any }
   closePanel: () => void
 }
 
-const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) => {
+const ForeignKeySelector = ({ visible, referenceRow, closePanel }: ForeignKeySelectorProps) => {
   const loading = referenceRow?.loading ?? true
   const foreignKey: PostgresRelationship = referenceRow?.foreignKey ?? undefined
   const row = referenceRow?.row ?? undefined
@@ -36,7 +36,7 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       size="large"
       header={
         <div>
-          Viewing reference row from{' '}
+          Selecting foreign key for{' '}
           <code className="text-sm">
             {foreignKey?.target_table_schema ?? ''}.{foreignKey?.target_table_name ?? ''}
           </code>
@@ -74,4 +74,4 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
   )
 }
 
-export default ReferenceRowViewer
+export default ForeignKeySelector

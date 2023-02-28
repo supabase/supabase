@@ -1,28 +1,28 @@
 import { FC } from 'react'
-import { isUndefined, includes } from 'lodash'
+import { isUndefined, includes, noop } from 'lodash'
 import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
 import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
 
-interface Props {
+export interface InputFieldProps {
   field: RowField
   errors: any
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
-  onViewForeignKey?: () => void
+  onSelectForeignKey?: () => void
 }
 
-const InputField: FC<Props> = ({
+const InputField = ({
   field,
   errors,
   isEditable = true,
-  onUpdateField = () => {},
-  onEditJson = () => {},
-  onViewForeignKey = () => {},
-}) => {
+  onUpdateField = noop,
+  onEditJson = noop,
+  onSelectForeignKey = noop,
+}: InputFieldProps) => {
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
     if (isArray) {
@@ -99,14 +99,8 @@ const InputField: FC<Props> = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button
-            disabled={field.value === null || field.value?.length === 0}
-            type="default"
-            htmlType="button"
-            onClick={onViewForeignKey}
-            icon={<IconLink />}
-          >
-            View data
+          <Button type="default" htmlType="button" onClick={onSelectForeignKey} icon={<IconLink />}>
+            Select
           </Button>
         }
       />
