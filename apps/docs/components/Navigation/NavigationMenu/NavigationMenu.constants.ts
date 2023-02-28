@@ -542,6 +542,7 @@ export const realtime = {
       items: [
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
         { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
     },
   ],
