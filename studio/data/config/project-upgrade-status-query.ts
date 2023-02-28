@@ -45,6 +45,8 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
     ...options
   }: UseQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
 ) => {
+  const client = useQueryClient()
+
   return useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>(
     configKeys.upgradeStatus(projectRef),
     ({ signal }) => getProjectUpgradingStatus({ projectRef }, signal),
@@ -58,6 +60,12 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
           response.databaseUpgradeStatus.status === DatabaseUpgradeStatus.Upgrading ? 5000 : false
         return interval
       },
+      onSuccess(data) {
+        const response = data as unknown as ProjectUpgradingStatusResponse
+        if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
+          client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
+        }
+      },
       ...options,
     }
   )
@@ -68,6 +76,7 @@ export const useProjectUpgradingStatusPrefetch = ({
 }: ProjectUpgradingStatusVariables) => {
   const client = useQueryClient()
 
+  //[josheh] need to invalidate the eligibility key
   return useCallback(() => {
     if (projectRef) {
       client.prefetchQuery(configKeys.upgradeStatus(projectRef), ({ signal }) =>
