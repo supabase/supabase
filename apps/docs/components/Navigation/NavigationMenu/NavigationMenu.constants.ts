@@ -509,16 +509,26 @@ export const realtime = {
   label: 'Realtime',
   url: '/guides/realtime',
   items: [
-    { name: 'Overview', url: '/guides/realtime', items: [] },
-    { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-    { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
     {
-      name: 'Discover',
+      name: 'Overview',
       url: undefined,
-      items: [{ name: 'Architecture', url: '/guides/realtime/architecture', items: [] }],
+      items: [{ name: 'Realtime', url: '/guides/realtime', items: [] }],
     },
     {
-      name: 'Extensions',
+      name: 'Quickstart',
+      url: undefined,
+      items: [{ name: 'multiplayer.dev', url: '/guides/realtime/quickstart', items: [] }],
+    },
+    {
+      name: 'Features',
+      url: undefined,
+      items: [
+        { name: 'Extensions', url: '/guides/realtime/extensions', items: [] },
+        { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+      ],
+    },
+    {
+      name: 'Guides',
       url: undefined,
       items: [
         { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
@@ -527,9 +537,12 @@ export const realtime = {
       ],
     },
     {
-      name: 'Administer',
+      name: 'Discover',
       url: undefined,
-      items: [{ name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] }],
+      items: [
+        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+      ],
     },
   ],
 }
