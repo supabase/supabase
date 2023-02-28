@@ -1,23 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 
 import { NextPageWithLayout } from 'types'
 import { useParams, useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { getAccessToken } from 'lib/common/fetch'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
+import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
-  const [accessToken, setAccessToken] = useState<string>()
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
+  const { data: accessToken } = useSessionAccessTokenQuery()
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {
@@ -25,12 +25,6 @@ const GraphiQLPage: NextPageWithLayout = () => {
       meta.schemas.load()
       meta.extensions.load()
     }
-
-    const fetchAccessToken = async () => {
-      const accessToken = await getAccessToken()
-      setAccessToken(accessToken)
-    }
-    fetchAccessToken()
   }, [ui.selectedProject?.ref])
 
   const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
