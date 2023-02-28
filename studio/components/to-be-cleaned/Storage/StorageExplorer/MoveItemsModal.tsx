@@ -1,7 +1,15 @@
-import { useEffect, useState } from 'react'
-import { Modal, Button, Input, Space } from 'ui'
+import { FC, useEffect, useState } from 'react'
+import { Modal, Button, Input } from 'ui'
 
-const MoveItemsModal = ({
+interface Props {
+  bucketName: string
+  visible: boolean
+  selectedItemsToMove: any[]
+  onSelectCancel: () => void
+  onSelectMove: (path: string) => void
+}
+
+const MoveItemsModal: FC<Props> = ({
   bucketName = '',
   visible = false,
   selectedItemsToMove = [],
@@ -21,14 +29,14 @@ const MoveItemsModal = ({
   const title = multipleFiles
     ? `Moving ${selectedItemsToMove.length} items within ${bucketName}`
     : selectedItemsToMove.length === 1
-    ? `Moving ${selectedItemsToMove[0].name} within ${bucketName}`
+    ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
     : ``
 
   const description = `Enter the path to where you'd like to move the file${
     multipleFiles ? 's' : ''
   } to.`
 
-  const onConfirmMove = (event) => {
+  const onConfirmMove = (event: any) => {
     if (event) {
       event.preventDefault()
     }

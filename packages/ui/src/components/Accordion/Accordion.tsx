@@ -39,8 +39,8 @@ interface AccordionProps {
   iconPosition?: Align
   onChange?: (item: string | string[]) => void
   openBehaviour: 'single' | 'multiple'
-  type: Type
-  size: Size
+  type?: Type
+  size?: Size
   defaultValue?: string | string[] | undefined
   justified?: Boolean
   chevronAlign?: Align
@@ -98,7 +98,7 @@ function Accordion({
         className={containerClasses.join(' ')}
         children={
           <AccordionContext.Provider value={{ ...contextValue }}>
-            <div className={containerClasses.join(' ')}>{children}</div>
+            <div>{children}</div>
           </AccordionContext.Provider>
         }
       ></RadixAccordion.Root>

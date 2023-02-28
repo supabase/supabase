@@ -10,7 +10,6 @@ import 'styles/contextMenu.scss'
 import 'styles/react-data-grid-logs.scss'
 import 'styles/date-picker.scss'
 import 'styles/grid.scss'
-import 'styles/users-table.scss'
 
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
