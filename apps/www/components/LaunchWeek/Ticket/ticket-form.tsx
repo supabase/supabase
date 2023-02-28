@@ -11,8 +11,6 @@ import formStyles from './form.module.css'
 import ticketFormStyles from './ticket-form.module.css'
 import { Button, IconCheck, IconCheckCircle, IconLoader } from 'ui'
 
-console.log('SITE_ORIGIN', SITE_ORIGIN)
-
 type FormState = 'default' | 'loading' | 'error'
 type TicketGenerationState = 'default' | 'loading'
 
