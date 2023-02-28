@@ -24,8 +24,6 @@ export default function TicketCopy({ username }: Props) {
     }
   }, [])
 
-  const copiedText = <span className="text-xs text-scale-1200">Copied!</span>
-
   // background: none;
   // outline: none;
   // border: none;
@@ -41,7 +39,7 @@ export default function TicketCopy({ username }: Props) {
     <button
       type="button"
       name="Copy"
-      className="text-scale-900 hover:text-scale-1200 w-21 flex items-center cursor-pointer"
+      className="bg-[#E6E8EB] text-scale-500 text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-md"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -52,13 +50,17 @@ export default function TicketCopy({ username }: Props) {
         })
       }}
     >
-      {copied ? (
-        <div className="text-brand-900">
-          <IconCheck size={14} />
-        </div>
-      ) : (
-        <IconCopy size={14} />
-      )}
+      <div className="flex items-center gap-1 ">
+        {copied ? (
+          <>
+            <IconCheck size={14} /> Copied!
+          </>
+        ) : (
+          <>
+            <IconCopy size={14} /> Copy your unique URL{' '}
+          </>
+        )}
+      </div>
     </button>
   )
 
@@ -67,11 +69,10 @@ export default function TicketCopy({ username }: Props) {
       className={cn(
         styleUtils.appear,
         styleUtils['appear-third'],
-        'bg-scaleA-200 h-8 rounded border border-scale-400 w-full'
+        'bg-scaleA-200 h-8 rounded-md border border-scale-1100 w-full'
       )}
     >
-      <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20">
-        <div className="text-scale-900 text-sm hidden lg:flex">Your ticket URL:</div>
+      <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20 bg-[#D9D9D94D]">
         <div className="flex items-center truncate">
           <p
             className={['text-xs font-mono text-scale-1200 truncate'].join(' ')}
@@ -95,10 +96,7 @@ export default function TicketCopy({ username }: Props) {
             {url}
           </p>
         </div>
-        <div className="absolute right-3 with-auto height-auto flex items-center">
-          {copied && copiedText}
-          {copyButton}
-        </div>
+        <div className="absolute right-1 with-auto height-auto flex items-center">{copyButton}</div>
       </div>
     </div>
   )

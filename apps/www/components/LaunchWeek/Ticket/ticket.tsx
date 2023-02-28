@@ -13,6 +13,7 @@ import TicketCopy from './ticket-copy'
 import { DATE, SITE_NAME } from '~/lib/constants'
 import Form from './form'
 import { UserData } from './hooks/use-conf-data'
+import ReferralIndicator from '../ReferralIndicator'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -86,7 +87,7 @@ export default function Ticket({
         {!sharePage && (
           <>
             {username ? (
-              <div className="flex flex-col gap-6 py-4 mx-8">
+              <div className="flex flex-col gap-6 py-4 mx-3">
                 <div>
                   <TicketCopy username={username} />
                 </div>
@@ -112,12 +113,11 @@ export default function Ticket({
           `}
         >
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
-            {sharePage ? (
-              name ? (
-                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{name}'s ticket</p>
-              ) : (
-                <p className="text-3xl dark:text-scale-1200 tracking-[0.02rem]">{SITE_NAME}</p>
-              )
+            {name ? (
+              <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                You're <span className="gradient-text-purple-500">in the draw!</span> <br />
+                Now make it gold.
+              </p>
             ) : golden ? (
               <p className="text-xl dark:text-scale-1200 tracking-[0.02rem]">Congratulations!</p>
             ) : (
@@ -142,13 +142,19 @@ export default function Ticket({
               </>
             ) : (
               <>
-                <p>
-                  We have some fantastic swag up for grabs, including 3x limited edition mechanical
-                  keyboard that you won't want to miss.
-                </p>
-                {username && (
+                {username ? (
+                  <>
+                    <p>
+                      Why stop there? Increase your chances of winning by sharing your unique
+                      ticket. Get sharing!
+                    </p>
+
+                    <ReferralIndicator referrals={referrals} />
+                  </>
+                ) : (
                   <p>
-                    {`<<<<`} Referrals: {referrals} {`>>>>`}
+                    We have some fantastic swag up for grabs, including 3x limited edition
+                    mechanical keyboard that you won't want to miss.
                   </p>
                 )}
               </>
