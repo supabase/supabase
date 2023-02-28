@@ -58,7 +58,11 @@ const GraphiQL = ({ fetcher, theme = 'dark', accessToken }: GraphiQLProps) => {
   return (
     <GraphiQLProvider
       fetcher={fetcher}
-      defaultHeaders={JSON.stringify({ Authorization: `Bearer ${accessToken}` })}
+      defaultHeaders={
+        accessToken !== undefined
+          ? JSON.stringify({ Authorization: `Bearer ${accessToken}` })
+          : undefined
+      }
     >
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
