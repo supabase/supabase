@@ -34,7 +34,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
 
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
 
-  const onConfirmUpgrade = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
 
     const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
@@ -52,7 +52,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       if (projectId !== undefined) {
         app.onProjectStatusUpdated(projectId, PROJECT_STATUS.UPGRADING)
         ui.setNotification({ category: 'success', message: 'Upgrading project' })
-        router.push(`/project/${ref}`)
+        router.push(`/project/${ref}?upgradeInitiated=true`)
       }
     }
   }

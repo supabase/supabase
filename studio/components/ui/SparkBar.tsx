@@ -3,7 +3,7 @@ import { FC } from 'react'
 interface Props {
   value: number
   max?: number
-  type?: string
+  type?: 'horizontal' | 'vertical'
   labelTop?: string
   labelBottom?: string
   barClass?: string
@@ -16,7 +16,7 @@ const SparkBar: FC<Props> = ({
   value = 0,
   barClass = '',
   bgClass = '',
-  type = '',
+  type = 'vertical',
   borderClass = '',
   labelBottom = '',
   labelTop = '',
@@ -30,7 +30,9 @@ const SparkBar: FC<Props> = ({
       <div className="flex flex-col w-full">
         {hasLabels && (
           <div className="flex align-baseline justify-between pb-1 space-x-8">
-            <span className="text-scale-1200 text-sm truncate">{labelBottom}</span>
+            <span className="text-scale-1200 text-sm truncate capitalize-sentence">
+              {labelBottom}
+            </span>
             <span className="text-scale-1100 text-sm tabular-nums">{labelTop}</span>
           </div>
         )}
@@ -40,7 +42,7 @@ const SparkBar: FC<Props> = ({
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div
-            className={`absolute rounded inset-x-0 bottom-0 h-1 ${barClass}`}
+            className={`absolute rounded inset-x-0 bottom-0 h-1 ${barClass} transition-all`}
             style={{ width: widthCss }}
           ></div>
         </div>

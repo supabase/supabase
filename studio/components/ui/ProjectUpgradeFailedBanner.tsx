@@ -6,11 +6,12 @@ import { useParams } from 'hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
+// [Joshen] Think twice about the category though - it doesn't correspond
+
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref })
-  const { target_version, status, progress, initiated_at, error } =
-    data?.databaseUpgradeStatus ?? {}
+  const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
   const isAcknowledged = localStorage.getItem(key) === 'true'
@@ -22,7 +23,7 @@ const ProjectUpgradeFailedBanner = () => {
     .format('DD MMM YYYY HH:mm:ss')
 
   const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Progress state: ${progress}%0A• Error: ${error}`
+  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Target Version: ${target_version}%0A• Error: ${error}`
 
   const acknowledgeMessage = () => {
     setShowMessage(false)
@@ -36,13 +37,13 @@ const ProjectUpgradeFailedBanner = () => {
       <Alert
         withIcon
         variant={'warning'}
-        title={`Postgres version upgrade to ${target_version} was not successful`}
+        title={`Postgres version upgrade to ${target_version} was not successful (Initiated at ${initiatedAtUTC} UTC)`}
         actions={
           <div className="flex h-full items-center space-x-4">
             <Link
               href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
             >
-              <a>
+              <a target="_blank">
                 <Button type="default">Contact support</Button>
               </a>
             </Link>
@@ -55,8 +56,8 @@ const ProjectUpgradeFailedBanner = () => {
           </div>
         }
       >
-        Your request to upgrade your project's Postgres on {initiatedAtUTC} was not successful.
-        Please reach out to us via our support form.
+        Your project and its data are not affected. Please reach out to us via our support form for
+        assistance with the upgrade.
       </Alert>
     </div>
   )
