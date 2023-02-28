@@ -126,6 +126,7 @@ export default MyApp
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
 ```jsx lines=2,8 title=pages/_app.tsx
+import '../styles/globals.css';
 import { useState } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -166,7 +167,8 @@ npm install @supabase/auth-ui-react
 Add the `Auth` component to your home page
 
 ```jsx title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home = () => {
