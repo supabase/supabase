@@ -10,6 +10,8 @@ export type UserData = {
   name?: string
   golden?: boolean
   referrals?: number
+  sharedOnTwitter?: string
+  sharedOnLinkedIn?: string
 }
 
 type ConfDataContextType = {

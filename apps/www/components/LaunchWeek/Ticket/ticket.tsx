@@ -149,7 +149,7 @@ export default function Ticket({
                       ticket. Get sharing!
                     </p>
 
-                    <ReferralIndicator referrals={referrals} />
+                    <ReferralIndicator />
                   </>
                 ) : (
                   <p>
