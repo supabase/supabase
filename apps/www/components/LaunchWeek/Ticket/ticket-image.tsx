@@ -16,7 +16,7 @@ export default function TicketImage() {
               rel="stylesheet"
             />
           </Head>
-          <TicketVisual
+          {/* <TicketVisual
             size={1700 / 650}
             username={query.username ? query.username.toString() : undefined}
             ticketNumber={parseInt(query.ticketNumber.toString(), 10)}
@@ -28,7 +28,7 @@ export default function TicketImage() {
                 : undefined
             }
             golden={query.golden ? true : false}
-          />
+          /> */}
         </div>
       </div>
     )
