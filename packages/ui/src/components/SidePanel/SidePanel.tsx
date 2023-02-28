@@ -22,7 +22,7 @@ interface CustomProps {
   children?: React.ReactNode
   header?: string | React.ReactNode
   visible: boolean
-  size?: 'medium' | 'large' | 'xlarge'
+  size?: 'medium' | 'large' | 'xlarge' | 'xxlarge'
   loading?: boolean
   align?: 'right' | 'left'
   hideFooter?: boolean
@@ -67,7 +67,12 @@ const SidePanel = ({
       <Button disabled={loading} type="default" onClick={() => (onCancel ? onCancel() : null)}>
         {cancelText}
       </Button>
-      <Button loading={loading} onClick={() => (onConfirm ? onConfirm() : null)}>
+      <Button
+        htmlType="submit"
+        disabled={loading}
+        loading={loading}
+        onClick={() => (onConfirm ? onConfirm() : null)}
+      >
         {confirmText}
       </Button>
     </div>

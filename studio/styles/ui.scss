@@ -224,8 +224,38 @@
     @apply border-b flex border-scale-500;
   }
 
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--client-libraries {
+    flex-direction: column;
+    margin-bottom: 40px;
+
+    .text,
+    .code {
+      width: 100%;
+      max-width: none;
+    }
+    .code {
+      margin-bottom: 20px;
+    }
+  }
+
   .doc-section article:first-child {
     @apply prose prose-docs prose-sm max-w-none;
+  }
+
+  &.Docs--table-editor .doc-section__table-name {
+    @apply mt-12;
   }
 
   .text {
@@ -239,7 +269,7 @@
     a {
       @apply transition;
     }
-    
+
     a:hover {
       @apply text-brand-1000;
     }
@@ -269,6 +299,9 @@
     .is-highlighted {
       @apply text-brand-900;
     }
+  }
+  .codeblock-container + .codeblock-container {
+    @apply mt-12;
   }
 }
 
@@ -333,4 +366,50 @@
 
 .pitr-listbox {
   @apply md:gap-x-2;
+}
+
+.roles-toggle {
+  label {
+    @apply mt-1;
+  }
+}
+
+.thin-scrollbars {
+  scrollbar-width: thin;
+  scrollbar-color: var(--colors-slate9) var(--colors-slate1);
+
+  .dark & {
+    scrollbar-color: var(--colors-slate10) var(--colors-slate3o);
+  }
+
+  ::-webkit-scrollbar {
+    background: var(--colors-slate2);
+    height: 3px;
+    width: 0px;
+    border-radius: 0;
+
+    .dark & {
+      background: var(--colors-slate6);
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px var(--colors-slate6);
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate8);
+    }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: var(--colors-slate9);
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
+    }
+  }
 }
