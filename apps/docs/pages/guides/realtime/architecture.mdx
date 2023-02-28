@@ -11,6 +11,8 @@ Realtime is a globally distributed Erlang cluster. Clients can connect to any no
 
 Realtime is written in [Elixir](https://elixir-lang.org/) (a flavor of Erlang) and utilizes many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
 
+![Global Architecture](/docs/img/guides/realtime/realtime-arch.png)
+
 ## Elixir & Phoenix
 
 Phoenix is fast and able to handle millions of concurrent connections.
@@ -18,14 +20,6 @@ Phoenix is fast and able to handle millions of concurrent connections.
 Phoenix can handle many concurrent connections because Erlang provides lightweight processes to work with (not Linux processes).
 
 Client-facing WebSocket servers need to handle many concurrent connections. Elixir & Phoenix let the Supbase Realtime cluster do this easily.
-
-## Extensions
-
-Extensions are pluggable feature sets enabled by initializing a Realtime connection with certain message types.
-
-[Broadcast](/docs/guides/realtime/broadcast), [Presence](/docs/guides/realtime/presence) and [Posgres Changes](/docs/guides/realtime/postgres-changes) are all Realtime Extensions. Some Extensions, like Postgres Changes, require backend configuration to be saved on the cluster before use.
-
-For example, Realtime needs your database credentials to know how to connect to your database and you don't want to send those over a client connection.
 
 ## Global Cluster
 
@@ -58,18 +52,6 @@ Realtime delivers changes by polling the replication slot and appending connecti
 Connection IDs are Erlang processes representing underlying sockets on the cluster. These IDs are globally unique and messages to processes are routed automatically by the Erlang virtual machine.
 
 After receiving results from the polling query, with connection IDs appended, Realtime delivers records to those connections.
-
-## Channels
-
-Channels are a `topic` you define when you initialize your Supabase Realtime client. Everyone connected to the same Channel will receive the same messages.
-
-Clients can send and receive messages bi-directionally over a Channel. The Realtime backend can also push messages to all clients connected to the same Channel.
-
-A single client can receive change records from Postgres, Broadcast messages from other clients and Presence updates all over the same Channel.
-
-Channels are implemented over [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
-
-The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
