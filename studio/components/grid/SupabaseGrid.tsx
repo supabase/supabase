@@ -74,7 +74,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const table = props.table
 
   const { project } = useProjectContext()
-  const { data } = useTableRowsQuery(
+  const { data, isLoading, isRefetching } = useTableRowsQuery(
     {
       queryKey: [table.schema, table.name],
       projectRef: project?.ref,
@@ -199,7 +199,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         headerActions={headerActions}
       />
       <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} updateRow={props.updateTableRow} />
-      <Footer />
+      <Footer isLoading={isLoading || isRefetching} />
       <Shortcuts gridRef={gridRef} />
       {mounted && createPortal(<RowContextMenu table={table} />, document.body)}
     </div>

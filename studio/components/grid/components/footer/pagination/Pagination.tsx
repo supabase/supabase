@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from 'ui'
 import { useUrlState } from 'hooks'
@@ -23,9 +23,11 @@ const rowsPerPageOptions = [
   { value: 1000, label: '1000 rows' },
 ]
 
-type PaginationProps = {}
+export interface PaginationProps {
+  isLoading?: boolean
+}
 
-const Pagination: FC<PaginationProps> = () => {
+const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const [page, setPage] = useState<number | null>(state.page)
@@ -174,7 +176,7 @@ const Pagination: FC<PaginationProps> = () => {
           <p className="text-sm text-scale-1100">{`${data.count.toLocaleString()} ${
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
-          {state.isLoading && <IconLoader size={14} className="animate-spin" />}
+          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
         </>
       )}
 
