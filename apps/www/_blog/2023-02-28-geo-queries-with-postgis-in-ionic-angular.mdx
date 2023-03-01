@@ -936,28 +936,19 @@ For this, add two new functions to our **src/app/services/stores.service.ts**:
   }
 
   async getStoreImage(id: number) {
-    // Get an image for a store and transform it automatically!
+    // Get image for a store and transform it automatically!
     return this.supabase.storage
       .from('stores')
-      .download(`images/${id}.png`, {
+      .getPublicUrl(`images/${id}.png`, {
         transform: {
           width: 300,
           resize: 'contain',
         },
-      })
-      .then((res) => {
-        if (!res.data) {
-          return null;
-        }
-
-        const url = URL.createObjectURL(res.data!);
-        const imageUrl = this.sanitizer.bypassSecurityTrustUrl(url);
-        return imageUrl;
-      });
+      }).data.publicUrl;
   }
 ```
 
-To use image transformations we only need to add an object to the `download()` function and define the different properties we want to have.
+To use image transformations we only need to add an object to the `getPublicUrl()` function and define the different properties we want to have.
 
 Again, it's _that_ easy.
 
