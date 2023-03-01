@@ -1,0 +1,54 @@
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { patch } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
+import { edgeFunctionsKeys } from './keys'
+
+export type EdgeFunctionsUpdateVariables = {
+  projectRef: string
+  slug: string
+  verifyJwt?: boolean
+  importMap?: boolean
+}
+
+export async function updateEdgeFunction({
+  projectRef,
+  slug,
+  verifyJwt,
+  importMap,
+}: EdgeFunctionsUpdateVariables) {
+  if (!projectRef) throw new Error('projectRef is required')
+
+  const response = await patch(
+    `${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}?verify_jwt=${verifyJwt}&import_map=${importMap}`,
+    {}
+  )
+  if (response.error) throw response.error
+
+  return response
+}
+
+type EdgeFunctionsUpdateData = Awaited<ReturnType<typeof updateEdgeFunction>>
+
+export const useEdgeFunctionDeleteMutation = ({
+  onSuccess,
+  ...options
+}: Omit<
+  UseMutationOptions<EdgeFunctionsUpdateData, unknown, EdgeFunctionsUpdateVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<EdgeFunctionsUpdateData, unknown, EdgeFunctionsUpdateVariables>(
+    (vars) => updateEdgeFunction(vars),
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef), {
+          refetchType: 'all',
+        })
+        await onSuccess?.(data, variables, context)
+      },
+      ...options,
+    }
+  )
+}
