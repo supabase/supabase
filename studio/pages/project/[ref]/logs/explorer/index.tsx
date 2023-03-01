@@ -23,12 +23,14 @@ import {
   LogTemplate,
   maybeShowUpgradePrompt,
   TEMPLATES,
+  useEditorHints,
 } from 'components/interfaces/Settings/Logs'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
+  useEditorHints()
   const { ui, content } = useStore()
   const router = useRouter()
   const { ref: projectRef, q, ite, its } = useParams()
@@ -38,7 +40,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
-
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(projectRef as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
@@ -145,6 +146,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       })
     }
   }
+
 
   return (
     <div className="w-full h-full px-5 py-6 mx-auto">
