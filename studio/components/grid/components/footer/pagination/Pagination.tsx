@@ -99,6 +99,8 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
     }
   }
 
+  // TODO: look at aborting useTableRowsQuery if the user presses the button quickly
+
   const goToPreviousPage = () => {
     const previousPage = state.page - 1
     setPage(previousPage)
