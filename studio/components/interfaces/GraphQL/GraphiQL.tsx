@@ -1,22 +1,18 @@
 /* Based on https://github.com/graphql/graphiql/blob/main/packages/graphiql/src/components/GraphiQL.tsx */
 
 import {
-  Button,
   ChevronDownIcon,
   ChevronUpIcon,
   CopyIcon,
-  Dialog,
   ExecuteButton,
   GraphiQLProvider,
   HeaderEditor,
-  KeyboardShortcutIcon,
   MergeIcon,
   PlusIcon,
   PrettifyIcon,
   QueryEditor,
   ReloadIcon,
   ResponseEditor,
-  SettingsIcon,
   Spinner,
   Tab,
   Tabs,
@@ -31,14 +27,12 @@ import {
   usePluginContext,
   usePrettifyEditors,
   useSchemaContext,
-  useStorageContext,
   useTheme,
   VariableEditor,
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
 import clsx from 'clsx'
-import 'graphiql/graphiql.css'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './graphiql.module.css'
 
 export type GraphiQLProps = {
@@ -77,7 +71,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
-  const storageContext = useStorageContext()
   const pluginContext = usePluginContext()
 
   const copy = useCopyQuery()
@@ -124,10 +117,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         : 'variables'
     }
   )
-  const [showDialog, setShowDialog] = useState<'settings' | 'short-keys' | null>(null)
-  const [clearStorageStatus, setClearStorageStatus] = useState<'success' | 'error' | null>(null)
-
-  const logo = <GraphiQLLogo />
 
   const toolbar = (
     <>
@@ -149,19 +138,19 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     }
   }
 
-  const modifier =
-    window.navigator.platform.toLowerCase().indexOf('mac') === 0 ? (
-      <code className="graphiql-key">Cmd</code>
-    ) : (
-      <code className="graphiql-key">Ctrl</code>
-    )
+  const hasSingleTab = editorContext.tabs.length === 1
 
   return (
     <div className={clsx('graphiql-container', styles.graphiqlContainer)}>
       <div className="graphiql-main">
         <div ref={pluginResize.firstRef} style={{ minWidth: 0 }}>
           <div className={clsx('graphiql-sessions', styles.graphiqlSessions)}>
-            <div className="graphiql-session-header">
+            <div
+              className={clsx(
+                'graphiql-session-header',
+                !hasSingleTab && styles.graphiqlSessionHeader
+              )}
+            >
               <Tabs aria-label="Select active operation">
                 {editorContext.tabs.length > 1 ? (
                   <>
@@ -203,8 +192,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 ) : null}
               </Tabs>
               <div className="graphiql-session-header-right">
-                {editorContext.tabs.length === 1 ? (
-                  <div className="graphiql-add-tab-wrapper">
+                {hasSingleTab ? (
+                  <div className={clsx('graphiql-add-tab-wrapper', styles.graphiqlAddTabWrapper)}>
                     <Tooltip label="Add tab">
                       <UnStyledButton
                         type="button"
@@ -217,7 +206,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                     </Tooltip>
                   </div>
                 ) : null}
-                {logo}
               </div>
             </div>
             <div
@@ -228,12 +216,17 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             >
               <div ref={editorResize.firstRef}>
                 <div
-                  className={`graphiql-editors ${styles.graphiqlEditors}${
-                    editorContext.tabs.length === 1 ? ' full-height' : ''
-                  }`}
+                  className={clsx(
+                    'graphiql-editors',
+                    styles.graphiqlEditors,
+                    hasSingleTab && 'full-height'
+                  )}
                 >
                   <div ref={editorToolsResize.firstRef}>
-                    <section className="graphiql-query-editor" aria-label="Query Editor">
+                    <section
+                      className={clsx('graphiql-query-editor', styles.graphiqlQueryEditor)}
+                      aria-label="Query Editor"
+                    >
                       <div className="graphiql-query-editor-wrapper">
                         <QueryEditor />
                       </div>
@@ -327,10 +320,19 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 </div>
               </div>
               <div ref={editorResize.dragBarRef}>
-                <div className="graphiql-horizontal-drag-bar" />
+                <div
+                  className={clsx('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
+                />
               </div>
               <div ref={editorResize.secondRef}>
-                <div className="graphiql-response">
+                <div
+                  className={clsx(
+                    'graphiql-response',
+                    hasSingleTab
+                      ? styles.graphiqlResponseSingleTab
+                      : styles.graphiqlResponseMultiTab
+                  )}
+                >
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
                 </div>
@@ -340,7 +342,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         </div>
 
         <div ref={pluginResize.dragBarRef}>
-          {pluginContext?.visiblePlugin ? <div className="graphiql-horizontal-drag-bar" /> : null}
+          {pluginContext?.visiblePlugin ? (
+            <div
+              className={clsx('graphiql-horizontal-drag-bar', styles.graphiqlHorizontalDragBar)}
+            />
+          ) : null}
         </div>
 
         <div
@@ -354,7 +360,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
           <div className="graphiql-plugin">{PluginContent ? <PluginContent /> : null}</div>
         </div>
       </div>
-      <div className="graphiql-sidebar">
+      <div className={clsx('graphiql-sidebar', styles.graphiqlSidebar)}>
         <div className="graphiql-sidebar-section">
           {pluginContext?.plugins.map((plugin) => {
             const isVisible = plugin === pluginContext.visiblePlugin
@@ -396,195 +402,10 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               />
             </UnStyledButton>
           </Tooltip>
-          <Tooltip label="Open short keys dialog">
-            <UnStyledButton
-              type="button"
-              onClick={() => setShowDialog('short-keys')}
-              aria-label="Open short keys dialog"
-            >
-              <KeyboardShortcutIcon aria-hidden="true" />
-            </UnStyledButton>
-          </Tooltip>
-          <Tooltip label="Open settings dialog">
-            <UnStyledButton
-              type="button"
-              onClick={() => setShowDialog('settings')}
-              aria-label="Open settings dialog"
-            >
-              <SettingsIcon aria-hidden="true" />
-            </UnStyledButton>
-          </Tooltip>
         </div>
       </div>
-      <Dialog isOpen={showDialog === 'short-keys'} onDismiss={() => setShowDialog(null)}>
-        <div className="graphiql-dialog-header">
-          <div className="graphiql-dialog-title">Short Keys</div>
-          <Dialog.Close onClick={() => setShowDialog(null)} />
-        </div>
-        <div className="graphiql-dialog-section">
-          <div>
-            <table className="graphiql-table">
-              <thead>
-                <tr>
-                  <th>Short key</th>
-                  <th>Function</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">F</code>
-                  </td>
-                  <td>Search in editor</td>
-                </tr>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">K</code>
-                  </td>
-                  <td>Search in documentation</td>
-                </tr>
-                <tr>
-                  <td>
-                    {modifier}
-                    {' + '}
-                    <code className="graphiql-key">Enter</code>
-                  </td>
-                  <td>Execute query</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">P</code>
-                  </td>
-                  <td>Prettify editors</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">M</code>
-                  </td>
-                  <td>Merge fragments definitions into operation definition</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">C</code>
-                  </td>
-                  <td>Copy query</td>
-                </tr>
-                <tr>
-                  <td>
-                    <code className="graphiql-key">Ctrl</code>
-                    {' + '}
-                    <code className="graphiql-key">Shift</code>
-                    {' + '}
-                    <code className="graphiql-key">R</code>
-                  </td>
-                  <td>Re-fetch schema using introspection</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              The editors use{' '}
-              <a
-                href="https://codemirror.net/5/doc/manual.html#keymaps"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                CodeMirror Key Maps
-              </a>{' '}
-              that add more short keys. This instance of Graph<em>i</em>QL uses <code>sublime</code>
-              .
-            </p>
-          </div>
-        </div>
-      </Dialog>
-      <Dialog
-        isOpen={showDialog === 'settings'}
-        onDismiss={() => {
-          setShowDialog(null)
-          setClearStorageStatus(null)
-        }}
-      >
-        <div className="graphiql-dialog-header">
-          <div className="graphiql-dialog-title">Settings</div>
-          <Dialog.Close
-            onClick={() => {
-              setShowDialog(null)
-              setClearStorageStatus(null)
-            }}
-          />
-        </div>
-
-        {storageContext ? (
-          <div className="graphiql-dialog-section">
-            <div>
-              <div className="graphiql-dialog-section-title">Clear storage</div>
-              <div className="graphiql-dialog-section-caption">
-                Remove all locally stored data and start fresh.
-              </div>
-            </div>
-            <div>
-              <Button
-                type="button"
-                state={clearStorageStatus || undefined}
-                disabled={clearStorageStatus === 'success'}
-                onClick={() => {
-                  try {
-                    storageContext?.clear()
-                    setClearStorageStatus('success')
-                  } catch {
-                    setClearStorageStatus('error')
-                  }
-                }}
-              >
-                {clearStorageStatus === 'success'
-                  ? 'Cleared data'
-                  : clearStorageStatus === 'error'
-                  ? 'Failed'
-                  : 'Clear data'}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </Dialog>
     </div>
   )
 }
-
-// Configure the UI by providing this Component as a child of GraphiQL.
-function GraphiQLLogo<TProps>(props: PropsWithChildren<TProps>) {
-  return (
-    <div className="graphiql-logo">
-      {props.children || (
-        <a
-          className="graphiql-logo-link"
-          href="https://github.com/graphql/graphiql"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Graph
-          <em>i</em>
-          QL
-        </a>
-      )}
-    </div>
-  )
-}
-
-GraphiQLLogo.displayName = 'GraphiQLLogo'
 
 export default GraphiQL
