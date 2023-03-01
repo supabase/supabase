@@ -1,5 +1,5 @@
 import styles from './ticket-visual.module.css'
-import TicketProfile from './ticket-profile'
+import TicketProfile from './TicketProfile'
 import TicketNumber from './ticket-number'
 import TicketMono from './ticket-mono'
 import TicketInfoFooter from './ticket-info-footer'

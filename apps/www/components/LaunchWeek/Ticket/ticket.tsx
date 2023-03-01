@@ -6,9 +6,9 @@ import { useRef, useEffect, useState } from 'react'
 // import { scrollTo } from '@lib/smooth-scroll'
 import styles from './ticket.module.css'
 import styleUtils from './utils.module.css'
-import TicketForm from './ticket-form'
+import TicketForm from './TicketForm'
 import TicketVisual from './ticket-visual'
-import TicketActions from './ticket-actions'
+import TicketActions from './TicketActions'
 import TicketCopy from './ticket-copy'
 import { DATE, SITE_NAME } from '~/lib/constants'
 import Form from './form'
@@ -123,66 +123,94 @@ export default function Ticket({
           `}
         >
           <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
-            {name ? (
+            {!sharePage ? (
               <>
-                {winningChances === 1 && (
+                {name ? (
+                  <>
+                    {winningChances === 1 && (
+                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                        You're <span className="gradient-text-purple-500">in the draw!</span> <br />
+                        Now make it gold.
+                      </p>
+                    )}
+                    {winningChances === 2 && (
+                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                        You've <span className="gradient-text-purple-500">doubled</span> your
+                        <br />
+                        chance! Almost gold.
+                      </p>
+                    )}
+                    {winningChances === 3 && (
+                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                        You're <span className="gradient-text-gold-500">gold</span>!<br />
+                        You've maxed your <br /> chances of winning!
+                      </p>
+                    )}
+                  </>
+                ) : (
                   <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                    You're <span className="gradient-text-purple-500">in the draw!</span> <br />
-                    Now make it gold.
-                  </p>
-                )}
-                {winningChances === 2 && (
-                  <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                    You've <span className="gradient-text-purple-500">doubled</span> your
-                    <br />
-                    chance! Almost gold.
-                  </p>
-                )}
-                {winningChances === 3 && (
-                  <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                    You're <span className="gradient-text-gold-500">gold</span>!<br />
-                    You've maxed your <br /> chances of winning!
+                    Generate your ticket. <br />
+                    Win the <span className="gradient-text-purple-500">SupaKeyboard</span>.
                   </p>
                 )}
               </>
             ) : (
-              <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                Generate your ticket. <br />
-                Win the <span className="gradient-text-purple-500">SupaKeyboard</span>.
-              </p>
+              <>
+                {name ? name : username}'s <br />
+                unique ticket
+              </>
             )}
           </h1>
 
           <h2 className="text-base max-w-[520px]">
-            {golden ? (
+            {!sharePage ? (
               <>
-                <p>
-                  You got a Golden ticket. This means you’re in, and you also won a Supabase sticker
-                  pack!
-                </p>
-              </>
-            ) : (
-              <>
-                {username ? (
+                {golden ? (
                   <>
                     <p>
-                      Why stop there? Increase your chances of winning by sharing your unique
-                      ticket. Get sharing!
+                      You got a Golden ticket. This means you’re in, and you also won a Supabase
+                      sticker pack!
                     </p>
                   </>
                 ) : (
-                  <p>
-                    We have some fantastic swag up for grabs, including 3x limited edition
-                    mechanical keyboard that you won't want to miss.
-                  </p>
+                  <>
+                    {username ? (
+                      <>
+                        <p>
+                          Why stop there? Increase your chances of winning by sharing your unique
+                          ticket. Get sharing!
+                        </p>
+                      </>
+                    ) : (
+                      <p>
+                        We have some fantastic swag up for grabs, including 3x limited edition
+                        mechanical keyboard that you won't want to miss.
+                      </p>
+                    )}
+                  </>
                 )}
+              </>
+            ) : (
+              <>
+                <p>
+                  Get yours and win some fantastic swag, including a limited edition mechanical
+                  keyboard that you won't want to miss.
+                </p>
               </>
             )}
           </h2>
-          {username && <ReferralIndicator />}
+
+          {!sharePage && username && <ReferralIndicator />}
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
-          {username && <TicketActions username={username} golden={golden} />}
+          {username && (
+            <TicketActions
+              username={username}
+              golden={golden}
+              ticketGenerationState={ticketGenerationState}
+              setTicketGenerationState={setTicketGenerationState}
+            />
+          )}
         </div>
       </div>
     </div>
