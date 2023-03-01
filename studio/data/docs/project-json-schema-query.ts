@@ -1,41 +1,26 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { docsKeys } from './keys'
 
 export type ProjectJsonSchemaVariables = {
   projectRef?: string
-  swaggerUrl?: string
-  apiKey?: string
 }
 
 export type ProjectJsonSchemaResponse = any
 
 export async function getProjectJsonSchema(
-  { projectRef, swaggerUrl, apiKey }: ProjectJsonSchemaVariables,
+  { projectRef }: ProjectJsonSchemaVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
-  if (!swaggerUrl) {
-    throw new Error('id is required')
-  }
 
-  let headers: {
-    [key: string]: string | undefined
-  } = { apikey: apiKey }
-  if ((apiKey?.length ?? 0) > 40) headers['Authorization'] = `Bearer ${apiKey}`
-
-  const response = await get(swaggerUrl, {
-    signal,
-    headers,
-    credentials: 'omit',
-  })
-  if (response.error) {
-    throw response.error
-  }
-
+  const url = `${API_URL}/projects/${projectRef}/api/rest`
+  const response = await get(url, { signal })
+  if (response.error) throw response.error
   return response as ProjectJsonSchemaResponse
 }
 
@@ -43,33 +28,29 @@ export type ProjectJsonSchemaData = Awaited<ReturnType<typeof getProjectJsonSche
 export type ProjectJsonSchemaError = unknown
 
 export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
-  { projectRef, swaggerUrl, apiKey }: ProjectJsonSchemaVariables,
+  { projectRef }: ProjectJsonSchemaVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
 ) =>
   useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>(
-    docsKeys.jsonSchema(projectRef, swaggerUrl, apiKey),
-    ({ signal }) => getProjectJsonSchema({ projectRef, swaggerUrl, apiKey }, signal),
+    docsKeys.jsonSchema(projectRef),
+    ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof swaggerUrl !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
 
-export const useProjectJsonSchemaPrefetch = ({
-  projectRef,
-  swaggerUrl,
-  apiKey,
-}: ProjectJsonSchemaVariables) => {
+export const useProjectJsonSchemaPrefetch = ({ projectRef }: ProjectJsonSchemaVariables) => {
   const client = useQueryClient()
 
   return useCallback(() => {
-    if (projectRef && swaggerUrl) {
-      client.prefetchQuery(docsKeys.jsonSchema(projectRef, swaggerUrl, apiKey), ({ signal }) =>
-        getProjectJsonSchema({ projectRef, swaggerUrl, apiKey }, signal)
+    if (projectRef) {
+      client.prefetchQuery(docsKeys.jsonSchema(projectRef), ({ signal }) =>
+        getProjectJsonSchema({ projectRef }, signal)
       )
     }
-  }, [projectRef, swaggerUrl])
+  }, [projectRef])
 }

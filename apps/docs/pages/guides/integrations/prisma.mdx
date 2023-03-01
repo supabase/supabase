@@ -17,6 +17,7 @@ This guide explains how to quickly connect the Postgres database provided by Sup
 ## Step 1: Get the connection string from Supabase project settings
 
 Go to the settings page from the sidebar and navigate to the **Database** tab. You’ll find the database’s connection string with a placeholder for the password you provided when you created the project.
+
 ![Getting the connection string](/docs/img/guides/integrations/prisma/zntcsh3ic91gf1gy8j73.png)
 
 ## Step 2: Testing the connection
@@ -29,22 +30,17 @@ In case you don’t have a Prisma project or this is your first time working wit
 
 ### Cloning the starter project
 
-Navigate into a directory of your choice and run the following command in your terminal if you’re on a Windows machine:
+Navigate into a directory of your choice and run the following command in your terminal:
 
 ```bash
-curl https://pris.ly/quickstart -L -o quickstart-main.tar.gz && tar -zxvf quickstart-main.tar.gz quickstart-main/typescript/starter && move quickstart-main\typescript\starter starter && rmdir /S /Q quickstart-main && del /Q quickstart-main.tar.gz
-```
-
-And if you’re using Mac OS or Linux, run the following command:
-
-```bash
-curl -L https://pris.ly/quickstart | tar -xz --strip=2 quickstart-main/typescript/starter
+curl https://codeload.github.com/prisma/prisma-examples/tar.gz/latest | tar -xz --strip=2 prisma-examples-latest/databases/postgresql-supabase
 ```
 
 You can now navigate into the directory and install the project’s dependencies:
 
 ```bash
-cd starter && npm install
+cd postgresql-supabase
+npm install
 ```
 
 ### A look at the project’s structure
@@ -52,53 +48,43 @@ cd starter && npm install
 This project comes with TypeScript configured and has the following structure.
 
 - A `prisma` directory which contains:
-  - A `dev.db` file: This is a SQLite database.
-  - A `schema.prisma` file: Where we define the different database models and relations between them.
-- A `.env` file: Contains the `DATABASE_URL` variable, which Prisma will use.
-- A `script.ts` file: where we will run some queries using Prisma Client.
-  This starter also comes with the following packages installed:
+  - A `seed.ts` file: This is the data used to seed your database.
+  - A `schema.prisma` file: Where you define the different database models and relations between them.
+- A `script.ts` file: where you will run some queries using Prisma Client.
+
+This starter also comes with the following packages installed:
 - [`@prisma/client`](https://www.npmjs.com/package/@prisma/client): An auto-generated and type-safe query builder that’s _tailored_ to your data.
 - [`prisma`](https://www.npmjs.com/package/prisma): Prisma’s command-line interface (CLI). It allows you to initialize new project assets, generate Prisma Client, and analyze existing database structures through introspection to automatically create your application models.
-  > Note: Prisma works with both JavaScript and TypeScript. However, to get the best possible development experience, using TypeScript is highly recommended.
 
-### Configuring the project to use PostgreSQL
+> Note: Prisma works with both JavaScript and TypeScript. However, to get the best possible development experience, using TypeScript is highly recommended.
 
-By default, Prisma migrations will try to drop the `postgres` database, which can lead to conflicts with Supabase databases. For this scenario, use [Prisma Shadow Databases](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database#cloud-hosted-shadow-databases-must-be-created-manually).
+### Configuring the project
 
-Create a shadow database in your PostgreSQL server within the same Supabase project using the `psql` CLI and the `DATABASE_URL` from the previous steps (or use the local database).
-
-```bash
-psql postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432
-```
-
-After you connect to your project's PostgreSQL instance, create another database (e.g., `postgres_shadow`):
+Create a `.env` file at the root of your project:
 
 ```bash
-postgres=> CREATE DATABASE postgres_shadow;
-postgres=> exit
+touch .env
 ```
 
-Go ahead and delete the `prisma/dev.db` file because we will be switching to PostgreSQL.
-In the `.env` file, update `DATABASE_URL` and `SHADOW_DATABASE_URL` to the connection string from **step 1**. The `.env` file should look like:
+In the `.env` file, add a `DATABASE_URL` variable and add the connection string from **step 1**. The `.env` file should look like:
 
 ```env
 # .env
 DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
-SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres_shadow"
 ```
 
-In the `schema.prisma` file, change the `provider` from "sqlite" to `"postgresql"` and add the `shadowDatabaseUrl` property.
 This is what your `schema.prisma` file should look like:
 
 ```go
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
 }
+
 generator client {
   provider = "prisma-client-js"
 }
+
 model Post {
   id        Int     @id @default(autoincrement())
   title     String
@@ -107,6 +93,7 @@ model Post {
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
 }
+
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
@@ -115,53 +102,81 @@ model User {
 }
 ```
 
+
 To test that everything works correctly, run the following command to create a migration:
 
 ```bash
-prisma migrate dev --name init
+npx prisma migrate dev --name init
 ```
 
-You can optionally give your migration a name, depending on the changes you made. Since this is the project’s first migration, you’re setting the `--name` flag to “init”.
-If everything works correctly, you should get the following message in your terminal:
+You can optionally give your migration a name, depending on the changes you made. Since this is the project’s first migration, you’re setting the `--name` flag to “init”. If everything works correctly, you should get the following message in your terminal:
 
 ```text
 Your database is now in sync with your schema.
-:heavy_check_mark: Generated Prisma Client (2.x.x) to ./node_modules/@prisma/client in 111ms
+:heavy_check_mark: Generated Prisma Client (4.x.x) to ./node_modules/@prisma/client in 111ms
 ```
 
 This will create a `prisma/migrations` folder inside your `prisma` directory and synchronize your Prisma schema with your database schema.
 
-> Note: if you want to skip the process of creating a migration history, you can use the [`db push`](https://www.prisma.io/docs/concepts/components/prisma-migrate/db-push) command instead of `migrate dev`.
-> If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post` and a `User` table.
-> ![tables created in the UI](/docs/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
-> That’s it! You have now successfully connected a Prisma project to a PostgreSQL database hosted on Supabase and ran your first migration.
+> **Note**: If you want to skip the process of creating a migration history, you can use the [`prisma db push`](https://www.prisma.io/docs/concepts/components/prisma-migrate/db-push) command instead of `prisma migrate dev`. However, we recommend using `prisma migrate dev` to evolve your database schema in development.
+> If you would like to get a conceptual overview of how Prisma Migrate works and which commands to use in what environment, refer to [this page in the Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate/mental-model).
+
+If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post`, `User`, and `_prisma_migrations` tables. The `_prisma_migrations` table is used to keep
+
+![tables created in the UI](/docs/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
+
+That’s it! You have now successfully connected a Prisma project to a PostgreSQL database hosted on Supabase and ran your first migration.
 
 ## Connection pooling with Supabase
 
-If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [supports connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
-Go to the **Database** page from the sidebar in the Supabase dashboard and navigate to **connection pool** settings
+If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). 
+
+Supabase [supports connection management using PgBouncer](/docs/guides/database/connecting-to-postgres#connection-pool) which prevents a traffic spike from overwhelming your database. 
+
+Go to the **Database** page from the sidebar in the Supabase dashboard and navigate to **Connection pool** settings:
+
 ![Connection pool settings](/docs/img/guides/integrations/prisma/w0oowg8vq435ob5c3gf0.png)
-When migrating, you need to use the non-pooled connection URL (like the one used in **step 1**). However, when deploying your app, use the pooled connection URL and add the `?pgbouncer=true` flag to the PostgreSQL connection URL. It's also recommended to minimize the number of concurrent connections by setting the `connection_limit` to `1`. The `.env` file should look like:
+
+When updating your database schema, you need to use the non-pooled connection URL (like the one used in **step 1**). You can configure the non-pooled connection string by using the `directUrl` property in the datasource block.
+
+Update your `.env` file with the following changes:
+1. Rename the `DATABASE_URL` environment variable to `DIRECT_URL`
+1. Create a `DATABASE_URL` environment variable and paste in the new connection string from the dashboard as its value
+
+Append the `?pgbouncer=true` flag to the `DATABASE_URL` variable.
+
+Your `.env` file should resemble the following:
 
 ```env
 # .env
-DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true&connection_limit=1"
-SHADOW_DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres_shadow"
+# PostgreSQL connection string used for migrations
+DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+# PostgreSQL connection string with pgBouncer config — used by Prisma Client
+DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true"
+
 ```
 
-Prisma Migrate uses database transactions to check out the current state of the database and the migrations table. However, the Migration Engine is designed to use a single connection to the database, and does not support connection pooling with PgBouncer. If you attempt to run Prisma Migrate commands in any environment that uses PgBouncer for connection pooling, you might see the following error:
+Update your Prisma schema by setting the `directUrl` in the datasource block:
 
-```bash
-Error: undefined: Database error
-Error querying the database: db error: ERROR: prepared statement “s0” already exists
+```go
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directURL         = env("DIRECT_URL")
+}
 ```
 
-This is a known issue and it is being worked on, you can follow the progress on this [GitHub issue](https://github.com/prisma/prisma/issues/6485).
-If you want to learn more about Prisma, check out the [docs](https://www.prisma.io/docs). Also in case you have any questions or run into any issue, feel free to start a discussion in the repo’s [discussions section](https://github.com/prisma/prisma/discussions).
+> **Note**: This feature is available from Prisma version [4.10.0](https://github.com/prisma/prisma/releases/tag/4.10.0) and higher.
+
+If you want to learn more about Prisma, check out the [docs](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#fields). Also in case you have any questions or run into any issue, feel free to start a discussion in the repo’s [discussions section](https://github.com/prisma/prisma/discussions).
 
 ## Troubleshooting
 
-If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to recreate the whole schema. If you chose yes, it will delete the public schema and recreate it. The default grants are missing after this. If you run into this problem, add a helper SQL for fixing the grants:
+### Missing grants
+
+If your database schema is out of sync from your migration history, `prisma migrate dev` will detect a migration history conflict or a [schema drift](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development#schema-drift). When `prisma migrate dev` detects the drift, it might ask to to reset your database schema. If you choose yes, it will delete the `public` schema along with the default grants defined in your database.
+
+If you run into this problem, create a draft migration using `prisma migrate dev --create-only`, and add the following helper SQL:
 
 ```sql
 grant usage on schema public to postgres, anon, authenticated, service_role;
@@ -174,6 +189,98 @@ alter default privileges in schema public grant all on tables to postgres, anon,
 alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
 ```
+
+Run `prisma migrate dev` to apply the draft migration to the database.
+
+### Using Supabase Auth with Prisma
+
+If you would like to use Supabase Auth and Prisma in your application, you will have to enable the `multiSchema` Preview feature flag in the `generator` block of your Prisma schema:
+
+```go
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directURL         = env("DIRECT_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+```
+
+Next, specify the database schemas you would like to include in your Prisma schema:
+
+```go
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directURL         = env("DIRECT_URL")
+  schemas           = ["public", "auth"]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+```
+
+You can then specify what schema a model or enum belongs to using the `@@schema` attribute:
+
+```go
+model User {
+  id     Int     @id
+  // ...
+
+  @@schema("auth") // or @@schema("public")
+}
+```
+
+To learn more about using Prisma with multiple database schemas, refer to [this page in the Prisma docs](https://www.prisma.io/docs/guides/database/multi-schema#learn-more-about-the-multischema-preview-feature).
+
+### Using PostgreSQL Row Level Security with Prisma
+
+
+If you would like to use Row Level Security (RLS) with Prisma, check out the [Prisma Client Extension - Row Level Security example](https://github.com/prisma/prisma-client-extensions/tree/main/row-level-security) that provides the primitives you could use to build and extend Prisma Client in PostgreSQL.
+
+Also check out [useSupabaseRowLevelSecurity](https://github.com/dthyresson/prisma-extension-supabase-rls) Prisma Client extension that supports [Supabase RLS](/docs/guides/auth/row-level-security#authrole) and policies written to use [Supabase auth](/docs/guides/auth/overview).
+
+The example and extension use [Prisma Client extensions](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions) Preview feature.
+
+### Enabling PosgreSQL extensions
+
+If you would like to use a PostgreSQL extension with Prisma, enable the `postgresqlExtensions` Preview feature flag in the `generator` block of your Prisma schema:
+
+```go
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directURL         = env("DIRECT_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+```
+
+Next, specify the extensions you need in the `datasource` block:
+
+```go
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directURL         = env("DIRECT_URL")
+  extensions        = [hstore(schema: "myHstoreSchema"), pg_trgm, postgis(version: "2.1")]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+```
+
+To learn more about using Prisma with PostgreSQL extensions, refer to [this page in the Prisma docs](https://www.prisma.io/docs/concepts/components/prisma-schema/postgresql-extensions).
 
 ## Resources
 

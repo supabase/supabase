@@ -70,10 +70,16 @@ export const timestampFormatter = (
 export const useChartSize = (
   size: CommonChartProps<any>['size'] = 'normal',
   sizeMap: {
+    tiny: number
     small: number
     normal: number
     large: number
-  } = { small: 120, normal: 160, large: 280 }
+  } = {
+    tiny: 76,
+    small: 96,
+    normal: 160,
+    large: 280,
+  }
 ) => {
   const minHeight = sizeMap[size]
   const Container: React.FC = useMemo(

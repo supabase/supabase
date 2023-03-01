@@ -191,7 +191,7 @@ const PROVIDER_PHONE = {
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'string',
-      description: 'To format the OPT code use `{{ .Code }}`',
+      description: 'To format the OTP code use `{{ .Code }}`',
     },
   },
   validationSchema: object().shape({
