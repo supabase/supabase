@@ -13,7 +13,7 @@ import {
   IconMaximize2,
   IconMinimize2,
 } from 'ui'
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
 import { useParams, useStore } from 'hooks'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
@@ -187,8 +187,8 @@ const UpgradingPollingState = () => {
                           : `0px ${
                               (progressStage - 2 <= 0
                                 ? 0
-                                : progressStage > 7
-                                ? 6
+                                : progressStage > 6
+                                ? 5
                                 : progressStage - 2) * -28
                             }px`,
                       }}
