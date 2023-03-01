@@ -6,15 +6,15 @@ export default function ReferralIndicator() {
   const winningChances = useWinningChances()
 
   return (
-    <div className="bg-[#EAEAEA75] rounded-full mt-4 flex">
+    <div className="bg-[#EAEAEA75] rounded-full mt-4 flex w-full">
       <span
         className={[
           'bg-gradient-to-l from-[#A141E4] to-[#6300F569] rounded-full pl-4 pr-6 py-1.5 text-xs',
           winningChances === 2 ? 'w-1/2' : '',
-          winningChances === 3 ? 'w-full' : '',
+          winningChances === 3 ? 'w-full bg-gradient-to-l from-[#E4B641] to-[#F5BF0069]' : '',
         ].join(' ')}
       >
-        {winningChances}x {winningChances > 1 ? 'chances' : 'chance'}
+        {winningChances}x chance
       </span>
     </div>
   )
