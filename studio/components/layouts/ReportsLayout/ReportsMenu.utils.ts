@@ -27,6 +27,7 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
                 key: 'api-overview',
                 url: `/project/${ref}/reports/api-overview`,
                 items: [],
+                label: 'NEW',
               },
             ]
           : []),
