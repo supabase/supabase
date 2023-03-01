@@ -20,8 +20,8 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'hooks'
 import { isEqual } from 'lodash'
-import { useRouter } from 'next/router'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import ReportPadding from "components/interfaces/Reports/ReportPadding"
 
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -38,7 +38,7 @@ export const ApiReport: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-5 py-6 h-full mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
+    <ReportPadding>
       <ReportHeader title="API" isLoading={report.isLoading} onRefresh={report.refresh} />
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
@@ -81,7 +81,7 @@ export const ApiReport: NextPageWithLayout = () => {
         data={report.data.responseSpeed || []}
         renderer={renderResponseSpeed}
       />
-    </div>
+    </ReportPadding>
   )
 }
 
