@@ -44,10 +44,10 @@ import styles from './graphiql.module.css'
 export type GraphiQLProps = {
   fetcher: Fetcher
   theme?: 'dark' | 'light'
-  apiKey?: string
+  accessToken?: string
 }
 
-const GraphiQL = ({ fetcher, theme = 'dark', apiKey }: GraphiQLProps) => {
+const GraphiQL = ({ fetcher, theme = 'dark', accessToken }: GraphiQLProps) => {
   // Ensure props are correct
   if (typeof fetcher !== 'function') {
     throw new TypeError(
@@ -56,7 +56,14 @@ const GraphiQL = ({ fetcher, theme = 'dark', apiKey }: GraphiQLProps) => {
   }
 
   return (
-    <GraphiQLProvider fetcher={fetcher} defaultHeaders={JSON.stringify({ apiKey }, null, 2)}>
+    <GraphiQLProvider
+      fetcher={fetcher}
+      defaultHeaders={
+        accessToken !== undefined
+          ? JSON.stringify({ Authorization: `Bearer ${accessToken}` })
+          : undefined
+      }
+    >
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )

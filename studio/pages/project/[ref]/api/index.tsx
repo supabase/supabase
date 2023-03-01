@@ -77,17 +77,12 @@ const DocView: FC<any> = observer(({}) => {
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = data?.autoApiService?.restUrl
 
   const {
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
