@@ -13,9 +13,8 @@ For an instantaneous live view of the DB size, you can execute in Postgres:
 
 ```sql
 select
-  sum(pg_database_size (pg_database.datname)) / (1024 * 1024) as db_size_mb
-from
-  pg_database;
+  sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+from pg_database;
 ```
 
 This value is also reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
