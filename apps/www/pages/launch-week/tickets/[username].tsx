@@ -11,8 +11,14 @@ import { FastGlobOptionsWithoutCwd } from 'globby'
 import { useTheme } from 'common/Providers'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
+import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 
-type Props = {
+interface Props {
+  user: user
+  users: user[]
+}
+
+interface user {
   username: string | null
   name: string | null
   ticketNumber: number | null
@@ -26,7 +32,8 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export default function TicketShare({ username, ticketNumber, name, golden, referrals }: Props) {
+export default function TicketShare({ user, users }: Props) {
+  const { username, ticketNumber, name, golden, referrals } = user
   const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
@@ -79,19 +86,24 @@ export default function TicketShare({ username, ticketNumber, name, golden, refe
             />
           </SectionContainer>
           <LaunchWeekPrizeSection />
+          <TicketBrickWall users={users} />
         </div>
       </DefaultLayout>
     </>
   )
 }
 
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   let name: string | null | undefined
   let ticketNumber: number | null | undefined
   let golden = false
   let referrals = 0
 
+  // fetch users for the TicketBrickWall
+  const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
+
+  // fetch a specific user
   if (username) {
     const { data: user } = await supabaseAdmin!
       .from('lw7_tickets_golden')
@@ -105,12 +117,15 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   }
   return {
     props: {
-      username: ticketNumber ? username : null,
-      usernameFromParams: username || null,
-      name: ticketNumber ? name || username || null : null,
-      ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
-      golden,
-      referrals,
+      user: {
+        username: ticketNumber ? username : null,
+        usernameFromParams: username || null,
+        name: ticketNumber ? name || username || null : null,
+        ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
+        golden,
+        referrals,
+      },
+      users,
     },
     revalidate: 5,
   }

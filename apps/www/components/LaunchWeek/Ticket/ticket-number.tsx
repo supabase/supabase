@@ -41,9 +41,9 @@ export default function TicketNumber({ number }: Props) {
               y2="327.763"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stop-color="white" stop-opacity="0" />
-              <stop offset="0.53125" stop-color="white" />
-              <stop offset="1" stop-color="white" stop-opacity="0" />
+              <stop stopColor="white" stop-opacity="0" />
+              <stop offset="0.53125" stopColor="white" />
+              <stop offset="1" stopColor="white" stop-opacity="0" />
             </linearGradient>
           </defs>
         </svg>

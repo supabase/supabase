@@ -11,6 +11,7 @@ import LabelBadge from '~/components/LaunchWeek/LabelBadge'
 import launchweek from './6'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
+import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 
 export default function TicketHome() {
   const { isDarkMode } = useTheme()
@@ -94,6 +95,7 @@ export default function TicketHome() {
           </SectionContainer>
 
           <LaunchWeekPrizeSection />
+          <TicketBrickWall />
         </div>
       </DefaultLayout>
     </>
