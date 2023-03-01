@@ -46,7 +46,6 @@
     "dayjs": "^1.11.0",
     "file-saver": "^2.0.5",
     "generate-password": "^1.7.0",
-    "graphiql": "^2.2.0",
     "graphql": "^16.6.0",
     "graphql-ws": "^5.11.3",
     "html-to-image": "^1.10.8",

@@ -128,8 +128,8 @@ export default class UiStore implements IUiStore {
   }
 
   setTheme(theme: 'dark' | 'light') {
+    document.body.classList.replace(this.theme, theme)
     this.theme = theme
-    document.body.className = theme
   }
 
   onThemeOptionChange(themeOption: 'dark' | 'light' | 'system') {
