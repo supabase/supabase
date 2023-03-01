@@ -10,23 +10,20 @@ import { Commands } from './Functions.types'
 
 interface Props {
   closable?: boolean
+  removeBorder?: boolean
 }
 
-const TerminalInstructions: FC<Props> = ({ closable = false }) => {
+const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = false }) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-
   const [showInstructions, setShowInstructions] = useState(!closable)
-
   const { data: tokens } = useAccessTokensQuery()
+  const { data: settings } = useProjectApiQuery({ projectRef })
 
-  const { data: settings } = useProjectApiQuery({
-    projectRef,
-  })
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
-    : undefined
+    : '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
   const endpointSections = endpoint.split('.')
@@ -86,7 +83,9 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
 
   return (
     <div
-      className="col-span-7 overflow-hidden transition-all border rounded shadow bg-scale-100 dark:bg-scale-300"
+      className={`col-span-7 overflow-hidden transition-all rounded bg-scale-100 dark:bg-scale-300 ${
+        removeBorder ? '' : 'border shadow'
+      }`}
       style={{ maxHeight: showInstructions ? 500 : 80 }}
     >
       <div className="px-8 py-6 space-y-6">
@@ -107,7 +106,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
             </div>
           )}
         </div>
-        <div className="space-y-4">
+        <div>
           <CommandRender commands={commands} />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { IconBarChart2 } from '@supabase/ui'
+import { IconBarChart2 } from 'ui'
 
 interface Props {
   title?: string
@@ -12,9 +12,10 @@ const NoDataPlaceholder: React.FC<Props> = ({
 }) => (
   <div
     className={
-      'border-scale-600 flex h-full w-full flex-col items-center justify-center space-y-2 border border-dashed text-center ' +
+      'border-scale-600 flex w-full flex-col items-center justify-center space-y-2 border border-dashed text-center ' +
       className
     }
+    style={{minHeight: "100px"}}
   >
     <IconBarChart2 className="text-scale-800" />
     <div>

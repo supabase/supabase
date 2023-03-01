@@ -329,6 +329,129 @@ Tip: Make sure to enable RLS for all your tables, so that your tables are inacce
 Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
 
+### Testing policies
+
+To test policies on the database itself (i.e., from the [SQL Editor](https://app.supabase.com/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
+
+```sql
+grant anon, authenticated to postgres;
+
+create or replace procedure auth.login_as_user (user_email text)
+    language plpgsql
+    as $$
+declare
+    auth_user auth.users;
+begin
+    select
+        * into auth_user
+    from
+        auth.users
+    where
+        email = user_email;
+    execute format('set request.jwt.claim.sub=%L', (auth_user).id::text);
+    execute format('set request.jwt.claim.role=%I', (auth_user).role);
+    execute format('set request.jwt.claim.email=%L', (auth_user).email);
+    execute format('set request.jwt.claims=%L', json_strip_nulls(json_build_object('app_metadata', (auth_user).raw_app_meta_data))::text);
+
+    raise notice '%', format( 'set role %I; -- logging in as %L (%L)', (auth_user).role, (auth_user).id, (auth_user).email);
+    execute format('set role %I', (auth_user).role);
+end;
+$$;
+
+create or replace procedure auth.login_as_anon ()
+    language plpgsql
+    as $$
+begin
+    set request.jwt.claim.sub='';
+    set request.jwt.claim.role='';
+    set request.jwt.claim.email='';
+    set request.jwt.claims='';
+    set role anon;
+end;
+$$;
+
+create or replace procedure auth.logout ()
+    language plpgsql
+    as $$
+begin
+    set request.jwt.claim.sub='';
+    set request.jwt.claim.role='';
+    set request.jwt.claim.email='';
+    set request.jwt.claims='';
+    set role postgres;
+end;
+$$;
+```
+
+To switch to a given user (by email), use `call auth.login_as_user('my@email.com');`. You can also switch to the `anon` role using `call auth.login_as_anon();`. When you are done, use `call auth.logout();` to return yourself to the `postgres` role.
+
+These procedures can also be used for writing [pgTAP](/docs/guides/database/extensions/pgtap) unit tests for policies.
+
+<details>
+  <summary>Click here to see an example `psql` interaction using this.</summary>
+
+This example shows that the `public.profiles` table from the tutorial example can indeed be updated by the `postgres` role and the owner of the row but not from `anon` connections:
+
+```shell
+postgres=> select id, email from auth.users;
+                  id                  |       email
+--------------------------------------+-------------------
+ d4f0aa86-e6f6-41d1-bd32-391f077cf1b9 | user1@example.com
+ 15d6811a-16ee-4fa2-9b18-b63085688be4 | user2@example.com
+ 4e1010bb-eb37-4a4d-a05a-b0ee315c9d56 | user3@example.com
+(3 rows)
+
+postgres=> table public.profiles;
+                  id                  | updated_at | username | full_name | avatar_url | website
+--------------------------------------+------------+----------+-----------+------------+---------
+ d4f0aa86-e6f6-41d1-bd32-391f077cf1b9 |            | user1    | User 1    |            |
+ 15d6811a-16ee-4fa2-9b18-b63085688be4 |            | user2    | User 2    |            |
+ 4e1010bb-eb37-4a4d-a05a-b0ee315c9d56 |            | user3    | User 3    |            |
+(3 rows)
+
+postgres=> call auth.login_as_anon();
+CALL
+postgres=> update public.profiles set updated_at=now();
+UPDATE 0 -- anon users cannot update any profile but see all of them
+postgres=> table public.profiles;
+                  id                  | updated_at | username | full_name | avatar_url | website
+--------------------------------------+------------+----------+-----------+------------+---------
+ d4f0aa86-e6f6-41d1-bd32-391f077cf1b9 |            | user1    | User 1    |            |
+ 15d6811a-16ee-4fa2-9b18-b63085688be4 |            | user2    | User 2    |            |
+ 4e1010bb-eb37-4a4d-a05a-b0ee315c9d56 |            | user3    | User 3    |            |
+(3 rows)
+
+postgres=> call auth.logout();
+CALL
+postgres=> call auth.login_as_user('user1@example.com');
+NOTICE:  set role authenticated; -- logging in as 'd4f0aa86-e6f6-41d1-bd32-391f077cf1b9' ('user1@example.com')
+CALL
+postgres=> update public.profiles set updated_at=now();
+UPDATE 1 -- authenticated users can update their own profile and see all of them
+postgres=> table public.profiles;
+                  id                  |          updated_at           | username | full_name | avatar_url | website
+--------------------------------------+-------------------------------+----------+-----------+------------+---------
+ 15d6811a-16ee-4fa2-9b18-b63085688be4 |                               | user1    | User 1    |            |
+ 4e1010bb-eb37-4a4d-a05a-b0ee315c9d56 |                               | user2    | User 2    |            |
+ d4f0aa86-e6f6-41d1-bd32-391f077cf1b9 | 2023-02-18 21:39:16.204612+00 | user3    | User 3    |            |
+(3 rows)
+
+postgres=> call auth.logout();
+CALL
+postgres=> update public.profiles set updated_at=now();
+UPDATE 3 -- the 'postgres' role can update and see all profiles
+postgres=> table public.profiles;
+                  id                  |          updated_at           | username | full_name | avatar_url | website
+--------------------------------------+-------------------------------+----------+-----------+------------+---------
+ 15d6811a-16ee-4fa2-9b18-b63085688be4 | 2023-02-18 21:40:08.216324+00 | user1    | User 1    |            |
+ 4e1010bb-eb37-4a4d-a05a-b0ee315c9d56 | 2023-02-18 21:40:08.216324+00 | user2    | User 2    |            |
+ d4f0aa86-e6f6-41d1-bd32-391f077cf1b9 | 2023-02-18 21:40:08.216324+00 | user3    | User 3    |            |
+(3 rows)
+
+```
+
+</details>
+
 ## Deprecated features
 
 We have deprecate some functions to ensure better performance and extensibilty of RLS policies.

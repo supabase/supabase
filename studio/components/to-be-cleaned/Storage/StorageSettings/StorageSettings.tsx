@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
@@ -41,6 +43,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const { ui } = useStore()
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
+
+  const canUpdateStorageSettings = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
@@ -138,7 +142,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                               id="fileSizeLimit"
                               name="fileSizeLimit"
                               type="number"
-                              disabled={isFreeTier}
+                              disabled={isFreeTier || !canUpdateStorageSettings}
                               step={1}
                               onKeyPress={(event) => {
                                 if (event.charCode < 48 || event.charCode > 57) {
@@ -184,13 +188,20 @@ const StorageConfig = ({ config, projectRef }: any) => {
                         icon={<IconClock size="large" />}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                         projectRef={projectRef}
-                        secondaryText="Please upgrade to Pro plan for a configurable upload file size limit of up to 5 GB."
+                        secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                       />
                     </div>
                   )}
                   <div className="border-t border-scale-400" />
                   <div className="flex justify-between px-8 py-4">
-                    <div className="flex items-center justify-end w-full gap-2">
+                    <div className="flex items-center justify-between w-full gap-2">
+                      {!canUpdateStorageSettings ? (
+                        <p className="text-sm text-scale-1000">
+                          You need additional permissions to update storage settings
+                        </p>
+                      ) : (
+                        <div />
+                      )}
                       <div className="flex gap-2">
                         <Button
                           type="default"
@@ -204,7 +215,9 @@ const StorageConfig = ({ config, projectRef }: any) => {
                           type="primary"
                           htmlType="submit"
                           loading={isSubmitting}
-                          disabled={!hasChanges && hasChanges !== undefined}
+                          disabled={
+                            !canUpdateStorageSettings || (!hasChanges && hasChanges !== undefined)
+                          }
                         >
                           Save
                         </Button>
