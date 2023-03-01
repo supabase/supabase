@@ -3,7 +3,6 @@ import { FC } from 'react'
 import { Button, IconBookOpen, IconExternalLink, IconList, IconX, SidePanel, Tabs } from 'ui'
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
 import { useState } from 'react'
-import { Tab } from '@headlessui/react'
 import { logConstants } from 'shared-data'
 import Table from 'components/to-be-cleaned/Table'
 
