@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC } from 'react'
 import { IconBookOpen, IconHash } from '~/../../packages/ui'
-import { useClippy } from './ClippyProvider'
+import { useSearch } from './SearchProvider'
 
 export enum SearchResultType {
   Document = 'document',
@@ -16,7 +16,7 @@ type Props = {
 }
 
 const SearchResult: FC<Props> = ({ href, type, title, chip }) => {
-  const { close } = useClippy()
+  const { close } = useSearch()
 
   return (
     <Link href={href}>

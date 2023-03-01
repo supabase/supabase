@@ -21,10 +21,7 @@ import {
 } from 'ui'
 import components from '~/components'
 import SearchResult, { SearchResultType } from './SearchResult'
-
-type Props = {
-  onClose?: () => void
-}
+import { useSearch } from './SearchProvider'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -49,9 +46,9 @@ function getEdgeFunctionUrl() {
 
 const edgeFunctionUrl = getEdgeFunctionUrl()
 
-const ClippyModal: FC<Props> = ({ onClose }) => {
+const SearchModal: FC = () => {
   const { isDarkMode } = useTheme()
-  const [query, setQuery] = useState('')
+  const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState('')
   const [results, setResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -160,7 +157,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
     setHasError(false)
   }
   return (
-    <Modal size="xlarge" visible={true} onCancel={onClose} closable={false} hideFooter>
+    <Modal size="xlarge" visible={true} onCancel={close} closable={false} hideFooter>
       <div
         className={`mx-auto max-h-[50vh] lg:max-h-[75vh] flex flex-col gap-4 rounded-lg p-4 md:pt-6 md:px-6 pb-2 w-full shadow-2xl overflow-hidden border text-left border-scale-500 bg-scale-100 dark:bg-scale-300 cursor-auto relative min-w-[340px]`}
         onClick={(e) => e.stopPropagation()}
@@ -185,7 +182,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
             }}
           />
           <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block">
-            <Button type="default" size="tiny" onClick={onClose}>
+            <Button type="default" size="tiny" onClick={close}>
               esc
             </Button>
           </div>
@@ -205,7 +202,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
 
               <ul className="text-sm mt-4 text-scale-1100 grid md:flex gap-4 flex-wrap max-w-3xl">
                 {questions.map((question) => (
-                  <li>
+                  <li key={question}>
                     <button
                       className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
                       onClick={() => {
@@ -337,4 +334,4 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
   )
 }
 
-export default ClippyModal
+export default SearchModal
