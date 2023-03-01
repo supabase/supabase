@@ -12,15 +12,15 @@
 <path d="M148 48H261" stroke="#A4A4A4" stroke-linecap="round"/>
 <defs>
 <linearGradient id="paint0_linear" x1="328.5" y1="81" x2="328.5" y2="148" gradientUnits="userSpaceOnUse">
-<stop stop-color="#747474"/>
+<stop stopColor="#747474"/>
 <stop offset="1" stop-color="#747474" stop-opacity="0"/>
 </linearGradient>
 <linearGradient id="paint1_linear" x1="217.5" y1="123" x2="217.5" y2="148" gradientUnits="userSpaceOnUse">
-<stop stop-color="#747474"/>
+<stop stopColor="#747474"/>
 <stop offset="1" stop-color="#747474" stop-opacity="0"/>
 </linearGradient>
 <linearGradient id="paint2_linear" x1="376.5" y1="41" x2="376.5" y2="148" gradientUnits="userSpaceOnUse">
-<stop stop-color="#747474"/>
+<stop stopColor="#747474"/>
 <stop offset="1" stop-color="#747474" stop-opacity="0"/>
 </linearGradient>
 </defs>

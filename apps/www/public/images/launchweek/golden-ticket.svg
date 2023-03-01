@@ -59,11 +59,11 @@
 <feGaussianBlur stdDeviation="67.4384" result="effect1_foregroundBlur_660_34464"/>
 </filter>
 <linearGradient id="paint0_linear_660_34464" x1="118.076" y1="120.152" x2="32.5429" y2="275.113" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFC700"/>
+<stop stopColor="#FFC700"/>
 <stop offset="1" stop-color="#FFEBB9"/>
 </linearGradient>
 <linearGradient id="paint1_linear_660_34464" x1="148.98" y1="54.9662" x2="17.0834" y2="274.049" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFE600"/>
+<stop stopColor="#FFE600"/>
 <stop offset="1" stop-color="#FFE49F"/>
 </linearGradient>
 </defs>
