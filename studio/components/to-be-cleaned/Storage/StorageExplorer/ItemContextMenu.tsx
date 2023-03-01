@@ -1,12 +1,19 @@
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Menu, Item, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
 
+import { checkPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-const ItemContextMenu = ({ id = '' }) => {
+interface Props {
+  id: string
+}
+
+const ItemContextMenu: FC<Props> = ({ id = '' }) => {
   const storageExplorerStore = useStorageStore()
   const {
     downloadFile,
@@ -18,12 +25,13 @@ const ItemContextMenu = ({ id = '' }) => {
     copyFileURLToClipboard,
   } = storageExplorerStore
   const isPublic = selectedBucket.public
+  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  const onHandleClick = async (event, item, expiresIn) => {
+  const onHandleClick = async (event: any, item: any, expiresIn?: number) => {
     if (item.isCorrupted) return
     switch (event) {
       case 'copy':
-        if (expiresIn < 0) return setSelectedFileCustomExpiry(item)
+        if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
         else return await copyFileURLToClipboard(item, expiresIn)
       case 'rename':
         return setSelectedItemToRename(item)
@@ -73,23 +81,27 @@ const ItemContextMenu = ({ id = '' }) => {
           </Item>
         </Submenu>
       )}
-      <Item onClick={({ props }) => onHandleClick('rename', props.item)}>
-        <IconEdit size="tiny" />
-        <span className="ml-2 text-xs">Rename</span>
-      </Item>
-      <Item onClick={({ props }) => onHandleClick('move', props.item)}>
-        <IconMove size="tiny" />
-        <span className="ml-2 text-xs">Move</span>
-      </Item>
-      <Item onClick={({ props }) => onHandleClick('download', props.item)}>
-        <IconDownload size="tiny" />
-        <span className="ml-2 text-xs">Download</span>
-      </Item>
-      <Separator />
-      <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-        <IconTrash2 size="tiny" />
-        <span className="ml-2 text-xs">Delete</span>
-      </Item>
+      {canUpdateFiles && (
+        <>
+          <Item onClick={({ props }) => onHandleClick('rename', props.item)}>
+            <IconEdit size="tiny" />
+            <span className="ml-2 text-xs">Rename</span>
+          </Item>
+          <Item onClick={({ props }) => onHandleClick('move', props.item)}>
+            <IconMove size="tiny" />
+            <span className="ml-2 text-xs">Move</span>
+          </Item>
+          <Item onClick={({ props }) => onHandleClick('download', props.item)}>
+            <IconDownload size="tiny" />
+            <span className="ml-2 text-xs">Download</span>
+          </Item>
+          <Separator />
+          <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
+            <IconTrash2 size="tiny" />
+            <span className="ml-2 text-xs">Delete</span>
+          </Item>
+        </>
+      )}
     </Menu>
   )
 }

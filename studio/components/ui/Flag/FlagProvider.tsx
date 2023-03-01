@@ -16,20 +16,12 @@ const FlagProvider: FC = ({ children }) => {
   const { Provider } = FlagContext
   const [store, setStore] = useState({})
 
-  useEffect(() => {
-    // [Joshen] getFlags get triggered everytime the tab refocuses but this should be okay
-    // as per https://configcat.com/docs/sdk-reference/js/#polling-modes:
-    // The polling downloads the config.json at the set interval and are stored in the internal cache
-    // which subsequently all getValueAsync() calls are served from there
-    if (IS_PLATFORM) getFlags(profile)
-  }, [profile])
-
   const getFlags = async (user?: User) => {
     if (!client) {
       client = configcat.getClient(
         process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
         configcat.PollingMode.AutoPoll,
-        { pollIntervalSeconds: 10 }
+        { pollIntervalSeconds: 600 }
       )
     }
 
@@ -43,6 +35,14 @@ const FlagProvider: FC = ({ children }) => {
     })
     setStore(flagStore)
   }
+
+  useEffect(() => {
+    // [Joshen] getFlags get triggered everytime the tab refocuses but this should be okay
+    // as per https://configcat.com/docs/sdk-reference/js/#polling-modes:
+    // The polling downloads the config.json at the set interval and are stored in the internal cache
+    // which subsequently all getValueAsync() calls are served from there
+    if (IS_PLATFORM) getFlags(profile)
+  }, [profile])
 
   return <Provider value={store}>{children}</Provider>
 }
