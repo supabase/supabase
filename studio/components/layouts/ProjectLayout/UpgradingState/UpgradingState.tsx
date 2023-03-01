@@ -13,7 +13,7 @@ import {
   IconMaximize2,
   IconMinimize2,
 } from 'ui'
-import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
 import { useParams, useStore } from 'hooks'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
@@ -234,24 +234,26 @@ const UpgradingPollingState = () => {
                     </div>
                   </div>
 
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger className="w-full">
-                      <p className="text-center text-sm text-scale-1000">
-                        Started on: {initiatedAtUTC} (UTC)
-                      </p>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                          'border border-scale-200 ', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">{initiatedAt}</span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Root>
+                  {initiated_at !== undefined && (
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger className="w-full">
+                        <p className="text-center text-sm text-scale-1000">
+                          Started on: {initiatedAtUTC} (UTC)
+                        </p>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                            'border border-scale-200 ', //border
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">{initiatedAt}</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  )}
                 </div>
               </div>
             )}

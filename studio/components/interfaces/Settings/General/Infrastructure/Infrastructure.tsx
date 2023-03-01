@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 
-import { useParams, useStore } from 'hooks'
+import { useFlag, useParams, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import {
   FormHeader,
@@ -29,6 +29,8 @@ const Infrastructure: FC<Props> = ({}) => {
 
   const { data, isLoading } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
+
+  const showDbUpgrades = useFlag('databaseUpgrades')
 
   return (
     <div>
@@ -79,7 +81,7 @@ const Infrastructure: FC<Props> = ({}) => {
         <FormSection header={<FormSectionLabel>Postgres</FormSectionLabel>}>
           <FormSectionContent loading={isLoading}>
             <Input readOnly disabled value={currentPgVersion} label="Current version" />
-            {data?.eligible && <ProjectUpgradeAlert />}
+            {data?.eligible && showDbUpgrades && <ProjectUpgradeAlert />}
           </FormSectionContent>
         </FormSection>
       </FormPanel>
