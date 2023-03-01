@@ -6,7 +6,6 @@ import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
   LogsWarning,
-  LOGS_EXPLORER_DOCS_URL,
   LOGS_SOURCE_DESCRIPTION,
   LogTemplate,
 } from '.'
@@ -14,7 +13,6 @@ import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
 import { checkPermissions, useStore } from 'hooks'
-import { IconBookOpen } from '@supabase/ui'
 
 interface Props {
   templates?: LogTemplate[]
@@ -132,11 +130,6 @@ const LogsQueryPanel: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <a target="_blank" href={LOGS_EXPLORER_DOCS_URL}>
-                  <Button type="default" icon={<IconBookOpen size={12} />}>
-                    Docs
-                  </Button>
-                </a>
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>

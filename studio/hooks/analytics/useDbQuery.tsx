@@ -5,16 +5,19 @@ import {
   DbQueryData,
   DbQueryHandler,
   MetaQueryResponse,
-  DbQuery,
+  ReportQuery,
 } from 'components/interfaces/Reports/Reports.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
 
-type UseDbQuery = (sql: DbQuery['sql'], params?: BaseReportParams) => [DbQueryData, DbQueryHandler]
+type UseDbQuery = (
+  sql: ReportQuery['sql'],
+  params?: BaseReportParams
+) => [DbQueryData, DbQueryHandler]
 const useDbQuery: UseDbQuery = (sql, params = DEFAULT_QUERY_PARAMS) => {
   const { project } = useProjectContext()
 
-  const resolvedSql = typeof sql === 'function' ? sql(params) : sql
+  const resolvedSql = typeof sql === 'function' ? sql([]) : sql
 
   const {
     data,

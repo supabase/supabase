@@ -45,12 +45,16 @@ Let's say we create a leaderboard table. We want people on our website to be abl
 
 ```sql
 create table leaderboard (
-    name text,
-    score int
+  name text,
+  score int
 );
 
-insert into leaderboard(name, score)
-values ('Paul', 100), ('Leto', 50), ('Chani', 200);
+insert into leaderboard
+  (name, score)
+values
+  ('Paul', 100),
+  ('Leto', 50),
+  ('Chani', 200);
 ```
 
 Now let's set up a client to read the data, I've created a repl here to show a living example: [https://replit.com/@awalias/supabase-leaderboard-demo#index.js](https://replit.com/@awalias/supabase-leaderboard-demo#index.js). If you copy the snippet you can plug in your own Supabase URL and anon key.

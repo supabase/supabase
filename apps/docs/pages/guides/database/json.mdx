@@ -221,12 +221,11 @@ Select the title, description, price, and age range for each book.
 ```sql
 select
   title,
-  metadata -> 'description' AS description,
+  metadata -> 'description' as description,
   metadata -> 'price' as price,
   metadata -> 'ages' -> 0 as low_age,
   metadata -> 'ages' -> 1 as high_age
-from
-  books;
+from books;
 ```
 
 </TabPanel>
