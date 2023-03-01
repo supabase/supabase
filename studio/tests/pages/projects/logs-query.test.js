@@ -172,11 +172,10 @@ test('query warnings', async () => {
   await screen.findByText('1 warning')
 })
 
-test("field reference", async ()=>{
+test('field reference', async () => {
   render(<LogsExplorerPage />)
-  userEvent.click( await screen.findByText('Field Reference'))
+  userEvent.click(await screen.findByText('Field Reference'))
   await screen.findByText('metadata.request.cf.asOrganization')
-
 })
 
 describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
