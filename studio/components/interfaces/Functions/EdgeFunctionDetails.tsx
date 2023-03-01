@@ -5,14 +5,15 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Alert,
-  IconGlobe,
   IconTerminal,
   IconMinimize2,
   IconMaximize2,
-  IconCheck,
-  IconClipboard,
   Button,
   Modal,
+  Form,
+  Toggle,
+  IconHelpCircle,
+  Input,
 } from 'ui'
 
 import { useStore, useParams, checkPermissions } from 'hooks'
@@ -20,6 +21,15 @@ import Panel from 'components/ui/Panel'
 import CommandRender from './CommandRender'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
+import {
+  FormHeader,
+  FormPanel,
+  FormActions,
+  FormSection,
+  FormSectionLabel,
+  FormSectionContent,
+} from 'components/ui/Forms'
+import Link from 'next/link'
 
 interface Props {}
 
@@ -29,19 +39,19 @@ const EdgeFunctionDetails: FC<Props> = () => {
   const router = useRouter()
   const { functions, ui } = useStore()
   const { ref: projectRef, id } = useParams()
-  const [isCopied, setIsCopied] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [selectedFunction, setSelectedFunction] = useState<any>(null)
 
-  const canDeleteEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const { data: settings } = useProjectApiQuery({ projectRef })
   const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
+
+  const formId = 'edge-function-update-form'
+  const canUpdateEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   useEffect(() => {
     setSelectedFunction(functions.byId(id))
   }, [functions.isLoaded, ui.selectedProject])
-
-  const { data: settings } = useProjectApiQuery({ projectRef })
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -166,81 +176,106 @@ const EdgeFunctionDetails: FC<Props> = () => {
 
   return (
     <>
-      <div className="space-y-8 pb-16">
-        <div className="space-y-6 rounded border bg-scale-100 px-10 py-8 drop-shadow-sm dark:bg-scale-300">
-          <div className="flex items-center">
-            <p className="text-sm text-scale-1000 w-[130px]">Function Name</p>
-            <p className="text-sm text-scale-1200">{selectedFunction?.name}</p>
-          </div>
+      <div className="space-y-4 pb-16">
+        <Form id={formId} initialValues={{}} onSubmit={() => {}}>
+          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
-          <div className="flex items-center">
-            <p className="text-sm text-scale-1000 w-[130px]">Endpoint URL</p>
-            <p className="text-sm text-scale-1200">{functionUrl}</p>
-            <button
-              type="button"
-              className="text-scale-900 hover:text-scale-1200 transition ml-2"
-              onClick={(event: any) => {
-                function onCopy(value: any) {
-                  setIsCopied(true)
-                  navigator.clipboard.writeText(value).then()
-                  setTimeout(function () {
-                    setIsCopied(false)
-                  }, 3000)
+            useEffect(() => {
+              if (selectedFunction !== undefined) {
+                const formValues = {
+                  name: selectedFunction?.name,
+                  verifyJwt: selectedFunction?.verify_jwt,
+                  importMap: selectedFunction?.import_map,
                 }
-                event.stopPropagation()
-                onCopy(functionUrl)
-              }}
-            >
-              {isCopied ? (
-                <div className="text-brand-900">
-                  <IconCheck size={14} strokeWidth={3} />
-                </div>
-              ) : (
-                <div className="relative">
-                  <div className="block">
-                    <IconClipboard size={14} strokeWidth={1.5} />
-                  </div>
-                </div>
-              )}
-            </button>
-          </div>
-
-          <div className="flex items-center">
-            <p className="text-sm text-scale-1000 w-[130px]">Created At</p>
-            <p className="text-sm text-scale-1200">
-              {selectedFunction?.created_at &&
-                dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
-            </p>
-          </div>
-
-          <div className="flex items-center">
-            <p className="text-sm text-scale-1000 w-[130px]">Last Updated At</p>
-            <p className="text-sm text-scale-1200">
-              {selectedFunction?.updated_at &&
-                dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
-            </p>
-          </div>
-
-          <div className="flex items-center">
-            <span className="text-sm text-scale-1000 w-[130px]">Deployments</span>
-            <div className="text-sm text-scale-1200">{selectedFunction?.version}</div>
-          </div>
-
-          <div className="flex items-start">
-            <span className="text-sm text-scale-1000 w-[130px]">Regions</span>
-            <div className="col-span-2 flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-sm text-scale-1200">
-                <IconGlobe size={16} strokeWidth={1.5} />
-                <span>Earth</span>
-              </div>
-              <span className="text-sm text-scale-1000">All functions are deployed globally</span>
-            </div>
-          </div>
-        </div>
+                resetForm({ values: formValues, initialValues: formValues })
+              }
+            }, [selectedFunction])
+            return (
+              <>
+                <FormPanel
+                  disabled={!canUpdateEdgeFunction}
+                  footer={
+                    <div className="flex py-4 px-8">
+                      <FormActions
+                        form={formId}
+                        isSubmitting={isSubmitting}
+                        hasChanges={hasChanges}
+                        handleReset={handleReset}
+                        helper={
+                          !canUpdateEdgeFunction
+                            ? 'You need additional permissions to update this function'
+                            : undefined
+                        }
+                      />
+                    </div>
+                  }
+                >
+                  <FormSection header={<FormSectionLabel>Function Details</FormSectionLabel>}>
+                    <FormSectionContent loading={selectedFunction === undefined}>
+                      <Input id="name" name="name" label="Name" />
+                      <Input
+                        disabled
+                        copy
+                        label="Endpoint URL"
+                        value={functionUrl}
+                        descriptionText="All functions are deployed globally"
+                      />
+                      <Input
+                        disabled
+                        label="Created at"
+                        value={dayjs(selectedFunction?.created_at ?? 0).format(
+                          'dddd, MMMM D, YYYY h:mm A'
+                        )}
+                      />
+                      <Input
+                        disabled
+                        label="Last updated at"
+                        value={dayjs(selectedFunction?.updated_at ?? 0).format(
+                          'dddd, MMMM D, YYYY h:mm A'
+                        )}
+                      />
+                      <Input disabled label="Deployments" value={selectedFunction?.version ?? 0} />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection header={<FormSectionLabel>Function Configuration</FormSectionLabel>}>
+                    <FormSectionContent loading={selectedFunction === undefined}>
+                      <Toggle
+                        id="verifyJwt"
+                        name="verifyJwt"
+                        label="Enforce JWT Verification"
+                        descriptionText="Require a valid JWT in the authorization header when invoking the function"
+                      />
+                      <Toggle
+                        id="importMap"
+                        name="importMap"
+                        label={
+                          <div className="flex items-center space-x-2">
+                            <p>Allow import maps</p>
+                            <Link href="https://supabase.com/docs/guides/functions/import-maps">
+                              <a target="_blank">
+                                <IconHelpCircle
+                                  size={16}
+                                  strokeWidth={1.5}
+                                  className="text-scale-1000 hover:text-scale-1200 transition"
+                                />
+                              </a>
+                            </Link>
+                          </div>
+                        }
+                        descriptionText="Allow the use of bare specifiers without having to install the Node.js package locally"
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                </FormPanel>
+              </>
+            )
+          }}
+        </Form>
 
         <div
-          className="space-y-6 rounded border bg-scale-100 px-8 py-6 drop-shadow-sm dark:bg-scale-300 transition-all overflow-hidden"
-          style={{ maxHeight: showInstructions ? 800 : 80 }}
+          className="space-y-6 rounded border bg-scale-100 px-6 py-4 drop-shadow-sm dark:bg-scale-300 transition-all overflow-hidden"
+          style={{ maxHeight: showInstructions ? 800 : 66 }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -266,7 +301,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
           <CommandRender commands={secretCommands} />
         </div>
 
-        <Panel title={<p>Delete Edge Function</p>}>
+        <Panel title={<p>Delete Edge Function</p>} className="!mt-8">
           <Panel.Content>
             <Alert
               withIcon
@@ -280,14 +315,14 @@ const EdgeFunctionDetails: FC<Props> = () => {
                 <Tooltip.Trigger>
                   <Button
                     type="danger"
-                    disabled={!canDeleteEdgeFunction}
+                    disabled={!canUpdateEdgeFunction}
                     loading={selectedFunction?.id === undefined}
                     onClick={() => setShowDeleteModal(true)}
                   >
                     Delete edge function
                   </Button>
                 </Tooltip.Trigger>
-                {!canDeleteEdgeFunction && (
+                {!canUpdateEdgeFunction && (
                   <Tooltip.Content side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
