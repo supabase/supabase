@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
+import { Database } from '../common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
@@ -46,7 +47,7 @@ serve(async (req) => {
 
     const sanitizedQuery = query.trim()
 
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+    const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
     const configuration = new Configuration({ apiKey: openAiKey })
     const openai = new OpenAIApi(configuration)
@@ -73,7 +74,6 @@ serve(async (req) => {
     }
 
     const [{ embedding }] = embeddingResponse.data.data
-
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
       'match_page_sections',
       {
@@ -85,7 +85,7 @@ serve(async (req) => {
     )
 
     if (matchError || !pageSections) {
-      throw new ApplicationError('Failed to match page sections', matchError)
+      throw new ApplicationError('Failed to match page sections', matchError ?? undefined)
     }
 
     const uniquePageIds = pageSections

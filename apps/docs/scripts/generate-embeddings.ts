@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { ObjectExpression } from 'estree'
 import { readdir, readFile, stat } from 'fs/promises'
 import GithubSlugger from 'github-slugger'
+import yaml from 'js-yaml'
 import { Content, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, MdxjsEsm } from 'mdast-util-mdx'
@@ -12,10 +13,15 @@ import { toString } from 'mdast-util-to-string'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
+import { OpenAPIV3 } from 'openapi-types'
 import { basename, dirname, join } from 'path'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
 import { inspect } from 'util'
+import { IFunctionDefinition, ISpec } from '../components/reference/Reference.types'
+import { CliCommand, CliSpec } from '../generator/types/CliSpec'
+import { flattenSections, ReferenceSection } from '../lib/helpers'
+import { enrichedOperation, gen_v3 } from '../lib/refGenerator/helpers'
 
 dotenv.config()
 
@@ -220,6 +226,174 @@ async function walk(dir: string, parentPath?: string): Promise<WalkEntry[]> {
   return flattenedFiles.sort((a, b) => a.path.localeCompare(b.path))
 }
 
+abstract class BaseEmbeddingSource {
+  checksum?: string
+  meta?: Meta
+  sections?: Section[]
+
+  constructor(public source: string, public path: string, public parentPath?: string) {}
+
+  abstract load(): Promise<{ checksum: string; meta?: Meta; sections: Section[] }>
+}
+
+class MarkdownEmbeddingSource extends BaseEmbeddingSource {
+  type: 'markdown' = 'markdown'
+
+  constructor(source: string, public filePath: string, public parentFilePath?: string) {
+    const path = filePath.replace(/^pages/, '').replace(/\.mdx?$/, '')
+    const parentPath = parentFilePath?.replace(/^pages/, '').replace(/\.mdx?$/, '')
+
+    super(source, path, parentPath)
+  }
+
+  async load() {
+    const contents = await readFile(this.filePath, 'utf8')
+
+    const { checksum, meta, sections } = processMdxForSearch(contents)
+
+    this.checksum = checksum
+    this.meta = meta
+    this.sections = sections
+
+    return {
+      checksum,
+      meta,
+      sections,
+    }
+  }
+}
+
+abstract class ReferenceEmbeddingSource<SpecSection> extends BaseEmbeddingSource {
+  type: 'reference' = 'reference'
+
+  constructor(
+    source: string,
+    path: string,
+    public meta: Meta,
+    public specFilePath: string,
+    public sectionsFilePath: string
+  ) {
+    super(source, path)
+  }
+
+  async load() {
+    const specContents = await readFile(this.specFilePath, 'utf8')
+    const refSectionsContents = await readFile(this.sectionsFilePath, 'utf8')
+
+    const refSections: ReferenceSection[] = JSON.parse(refSectionsContents)
+    const flattenedRefSections = flattenSections(refSections)
+
+    const checksum = createHash('sha256')
+      .update(specContents + refSectionsContents)
+      .digest('base64')
+
+    const specSections = this.getSpecSections(specContents)
+
+    const sections = flattenedRefSections
+      .map((refSection) => {
+        const specSection = this.matchSpecSection(specSections, refSection.id)
+
+        if (!specSection) {
+          return
+        }
+
+        return {
+          heading: refSection.title,
+          slug: refSection.slug,
+          content: `${this.meta.title} for ${refSection.title}:\n${this.formatSection(
+            specSection,
+            refSection
+          )}`,
+        }
+      })
+      .filter((section) => !!section)
+
+    this.checksum = checksum
+    this.sections = sections
+
+    return {
+      checksum,
+      sections,
+      meta: this.meta,
+    }
+  }
+
+  abstract getSpecSections(specContents: string): SpecSection[]
+  abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection
+  abstract formatSection(specSection: SpecSection, refSection: ReferenceSection): string
+}
+
+class OpenApiEmbeddingSource extends ReferenceEmbeddingSource<enrichedOperation> {
+  getSpecSections(specContents: string): enrichedOperation[] {
+    const spec: OpenAPIV3.Document<{}> = JSON.parse(specContents)
+
+    const generatedSpec = gen_v3(spec, '', {
+      apiUrl: 'apiv0',
+    })
+
+    return generatedSpec.operations
+  }
+  matchSpecSection(operations: enrichedOperation[], id: string): enrichedOperation {
+    return operations.find((operation) => operation.operationId === id)
+  }
+  formatSection(specOperation: enrichedOperation) {
+    const { summary, description, operation, path, tags } = specOperation
+    return JSON.stringify({
+      summary,
+      description,
+      operation,
+      path,
+      tags,
+    })
+  }
+}
+
+class ClientLibEmbeddingSource extends ReferenceEmbeddingSource<IFunctionDefinition> {
+  getSpecSections(specContents: string): IFunctionDefinition[] {
+    const spec = yaml.load(specContents) as ISpec
+
+    return spec.functions
+  }
+  matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
+    return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
+  }
+  formatSection(functionDefinition: IFunctionDefinition, refSection: ReferenceSection): string {
+    const { title } = refSection
+    const { description, title: functionName } = functionDefinition
+
+    return JSON.stringify({
+      title,
+      description,
+      functionName,
+    })
+  }
+}
+
+class CliEmbeddingSource extends ReferenceEmbeddingSource<CliCommand> {
+  getSpecSections(specContents: string): CliCommand[] {
+    const spec = yaml.load(specContents) as CliSpec
+
+    return spec.commands
+  }
+  matchSpecSection(cliCommands: CliCommand[], id: string): CliCommand {
+    return cliCommands.find((cliCommand) => cliCommand.id === id)
+  }
+  formatSection(cliCommand: CliCommand): string {
+    const { summary, description, usage } = cliCommand
+    return JSON.stringify({
+      summary,
+      description,
+      usage,
+    })
+  }
+}
+
+type EmbeddingSource =
+  | MarkdownEmbeddingSource
+  | OpenApiEmbeddingSource
+  | ClientLibEmbeddingSource
+  | CliEmbeddingSource
+
 async function generateEmbeddings() {
   // TODO: use better CLI lib like yargs
   const args = process.argv.slice(2)
@@ -237,14 +411,65 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
   )
 
-  const markdownFiles = (await walk('pages'))
-    .filter(({ path }) => /\.mdx?$/.test(path))
-    .filter(({ path }) => !ignoredFiles.includes(path))
+  const embeddingSources: EmbeddingSource[] = [
+    new OpenApiEmbeddingSource(
+      'api',
+      '/reference/api',
+      { title: 'Management API Reference' },
+      '../../spec/transforms/api_v0_openapi_deparsed.json',
+      '../../spec/common-api-sections.json'
+    ),
+    new ClientLibEmbeddingSource(
+      'js-lib',
+      '/reference/javascript',
+      { title: 'JavaScript Reference' },
+      '../../spec/supabase_js_v2.yml',
+      '../../spec/common-client-libs-sections.json'
+    ),
+    new ClientLibEmbeddingSource(
+      'dart-lib',
+      '/reference/dart',
+      { title: 'Dart Reference' },
+      '../../spec/supabase_dart_v1.yml',
+      '../../spec/common-client-libs-sections.json'
+    ),
+    new ClientLibEmbeddingSource(
+      'python-lib',
+      '/reference/python',
+      { title: 'Python Reference' },
+      '../../spec/supabase_py_v2.yml',
+      '../../spec/common-client-libs-sections.json'
+    ),
+    new ClientLibEmbeddingSource(
+      'csharp-lib',
+      '/reference/csharp',
+      { title: 'C# Reference' },
+      '../../spec/supabase_csharp_v0.yml',
+      '../../spec/common-client-libs-sections.json'
+    ),
+    new CliEmbeddingSource(
+      'cli',
+      '/reference/cli',
+      { title: 'CLI Reference' },
+      '../../spec/cli_v1_commands.yaml',
+      '../../spec/common-cli-sections.json'
+    ),
+    ...(await walk('pages'))
+      .filter(({ path }) => /\.mdx?$/.test(path))
+      .filter(({ path }) => !ignoredFiles.includes(path))
+      .map((entry) => new MarkdownEmbeddingSource('guide', entry.path)),
+  ]
 
-  console.log(`Discovered ${markdownFiles.length} pages`)
+  console.log(`Discovered ${embeddingSources.length} pages`)
 
   if (!shouldRefresh) {
     console.log('Checking which pages are new or have changed')
@@ -252,14 +477,11 @@ async function generateEmbeddings() {
     console.log('Refresh flag set, re-generating all pages')
   }
 
-  for (const markdownFile of markdownFiles) {
-    const path = markdownFile.path.replace(/^pages/, '').replace(/\.mdx?$/, '')
-    const parentPath = markdownFile.parentPath?.replace(/^pages/, '').replace(/\.mdx?$/, '')
+  for (const embeddingSource of embeddingSources) {
+    const { type, source, path, parentPath } = embeddingSource
 
     try {
-      const contents = await readFile(markdownFile.path, 'utf8')
-
-      const { checksum, meta, sections } = processMdxForSearch(contents)
+      const { checksum, meta, sections } = await embeddingSource.load()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
@@ -345,6 +567,8 @@ async function generateEmbeddings() {
           {
             checksum: null,
             path,
+            type,
+            source,
             meta,
             parent_page_id: parentPage?.id,
           },
