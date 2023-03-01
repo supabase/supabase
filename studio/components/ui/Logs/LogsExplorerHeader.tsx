@@ -62,7 +62,7 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
             onClick={() => setShowReference(true)}
             icon={<IconBookOpen strokeWidth={1.5} />}
           >
-            Show Reference
+            Field Reference
           </Button>
         }
       >
