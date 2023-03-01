@@ -33,9 +33,16 @@ export function getPageType(asPath: string) {
   return page
 }
 
-export function flattenSections(sections) {
-  var a = []
-  for (var i = 0; i < sections.length; i++) {
+export type ReferenceSection = {
+  title: string
+  id?: string
+  slug?: string
+  items?: ReferenceSection[]
+}
+
+export function flattenSections(sections: ReferenceSection[]) {
+  let a: ReferenceSection[] = []
+  for (let i = 0; i < sections.length; i++) {
     if (sections[i].id) {
       // only push a section that has an id
       // these are reserved for sidebar subtitles

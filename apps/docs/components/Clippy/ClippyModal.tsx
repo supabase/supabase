@@ -228,7 +228,7 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
               return (
                 <div key={page.id} className="flex flex-col gap-3">
                   <SearchResult
-                    href={`${page.path}`}
+                    href={page.path}
                     type={SearchResultType.Document}
                     title={page.meta.title}
                   />
@@ -239,7 +239,9 @@ const ClippyModal: FC<Props> = ({ onClose }) => {
                         {pageSections.map((section) => (
                           <SearchResult
                             key={section.id}
-                            href={`${page.path}#${section.slug}`}
+                            href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
+                              section.slug
+                            }`}
                             type={SearchResultType.Section}
                             title={section.heading}
                             chip={page.meta.title}
