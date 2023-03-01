@@ -1,6 +1,6 @@
 const schemas = [
   {
-    name: 'API Edge Network',
+    name: 'API Edge',
     reference: 'edge_logs',
     fields: [
       { path: 'id', type: 'string' },
