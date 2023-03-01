@@ -390,7 +390,7 @@ This ensures that any `delete()` or `update()` would fail if there are no accomp
 To confirm that safeupdate is enabled for queries going through the API of your project, the following query could be run:
 
 ```sql
-select usename,useconfig from pg_shadow where usename = 'authenticator' ;
+select usename, useconfig from pg_shadow where usename = 'authenticator';
 ```
 
 The expected value for `useconfig` should be:
