@@ -9,7 +9,7 @@ cp supabase/.env.local.example supabase/.env.local
 ## Run locally
 
 ```bash
-supabase functions serve --no-verify-jwt --env-file ./supabase/.env.local openai
+supabase functions serve --env-file ./supabase/.env.local --no-verify-jwt
 ```
 
 Use cURL or Postman to make a POST request to http://localhost:54321/functions/v1/openai.

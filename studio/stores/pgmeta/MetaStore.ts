@@ -183,7 +183,7 @@ export default class MetaStore implements IMetaStore {
 
     this.openApi = new OpenApiStore(
       this.rootStore,
-      `${API_URL}/props/project/${this.projectRef}/api`
+      `${API_URL}/projects/${this.projectRef}/api/rest`
     )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
@@ -895,7 +895,7 @@ export default class MetaStore implements IMetaStore {
       this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi.setUrl(`${API_URL}/props/project/${this.projectRef}/api`)
+    this.openApi.setUrl(`${API_URL}/projects/${this.projectRef}/api/rest`)
     this.openApi.setHeaders(this.headers)
 
     this.tables.setUrl(`${this.baseUrl}/tables`)
