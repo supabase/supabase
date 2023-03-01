@@ -80,6 +80,7 @@ export const menuItems: NavMenu = {
       label: 'Auth',
       items: [
         { name: 'Overview', url: '/guides/auth', items: [] },
+        { name: 'Quickstarts', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'Authentication',
           url: undefined,
