@@ -1862,4 +1862,19 @@ module.exports = [
     source: '/docs/guides/platform/database-usage',
     destination: '/docs/guides/platform/database-size',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
+    destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/first-row-in-group',
+    destination: '/docs/guides/database/postgres/first-row-in-group',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/which-version-of-postgres',
+    destination: '/docs/guides/database/postgres/which-version-of-postgres',
+  },
 ]
