@@ -130,7 +130,7 @@ export default function TicketHome() {
             <div className={classNames(styles['bg-lw7-black-transition'], 'h-24 ')}></div>
           </div>
           <div className="bg-black text-white">
-            <div className="flex gap-4 max-w-7xl mx-auto">
+            <div className="flex gap-4 max-w-7xl mx-auto mb-8">
               <div className=" w-3/5">
                 <div className="grid gap-4 border border-[#484848]  rounded-tr-xl rounded-tl-xl overflow-hidden">
                   <div className="relative h-[360px]">

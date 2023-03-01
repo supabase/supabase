@@ -71,6 +71,7 @@ export default function TicketCopy({ username }: Props) {
         styleUtils['appear-third'],
         'bg-scaleA-200 h-8 rounded-md border border-scale-1100 w-full'
       )}
+      id="wayfinding--ticket-copy"
     >
       <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20 bg-[#D9D9D94D]">
         <div className="flex items-center truncate">

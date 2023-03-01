@@ -63,7 +63,7 @@ export default function TicketVisual({
             </div>*/}
           </div>
         </div>
-        <div className={cn(styles['horizontal-ticket'], 'wayfinding--TicketMono-container')}>
+        <div className={cn(styles['horizontal-ticket'])} id="wayfinding--TicketMono-container">
           <TicketMono golden={golden} />
         </div>
         <div className={styles['vertical-ticket']}>
@@ -83,7 +83,7 @@ export default function TicketVisual({
             golden={golden}
           />
         </div>
-        {ticketNumber && <TicketNumber number={ticketNumber} />}
+        <TicketNumber number={ticketNumber} />
       </div>
     </>
   )

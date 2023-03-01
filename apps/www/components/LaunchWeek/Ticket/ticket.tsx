@@ -74,32 +74,39 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            'relative mx-2 rounded-xl h-[390px]'
+            username ? 'h-[390px]' : 'h-[350px]',
+            'relative mx-2 rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
           <TicketVisual
             username={username ?? undefined}
             name={name ?? undefined}
-            ticketNumber={ticketNumber ?? undefined}
+            ticketNumber={ticketNumber ?? 0}
             ticketGenerationState={ticketGenerationState}
             setTicketGenerationState={setTicketGenerationState}
             golden={golden}
           />
+          {username && (
+            <div className="mt-4">
+              <TicketCopy username={username} />
+            </div>
+          )}
         </div>
         {!sharePage && (
           <>
             {username ? (
               <div className="flex flex-col gap-6 py-4 mx-3">
-                <div>
+                {/* <div>
                   <TicketCopy username={username} />
-                </div>
+                </div> */}
                 {/* <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
                   <TicketActions username={username} golden={golden} />
                 </div> */}
               </div>
             ) : (
-              <div className={styles['ticket-actions-placeholder']} />
+              <></>
+              // <div className={styles['ticket-actions-placeholder']} />
             )}
           </>
         )}
@@ -145,6 +152,7 @@ export default function Ticket({
               </p>
             )}
           </h1>
+
           <h2 className="text-base max-w-[520px]">
             {golden ? (
               <>
@@ -152,7 +160,6 @@ export default function Ticket({
                   You got a Golden ticket. This means you’re in, and you also won a Supabase sticker
                   pack!
                 </p>
-                <p>Referrals: {referrals}</p>
               </>
             ) : (
               <>
@@ -162,8 +169,6 @@ export default function Ticket({
                       Why stop there? Increase your chances of winning by sharing your unique
                       ticket. Get sharing!
                     </p>
-
-                    <ReferralIndicator />
                   </>
                 ) : (
                   <p>
@@ -174,6 +179,7 @@ export default function Ticket({
               </>
             )}
           </h2>
+          {username && <ReferralIndicator />}
         </div>
         <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
           {username && <TicketActions username={username} golden={golden} />}
