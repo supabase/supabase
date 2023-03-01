@@ -61,4 +61,7 @@ jobs:
         run: npm ci
       - name: Run prettier
         run: |-
-          npx prettier -c '*.sql'
+          # Check mdx files which contain sql code blocks
+          grep -lr '```sql' apps/docs/pages/**/*.mdx | \
+          grep -Ev '(/guides/auth/|/guides/integrations/)' | \
+          xargs npx prettier -c
