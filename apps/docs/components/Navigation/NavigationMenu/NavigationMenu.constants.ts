@@ -293,6 +293,10 @@ export const auth = {
       url: '/guides/auth/overview',
     },
     {
+      name: 'Quickstarts',
+      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+    },
+    {
       name: 'Authentication',
       url: undefined,
       items: [
