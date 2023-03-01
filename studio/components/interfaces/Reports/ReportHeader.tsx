@@ -21,7 +21,7 @@ const ReportHeader: React.FC<Props> = ({ title, onRefresh, isLoading }) => (
         />
       }
     >
-      Refresh
+      {isLoading ? 'Refreshing' : 'Refresh'}
     </Button>
   </div>
 )
