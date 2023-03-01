@@ -1,9 +1,10 @@
-import { FC, useRef, useEffect, useState, useCallback } from 'react'
+import { FC, useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
 
 import { SchemaView } from 'types'
 import { checkPermissions, useFlag, useStore, useParams } from 'hooks'
@@ -20,13 +21,14 @@ import {
 import { IconBookOpen, SidePanel } from 'ui'
 import ActionBar from './SidePanelEditor/ActionBar'
 import { GeneralContent, ResourceContent } from '../Docs'
+import { sqlKeys } from 'data/sql/keys'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { snakeToCamel } from 'lib/helpers'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
@@ -109,8 +111,61 @@ const TableGridEditor: FC<Props> = ({
     setEncryptedColumns(columns)
   }
 
+  const queryClient = useQueryClient()
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
-    onError(error) {
+    async onMutate({ projectRef, table, configuration, payload }) {
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
+
+      await queryClient.cancelQueries(queryKey)
+
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+
       onError(error)
     },
   })
