@@ -1,9 +1,13 @@
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from 'ui'
+import { useUrlState } from 'hooks'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
   dispatch({
@@ -19,14 +23,34 @@ const rowsPerPageOptions = [
   { value: 1000, label: '1000 rows' },
 ]
 
-type PaginationProps = {}
+export interface PaginationProps {
+  isLoading?: boolean
+}
 
-const Pagination: FC<PaginationProps> = () => {
+const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const [page, setPage] = useState<number | null>(state.page)
-  const maxPages = Math.ceil(state.totalRows / state.rowsPerPage)
-  const totalPages = state.totalRows > 0 ? maxPages : 1
+
+  const [{ filter }] = useUrlState({
+    arrayKeys: ['filter'],
+  })
+  const filters = formatFilterURLParams(filter as string[])
+  const table = state.table ?? undefined
+  const { project } = useProjectContext()
+  const { data, isLoading, isSuccess, isError } = useTableRowsCountQuery(
+    {
+      queryKey: [table?.schema, table?.name, 'count'],
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      table,
+      filters,
+    },
+    { keepPreviousData: true }
+  )
+
+  const maxPages = Math.ceil((data?.count ?? 0) / state.rowsPerPage)
+  const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
@@ -75,6 +99,8 @@ const Pagination: FC<PaginationProps> = () => {
     }
   }
 
+  // TODO: look at aborting useTableRowsQuery if the user presses the button quickly
+
   const goToPreviousPage = () => {
     const previousPage = state.page - 1
     setPage(previousPage)
@@ -102,14 +128,14 @@ const Pagination: FC<PaginationProps> = () => {
 
   return (
     <div className="sb-grid-pagination">
-      {state.totalRows < 0 ? (
-        <p className="text-sm text-scale-1100">Loading records...</p>
-      ) : (
+      {isLoading && <p className="text-sm text-scale-1100">Loading records count...</p>}
+
+      {isSuccess && (
         <>
           <Button
             icon={<IconArrowLeft />}
             type="outline"
-            disabled={state.page <= 1 || state.isLoading}
+            disabled={state.page <= 1 || isLoading}
             onClick={onPreviousPage}
             style={{ padding: '3px 10px' }}
           />
@@ -132,7 +158,7 @@ const Pagination: FC<PaginationProps> = () => {
           <Button
             icon={<IconArrowRight />}
             type="outline"
-            disabled={state.page >= maxPages || state.isLoading}
+            disabled={state.page >= maxPages || isLoading}
             onClick={onNextPage}
             style={{ padding: '3px 10px' }}
           />
@@ -149,11 +175,17 @@ const Pagination: FC<PaginationProps> = () => {
               style={{ padding: '3px 10px' }}
             >{`${state.rowsPerPage} rows`}</Button>
           </DropdownControl>
-          <p className="text-sm text-scale-1100">{`${state.totalRows.toLocaleString()} ${
-            state.totalRows === 0 || state.totalRows > 1 ? `records` : 'record'
+          <p className="text-sm text-scale-1100">{`${data.count.toLocaleString()} ${
+            data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
-          {state.isLoading && <IconLoader size={14} className="animate-spin" />}
+          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
         </>
+      )}
+
+      {isError && (
+        <p className="text-sm text-scale-1100">
+          Error fetching records count. Please refresh the page.
+        </p>
       )}
     </div>
   )
