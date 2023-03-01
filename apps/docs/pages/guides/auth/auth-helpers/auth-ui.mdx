@@ -161,7 +161,7 @@ If you don't pass a value to `theme` it uses the `"default"` theme. You can pass
 
 ### Override themes
 
-Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js lines=14-21 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -192,7 +192,7 @@ If you created your own theme, you may not need to override any of the them.
 ### Create your own theme [#create-theme]
 
 You can create your own theme by following the same structure within a `appearance.theme` property.
-See the list of [tokens within a theme](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -293,7 +293,7 @@ const App = () => (
 
 ### Custom labels [#custom-labels]
 
-You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json) that can be overwritten.
+You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/localization/en.json) that can be overwritten.
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
