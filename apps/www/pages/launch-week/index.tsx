@@ -95,7 +95,6 @@ export default function TicketHome() {
           </SectionContainer>
 
           <LaunchWeekPrizeSection />
-          <TicketBrickWall />
         </div>
       </DefaultLayout>
     </>
