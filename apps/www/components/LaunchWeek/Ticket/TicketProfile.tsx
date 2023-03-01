@@ -1,6 +1,6 @@
 // import GithubIcon from '~/components/LaunchWeek/Ticket/icons/icon-github'
 import cn from 'classnames'
-import TicketForm from './ticket-form'
+import TicketForm from './TicketForm'
 // import IconAvatar from '~/components/LaunchWeek/Ticket/icons/icon-avatar'
 import styles from './ticket-profile.module.css'
 

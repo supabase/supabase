@@ -9,6 +9,8 @@ import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { FastGlobOptionsWithoutCwd } from 'globby'
 import { useTheme } from 'common/Providers'
+import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
+import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 
 type Props = {
   username: string | null
@@ -60,28 +62,24 @@ export default function TicketShare({ username, ticketNumber, name, golden, refe
         }}
       />
       <DefaultLayout>
-        <SectionContainer className="flex flex-col gap-8 pb-0 md:gap-16 lg:gap-16 items-center xl:items-start">
-          <img
-            src="/images/launchweek/launchweek-logo--light.svg"
-            className="md:40 w-40 dark:hidden lg:w-80"
-          />
-          <img
-            src="/images/launchweek/launchweek-logo--dark.svg"
-            className="md:40 hidden w-40 dark:block lg:w-80"
-          />
-          <TicketContainer
-            supabase={supabase}
-            session={null}
-            defaultUserData={{
-              username: username || undefined,
-              name: name || '',
-              ticketNumber,
-              golden,
-              referrals,
-            }}
-            sharePage
-          />
-        </SectionContainer>
+        <div className="bg-lw7 -mt-16 pt-12">
+          <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
+            <LaunchWeekLogoHeader />
+            <TicketContainer
+              supabase={supabase}
+              session={null}
+              defaultUserData={{
+                username: username || undefined,
+                name: name || '',
+                ticketNumber,
+                golden,
+                referrals,
+              }}
+              sharePage
+            />
+          </SectionContainer>
+          <LaunchWeekPrizeSection />
+        </div>
       </DefaultLayout>
     </>
   )
