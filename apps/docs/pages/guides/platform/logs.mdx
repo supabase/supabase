@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { logConstants } from 'shared-data'
 
 export const meta = {
   id: 'logs',
@@ -248,6 +249,33 @@ from
   cross join unnest(r.headers) as h
 where h.x_real_ip is not null and r.method = "GET";
 ```
+
+### Log Source Reference
+
+Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs">
+  {logConstants.schemas.map((schema) => (
+    <TabPanel id={schema.reference} label={schema.name}>
+      <table>
+        <thead>
+          <td className="font-bold">Path</td>
+          <td className="font-bold">Type</td>
+        </thead>
+        <tbody>
+          {schema.fields
+            .sort((a, b) => a.path - b.path)
+            .map((field) => (
+              <tr>
+                <td className="font-mono">{field.path}</td>
+                <td className="font-mono">{field.type}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </TabPanel>
+  ))}
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
