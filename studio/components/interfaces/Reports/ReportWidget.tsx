@@ -31,6 +31,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   return (
     <Panel
       noMargin
+      noHideOverflow
       className={'pb-0 ' + props.className}
       bodyClassName="h-full"
       wrapWithLoading={false}

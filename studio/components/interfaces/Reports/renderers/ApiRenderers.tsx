@@ -15,7 +15,7 @@ export const renderTotalRequests = (
       size="small"
       minimalHeader
       highlightedValue={total}
-      className="w-full h-42"
+      className="w-full"
       data={props.data}
       yAxisKey="count"
       xAxisKey="timestamp"
@@ -37,8 +37,8 @@ export const renderErrorCounts = (
     <BarChart
       size="small"
       minimalHeader
+      className="w-full"
       highlightedValue={total}
-      className="w-full h-42"
       data={props.data}
       yAxisKey="count"
       xAxisKey="timestamp"
@@ -66,7 +66,7 @@ export const renderResponseSpeed = (
       highlightedValue={lastAvg}
       format="ms"
       minimalHeader
-      className="w-full h-42"
+      className="w-full"
       data={transformedData}
       yAxisKey="avg"
       xAxisKey="timestamp"

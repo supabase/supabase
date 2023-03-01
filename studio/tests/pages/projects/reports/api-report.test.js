@@ -22,6 +22,7 @@ test(`static elements`, async () => {
 test('refresh button', async () => {
   render(<ApiReport />)
   await waitFor(() => expect(get).toBeCalled())
+  expect(screen.findByText(/Refreshing/)).resolves.toThrow()
   get.mockReset()
   userEvent.click(await screen.findByText(/Refresh/))
   await waitFor(() => expect(get).toBeCalled())
