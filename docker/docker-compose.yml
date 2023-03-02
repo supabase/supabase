@@ -46,7 +46,8 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
-      - ./volumes/api:/var/lib/kong:ro
+      # https://github.com/supabase/supabase/issues/12661
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
   auth:
     container_name: supabase-auth
