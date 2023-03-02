@@ -77,13 +77,21 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
           }
         >
           <SidePanel.Content>
-            <div className="pt-4 pb-2">
+            <div className="pt-4 pb-2 space-y-1">
               <p className="text-sm">
                 The following table shows all the available paths that can be queried from each
-                respective source, by following the syntax:{' '}
-                <code className="text-xs">
-                  select {`{path}`} from {`{source}`};
-                </code>
+                respective source. Do note that to access nested keys, you would need to perform the
+                necessary{' '}
+                <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
+                  <a target="_blank" className="text-brand-900">
+                    unnesting joins
+                    <IconExternalLink
+                      size="tiny"
+                      className="ml-1 inline -translate-y-[2px]"
+                      strokeWidth={1.5}
+                    />
+                  </a>
+                </Link>
               </p>
             </div>
           </SidePanel.Content>
