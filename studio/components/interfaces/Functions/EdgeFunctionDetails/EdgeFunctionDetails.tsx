@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -18,8 +19,11 @@ import {
 
 import { useStore, useParams, checkPermissions } from 'hooks'
 import Panel from 'components/ui/Panel'
-import CommandRender from './CommandRender'
+import CommandRender from '../CommandRender'
+import { generateCLICommands } from './EdgeFunctionDetails.utils'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import {
   FormHeader,
@@ -29,29 +33,28 @@ import {
   FormSectionLabel,
   FormSectionContent,
 } from 'components/ui/Forms'
-import Link from 'next/link'
 
 interface Props {}
 
-// [Joshen] Next - additional configs: Verify jwt + import maps
-
 const EdgeFunctionDetails: FC<Props> = () => {
   const router = useRouter()
-  const { functions, ui } = useStore()
+  const { ui } = useStore()
   const { ref: projectRef, id } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [selectedFunction, setSelectedFunction] = useState<any>(null)
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
+  const { data: functions } = useEdgeFunctionsQuery({ projectRef })
+  const { mutateAsync: updateEdgeFunction } = useEdgeFunctionUpdateMutation()
   const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
 
   const formId = 'edge-function-update-form'
   const canUpdateEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   useEffect(() => {
-    setSelectedFunction(functions.byId(id))
-  }, [functions.isLoaded, ui.selectedProject])
+    if (!isLoading) setSelectedFunction((functions ?? []).find((fn: any) => fn.id === id))
+  }, [isLoading, ui.selectedProject])
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -67,6 +70,34 @@ const EdgeFunctionDetails: FC<Props> = () => {
     ...endpointSections.slice(1),
   ].join('.')
   const functionUrl = `${apiService?.protocol}://${functionsEndpoint}/${selectedFunction?.slug}`
+
+  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
+    selectedFunction,
+    functionUrl,
+    anonKey
+  )
+
+  const onUpdateFunction = async (values: any, { setSubmitting, resetForm }: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    setSubmitting(true)
+
+    try {
+      await updateEdgeFunction({
+        projectRef,
+        slug: selectedFunction.slug,
+        payload: values,
+      })
+      resetForm({ values, initialValues: values })
+      ui.setNotification({ category: 'success', message: `Successfully updated edge function` })
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update edge function: ${error.message}`,
+      })
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -87,97 +118,10 @@ const EdgeFunctionDetails: FC<Props> = () => {
     }
   }
 
-  const managementCommands: any = [
-    {
-      command: `supabase functions deploy ${selectedFunction?.slug}`,
-      description: 'This will overwrite the deployed function with your new function',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> functions deploy{' '}
-            {selectedFunction?.slug}
-          </>
-        )
-      },
-      comment: 'Deploy a new version',
-    },
-    {
-      command: `supabase functions delete ${selectedFunction?.slug}`,
-      description: 'This will remove the function and all the logs associated with it',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> functions delete{' '}
-            {selectedFunction?.slug}
-          </>
-        )
-      },
-      comment: 'Delete the function',
-    },
-  ]
-
-  const secretCommands: any = [
-    {
-      command: `supabase secrets list`,
-      description: 'This will list all the secrets for your project',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> secrets list
-          </>
-        )
-      },
-      comment: 'View all secrets',
-    },
-    {
-      command: `supabase secrets set NAME1=VALUE1 NAME2=VALUE2`,
-      description: 'This will set secrets for your project',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
-          </>
-        )
-      },
-      comment: 'Set secrets for your project',
-    },
-    {
-      command: `supabase secrets unset NAME1 NAME2 `,
-      description: 'This will delete secrets for your project',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> secrets unset NAME1 NAME2
-          </>
-        )
-      },
-      comment: 'Unset secrets for your project',
-    },
-  ]
-
-  const invokeCommands: any = [
-    {
-      command: `curl -L -X POST '${functionUrl}' -H 'Authorization: Bearer ${
-        anonKey ?? '[YOUR ANON KEY]'
-      }' --data '{"name":"Functions"}'`,
-      description: 'Invokes the hello function',
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">curl</span> -L -X POST 'https://{functionsEndpoint}/
-            {selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
-            {`--data '{"name":"Functions"}'`}
-          </>
-        )
-      },
-      comment: 'Invoke your function',
-    },
-  ]
-
   return (
     <>
       <div className="space-y-4 pb-16">
-        <Form id={formId} initialValues={{}} onSubmit={() => {}}>
+        <Form id={formId} initialValues={{}} onSubmit={onUpdateFunction}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -186,7 +130,6 @@ const EdgeFunctionDetails: FC<Props> = () => {
                 const formValues = {
                   name: selectedFunction?.name,
                   verifyJwt: selectedFunction?.verify_jwt,
-                  importMap: selectedFunction?.import_map,
                 }
                 resetForm({ values: formValues, initialValues: formValues })
               }
@@ -214,6 +157,13 @@ const EdgeFunctionDetails: FC<Props> = () => {
                   <FormSection header={<FormSectionLabel>Function Details</FormSectionLabel>}>
                     <FormSectionContent loading={selectedFunction === undefined}>
                       <Input id="name" name="name" label="Name" />
+                      <Input
+                        disabled
+                        id="slug"
+                        name="slug"
+                        label="Slug"
+                        value={selectedFunction?.slug}
+                      />
                       <Input
                         disabled
                         copy
@@ -247,6 +197,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
                       <Toggle
+                        disabled
                         id="importMap"
                         name="importMap"
                         label={
@@ -263,6 +214,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                             </Link>
                           </div>
                         }
+                        checked={selectedFunction?.import_map}
                         descriptionText="Allow the use of bare specifiers without having to install the Node.js package locally"
                       />
                     </FormSectionContent>
@@ -301,46 +253,49 @@ const EdgeFunctionDetails: FC<Props> = () => {
           <CommandRender commands={secretCommands} />
         </div>
 
-        <Panel title={<p>Delete Edge Function</p>} className="!mt-8">
-          <Panel.Content>
-            <Alert
-              withIcon
-              variant="danger"
-              title="Once your function is deleted, it can no longer be restored"
-            >
-              <p className="mb-3">
-                Make sure you have made a backup if you want to restore your edge function
-              </p>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    type="danger"
-                    disabled={!canUpdateEdgeFunction}
-                    loading={selectedFunction?.id === undefined}
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    Delete edge function
-                  </Button>
-                </Tooltip.Trigger>
-                {!canUpdateEdgeFunction && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
+        <div className="!mt-8">
+          <FormHeader title="Delete Edge Function" description="" />
+          <Panel>
+            <Panel.Content>
+              <Alert
+                withIcon
+                variant="danger"
+                title="Once your function is deleted, it can no longer be restored"
+              >
+                <p className="mb-3">
+                  Make sure you have made a backup if you want to restore your edge function
+                </p>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      type="danger"
+                      disabled={!canUpdateEdgeFunction}
+                      loading={selectedFunction?.id === undefined}
+                      onClick={() => setShowDeleteModal(true)}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to delete an edge function
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
-            </Alert>
-          </Panel.Content>
-        </Panel>
+                      Delete edge function
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canUpdateEdgeFunction && (
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to delete an edge function
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  )}
+                </Tooltip.Root>
+              </Alert>
+            </Panel.Content>
+          </Panel>
+        </div>
       </div>
 
       <Modal

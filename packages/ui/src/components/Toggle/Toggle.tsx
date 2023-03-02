@@ -129,7 +129,7 @@ function Toggle({
         type="button"
         id={id}
         name={name}
-        className={toggleClasses.join(' ')}
+        className={`${toggleClasses.join(' ')} ${disabled ? 'opacity-50 cursor-default' : ''}`}
         onClick={onClick}
         disabled={disabled}
         onBlur={handleBlurEvent}
