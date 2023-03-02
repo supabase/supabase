@@ -36,7 +36,7 @@ const Docs = (props: Props) => {
                 <div tw="w-[50px] h-[50px] bg-[#164430] rounded-md flex items-center justify-center">
                     <img src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${type.toLowerCase()}.svg`} width="80%" height="80%" />
                 </div>
-                <span tw="text-[36px] text-[#ededed] ml-[16px]">{type.substring(0, 1).toUpperCase() + title.substring(1)}</span>
+                <span tw="text-[36px] text-[#ededed] ml-[16px]">{type.substring(0, 1).toUpperCase() + type.substring(1)}</span>
             </>
           )}
         </div>
