@@ -62,7 +62,7 @@ export default function TicketShare({ user, users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-lw7 -mt-16 pt-12">
+        <div className="bg-lw7 -mt-20 pt-12">
           <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
             <LaunchWeekLogoHeader />
             <TicketContainer

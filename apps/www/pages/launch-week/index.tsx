@@ -1,4 +1,5 @@
 import { NextSeo } from 'next-seo'
+import { GetStaticProps, GetStaticPaths } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
@@ -7,13 +8,23 @@ import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
 import { IconArrowDown, useTheme } from 'ui'
-import LabelBadge from '~/components/LaunchWeek/LabelBadge'
-import launchweek from './6'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
+
+import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 
-export default function TicketHome() {
+interface Props {
+  users: UserData[]
+}
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
+  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
+)
+
+export default function TicketHome({ users }: Props) {
   const { isDarkMode } = useTheme()
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
@@ -74,7 +85,7 @@ export default function TicketHome() {
         }}
       />
       <DefaultLayout>
-        <div className="bg-lw7 -mt-16 pt-12">
+        <div className="bg-lw7 -mt-20 pt-12">
           <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
             <LaunchWeekLogoHeader />
 
@@ -95,8 +106,22 @@ export default function TicketHome() {
           </SectionContainer>
 
           <LaunchWeekPrizeSection />
+
+          {users && <TicketBrickWall users={users} />}
         </div>
       </DefaultLayout>
     </>
   )
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  // fetch users for the TicketBrickWall
+  const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
+
+  return {
+    props: {
+      users,
+    },
+    revalidate: 5,
+  }
 }

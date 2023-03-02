@@ -9,8 +9,8 @@ export default function TicketHeader({ size }: Props) {
     <div className="flex w-full justify-center pt-4" id="wayfinding--ticket-header">
       <div className="flex items-center gap-6">
         <img
-          className={size === 'small' ? 'w-[165px]' : ''}
-          src={`/images/launchweek/ticket-header-logo.svg`}
+          className={size === 'small' ? 'w-[165px]' : 'w-[224px]'}
+          src={`/images/launchweek/ticket-header-logo.png`}
         />
         <span className="text-white text-[10px]">{DATE}</span>
         {/*<div id="wayfinding--TicketInfo-container">
