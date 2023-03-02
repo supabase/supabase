@@ -9,6 +9,7 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
+import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -31,6 +32,7 @@ const Home: NextPageWithLayout = () => {
       <div className="mx-6">
         {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
         {/* {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />} */}
+        <ProjectUpgradeFailedBanner />
       </div>
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
