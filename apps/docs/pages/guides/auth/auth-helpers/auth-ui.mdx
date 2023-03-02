@@ -44,11 +44,11 @@ We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearence.theme` prop.
 
 ```js lines=4,16 title=/src/index.js
+import { Auth } from '@supabase/auth-ui-react'
 import {
-  Auth,
   // Import predefined theme
   ThemeSupa,
-} from '@supabase/auth-ui-react'
+} from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -70,7 +70,8 @@ The Auth component also supports login with [offical social providers](../../aut
 
 ```js lines=13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
@@ -112,7 +113,8 @@ Auth UI comes with several themes to customize the appearance. Each predefined t
 
 ```js lines=2,13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -140,7 +142,8 @@ Auth UI comes with two theme variations: `default` and `dark`. You can switch be
 
 ```js lines=14 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -165,7 +168,8 @@ Auth UI themes can be overridden using variable tokens. See the [list of variabl
 
 ```js lines=14-21 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
