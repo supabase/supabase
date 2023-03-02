@@ -1,28 +1,41 @@
 type Props = {
   number: number | undefined
+  size?: 'default' | 'small'
 }
 
-export default function TicketNumber({ number }: Props) {
+export default function TicketNumber({ number, size }: Props) {
   const numDigits = `${number}`.length
   const prefix = `00000000`.slice(numDigits)
   return (
     <>
       <div
-        className="absolute bottom-10 lg:bottom-0 right-24 dark:text-white"
+        className={[
+          'absolute bottom-10 lg:bottom-0  dark:text-white',
+          size === 'small' ? 'right-12' : 'right-24',
+        ].join(' ')}
         id="wayfinding--ticket-number-outer"
       >
         <div
-          className="text-[42px] leading-[1] w-[370px] text-center bg-clip-text lg:transform lg:rotate-90 lg:translate-y-100 origin-bottom-right bg-gradient-to-r from-white via-white"
+          className={[
+            'text-[42px] leading-[1] w-[370px] text-center bg-clip-text lg:transform lg:rotate-90 lg:translate-y-100 origin-bottom-right bg-gradient-to-r from-white via-white',
+            size === 'small' ? 'text-[20px] w-[220px]' : '',
+          ].join(' ')}
           id="wayfinding--ticket-number-inner"
         >
           № {prefix}
           {number}
         </div>
       </div>
-      <div className="absolute right-28 top-3 w-4 h-[290px]" id="wayfinding--ticket-stitch">
+      <div
+        className={[
+          'absolute right-28 top-3 w-4',
+          size === 'small' ? 'h-[200px] right-12' : 'h-[290px] right-28',
+        ].join(' ')}
+        id="wayfinding--ticket-stitch"
+      >
         <svg
           width="2"
-          height="328"
+          height={size === 'small' ? '210' : '328'}
           viewBox="0 0 2 328"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

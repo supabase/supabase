@@ -12,18 +12,11 @@ import { useTheme } from 'common/Providers'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
+import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 
 interface Props {
-  user: user
-  users: user[]
-}
-
-interface user {
-  username: string | null
-  name: string | null
-  ticketNumber: number | null
-  golden: boolean
-  referrals: number
+  user: UserData
+  users: UserData[]
 }
 
 const supabaseAdmin = createClient(
