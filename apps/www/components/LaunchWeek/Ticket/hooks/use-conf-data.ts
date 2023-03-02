@@ -26,6 +26,7 @@ export const ConfDataContext = createContext<ConfDataContextType | null>(null)
 
 export default function useConfData() {
   const result = useContext(ConfDataContext)
+  console.log('result', result)
   if (!result) {
     throw new Error()
   }

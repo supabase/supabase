@@ -17,7 +17,7 @@ type TicketGenerationState = 'default' | 'loading'
 type Props = {
   defaultUsername?: string
   ticketGenerationState?: TicketGenerationState
-  setTicketGenerationState: (ticketGenerationState: TicketGenerationState) => void
+  setTicketGenerationState: any
 }
 
 export default function TicketForm({ defaultUsername = '', setTicketGenerationState }: Props) {

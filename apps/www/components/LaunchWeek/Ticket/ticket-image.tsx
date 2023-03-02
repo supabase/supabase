@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import TicketVisual from './ticket-visual'
+import TicketVisual from './TicketVisual'
 import styles from './ticket-image.module.css'
 
 export default function TicketImage() {

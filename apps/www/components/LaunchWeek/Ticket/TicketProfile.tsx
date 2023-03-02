@@ -9,8 +9,8 @@ type Props = {
   name?: string
   username?: string
   size?: number
-  ticketGenerationState: TicketGenerationState
-  setTicketGenerationState: (ticketGenerationState: TicketGenerationState) => void
+  ticketGenerationState?: TicketGenerationState
+  setTicketGenerationState?: (ticketGenerationState: TicketGenerationState) => void
   golden?: boolean
 }
 
