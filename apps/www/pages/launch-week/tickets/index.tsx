@@ -1,14 +1,27 @@
 import { NextSeo } from 'next-seo'
+import { GetStaticProps, GetStaticPaths } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
+import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
 import { useTheme } from 'common/Providers'
+import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
+import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 
-export default function TicketHome() {
+interface Props {
+  users: UserData[]
+}
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
+  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
+)
+
+export default function TicketHome({ users }: Props) {
   const { isDarkMode } = useTheme()
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
@@ -89,7 +102,27 @@ export default function TicketHome() {
             />
           )}
         </SectionContainer>
+        {users && <TicketBrickWall users={users} />}
       </DefaultLayout>
     </>
   )
+}
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  // fetch users for the TicketBrickWall
+  const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
+
+  return {
+    props: {
+      users,
+    },
+    revalidate: 5,
+  }
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return Promise.resolve({
+    paths: [],
+    fallback: 'blocking',
+  })
 }
