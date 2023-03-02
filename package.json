@@ -33,10 +33,12 @@
   },
   "devDependencies": {
     "@types/json-stringify-safe": "^5.0.0",
+    "aws-sdk": "^2.1315.0",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
     "json-stringify-safe": "^5.0.1",
-    "prettier": "^2.5.1",
+    "prettier": "^2.8.4",
+    "prettier-plugin-sql-cst": "^0.5.0",
     "ts-jest": "^27.0.7",
     "turbo": "^1.4.7"
   },
@@ -55,16 +57,5 @@
     "functions",
     "database",
     "auth"
-  ],
-  "dependencies": {
-    "@code-hike/mdx": "^0.7.4",
-    "@mdx-js/react": "^2.1.1",
-    "aws-sdk": "^2.1315.0",
-    "mdx-mermaid": "^1.3.2",
-    "mermaid": "^9.2.2",
-    "mini-svg-data-uri": "^1.4.4"
-  },
-  "overrides": {
-    "pgsql-parser": "13.4.0"
-  }
+  ]
 }

@@ -1,17 +1,24 @@
-import * as React from 'react'
 import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
 import { IconTrash, IconClipboard, IconEdit } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { SupaTable } from 'components/grid/types'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
-type RowContextMenuProps = {}
+export type RowContextMenuProps = {
+  table: SupaTable
+}
 
-const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
+const RowContextMenu = ({ table }: RowContextMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
+
+  const { project } = useProjectContext()
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
 
   function onDeleteRow(p: ItemParams) {
     confirmAlert({
@@ -21,17 +28,23 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
         const { props } = p
         const { rowIdx } = props
         const row = state.rows[rowIdx]
-        if (!row) return
+        if (!row || !project) return
 
-        const { error } = await state.rowService!.delete([row])
-        if (error) {
-          if (state.onError) state.onError(error)
-        } else {
+        try {
+          await deleteRows({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table,
+            rows: [row],
+          })
+
           dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
           dispatch({
             type: 'SELECTED_ROWS_CHANGE',
             payload: { selectedRows: new Set() },
           })
+        } catch (error) {
+          if (state.onError) state.onError(error)
         }
       },
     })

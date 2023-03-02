@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { logConstants } from 'shared-data'
 
 export const meta = {
   id: 'logs',
@@ -168,7 +169,7 @@ Each log event stores metadata an array of objects with multiple levels, and can
 For example, to query the edge logs without any joins:
 
 ```sql
-select timestamp, metadata from edge_logs t
+select timestamp, metadata from edge_logs as t;
 ```
 
 The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
@@ -183,10 +184,11 @@ To query for a nested value, add a join for each array level:
 
 ```sql
 select timestamp, request.method, header.cf_ipcountry
-from edge_logs t
-cross join unnest(t.metadata) as metadata
-cross join unnest(metadata.request) as request
-cross join unnest(request.headers) as header
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as metadata
+  cross join unnest(metadata.request) as request
+  cross join unnest(request.headers) as header;
 ```
 
 This surfaces the following columns available for selection:
@@ -217,17 +219,19 @@ Instead, select only the values required.
 -- ❌ Avoid doing this
 select
   datetime(timestamp),
-  m as metadata  -- <- metadata contains many nested keys
-from edge_logs t
-cross join unnest(t.metadata) as m;
+  m as metadata -- <- metadata contains many nested keys
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as m;
 
 -- ✅ Do this
 select
-datetime(timestamp),
-r.method   -- <- select only the required values
-from edge_logs t
-cross join unnest(t.metadata) as m
-cross join unnest(m.request) as r
+  datetime(timestamp),
+  r.method -- <- select only the required values
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as m
+  cross join unnest(m.request) as r;
 ```
 
 ### Examples and Templates
@@ -238,12 +242,40 @@ For example, you can enter the following query in the SQL Editor to retrieve eac
 
 ```sql
 select datetime(timestamp), h.x_real_ip
-from edge_logs
+from
+  edge_logs
   cross join unnest(metadata) as m
-  cross join unnest(m.request) AS r
-  cross join unnest(r.headers) AS h
-where h.x_real_ip is not null and r.method = "GET"
+  cross join unnest(m.request) as r
+  cross join unnest(r.headers) as h
+where h.x_real_ip is not null and r.method = "GET";
 ```
+
+### Log Source Reference
+
+Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs">
+  {logConstants.schemas.map((schema) => (
+    <TabPanel id={schema.reference} label={schema.name}>
+      <table>
+        <thead>
+          <td className="font-bold">Path</td>
+          <td className="font-bold">Type</td>
+        </thead>
+        <tbody>
+          {schema.fields
+            .sort((a, b) => a.path - b.path)
+            .map((field) => (
+              <tr>
+                <td className="font-mono">{field.path}</td>
+                <td className="font-mono">{field.type}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </TabPanel>
+  ))}
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

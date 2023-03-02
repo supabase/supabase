@@ -15,7 +15,7 @@ export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string
+  table: SupaTable
   /**
    *
    * run sql query
@@ -74,6 +74,7 @@ export interface SupabaseGridProps {
    */
   refreshDocs: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  updateTableRow: (previousRow: any, updatedData: any) => void
 }
 
 export interface SupabaseGridRef {
