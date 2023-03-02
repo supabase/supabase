@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PageState, ConfDataContext, UserData } from './hooks/use-conf-data'
-import Ticket from './ticket'
+import Ticket from './Ticket'
 import ConfContainer from './conf-container'
 import Form from './form'
 import { SupabaseClient, Session } from '@supabase/supabase-js'

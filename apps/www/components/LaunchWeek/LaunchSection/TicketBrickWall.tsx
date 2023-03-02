@@ -1,5 +1,5 @@
 import React from 'react'
-import Ticket from '../Ticket/ticket'
+import Ticket from '../Ticket/Ticket'
 
 interface User {
   username: string | null
@@ -23,6 +23,7 @@ export default function TicketBrickWall({ users }: Props) {
         </h2>
         <div>
           {users.map((user) => (
+            <></>
             // <Ticket
             //   username={user.username}
             //   name={user.name}
