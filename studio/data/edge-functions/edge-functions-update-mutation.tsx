@@ -6,22 +6,21 @@ import { edgeFunctionsKeys } from './keys'
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
   slug: string
-  verifyJwt?: boolean
-  importMap?: boolean
+  payload: {
+    name?: string
+    verifyJwt?: boolean
+    importMap?: boolean
+  }
 }
 
 export async function updateEdgeFunction({
   projectRef,
   slug,
-  verifyJwt,
-  importMap,
+  payload,
 }: EdgeFunctionsUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await patch(
-    `${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}?verify_jwt=${verifyJwt}&import_map=${importMap}`,
-    {}
-  )
+  const response = await patch(`${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}`, payload)
   if (response.error) throw response.error
 
   return response
@@ -29,7 +28,7 @@ export async function updateEdgeFunction({
 
 type EdgeFunctionsUpdateData = Awaited<ReturnType<typeof updateEdgeFunction>>
 
-export const useEdgeFunctionDeleteMutation = ({
+export const useEdgeFunctionUpdateMutation = ({
   onSuccess,
   ...options
 }: Omit<
