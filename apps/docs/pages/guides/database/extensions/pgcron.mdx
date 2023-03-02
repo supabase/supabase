@@ -84,7 +84,7 @@ select cron.schedule (
 Vacuum every day at 3:00am (GMT)
 
 ```sql
-SELECT cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
+select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 ```
 
 ### Invoke Supabase Edge Function every minute
@@ -112,7 +112,7 @@ select
 Unschedules a job called `'nightly-vacuum'`
 
 ```sql
-SELECT cron.unschedule('nightly-vacuum');
+select cron.unschedule('nightly-vacuum');
 ```
 
 ## Resources
