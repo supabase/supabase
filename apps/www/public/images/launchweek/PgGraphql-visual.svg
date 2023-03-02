@@ -8,23 +8,23 @@
 <path d="M122.18 64.8672L-17.1457 145.053" stroke="url(#paint5_linear_946_92186)" stroke-width="0.5"/>
 <path d="M128.547 284.09L28.175 341.857" stroke="url(#paint6_linear_946_92186)" stroke-width="0.5"/>
 <path d="M433.48 108.375L333.109 166.142" stroke="url(#paint7_linear_946_92186)" stroke-width="0.5"/>
-<path d="M175.094 257.023L128.55 283.811" stroke="url(#paint8_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M275.453 258.025L321.997 284.813" stroke="url(#paint9_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M224.273 227.951L322.999 171.131" stroke="url(#paint10_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M321.664 387.057L321.664 289.686" stroke="url(#paint11_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M418.953 387.058L418.953 114.609" stroke="url(#paint12_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M31.7852 387.058L31.7852 114.609" stroke="url(#paint13_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M224.996 171.763L224.996 114.609" stroke="url(#paint14_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M175.094 257.023L128.55 283.811" stroke="url(#paint8_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M275.453 258.025L321.997 284.813" stroke="url(#paint9_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M224.273 227.951L322.999 171.131" stroke="url(#paint10_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M321.664 387.057L321.664 289.686" stroke="url(#paint11_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M418.953 387.058L418.953 114.609" stroke="url(#paint12_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M31.7852 387.058L31.7852 114.609" stroke="url(#paint13_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M224.996 171.763L224.996 114.609" stroke="url(#paint14_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <path d="M-24.625 196.029L120.578 280.127" stroke="url(#paint15_linear_946_92186)" stroke-width="0.5"/>
 <path d="M224.744 340.283L321.664 284.327V172.414L224.744 116.457L127.824 172.414M224.744 340.287L127.824 284.33V172.416" stroke="url(#paint16_linear_946_92186)" stroke-width="0.5"/>
-<path d="M235.032 234.312L127.824 172.416" stroke="url(#paint17_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M235.032 234.312L127.824 172.416" stroke="url(#paint17_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <path d="M224.853 96.75L338.842 162.561V294.184L224.853 359.996L110.865 294.184V162.561L224.853 96.75Z" stroke="url(#paint18_linear_946_92186)" stroke-width="0.5"/>
 <path d="M224.851 81.2246L352.285 154.799V301.947L224.851 375.521L97.4172 301.947V154.799L224.851 81.2246Z" stroke="url(#paint19_linear_946_92186)" stroke-width="0.5"/>
 <path d="M224.852 171.762L273.877 200.066V256.676L224.852 284.981L175.826 256.676V200.066L224.852 171.762Z" fill="url(#paint20_linear_946_92186)" stroke="url(#paint21_linear_946_92186)" stroke-width="0.5"/>
 <path d="M224.848 172.455L273.272 256.327H176.425L224.848 172.455Z" fill="url(#paint22_linear_946_92186)" stroke="url(#paint23_linear_946_92186)" stroke-width="0.5"/>
-<path d="M273.561 256.135L321.652 228.369L273.561 200.604" stroke="url(#paint24_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M175.658 255.988L127.824 228.371L175.658 200.754" stroke="url(#paint25_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M127.816 385.222L127.816 287.896" stroke="url(#paint26_linear_946_92186)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M273.561 256.135L321.652 228.369L273.561 200.604" stroke="url(#paint24_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M175.658 255.988L127.824 228.371L175.658 200.754" stroke="url(#paint25_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M127.816 385.222L127.816 287.896" stroke="url(#paint26_linear_946_92186)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <circle cx="224.754" cy="284.287" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>
 <circle cx="224.754" cy="171.76" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>
 <circle cx="176.446" cy="256.625" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>

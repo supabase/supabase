@@ -28,7 +28,7 @@ export default function TicketNumber({ number, size }: Props) {
       </div>
       <div
         className={[
-          'absolute right-28 top-3 w-4',
+          'absolute top-3 w-4',
           size === 'small' ? 'h-[200px] right-12' : 'h-[290px] right-28',
         ].join(' ')}
         id="wayfinding--ticket-stitch"
@@ -43,7 +43,7 @@ export default function TicketNumber({ number, size }: Props) {
           <path
             d="M0.601562 0.988281V327.763"
             stroke="url(#paint0_linear_1736_81388)"
-            stroke-dasharray="2 2"
+            strokeDasharray="2 2"
           />
           <defs>
             <linearGradient
@@ -54,9 +54,9 @@ export default function TicketNumber({ number, size }: Props) {
               y2="327.763"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="white" stop-opacity="0" />
+              <stop stopColor="white" stopOpacity="0" />
               <stop offset="0.53125" stopColor="white" />
-              <stop offset="1" stopColor="white" stop-opacity="0" />
+              <stop offset="1" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
