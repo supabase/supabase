@@ -14,6 +14,7 @@ import PausingState from './PausingState'
 import BuildingState from './BuildingState'
 import { ProjectContextProvider } from './ProjectContext'
 import RestoringState from './RestoringState'
+import UpgradingState from './UpgradingState'
 
 interface Props {
   title?: string
@@ -125,6 +126,8 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
+      ) : isProjectUpgrading ? (
+        <UpgradingState />
       ) : isProjectPausing ? (
         <PausingState project={ui.selectedProject} />
       ) : requiresPostgrestConnection && isProjectOffline ? (
