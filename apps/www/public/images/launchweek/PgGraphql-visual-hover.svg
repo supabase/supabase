@@ -8,24 +8,24 @@
 <path d="M122.18 64.7832L-17.1457 144.969" stroke="url(#paint5_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M128.547 284.006L28.175 341.773" stroke="url(#paint6_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M433.48 108.291L333.109 166.058" stroke="url(#paint7_linear_1116_120701)" stroke-width="0.5"/>
-<path d="M175.094 256.939L128.55 283.727" stroke="url(#paint8_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M275.453 257.941L321.997 284.729" stroke="url(#paint9_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M224.273 227.867L322.999 171.047" stroke="url(#paint10_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M321.664 386.973L321.664 289.602" stroke="url(#paint11_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M418.953 386.974L418.953 114.525" stroke="url(#paint12_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M31.7852 386.974L31.7852 114.525" stroke="url(#paint13_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M224.996 171.679L224.996 114.525" stroke="url(#paint14_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M175.094 256.939L128.55 283.727" stroke="url(#paint8_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M275.453 257.941L321.997 284.729" stroke="url(#paint9_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M224.273 227.867L322.999 171.047" stroke="url(#paint10_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M321.664 386.973L321.664 289.602" stroke="url(#paint11_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M418.953 386.974L418.953 114.525" stroke="url(#paint12_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M31.7852 386.974L31.7852 114.525" stroke="url(#paint13_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M224.996 171.679L224.996 114.525" stroke="url(#paint14_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <path d="M-24.625 195.945L120.578 280.043" stroke="url(#paint15_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M224.744 340.199L321.664 284.243V172.33L224.744 116.373L127.824 172.33M224.744 340.203L127.824 284.246V172.332" stroke="url(#paint16_linear_1116_120701)" stroke-width="0.5"/>
-<path d="M235.032 234.229L127.824 172.332" stroke="url(#paint17_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M224.758 339.946L224.758 286.814" stroke="url(#paint18_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M235.032 234.229L127.824 172.332" stroke="url(#paint17_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M224.758 339.946L224.758 286.814" stroke="url(#paint18_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <path d="M224.853 96.666L338.842 162.478V294.1L224.853 359.912L110.865 294.1V162.478L224.853 96.666Z" stroke="url(#paint19_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M224.851 81.1406L352.285 154.715V301.863L224.851 375.437L97.4172 301.863V154.715L224.851 81.1406Z" stroke="url(#paint20_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M224.852 171.678L273.877 199.982V256.592L224.852 284.897L175.826 256.592V199.982L224.852 171.678Z" fill="url(#paint21_linear_1116_120701)" stroke="url(#paint22_linear_1116_120701)" stroke-width="0.5"/>
 <path d="M224.848 172.371L273.272 256.243H176.425L224.848 172.371Z" fill="url(#paint23_linear_1116_120701)" stroke="url(#paint24_linear_1116_120701)" stroke-width="0.5"/>
-<path d="M273.561 256.051L321.652 228.285L273.561 200.52" stroke="url(#paint25_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M175.658 255.904L127.824 228.287L175.658 200.67" stroke="url(#paint26_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
-<path d="M127.816 385.138L127.816 287.812" stroke="url(#paint27_linear_1116_120701)" stroke-width="0.5" stroke-dasharray="0.1 2"/>
+<path d="M273.561 256.051L321.652 228.285L273.561 200.52" stroke="url(#paint25_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M175.658 255.904L127.824 228.287L175.658 200.67" stroke="url(#paint26_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
+<path d="M127.816 385.138L127.816 287.812" stroke="url(#paint27_linear_1116_120701)" stroke-width="0.5" strokeDasharray="0.1 2"/>
 <circle cx="224.754" cy="284.203" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>
 <circle cx="224.754" cy="171.676" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>
 <circle cx="176.446" cy="256.541" r="4.61993" fill="#163D3C" stroke="#121212" stroke-width="1.55778"/>

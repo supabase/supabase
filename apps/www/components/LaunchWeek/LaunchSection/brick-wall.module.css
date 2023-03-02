@@ -1,0 +1,6 @@
+/* mask overlay on left & right */
+.brick-wall-mask--left,
+.brick-wall-mask--right {
+  background: linear-gradient(358.88deg, #161616 24.57%, rgba(28, 28, 28, 0) 87.73%),
+    linear-gradient(358.88deg, #161616 24.57%, rgba(28, 28, 28, 0) 87.73%);
+}
