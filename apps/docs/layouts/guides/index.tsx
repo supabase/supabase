@@ -67,11 +67,9 @@ const Layout: FC<Props> = (props) => {
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
   // open graph image url constructor
-  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+  const ogImageUrl = encodeURIComponent(`https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
     ogPageType ? `&type=${ogPageType}` : ''
-  }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
-    props.meta?.description
-  )}`
+  }&title=${props.meta?.title}&description=${props.meta?.description}`)
 
   return (
     <>
