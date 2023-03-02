@@ -207,7 +207,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     params: { slug: string }
     locale?: string | undefined
   }[] =
-    slugs?.map(({ slug }) => ({
+    slugs?.map(({ slug }: any) => ({
       params: {
         slug,
       },

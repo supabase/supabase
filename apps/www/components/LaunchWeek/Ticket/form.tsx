@@ -49,7 +49,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
         .eq('email', email)
         .select()
         .single()
-        .then(async ({ error }) => {
+        .then(async ({ error }: any) => {
           if (error) return supabase.auth.signOut()
           const { data } = await supabase
             .from('lw6_tickets_golden')

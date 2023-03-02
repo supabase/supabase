@@ -79,14 +79,14 @@ function AuthWidgetSection() {
                     Sign in today for Supa stuff
                   </p>
                 </div>
-                <Auth.UserContextProvider supabaseClient={supabase}>
+                <Auth.UserContextProvider supabaseClient={supabase as any}>
                   <AuthContainer supabaseClient={supabase}>
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
                       theme={isDarkMode ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
-                      supabaseClient={supabase}
+                      supabaseClient={supabase as any}
                       localization={{
                         lang: 'en',
                       }}
