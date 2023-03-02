@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
 import { UserData } from '../Ticket/hooks/use-conf-data'
-import Ticket from '../Ticket/Ticket'
-import TicketContainer from '../Ticket/TicketContainer'
-import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import TicketVisual from '../Ticket/TicketVisual'
-import TicketProfile from '../Ticket/TicketProfile'
+
+import { createClient } from '@supabase/supabase-js'
+
 import TicketHeader from '../Ticket/TicketHeader'
 import TicketNumber from '../Ticket/TicketNumber'
 
