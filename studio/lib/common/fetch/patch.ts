@@ -14,7 +14,6 @@ export async function patch<T = any>(
     const response = await fetch(url, {
       method: 'PATCH',
       body: JSON.stringify(data),
-      credentials: 'include',
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,

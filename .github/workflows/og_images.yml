@@ -3,7 +3,7 @@ name: Deploy OG Images
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'supabase/functions/og-images'
   workflow_dispatch:
@@ -25,4 +25,4 @@ jobs:
         with:
           version: 1.0.0
 
-      - run: supabase functions deploy og-images --project-ref $PROJECT_ID
+      - run: supabase functions deploy og-images --project-ref $PROJECT_ID --no-verify-jwt

@@ -1,17 +1,9 @@
-import { FC, useState, ReactNode } from 'react'
-import {
-  Button,
-  IconDownload,
-  IconPlus,
-  IconX,
-  IconTrash,
-  Dropdown,
-  IconColumns,
-  IconChevronDown,
-} from 'ui'
 import { saveAs } from 'file-saver'
+import { useState, ReactNode } from 'react'
+import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -19,14 +11,20 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { Sort, Filter, SupaTable } from 'components/grid/types'
 import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
 const MAX_EXPORT_ROW_COUNT = 500000
 
-interface HeaderProps {
-  table: Partial<SupaTable>
+export type HeaderProps = {
+  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
   onAddColumn?: () => void
@@ -34,56 +32,39 @@ interface HeaderProps {
   headerActions?: ReactNode
 }
 
-const Header: FC<HeaderProps> = ({
-  table,
-  sorts,
-  filters,
-  onAddColumn,
-  onAddRow,
-  headerActions,
-}) => {
+const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
       {selectedRows.size > 0 ? (
-        <RowHeader sorts={sorts} filters={filters} />
+        <RowHeader table={table} sorts={sorts} filters={filters} />
       ) : (
-        <DefaultHeader
-          table={table}
-          sorts={sorts}
-          filters={filters}
-          onAddColumn={onAddColumn}
-          onAddRow={onAddRow}
-        />
+        <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
       )}
       <div className="sb-grid-header__inner">{headerActions}</div>
     </div>
   )
 }
+
 export default Header
 
-interface DefaultHeaderProps {
-  table: Partial<SupaTable>
-  sorts: Sort[]
-  filters: Filter[]
+type DefaultHeaderProps = {
+  table: SupaTable
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader: FC<DefaultHeaderProps> = ({
-  table,
-  sorts,
-  filters,
-  onAddColumn,
-  onAddRow,
-}) => {
+const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
+
+  // [Joshen] Using this logic to block both column and row creation/update/delete
+  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton filters={filters} sorts={sorts} />
+        <RefreshButton table={table} />
         <FilterDropdown />
         <SortPopover />
       </div>
@@ -91,71 +72,73 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({
         <>
           <div className="h-[20px] w-px border-r border-scale-600"></div>
           <div className="flex items-center gap-2">
-            <Dropdown
-              side="bottom"
-              align="start"
-              size="medium"
-              overlay={[
-                ...(onAddRow !== undefined
-                  ? [
-                      <Dropdown.Item
-                        key="add-row"
-                        className="group"
-                        onClick={onAddRow}
-                        disabled={onAddRow === undefined}
-                        icon={
-                          <div className="-mt-2 pr-1.5">
-                            <div className="border border-scale-1000 w-[15px] h-[4px]" />
-                            <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
-                            <div
-                              className={[
-                                'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
-                              ].join(' ')}
-                            />
+            {canCreateColumns && (
+              <Dropdown
+                side="bottom"
+                align="start"
+                size="medium"
+                overlay={[
+                  ...(onAddRow !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-row"
+                          className="group"
+                          onClick={onAddRow}
+                          disabled={onAddRow === undefined}
+                          icon={
+                            <div className="-mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[15px] h-[4px]" />
+                              <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert row</p>
+                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
                           </div>
-                        }
-                      >
-                        <div className="">
-                          <p>Insert row</p>
-                          <p className="text-scale-1000">Insert a new row into {table.name}</p>
-                        </div>
-                      </Dropdown.Item>,
-                    ]
-                  : []),
-                ...(onAddColumn !== undefined
-                  ? [
-                      <Dropdown.Item
-                        key="add-column"
-                        className="group"
-                        onClick={onAddColumn}
-                        disabled={onAddColumn === undefined}
-                        icon={
-                          <div className="flex -mt-2 pr-1.5">
-                            <div className="border border-scale-1000 w-[4px] h-[15px]" />
-                            <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
-                            <div
-                              className={[
-                                'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
-                              ].join(' ')}
-                            />
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onAddColumn !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-column"
+                          className="group"
+                          onClick={onAddColumn}
+                          disabled={onAddColumn === undefined}
+                          icon={
+                            <div className="flex -mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[4px] h-[15px]" />
+                              <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
+                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert column</p>
+                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
                           </div>
-                        }
-                      >
-                        <div className="">
-                          <p>Insert column</p>
-                          <p className="text-scale-1000">Insert a new column into {table.name}</p>
-                        </div>
-                      </Dropdown.Item>,
-                    ]
-                  : []),
-              ]}
-            >
-              <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
-                Insert
-              </Button>
-            </Dropdown>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                ]}
+              >
+                <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                  Insert
+                </Button>
+              </Dropdown>
+            )}
           </div>
         </>
       )}
@@ -163,18 +146,48 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({
   )
 }
 
-interface RowHeaderProps {
+type RowHeaderProps = {
+  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
 }
-const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
+const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
-  const [isExporting, setIsExporting] = useState(false)
+  const { project } = useProjectContext()
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation()
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation()
 
-  const { selectedRows, rows: allRows, editable, allRowsSelected, totalRows } = state
+  const { data } = useTableRowsQuery({
+    queryKey: [table.schema, table.name],
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    table,
+    sorts,
+    filters,
+    page: state.page,
+    limit: state.rowsPerPage,
+  })
+
+  const allRows = data?.rows ?? []
+
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      queryKey: [table?.schema, table?.name, 'count'],
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      table,
+      filters,
+    },
+    { keepPreviousData: true }
+  )
+
+  const totalRows = countData?.count ?? 0
+
+  const { selectedRows, editable, allRowsSelected } = state
 
   const onSelectAllRows = () => {
     dispatch({
@@ -192,37 +205,59 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
       }? This action cannot be undone.`,
       confirmText: `Delete ${numRows} rows`,
       onAsyncConfirm: async () => {
+        if (!project) return
+
         if (allRowsSelected) {
-          const { error } =
-            filters.length === 0
-              ? await state.rowService!.truncate()
-              : await state.rowService!.deleteAll(filters)
-          if (error) {
-            if (state.onError) state.onError(error)
-          } else {
+          try {
+            if (filters.length === 0) {
+              await truncateRows({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table,
+              })
+            } else {
+              await deleteAllRows({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table,
+                filters,
+              })
+            }
+
             dispatch({ type: 'REMOVE_ALL_ROWS' })
             dispatch({
               type: 'SELECTED_ROWS_CHANGE',
               payload: { selectedRows: new Set() },
             })
+          } catch (error) {
+            if (state.onError) state.onError(error)
           }
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-          const { error } = await state.rowService!.delete(rows)
-          if (error) {
-            if (state.onError) state.onError(error)
-          } else {
+
+          try {
+            await deleteRows({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              table,
+              rows,
+            })
+
             dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
             dispatch({
               type: 'SELECTED_ROWS_CHANGE',
               payload: { selectedRows: new Set() },
             })
+          } catch (error) {
+            if (state.onError) state.onError(error)
           }
         }
       },
     })
   }
+
+  const [isExporting, setIsExporting] = useState(false)
 
   async function onRowsExportCSV() {
     setIsExporting(true)

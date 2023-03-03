@@ -16,7 +16,7 @@ export const meta = {
   ></iframe>
 </div>
 
-[Clouflare Turnstile](https://www.cloudflare.com/products/turnstile/) is a friendly, free CAPTCHA replacement, and it works seamlessly with Supabase Edge Functions to protect your forms. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/cloudflare-turnstile).
+[Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) is a friendly, free CAPTCHA replacement, and it works seamlessly with Supabase Edge Functions to protect your forms. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/cloudflare-turnstile).
 
 ## Setup
 
@@ -34,7 +34,7 @@ supabase functions new cloudflare-turnstile
 And add the code to the `index.ts` file:
 
 ```ts index.ts
-import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log('Hello from Cloudflare Trunstile!')

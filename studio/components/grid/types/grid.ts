@@ -15,7 +15,7 @@ export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string
+  table: SupaTable
   /**
    *
    * run sql query
@@ -64,7 +64,17 @@ export interface SupabaseGridProps {
    */
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
+  /**
+   * Toggle api preview panel open
+   */
+  apiPreviewPanelOpen?: boolean
+  setApiPreviewPanelOpen?: () => void
+  /**
+   * Refresh the docs after a change is made to the table
+   */
+  refreshDocs: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  updateTableRow: (previousRow: any, updatedData: any) => void
 }
 
 export interface SupabaseGridRef {
