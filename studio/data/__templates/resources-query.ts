@@ -40,6 +40,18 @@ export const useResourcesQuery = <TData = ResourcesData>(
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
+/**
+ * useResourcesPrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.
+ *
+ * @example
+ * const prefetch = useResourcesPrefetch({ projectRef })
+ *
+ * return (
+ *   <Link onMouseEnter={() => prefetch()}>
+ *     Start loading on hover
+ *   </Link>
+ * )
+ */
 export const useResourcesPrefetch = ({ projectRef }: ResourcesVariables) => {
   const client = useQueryClient()
 

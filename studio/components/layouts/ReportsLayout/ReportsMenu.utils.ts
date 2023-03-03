@@ -24,15 +24,10 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
           ? [
               {
                 name: 'API',
-                key: 'api',
-                url: `/project/${ref}/reports/api`,
+                key: 'api-overview',
+                url: `/project/${ref}/reports/api-overview`,
                 items: [],
-              },
-              {
-                name: 'Auth',
-                key: 'auth',
-                url: `/project/${ref}/reports/auth`,
-                items: [],
+                label: 'NEW',
               },
             ]
           : []),
@@ -41,6 +36,13 @@ export const generateReportsMenu = (project?: Project): ProductMenuGroup[] => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
           items: [],
+        },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/reports/query-performance`,
+          items: [],
+          label: 'NEW',
         },
       ],
     },

@@ -173,13 +173,18 @@ interface RadioProps {
   children: React.ReactNode
   value: string
   ItemIndicator?: React.ReactNode
+  disabled?: boolean
 }
 
-export function Radio({ children, value, ItemIndicator }: RadioProps) {
+export function Radio({ children, value, ItemIndicator, disabled }: RadioProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.RadioItem value={value} className={`${__styles.item} ${__styles.input}`}>
+    <RadixDropdown.RadioItem
+      value={value}
+      disabled={disabled}
+      className={`${__styles.item} ${__styles.input}`}
+    >
       <RadixDropdown.ItemIndicator className={__styles.check}>
         {ItemIndicator ? ItemIndicator : <IconTarget strokeWidth={6} size={10} />}
       </RadixDropdown.ItemIndicator>

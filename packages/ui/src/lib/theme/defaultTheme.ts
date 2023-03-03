@@ -187,7 +187,11 @@ export default {
     chevron: {
       base: `
         text-scale-900
-        rotate-0 group-state-open:rotate-180
+        rotate-0
+        group-state-open:rotate-180
+        group-data-[state=open]:rotate-180
+        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        transition-transform duration-300
         duration-200
       `,
       align: {
@@ -998,6 +1002,7 @@ export default {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
       xlarge: `w-screen max-w-3xl h-full`,
+      xxlarge: `w-screen max-w-4xl h-full`,
     },
     align: {
       left: `

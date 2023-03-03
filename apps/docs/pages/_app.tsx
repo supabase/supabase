@@ -2,6 +2,7 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { ThemeProvider } from 'common/Providers'
 import { DefaultSeo } from 'next-seo'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
@@ -9,8 +10,8 @@ import ClippyProvider from '~/components/Clippy/ClippyProvider'
 import { SearchProvider } from '~/components/DocSearch'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { post } from '~/lib/fetchWrappers'
 import { IS_PLATFORM } from '~/lib/constants'
+import { post } from '~/lib/fetchWrappers'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -59,34 +60,10 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [router.events])
 
   const SITE_TITLE = 'Supabase Documentation'
-  const SITE_DESCRIPTION = 'The open source Firebase alternative.'
-  const { basePath } = useRouter()
 
   return (
     <>
       <Favicons />
-      <DefaultSeo
-        title={SITE_TITLE}
-        description={SITE_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/docs',
-          site_name: SITE_TITLE,
-          images: [
-            {
-              url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
       {IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>

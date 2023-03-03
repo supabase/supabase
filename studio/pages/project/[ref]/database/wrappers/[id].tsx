@@ -9,6 +9,7 @@ import { EditWrapper } from 'components/interfaces/Database'
 
 const DatabaseWrappersNew: NextPageWithLayout = () => {
   const canReadWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'wrappers')
+
   if (!canReadWrappers) {
     return <NoPermission isFullPage resourceText="view foreign data wrappers" />
   }
