@@ -56,7 +56,7 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 ### Set up the Supabase client
 
-Create the server client in a handle hook:
+Create a server supabase client in a handle hook:
 
 ```ts title=src/hooks.server.ts
 // src/hooks.server.ts
@@ -74,7 +74,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     event
   });
 
-  // a little helper to save some lines
+  /**
+   * a little helper that is written for convenience so that instead
+   * of calling `const { data: { session } } = await supabase.auth.getSession()`
+   * you just call this `await getSession()`
+   */
   event.locals.getSession = async () => {
     const {
       data: { session }
@@ -114,7 +118,7 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 
 #### Shared Load functions and pages
 
-To be able to use supabase in shared load functions and inside pages you need to create a supabase client in the root layout load:
+To be able to use supabase in shared load functions and inside pages you need to create a Supabase client in the root layout load:
 
 ```ts
 // src/routes/+layout.ts
@@ -148,13 +152,13 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 };
 ```
 
-The client can be accessed inside pages by `$page.data.supabase` or `data.supabase` when using `export let data: PageData`.
+Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data: PageData`.
 
 The usage of `depends` and `invalidate` tells sveltekit that this load function should be executed whenever the session updates to keep the page store in sync.
 
 `createSupabaseLoadClient` caches the client when running in a browser environment and therefore does not create a new client for every time the load function runs.
 
-### Typings with v2 from Supabase CLI
+### Generate types from your database
 
 In order to get the most out of TypeScript and it's intellisense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
 
@@ -452,7 +456,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     event
   });
 
-  // a little helper to save some lines
+  /**
+   * a little helper that is written for convenience so that instead
+   * of calling `const { data: { session } } = await supabase.auth.getSession()`
+   * you just call this `await getSession()`
+   */
   event.locals.getSession = async () => {
     const {
       data: { session }
