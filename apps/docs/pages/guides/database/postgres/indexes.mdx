@@ -8,7 +8,7 @@ export const meta = {
 
 An index makes your Postgres queries faster. The index is like a "table of contents" for your data - a reference list which allows queries to quickly locate a row in a given table without needing to scan the entire table (which in large tables can take a long time).
 
-Indexes can be structured in a few different ways. The type of index chosen often depends on the values you are indexing. By far the most common index type, and the default in Postgres, is the B-Tree. A B-Tree is the generalized form of a binary search tree, where nodes can have more than two children.
+Indexes can be structured in a few different ways. The type of index chosen depends on the values you are indexing. By far the most common index type, and the default in Postgres, is the B-Tree. A B-Tree is the generalized form of a binary search tree, where nodes can have more than two children.
 
 Whilst indexes are useful for speeding up query performance, the query planner may not always make use of a given index when choosing which optimizations to make. Additionally indexes come with some overhead in terms of additional writes and storage, so it's useful to understand how and when to use indexes, if at all.
 
