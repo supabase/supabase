@@ -1,6 +1,7 @@
 import { FC } from 'react'
-import { Input } from 'ui'
+import { Badge, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useFlag, useParams, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -28,6 +29,7 @@ const Infrastructure: FC<Props> = ({}) => {
   const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
   const { data, isLoading } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
+  const isOnLatestVersion = data?.current_app_version === data?.latest_app_version
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
@@ -80,7 +82,36 @@ const Infrastructure: FC<Props> = ({}) => {
 
         <FormSection header={<FormSectionLabel>Postgres</FormSectionLabel>}>
           <FormSectionContent loading={isLoading}>
-            <Input readOnly disabled value={currentPgVersion} label="Current version" />
+            <Input
+              readOnly
+              disabled
+              value={currentPgVersion}
+              label="Current version"
+              actions={[
+                isOnLatestVersion && (
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <Badge color="green" className="mr-1">
+                        Latest
+                      </Badge>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200 w-[200px]',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          Project is on the latest version of Postgres that Supabase supports
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Root>
+                ),
+              ]}
+            />
             {data?.eligible && showDbUpgrades && <ProjectUpgradeAlert />}
           </FormSectionContent>
         </FormSection>
