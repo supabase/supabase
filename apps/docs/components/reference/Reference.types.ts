@@ -34,13 +34,13 @@ export interface IFunctionDefinition {
 }
 
 export interface ICommonFunc {
-  id: string
+  id?: string
   title: string
-  slug: string
-  product: string
-  type: string
+  slug?: string
+  product?: string
+  type?: string
   parent?: string
-  items: ICommonFunc[]
+  items?: ICommonFunc[]
 }
 
 export interface IRefFunctionSection {
