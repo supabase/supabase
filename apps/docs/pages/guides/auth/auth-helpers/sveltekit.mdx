@@ -93,7 +93,7 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 
 #### Shared Load functions and pages
 
-To be able to use supabase in shared load functions and inside pages you need to create a Supabase client in the root layout load:
+To be able to use Supabase in shared load functions and inside pages you need to create a Supabase client in the root layout load:
 
 ```ts
 // src/routes/+layout.ts
@@ -180,7 +180,7 @@ You can now determine if a user is authenticated on the client-side by checking 
 
 ## Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use supabaseClient from `PageData` and only run your query once the session is defined client-side:
+For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```html
 <script>
@@ -263,7 +263,7 @@ export const GET: RequestHandler = async ({
 };
 ```
 
-If you visit `/api/protected-route` without a valid session cookie, you will get a 303 response.
+If you visit `/api/protected-route` without a valid session cookie, you will get a 401 response.
 
 ## Protecting Actions
 
@@ -302,7 +302,7 @@ export const actions: Actions = {
 };
 ```
 
-If you try to submit a form with the action `?/createPost` without a valid session cookie, you will get a 403 error response.
+If you try to submit a form with the action `?/createPost` without a valid session cookie, you will get a 401 error response.
 
 ## Saving and deleting the session
 
