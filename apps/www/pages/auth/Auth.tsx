@@ -64,22 +64,24 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
+            <div className="block w-full header--light" key="light">
               <Image
                 src={`${basePath}/images/product/auth/header--light.png`}
                 alt="auth header"
                 layout="responsive"
                 width="1372"
                 height="1074"
+                priority
               />
             </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
+            <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/auth/header--dark.png`}
                 alt="auth header"
                 layout="responsive"
                 width="1372"
                 height="1074"
+                priority
               />
             </div>,
           ]}
@@ -91,7 +93,7 @@ function AuthPage() {
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <div className="mb-4 -mt-[1.9rem]">
                 <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
-                  <div className="flex w-fit items-center">
+                  <div className="flex items-center w-fit">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 32.58 31.77"
@@ -107,7 +109,7 @@ function AuthPage() {
                   </div>
                   {AuthProviders.map((auth, i) => {
                     return (
-                      <div className="flex w-fit items-center" key={i}>
+                      <div className="flex items-center w-fit" key={i}>
                         <Image
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}
@@ -121,27 +123,27 @@ function AuthPage() {
                 </div>
               </div>
               <h4 className="h4">All the social providers</h4>
-              <p className="p text-base">
+              <p className="text-base p">
                 Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
                 Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
-              <div className="p mb-4">
+              <div className="mb-4 p">
                 <IconLink />
               </div>
               <h4 className="h4">Fully integrated</h4>
-              <p className="p text-base">
+              <p className="text-base p">
                 Incredibly simple Auth, without a single external authentication service. Built-in
                 Authentication, Authorization, and User Management.
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="p mb-4">
+              <div className="mb-4 p">
                 <IconShield />
               </div>
               <h4 className="h4">Own your data</h4>
-              <p className="p text-base">
+              <p className="text-base p">
                 User data stored in your Supabase database so you never have to worry about 3rd
                 party privacy issues. Host your data in 8 different locations.
               </p>
@@ -169,7 +171,7 @@ function AuthPage() {
               </p>,
             ]}
             footer={[
-              <div className="mt-8 grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16" key={0}>
+              <div className="grid grid-cols-12 mt-8 md:gap-8 lg:gap-0 xl:gap-16" key={0}>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconBriefcase />}
@@ -193,12 +195,12 @@ function AuthPage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="border-t border-b border-gray-100 section--bg dark:border-gray-600"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="pt-12 pb-0 section-container">
               <FloatingIcons />
               <div className="overflow-x-hidden">
-                <SectionContainer className="mb-0 pb-8">
+                <SectionContainer className="pb-8 mb-0">
                   <GithubExamples />
                 </SectionContainer>
               </div>
@@ -211,7 +213,7 @@ function AuthPage() {
             <div className="col-span-12 mb-8 lg:col-span-5">
               <h2 className="h3">User permissions without the middleware</h2>
 
-              <p className="p text-base lg:text-lg">
+              <p className="text-base p lg:text-lg">
                 Supabase Auth works without any additional servers. Build Authorization rules with
                 Postgres' Row Level Security, controlling who can create, edit and delete specific
                 rows in your database.

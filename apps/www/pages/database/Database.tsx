@@ -76,22 +76,24 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
+            <div className="block w-full header--light" key="light">
               <Image
                 src={`${basePath}/images/product/database/header--light-2.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
                 height="1116"
+                priority
               />
             </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
+            <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/database/header--dark-2.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
                 height="1116"
+                priority
               />
             </div>,
           ]}
@@ -101,10 +103,10 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="p mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
-                <div className="flex w-fit items-center">
+                <div className="flex items-center w-fit">
                   <Image
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
@@ -115,12 +117,12 @@ function Database() {
               </div>
               <h4 className="h4">Just Postgres</h4>
               <p className="p">Every Supabase project is a dedicated Postgres database.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 100% portable. Bring your existing Postgres database, or migrate away at any time.
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
-              <div className="p mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -128,13 +130,13 @@ function Database() {
 
               <h4 className="h4">Built-in Auth</h4>
               <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 Integrated with JWT authentication which controls exactly what your users can
                 access.
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="p mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
@@ -142,7 +144,7 @@ function Database() {
 
               <h4 className="h4">Realtime enabled</h4>
               <p className="p">Data-change listeners over websockets.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 Subscribe and react to database changes, milliseconds after they happen.
               </p>
             </div>
@@ -241,9 +243,9 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
+                <div className="flex col-span-12 mt-0 lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
+                    <p className="m-0 text-scale-1100">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
@@ -252,7 +254,7 @@ function Database() {
                     <Badge dot={false}>Kotlin</Badge>
                   </div>
                 </div>
-                <div className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block" key={1}>
+                <div className="hidden col-span-12 lg:col-span-6 xl:col-span-10 xl:block" key={1}>
                   {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
@@ -270,12 +272,12 @@ function Database() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="border-t border-b border-gray-100 section--bg dark:border-gray-600"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="pt-12 pb-0 section-container">
               <FloatingIcons />
               <div className="overflow-x-hidden">
-                <SectionContainer className="mb-0 pb-8 lg:pt-32">
+                <SectionContainer className="pb-8 mb-0 lg:pt-32">
                   <GithubExamples />
                 </SectionContainer>
               </div>

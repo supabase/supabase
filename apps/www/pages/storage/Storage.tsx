@@ -57,22 +57,24 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
+            <div className="block w-full header--light" key="light">
               <Image
                 src={`${basePath}/images/product/storage/header--light.png`}
                 alt="storage header"
                 layout="responsive"
                 width="1386"
                 height="1067"
+                priority
               />
             </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
+            <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/storage/header--dark.png`}
                 alt="storage header"
                 layout="responsive"
                 width="1386"
                 height="1067"
+                priority
               />
             </div>,
           ]}
@@ -82,7 +84,7 @@ function StoragePage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="p mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2 p">
                 <ProductIcon icon={Solutions['storage'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -97,7 +99,7 @@ function StoragePage() {
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2">
                 <ProductIcon
                   icon={
                     'M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
@@ -110,7 +112,7 @@ function StoragePage() {
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2">
                 <ProductIcon
                   icon={
                     'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
@@ -124,9 +126,9 @@ function StoragePage() {
         </SectionContainer>
 
         <SectionContainer className="pt-16">
-          <div className="mb-16 block">
+          <div className="block mb-16">
             <h2 className="h3">Sleek dashboard for managing your media</h2>
-            <p className="p text-lg">
+            <p className="text-lg p">
               A complete Object Explorer so that any of your team can use.
             </p>
             <p className="p">
@@ -139,7 +141,7 @@ function StoragePage() {
             content={DashboardViewData}
             footer={
               <>
-                <span key="check-out" className="p mb-4 block">
+                <span key="check-out" className="block mb-4 p">
                   Check out our example app
                 </span>
                 <ExampleCard
@@ -167,7 +169,7 @@ function StoragePage() {
           />
         </SectionContainer>
 
-        <SectionContainer className="-mb-48 pt-0">
+        <SectionContainer className="pt-0 -mb-48">
           <APISection
             title="Simple and convenient APIs"
             // @ts-ignore
@@ -180,7 +182,7 @@ function StoragePage() {
               </p>,
             ]}
             footer={[
-              <div className="my-8 grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16" key={0}>
+              <div className="grid grid-cols-12 gap-8 my-8 lg:gap-0 xl:gap-16" key={0}>
                 <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:col-span-4 xl:mb-0">
                   <FeatureColumn
                     icon={<IconWifi />}
@@ -225,12 +227,12 @@ function StoragePage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-gray-100 dark:border-gray-600"></div>
+              <div className="border-t border-gray-100 section--bg dark:border-gray-600"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="pt-12 pb-0 section-container">
               {/* <FloatingIcons /> */}
               <div className="overflow-x-hidden">
-                {/* <SectionContainer className="mb-0 pb-8">
+                {/* <SectionContainer className="pb-8 mb-0">
                 <GithubExamples />
               </SectionContainer> */}
 

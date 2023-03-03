@@ -114,22 +114,24 @@ function Database() {
           ]}
           subheader={[subtitle]}
           image={[
-            <div className="header--light block w-full" key="light">
+            <div className="block w-full header--light" key="light">
               <Image
                 src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
                 height="1116"
+                priority
               />
             </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
+            <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
                 height="1116"
+                priority
               />
             </div>,
           ]}
@@ -142,16 +144,16 @@ function Database() {
               {featureBlocks.map((item, i) => {
                 return (
                   <div
-                    className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"
+                    className="flex flex-col gap-4 px-8 py-6 border rounded bg-scale-100 dark:bg-scale-300 group"
                     key={i}
                   >
-                    <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                    <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
                       {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                     </div>
 
                     <div>
-                      <h3 className="text-scale-1200 text-lg">{item.title}</h3>
-                      <p className="text-scale-900 text-sm">{item.description}</p>
+                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
+                      <p className="text-sm text-scale-900">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -273,9 +275,9 @@ serve(async (req) => {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
+                <div className="flex col-span-12 mt-0 lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
+                    <p className="m-0 text-scale-1100">Libraries coming soon:</p>
                   </p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
@@ -285,7 +287,7 @@ serve(async (req) => {
                   </div>
                 </div>
                 <div
-                  className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block"
+                  className="hidden col-span-12 lg:col-span-6 xl:col-span-10 xl:block"
                   key={1}
                 ></div>
               </div>,
