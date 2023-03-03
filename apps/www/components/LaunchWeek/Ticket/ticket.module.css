@@ -58,26 +58,6 @@
   margin-bottom: auto;
 }
 
-.ticket-visual {
-  /* position: relative;
-  border-radius: calc(16px * var(--size)); */
-  /* overflow: hidden; */
-  /* width: 330px; */
-  /* margin: 0 auto; */
-}
-
-/* .ticket-visual:before,
-.ticket-visual:after { */
-/* content: '';
-  display: block;
-  width: 72px;
-  height: 58px; */
-/* background-color: #1C1C1C; */
-/* position: absolute;
-  z-index: 100;
-  border-radius: 50%; */
-/* } */
-
 .ticket-visual:before {
   left: 50%;
   top: -7.5%;
@@ -91,10 +71,6 @@
 }
 
 @media (min-width: 768px) {
-  .ticket-visual {
-    /* width: 650px; */
-  }
-
   .ticket-visual:before {
     top: 50%;
     left: -7%;

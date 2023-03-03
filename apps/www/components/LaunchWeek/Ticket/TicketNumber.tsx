@@ -17,8 +17,8 @@ export default function TicketNumber({ number, size }: Props) {
       >
         <div
           className={[
-            'text-[42px] leading-[1] w-[370px] text-center bg-clip-text lg:transform lg:rotate-90 lg:translate-y-100 origin-bottom-right bg-gradient-to-r from-white via-white',
-            size === 'small' ? 'text-[20px] w-[220px]' : '',
+            'leading-[1] w-[370px] text-center bg-clip-text lg:transform lg:rotate-90 lg:translate-y-100 origin-bottom-right bg-gradient-to-r from-white via-white',
+            size === 'small' ? 'text-[20px] w-[220px]' : 'text-[20px] lg:text-[42px] ',
           ].join(' ')}
           id="wayfinding--ticket-number-inner"
         >

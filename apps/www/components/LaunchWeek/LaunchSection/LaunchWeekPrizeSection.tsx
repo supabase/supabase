@@ -5,7 +5,7 @@ import LabelBadge from '../LabelBadge'
 export default function LaunchWeekPrizeSection() {
   return (
     <div>
-      <div className="mt-24 relative h-[640px] overflow-hidden">
+      <div className="mt-8 relative h-[640px] overflow-hidden">
         <div className="-ml-[24rem] -mr-[24rem]">
           <Image src="/images/launchweek/seven/lw-7-bg.svg" layout="fill" objectFit="cover" />
         </div>
@@ -29,6 +29,7 @@ export default function LaunchWeekPrizeSection() {
           <div className="lg:w-3/5">
             <div className="grid gap-4 border border-[#484848]  rounded-tr-xl rounded-tl-xl overflow-hidden">
               <div className="relative h-[360px]">
+                <div className="glass-tile-gradient w-[150px] h-[420px]  -top-8 -ml-12"></div>
                 <Image
                   src="/images/launchweek/seven/keyboard.png"
                   layout="fill"
