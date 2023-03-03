@@ -18,9 +18,9 @@ import { basename, dirname, join } from 'path'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
 import { inspect } from 'util'
-import { IFunctionDefinition, ISpec } from '../components/reference/Reference.types'
+import { ICommonFunc, IFunctionDefinition, ISpec } from '../components/reference/Reference.types'
 import { CliCommand, CliSpec } from '../generator/types/CliSpec'
-import { flattenSections, ReferenceSection } from '../lib/helpers'
+import { flattenSections } from '../lib/helpers'
 import { enrichedOperation, gen_v3 } from '../lib/refGenerator/helpers'
 
 dotenv.config()
@@ -280,7 +280,7 @@ abstract class ReferenceEmbeddingSource<SpecSection> extends BaseEmbeddingSource
     const specContents = await readFile(this.specFilePath, 'utf8')
     const refSectionsContents = await readFile(this.sectionsFilePath, 'utf8')
 
-    const refSections: ReferenceSection[] = JSON.parse(refSectionsContents)
+    const refSections: ICommonFunc[] = JSON.parse(refSectionsContents)
     const flattenedRefSections = flattenSections(refSections)
 
     const checksum = createHash('sha256')
@@ -320,7 +320,7 @@ abstract class ReferenceEmbeddingSource<SpecSection> extends BaseEmbeddingSource
 
   abstract getSpecSections(specContents: string): SpecSection[]
   abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection
-  abstract formatSection(specSection: SpecSection, refSection: ReferenceSection): string
+  abstract formatSection(specSection: SpecSection, refSection: ICommonFunc): string
 }
 
 class OpenApiEmbeddingSource extends ReferenceEmbeddingSource<enrichedOperation> {
@@ -357,7 +357,7 @@ class ClientLibEmbeddingSource extends ReferenceEmbeddingSource<IFunctionDefinit
   matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
-  formatSection(functionDefinition: IFunctionDefinition, refSection: ReferenceSection): string {
+  formatSection(functionDefinition: IFunctionDefinition, refSection: ICommonFunc): string {
     const { title } = refSection
     const { description, title: functionName } = functionDefinition
 
