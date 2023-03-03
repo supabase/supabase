@@ -5,15 +5,16 @@ import { formatClipboardValue, copyToClipboard } from '../../utils'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { SupaTable } from 'components/grid/types'
+import { SupaRow, SupaTable } from 'components/grid/types'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
 export type RowContextMenuProps = {
   table: SupaTable
+  rows: SupaRow[]
 }
 
-const RowContextMenu = ({ table }: RowContextMenuProps) => {
+const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -27,7 +28,7 @@ const RowContextMenu = ({ table }: RowContextMenuProps) => {
       onAsyncConfirm: async () => {
         const { props } = p
         const { rowIdx } = props
-        const row = state.rows[rowIdx]
+        const row = rows[rowIdx]
         if (!row || !project) return
 
         try {
@@ -53,7 +54,7 @@ const RowContextMenu = ({ table }: RowContextMenuProps) => {
   function onEditRowClick(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props
-    const row = state.rows[rowIdx]
+    const row = rows[rowIdx]
     if (state.onEditRow) state.onEditRow(row)
   }
 
@@ -71,7 +72,7 @@ const RowContextMenu = ({ table }: RowContextMenuProps) => {
     }
 
     const { rowIdx } = props
-    const row = state.rows[rowIdx]
+    const row = rows[rowIdx]
 
     const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
