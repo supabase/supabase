@@ -199,6 +199,9 @@ const SearchModal: FC = () => {
             onKeyDown={(e) => {
               switch (e.key) {
                 case 'Enter':
+                  if (!query) {
+                    return
+                  }
                   handleConfirm(selectedTab, query)
                   return
                 default:
