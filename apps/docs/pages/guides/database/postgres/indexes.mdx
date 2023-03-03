@@ -6,7 +6,7 @@ export const meta = {
   footerHelpType: 'postgres',
 }
 
-An index in Postgres is a kind of reference list (analogous to a table of contents or glossary section in a book) which allows queries to quickly locate a row in a given table without needing to scan the entire table, which in large tables can take a long time.
+An index makes your Postgres queries faster. The index is like a "table of contents" for your data - a reference list which allows queries to quickly locate a row in a given table without needing to scan the entire table (which in large tables can take a long time).
 
 Indexes can be structured in a few different ways. The type of index chosen often depends on the values you are indexing. By far the most common index type, and the default in Postgres, is the B-Tree. A B-Tree is the generalized form of a binary search tree, where nodes can have more than two children.
 
