@@ -233,12 +233,12 @@ const SearchModal: FC = () => {
             handleConfirm(tabId, query)
           }}
         >
-          <Tabs.Panel id="search-panel" label="Guides & References">
+          <Tabs.Panel id="search-panel" label="Guides & Reference">
             <div className="mb-6">
               {!isLoading && !hasSearchError && !results && (
                 <div className="p-10 grid">
                   <h2 className="text-lg text-center text-scale-1100">
-                    Search Supabase guides & references
+                    Search Supabase guides & reference docs
                   </h2>
                 </div>
               )}
