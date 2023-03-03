@@ -9,7 +9,7 @@ interface Props {
 
 export function TicketBrick({ user }: Props) {
   const golden = user.sharedOnLinkedIn && user.sharedOnTwitter
-  console.log(user)
+
   return (
     <div
       key={user.name}
