@@ -88,7 +88,6 @@ create index idx_persons_age_desc on persons(age desc nulls last);
 
 After a while indexes can become stale and may need rebuilding. Postgres provides a `reindex` command for this, but due to Postgres locks being placed on the index during this process, you may want to make use of the `concurrent` keyword.
 
-You can reindex an index:
 
 ```sql
 reindex index concurrently idx_persons_age;
