@@ -517,15 +517,19 @@ export const database = {
       url: undefined,
       items: [
         {
-          name: 'Drop all tables in schema',
+          name: 'Managing Indexes',
+          url: '/guides/database/postgres/indexes',
+        },
+        {
+          name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
         {
-          name: 'Select first row per group',
+          name: 'Select First Row per Group',
           url: '/guides/database/postgres/first-row-in-group',
         },
         {
-          name: 'Print PostgreSQL version',
+          name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
         },
       ],
