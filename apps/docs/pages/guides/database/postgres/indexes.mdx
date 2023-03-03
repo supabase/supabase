@@ -36,7 +36,7 @@ We might want to frequently query users based on their age:
 select name from persons where age = 32;
 ```
 
-The issue is that without an index, postgres will do a sequential scan of every row in the table to find equality matches on age.
+Without an index, Postgres will scan every row in the table to find equality matches on age.
 
 You can verify this by doing an explain on the query:
 ```sql
