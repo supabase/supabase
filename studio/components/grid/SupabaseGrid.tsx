@@ -201,7 +201,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} updateRow={props.updateTableRow} />
       <Footer isLoading={isLoading || isRefetching} />
       <Shortcuts gridRef={gridRef} />
-      {mounted && createPortal(<RowContextMenu table={table} />, document.body)}
+      {mounted &&
+        createPortal(<RowContextMenu table={table} rows={data?.rows ?? []} />, document.body)}
     </div>
   )
 })
