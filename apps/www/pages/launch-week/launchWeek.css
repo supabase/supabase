@@ -5,3 +5,15 @@
 .bg-lw7-black-transition {
   background: linear-gradient(0.39deg, #161616 53.84%, rgba(28, 28, 28, 0) 88.21%);
 }
+
+.glass-tile-gradient {
+  position: absolute;
+
+  left: calc(50% - 146.58px / 2 - 181.35px);
+  top: calc(50% - 426.82px / 2 - 76.38px);
+
+  background: #579ca1;
+  filter: blur(85.7962px);
+  border-radius: 16.9281px;
+  transform: matrix(0.84, 0.55, -0.55, 0.83, 0, 0);
+}

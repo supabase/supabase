@@ -44,7 +44,7 @@ export default function Ticket({
   useEffect(() => {
     if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
       Tilt.init(ticketRef.current, {
-        glare: true,
+        glare: false,
         max: 5,
         'max-glare': 0.16,
         'full-page-listening': true,
@@ -61,7 +61,7 @@ export default function Ticket({
 
   return (
     <div
-      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[380px]"
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[520px] lg:h-[380px] "
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
