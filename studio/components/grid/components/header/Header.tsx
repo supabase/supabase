@@ -15,7 +15,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
-import { useQueryClient } from '@tanstack/react-query'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 
@@ -153,7 +152,6 @@ type RowHeaderProps = {
   filters: Filter[]
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
