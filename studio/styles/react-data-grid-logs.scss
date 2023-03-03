@@ -49,7 +49,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-scale-1200 font-semibold #{!important};
+      @apply text-scale-1100 font-semibold #{!important};
     }
   }
 }

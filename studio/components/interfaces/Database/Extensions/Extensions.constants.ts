@@ -14,4 +14,5 @@ export const HIDDEN_EXTENSIONS = [
   'supabase_vault',
   'intagg',
   'xml2',
+  'pg_tle',
 ]

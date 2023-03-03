@@ -19,7 +19,6 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
       type="default"
       chevronAlign="left"
       size="small"
-      bordered={false}
       iconPosition="left"
     >
       <Accordion.Item id="1" header="Full error message">

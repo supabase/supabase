@@ -102,13 +102,17 @@ const channel = supabase
 
 ## Filter Changes
 
-To listen to changes when a column's value in a table matches a client-specified value:
+Realtime offers filters so you can specify the data your client receives at a more granular level.
+
+### eq
+
+To listen to changes when a column's value in a table equals a client-specified value:
 
 ```js
 // Supabase client setup
 
 const channel = supabase
-  .channel('value-db-changes')
+  .channel('changes')
   .on(
     'postgres_changes',
     {
@@ -121,6 +125,166 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+<Admonition type="note">
+  This filter uses Postgres' `=`.
+</Admonition>
+
+### neq
+
+To listen to changes when a column's value in a table does not equal a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=neq.bye',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `!=`.
+</Admonition>
+
+### lt
+
+To listen to changes when a column's value in a table is less than a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'id=lt.100',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `<` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### lte
+
+To listen to changes when a column's value in a table is less than or equal to a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'profiles',
+      filter: 'age=lte.65',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `<=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### gt
+
+To listen to changes when a column's value in a table is greater than a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: 'quantity=gt.10',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `>` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### gte
+
+To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: 'quantity=gte.10',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `>=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### in
+
+To listen to changes when a column's value in a table equals any client-specified values:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'colors',
+      filter: 'name=in.(red, blue, yellow)',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `= ANY`. Realtime allows a maximum of 100 values for this filter.
+</Admonition>
 
 ## Combination Changes
 

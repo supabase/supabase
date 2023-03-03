@@ -513,6 +513,28 @@ export const database = {
       ],
     },
     {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Managing Indexes',
+          url: '/guides/database/postgres/indexes',
+        },
+        {
+          name: 'Drop All Tables in Schema',
+          url: '/guides/database/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select First Row per Group',
+          url: '/guides/database/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL Version',
+          url: '/guides/database/postgres/which-version-of-postgres',
+        },
+      ],
+    },
+    {
       name: 'Configuration',
       url: undefined,
       items: [
@@ -553,8 +575,10 @@ export const functions = {
           url: '/guides/functions/examples/connect-to-postgres',
           items: [],
         },
+        { name: 'Discord Bot', url: '/guides/functions/examples/discord-bot', items: [] },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+        { name: 'OpenAI', url: '/guides/functions/examples/openai', items: [] },
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
         { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
         { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
@@ -635,7 +659,7 @@ export const platform = {
       url: undefined,
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
-        { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'Database Size', url: '/guides/platform/database-size', items: [] },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
@@ -725,24 +749,6 @@ export const resources = {
         },
       ],
     },
-    {
-      name: 'Postgres resources',
-      url: undefined,
-      items: [
-        {
-          name: 'Drop all tables in schema',
-          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
-        },
-        {
-          name: 'Select first row per group',
-          url: '/guides/resources/postgres/first-row-in-group',
-        },
-        {
-          name: 'Print PostgreSQL version',
-          url: '/guides/resources/postgres/which-version-of-postgres',
-        },
-      ],
-    },
   ],
 }
 
@@ -821,6 +827,7 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
+        { name: 'OpenAI', url: '/guides/functions/examples/openai', items: [] },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
         { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },

@@ -21,6 +21,7 @@ import {
   Tabs,
 } from 'ui'
 import components from '~/components'
+import { IS_PLATFORM } from '~/lib/constants'
 import { useSearch } from './SearchProvider'
 import SearchResult, { SearchResultType } from './SearchResult'
 
@@ -35,9 +36,8 @@ const questions = [
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
-  const isPlatform = supabaseUrl?.match(/(supabase\.co)|(supabase\.in)/)
 
-  if (isPlatform) {
+  if (IS_PLATFORM) {
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
     return `${schemeAndProjectId}.functions.${domain}.${tld}`
   } else {
@@ -312,19 +312,22 @@ const SearchModal: FC = () => {
                   <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
 
                   <ul className="text-sm mt-4 text-scale-1100 grid md:flex gap-4 flex-wrap max-w-3xl">
-                    {questions.map((question) => (
-                      <li key={question}>
-                        <button
-                          className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
-                          onClick={() => {
-                            setQuery(question)
-                            handleClippyConfirm(question)
-                          }}
-                        >
-                          {question}
-                        </button>
-                      </li>
-                    ))}
+                    {questions.map((question) => {
+                      const key = question.replace(/\s+/g, '_')
+                      return (
+                        <li key={key}>
+                          <button
+                            className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
+                            onClick={() => {
+                              setQuery(question)
+                              handleClippyConfirm(question)
+                            }}
+                          >
+                            {question}
+                          </button>
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               </div>

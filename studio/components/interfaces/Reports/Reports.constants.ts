@@ -1,21 +1,25 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper } from '../Settings/Logs'
-import { PresetConfig, Presets } from './Reports.types'
+import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 24
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    text: 'Last 24 hours',
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
   {
     text: 'Last 14 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
   {
     text: 'Last 30 days',
@@ -29,216 +33,174 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
+const generateRexepWhere = (filters: ReportFilterItem[], prepend = true) => {
+  if (filters.length === 0) return ''
+  const conditions = filters
+    .map((filter) => {
+      const splitKey = filter.key.split('.')
+      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      if (filter.compare === 'matches') {
+        return `REGEXP_CONTAINS(${normalizedKey}, '${filter.value}')`
+      } else if (filter.compare === 'is') {
+        return `${normalizedKey} = ${filter.value}`
+      }
+    })
+    .join(' AND ')
+  if (prepend) {
+    return 'WHERE ' + conditions
+  } else {
+    return conditions
+  }
+}
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
     queries: {
-      statusCodes: {
+      totalRequests: {
         queryType: 'logs',
-        sql: `
+        sql: (filters) => `
         select
-          timestamp_trunc(timestamp, hour) as timestamp,
-          r.status_code as status_code,
-          count(status_code) as count
-        FROM
-          edge_logs
-        CROSS JOIN UNNEST(metadata) AS m
-        CROSS JOIN UNNEST(m.response) AS r
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRexepWhere(filters)}
         GROUP BY
-          timestamp,
-          status_code
+          timestamp
         ORDER BY
           timestamp ASC`,
       },
-      errorRates: {
+      errorCounts: {
         queryType: 'logs',
-        sql: `
+        sql: (filters) => `
         select
-          timestamp_trunc(timestamp, hour) as timestamp,
-          count(timestamp) as count
-        FROM
-          edge_logs
-          LEFT JOIN UNNEST(metadata) AS f1 ON TRUE
-          LEFT JOIN UNNEST(f1.response) AS f3 ON TRUE
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
         WHERE
-          f3.status_code >= 400
+          response.status_code >= 400
+        ${generateRexepWhere(filters, false)}
         GROUP BY
           timestamp
         ORDER BY
           timestamp ASC
         `,
       },
-      requestPaths: {
+      responseSpeed: {
         queryType: 'logs',
-        sql: `
+        sql: (filters) => `
         select
-          f2.path as path,
-          f2.search as query_params,
-          f2.method as method,
-          f3.status_code as status_code,
-          avg(f3.origin_time) as avg_origin_time,
-          sum(f3.origin_time) as sum,
-          APPROX_QUANTILES(f3.origin_time, 100) as quantiles,
-          count(timestamp) as count
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          avg(response.origin_time) as avg,
+          APPROX_QUANTILES(response.origin_time, 100) as quantiles
         FROM
-          edge_logs
-          LEFT JOIN UNNEST(metadata) AS f1 ON TRUE
-          LEFT JOIN UNNEST(f1.request) AS f2 ON TRUE
-          LEFT JOIN UNNEST(f1.response) AS f3 ON TRUE
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRexepWhere(filters)}
         GROUP BY
-          path,
-          query_params,
-          method,
-          status_code
+          timestamp
         ORDER BY
-          sum DESC,
-          count desc,
-          avg_origin_time DESC
-        LIMIT 50
+          timestamp ASC
       `,
-      },
-      userAgents: {
-        queryType: 'logs',
-        sql: `
-        select
-          h.user_agent as user_agent,
-          cf.asOrganization as request_source,
-          count(f.id) as count
-        from
-          edge_logs as f
-          cross join unnest(f.metadata) as m
-          cross join unnest(m.request) as r
-          cross join unnest(r.cf) as cf
-          cross join unnest(r.headers) as h
-        group by
-          user_agent,
-          request_source
-        order by
-          count desc
-        limit 12
-        `,
-      },
-      botScores: {
-        queryType: 'logs',
-        sql: `
-        select
-          h.cf_connecting_ip as ip,
-          h.cf_ipcountry as country,
-          h.user_agent as user_agent,
-          r.path as path,
-          b.score as bot_score,
-          b.verifiedBot as bot_verified,
-          count(f.id) as count
-        from
-          edge_logs as f
-          cross join unnest(f.metadata) as m
-          cross join unnest(m.request) as r
-          cross join unnest(r.cf) as cf
-          cross join unnest(r.headers) as h
-          cross join unnest(cf.botManagement) as b
-        group by
-          ip,
-          country,
-          path,
-          user_agent,
-          bot_score,
-          bot_verified
-        order by
-          bot_score desc
-        limit 20
-              `,
       },
     },
   },
   [Presets.AUTH]: {
-    title: 'Auth',
+    title: '',
+    queries: {},
+  },
+  [Presets.QUERY_PERFORMANCE]: {
+    title: 'Query performance',
     queries: {
-      bannedUsers: {
+      mostFrequentlyInvoked: {
         queryType: 'db',
         sql: (_params) => `
-select 
-  count(distinct u.id) as count
-from auth.users u
-where u.banned_until is not null and u.banned_until > now()
-limit 1
-        `,
+-- Most frequently called queries
+-- A limit of 100 has been added below
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    statements.rows / statements.calls as avg_rows
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    statements.calls desc
+  limit 10;`,
       },
-      unverifiedUsers: {
+      mostTimeConsuming: {
         queryType: 'db',
-        sql: (params) => `
-select 
-  date_trunc('day', u.created_at) as timestamp,
-  count(distinct u.id) as count
-from auth.users u
-where u.confirmed_at is null and '${params.iso_timestamp_start}' < u.created_at 
-group by timestamp
-order by timestamp desc
-        `,
+        sql: (_params) => `-- A limit of 100 has been added below
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    total_time desc
+  limit 10;`,
       },
-      signUpProviders: {
+      slowestExecutionTime: {
         queryType: 'db',
-        sql: (params) => `
-select 
-  sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count, 
-  date_trunc('day', u.created_at) as timestamp, 
-  i.provider as provider
-from auth.users u
-join auth.identities as i on u.id = i.user_id
-where date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
-group by timestamp, provider
-order by timestamp desc
-        `,
+        sql: (_params) => `-- Slowest queries by max execution time
+-- A limit of 100 has been added below
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    statements.rows / statements.calls as avg_rows
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    max_time desc
+  limit 10`,
       },
-      failedMigrations: {
-        queryType: 'logs',
-        sql: `
-select count(f.id)
-from auth_logs
-where json_value(f.event_message, "$.level") = "fatal"
-  and regexp_contains(f.event_message, "error executing migrations") 
-limit 1
-`,
-      },
-      dailyActiveUsers: {
-        queryType: 'logs',
-        sql: `
-select 
-  timestamp_trunc(timestamp, day) as timestamp,
-  count(distinct json_value(f.event_message, "$.user_id")) as count
-from auth_logs f
-where json_value(f.event_message, "$.action") = "login"
-group by 
-  timestamp
-order by
-  timestamp desc
-`,
-      },
-      cumulativeUsers: {
+      queryHitRate: {
         queryType: 'db',
-        sql: (params) => `
-        
-select 
-  date_trunc('day', u.created_at) as timestamp, 
-  sum(count(u.id)) over (order by date_trunc('day', u.created_at)) as count
-from auth.users as u
-where u.confirmed_at is not null and date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
-group by timestamp
-order by timestamp desc
-        `,
-      },
-      newUsers: {
-        queryType: 'db',
-        sql: (params) => `
-select 
-date_trunc('day', u.created_at) as timestamp,
-count(u.id) as count
-from auth.users as u
-where u.confirmed_at is not null and date_trunc('day', u.created_at) > '${params.iso_timestamp_start}'
-group by 
-  timestamp
-order by
-  timestamp desc
-`,
+        sql: (_params) => `-- Cache and index hit rate
+select
+    'index hit rate' as name,
+    (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
+  from pg_statio_user_indexes
+  union all
+  select
+    'table hit rate' as name,
+    sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
+  from pg_statio_user_tables;`,
       },
     },
   },

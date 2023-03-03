@@ -30,7 +30,10 @@ Create a test table with a text array (an array of strings):
 <TabPanel id="sql" label="SQL">
 
 ```sql
-CREATE TABLE arraytest (id integer NOT NULL, textarray text ARRAY);
+create table arraytest (
+  id integer not null,
+  textarray text array
+);
 ```
 
 </TabPanel>
@@ -95,7 +98,7 @@ You should see:
 <TabPanel id="sql" label="SQL">
 
 ```sql
-SELECT * FROM arraytest;
+select * from arraytest;
 ```
 
 You should see:
