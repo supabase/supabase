@@ -70,7 +70,7 @@ You can see that in any large data set, traversing the index to locate a given v
 
 ## Partial indexes
 
-If you are frequently querying only a subset of rows then it may be more performant and space efficient to build a partial index. In our example, perhaps we only want to match on `age` where `deceased is false`. We could build a partial index:
+If you are frequently querying a subset of rows then it may be more efficient to build a partial index. In our example, perhaps we only want to match on `age` where `deceased is false`. We could build a partial index:
 
 ```sql
 create index idx_living_persons_age ON persons(age) where deceased is false;
