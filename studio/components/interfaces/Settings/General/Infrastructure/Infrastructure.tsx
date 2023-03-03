@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { FC } from 'react'
-import { Badge, Input } from 'ui'
+import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -29,10 +30,14 @@ const Infrastructure: FC<Props> = ({}) => {
   const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
   const { data, isLoading } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
-  const isOnLatestVersion = data?.current_app_version === data?.latest_app_version
-  const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
+  const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
+  const isOnLatestVersion = current_app_version === latest_app_version
+  const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
+  const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
+  const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
   return (
     <div>
@@ -112,7 +117,28 @@ const Infrastructure: FC<Props> = ({}) => {
                 ),
               ]}
             />
-            {data?.eligible && showDbUpgrades && <ProjectUpgradeAlert />}
+            {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
+            {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
+              <Alert
+                icon={<IconPackage className="text-scale-1100" strokeWidth={1.5} />}
+                variant="neutral"
+                title="A new version of Postgres is available for your project"
+              >
+                <p className="mb-3">
+                  Please reach out to us via our support form if you are keen to upgrade your
+                  Postgres version to the latest available ({latestPgVersion}).
+                </p>
+                <Link
+                  href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+                >
+                  <a target="_blank">
+                    <Button size="tiny" type="default">
+                      Contact support
+                    </Button>
+                  </a>
+                </Link>
+              </Alert>
+            )}
           </FormSectionContent>
         </FormSection>
       </FormPanel>
