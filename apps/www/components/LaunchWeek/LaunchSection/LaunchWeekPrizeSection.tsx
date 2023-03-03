@@ -25,8 +25,8 @@ export default function LaunchWeekPrizeSection() {
         <div className="bg-lw7-black-transition h-24"></div>
       </div>
       <div className="bg-scale-100 text-white">
-        <div className="flex gap-4 max-w-7xl mx-auto">
-          <div className=" w-3/5">
+        <div className="lg:flex gap-4 max-w-7xl mx-auto">
+          <div className="lg:w-3/5">
             <div className="grid gap-4 border border-[#484848]  rounded-tr-xl rounded-tl-xl overflow-hidden">
               <div className="relative h-[360px]">
                 <Image

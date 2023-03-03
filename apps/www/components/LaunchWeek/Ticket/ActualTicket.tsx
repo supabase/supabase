@@ -61,7 +61,7 @@ export default function Ticket({
 
   return (
     <div
-      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[420px]"
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[380px]"
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
@@ -74,7 +74,7 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            username ? 'h-[390px]' : 'h-[350px]',
+            username ? 'h-[390px]' : 'h-[395px]',
             'relative mx-2 rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { UserData } from '../Ticket/hooks/use-conf-data'
 import { createClient } from '@supabase/supabase-js'
 import { TicketBrick } from './TicketBrick'
@@ -11,9 +11,20 @@ interface Props {
 }
 
 export default function TicketBrickWall({ users }: Props) {
-  const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+
+  const filepath = `lw7/tickets_bg/reg_bg_5.png`
+  async function fetchImage() {
+    const { data } = await supabase.storage.from('images').getPublicUrl(filepath)
+    console.log('image', data)
+  }
+
+  useEffect(() => {
+    fetchImage()
+  }, [])
 
   return (
     <div className="relative">
