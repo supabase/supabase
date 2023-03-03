@@ -7,12 +7,12 @@ const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/
 const BACKGROUND = {
   REG: {
     BG: `${STORAGE_URL}/reg_bg.png?v=3`,
-    AI: `${STORAGE_URL}/reg_ai.png?v=3`,
+    AI: `${STORAGE_URL}/tickets_bg/reg_bg_${Math.floor(Math.random() * 281)}.png?v=3`,
     TICKET: `${STORAGE_URL}/reg_ticket.png?v=3`,
   },
   GOLD: {
     BG: `${STORAGE_URL}/gold_bg.png?v=3`,
-    AI: `${STORAGE_URL}/gold_ai.png?v=3`,
+    AI: `${STORAGE_URL}/tickets_bg/gold_bg_${Math.floor(Math.random() * 56)}.png?v=3`,
     TICKET: `${STORAGE_URL}/gold_ticket.png?v=3`,
   },
 }
