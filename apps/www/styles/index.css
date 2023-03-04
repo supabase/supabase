@@ -695,7 +695,7 @@ launch week
   }
 
   .gradient-text-purple-500 {
-    background-image: -webkit-linear-gradient(45deg, #902dfb 17%, #d87bf5 97%);
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#902DFB] to-[#D87BF5];
   }
 
   .gradient-text-gold-500 {
