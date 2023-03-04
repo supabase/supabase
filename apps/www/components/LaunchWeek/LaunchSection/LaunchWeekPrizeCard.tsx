@@ -15,7 +15,7 @@ export default function LaunchWeekPrizeCard({
   return (
     <div
       className={[
-        'relative p-[1px] bg-gradient-to-b from-[#484848] to-[#1C1C1C] rounded-lg overflow-hidden',
+        'relative p-[1px] bg-gradient-to-b from-[#484848] to-[#1C1C1C] rounded-lg overflow-hidden shadow-lg',
         className && className,
       ].join(' ')}
     >

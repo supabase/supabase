@@ -13,6 +13,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
+import Image from 'next/image'
 
 interface Props {
   users: UserData[]
@@ -85,25 +86,39 @@ export default function TicketHome({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-lw7 -mt-20 pt-12">
-          <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
-            <LaunchWeekLogoHeader />
+        <div className="bg-[#1C1C1C] -mt-20">
+          <div className="relative bg-lw7 pt-20">
+            <div className="relative z-10">
+              <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
+                <LaunchWeekLogoHeader />
 
-            {supabase && (
-              <TicketContainer
-                supabase={supabase}
-                session={session}
-                defaultUserData={defaultUserData}
-                defaultPageState="ticket"
-              />
-            )}
+                {supabase && (
+                  <TicketContainer
+                    supabase={supabase}
+                    session={session}
+                    defaultUserData={defaultUserData}
+                    defaultPageState="ticket"
+                  />
+                )}
 
-            <div>
-              <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
-                More about the prizes <IconArrowDown w={10} h={12} />
-              </a>
+                <div>
+                  <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
+                    More about the prizes <IconArrowDown w={10} h={12} />
+                  </a>
+                </div>
+              </SectionContainer>
+              <div className="mt-8 relative h-[640px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[400px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent">
+                <div className="absolute bottom-0 w-full h-full mt-40 transform scale-125">
+                  <Image
+                    src="/images/launchweek/seven/lw-7-bg.svg"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+              </div>
             </div>
-          </SectionContainer>
+            <div className="bg-lw7-gradient absolute inset-0 z-0" />
+          </div>
 
           <LaunchWeekPrizeSection />
 
