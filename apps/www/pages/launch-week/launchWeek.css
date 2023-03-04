@@ -11,6 +11,10 @@
   background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%);
 }
 
+.gradient-pulse {
+  animation: gradient-pulse 1s ease-in-out infinite alternate both;
+}
+
 .glass-tile-gradient {
   position: absolute;
 
@@ -21,4 +25,26 @@
   filter: blur(85.7962px);
   border-radius: 16.9281px;
   transform: matrix(0.84, 0.55, -0.55, 0.83, 0, 0);
+}
+
+.bounce-loop {
+  animation: bounce 1s ease-in-out infinite alternate both;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translate3D(0, -5px, 0);
+  }
+  100% {
+    transform: translate3D(0, 5px, 0);
+  }
+}
+
+@keyframes gradient-pulse {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
