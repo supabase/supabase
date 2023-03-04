@@ -6,14 +6,8 @@ import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
 export default function LaunchWeekPrizeSection() {
   return (
     <div>
-      <div className="mt-8 relative h-[640px] overflow-hidden">
-        <div className="-ml-[24rem] -mr-[24rem]">
-          <Image src="/images/launchweek/seven/lw-7-bg.svg" layout="fill" objectFit="cover" />
-        </div>
-      </div>
-
-      <div>
-        <div className="text-center relative z-10 -mt-56 text-white bg-gradient-to-t from-[#1C1C1C] to-transparent">
+      <div className="">
+        <div className="text-center relative z-10 text-white -mt-60">
           <div className="max-w-[38rem] mx-auto px-4">
             <Image src="/images/launchweek/seven/lw7-seven.svg" width={40} height={40} />
             <h2 className="text-4xl mt-2">
@@ -24,9 +18,8 @@ export default function LaunchWeekPrizeSection() {
               to find out if you're one of the lucky winners. Get sharing!
             </p>
           </div>
-          <div className="bg-lw7-black-transition h-24"></div>
         </div>
-        <div className="px-4 bg-scale-100">
+        <div className="px-4 pt-24">
           <div className="grid grid-cols-1 md:grid-cols-2 col-span-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto text-white">
             <LaunchWeekPrizeCard
               imageUrl="/images/launchweek/seven/keyboard.jpg"

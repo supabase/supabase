@@ -1,9 +1,14 @@
 .bg-lw7 {
-  background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, #9e44ef 100%);
+  /* background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, #9e44ef 100%); */
+  background: #9e44ef;
 }
 
 .bg-lw7-black-transition {
   background: linear-gradient(0.39deg, #161616 53.84%, rgba(28, 28, 28, 0) 88.21%);
+}
+
+.bg-lw7-gradient {
+  background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%);
 }
 
 .glass-tile-gradient {
