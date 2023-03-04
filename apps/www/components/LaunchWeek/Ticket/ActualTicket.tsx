@@ -61,7 +61,7 @@ export default function Ticket({
 
   return (
     <div
-      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[520px] lg:h-[380px] "
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[520px] lg:h-[400px] "
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
@@ -129,13 +129,13 @@ export default function Ticket({
                   <>
                     {winningChances === 1 && (
                       <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                        You're <span className="gradient-text-purple-500">in the draw!</span> <br />
+                        You're <span className="gradient-text-purple-800">in the draw!</span> <br />
                         Now make it gold.
                       </p>
                     )}
                     {winningChances === 2 && (
                       <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
-                        You've <span className="gradient-text-purple-500">doubled</span> your
+                        You've <span className="gradient-text-purple-800">doubled</span> your
                         <br />
                         chance! Almost gold.
                       </p>
@@ -150,7 +150,7 @@ export default function Ticket({
                 ) : (
                   <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
                     Generate your ticket. <br />
-                    Win the <span className="gradient-text-purple-500">SupaKeyboard</span>.
+                    Win the <span className="gradient-text-purple-800">SupaKeyboard</span>.
                   </p>
                 )}
               </>

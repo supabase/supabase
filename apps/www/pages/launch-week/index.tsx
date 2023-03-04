@@ -150,6 +150,7 @@ export default function TicketHome({ users }: Props) {
                 </motion.div>
               </div>
             </div>
+            {/* TODO: set gold gradient if ticket is gold */}
             <motion.div
               className={[
                 'bg-lw7-gradient absolute inset-0 z-0',
