@@ -36,7 +36,6 @@ export default function TicketHome({ users }: Props) {
   const isLauchWeekPage = pathname.includes('launch-week')
   const ticketNumber = query.ticketNumber?.toString()
   const { scrollYProgress } = useScroll()
-  const [scrollY, setScrollY] = useState(0)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -73,28 +72,19 @@ export default function TicketHome({ users }: Props) {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
   }, [isDarkMode])
 
-  scrollYProgress.onChange((number) => setScrollY(number))
-
-  const gradientOpacity = useTransform(
-    scrollYProgress,
-    // Map scrollYProgress from these values:
-    [0.01, 0.2],
-    // Into these opacity values:
-    [0.2, 1]
-  )
   const graphicsScale = useTransform(
     scrollYProgress,
     // Map scrollYProgress from these values:
     [0, 0.5],
     // Into these scale values:
-    [1, 1.5]
+    [1, 1.8]
   )
   const graphicsY = useTransform(
     scrollYProgress,
     // Map scrollYProgress from these values:
     [0, 0.5],
     // Into these values:
-    [0, 80]
+    [0, 120]
   )
 
   return (
@@ -139,11 +129,16 @@ export default function TicketHome({ users }: Props) {
               </SectionContainer>
               <div className="mt-8 relative h-[640px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[400px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent">
                 <motion.div
-                  className="absolute bottom-0 w-full h-full mt-40 transform scale-125"
-                  style={{ scale: graphicsScale, y: graphicsY, willChange: 'transform' }}
+                  className="absolute bottom-0 w-full h-full mt-40"
+                  style={{
+                    scale: graphicsScale,
+                    y: graphicsY,
+                    willChange: 'transform',
+                  }}
                 >
                   <Image
-                    src="/images/launchweek/seven/lw-7-bg.svg"
+                    src="/images/launchweek/seven/lw-7-bg.png"
+                    loading="eager"
                     layout="fill"
                     objectFit="cover"
                   />
@@ -151,13 +146,7 @@ export default function TicketHome({ users }: Props) {
               </div>
             </div>
             {/* TODO: set gold gradient if ticket is gold */}
-            <motion.div
-              className={[
-                'bg-lw7-gradient absolute inset-0 z-0',
-                scrollY < 0.01 && 'gradient-pulse',
-              ].join(' ')}
-              style={{ opacity: gradientOpacity }}
-            />
+            <div className="bg-lw7-gradient absolute inset-0 z-0" />
           </div>
 
           <LaunchWeekPrizeSection />

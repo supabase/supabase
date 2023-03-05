@@ -11,10 +11,6 @@
   background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%);
 }
 
-.gradient-pulse {
-  animation: gradient-pulse 1s ease-in-out infinite alternate both;
-}
-
 .glass-tile-gradient {
   position: absolute;
 
@@ -37,14 +33,5 @@
   }
   100% {
     transform: translate3D(0, 5px, 0);
-  }
-}
-
-@keyframes gradient-pulse {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0.5;
   }
 }

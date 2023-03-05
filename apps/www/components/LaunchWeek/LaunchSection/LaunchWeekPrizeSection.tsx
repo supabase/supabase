@@ -2,13 +2,22 @@ import Image from 'next/image'
 import React from 'react'
 import LabelBadge from '../LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
+import { motion } from 'framer-motion'
 
 export default function LaunchWeekPrizeSection() {
+  const finalAnimationState = { y: 0, opacity: 1 }
+
   return (
     <div>
       <div className="">
         <div className="text-center relative z-10 text-white -mt-60">
-          <div className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4">
+          <motion.div
+            className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
+            initial={{ y: -20, opacity: 0 }}
+            whileInView={finalAnimationState}
+            viewport={{ once: true, margin: '-150px' }}
+            transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
+          >
             <div className="w-[40px] h-[40px] rounded-sm bg-[#32313F] flex items-center justify-center">
               <svg
                 width="21"
@@ -38,7 +47,6 @@ export default function LaunchWeekPrizeSection() {
                 </defs>
               </svg>
             </div>
-            {/* <Image src="/images/launchweek/seven/lw7-seven.svg" width={40} height={40} /> */}
             <h2 className="text-4xl">
               Get your <span className="gradient-text-pink-500">winning ticket</span>
             </h2>
@@ -46,7 +54,7 @@ export default function LaunchWeekPrizeSection() {
               Mark your calendars for April 9th and join us on Discord for Launch Week 7's final day
               to find out if you're one of the lucky winners. Get sharing!
             </p>
-          </div>
+          </motion.div>
         </div>
         <div className="px-4 pt-24">
           <div className="grid grid-cols-1 md:grid-cols-2 col-span-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto text-white">
@@ -54,6 +62,7 @@ export default function LaunchWeekPrizeSection() {
               imageUrl="/images/launchweek/seven/keyboard.jpg"
               imageWrapperClassName="h-[40vw] lg:max-h-[360px]"
               className="col-span-2 lg:col-span-3"
+              animateFrom="left"
               content={
                 <>
                   <h3 className="gradient-text-purple-500 font-mono uppercase font-medium">
@@ -85,6 +94,7 @@ export default function LaunchWeekPrizeSection() {
                       Supa T-shirt <LabelBadge text="10 shirts" />
                     </h3>
                   }
+                  animateFrom="up"
                 />
                 <LaunchWeekPrizeCard
                   imageUrl="/images/launchweek/seven/socks.jpg"
@@ -94,11 +104,13 @@ export default function LaunchWeekPrizeSection() {
                       Supa Socks <LabelBadge text="5 pairs" />
                     </h3>
                   }
+                  animateFrom="right"
                 />
               </div>
               <LaunchWeekPrizeCard
                 imageUrl="/images/launchweek/seven/stickers.jpg"
                 imageWrapperClassName="h-[40vw] lg:max-h-[175px] lg:h-auto"
+                animateFrom="down"
                 content={
                   <h3 className="text-sm flex items-center gap-4">
                     Launch Week 7 Limited Edition Sticker Pack <LabelBadge text="20 packs" />
