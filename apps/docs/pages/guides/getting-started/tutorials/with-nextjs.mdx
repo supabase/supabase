@@ -166,7 +166,8 @@ npm install @supabase/auth-ui-react
 Add the `Auth` component to your home page
 
 ```jsx title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home = () => {
@@ -448,7 +449,8 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx lines=3,14 title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Account from '../components/Account'
 
