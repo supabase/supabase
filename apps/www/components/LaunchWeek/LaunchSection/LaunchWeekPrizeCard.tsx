@@ -1,23 +1,49 @@
 import Image from 'next/image'
 import React from 'react'
+import { motion } from 'framer-motion'
+
+type animateFromType = 'left' | 'right' | 'up' | 'down' | 'opacityOnly'
 
 export default function LaunchWeekPrizeCard({
   imageUrl,
   imageWrapperClassName,
   content,
   className,
+  animateFrom,
 }: {
   imageUrl: string
   imageWrapperClassName?: string
   content: any
   className?: string
+  animateFrom?: animateFromType
 }) {
+  const finalState = { x: 0, y: 0, opacity: 1 }
+
+  function getAnimationFrom(animationDirection: animateFromType) {
+    switch (animationDirection) {
+      case 'left':
+        return { x: -20, opacity: 0 }
+      case 'up':
+        return { y: -20, opacity: 0 }
+      case 'right':
+        return { x: 20, opacity: 0 }
+      case 'down':
+        return { y: 20, opacity: 0 }
+      case 'opacityOnly':
+        return { opacity: 0 }
+    }
+  }
+
   return (
-    <div
+    <motion.div
       className={[
         'relative p-[1px] bg-gradient-to-b from-[#484848] to-[#1C1C1C] rounded-lg overflow-hidden shadow-lg',
         className && className,
       ].join(' ')}
+      initial={animateFrom ? getAnimationFrom(animateFrom) : finalState}
+      whileInView={finalState}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', bounce: 0, delay: 0.5 }}
     >
       <div className="relative h-full flex flex-col bg-[#1C1C1C] rounded-lg overflow-hidden">
         <div
@@ -30,6 +56,6 @@ export default function LaunchWeekPrizeCard({
         </div>
         <div className="p-4">{content && content}</div>
       </div>
-    </div>
+    </motion.div>
   )
 }
