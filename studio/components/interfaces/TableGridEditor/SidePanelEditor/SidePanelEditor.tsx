@@ -19,6 +19,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
 import { JsonEditValue } from './RowEditor/RowEditor.types'
+import { useQueryClient } from '@tanstack/react-query'
+import { sqlKeys } from 'data/sql/keys'
 
 interface Props {
   selectedSchema: string
@@ -55,6 +57,7 @@ const SidePanelEditor: FC<Props> = ({
   onColumnSaved = () => {},
 }) => {
   const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -178,7 +181,12 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
+      ui.setNotification({
+        category: 'success',
+        message: isNewRecord ? `Successfully created column` : `Successfully updated column`,
+      })
       await meta.tables.loadById(selectedTable!.id)
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
@@ -274,6 +282,7 @@ const SidePanelEditor: FC<Props> = ({
           })
         }
       }
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
