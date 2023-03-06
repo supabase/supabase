@@ -511,20 +511,18 @@ export const realtime = {
   items: [
     {
       name: 'Overview',
-      url: undefined,
-      items: [{ name: 'Realtime', url: '/guides/realtime', items: [] }],
+      url: '/guides/realtime',
     },
     {
       name: 'Quickstart',
-      url: undefined,
-      items: [{ name: 'multiplayer.dev', url: '/guides/realtime/quickstart', items: [] }],
+      url: '/guides/realtime/quickstart',
     },
     {
       name: 'Features',
       url: undefined,
       items: [
-        { name: 'Extensions', url: '/guides/realtime/extensions', items: [] },
         { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+        { name: 'Extensions', url: '/guides/realtime/extensions', items: [] },
       ],
     },
     {
