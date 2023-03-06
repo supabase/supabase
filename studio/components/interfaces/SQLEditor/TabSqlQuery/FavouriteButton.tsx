@@ -4,12 +4,13 @@ import { Button, IconHeart } from 'ui'
 
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useStore } from 'hooks'
+import { useUser } from 'lib/auth'
 import Telemetry from 'lib/telemetry'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 
 const FavouriteButton = () => {
   const { ui, content: contentStore } = useStore()
-  const { profile: user } = ui
+  const user = useUser()
 
   const sqlEditorStore: any = useSqlStore()
 

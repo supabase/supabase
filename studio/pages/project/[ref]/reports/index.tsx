@@ -4,7 +4,8 @@ import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
+import { useUser } from 'lib/auth'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -17,15 +18,16 @@ export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
+  const user = useUser()
   const { ui } = useStore()
   const project = ui.selectedProject
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'report', owner_id: user?.id },
+    subject: { id: user?.id },
   })
 
   const kpsEnabled = useFlag('initWithKps')

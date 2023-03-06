@@ -12,9 +12,10 @@ import {
 import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useUser } from 'lib/auth'
 
-interface Props {
+export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
@@ -29,7 +30,7 @@ interface Props {
   warnings: LogsWarning[]
 }
 
-const LogsQueryPanel: React.FC<Props> = ({
+const LogsQueryPanel = ({
   templates = [],
   onSelectTemplate,
   hasEditorValue,
@@ -42,18 +43,15 @@ const LogsQueryPanel: React.FC<Props> = ({
   defaultTo,
   onDateChange,
   warnings,
-}) => {
-  const { ui } = useStore()
+}: LogsQueryPanelProps) => {
+  const user = useUser()
   const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'log_sql', owner_id: user?.id },
+    subject: { id: user?.id },
   })
 
   return (
-    <div
-      className=" rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark
-  "
-    >
+    <div className="rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
