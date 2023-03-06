@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Alert, Button, IconEye, IconEyeOff } from 'ui'
-import DataGrid from '@supabase/react-data-grid'
+import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
@@ -76,7 +76,7 @@ const LogTable = ({
     formatter = (received: FormatterArg) => {
       const value = received.row?.[v]
       if (value && typeof value === 'object') {
-        return `[Object]`
+        return JSON.stringify(value)
       } else if (value === null) {
         return 'NULL'
       } else {
@@ -162,6 +162,15 @@ const LogTable = ({
       return dedupedData
     }
   }, [stringData])
+
+  const RowRenderer = (props: RowRendererProps<any>) => {
+    return (
+      <Row
+        {...props}
+        className="font-mono tracking-tight cursor-pointer !bg-scale-200 hover:!bg-scale-300"
+      />
+    )
+  }
 
   const LogsExplorerTableHeader = () => (
     <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
@@ -282,6 +291,7 @@ const LogTable = ({
               return row.id
             }}
             onRowClick={(r) => setFocusedLog(r)}
+            rowRenderer={RowRenderer}
           />
           {logDataRows.length > 0 ? (
             <div

@@ -14,13 +14,13 @@ Unoptimized queries are a major cause of poor database performance. The techniqu
 
 Database performance is a large topic and many factors can contribute. Some of the most common causes of poor performance include:
 
-* An inefficiently designed schema
-* Inefficiently designed queries
-* A lack of indexes causing slower than required queries over large tables
-* Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
-* Not enough compute resources, such as memory, causing your database to go to disk for results too often
-* Lock contention from multiple queries operating on highly utilized tables
-* Large amount of bloat on your tables causing poor query planning
+- An inefficiently designed schema
+- Inefficiently designed queries
+- A lack of indexes causing slower than required queries over large tables
+- Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
+- Not enough compute resources, such as memory, causing your database to go to disk for results too often
+- Lock contention from multiple queries operating on highly utilized tables
+- Large amount of bloat on your tables causing poor query planning
 
 Thankfully there are solutions to all these issues, which we will cover in the following sections.
 
@@ -48,13 +48,11 @@ select
   -- max_time,
   -- mean_time,
   statements.rows / statements.calls as avg_rows
-
-from pg_stat_statements as statements
+from
+  pg_stat_statements as statements
   inner join pg_authid as auth on statements.userid = auth.oid
-order by
-  statements.calls desc
-limit
-  100;
+order by statements.calls desc
+limit 100;
 ```
 
 This query shows:
@@ -63,7 +61,7 @@ This query shows:
 - the role that ran the query
 - the number of times it has been called
 - the average number of rows returned
-- the cumulative total time the query has spent running 
+- the cumulative total time the query has spent running
 - the min, max and mean query times.
 
 This provides useful information about the queries you run most frequently. Queries that have high `max_time` or `mean_time` times and are being called often can be good candidates for optimization.
@@ -86,12 +84,11 @@ select
   -- max_time,
   -- mean_time,
   statements.rows / statements.calls as avg_rows
-from pg_stat_statements as statements
-    inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    max_time desc
-  limit
-    100;
+from
+  pg_stat_statements as statements
+  inner join pg_authid as auth on statements.userid = auth.oid
+order by max_time desc
+limit 100;
 ```
 
 This query will show you statistics about queries ordered by the maximum execution time. It is similar to the query above ordered by calls, but this one highlights outliers that may have high executions times. Queries which have high or mean execution times are good candidates for optimisation.
@@ -104,13 +101,19 @@ select
   statements.query,
   statements.calls,
   statements.total_exec_time + statements.total_plan_time as total_time,
-  to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) over()) * 100, 'FM90D0') || '%'  as prop_total_time
-from pg_stat_statements as statements
+  to_char(
+    (
+      (statements.total_exec_time + statements.total_plan_time) / sum(
+        statements.total_exec_time + statements.total_plan_time
+      ) over ()
+    ) * 100,
+    'FM90D0'
+  ) || '%' as prop_total_time
+from
+  pg_stat_statements as statements
   inner join pg_authid as auth on statements.userid = auth.oid
-order by
-  total_time desc
-limit
-  100;
+order by total_time desc
+limit 100;
 ```
 
 This query will show you statistics about queries ordered by the cumulative total execution time. It shows the total time the query has spent running as well as the proportion of total execution time the query has taken up.
@@ -128,19 +131,18 @@ You can view your cache and index hit rate by executing the following query:
 ```sql
 select
   'index hit rate' as name,
-  (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) * 100 as ratio
+  (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read), 0) * 100 as ratio
 from pg_statio_user_indexes
 union all
 select
   'table hit rate' as name,
-  sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) * 100 as ratio
+  sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0) * 100 as ratio
 from pg_statio_user_tables;
 ```
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
 If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](https://supabase.com/docs/guides/platform/compute-add-ons) is easy and can be done from your [project dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
-
 
 ### Optimizing poor performing queries
 

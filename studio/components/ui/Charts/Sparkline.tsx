@@ -8,6 +8,7 @@ interface Props extends CommonChartProps<any> {
 }
 const Sparkline: React.FC<Props> = ({ size, data, xAxisKey, yAxisKey }) => {
   const { Container } = useChartSize(size, {
+    tiny: 30,
     small: 50,
     normal: 90,
     large: 140,

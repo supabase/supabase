@@ -4,13 +4,9 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import FooterHelpCallout from '~/components/FooterHelpCallout'
-
 import { memo, useEffect } from 'react'
-import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { IS_PLATFORM } from '~/lib/constants'
 
 const levelsData = {
   home: {
@@ -340,9 +336,6 @@ const SiteLayout = ({ children }) => {
           </div>
           <MobileMenuBackdrop />
         </Container>
-        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
-          {IS_PLATFORM && <Clippy />}
-        </div>
       </div>
     </main>
   )

@@ -1,6 +1,6 @@
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
-import { hooksFactory, usePresetReport } from 'components/interfaces/Reports/Reports.utils'
+import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
@@ -9,33 +9,37 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPageWithLayout } from 'types'
 import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
-  const router = useRouter()
-  const { ref } = router.query
-
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
-
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = hooksFactory(ref as string, config)
+  const hooks = queriesFactory(config.queries)
   const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
   const mostTimeConsuming = hooks.mostTimeConsuming()
   const slowestExecutionTime = hooks.slowestExecutionTime()
   const queryHitRate = hooks.queryHitRate()
 
-  const { isLoading, Layout, handleRefresh } = usePresetReport([
-    mostFrequentlyInvoked,
-    mostTimeConsuming,
-    slowestExecutionTime,
-    queryHitRate,
-  ])
+  const isLoading = [
+    mostFrequentlyInvoked[0].isLoading,
+    mostTimeConsuming[0].isLoading,
+    slowestExecutionTime[0].isLoading,
+    queryHitRate[0].isLoading,
+  ].every((value) => value)
+
+  const handleRefresh = async () => {
+    mostFrequentlyInvoked[1].runQuery()
+    mostTimeConsuming[1].runQuery()
+    slowestExecutionTime[1].runQuery()
+    queryHitRate[1].runQuery()
+  }
 
   const checkAlert = (
     <div className="w-5 h-5 text-brand-1400 text-brand-900 flex items-center justify-center">
@@ -62,7 +66,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   It relies on the \`pg_stat_statements\` table. Read more about [examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
 
-  Consider resetting the analysis after optimising any queries.
+  Consider resetting the analysis after optimizing any queries.
 
 `
 
@@ -85,7 +89,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
 
   return (
-    <Layout title="Query Performance" showDatePickers={false}>
+    <ReportPadding>
+      <ReportHeader title="Query Performance" isLoading={isLoading} onRefresh={handleRefresh} />
       {tableIndexEfficiencyEnabled && (
         <Accordion
           openBehaviour="multiple"
@@ -201,7 +206,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostTimeConsuming ? (
+                    !isLoading && mostTimeConsuming && mostTimeConsuming[0]?.data ? (
                       mostTimeConsuming[0].data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
@@ -254,7 +259,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostFrequentlyInvoked ? (
+                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked[0]?.data ? (
                       mostFrequentlyInvoked[0].data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
@@ -318,7 +323,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && slowestExecutionTime ? (
+                    !isLoading && slowestExecutionTime && slowestExecutionTime[0]?.data ? (
                       slowestExecutionTime[0].data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
@@ -363,7 +368,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
         </Tabs>
       </div>
-    </Layout>
+    </ReportPadding>
   )
 }
 

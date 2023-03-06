@@ -1,10 +1,10 @@
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
-import { oneLine, stripIndent } from 'https://esm.sh/common-tags@1.8.2'
+import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
-import { ApplicationError, UserError } from './errors.ts'
+import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -107,7 +107,7 @@ serve(async (req) => {
       contextText += `${content.trim()}\n---\n`
     }
 
-    const prompt = stripIndent`
+    const prompt = codeBlock`
       ${oneLine`
         You are a very enthusiastic Supabase representative who loves
         to help people! Given the following sections from the Supabase

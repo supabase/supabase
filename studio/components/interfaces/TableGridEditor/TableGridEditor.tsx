@@ -4,22 +4,32 @@ import { useRouter } from 'next/router'
 import { find, isUndefined } from 'lodash'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
 
 import { SchemaView } from 'types'
 import { checkPermissions, useFlag, useStore, useParams } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import {
+  Dictionary,
+  parseSupaTable,
+  SupabaseGrid,
+  SupabaseGridRef,
+  SupaTable,
+} from 'components/grid'
 import { IconBookOpen, SidePanel } from 'ui'
 import ActionBar from './SidePanelEditor/ActionBar'
 import { GeneralContent, ResourceContent } from '../Docs'
+import { sqlKeys } from 'data/sql/keys'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { snakeToCamel } from 'lib/helpers'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
   /** Theme for the editor */
@@ -67,6 +77,7 @@ const TableGridEditor: FC<Props> = ({
   onExpandJSONEditor = () => {},
   onClosePanel = () => {},
 }) => {
+  const { project } = useProjectContext()
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const { ref: projectRef, page, id } = useParams()
@@ -100,6 +111,65 @@ const TableGridEditor: FC<Props> = ({
     setEncryptedColumns(columns)
   }
 
+  const queryClient = useQueryClient()
+  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
+    async onMutate({ projectRef, table, configuration, payload }) {
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
+
+      await queryClient.cancelQueries(queryKey)
+
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+
+      onError(error)
+    },
+  })
+
   function getResourcesFromJsonSchema(value: any) {
     const { paths } = value || {}
     const functionPath = 'rpc/'
@@ -122,17 +192,12 @@ const TableGridEditor: FC<Props> = ({
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = settings?.autoApiService?.restUrl
 
   const {
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
 
@@ -148,6 +213,7 @@ const TableGridEditor: FC<Props> = ({
     }
   }, [selectedTable?.id])
 
+  // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
   }
@@ -173,7 +239,12 @@ const TableGridEditor: FC<Props> = ({
           },
           encryptedColumns
         )
-      : (selectedTable as SchemaView).name
+      : parseSupaTable({
+          table: selectedTable as SchemaView,
+          columns: (selectedTable as SchemaView).columns ?? [],
+          primaryKeys: [],
+          relationships: [],
+        })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
@@ -232,6 +303,32 @@ const TableGridEditor: FC<Props> = ({
     })
   }
 
+  const updateTableRow = (previousRow: any, updatedData: any) => {
+    if (!project) return
+
+    const enumArrayColumns = selectedTable.columns
+      .filter((column: any) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column: any) => column.name)
+
+    const identifiers = {} as Dictionary<any>
+    ;(selectedTable as PostgresTable).primary_keys.forEach(
+      (column) => (identifiers[column.name] = previousRow[column.name])
+    )
+
+    const configuration = { identifiers }
+
+    mutateUpdateTableRow({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      table: gridTable as SupaTable,
+      configuration,
+      payload: updatedData,
+      enumArrayColumns,
+    })
+  }
+
   return (
     <>
       <SupabaseGrid
@@ -258,6 +355,7 @@ const TableGridEditor: FC<Props> = ({
         onEditColumn={onSelectEditColumn}
         onDeleteColumn={onSelectDeleteColumn}
         onAddRow={onAddRow}
+        updateTableRow={updateTableRow}
         onEditRow={onEditRow}
         onError={onError}
         onSqlQuery={onSqlQuery}

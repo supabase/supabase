@@ -178,9 +178,9 @@ This creates a new migration named `supabase/migrations/<timestamp>_create_emplo
 Use the seed script in `supabase/seed.sql` (created with [`supabase init`](/docs/reference/cli/usage#supabase-init)) to add sample data to the table.
 
 ```sql
- -- in supabase/seed.sql
-insert into
-  public.employees (name)
+-- in supabase/seed.sql
+insert into public.employees
+  (name)
 values
   ('Erlich Bachman'),
   ('Richard Hendricks'),
@@ -200,9 +200,9 @@ You should now see the contents of `employees` in Studio.
 Use the [`reset`](/docs/reference/cli/usage#supabase-db-reset) command to revert any changes to the local database.
 
 ```sql
- -- run on local database to make a change
-alter table
-  employees add department text default 'Hooli';
+-- run on local database to make a change
+alter table employees
+add department text default 'Hooli';
 ```
 
 Run the following command to reset the local database:

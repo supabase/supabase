@@ -513,6 +513,28 @@ export const database = {
       ],
     },
     {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Managing Indexes',
+          url: '/guides/database/postgres/indexes',
+        },
+        {
+          name: 'Drop All Tables in Schema',
+          url: '/guides/database/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select First Row per Group',
+          url: '/guides/database/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL Version',
+          url: '/guides/database/postgres/which-version-of-postgres',
+        },
+      ],
+    },
+    {
       name: 'Configuration',
       url: undefined,
       items: [
@@ -724,24 +746,6 @@ export const resources = {
           name: 'Render',
           url: '/guides/resources/migrating-to-supabase/render',
           items: [],
-        },
-      ],
-    },
-    {
-      name: 'Postgres resources',
-      url: undefined,
-      items: [
-        {
-          name: 'Drop all tables in schema',
-          url: '/guides/resources/postgres/dropping-all-tables-in-schema',
-        },
-        {
-          name: 'Select first row per group',
-          url: '/guides/resources/postgres/first-row-in-group',
-        },
-        {
-          name: 'Print PostgreSQL version',
-          url: '/guides/resources/postgres/which-version-of-postgres',
         },
       ],
     },
