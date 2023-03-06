@@ -15,6 +15,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 import Image from 'next/image'
+import LW7BgGraphic from '../../components/LaunchWeek/LW7BgGraphic'
 
 interface Props {
   users: UserData[]
@@ -127,29 +128,13 @@ export default function TicketHome({ users }: Props) {
                   </a>
                 </div>
               </SectionContainer>
-              <div className="mt-8 relative h-[640px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[400px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent">
-                <motion.div
-                  className="absolute bottom-0 w-full h-full mt-40"
-                  style={{
-                    scale: graphicsScale,
-                    y: graphicsY,
-                    willChange: 'transform',
-                  }}
-                >
-                  <Image
-                    src="/images/launchweek/seven/lw-7-bg.png"
-                    loading="eager"
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </motion.div>
-              </div>
+              <LW7BgGraphic />
             </div>
             {/* TODO: set gold gradient if ticket is gold */}
             <div className="bg-lw7-gradient absolute inset-0 z-0" />
           </div>
 
-          <LaunchWeekPrizeSection />
+          <LaunchWeekPrizeSection className="-mt-60" />
 
           {users && <TicketBrickWall users={users} />}
         </div>
