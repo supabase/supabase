@@ -244,7 +244,7 @@ export const getForeignKeyDeletionAction = (deletionAction?: string) => {
     case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
       return 'Set default'
     case FOREIGN_KEY_DELETION_ACTION.SET_NULL:
-      return 'Set null'
+      return 'Set NULL'
     default:
       return undefined
   }
