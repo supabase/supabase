@@ -1,14 +1,9 @@
 import Link from 'next/link'
-import React, { FC, useState } from 'react'
-import { partition, isEmpty, isUndefined } from 'lodash'
+import { FC, useState } from 'react'
+import { partition, isEmpty } from 'lodash'
 import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
 
-import type {
-  PostgresTable,
-  PostgresColumn,
-  PostgresRelationship,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresColumn, PostgresType } from '@supabase/postgres-meta'
 import {
   DragDropContext,
   Droppable,
@@ -60,7 +55,7 @@ const ColumnManagement: FC<Props> = ({
     column: PostgresColumn
     deletionAction: string
   }) => {
-    if (!isUndefined(selectedColumnToEditRelation)) {
+    if (selectedColumnToEditRelation !== undefined) {
       onUpdateColumn(selectedColumnToEditRelation, {
         foreignKey:
           foreignKeyConfiguration !== undefined
@@ -356,7 +351,7 @@ const ColumnManagement: FC<Props> = ({
       </div>
       <ForeignKeySelector
         column={selectedColumnToEditRelation as ColumnField}
-        visible={!isUndefined(selectedColumnToEditRelation)}
+        visible={selectedColumnToEditRelation !== undefined}
         closePanel={() => setSelectedColumnToEditRelation(undefined)}
         saveChanges={saveColumnForeignKey}
       />
