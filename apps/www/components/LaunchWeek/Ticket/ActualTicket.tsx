@@ -44,9 +44,9 @@ export default function Ticket({
   useEffect(() => {
     if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
       Tilt.init(ticketRef.current, {
-        glare: false,
-        max: 5,
-        'max-glare': 0.16,
+        glare: true,
+        max: 4,
+        'max-glare': 0.1,
         'full-page-listening': true,
       })
     }
@@ -61,11 +61,11 @@ export default function Ticket({
 
   return (
     <div
-      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-4 bg-[#a988d748] rounded-2xl items-center h-[520px] lg:h-[400px] "
+      className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8 2xl:gap-16 p-2 bg-[#a988d748] rounded-2xl items-stretch h-auto"
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
-        className={cn(styles['ticket-visual-wrapper'], 'col-span-8')}
+        className={cn(styles['ticket-visual-wrapper'], 'flex items-stretch col-span-8')}
         id="wayfinding--ticket-visual-wrapper"
       >
         <div
@@ -74,8 +74,8 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            username ? 'h-[390px]' : 'h-[395px]',
-            'relative mx-2 rounded-xl'
+            username ? 'h-[420px]' : 'h-[395px]',
+            'relative flex flex-col gap-2 w-full h-full rounded-xl box-border bg-transparent overflow-hidden'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
@@ -88,7 +88,7 @@ export default function Ticket({
             golden={golden}
           />
           {username && (
-            <div className="mt-4">
+            <div>
               <TicketCopy username={username} />
             </div>
           )}
@@ -111,7 +111,10 @@ export default function Ticket({
           </>
         )}
       </div>
-      <div ref={divRef} className="flex flex-col gap-6 col-span-4">
+      <div
+        ref={divRef}
+        className="flex flex-col h-full justify-center gap-6 col-span-4 2xl:col-span-3"
+      >
         <div
           className={`
           text-scale-1200

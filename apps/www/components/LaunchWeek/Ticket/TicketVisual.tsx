@@ -43,7 +43,7 @@ export default function TicketVisual({
           styles.visual,
           golden ? styles['visual--gold'] : '',
           session ? styles['visual--logged-in'] : '',
-          'flex  relative flex-col justify-between rounded-xl bg-black ',
+          'flex relative flex-col flex-1 justify-between rounded-xl bg-black w-full h-full box-border',
         ].join(' ')}
         style={{
           ['--size' as string]: size,
