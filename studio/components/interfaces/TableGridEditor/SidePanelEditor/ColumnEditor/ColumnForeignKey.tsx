@@ -101,7 +101,9 @@ const ColumnForeignKeyInformation: FC<{
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
               </span>
-              {deletionAction !== undefined && <Badge color="gray">Delete: {deletionAction}</Badge>}
+              {deletionAction !== undefined && (
+                <Badge color="gray">On delete: {deletionAction}</Badge>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -148,7 +150,9 @@ const ColumnForeignKeyAdded: FC<{
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
               </span>
-              {deletionAction !== undefined && <Badge color="gray">Delete: {deletionAction}</Badge>}
+              {deletionAction !== undefined && (
+                <Badge color="gray">On delete: {deletionAction}</Badge>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -248,11 +252,11 @@ const ColumnForeignKeyUpdated: FC<{
                 {originalDeletionAction !== undefined &&
                   originalDeletionAction !== updatedDeletionAction && (
                     <Badge color="gray" className="line-through">
-                      Delete: {originalDeletionAction}
+                      On delete: {originalDeletionAction}
                     </Badge>
                   )}
                 {updatedDeletionAction !== undefined && (
-                  <Badge color="green">Delete: {updatedDeletionAction}</Badge>
+                  <Badge color="green">On delete: {updatedDeletionAction}</Badge>
                 )}
               </div>
             </div>
