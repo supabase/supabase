@@ -37,29 +37,22 @@ export default function TicketVisual({
   const basePath = router.basePath
 
   return (
-    <>
-      <div
-        className={[
-          styles.visual,
-          golden ? styles['visual--gold'] : '',
-          session ? styles['visual--logged-in'] : '',
-          'flex relative flex-col flex-1 justify-between rounded-xl bg-black w-full h-full box-border',
-        ].join(' ')}
-        style={{
-          ['--size' as string]: size,
-        }}
-        id="wayfinding--ticket-visual-inner-container"
-      >
-        <TicketHeader />
-        <div className={cn(styles['horizontal-ticket'])} id="wayfinding--TicketMono-container">
-          <TicketMono golden={golden} />
-        </div>
-        <div className={styles['vertical-ticket']}>
-          <TicketMonoMobile golden={golden} />
-        </div>
-
+    <div
+      className={[
+        styles.visual,
+        golden ? styles['visual--gold'] : '',
+        session ? styles['visual--logged-in'] : '',
+        'flex relative flex-col flex-1 justify-between rounded-xl bg-black w-full h-full box-border',
+      ].join(' ')}
+      style={{
+        ['--size' as string]: size,
+      }}
+      id="wayfinding--ticket-visual-inner-container"
+    >
+      <div className="flex flex-col items-center justify-between w-full h-full flex-1 md:pr-[110px]">
+        {username && <TicketHeader />}
         <div
-          className="absolute top-[90px] lg:-translate-y-1/2  w-full lg:top-1/2 flex justify-center"
+          className="flex-1 w-full h-full md:h-auto flex flex-col justify-center"
           id="wayfinding--TicketProfile-container"
         >
           <TicketProfile
@@ -71,8 +64,14 @@ export default function TicketVisual({
             golden={golden}
           />
         </div>
-        <TicketNumber number={ticketNumber} />
       </div>
-    </>
+      <TicketNumber number={ticketNumber} />
+      <div className="hidden md:flex absolute inset-0" id="wayfinding--TicketMono-container">
+        <TicketMono golden={golden} />
+      </div>
+      <div className="flex md:hidden absolute inset-0">
+        <TicketMonoMobile golden={golden} />
+      </div>
+    </div>
   )
 }

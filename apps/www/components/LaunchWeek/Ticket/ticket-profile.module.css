@@ -12,24 +12,12 @@
   }
 }
 
-/* .text {
-  flex: 1;
-  margin-left: 10px;
-} */
-/*
-@media (min-width: 768px) {
-  .text {
-    margin-left: calc(15px * var(--size));
-  }
-} */
-
 .name {
   font-size: 24px;
   display: inline-block;
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0;
-  max-width: 300px;
 }
 
 .name-golden {
