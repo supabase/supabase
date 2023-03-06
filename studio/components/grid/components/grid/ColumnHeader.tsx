@@ -1,12 +1,14 @@
 import * as React from 'react'
-import { IconKey, IconLink, IconLock } from 'ui'
+import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 import { XYCoord } from 'dnd-core'
 import { useDispatch } from '../../store'
-import { ColumnHeaderProps, ColumnType, DragItem } from '../../types'
+import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
 import { useTrackedState } from '../../store'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { getForeignKeyDeletionAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
   column,
@@ -14,6 +16,7 @@ export function ColumnHeader<R>({
   isPrimaryKey,
   isEncrypted,
   format,
+  foreignKey,
 }: ColumnHeaderProps<R>) {
   const ref = React.useRef<HTMLDivElement>(null)
   const dispatch = useDispatch()
@@ -119,7 +122,7 @@ export function ColumnHeader<R>({
     <div ref={ref} data-handler-id={handlerId} style={{ opacity }} className="w-full">
       <div className={`sb-grid-column-header ${cursor}`}>
         <div className="sb-grid-column-header__inner">
-          {renderColumnIcon(columnType)}
+          {renderColumnIcon(columnType, { name: column.name as string, foreignKey })}
           {isPrimaryKey && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
@@ -169,13 +172,45 @@ export function ColumnHeader<R>({
   )
 }
 
-function renderColumnIcon(type: ColumnType) {
+function renderColumnIcon(
+  type: ColumnType,
+  columnMeta: { name?: string; foreignKey?: GridForeignKey }
+) {
+  const { name, foreignKey } = columnMeta
   switch (type) {
     case 'foreign_key':
       return (
-        <div>
-          <IconLink size="tiny" strokeWidth={2} />
-        </div>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconLink size="tiny" strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <div>
+                <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                <div className="flex items-center space-x-1">
+                  <p className="text-xs text-scale-1200">{name}</p>
+                  <IconArrowRight size="tiny" strokeWidth={1.5} />
+                  <p className="text-xs text-scale-1200">
+                    {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
+                    {foreignKey?.targetColumnName}
+                  </p>
+                </div>
+                {foreignKey?.deletionAction !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                  <p className="text-xs text-scale-1200 mt-1">
+                    On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
       )
     default:
       return null
