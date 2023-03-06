@@ -4,7 +4,7 @@ export enum FOREIGN_KEY_DELETION_ACTION {
   NO_ACTION = 'a',
   RESTRICT = 'r',
   CASCADE = 'c',
-  SET_NULL = 's',
+  SET_NULL = 'n',
   SET_DEFAULT = 'd',
 }
 

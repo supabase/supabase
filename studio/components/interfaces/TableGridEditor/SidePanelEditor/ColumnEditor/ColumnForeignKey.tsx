@@ -256,7 +256,9 @@ const ColumnForeignKeyUpdated: FC<{
                     </Badge>
                   )}
                 {updatedDeletionAction !== undefined && (
-                  <Badge color="green">On delete: {updatedDeletionAction}</Badge>
+                  <div>
+                    <Badge color="green">On delete: {updatedDeletionAction}</Badge>
+                  </div>
                 )}
               </div>
             </div>
