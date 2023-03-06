@@ -111,7 +111,8 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           },
         })
       }}
-      className="flex flex-col items-center xl:block wayfinding--connect-with-github-form"
+      className="flex flex-col items-center xl:block relative z-20"
+      id="wayfinding--connect-with-github-form"
     >
       <div className="flex flex-col gap-3">
         <div>
