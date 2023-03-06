@@ -33,10 +33,9 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   return (
     <RefSubLayout>
       {props.sections.map((x, i) => {
+        const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
         switch (x.type) {
           case 'markdown':
-            const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
-
             return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
             break
           case 'function':
@@ -47,6 +46,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
                 commonFuncData={x}
                 spec={props.spec}
                 typeSpec={props.typeSpec}
+                markdownData={markdownData}
               />
             )
           case 'cli-command':

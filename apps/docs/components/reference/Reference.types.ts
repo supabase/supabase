@@ -48,6 +48,7 @@ export interface IRefFunctionSection {
   commonFuncData: ICommonFunc
   spec: any
   typeSpec?: TypeSpec
+  markdownData?: any
 }
 
 export interface IRefStaticDoc {

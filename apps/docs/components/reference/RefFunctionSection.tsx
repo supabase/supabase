@@ -1,27 +1,20 @@
 import ReactMarkdown from 'react-markdown'
-import { MDXProvider } from '@mdx-js/react'
 
-import { IconDatabase, Tabs } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { Tabs } from 'ui'
 
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
 
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { IRefFunctionSection } from './Reference.types'
 
 // codehike
-import { serialize } from 'next-mdx-remote/serialize'
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from '~/codeHikeTheme.js'
+
 import { MDXRemote } from 'next-mdx-remote'
 import components from '~/components'
-import { CH } from '@code-hike/mdx/components'
-import remarkGfm from 'remark-gfm'
-import matter from 'gray-matter'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -114,173 +107,61 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
           </>
         </RefSubLayout.Details>
         <RefSubLayout.Examples>
-          {item.examples && (
+          {props.markdownData.examples && props.markdownData.examples.length > 0 && (
             <>
-              <div className="overflow-hidden w-full">
+              <div className="overflow-hidden w-full remove-ch-codeblock-margin">
                 <Tabs
-                  defaultActiveId={item.examples[0].id}
+                  defaultActiveId={props.markdownData?.examples[0]?.id}
                   size="tiny"
                   type="rounded-pills"
                   scrollable
                 >
-                  {item.examples &&
-                    item.examples.map((example, exampleIndex) => {
-                      const exampleString = ''
+                  {props.markdownData.examples.map((example, exampleIndex) => {
+                    return (
+                      <Tabs.Panel
+                        id={example.id}
+                        key={example.id}
+                        label={example.name}
+                        className="flex flex-col gap-3"
+                      >
+                        {example.code && <MDXRemote {...example.code} components={components} />}
 
-                      // async function serializeContent() {
-                      //   return await serialize(exampleString ?? '', {
-                      //     // MDX's available options, see the MDX docs for more info.
-                      //     // https://mdxjs.com/packages/mdx/#compilefile-options
-                      //     // mdxOptions: {
-                      //     //   remarkPlugins: [
-                      //     //     [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-                      //     //   ],
-                      //     //   useDynamicImport: true,
-                      //     // },
-                      //     // Indicates whether or not to parse the frontmatter from the mdx source
-                      //   })
-                      // }
+                        {example.data.sql && (
+                          <RefDetailCollapse
+                            id={`${example.id}-${exampleIndex}-data`}
+                            label="Data source"
+                            defaultOpen={false}
+                          >
+                            <MDXRemote {...example.data.sql} components={components} />
+                          </RefDetailCollapse>
+                        )}
 
-                      // const serializeddd = serializeContent()
+                        {example.response && (
+                          <RefDetailCollapse
+                            id={`${example.id}-${exampleIndex}-response`}
+                            label="Response"
+                            defaultOpen={false}
+                          >
+                            <MDXRemote {...example.response} components={components} />
+                          </RefDetailCollapse>
+                        )}
 
-                      const { data: exampleData, content: exampleContent } = matter(example.code)
-
-                      console.log('exampleContent', exampleContent)
-                      console.log('exampleData', exampleData)
-
-                      const codeBlockLang = example?.code?.startsWith('```js')
-                        ? 'js'
-                        : example?.code?.startsWith('```ts')
-                        ? 'ts'
-                        : example?.code?.startsWith('```dart')
-                        ? 'dart'
-                        : example?.code?.startsWith('```c#')
-                        ? 'csharp'
-                        : 'js'
-                      //                     `
-                      // import { createClient } from '@supabase/supabase-js'
-
-                      // // Create a single supabase client for interacting with your database
-                      // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-                      // `
-                      const currentExampleId = example.id
-                      const staticExample = item.examples[exampleIndex]
-
-                      const response = staticExample.response
-                      const sql = staticExample?.data?.sql
-                      const tables = staticExample?.data?.tables
-
-                      const markdown = `
-\`\`\`js const hello = "world"\`\`\`
-`
-
-                      return (
-                        <Tabs.Panel
-                          id={example.id}
-                          key={example.id}
-                          label={example.name}
-                          className="flex flex-col gap-3"
-                        >
-                          <div className="prose">
-                            <ReactMarkdown
-                              remarkPlugins={[
-                                [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-                              ]}
-                              components={components}
-                            >
-                              {exampleContent}
-                            </ReactMarkdown>
-                            <MDXProvider components={components}>{exampleContent}</MDXProvider>
-                            {/* <MDXRemote {...exampleContent} components={components}>
-                              {exampleContent}
-                            </MDXRemote> */}
-                            <MDXProvider components={components}>{exampleContent}</MDXProvider>
-                            {/* <CodeBlock
-                              className="useless-code-block-class"
-                              language={codeBlockLang}
-                              hideLineNumbers={true}
-                            >
-                              {exampleString +
-                                (example.code &&
-                                  example.code
-                                    .replace(/```/g, '')
-                                    .replace('js', '')
-                                    .replace('ts', '')
-                                    .replace('dart', '')
-                                    .replace('c#', ''))}
-                            </CodeBlock> */}
-                          </div>
-
-                          {((tables && tables.length > 0) || sql) && (
-                            <RefDetailCollapse
-                              id={`${example.id}-${exampleIndex}-data`}
-                              label="Data source"
-                              defaultOpen={false}
-                            >
-                              <>
-                                {tables &&
-                                  tables.length > 0 &&
-                                  tables.map((table) => {
-                                    return (
-                                      <div className="bg-scale-300 border rounded prose max-w-none">
-                                        <div className="bg-scale-200 px-5 py-2">
-                                          <div className="flex gap-2 items-center">
-                                            <div className="text-brand-900">
-                                              <IconDatabase size={16} />
-                                            </div>
-                                            <h5 className="text-xs text-scale-1200">
-                                              {table.name}
-                                            </h5>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )
-                                  })}
-                                {sql && (
-                                  <CodeBlock
-                                    className="useless-code-block-class my-0 border border-t-0 border-scale-500 !rounded-tl-none !rounded-tr-none"
-                                    language="sql"
-                                    hideLineNumbers={true}
-                                  >
-                                    {sql.replace(/sql/g, '').replace(/```/g, '')}
-                                  </CodeBlock>
-                                )}
-                              </>
-                            </RefDetailCollapse>
-                          )}
-
-                          {response && (
-                            <RefDetailCollapse
-                              id={`${example.id}-${exampleIndex}-response`}
-                              label="Response"
-                              defaultOpen={false}
-                            >
-                              <CodeBlock
-                                className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
-                                language={codeBlockLang}
-                                hideLineNumbers={true}
-                              >
-                                {response.replace(/```/g, '').replace('json', '')}
-                              </CodeBlock>
-                            </RefDetailCollapse>
-                          )}
-
-                          {example.description && (
-                            <RefDetailCollapse
-                              id={`${example.id}-${exampleIndex}-notes`}
-                              label="Notes"
-                              defaultOpen={false}
-                            >
-                              <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
-                                <ReactMarkdown className="text-sm">
-                                  {example.description}
-                                </ReactMarkdown>
-                              </div>
-                            </RefDetailCollapse>
-                          )}
-                        </Tabs.Panel>
-                      )
-                    })}
+                        {example.description && (
+                          <RefDetailCollapse
+                            id={`${example.id}-${exampleIndex}-notes`}
+                            label="Notes"
+                            defaultOpen={false}
+                          >
+                            <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                              <ReactMarkdown className="text-sm">
+                                {example.description}
+                              </ReactMarkdown>
+                            </div>
+                          </RefDetailCollapse>
+                        )}
+                      </Tabs.Panel>
+                    )
+                  })}
                 </Tabs>
               </div>
             </>
@@ -289,23 +170,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
       </RefSubLayout.Section>
     </>
   )
-}
-
-export async function getStaticProps() {
-  console.log('static props ran')
-  //   const mdx = `# Hello World
-
-  // Here's a component used inside Markdown:
-
-  // <Hello />`
-
-  //   const mdxSource = await serialize(mdx)
-
-  //   return {
-  //     props: {
-  //       source: mdxSource,
-  //     },
-  //   }
 }
 
 export default RefFunctionSection

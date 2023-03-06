@@ -62,75 +62,76 @@ async function generateRefMarkdown(sections, slug, spec) {
               })
             : null,
         })
+      } else if (spec) {
+        const foundFunction = spec.functions.find((item: any) => item.id === x.id)
+        if (!foundFunction) return null
+
+        // console.log('found function:', foundFunction.id)
+
+        let examples = []
+
+        if (foundFunction.examples) {
+          await Promise.all(
+            foundFunction.examples.map(async (example, i) => {
+              // console.log('*** function ***')
+              // console.log(example?.id)
+              // console.log(example?.description)
+              // console.log('about to do example: ', example.id, example.name)
+              examples.push({
+                id: example?.id,
+                name: example?.name,
+                code: example?.code
+                  ? await serialize(example.code, {
+                      mdxOptions: {
+                        remarkPlugins: [
+                          [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                        ],
+                        useDynamicImport: true,
+                      },
+                    })
+                  : null,
+                response: example?.response
+                  ? await serialize(example.response, {
+                      mdxOptions: {
+                        remarkPlugins: [
+                          [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                        ],
+                        useDynamicImport: true,
+                      },
+                    })
+                  : null,
+                data: {
+                  sql: example?.data?.sql
+                    ? await serialize(example.data.sql, {
+                        mdxOptions: {
+                          remarkPlugins: [
+                            [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                          ],
+                          useDynamicImport: true,
+                        },
+                      })
+                    : null,
+                },
+                // description: example?.description
+                //   ? await serialize(example.description, {
+                //       mdxOptions: {
+                //         remarkPlugins: [
+                //           [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
+                //         ],
+                //       },
+                //     })
+                //   : null,
+              })
+            })
+          )
+        }
+
+        markdownContent.push({
+          id: foundFunction.id,
+          title: foundFunction.title,
+          examples,
+        })
       }
-
-      // else if (spec) {
-      //   const foundFunction = spec.functions.find((item: any) => item.id === x.id)
-      //   if (!foundFunction) return null
-
-      //   // console.log('found function:', foundFunction.id)
-
-      //   let examples = []
-
-      //   if (foundFunction.examples) {
-      //     await Promise.all(
-      //       foundFunction.examples.map(async (example, i) => {
-      //         console.log('*** new function ***')
-      //         console.log(example?.id)
-      //         console.log(example?.description)
-      //         // console.log('about to do example: ', example.id, example.name)
-      //         examples.push({
-      //           id: example?.id,
-      //           name: example?.name,
-      //           code: example?.code
-      //             ? await serialize(example.code, {
-      //                 mdxOptions: {
-      //                   remarkPlugins: [
-      //                     [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-      //                   ],
-      //                 },
-      //               })
-      //             : null,
-      //           response: example?.response
-      //             ? await serialize(example.response, {
-      //                 mdxOptions: {
-      //                   remarkPlugins: [
-      //                     [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-      //                   ],
-      //                 },
-      //               })
-      //             : null,
-      //           data: {
-      //             sql: example?.data?.sql
-      //               ? await serialize(example.data.sql, {
-      //                   mdxOptions: {
-      //                     remarkPlugins: [
-      //                       [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-      //                     ],
-      //                   },
-      //                 })
-      //               : null,
-      //           },
-      //           // description: example?.description
-      //           //   ? await serialize(example.description, {
-      //           //       mdxOptions: {
-      //           //         remarkPlugins: [
-      //           //           [remarkCodeHike, { autoImport: false, theme: codeHikeTheme }],
-      //           //         ],
-      //           //       },
-      //           //     })
-      //           //   : null,
-      //         })
-      //       })
-      //     )
-      //   }
-
-      //   markdownContent.push({
-      //     id: foundFunction.id,
-      //     title: foundFunction.title,
-      //     examples,
-      //   })
-      // }
     })
   )
 

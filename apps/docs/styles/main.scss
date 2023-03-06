@@ -272,3 +272,17 @@ div[role='tablist'] {
   position: relative !important;
   height: unset !important;
 }
+
+/* ref docs */
+
+.remove-ch-codeblock-margin {
+  .ch-codeblock {
+    margin: 0 !important;
+  }
+
+  .AccordionRoot .ch-codeblock {
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-top: none;
+  }
+}

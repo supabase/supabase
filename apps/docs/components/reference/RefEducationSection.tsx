@@ -9,6 +9,9 @@ const RefEducationSection = (props) => {
     return <div></div>
   }
 
+  // console.log(props.item.title)
+  // console.log(props)
+
   return (
     <RefSubLayout.EducationSection
       key={props.item.id}
