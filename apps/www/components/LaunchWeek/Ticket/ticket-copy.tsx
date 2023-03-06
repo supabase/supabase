@@ -39,7 +39,7 @@ export default function TicketCopy({ username }: Props) {
     <button
       type="button"
       name="Copy"
-      className="bg-[#E6E8EB] text-scale-500 text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-md"
+      className="bg-[#E6E8EB] text-scale-500 text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-lg"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -69,7 +69,7 @@ export default function TicketCopy({ username }: Props) {
       className={cn(
         styleUtils.appear,
         styleUtils['appear-third'],
-        'bg-scaleA-200 h-8 rounded-md border border-scale-1100 w-full'
+        'bg-scaleA-200 h-8 rounded-xl border border-scale-1100 w-full overflow-hidden'
       )}
       id="wayfinding--ticket-copy"
     >

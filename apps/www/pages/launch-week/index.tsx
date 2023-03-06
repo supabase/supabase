@@ -107,7 +107,8 @@ export default function TicketHome({ users }: Props) {
         <div className="bg-[#1C1C1C] -mt-20">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
+              {/* <SectionContainer className="flex flex-col justify-between items-center min-h-[800px] h-[calc(100vh_-_75px)] gap-4"> */}
+              <SectionContainer className="flex flex-col justify-between items-center !pb-16 gap-16">
                 <LaunchWeekLogoHeader />
 
                 {supabase && (
