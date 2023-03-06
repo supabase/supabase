@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { GetStaticProps, GetStaticPaths } from 'next'
+import { GetStaticProps } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
