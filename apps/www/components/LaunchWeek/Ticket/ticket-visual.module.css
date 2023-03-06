@@ -72,24 +72,6 @@
   }
 }
 
-.horizontal-ticket {
-  display: none;
-}
-
-.vertical-ticket {
-  display: flex;
-}
-
-@media (min-width: 768px) {
-  .horizontal-ticket {
-    display: flex;
-  }
-
-  .vertical-ticket {
-    display: none;
-  }
-}
-
 .logo {
   z-index: 1;
   position: absolute;

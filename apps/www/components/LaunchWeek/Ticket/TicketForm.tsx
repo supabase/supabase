@@ -70,7 +70,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   }, [session])
 
   return formState === 'error' ? (
-    <div>
+    <div className="h-full">
       <div className={cn(formStyles['form-row'], ticketFormStyles['form-row'])}>
         <div className={cn(formStyles['input-label'], formStyles.error)}>
           <div className={cn(formStyles.input, formStyles['input-text'])}>{errorMsg}</div>

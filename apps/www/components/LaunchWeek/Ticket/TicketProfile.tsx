@@ -26,7 +26,7 @@ export default function TicketProfile({
   golden = false,
 }: Props) {
   return (
-    <div className="grid gap-4 items-center justify-center" id="wayfinding--ticket-middle">
+    <div className="grid gap-4 items-center justify-center px-2" id="wayfinding--ticket-middle">
       {username && (
         <span
           className={cn('rounded-full inline-block mx-auto', styles.wrapper, styles.rounded, {
@@ -56,7 +56,7 @@ export default function TicketProfile({
           )}
         </span>
       )}
-      <div className={styles.text}>
+      <div>
         {username ? (
           <p
             className={`${cn(
