@@ -48,6 +48,7 @@ export default function LW7BgGraphic() {
           objectFit="cover"
           quality={100}
           unoptimized
+          priority
         />
       </motion.div>
     </div>
