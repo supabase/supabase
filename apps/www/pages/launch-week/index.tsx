@@ -68,7 +68,7 @@ export default function TicketHome({ users }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+    document.body.className = isDarkMode ? 'dark bg-[#1C1C1C]' : 'light bg-[#fff]'
   }, [isDarkMode])
 
   return (

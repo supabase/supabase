@@ -31,8 +31,8 @@ export default function TicketNumber({ number, size }: Props) {
               <path
                 d="M0.0390625 1L233.294 0.99999"
                 stroke="url(#paint0_linear_1701_100991)"
-                stroke-width="0.71381"
-                stroke-dasharray="1.43 1.43"
+                strokeWidth="0.71381"
+                strokeDasharray="1.43 1.43"
               />
               <defs>
                 <linearGradient
@@ -43,9 +43,9 @@ export default function TicketNumber({ number, size }: Props) {
                   y2="0.49999"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop stop-color="white" stop-opacity="0" />
-                  <stop offset="0.53125" stop-color="white" />
-                  <stop offset="1" stop-color="white" stop-opacity="0" />
+                  <stop stopColor="white" stopOpacity="0" />
+                  <stop offset="0.53125" stopColor="white" />
+                  <stop offset="1" stopColor="white" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>
