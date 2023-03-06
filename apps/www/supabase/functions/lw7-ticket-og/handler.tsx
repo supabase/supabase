@@ -4,18 +4,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
-const BACKGROUND = {
-  REG: {
-    BG: `${STORAGE_URL}/reg_bg.png?v=3`,
-    AI: `${STORAGE_URL}/tickets_bg/reg_bg_${Math.floor(Math.random() * 281)}.png?v=3`,
-    TICKET: `${STORAGE_URL}/reg_ticket.png?v=3`,
-  },
-  GOLD: {
-    BG: `${STORAGE_URL}/gold_bg.png?v=3`,
-    AI: `${STORAGE_URL}/tickets_bg/gold_bg_${Math.floor(Math.random() * 56)}.png?v=3`,
-    TICKET: `${STORAGE_URL}/gold_ticket.png?v=3`,
-  },
-}
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
@@ -24,7 +12,21 @@ const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBu
 export async function handler(req: Request) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
+  const assumeGolden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
   const userAgent = req.headers.get('user-agent')
+
+  const BACKGROUND = {
+    REG: {
+      BG: `${STORAGE_URL}/reg_bg.png`,
+      AI: `${STORAGE_URL}/tickets_bg/reg_bg_${Math.floor(Math.random() * 281)}.png`,
+      TICKET: `${STORAGE_URL}/reg_ticket.png`,
+    },
+    GOLD: {
+      BG: `${STORAGE_URL}/gold_bg.png`,
+      AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
+      TICKET: `${STORAGE_URL}/gold_ticket.png`,
+    },
+  }
 
   try {
     if (!username) throw new Error('missing username param')
@@ -51,10 +53,12 @@ export async function handler(req: Request) {
       if (error) console.log(error.message)
     }
 
-    // TODO: reenable storage
     // Try to get image from Supabase Storage CDN.
-    // const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
-    // if (storageResponse.ok) return storageResponse
+    let storageResponse: Response
+    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/${username}.png`)
+    if (storageResponse.ok) return storageResponse
+    storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
+    if (!assumeGolden && storageResponse.ok) return storageResponse
 
     // Get ticket data
     const { data, error } = await supabaseAdminClient
@@ -63,9 +67,11 @@ export async function handler(req: Request) {
       .eq('username', username)
       .maybeSingle()
     if (error) console.log(error.message)
-
-    const { name = 'Marijana Šimag', ticketNumber = 99347892 } = data ?? {}
+    if (!data) throw new Error('user not found')
+    const { name, ticketNumber } = data
     const golden = data?.golden ?? false
+
+    if (assumeGolden && !golden) return await fetch(`${STORAGE_URL}/golden_no_meme.png`)
 
     // Else, generate image ad upload to storage.
     const fontData = await font
@@ -135,7 +141,7 @@ export async function handler(req: Request) {
                 left: '484',
                 borderRadius: 83,
               }}
-              src={`https://github.com/${username}.png?v=3`}
+              src={`https://github.com/${username}.png`}
             />
             {/* Name & username */}
             <div
@@ -236,18 +242,17 @@ export async function handler(req: Request) {
       }
     )
 
-    // TODO: reenable storage
     // Upload image to storage.
-    // const { error: storageError } = await supabaseAdminClient.storage
-    //   .from('images')
-    //   .upload(`lw7/tickets/${username}.png`, generatedImage.body!, {
-    //     contentType: 'image/png',
-    //     cacheControl: '31536000',
-    //     upsert: false,
-    //   })
-    // if (storageError) throw storageError
+    const { error: storageError } = await supabaseAdminClient.storage
+      .from('images')
+      .upload(`lw7/tickets/${golden ? `golden/${username}` : username}.png`, generatedImage.body!, {
+        contentType: 'image/png',
+        cacheControl: '31536000',
+        upsert: false,
+      })
+    if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
-    return generatedImage
+    return await fetch(`${STORAGE_URL}/tickets/${golden ? `golden/${username}` : username}.png`)
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
