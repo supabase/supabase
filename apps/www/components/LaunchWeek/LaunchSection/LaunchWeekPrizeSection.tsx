@@ -4,13 +4,13 @@ import LabelBadge from '../LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
 import { motion } from 'framer-motion'
 
-export default function LaunchWeekPrizeSection() {
+export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
   const finalAnimationState = { y: 0, opacity: 1 }
 
   return (
-    <div>
+    <div className={[className].join(' ')}>
       <div className="">
-        <div className="text-center relative z-10 text-white -mt-60">
+        <div className="text-center relative z-10 text-white">
           <motion.div
             className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
             initial={{ y: -20, opacity: 0 }}
