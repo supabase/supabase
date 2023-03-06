@@ -8,8 +8,8 @@ import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
 // import admonitions from 'remark-admonitions'
 
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import codeHikeTheme from './codeHikeTheme.js'
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from './codeHikeTheme.js'
 
 /**
  * Rewrites and redirects are handled by
@@ -22,20 +22,20 @@ const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [
-      // [
-      //   remarkCodeHike,
-      //   {
-      //     theme: codeHikeTheme,
-      //     autoImport: false,
-      //     lineNumbers: true,
-      //     showCopyButton: true,
-      //   },
-      // ],
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          autoImport: false,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
       remarkGfm,
     ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
-    // providerImportSource: '@mdx-js/react',
+    providerImportSource: '@mdx-js/react',
   },
 })
 

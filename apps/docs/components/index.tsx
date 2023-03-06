@@ -25,7 +25,7 @@ import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import InlineCodeTag from './CustomHTMLElements/InlineCode'
 import React from 'react'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-// import { CH } from '@code-hike/mdx/components'
+import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
 // Ref version specific
@@ -77,7 +77,7 @@ const components = {
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
   // inlineCode: (props: { children: string }) => <InlineCodeTag {...props} />,
   RefSubLayout,
-  // CH,
+  CH,
   code: (props: any) => <CodeBlock {...props} />,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,

@@ -90,7 +90,8 @@
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
-    "valtio": "^1.7.6"
+    "valtio": "^1.7.6",
+    "@code-hike/mdx": "v0.8.1-next.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.12",
