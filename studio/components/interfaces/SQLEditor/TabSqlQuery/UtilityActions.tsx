@@ -1,27 +1,26 @@
-import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useKeyboardShortcuts, useStore, checkPermissions } from 'hooks'
+import { useKeyboardShortcuts, checkPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { useUser } from 'lib/auth'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import SavingIndicator from './SavingIndicator'
 import FavouriteButton from './FavouriteButton'
 import SizeToggleButton from './SizeToggleButton'
 
-interface Props {
+export interface UtilityActionsProps {
   updateSqlSnippet: (value: any) => void
 }
 
-const UtilityActions: FC<Props> = ({ updateSqlSnippet }) => {
-  const { ui } = useStore()
+const UtilityActions = ({ updateSqlSnippet }: UtilityActionsProps) => {
+  const user = useUser()
   const sqlEditorStore: any = useSqlStore()
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: user?.id },
+    subject: { id: user?.id },
   })
 
   useKeyboardShortcuts(
@@ -80,4 +79,4 @@ const UtilityActions: FC<Props> = ({ updateSqlSnippet }) => {
   )
 }
 
-export default observer(UtilityActions)
+export default UtilityActions

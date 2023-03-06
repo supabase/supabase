@@ -1,11 +1,12 @@
 import { createSqlSnippetSkeleton } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
+import { useUser } from 'lib/auth'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useCallback } from 'react'
 import { useStore } from './useStore'
 
 export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
   const { ui, content: contentStore } = useStore()
-  const { profile: user } = ui
+  const user = useUser()
 
   const sqlEditorStore: any = useSqlStore()
 
@@ -14,7 +15,10 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
       // get currently selected tab id in case we need to roll back to it
       const previouslySelectedTabId = sqlEditorStore.selectedTabId
 
-      const snippet = createSqlSnippetSkeleton({ owner_id: user?.id, ...args })
+      const snippet = createSqlSnippetSkeleton({
+        owner_id: user ? Number(user.id) : undefined,
+        ...args,
+      })
 
       // save the snippet in memory in the content store with a client-generated id
       const { data } = contentStore.createOptimistically(snippet)

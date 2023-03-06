@@ -17,6 +17,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'
+import { useUser } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
@@ -45,10 +46,8 @@ const OpenQueryItem = observer(
 )
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const {
-    ui: { profile: user },
-    content: contentStore,
-  } = useStore()
+  const user = useUser()
+  const { content: contentStore } = useStore()
 
   const sqlEditorStore: any = useSqlStore()
 
@@ -129,13 +128,13 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const SideBarContent = observer(() => {
-  const { ui } = useStore()
+  const user = useUser()
   const sqlEditorStore: any = useSqlStore()
   const [filterString, setFilterString] = useState('')
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: user?.id },
+    subject: { id: user?.id },
   })
 
   const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)

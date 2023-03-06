@@ -10,6 +10,7 @@ import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
+import { useUser } from 'lib/auth'
 import Telemetry from 'lib/telemetry'
 import { copyToClipboard, timeout } from 'lib/helpers'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
@@ -18,7 +19,8 @@ import UtilityActions from 'components/interfaces/SQLEditor/TabSqlQuery/UtilityA
 
 const TabSqlQuery = observer(() => {
   const sqlEditorStore = useSqlStore()
-  const { ui, content: contentStore } = useStore()
+  const user = useUser()
+  const { content: contentStore } = useStore()
   const { height: screenHeight } = useWindowDimensions()
 
   const snapOffset = 50
@@ -27,8 +29,8 @@ const TabSqlQuery = observer(() => {
   const offset = 3
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: user?.id },
+    subject: { id: user?.id },
   })
 
   useEffect(() => {
