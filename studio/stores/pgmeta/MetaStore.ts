@@ -102,7 +102,8 @@ export interface IMetaStore {
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
     foreignKey?: ExtendedPostgresRelationship,
-    skipPKCreation?: boolean
+    skipPKCreation?: boolean,
+    skipSuccessMessage?: boolean
   ) => any
   duplicateTable: (
     payload: any,
@@ -460,7 +461,8 @@ export default class MetaStore implements IMetaStore {
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
     foreignKey?: ExtendedPostgresRelationship,
-    skipPKCreation?: boolean
+    skipPKCreation?: boolean,
+    skipSuccessMessage: boolean = false
   ) {
     try {
       const { isPrimaryKey, ...formattedPayload } = payload
@@ -489,19 +491,22 @@ export default class MetaStore implements IMetaStore {
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
-      if (!isUndefined(existingForeignKey)) {
+      if (existingForeignKey !== undefined) {
         const relation: any = await this.removeForeignKey(existingForeignKey)
         if (relation.error) throw relation.error
       }
 
-      if (!isUndefined(foreignKey)) {
+      if (foreignKey !== undefined) {
         const relation: any = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
       }
-      this.rootStore.ui.setNotification({
-        category: 'success',
-        message: `Successfully updated column "${column.name}"`,
-      })
+
+      if (!skipSuccessMessage) {
+        this.rootStore.ui.setNotification({
+          category: 'success',
+          message: `Successfully updated column "${column.name}"`,
+        })
+      }
     } catch (error: any) {
       return { error }
     }
@@ -789,12 +794,14 @@ export default class MetaStore implements IMetaStore {
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
             const skipPKCreation = true
+            const skipSuccessMessage = true
             const res: any = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
               column.foreignKey,
-              skipPKCreation
+              skipPKCreation,
+              skipSuccessMessage
             )
             if (res?.error) {
               hasError = true
