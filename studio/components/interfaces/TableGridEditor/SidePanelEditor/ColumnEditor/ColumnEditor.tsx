@@ -75,7 +75,7 @@ const ColumnEditor: FC<Props> = ({
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
 
-  const { data, isLoading } = useForeignKeyConstraintsQuery({
+  const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedTable?.schema,

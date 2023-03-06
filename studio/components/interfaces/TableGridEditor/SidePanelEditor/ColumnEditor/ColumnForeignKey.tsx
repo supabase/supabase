@@ -245,11 +245,12 @@ const ColumnForeignKeyUpdated: FC<{
                 <code className="text-xs font-mono">{updatedKey}</code>
               </div>
               <div className="flex flex-col space-y-2">
-                {originalDeletionAction !== updatedDeletionAction && (
-                  <Badge color="gray" className="line-through">
-                    Delete: {originalDeletionAction}
-                  </Badge>
-                )}
+                {originalDeletionAction !== undefined &&
+                  originalDeletionAction !== updatedDeletionAction && (
+                    <Badge color="gray" className="line-through">
+                      Delete: {originalDeletionAction}
+                    </Badge>
+                  )}
                 {updatedDeletionAction !== undefined && (
                   <Badge color="green">Delete: {updatedDeletionAction}</Badge>
                 )}
