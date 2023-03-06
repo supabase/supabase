@@ -79,6 +79,7 @@ const nextConfig = {
       },
     ]
   },
+  staticPageGenerationTimeout: 240,
 }
 
 // next.config.js
