@@ -13,6 +13,7 @@ import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/Launch
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
+import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 
 interface Props {
   user: UserData
@@ -62,23 +63,29 @@ export default function TicketShare({ user, users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-lw7 -mt-20 pt-12">
-          <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
-            <LaunchWeekLogoHeader />
-            <TicketContainer
-              supabase={supabase}
-              session={null}
-              defaultUserData={{
-                username: username || undefined,
-                name: name || '',
-                ticketNumber,
-                golden,
-                referrals,
-              }}
-              sharePage
-            />
-          </SectionContainer>
-          <LaunchWeekPrizeSection />
+        <div className="bg-[#1C1C1C] -mt-20">
+          <div className="relative bg-lw7 pt-20">
+            <div className="relative z-10">
+              <SectionContainer className="flex flex-col justify-between items-center !pb-16 gap-16">
+                <LaunchWeekLogoHeader />
+                <TicketContainer
+                  supabase={supabase}
+                  session={null}
+                  defaultUserData={{
+                    username: username || undefined,
+                    name: name || '',
+                    ticketNumber,
+                    golden,
+                    referrals,
+                  }}
+                  sharePage
+                />
+              </SectionContainer>
+              <LW7BgGraphic />
+            </div>
+            <div className="bg-lw7-gradient absolute inset-0 z-0" />
+          </div>
+          <LaunchWeekPrizeSection className="-mt-60" />
           <TicketBrickWall users={users} />
         </div>
       </DefaultLayout>
