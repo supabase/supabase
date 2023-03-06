@@ -3,6 +3,7 @@ import cn from 'classnames'
 import TicketForm from './TicketForm'
 // import IconAvatar from '~/components/LaunchWeek/Ticket/icons/icon-avatar'
 import styles from './ticket-profile.module.css'
+import Image from 'next/image'
 
 type TicketGenerationState = 'default' | 'loading'
 type Props = {
@@ -25,7 +26,7 @@ export default function TicketProfile({
   golden = false,
 }: Props) {
   return (
-    <div className="grid items-center justify-center" id="wayfinding--ticket-middle">
+    <div className="grid gap-4 items-center justify-center" id="wayfinding--ticket-middle">
       {username && (
         <span
           className={cn('rounded-full inline-block mx-auto', styles.wrapper, styles.rounded, {
@@ -33,9 +34,12 @@ export default function TicketProfile({
           })}
         >
           {username ? (
-            <img
+            <Image
               src={`https://github.com/${username}.png`}
               alt={username}
+              layout="fill"
+              objectFit="contain"
+              priority
               className={styles.image}
             />
           ) : (
@@ -59,7 +63,7 @@ export default function TicketProfile({
               styles.name,
               { [styles['name-blank']]: !username },
               { [styles['name-golden']]: golden }
-            )} dark:text-white`}
+            )} dark:text-white text-center`}
           >
             <span
               className={`${cn(styles.skeleton, styles.wrapper, {

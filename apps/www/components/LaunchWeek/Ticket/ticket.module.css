@@ -123,6 +123,6 @@
 }
 
 .ticket-visual-wrapper {
-  border-radius: calc(16px * var(--size));
+  /* border-radius: calc(16px * var(--size)); */
   width: 100%;
 }
