@@ -58,7 +58,7 @@ alter table
 
 <Admonition type="caution">
 
-When RLS is on and `replica identity` is `full` the `old` record will only contain the primary key. You can not enforce RLS on `DELETE` statements.
+RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
 
 </Admonition>
 
