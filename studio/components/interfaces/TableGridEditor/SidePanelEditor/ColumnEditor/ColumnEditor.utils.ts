@@ -222,7 +222,10 @@ export const getColumnForeignKey = (
   if (foreignKey === undefined) return foreignKey
   else {
     const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)
-    return { ...foreignKey, deletion_action: foreignKeyMeta?.deletion_action ?? 'a' }
+    return {
+      ...foreignKey,
+      deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+    }
   }
 }
 
