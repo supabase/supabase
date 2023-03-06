@@ -635,7 +635,6 @@ export default class MetaStore implements IMetaStore {
       // Then add the foreign key constraints here
       for (const column of columns) {
         if (!isUndefined(column.foreignKey)) {
-          console.log('Add foreign key', column)
           const relationship = await this.addForeignKey(column.foreignKey)
           if (relationship.error) throw relationship.error
         }
