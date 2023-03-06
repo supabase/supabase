@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
@@ -17,7 +16,7 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -26,15 +25,14 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { useUser } from 'lib/auth'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
-  const { ui } = useStore()
-
-  const router = useRouter()
-  const { id, ref } = router.query
+  const { id, ref } = useParams()
+  const user = useUser()
 
   const [report, setReport] = useState<any>()
 
@@ -53,7 +51,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: ui.profile?.id },
+    subject: { id: user?.id },
   })
   const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
@@ -61,7 +59,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: ui.profile?.id },
+    subject: { id: user?.id },
   })
 
   /*
