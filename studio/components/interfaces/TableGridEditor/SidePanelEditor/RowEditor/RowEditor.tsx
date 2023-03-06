@@ -8,14 +8,14 @@ import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
 import JsonEdit from './JsonEditor'
-import ForeignKeySelector from './ForeignKeySelector'
+import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import {
   generateRowFields,
   validateFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
 } from './RowEditor.utils'
-import { JsonEditValue, ReferenceRow, RowField } from './RowEditor.types'
+import { JsonEditValue, RowField } from './RowEditor.types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -39,7 +39,7 @@ const RowEditor = ({
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
 
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
-  const [referenceRow, setReferenceRow] = useState<ReferenceRow>()
+  const [referenceRow, setReferenceRow] = useState<RowField>()
 
   const isNewRecord = isUndefined(row)
   const isEditingJson = !isUndefined(selectedValueForJsonEdit)
@@ -72,47 +72,18 @@ const RowEditor = ({
     updateEditorDirty()
   }
 
-  const onSelectForeignKey = async (row: RowField) => {
+  const onOpenForeignRowSelector = async (row: RowField) => {
     setIsSelectingForeignKey(true)
+    setReferenceRow(row)
+  }
 
-    // Possible low prio refactor: Shift fetching reference row retrieval to ForeignKeySelector
-    // in a useEffect, rather than trying to manage a loading state in this method
-    // if (!row.value) {
-    //   ui.setNotification({
-    //     category: 'error',
-    //     message: `Please enter a value in the ${row.name} field first`,
-    //     duration: 4000,
-    //   })
-    // }
-    // const foreignKey = row.foreignKey
-    // setReferenceRow({ loading: true, foreignKey, row: undefined })
-    // setIsSelectingForeignKey(true)
+  const onSelectForeignRowValue = (value: any) => {
+    if (!referenceRow) return
 
-    // if (foreignKey) {
-    //   const schema = foreignKey.target_table_schema
-    //   const table = foreignKey.target_table_name
-    //   const column = foreignKey.target_column_name
+    onUpdateField({ [referenceRow.name]: value })
 
-    //   const query = new Query()
-    //     .from(table, schema)
-    //     .select()
-    //     .match({ [column]: row.value })
-    //     .toSql()
-    //   const res = await meta.query(query)
-    //   if (res.error) {
-    //     setReferenceRow({ loading: false, foreignKey, row: undefined })
-    //     return ui.setNotification({ category: 'error', message: res.error.message })
-    //   }
-    //   if (res.length === 0) {
-    //     setReferenceRow({ loading: false, foreignKey, row: undefined })
-    //     return ui.setNotification({
-    //       category: 'error',
-    //       message: `Unable to find the corresponding row in ${foreignKey.target_table_schema}.${foreignKey.target_table_name} where ${foreignKey.target_column_name} equals ${row.value}`,
-    //       duration: 4000,
-    //     })
-    //   }
-    //   setReferenceRow({ loading: false, foreignKey, row: res[0] })
-    // }
+    setIsSelectingForeignKey(false)
+    setReferenceRow(undefined)
   }
 
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,7 +146,7 @@ const RowEditor = ({
                       errors={errors}
                       onUpdateField={onUpdateField}
                       onEditJson={setSelectedValueForJsonEdit}
-                      onSelectForeignKey={() => onSelectForeignKey(field)}
+                      onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                     />
                   )
                 })}
@@ -200,7 +171,7 @@ const RowEditor = ({
                           errors={errors}
                           onUpdateField={onUpdateField}
                           onEditJson={setSelectedValueForJsonEdit}
-                          onSelectForeignKey={() => onSelectForeignKey(field)}
+                          onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         />
                       )
                     })}
@@ -220,9 +191,10 @@ const RowEditor = ({
               }}
             />
 
-            <ForeignKeySelector
+            <ForeignRowSelector
               visible={isSelectingForeignKey}
               referenceRow={referenceRow}
+              onSelect={onSelectForeignRowValue}
               closePanel={() => {
                 setIsSelectingForeignKey(false)
                 setReferenceRow(undefined)
