@@ -37,6 +37,8 @@ async function generateRefMarkdown(sections, slug, spec) {
     sections.map(async (x, i) => {
       if (!x.id) return null
 
+      if (i > 15) return {}
+
       const pathName = `docs/ref${slug}/${x.id}.mdx`
 
       const markdownExists = checkFileExists(pathName)
