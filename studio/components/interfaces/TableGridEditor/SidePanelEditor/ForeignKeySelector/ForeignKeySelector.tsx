@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
+import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase, Toggle } from 'ui'
 import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -9,14 +9,20 @@ import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
 interface Props {
   column: ColumnField
   metadata?: any
   visible: boolean
   closePanel: () => void
-  saveChanges: (value: { table: PostgresTable; column: PostgresColumn } | undefined) => void
+  saveChanges: (
+    value: { table: PostgresTable; column: PostgresColumn; deletionAction: string } | undefined
+  ) => void
 }
+
+// [Joshen] In the future, we can easily extend to other deletion actions as well by replacing
+// enableCascadeDelete with deletionAction
 
 const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
   const { meta } = useStore()
@@ -25,6 +31,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
     schema: 'public',
     table: '',
     column: '',
+    enableCascadeDelete: false,
   })
 
   const schemas = meta.schemas.list()
@@ -51,12 +58,14 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
           schema: foreignKey.target_table_schema,
           table: foreignKey.target_table_name,
           column: foreignKey.target_column_name,
+          enableCascadeDelete: foreignKey.deletion_action === FOREIGN_KEY_DELETION_ACTION.CASCADE,
         })
       } else {
         setSelectedForeignKey({
           schema: 'public',
           table: '',
           column: '',
+          enableCascadeDelete: false,
         })
       }
     }
@@ -64,7 +73,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
 
   const updateSelectedSchema = (schema: string) => {
     meta.tables.loadBySchema(schema)
-    const updatedForeignKey = { ...selectedForeignKey, schema, table: '', column: '' } as ForeignKey
+    const updatedForeignKey = { schema, table: '', column: '', enableCascadeDelete: false }
     setSelectedForeignKey(updatedForeignKey)
   }
 
@@ -75,6 +84,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         schema: '',
         table: '',
         column: '',
+        enableCascadeDelete: false,
       })
     }
     const table = find(tables, { id: tableId })
@@ -83,6 +93,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         schema: table.schema,
         table: table.name,
         column: table.columns?.length ? table.columns[0].name : undefined,
+        enableCascadeDelete: false,
       })
     }
   }
@@ -94,6 +105,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
       const updatedForeignKey = { ...selectedForeignKey, column: column.name } as ForeignKey
       setSelectedForeignKey(updatedForeignKey)
     }
+  }
+
+  const updateEnableCascadeDelete = (value: boolean) => {
+    setErrors({})
+    setSelectedForeignKey({ ...selectedForeignKey, enableCascadeDelete: value })
   }
 
   const onSaveChanges = (resolve: () => void) => {
@@ -110,7 +126,13 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         // Remove foreign key since no table selected
         saveChanges(undefined)
       } else {
-        saveChanges({ table: selectedTable, column: selectedColumn })
+        saveChanges({
+          table: selectedTable,
+          column: selectedColumn,
+          deletionAction: selectedForeignKey.enableCascadeDelete
+            ? FOREIGN_KEY_DELETION_ACTION.CASCADE
+            : FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+        })
       }
     }
     resolve()
@@ -240,6 +262,13 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                   ))}
                 </Listbox>
               )}
+              <Toggle
+                label="Enable cascade deletes"
+                // @ts-ignore
+                onChange={(value: boolean) => updateEnableCascadeDelete(value)}
+                checked={selectedForeignKey.enableCascadeDelete}
+                descriptionText={`Deleting a record from ${selectedForeignKey.schema}.${selectedForeignKey.table} will also delete the referencing records from this table`}
+              />
             </>
           )}
         </div>
