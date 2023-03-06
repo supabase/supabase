@@ -22,7 +22,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
       return (
         <>
           Deleting a record from <code className="text-xs text-scale-1100">{reference}</code> will{' '}
-          <span className="text-brand-900 opacity-75">raise an error</span> if there exists
+          <span className="text-brand-900 opacity-75">prevent deletion</span> of existing
           referencing rows from this table
         </>
       )
