@@ -41,7 +41,7 @@ export default function TicketShare({ user, users }: Props) {
 
   const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
     username ?? ''
-  )}`
+  )}${golden ? '&golden=true' : ''}`
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
