@@ -181,10 +181,6 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      ui.setNotification({
-        category: 'success',
-        message: isNewRecord ? `Successfully created column` : `Successfully updated column`,
-      })
       await meta.tables.loadById(selectedTable!.id)
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
       onColumnSaved(configuration.isEncrypted)
