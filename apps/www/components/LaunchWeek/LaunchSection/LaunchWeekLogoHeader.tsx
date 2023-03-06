@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 
 export function LaunchWeekLogoHeader() {
   return (
-    <div className="flex flex-col gap-3 items-center justify-center xl:justify-start">
+    <div className="flex flex-col gap-1 lg:gap-3 items-center justify-center xl:justify-start">
       <motion.div
         className={classNames(
           styleUtils.appear,
@@ -16,7 +16,7 @@ export function LaunchWeekLogoHeader() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ ease: 'circOut', delay: 0.2, duration: 0.8 }}
       >
-        <h1 className="flex gap-[24px] justify-center font-normal uppercase text-[32px] items-center">
+        <h1 className="flex gap-[24px] justify-center font-normal uppercase text-[28px] md:text-[32px] items-center">
           <span className="tracking-[4px] text-white">Launch week</span>
           <span className="flex justify-center">
             <Image src="/images/launchweek/seven/lw7-seven.svg" width={40} height={40} />
