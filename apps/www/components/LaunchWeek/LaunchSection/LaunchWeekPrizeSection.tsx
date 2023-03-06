@@ -74,7 +74,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                       width={16}
                       height={16}
                     />
-                    Supabase Mechanical Keyboard <LabelBadge text="3 pieces" />
+                    Mechanical Keyboard <LabelBadge text="3 pieces" />
                   </h4>
                   <p className="text-[#707070] mt-1">
                     Increase your chances of winning limited edition 62-Key ISO Custom Mechanical
