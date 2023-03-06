@@ -65,7 +65,7 @@ export default function TicketProfile({
               { [styles['name-golden']]: golden }
             )} dark:text-white text-center`}
           >
-            <span
+            <div
               className={`${cn(styles.skeleton, styles.wrapper, {
                 [styles.show]: ticketGenerationState === 'loading',
               })} text-4xl bg-gradient-to-r ${
@@ -73,7 +73,8 @@ export default function TicketProfile({
               } from-white via-white bg-clip-text text-transparent text-center`}
             >
               {name || username || 'Your Name'}
-            </span>
+              <p>{name && <p className="gradient-text-scale-100 text-sm">@{username}</p>}</p>
+            </div>
           </p>
         ) : (
           <TicketForm
