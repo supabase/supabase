@@ -34,6 +34,8 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
     <RefSubLayout>
       {props.sections.map((x, i) => {
         const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+
+        if (i > 15) return null
         switch (x.type) {
           case 'markdown':
             return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
