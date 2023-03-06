@@ -263,7 +263,6 @@ const TableEditor: FC<Props> = ({
             {!isDuplicating && (
               <ColumnManagement
                 table={{ name: tableFields.name, schema: selectedSchema }}
-                tables={tables}
                 columns={tableFields?.columns}
                 enumTypes={enumTypes}
                 isNewRecord={isNewRecord}

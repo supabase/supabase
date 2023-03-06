@@ -498,6 +498,10 @@ export default class MetaStore implements IMetaStore {
         const relation: any = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
       }
+      this.rootStore.ui.setNotification({
+        category: 'success',
+        message: `Successfully updated column "${column.name}"`,
+      })
     } catch (error: any) {
       return { error }
     }
@@ -631,6 +635,7 @@ export default class MetaStore implements IMetaStore {
       // Then add the foreign key constraints here
       for (const column of columns) {
         if (!isUndefined(column.foreignKey)) {
+          console.log('Add foreign key', column)
           const relationship = await this.addForeignKey(column.foreignKey)
           if (relationship.error) throw relationship.error
         }
