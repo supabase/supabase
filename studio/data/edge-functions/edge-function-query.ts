@@ -11,6 +11,14 @@ export type EdgeFunctionVariables = {
 
 export type EdgeFunctionResponse = {
   id: string
+  slug: string
+  name: string
+  status: string
+  created_at: number
+  updated_at: number
+  verify_jwt: boolean
+  import_map: boolean
+  version: number
 }
 
 export async function getEdgeFunction(
@@ -24,9 +32,6 @@ export async function getEdgeFunction(
     signal,
   })
   if (response.error) throw response.error
-
-  console.log('response', response)
-
   return response as EdgeFunctionResponse
 }
 
