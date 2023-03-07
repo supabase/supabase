@@ -68,7 +68,7 @@ export default function TicketProfile({
             <div
               className={`${cn(styles.skeleton, styles.wrapper, {
                 [styles.show]: ticketGenerationState === 'loading',
-              })} text-4xl bg-gradient-to-r ${
+              })} text-2xl sm:text-4xl bg-gradient-to-r ${
                 golden ? 'to-[#ffe8af]' : 'to-slate-900'
               } from-white via-white bg-clip-text text-transparent text-center`}
             >

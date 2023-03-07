@@ -24,7 +24,7 @@ type Props = {
   ticketNumber: UserData['ticketNumber']
   name: UserData['name']
   golden: UserData['golden']
-  bgImageId: UserData['bgImageId']
+  bgImageId: UserData['bg_image_id']
   referrals: number
   sharePage?: boolean
 }
