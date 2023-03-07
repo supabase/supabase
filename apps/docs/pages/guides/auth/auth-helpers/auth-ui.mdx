@@ -23,7 +23,7 @@ It supports custom themes and extensible styles to match your brand and aestheti
 Install the latest version of [supabase-js](/docs/reference/javascript) and the Auth UI package:
 
 ```bash
-npm install @supabase/supabase-js @supabase/auth-ui-react
+npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
 ```
 
 ### Import the Auth component
@@ -44,11 +44,11 @@ We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearence.theme` prop.
 
 ```js lines=4,16 title=/src/index.js
+import { Auth } from '@supabase/auth-ui-react'
 import {
-  Auth,
   // Import predefined theme
   ThemeSupa,
-} from '@supabase/auth-ui-react'
+} from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -70,7 +70,8 @@ The Auth component also supports login with [offical social providers](../../aut
 
 ```js lines=13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
@@ -112,7 +113,8 @@ Auth UI comes with several themes to customize the appearance. Each predefined t
 
 ```js lines=2,13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -140,7 +142,8 @@ Auth UI comes with two theme variations: `default` and `dark`. You can switch be
 
 ```js lines=14 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -161,11 +164,12 @@ If you don't pass a value to `theme` it uses the `"default"` theme. You can pass
 
 ### Override themes
 
-Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js lines=14-21 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
@@ -192,7 +196,7 @@ If you created your own theme, you may not need to override any of the them.
 ### Create your own theme [#create-theme]
 
 You can create your own theme by following the same structure within a `appearance.theme` property.
-See the list of [tokens within a theme](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -293,7 +297,7 @@ const App = () => (
 
 ### Custom labels [#custom-labels]
 
-You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json) that can be overwritten.
+You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/localization/en.json) that can be overwritten.
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'

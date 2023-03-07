@@ -20,58 +20,14 @@ import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 
 const UpgradingState = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
-
-  // [Joshen] If routing to this state from ProjectUpgradeAlert, give it a few seconds before starting
-  // to poll the upgrade status endpoint as the job is async and might not be immediately updated.
-  const { upgradeInitiated } = useParams()
-  const [isInitialized, setIsInitialized] = useState(upgradeInitiated !== 'true')
-
-  useEffect(() => {
-    if (!isInitialized) setTimeout(() => setIsInitialized(true), 5000)
-  }, [])
-
-  if (isInitialized) {
-    return <UpgradingPollingState />
-  } else {
-    return (
-      <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
-        <div className="mx-6 space-y-16">
-          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
-            <h1 className="text-3xl">{project?.name}</h1>
-          </div>
-          <div className="mx-auto mt-8 mb-16 w-full max-w-7xl">
-            <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
-              <div className="grid w-[480px] gap-4">
-                <div className="relative mx-auto max-w-[300px]">
-                  <div className="absolute flex h-full w-full items-center justify-center">
-                    <IconSettings className="animate-spin" size={20} strokeWidth={2} />
-                  </div>
-                  <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-center">Upgrading in progress</p>
-                  <p className="text-center text-sm text-scale-1100">
-                    Upgrades can take from a few minutes up to several hours depending on the size
-                    of your database. Your project will be offline while it is being upgraded.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-}
-
-const UpgradingPollingState = () => {
   const { ref } = useParams()
   const { app, ui, meta } = useStore()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const { data } = useProjectUpgradingStatusQuery({ projectRef: ref })
+  const { data } = useProjectUpgradingStatusQuery({
+    projectRef: ref,
+    projectStatus: ui.selectedProject?.status,
+  })
 
   const project = ui.selectedProject
   const { initiated_at, status, progress, target_version, error } =

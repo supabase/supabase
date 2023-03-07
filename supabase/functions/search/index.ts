@@ -1,9 +1,8 @@
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
-import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
-import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
-import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0'
+import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
+import { Database } from '../common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
@@ -48,7 +47,7 @@ serve(async (req) => {
 
     const sanitizedQuery = query.trim()
 
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+    const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
     const configuration = new Configuration({ apiKey: openAiKey })
     const openai = new OpenAIApi(configuration)
@@ -75,7 +74,6 @@ serve(async (req) => {
     }
 
     const [{ embedding }] = embeddingResponse.data.data
-
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
       'match_page_sections',
       {
@@ -86,74 +84,43 @@ serve(async (req) => {
       }
     )
 
-    if (matchError) {
-      throw new ApplicationError('Failed to match page sections', matchError)
+    if (matchError || !pageSections) {
+      throw new ApplicationError('Failed to match page sections', matchError ?? undefined)
     }
 
-    const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
-    let tokenCount = 0
-    let contextText = ''
+    const uniquePageIds = pageSections
+      .map<number>(({ page_id }) => page_id)
+      .filter((value, index, array) => array.indexOf(value) === index)
 
-    for (let i = 0; i < pageSections.length; i++) {
-      const pageSection = pageSections[i]
-      const content = pageSection.content
-      const encoded = tokenizer.encode(content)
-      tokenCount += encoded.text.length
+    const { error: fetchPagesError, data: pages } = await supabaseClient
+      .from('page')
+      .select()
+      .in('id', uniquePageIds)
 
-      if (tokenCount >= 1500) {
-        break
-      }
-
-      contextText += `${content.trim()}\n---\n`
+    if (fetchPagesError || !pages) {
+      throw new ApplicationError(`Failed to fetch pages`, fetchPagesError)
     }
 
-    const prompt = codeBlock`
-      ${oneLine`
-        You are a very enthusiastic Supabase representative who loves
-        to help people! Given the following sections from the Supabase
-        documentation, answer the question using only that information,
-        outputted in markdown format. If you are unsure and the answer
-        is not explicitly written in the documentation, say
-        "Sorry, I don't know how to help with that."
-      `}
+    const combinedPages = pages
+      .map((page) => {
+        const sections = pageSections
+          .filter(({ page_id }) => page_id === page.id)
+          .map(({ content: _, ...pageSection }) => pageSection)
 
-      Context sections:
-      ${contextText}
+        const score = sections.reduce((sum, section) => sum + section.similarity, 0)
 
-      Question: """
-      ${sanitizedQuery}
-      """
+        return {
+          ...page,
+          sections,
+          score,
+        }
+      })
+      .sort((a, b) => b.score - a.score)
 
-      Answer as markdown (including related code snippets if available):
-    `
-
-    const completionOptions: CreateCompletionRequest = {
-      model: 'text-davinci-003',
-      prompt,
-      max_tokens: 512,
-      temperature: 0,
-      stream: true,
-    }
-
-    const response = await fetch('https://api.openai.com/v1/completions', {
-      headers: {
-        Authorization: `Bearer ${openAiKey}`,
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(completionOptions),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new ApplicationError('Failed to generate completion', error)
-    }
-
-    // Proxy the streamed SSE response from OpenAI
-    return new Response(response.body, {
+    return new Response(JSON.stringify(combinedPages), {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/event-stream',
+        'Content-Type': 'application/json',
       },
     })
   } catch (err: unknown) {
