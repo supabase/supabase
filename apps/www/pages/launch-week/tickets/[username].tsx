@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { FastGlobOptionsWithoutCwd } from 'globby'
 import { useTheme } from 'common/Providers'
+import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
@@ -82,10 +83,18 @@ export default function TicketShare({ user, users }: Props) {
                   }}
                   sharePage
                 />
+                <div>
+                  <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
+                    See the prizes{' '}
+                    <span className="bounce-loop">
+                      <IconArrowDown w={10} h={12} />
+                    </span>
+                  </a>
+                </div>
               </SectionContainer>
               <LW7BgGraphic />
             </div>
-            <div className="bg-lw7-gradient absolute inset-0 z-0 opacity-pulse" />
+            <div className={['bg-lw7-gradient absolute inset-0 z-0', golden && 'gold'].join(' ')} />
           </div>
           <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
           <TicketBrickWall users={users} />

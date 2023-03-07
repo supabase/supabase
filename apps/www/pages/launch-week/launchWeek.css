@@ -11,8 +11,12 @@
   background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%);
 }
 
+.bg-lw7-gradient.gold {
+  background: radial-gradient(72.03% 66.03% at 50% 69.72%, #ffd132 0%, transparent 100%);
+}
+
 .opacity-pulse {
-  animation: opacity-pulse 2.5s ease-in-out infinite alternate both;
+  animation: opacity-pulse 3.5s ease-in-out infinite alternate both;
 }
 
 .glass-tile-gradient {
@@ -42,7 +46,7 @@
 
 @keyframes opacity-pulse {
   0% {
-    opacity: 0.5;
+    opacity: 0.75;
   }
   100% {
     opacity: 1;
