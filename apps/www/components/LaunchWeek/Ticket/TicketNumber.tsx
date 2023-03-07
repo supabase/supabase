@@ -9,7 +9,7 @@ export default function TicketNumber({ number, size }: Props) {
   return (
     <>
       <div
-        className="md:absolute md:flex inset-0 top-auto md:left-auto md:right-0 md:top-0 md:w-[110px] md:h-100% dark:text-white"
+        className="relative z-10 md:absolute md:flex inset-0 top-auto md:left-auto md:right-0 md:top-0 md:w-[110px] md:h-100% dark:text-white"
         id="wayfinding--ticket-number-outer"
       >
         <div

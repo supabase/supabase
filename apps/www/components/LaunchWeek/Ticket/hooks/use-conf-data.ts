@@ -10,6 +10,7 @@ export type UserData = {
   name?: string
   golden?: boolean
   referrals?: number
+  bgImageId?: number
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string
 }
