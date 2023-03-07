@@ -3,7 +3,7 @@ name: Deploy OG Images
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'supabase/functions/og-images'
   workflow_dispatch:

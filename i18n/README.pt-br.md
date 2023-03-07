@@ -155,6 +155,15 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
+    <td>PHP</td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/postgrest-php" target="_blank" rel="noopener noreferrer">postgrest-php</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-php" target="_blank" rel="noopener noreferrer">gotrue-php</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-php" target="_blank" rel="noopener noreferrer">storage-php</a></td>
+    <td>-</td>
+  </tr>
+  <tr>
     <td>Python</td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
