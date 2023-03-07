@@ -40,13 +40,15 @@ supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
 supabase db dump --db-url "$OLD_DB_URL" -f data.sql --data-only
 ```
 
-## Restore to your new project
+### Restore to your new project
 
-1. In your new project,
-  1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) if you enabled them in your old project.
-  2. Enable any [extensions](https://app.supabase.com/project/_/database/extensions) that were enabled in your old project.
-  3. Create any [custom roles](https://app.supabase.com/project/_/database/roles) that were created in your old project.
-2. Run the following command from your terminal:
+In your new project:
+
+1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) if you enabled them in your old project.
+2. Enable any [extensions](https://app.supabase.com/project/_/database/extensions) that were enabled in your old project.
+3. Create any [custom roles](https://app.supabase.com/project/_/database/roles) that were created in your old project.
+
+Then run the following command from your terminal:
 
 ```bash
 psql \
