@@ -28,7 +28,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketShare({ user, users }: Props) {
-  const { username, ticketNumber, name, golden, referrals } = user
+  const { username, ticketNumber, name, golden, referrals, bgImageId } = user
   const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
@@ -78,15 +78,16 @@ export default function TicketShare({ user, users }: Props) {
                     ticketNumber,
                     golden,
                     referrals,
+                    bgImageId,
                   }}
                   sharePage
                 />
               </SectionContainer>
               <LW7BgGraphic />
             </div>
-            <div className="bg-lw7-gradient absolute inset-0 z-0" />
+            <div className="bg-lw7-gradient absolute inset-0 z-0 opacity-pulse" />
           </div>
-          <LaunchWeekPrizeSection className="-mt-60" />
+          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
           <TicketBrickWall users={users} />
         </div>
       </DefaultLayout>
@@ -100,6 +101,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let ticketNumber: number | null | undefined
   let golden = false
   let referrals = 0
+  let bgImageId
 
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
@@ -108,14 +110,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (username) {
     const { data: user } = await supabaseAdmin!
       .from('lw7_tickets_golden')
-      .select('name, ticketNumber, golden, referrals')
+      .select('name, ticketNumber, golden, referrals, bg_image_id')
       .eq('username', username)
       .single()
     name = user?.name
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
+    bgImageId = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
   }
+
   return {
     props: {
       user: {
@@ -125,6 +129,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
         golden,
         referrals,
+        bgImageId,
       },
       users,
     },

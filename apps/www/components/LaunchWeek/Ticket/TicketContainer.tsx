@@ -42,6 +42,7 @@ export default function Conf({
           ticketNumber={userData.ticketNumber}
           sharePage={sharePage}
           golden={userData.golden}
+          bgImageId={userData.bgImageId}
           referrals={userData.referrals ?? 0}
         />
       )}
