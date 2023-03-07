@@ -19,7 +19,6 @@ export const Default = (args: any) => (
       side="bottom"
       align="end"
       size="content"
-      portalled
       showClose
       header={
         <div className="flex justify-between items-center">
