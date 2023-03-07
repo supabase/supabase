@@ -15,19 +15,6 @@ export async function handler(req: Request) {
   const assumeGolden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
   const userAgent = req.headers.get('user-agent')
 
-  const BACKGROUND = {
-    REG: {
-      BG: `${STORAGE_URL}/reg_bg.png`,
-      AI: `${STORAGE_URL}/tickets_bg/reg_bg_${Math.floor(Math.random() * 281)}.png`,
-      TICKET: `${STORAGE_URL}/reg_ticket.png`,
-    },
-    GOLD: {
-      BG: `${STORAGE_URL}/gold_bg.png`,
-      AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
-      TICKET: `${STORAGE_URL}/gold_ticket.png`,
-    },
-  }
-
   try {
     if (!username) throw new Error('missing username param')
     // Track social shares
@@ -63,17 +50,31 @@ export async function handler(req: Request) {
     // Get ticket data
     const { data, error } = await supabaseAdminClient
       .from('lw7_tickets_golden')
-      .select('name, ticketNumber, golden')
+      .select('name, ticketNumber, golden, bg_image_id')
       .eq('username', username)
       .maybeSingle()
     if (error) console.log(error.message)
     if (!data) throw new Error('user not found')
-    const { name, ticketNumber } = data
+    const { name, ticketNumber, bg_image_id } = data
     const golden = data?.golden ?? false
 
     if (assumeGolden && !golden) return await fetch(`${STORAGE_URL}/golden_no_meme.png`)
 
     // Else, generate image ad upload to storage.
+    const BACKGROUND = {
+      REG: {
+        BG: `${STORAGE_URL}/reg_bg.png`,
+        AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
+        TICKET: `${STORAGE_URL}/reg_ticket.png`,
+      },
+      GOLD: {
+        BG: `${STORAGE_URL}/gold_bg.png`,
+        // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
+        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
+        TICKET: `${STORAGE_URL}/gold_ticket.png`,
+      },
+    }
+
     const fontData = await font
     const numDigits = `${Number(ticketNumber)}`.length
     const prefix = `00000000`.slice(numDigits)
