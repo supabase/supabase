@@ -15,6 +15,7 @@ import Form from './form'
 import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
+import { SITE_URL } from '~/lib/constants'
 
 type TicketGenerationState = 'default' | 'loading'
 
@@ -203,6 +204,15 @@ export default function Ticket({
                   Get yours and win some fantastic swag, including a limited edition mechanical
                   keyboard that you won't want to miss.
                 </p>
+
+                <div className="mt-8 rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
+                  <a
+                    href={`${SITE_URL}`}
+                    className={`flex items-center justify-center gap-2 text-scale-500`}
+                  >
+                    Get your ticket
+                  </a>
+                </div>
               </>
             )}
           </h2>
