@@ -7,12 +7,12 @@ interface Props {
 export default function TicketHeader({ size }: Props) {
   return (
     <div className="flex w-full justify-center pt-4" id="wayfinding--ticket-header">
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col xs:flex-row gap-1 justify-center items-center xs:gap-5">
         <img
           className={size === 'small' ? 'w-[165px]' : 'w-[224px]'}
           src={`/images/launchweek/ticket-header-logo.png`}
         />
-        <span className="text-white text-[10px]">{DATE}</span>
+        <span className="text-white text-xs">{DATE}</span>
         {/*<div id="wayfinding--TicketInfo-container">
                <TicketInfoFooter
                 golden={golden}

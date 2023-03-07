@@ -29,7 +29,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketShare({ user, users }: Props) {
-  const { username, ticketNumber, name, golden, referrals, bgImageId } = user
+  const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
@@ -79,7 +79,7 @@ export default function TicketShare({ user, users }: Props) {
                     ticketNumber,
                     golden,
                     referrals,
-                    bgImageId,
+                    bg_image_id,
                   }}
                   sharePage
                 />
@@ -110,7 +110,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let ticketNumber: number | null | undefined
   let golden = false
   let referrals = 0
-  let bgImageId
+  let bg_image_id
 
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
@@ -125,7 +125,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     name = user?.name
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
-    bgImageId = user?.bg_image_id ?? 1
+    bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
   }
 
@@ -138,7 +138,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
         golden,
         referrals,
-        bgImageId,
+        bg_image_id,
       },
       users,
     },

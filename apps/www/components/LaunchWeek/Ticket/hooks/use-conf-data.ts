@@ -8,9 +8,9 @@ export type UserData = {
   ticketNumber?: number
   username?: string
   name?: string
-  golden?: boolean | string
+  golden?: boolean
   referrals?: number
-  bgImageId?: number | string
+  bg_image_id?: number
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string
 }
