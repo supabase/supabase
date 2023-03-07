@@ -28,6 +28,8 @@ export async function handler(req: Request) {
     })
   }
 
+  console.log(url)
+
   switch (site) {
     case 'docs':
       return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ),
