@@ -63,7 +63,7 @@ export default function Ticket({
 
   return (
     <div
-      className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 2xl:gap-16 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
+      className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
@@ -116,7 +116,7 @@ export default function Ticket({
       </div>
       <div
         ref={divRef}
-        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8 2xl:pr-16"
+        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8"
       >
         <div
           className={`
