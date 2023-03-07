@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'supabase/functions/og-images'
+      - 'supabase/functions/og-images/**'
   workflow_dispatch:
 
 jobs:
