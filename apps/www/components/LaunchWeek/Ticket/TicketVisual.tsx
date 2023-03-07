@@ -15,6 +15,7 @@ type Props = {
   size?: number
   name?: string
   ticketNumber?: number
+  bgImageId?: number
   username?: string
   ticketGenerationState?: TicketGenerationState
   setTicketGenerationState?: any
@@ -25,6 +26,7 @@ export default function TicketVisual({
   size = 1,
   name,
   username,
+  bgImageId,
   ticketNumber,
   ticketGenerationState = 'default',
   setTicketGenerationState,
@@ -37,9 +39,10 @@ export default function TicketVisual({
   const basePath = router.basePath
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [imageIsLoading, setImageIsLoading] = useState(true)
-  const randomNumber = Math.floor(Math.random() * 200) + 1
-  const goldRandomNumber = Math.floor(Math.random() * 56) + 1
-  const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg/`
+  // const randomNumber = Math.floor(Math.random() * 200) + 1
+  // const goldRandomNumber = Math.floor(Math.random() * 56) + 1
+  const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg`
+  const goldenImageId = Math.floor(bgImageId! / 56)
 
   return (
     <div
@@ -47,7 +50,7 @@ export default function TicketVisual({
         styles.visual,
         golden ? styles['visual--gold'] : '',
         session ? styles['visual--logged-in'] : '',
-        'flex relative flex-col flex-1 justify-between rounded-xl bg-black w-full h-full box-border',
+        'flex relative flex-col flex-1 justify-between rounded-2xl bg-black w-full h-full box-border before:rounded-2xl',
       ].join(' ')}
       style={{
         ['--size' as string]: size,
@@ -58,19 +61,21 @@ export default function TicketVisual({
         <Image
           src={
             golden
-              ? `${storageBaseFilepath}/reg_bg_${randomNumber}.png`
-              : `${storageBaseFilepath}/gold/gold_bg_${goldRandomNumber}.png`
+              ? `${storageBaseFilepath}/golden/_jpg/gold_bg_${goldenImageId}.jpg`
+              : `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`
           }
           layout="fill"
           objectFit="cover"
+          placeholder="blur"
+          blurDataURL="/images/blur.png"
           className={[
-            'duration-700 ease-in-out',
+            'duration-700 ease-in-out rounded-xl',
             imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0 scale-100',
           ].join(' ')}
           onLoadingComplete={() => setImageIsLoading(false)}
         />
       </div>
-      <div className="flex flex-col items-center justify-between w-full h-full flex-1 md:pr-[110px]">
+      <div className="relative z-10 flex flex-col items-center justify-between w-full h-full flex-1 md:pr-[110px]">
         {username && <TicketHeader />}
         <div
           className="flex-1 w-full h-full md:h-auto flex flex-col justify-center"
