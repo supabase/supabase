@@ -1447,7 +1447,7 @@ export default {
       shadow-xl
       data-open:animate-overlay-show
       data-closed:animate-overlay-hide
-
+      transition-height duration-500 ease-in-out
     `,
     header: `
       bg-scale-200 dark:bg-scale-400

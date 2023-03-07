@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/cmdk",
+    "apps/cmdk-app",
     "packages/ui",
     "packages/common",
     "packages/config"

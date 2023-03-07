@@ -240,4 +240,7 @@ module.exports = ui({
       })
     },
   ],
+  transitionProperty: {
+    height: 'height',
+  },
 })
