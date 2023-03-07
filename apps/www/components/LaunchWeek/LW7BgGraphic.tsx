@@ -21,7 +21,7 @@ export default function LW7BgGraphic() {
     // Map scrollYProgress from these values:
     [0, 0.5],
     // Into these scale values:
-    [1, isMobile ? 1.1 : 1.4]
+    [1, isMobile ? 1.1 : 1.2]
   )
   const graphicsY = useTransform(
     scrollYProgress,
