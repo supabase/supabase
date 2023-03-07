@@ -162,13 +162,8 @@ const EdgeFunctionDetails: FC<Props> = () => {
                         label="Slug"
                         value={selectedFunction?.slug}
                       />
-                      <Input
-                        disabled
-                        copy
-                        label="Endpoint URL"
-                        value={functionUrl}
-                        descriptionText="All functions are deployed globally"
-                      />
+                      <Input disabled copy label="Endpoint URL" value={functionUrl} />
+                      <Input disabled label="Region" value="All functions are deployed globally" />
                       <Input
                         disabled
                         label="Created at"
