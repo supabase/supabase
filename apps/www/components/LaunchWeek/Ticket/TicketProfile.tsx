@@ -82,33 +82,6 @@ export default function TicketProfile({
             setTicketGenerationState={setTicketGenerationState}
           />
         )}
-
-        <div
-          className={cn(styles.username, { [styles['username-golden']]: golden })}
-          id="wayfinder--username--container"
-        >
-          <p className="text-center w-full">
-            <span
-              className={`${golden ? 'text-white' : 'text-scale-1100'}`}
-              id="wayfinding--twitter-handle"
-            >
-              {/* <GithubIcon
-                color={golden ? 'var(--gold-primary)' : 'var(--secondary-color)'}
-                size={20 * size}
-              /> */}
-              {username ? `@${username}` : ''}
-            </span>
-            {/* {username && (
-              <img
-                alt="Supabase disconnected badge"
-                src={`/images/launchweek/supabadge-${
-                  golden ? 'gold' : username ? 'connected' : 'disconnected'
-                }.svg`}
-                className="ml-2"
-              />
-            )} */}
-          </p>
-        </div>
       </div>
     </div>
   )

@@ -22,11 +22,25 @@
   border-image-slice: 1;
   border-width: 2px;
   border-radius: 16px; */
-  background-color: linear-gradient(#fff000, #dea513);
-  background-color: #dea513;
+  /* background-color: linear-gradient(#fff000, #dea513); */
+  background: radial-gradient(#fcdf9d, #dbb333);
+  /* border: 1px solid rgba(255, 255, 0, 0.629); */
+  /* animation: svg-shadow 2s ease-in-out infinite alternate; */
+  /* background-image: url('/images/launchweek/seven/lw-7-bg.svg'); */
+  /* background-image: url('/images/launchweek/gold-ticket-background.png'); */
+  /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
+  /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
+}
+
+.visual--gold::before {
+  content: ' ';
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #dbb333);
+  background: radial-gradient(#fcdf9d, #dbb333);
   border: 1px solid rgba(255, 255, 0, 0.629);
-  animation: svg-shadow 2s ease-in-out infinite alternate;
-  background-image: url('/images/launchweek/seven/lw-7-bg.svg');
+  animation: opacity-pulse 2s ease-in-out infinite alternate;
+  /* background-image: url('/images/launchweek/seven/lw-7-bg.svg'); */
   /* background-image: url('/images/launchweek/gold-ticket-background.png'); */
   /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
   /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
@@ -52,13 +66,23 @@
 /* .svg-shadow {
 } */
 
+@keyframes opacity-pulse {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes svg-shadow {
   from {
     filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #d99f0c) drop-shadow(0 0 6px #d99f0c);
   }
 
   to {
-    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
+    filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
   }
 }
 

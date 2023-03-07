@@ -35,12 +35,15 @@ export default function TicketHome({ users }: Props) {
   const { query, pathname } = useRouter()
   const isLauchWeekPage = pathname.includes('launch-week')
   const ticketNumber = query.ticketNumber?.toString()
+  const bgImageId = query.bgImageId?.toString()
 
   const defaultUserData = {
     id: query.id?.toString(),
     ticketNumber: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
     name: query.name?.toString(),
     username: query.username?.toString(),
+    golden: !!query.golden,
+    bgImageId: bgImageId ? parseInt(bgImageId, 10) : undefined,
   }
 
   useEffect(() => {
@@ -113,8 +116,12 @@ export default function TicketHome({ users }: Props) {
               </SectionContainer>
               <LW7BgGraphic />
             </div>
-            {/* TODO: set gold gradient if ticket is gold */}
-            <div className="bg-lw7-gradient absolute inset-0 z-0" />
+            <div
+              className={[
+                'bg-lw7-gradient absolute inset-0 z-0',
+                defaultUserData?.golden && 'gold',
+              ].join(' ')}
+            />
           </div>
 
           <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />

@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { FastGlobOptionsWithoutCwd } from 'globby'
 import { useTheme } from 'common/Providers'
+import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
@@ -28,7 +29,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketShare({ user, users }: Props) {
-  const { username, ticketNumber, name, golden, referrals } = user
+  const { username, ticketNumber, name, golden, referrals, bgImageId } = user
   const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
@@ -42,7 +43,7 @@ export default function TicketShare({ user, users }: Props) {
 
   const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
     username ?? ''
-  )}`
+  )}${golden ? '&golden=true' : ''}`
 
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
@@ -78,15 +79,24 @@ export default function TicketShare({ user, users }: Props) {
                     ticketNumber,
                     golden,
                     referrals,
+                    bgImageId,
                   }}
                   sharePage
                 />
+                <div>
+                  <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
+                    See the prizes{' '}
+                    <span className="bounce-loop">
+                      <IconArrowDown w={10} h={12} />
+                    </span>
+                  </a>
+                </div>
               </SectionContainer>
               <LW7BgGraphic />
             </div>
-            <div className="bg-lw7-gradient absolute inset-0 z-0" />
+            <div className={['bg-lw7-gradient absolute inset-0 z-0', golden && 'gold'].join(' ')} />
           </div>
-          <LaunchWeekPrizeSection className="-mt-60" />
+          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
           <TicketBrickWall users={users} />
         </div>
       </DefaultLayout>
@@ -100,6 +110,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let ticketNumber: number | null | undefined
   let golden = false
   let referrals = 0
+  let bgImageId
 
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
@@ -108,14 +119,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (username) {
     const { data: user } = await supabaseAdmin!
       .from('lw7_tickets_golden')
-      .select('name, ticketNumber, golden, referrals')
+      .select('name, ticketNumber, golden, referrals, bg_image_id')
       .eq('username', username)
       .single()
     name = user?.name
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
+    bgImageId = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
   }
+
   return {
     props: {
       user: {
@@ -125,6 +138,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
         golden,
         referrals,
+        bgImageId,
       },
       users,
     },

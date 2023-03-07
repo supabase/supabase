@@ -23,6 +23,7 @@ type Props = {
   ticketNumber: UserData['ticketNumber']
   name: UserData['name']
   golden: UserData['golden']
+  bgImageId: UserData['bgImageId']
   referrals: number
   sharePage?: boolean
 }
@@ -33,6 +34,7 @@ export default function Ticket({
   ticketNumber,
   sharePage,
   golden,
+  bgImageId,
   referrals,
 }: Props) {
   const ticketRef = useRef<HTMLDivElement>(null)
@@ -44,7 +46,7 @@ export default function Ticket({
   useEffect(() => {
     if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
       Tilt.init(ticketRef.current, {
-        glare: true,
+        glare: false,
         max: 4,
         'max-glare': 0.1,
         'full-page-listening': true,
@@ -61,7 +63,7 @@ export default function Ticket({
 
   return (
     <div
-      className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 2xl:gap-16 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
+      className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
@@ -75,7 +77,7 @@ export default function Ticket({
             styleUtils.appear,
             styleUtils['appear-fourth'],
             username ? 'h-[420px]' : 'h-[395px]',
-            'relative flex flex-col gap-2 w-full h-full rounded-xl box-border bg-transparent overflow-hidden'
+            'relative flex flex-col gap-2 w-full h-full rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
@@ -86,6 +88,7 @@ export default function Ticket({
             ticketGenerationState={ticketGenerationState}
             setTicketGenerationState={setTicketGenerationState}
             golden={golden}
+            bgImageId={bgImageId}
           />
           {username && (
             <div>
@@ -113,7 +116,7 @@ export default function Ticket({
       </div>
       <div
         ref={divRef}
-        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8 2xl:pr-16"
+        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8"
       >
         <div
           className={`
