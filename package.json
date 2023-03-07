@@ -6,20 +6,14 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/www",
-    "apps/docs",
-    "apps/new-docs",
-    "studio",
-    "tests",
-    "packages/*"
+    "apps/cmdk",
+    "packages/ui",
+    "packages/common",
+    "packages/config"
   ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
-    "dev:reference": "turbo run dev --filter=reference --parallel",
-    "dev:studio": "turbo run dev --filter=studio --parallel",
-    "dev:docs": "turbo run dev --filter=docs --parallel",
-    "dev:www": "turbo run dev --filter=www --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
@@ -41,7 +35,7 @@
     "prettier": "^2.8.4",
     "prettier-plugin-sql-cst": "^0.5.0",
     "ts-jest": "^27.0.7",
-    "turbo": "^1.4.7"
+    "turbo": "^1.8.3"
   },
   "repository": {
     "type": "git",
