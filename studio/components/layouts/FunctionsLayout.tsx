@@ -9,6 +9,7 @@ import BaseLayout from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { TerminalInstructions } from 'components/interfaces/Functions'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
 interface Props {
@@ -17,9 +18,10 @@ interface Props {
 }
 
 const FunctionsLayout: FC<Props> = ({ title, children }) => {
-  const { id, ref } = useParams()
+  const { functionSlug, ref } = useParams()
   const [showTerminalInstructions, setShowTerminalInstructions] = useState(false)
-  const { isLoading, data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
   const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
@@ -32,9 +34,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
     )
   }
 
-  const item = id ? (functions ?? []).find((fn) => fn.id === id) : null
-  const name = item?.name || ''
-
+  const name = selectedFunction?.name || ''
   const hasFunctions = (functions ?? []).length > 0
   const centered = !hasFunctions
 
@@ -140,7 +140,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 </div>
               </div>
             </div>
-            {item && <FunctionsNav item={item} />}
+            {selectedFunction !== undefined && <FunctionsNav item={selectedFunction} />}
           </div>
           <div
             className={[
