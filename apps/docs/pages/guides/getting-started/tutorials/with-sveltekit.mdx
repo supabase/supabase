@@ -242,7 +242,7 @@ Add the `Auth` component to your home page
 
 Create a `src/routes/+page.server.ts` file that will return our website url to be used in our `redirectTo` above.
 
-> This is necessary because the current Supabase auth flow uses implicit grant which returns the tokens as part of the url fragment (#), 
+> This is necessary because the current Supabase auth flow uses implicit grant which returns the tokens as part of the url fragment (#).  
 The redirect to a non server protected page will make sure that the client captures the url fragment as we cannot read these on the server
 and send it over to the server. This all happens behind the scenes and isn't something you will need to do manually.
 
