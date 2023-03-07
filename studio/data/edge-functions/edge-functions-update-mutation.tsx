@@ -41,10 +41,8 @@ export const useEdgeFunctionUpdateMutation = ({
     (vars) => updateEdgeFunction(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef), {
-          refetchType: 'all',
-        })
+        const { projectRef, slug } = variables
+        await queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug))
         await onSuccess?.(data, variables, context)
       },
       ...options,

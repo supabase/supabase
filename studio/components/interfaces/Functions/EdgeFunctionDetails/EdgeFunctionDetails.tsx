@@ -22,7 +22,6 @@ import Panel from 'components/ui/Panel'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import {
@@ -33,28 +32,24 @@ import {
   FormSectionLabel,
   FormSectionContent,
 } from 'components/ui/Forms'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 
 interface Props {}
 
 const EdgeFunctionDetails: FC<Props> = () => {
   const router = useRouter()
   const { ui } = useStore()
-  const { ref: projectRef, id } = useParams()
+  const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
-  const [selectedFunction, setSelectedFunction] = useState<any>(null)
 
-  const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
-  const { data: functions } = useEdgeFunctionsQuery({ projectRef })
+  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction } = useEdgeFunctionUpdateMutation()
   const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
 
   const formId = 'edge-function-update-form'
   const canUpdateEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
-
-  useEffect(() => {
-    if (!isLoading) setSelectedFunction((functions ?? []).find((fn: any) => fn.id === id))
-  }, [isLoading, ui.selectedProject])
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -79,6 +74,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
 
   const onUpdateFunction = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (selectedFunction === undefined) return console.error('No edge function selected')
     setSubmitting(true)
 
     try {
