@@ -1,17 +1,12 @@
 import cn from 'classnames'
 import Tilt from 'vanilla-tilt'
 import { useRef, useEffect, useState } from 'react'
-// import { TicketGenerationState } from '@lib/constants'
-// import {isMobileOrTablet} from '~/lib/helpers'
-// import { scrollTo } from '@lib/smooth-scroll'
 import styles from './ticket.module.css'
 import styleUtils from './utils.module.css'
-import TicketForm from './TicketForm'
 import TicketVisual from './TicketVisual'
 import TicketActions from './TicketActions'
 import TicketCopy from './ticket-copy'
-import { DATE, SITE_NAME } from '~/lib/constants'
-import Form from './form'
+
 import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
@@ -54,13 +49,6 @@ export default function Ticket({
       })
     }
   }, [ticketRef])
-
-  // useEffect(() => {
-  //   if (!sharePage && divRef && divRef.current && isMobileOrTablet()) {
-  //     scrollTo(divRef.current, -30)
-  //   }
-  // }, [divRef, sharePage])
-  // golden = true
 
   return (
     <div
