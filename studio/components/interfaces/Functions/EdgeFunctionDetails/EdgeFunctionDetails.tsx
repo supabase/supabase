@@ -15,6 +15,7 @@ import {
   Toggle,
   IconHelpCircle,
   Input,
+  IconExternalLink,
 } from 'ui'
 
 import { useStore, useParams, checkPermissions } from 'hooks'
@@ -33,6 +34,7 @@ import {
   FormSectionContent,
 } from 'components/ui/Forms'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import clsx from 'clsx'
 
 interface Props {}
 
@@ -192,27 +194,34 @@ const EdgeFunctionDetails: FC<Props> = () => {
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
-                      <Toggle
-                        disabled
-                        id="importMap"
-                        name="importMap"
-                        label={
-                          <div className="flex items-center space-x-2">
-                            <p>Allow import maps</p>
-                            <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                              <a target="_blank">
-                                <IconHelpCircle
-                                  size={16}
-                                  strokeWidth={1.5}
-                                  className="text-scale-1000 hover:text-scale-1200 transition"
-                                />
-                              </a>
-                            </Link>
-                          </div>
-                        }
-                        checked={selectedFunction?.import_map}
-                        descriptionText="Allow the use of bare specifiers without having to install the Node.js package locally"
-                      />
+                      <div className="space-y-1 border rounded border-scale-500 bg-scale-400 px-4 py-4">
+                        <div className="flex items-center space-x-2">
+                          <p className="text-sm">
+                            Import maps are{' '}
+                            <span
+                              className={clsx(
+                                selectedFunction?.import_map ? 'text-brand-900' : 'text-amber-900'
+                              )}
+                            >
+                              {selectedFunction?.import_map ? 'allowed' : 'disallowed'}
+                            </span>{' '}
+                            for this function
+                          </p>
+                        </div>
+                        <p className="text-sm text-scale-1000">
+                          Import maps allow the use of bare specifiers without having to install the
+                          Node.js package locally
+                        </p>
+                        <div className="!mt-4">
+                          <Link href="https://supabase.com/docs/guides/functions/import-maps">
+                            <a target="_blank">
+                              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                                More about import maps
+                              </Button>
+                            </a>
+                          </Link>
+                        </div>
+                      </div>
                     </FormSectionContent>
                   </FormSection>
                 </FormPanel>
