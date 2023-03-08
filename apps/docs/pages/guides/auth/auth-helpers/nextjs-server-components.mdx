@@ -47,7 +47,7 @@ yarn add @supabase/auth-helpers-nextjs
 
 Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api) in the dashboard, and create a `.env.local` file with the following environment variables:
 
-```bash title=".env.local"
+```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -66,7 +66,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 Create a new file at `/utils/supabase-server.js` and populate with the following:
 
-```js title="/utils/supabase-server.js"
+```js /utils/supabase-server.js
 import { headers, cookies } from 'next/headers'
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
@@ -85,7 +85,7 @@ export const createClient = () =>
 
 Create a new file at `/utils/supabase-server.ts` and populate with the following:
 
-```ts title="/utils/supabase-server.ts"
+```ts /utils/supabase-server.ts
 import { headers, cookies } from 'next/headers'
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
@@ -121,7 +121,7 @@ Next, we need a middleware file to refresh the user's session on navigation.
 
 Create a new `middleware.js` file at the same level as your `app` (in the root or `src` directory) and populate with the following:
 
-```jsx title="middleware.js"
+```jsx middleware.js
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -144,7 +144,7 @@ export async function middleware(req) {
 
 Create a new `middleware.ts` file at the same level as your `app` (in the root or `src` directory) and populate with the following:
 
-```tsx title="middleware.ts"
+```tsx middleware.ts
 import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -201,7 +201,7 @@ We still need a Supabase instance client-side for authentication and realtime su
 
 Create a new file at `/utils/supabase-browser.js` and populate with the following:
 
-```js title="/utils/supabase-browser.js"
+```js /utils/supabase-browser.js
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 export const createClient = () => createBrowserSupabaseClient()
 ```
@@ -234,7 +234,7 @@ export const createClient = () => createBrowserSupabaseClient<Database>()
 
 Next, we need to create a single instance of Supabase to use client-side. Let's create a new Provider for Supabase at `/components/supabase-provider.jsx` and populate with the following:
 
-```jsx title=components/supabase-provider.jsx
+```jsx components/supabase-provider.js
 'use client'
 
 import { createContext, useContext, useState } from 'react'
@@ -246,7 +246,9 @@ export default function SupabaseProvider({ children }) {
   const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.access_token !== accessToken) {
         router.refresh()
       }
@@ -271,7 +273,7 @@ export const useSupabase = () => useContext(Context)
 
 Next, we need to create a single instance of Supabase to use client-side. Let's create a new Provider for Supabase at `/components/supabase-provider.tsx` and populate with the following:
 
-```tsx title=components/supabase-provider.tsx
+```tsx components/supabase-provider.tsx
 'use client'
 
 import { createContext, useContext, useState } from 'react'
@@ -297,11 +299,11 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
 }
 
 export const useSupabase = () => {
-  let context = useContext(Context);
+  let context = useContext(Context)
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider')
   } else {
-    return context;
+    return context
   }
 }
 ```
@@ -329,7 +331,7 @@ Next, let's modify our root layout to fetch the user's session, wrap our applica
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/layout.jsx
+```jsx app/layout.js
 import 'server-only'
 
 import SupabaseListener from '../components/supabase-listener'
@@ -369,7 +371,7 @@ export default async function RootLayout({ children }) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/layout.tsx
+```tsx app/layout.tsx
 import 'server-only'
 
 import SupabaseListener from '../components/supabase-listener'
@@ -418,7 +420,7 @@ And now create our Supabase listener component that uses the singleton Supabase 
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="/components/supabase-listener.jsx"
+```jsx /components/supabase-listener.jsx
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -451,7 +453,7 @@ export default function SupabaseListener({ serverAccessToken }) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="/components/supabase-listener.tsx"
+```tsx /components/supabase-listener.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -499,7 +501,7 @@ Now we can use our `useSupabase` hook throughout our client-side components.
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="/components/login.jsx"
+```jsx components/login.jsx
 'use client'
 
 import { useSupabase } from './supabase-provider'
@@ -539,7 +541,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="/components/login.tsx"
+```tsx /components/login.tsx
 'use client'
 
 import { useSupabase } from './supabase-provider'
@@ -594,7 +596,7 @@ A nice pattern for fetching data server-side and subscribing to changes client-s
 
 Create a new file at `/app/realtime/posts.jsx` and populate with the following:
 
-```jsx title="/app/realtime/posts.jsx"
+```jsx /app/realtime/posts.jsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -629,7 +631,7 @@ This can now be used in a Server Component to subscribe to realtime updates.
 
 Create a new file at `/app/realtime/page.jsx` and populate with the following:
 
-```jsx title="/app/realtime/page.jsx"
+```jsx /app/realtime/page.jsx
 import 'server-only'
 
 import { createClient } from '../../utils/supabase-server'
@@ -652,7 +654,7 @@ export default async function Realtime() {
 
 Create a new file at `/app/realtime/posts.tsx` and populate with the following:
 
-```tsx title="/app/realtime/posts.tsx"
+```tsx /app/realtime/posts.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -693,7 +695,7 @@ This can now be used in a Server Component to subscribe to realtime updates.
 
 Create a new file at `/app/realtime/page.tsx` and populate with the following:
 
-```tsx title="/app/realtime/page.tsx"
+```tsx /app/realtime/page.tsx
 import 'server-only'
 
 import { createClient } from '../../utils/supabase-server'

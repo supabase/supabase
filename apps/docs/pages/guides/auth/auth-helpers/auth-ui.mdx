@@ -30,7 +30,7 @@ npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shar
 
 Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
 
-```js title=/src/index.js
+```js /src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -198,7 +198,7 @@ If you created your own theme, you may not need to override any of the them.
 You can create your own theme by following the same structure within a `appearance.theme` property.
 See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
-```js title=/src/index.js
+```js /src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -250,7 +250,7 @@ You can swich between different variations of your theme with the ["theme" prop]
 You can use custom CSS classes for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
-```js title=/src/index.js
+```js /src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -275,7 +275,7 @@ const App = () => (
 You can use custom CSS inline styles for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
-```js title=/src/index.js
+```js /src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
@@ -299,7 +299,7 @@ const App = () => (
 
 You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/localization/en.json) that can be overwritten.
 
-```js title=/src/index.js
+```js /src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 

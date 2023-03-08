@@ -40,7 +40,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env`.
 All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=.env
+```bash .env
 PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
 PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
@@ -48,7 +48,7 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 Now that we have the API credentials in place, create a `src/lib/supabaseClient.ts` helper file to initialize the Supabase client.
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title=src/lib/supabaseClient.ts
+```js src/lib/supabaseClient.ts
 import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 
@@ -98,7 +98,7 @@ Update your `src/routes/+layout.svelte`:
 
 Create a new `src/routes/+layout.ts` file to handle the session on the client-side.
 
-```ts title=src/routes/+layout.ts
+```ts src/routes/+layout.ts
 import type { LayoutLoad } from './$types'
 import { getSupabase } from '@supabase/auth-helpers-sveltekit'
 
@@ -110,7 +110,7 @@ export const load: LayoutLoad = async (event) => {
 
 Create a new `src/routes/+layout.server.ts` file to handle the session on the server-side.
 
-```ts title=src/routes/+layout.server.ts
+```ts src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 import { getServerSession } from '@supabase/auth-helpers-sveltekit'
 
@@ -123,11 +123,11 @@ export const load: LayoutServerLoad = async (event) => {
 
 Be sure to create `src/hooks.client.ts` and `src/hooks.server.ts` in order to get the auth helper started on the client and server-side.
 
-```ts title=src/hooks.client.ts
+```ts src/hooks.client.ts
 import '$lib/supabaseClient'
 ```
 
-```ts title=src/hooks.server.ts
+```ts src/hooks.server.ts
 import '$lib/supabaseClient'
 ```
 
