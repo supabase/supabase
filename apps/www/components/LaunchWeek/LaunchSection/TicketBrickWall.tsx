@@ -12,7 +12,7 @@ interface Props {
 
 export default function TicketBrickWall({ users }: Props) {
   return (
-    <div className="relative">
+    <div className="relative py-36">
       <div
         className={[
           'absolute top-[196px] w-[475px] h-[420px] z-10 left-[-130px] rotate-90',

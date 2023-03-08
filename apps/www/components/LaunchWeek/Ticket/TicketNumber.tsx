@@ -15,7 +15,7 @@ export default function TicketNumber({ number, size }: Props) {
         <div
           className={[
             'flex flex-col md:flex-row items-center justify-center w-full text-center',
-            size === 'small' ? 'text-[20px]' : 'text-[30px] md:text-[42px] ',
+            size === 'small' ? 'text-[20px]' : 'text-[34px] md:text-[42px] ',
           ].join(' ')}
           id="wayfinding--ticket-number-inner"
         >
@@ -85,8 +85,8 @@ export default function TicketNumber({ number, size }: Props) {
           </div>
           <div
             className={[
-              'md:absolute py-8 md:w-[max-content] leading-[1] bg-clip-text md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-white via-white',
-              size === 'small' ? 'md:px-12' : 'md:px-24',
+              'md:absolute px-12 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA60] bg-clip-text text-transparent text-center',
+              size === 'small' ? 'md:px-12' : 'xs:px-24',
             ].join(' ')}
           >
             № {prefix}
