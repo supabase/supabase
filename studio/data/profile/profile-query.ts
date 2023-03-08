@@ -40,7 +40,10 @@ export const useProfileQuery = <TData = ProfileData>({
   useQuery<ProfileData, ProfileError, TData>(
     profileKeys.profile(),
     ({ signal }) => getProfile(signal),
-    options
+    {
+      staleTime: 1000 * 60 * 30, // default good for 30 mins
+      ...options,
+    }
   )
 
 export const useProfilePrefetch = () => {

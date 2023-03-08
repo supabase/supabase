@@ -10,7 +10,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
 export interface InviteMemberButtonProps {
-  userId: string
+  userId: number
   members: Member[]
   roles: Role[]
   rolesAddable: Number[]
@@ -70,7 +70,7 @@ const InviteMemberButton = ({
       const response = await mutateAsync({
         slug,
         invitedEmail: values.email.toLowerCase(),
-        ownerId: Number(userId),
+        ownerId: userId,
         roleId,
       })
 

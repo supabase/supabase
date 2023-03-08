@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 
 import { useStore, withAuth } from 'hooks'
-import { useUser } from 'lib/auth'
+import { useProfileQuery } from 'data/profile/profile-query'
 import Error from 'components/ui/Error'
 import { useSqlEditorStore, SqlEditorContext } from 'localStores/sqlEditor/SqlEditorStore'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -15,14 +15,14 @@ export interface SQLEditorLayoutProps {
 
 const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
   const { ui, content, meta } = useStore()
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
 
   const sqlEditorStore = useSqlEditorStore(ui.selectedProject?.ref, meta)
 
   useEffect(() => {
     if (sqlEditorStore) {
       // this calls content.load() for us, as well as loading tabs
-      sqlEditorStore.loadRemotePersistentData(content, user?.id)
+      sqlEditorStore.loadRemotePersistentData(content, profile?.id)
     }
   }, [sqlEditorStore])
 
