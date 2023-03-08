@@ -308,6 +308,17 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        {
+          name: 'Enterprise SSO',
+          url: '/guides/auth/enterprise-sso',
+          items: [
+            {
+              name: 'SAML 2.0 (Beta)',
+              url: '/guides/auth/sso/auth-sso-saml',
+              items: [],
+            },
+          ],
+        },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
