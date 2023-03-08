@@ -2,7 +2,7 @@ module.exports = {
   name: 'Stripe Docs Blue',
   type: 'dark',
   colors: {
-    'editor.background': '#232323',
+    'editor.background': 'var(--colors-ch-scale2)',
     'editor.foreground': '#fafafa',
     'activityBar.background': 'var(--colors-scale2)',
     'sideBar.background': 'yellow',
@@ -39,14 +39,14 @@ module.exports = {
       name: 'Variables',
       scope: ['source', 'variable', 'variable.other.object', 'string constant.other.placeholder'],
       settings: {
-        foreground: '#f5fbff',
+        foreground: '#777',
       },
     },
     {
       name: 'Colors',
       scope: ['variable.other.constant', 'constant.other.color'],
       settings: {
-        foreground: '#ffffff',
+        foreground: '#777',
         fontStyle: 'bold',
       },
     },
@@ -94,7 +94,7 @@ module.exports = {
         'keyword.other',
       ],
       settings: {
-        foreground: '#F2AFE3',
+        foreground: '#e361c6',
       },
     },
     {
@@ -122,7 +122,7 @@ module.exports = {
         'meta.group.braces.curly constant.other.object.key.js string.unquoted.label.js',
       ],
       settings: {
-        foreground: '#85d99e',
+        foreground: '--color: #bada55',
       },
     },
     {
@@ -218,7 +218,7 @@ module.exports = {
       name: 'Markdown - Plain',
       scope: ['text.html', 'punctuation.definition.list_item'],
       settings: {
-        foreground: '#f5fbff',
+        foreground: '#777',
       },
     },
     {

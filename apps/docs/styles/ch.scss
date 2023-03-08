@@ -1,3 +1,12 @@
+// Reverse how the light/dark colour flipping works for CH
+:root {
+  --colors-ch-scale2: 'hsl(210 16.7% 97.6%)';
+
+  &.dark {
+    --colors-ch-scale2: 'hsl(206 6% 43.5%)';
+  }
+}
+
 .ch-terminal {
   font-size: 14px;
   height: 100%;
@@ -51,11 +60,11 @@
   border: none;
 }
 .ch-code-scroll-parent ::-moz-selection {
-  background-color: var(--ch-selection-background);
+  background-color: #b5bf93;
   color: inherit;
 }
 .ch-code-scroll-parent ::selection {
-  background-color: var(--ch-selection-background);
+  background-color: #b5bf93;
   color: inherit;
 }
 .ch-code-button {
@@ -183,9 +192,11 @@
   margin-top: auto;
   margin-bottom: auto;
   font-size: 12px;
+  font-family: 'custom-font';
   line-height: 1.4em;
   text-overflow: ellipsis;
   overflow: hidden;
+  color: var(--colors-scale12);
 }
 .ch-editor-frame {
   display: flex;
