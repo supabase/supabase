@@ -55,6 +55,8 @@ import { IconCloudDrizzle } from '../Icon/icons/IconCloudDrizzle'
 import { IconBook } from '../Icon/icons/IconBook'
 import { IconInbox } from '../Icon/icons/IconInbox'
 import { Input } from '../Input'
+import { AiCommand } from './AiCommand'
+import { SearchProvider } from './SearchProvider'
 
 const SubItem = (props) => {
   const search = useCommandState((state) => state.search)
@@ -146,7 +148,7 @@ function CommandMenu() {
           <SubItem>Change theme to light</SubItem>
         </CommandList> */}
 
-        <CommandList className="my-2">
+        <CommandList className={['my-2', page !== 'ai' && 'max-h-[300px]'].join(' ')}>
           {page !== 'ai' && <CommandEmpty>No results found.</CommandEmpty>}
           {!page && (
             <>
@@ -164,7 +166,7 @@ function CommandMenu() {
                   <IconInbox className="text-scale-900 mr-2 h-4 w-4" />
                   <span>See what's new</span>
                 </CommandItem>
-                <CommandItem>
+                <CommandItem onSelect={() => handleSetPages([...pages, 'docs-search'], true)}>
                   {/* <IconCloudDrizzle strokeWidth={2} className="text-brand-900 mr-2 h-4 w-4" /> */}
                   <IconBook className="mr-2" />
 
@@ -177,6 +179,11 @@ function CommandMenu() {
               <CommandSeparator />
               <CommandGroup heading="Settings">
                 {!search && <AiItem />}
+                <CommandItem onSelect={() => handleSetPages([...pages, 'api-keys'], true)}>
+                  <CreditCard className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>API keys</span>
+                  <CommandShortcut>⌘B</CommandShortcut>
+                </CommandItem>
                 <CommandItem>
                   <User className="text-scale-900 mr-2 h-4 w-4" />
                   <span>Profile</span>
@@ -212,6 +219,29 @@ function CommandMenu() {
               </CommandGroup>
             </>
           )}
+          {page === 'docs-search' && (
+            <>
+              <CommandGroup heading="Database">
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Something database</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+              <CommandGroup heading="Auth">
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Something Auth</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Something Auth 2</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+            </>
+          )}
           {page === 'ai' && (
             <>
               <div className="min-h-[300px] flex flex-col">
@@ -221,8 +251,11 @@ function CommandMenu() {
                 <div className="grow">
                   <div className="mx-3">Something</div>
                 </div>
+                <div className="mx-3">
+                  <SearchProvider />
+                </div>
 
-                <div className="bg-scale-100 rounded mx-3">
+                {/* <div className="bg-scale-100 rounded mx-3">
                   <Input
                     placeholder="Ask Supabase AI something..."
                     autoFocus
@@ -234,12 +267,53 @@ function CommandMenu() {
                     }
                     onChange={(e) => setAiSearch(e.target.value)}
                   />
-                </div>
+                </div> */}
               </div>
+            </>
+          )}
+          {page === 'api-keys' && (
+            <>
+              <CommandGroup heading="">
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Copy Anon key</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+              <div className="w-full flex">
+                <code className="bg-scale-100 rounded mx-2 px-2 w-full text-scale-1200 text-sm py-3">
+                  I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM
+                </code>
+              </div>
+              <CommandGroup heading="">
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Copy Service role key</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+              <div className="w-full flex">
+                <code className="bg-scale-100 rounded mx-2 px-2 w-full text-scale-1200 text-sm py-3">
+                  I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM
+                </code>
+              </div>
+              <CommandGroup heading="">
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Roll new keys</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+                <CommandItem>
+                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
+                  <span>Switch project</span>
+                  <CommandShortcut>⌘S</CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
             </>
           )}
         </CommandList>
       </CommandDialog>
+      {/* <AiCommand /> */}
     </>
   )
 }

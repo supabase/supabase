@@ -9,12 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.5.5",
+    "config": "*",
     "next": "^12.1.0",
     "next-transpile-modules": "^10.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "ui": "*",
-    "config": "*"
+    "ui": "*"
   },
   "devDependencies": {
     "eslint": "8.35.0",
