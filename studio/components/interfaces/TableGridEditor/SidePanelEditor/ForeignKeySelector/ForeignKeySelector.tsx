@@ -276,7 +276,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
               <Listbox
                 id="deletionAction"
                 value={selectedForeignKey.deletionAction}
-                label="Deletion action if referenced row is removed"
+                label="Delete action if referenced row is removed"
                 // @ts-ignore
                 descriptionText={generateDeletionActionDescription(
                   selectedForeignKey.deletionAction,

@@ -81,29 +81,26 @@ export const useForeignKeyConstraintsQuery = <
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
   options: UseQueryOptions<ExecuteSqlData, ForeignKeyConstraintsError, TData> = {}
 ) => {
-  const response = useExecuteSqlQuery(
+  return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
       sql: getForeignKeyConstraintsQuery({ schema }),
       queryKey: ['foreignKeyConstraints'],
     },
-    options
-  )
-
-  // [Joshen] Convert target/source_columns into a string array
-  // This should be safe as the returned data is rather scoped
-  const formattedResults = ((response?.data as any)?.result ?? []).map(
-    (foreignKey: ForeignKeyConstraint) => {
-      return {
-        ...foreignKey,
-        source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-        target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
-      }
+    {
+      select(data) {
+        return ((data as any)?.result ?? []).map((foreignKey: ForeignKeyConstraint) => {
+          return {
+            ...foreignKey,
+            source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
+            target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+          }
+        })
+      },
+      ...options,
     }
   )
-
-  return { ...response, data: { ...response.data, result: formattedResults } }
 }
 
 export const useForeignKeyConstraintsPrefetch = ({
