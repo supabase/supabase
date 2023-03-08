@@ -2,7 +2,6 @@ import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { useFormContext } from '../Form/FormContext'
-
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
