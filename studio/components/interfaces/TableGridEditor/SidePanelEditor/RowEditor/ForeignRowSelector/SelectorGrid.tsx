@@ -3,7 +3,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { SupaRow, SupaTable } from 'components/grid'
 import { IconKey } from 'ui'
 
-export interface SelectorTableProps {
+export interface SelectorGridProps {
   table: SupaTable
   rows: SupaRow[]
   onRowSelect: (row: SupaRow) => void
@@ -41,7 +41,7 @@ const formatter = (column: string, row: any) => {
   )
 }
 
-const SelectorTable = ({ table, rows, onRowSelect }: SelectorTableProps) => {
+const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
   const columns: Column<SupaRow>[] = table.columns.map((column) => ({
     key: column.name,
     name: column.name,
@@ -56,4 +56,4 @@ const SelectorTable = ({ table, rows, onRowSelect }: SelectorTableProps) => {
   )
 }
 
-export default SelectorTable
+export default SelectorGrid
