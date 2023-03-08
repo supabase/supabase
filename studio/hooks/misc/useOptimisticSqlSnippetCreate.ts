@@ -1,12 +1,12 @@
 import { createSqlSnippetSkeleton } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
-import { useUser } from 'lib/auth'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useCallback } from 'react'
 import { useStore } from './useStore'
 
 export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
   const { ui, content: contentStore } = useStore()
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
 
   const sqlEditorStore: any = useSqlStore()
 
@@ -16,7 +16,7 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
       const previouslySelectedTabId = sqlEditorStore.selectedTabId
 
       const snippet = createSqlSnippetSkeleton({
-        owner_id: user ? Number(user.id) : undefined,
+        owner_id: profile?.id,
         ...args,
       })
 
@@ -24,7 +24,7 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
       const { data } = contentStore.createOptimistically(snippet)
 
       // update the tabs in the sql editor storage to match the content store
-      const tabs = sqlEditorStore.tabsFromContentStore(contentStore, user?.id)
+      const tabs = sqlEditorStore.tabsFromContentStore(contentStore, profile?.id)
       sqlEditorStore.loadTabs(tabs, false)
 
       // select tab with new snippet
@@ -46,6 +46,6 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
         })
       }
     },
-    [user, sqlEditorStore, contentStore]
+    [profile, sqlEditorStore, contentStore]
   )
 }

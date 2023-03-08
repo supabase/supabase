@@ -20,19 +20,19 @@ import { checkPermissions, useParams } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import { useProfileQuery } from 'data/profile/profile-query'
 import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { useUser } from 'lib/auth'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
 
   const [report, setReport] = useState<any>()
 
@@ -51,7 +51,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: user?.id },
+    subject: { id: profile?.id },
   })
   const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
@@ -59,7 +59,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: user?.id },
+    subject: { id: profile?.id },
   })
 
   /*

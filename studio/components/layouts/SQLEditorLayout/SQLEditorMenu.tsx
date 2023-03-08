@@ -17,10 +17,10 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'
-import { useUser } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -46,7 +46,7 @@ const OpenQueryItem = observer(
 )
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
   const { content: contentStore } = useStore()
 
   const sqlEditorStore: any = useSqlStore()
@@ -113,7 +113,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
           await contentStore.del(id)
 
           sqlEditorStore.loadTabs(
-            sqlEditorStore.tabsFromContentStore(contentStore, user?.id),
+            sqlEditorStore.tabsFromContentStore(contentStore, profile?.id),
             false
           )
         }}
@@ -128,13 +128,13 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const SideBarContent = observer(() => {
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
   const sqlEditorStore: any = useSqlStore()
   const [filterString, setFilterString] = useState('')
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: user?.id },
-    subject: { id: user?.id },
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)

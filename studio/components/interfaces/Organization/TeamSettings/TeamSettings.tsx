@@ -5,8 +5,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore, useParams } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { useUser } from 'lib/auth'
 import { API_URL } from 'lib/constants'
+import { useProfileQuery } from 'data/profile/profile-query'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
@@ -18,7 +18,7 @@ const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
   const isOwner = ui.selectedOrganization?.is_owner
 
   const { data: detailData } = useOrganizationDetailQuery({ slug })
@@ -74,10 +74,10 @@ const TeamSettings = () => {
             placeholder="Filter members"
           />
           <div className="flex items-center space-x-4">
-            {canAddMembers && user !== null && (
+            {canAddMembers && profile !== undefined && (
               <div>
                 <InviteMemberButton
-                  userId={user.id}
+                  userId={profile.id}
                   members={members}
                   roles={roles}
                   rolesAddable={rolesAddable}
