@@ -132,7 +132,14 @@ const ForeignRowSelector = ({
                   <FilterPopover
                     table={supaTable}
                     filters={params.filter ?? []}
-                    setParams={setParams}
+                    setParams={(...args) => {
+                      // Reset page to 1 when filters change
+                      if (page > 1) {
+                        setPage(1)
+                      }
+
+                      setParams(...args)
+                    }}
                   />
                   <DndProvider backend={HTML5Backend}>
                     <SortPopover
