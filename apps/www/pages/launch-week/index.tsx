@@ -135,7 +135,7 @@ export default function TicketHome({ users }: Props) {
 
 export const getStaticProps: GetStaticProps = async () => {
   // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
+  const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select('*').limit(12)
 
   return {
     props: {

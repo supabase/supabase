@@ -113,7 +113,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let bg_image_id
 
   // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw7_tickets').select().limit(8)
+  const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select().limit(12)
 
   // fetch a specific user
   if (username) {
