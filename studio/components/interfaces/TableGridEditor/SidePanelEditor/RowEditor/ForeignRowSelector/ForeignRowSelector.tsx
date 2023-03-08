@@ -14,8 +14,9 @@ import { IconLoader, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { RowField } from '../RowEditor.types'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
-import SelectorTable from './SelectorTable'
+import SelectorGrid from './SelectorGrid'
 import { useState } from 'react'
+import Pagination from './Pagination'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
@@ -60,7 +61,10 @@ const ForeignRowSelector = ({
   const sorts = formatSortURLParams(params.sort ?? [])
   const filters = formatFilterURLParams(params.filter ?? [])
 
-  const { data, isLoading, isSuccess, isError } = useTableRowsQuery(
+  const rowsPerPage = 100
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
       queryKey: [schemaName, tableName],
       projectRef: project?.ref,
@@ -68,8 +72,8 @@ const ForeignRowSelector = ({
       table: supaTable,
       sorts,
       filters,
-      // page: state.page,
-      // limit: state.rowsPerPage,
+      page,
+      limit: rowsPerPage,
     },
     {
       keepPreviousData: true,
@@ -115,23 +119,43 @@ const ForeignRowSelector = ({
 
           {isSuccess && supaTable && (
             <div className="h-full flex flex-col">
-              <div className="flex items-center my-2 mx-3">
-                <RefreshButton table={supaTable} />
-                <FilterPopover
-                  table={supaTable}
-                  filters={params.filter ?? []}
-                  setParams={setParams}
+              <div className="flex items-center justify-between my-2 mx-3">
+                <div className="flex items-center">
+                  <RefreshButton table={supaTable} />
+                  <FilterPopover
+                    table={supaTable}
+                    filters={params.filter ?? []}
+                    setParams={setParams}
+                  />
+                  <DndProvider backend={HTML5Backend}>
+                    <SortPopover
+                      table={supaTable}
+                      sorts={params.sort ?? []}
+                      setParams={setParams}
+                    />
+                  </DndProvider>
+                </div>
+
+                <Pagination
+                  page={page}
+                  setPage={setPage}
+                  rowsPerPage={rowsPerPage}
+                  currentPageRowsCount={data?.rows.length ?? 0}
+                  isLoading={isRefetching}
                 />
-                <DndProvider backend={HTML5Backend}>
-                  <SortPopover table={supaTable} sorts={params.sort ?? []} setParams={setParams} />
-                </DndProvider>
               </div>
 
-              <SelectorTable
-                table={supaTable}
-                rows={data?.rows ?? []}
-                onRowSelect={(row) => onSelect(row[columnName ?? ''])}
-              />
+              {data.rows.length > 0 ? (
+                <SelectorGrid
+                  table={supaTable}
+                  rows={data.rows}
+                  onRowSelect={(row) => onSelect(row[columnName ?? ''])}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center border-b border-t border-scale-500">
+                  <span className="text-scale-1100 text-sm">No Rows Found</span>
+                </div>
+              )}
             </div>
           )}
         </div>
