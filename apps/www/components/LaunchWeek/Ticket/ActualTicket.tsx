@@ -1,6 +1,5 @@
 import cn from 'classnames'
-import Tilt from 'vanilla-tilt'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import styles from './ticket.module.css'
 import styleUtils from './utils.module.css'
 import TicketVisual from './TicketVisual'
@@ -33,22 +32,10 @@ export default function Ticket({
   bgImageId,
   referrals,
 }: Props) {
-  const ticketRef = useRef<HTMLDivElement>(null)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')
   const divRef = useRef<HTMLDivElement>(null)
   const winningChances = useWinningChances()
-
-  useEffect(() => {
-    if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
-      Tilt.init(ticketRef.current, {
-        glare: false,
-        max: 4,
-        'max-glare': 0.1,
-        'full-page-listening': true,
-      })
-    }
-  }, [ticketRef])
 
   return (
     <div
@@ -56,17 +43,15 @@ export default function Ticket({
       id="wayfinding--ticket-visual-wrapper-container"
     >
       <div
-        className={cn(styles['ticket-visual-wrapper'], 'flex items-stretch col-span-8')}
+        className={cn(styles['ticket-visual-wrapper'], 'flex-1 col-span-8')}
         id="wayfinding--ticket-visual-wrapper"
       >
         <div
-          ref={ticketRef}
           className={cn(
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            username ? 'h-[400px]' : 'h-[395px]',
-            'relative flex flex-col gap-2 w-full h-full rounded-xl'
+            'relative flex flex-col gap-2 w-full h-fit rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
@@ -85,23 +70,6 @@ export default function Ticket({
             </div>
           )}
         </div>
-        {!sharePage && (
-          <>
-            {username ? (
-              <div className="flex flex-col gap-6 py-4 mx-3">
-                {/* <div>
-                  <TicketCopy username={username} />
-                </div> */}
-                {/* <div className={`flex flex-col xl:flex-row gap-3 items-center justify-center`}>
-                  <TicketActions username={username} golden={golden} />
-                </div> */}
-              </div>
-            ) : (
-              <></>
-              // <div className={styles['ticket-actions-placeholder']} />
-            )}
-          </>
-        )}
       </div>
       <div
         ref={divRef}

@@ -1,13 +1,12 @@
 import styles from './ticket-visual.module.css'
 import TicketProfile from './TicketProfile'
 import TicketNumber from './TicketNumber'
-import TicketMono from './ticket-mono'
-import TicketMonoMobile from './ticket-mono-mobile'
-import { useRouter } from 'next/router'
+// import TicketMono from './ticket-mono'
+// import TicketMonoMobile from './ticket-mono-mobile'
+import Tilt from 'vanilla-tilt'
 import useConfData from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketHeader from './TicketHeader'
-import { useState } from 'react'
-import { SupabaseClient } from '@supabase/supabase-js'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 type TicketGenerationState = 'default' | 'loading'
@@ -33,34 +32,50 @@ export default function TicketVisual({
   golden = false,
 }: Props) {
   const { session } = useConfData()
-  // golden = true
-
-  const router = useRouter()
-  const basePath = router.basePath
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [imageIsLoading, setImageIsLoading] = useState(true)
-  // const randomNumber = Math.floor(Math.random() * 200) + 1
-  // const goldRandomNumber = Math.floor(Math.random() * 56) + 1
+  const ticketRef = useRef<HTMLDivElement>(null)
   const storageBaseFilepath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg`
-  const goldenImageId = Math.floor(bgImageId! / 56)
+
+  const ticketBg = {
+    regular: {
+      image: `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`,
+      overlay: `/images/launchweek/seven/ticket-overlay-reg.png`,
+    },
+    gold: {
+      image: `${storageBaseFilepath}/golden/_jpg/gold_bg_${bgImageId}.jpg`,
+      overlay: `/images/launchweek/seven/ticket-overlay-gold.png`,
+    },
+  }
+
+  useEffect(() => {
+    if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
+      Tilt.init(ticketRef.current, {
+        glare: false,
+        max: 4,
+        'max-glare': 0.1,
+        'full-page-listening': true,
+      })
+    }
+  }, [ticketRef])
 
   return (
     <div
+      ref={ticketRef}
       className={[
         styles.visual,
         golden ? styles['visual--gold'] : '',
         session ? styles['visual--logged-in'] : '',
-        'flex relative flex-col flex-1 justify-between rounded-2xl bg-black w-full h-full box-border before:rounded-2xl',
+        'flex relative flex-col justify-between rounded-2xl w-full pt-0 md:pt-[50%] h-auto md:h-0 box-border before:rounded-2xl',
       ].join(' ')}
       style={{
         ['--size' as string]: size,
       }}
       id="wayfinding--ticket-visual-inner-container"
     >
-      <div className="relative z-10 flex flex-col items-center justify-between w-full h-full flex-1 md:pr-[110px]">
+      <div className="relative md:absolute inset-0 z-10 flex flex-col items-center justify-between w-full h-full flex-1 md:pl-[6%] md:pr-[15%]">
         {username && <TicketHeader />}
         <div
-          className="flex-1 w-full h-full md:h-auto flex md:pl-2 flex-col justify-center"
+          className="flex-1 w-full h-full md:h-auto flex py-14 md:py-4 flex-col justify-center"
           id="wayfinding--TicketProfile-container"
         >
           <TicketProfile
@@ -74,41 +89,35 @@ export default function TicketVisual({
         </div>
       </div>
       <TicketNumber number={ticketNumber} />
-      <div className="hidden md:flex absolute inset-0" id="wayfinding--TicketMono-container">
+      {/* <div className="hidden md:flex absolute inset-0" id="wayfinding--TicketMono-container">
         <TicketMono golden={golden} />
       </div>
       <div className="flex md:hidden absolute inset-0">
         <TicketMonoMobile golden={golden} />
-      </div>
+      </div> */}
       <div
         id="wayfinding--ticket-dynamic-bg-image"
         className="absolute inset-0 z-0 rounded-2xl overflow-hidden"
       >
-        <Image
-          src={
-            golden
-              ? `/images/launchweek/seven/ticket-overlay-gold.png`
-              : `/images/launchweek/seven/ticket-overlay-reg.png`
-          }
-          layout="fill"
-          objectFit="cover"
-          placeholder="blur"
-          blurDataURL="/images/blur.png"
-          className="absolute inset-0 z-[1] rounded-xl"
-        />
+        {username && (
+          <Image
+            src={golden ? ticketBg.gold.overlay : ticketBg.regular.overlay}
+            layout="fill"
+            objectFit="cover"
+            placeholder="blur"
+            blurDataURL="/images/blur.png"
+            className="absolute inset-0 z-[1] rounded-2xl"
+          />
+        )}
 
         <Image
-          src={
-            golden
-              ? `${storageBaseFilepath}/golden/_jpg/gold_bg_${goldenImageId}.jpg`
-              : `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`
-          }
+          src={golden ? ticketBg.gold.image : ticketBg.regular.image}
           layout="fill"
           objectFit="cover"
           placeholder="blur"
           blurDataURL="/images/blur.png"
           className={[
-            'duration-700 ease-in-out rounded-xl transform scale-105',
+            'duration-700 ease-in-out rounded-2xl transform scale-105',
             imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0',
           ].join(' ')}
           onLoadingComplete={() => setImageIsLoading(false)}
