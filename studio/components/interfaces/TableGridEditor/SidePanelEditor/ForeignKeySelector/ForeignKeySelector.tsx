@@ -273,10 +273,45 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                 </Listbox>
               )}
               <SidePanel.Separator />
+              <InformationBox
+                icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+                title="Which action is most appropriate?"
+                description={
+                  <>
+                    <p>
+                      The choice of the action depends on what kinds of objects the related tables
+                      represent:
+                    </p>
+                    <ul className="mt-2 list-disc pl-4 space-y-1">
+                      <li>
+                        <code className="text-xs">Cascade</code>: if the referencing table
+                        represents something that is a component of what is represented by the
+                        referenced table and cannot exist independently
+                      </li>
+                      <li>
+                        <code className="text-xs">Restrict</code> or{' '}
+                        <code className="text-xs">No action</code>: if the two tables represent
+                        independent objects
+                      </li>
+                      <li>
+                        <code className="text-xs">Set NULL</code> or{' '}
+                        <code className="text-xs">Set default</code>: if a foreign-key relationship
+                        represents optional information
+                      </li>
+                    </ul>
+                    <p className="mt-2">
+                      Typically, restricting and cascading deletes are the most common options, but
+                      the default behaviour is no action
+                    </p>
+                  </>
+                }
+                url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
+                urlLabel="More information"
+              />
               <Listbox
                 id="deletionAction"
                 value={selectedForeignKey.deletionAction}
-                label="Delete action if referenced row is removed"
+                label="Action if referenced row is removed"
                 // @ts-ignore
                 descriptionText={generateDeletionActionDescription(
                   selectedForeignKey.deletionAction,
