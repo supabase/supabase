@@ -314,7 +314,7 @@ export const auth = {
           items: [
             {
               name: 'SAML 2.0 (Beta)',
-              url: '/guides/auth/sso/auth-sso-saml',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml',
               items: [],
             },
           ],
