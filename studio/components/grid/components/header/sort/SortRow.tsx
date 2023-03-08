@@ -1,12 +1,12 @@
-import { FC, useRef, memo } from 'react'
+import { useRef, memo } from 'react'
 import { Button, IconMenu, Toggle, IconX } from 'ui'
 import { XYCoord } from 'dnd-core'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 
-import { DragItem, Sort } from 'components/grid/types'
-import { useTrackedState } from 'components/grid/store'
+import { DragItem, Sort, SupaTable } from 'components/grid/types'
 
-type SortRowProps = {
+export interface SortRowProps {
+  table: SupaTable
   index: number
   columnName: string
   sort: Sort
@@ -15,10 +15,8 @@ type SortRowProps = {
   onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow: FC<SortRowProps> = ({ index, columnName, sort, onDelete, onToggle, onDrag }) => {
-  const state = useTrackedState()
-
-  const column = state?.table?.columns.find((x) => x.name === columnName)
+const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+  const column = table.columns.find((x) => x.name === columnName)
   if (!column) return null
 
   const ref = useRef<HTMLDivElement>(null)

@@ -1,5 +1,11 @@
 import { PostgresTable } from '@supabase/postgres-meta'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import { parseSupaTable } from 'components/grid'
+import RefreshButton from 'components/grid/components/header/RefreshButton'
+import FilterPopover from 'components/grid/components/header/filter'
+import SortPopover from 'components/grid/components/header/sort'
+import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useStore } from 'hooks'
@@ -9,6 +15,7 @@ import ActionBar from '../../ActionBar'
 import { RowField } from '../RowEditor.types'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
 import SelectorTable from './SelectorTable'
+import { useState } from 'react'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
@@ -48,14 +55,19 @@ const ForeignRowSelector = ({
       encryptedColumns
     )
 
+  const [params, setParams] = useState<any>({ filter: [], sort: [] })
+
+  const sorts = formatSortURLParams(params.sort ?? [])
+  const filters = formatFilterURLParams(params.filter ?? [])
+
   const { data, isLoading, isSuccess, isError } = useTableRowsQuery(
     {
       queryKey: [schemaName, tableName],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table: supaTable,
-      // sorts,
-      // filters,
+      sorts,
+      filters,
       // page: state.page,
       // limit: state.rowsPerPage,
     },
@@ -102,11 +114,25 @@ const ForeignRowSelector = ({
           )}
 
           {isSuccess && supaTable && (
-            <SelectorTable
-              table={supaTable}
-              rows={data?.rows ?? []}
-              onRowSelect={(row) => onSelect(row[columnName ?? ''])}
-            />
+            <div className="h-full flex flex-col">
+              <div className="flex items-center my-2 mx-3">
+                <RefreshButton table={supaTable} />
+                <FilterPopover
+                  table={supaTable}
+                  filters={params.filter ?? []}
+                  setParams={setParams}
+                />
+                <DndProvider backend={HTML5Backend}>
+                  <SortPopover table={supaTable} sorts={params.sort ?? []} setParams={setParams} />
+                </DndProvider>
+              </div>
+
+              <SelectorTable
+                table={supaTable}
+                rows={data?.rows ?? []}
+                onRowSelect={(row) => onSelect(row[columnName ?? ''])}
+              />
+            </div>
           )}
         </div>
       </SidePanel.Content>
