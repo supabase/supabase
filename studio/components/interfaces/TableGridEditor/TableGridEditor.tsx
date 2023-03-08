@@ -213,7 +213,7 @@ const TableGridEditor: FC<Props> = ({
     connectionString: project?.connectionString,
     schema: selectedTable?.schema,
   })
-  const foreignKeyMeta = data?.result ?? []
+  const foreignKeyMeta = data || []
 
   useEffect(() => {
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {

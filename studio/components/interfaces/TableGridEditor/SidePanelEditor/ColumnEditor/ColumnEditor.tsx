@@ -80,7 +80,7 @@ const ColumnEditor: FC<Props> = ({
     connectionString: project?.connectionString,
     schema: selectedTable?.schema,
   })
-  const foreignKeyMeta = data?.result ?? []
+  const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
   const enumTypes = meta.types.list(
