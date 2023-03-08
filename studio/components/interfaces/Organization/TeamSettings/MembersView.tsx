@@ -8,7 +8,7 @@ import { Member, Role } from 'types'
 import { useStore, useParams } from 'hooks'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
-import { useUser } from 'lib/auth'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
@@ -30,7 +30,7 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
 
   const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
@@ -109,7 +109,7 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
               ...filteredMembers.map((x: Member, i: number) => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
-                const memberIsUser = x.primary_email == user?.email
+                const memberIsUser = x.primary_email == profile?.primary_email
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite

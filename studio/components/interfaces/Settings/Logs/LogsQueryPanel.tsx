@@ -13,7 +13,7 @@ import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
 import { checkPermissions } from 'hooks'
-import { useUser } from 'lib/auth'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -44,10 +44,10 @@ const LogsQueryPanel = ({
   onDateChange,
   warnings,
 }: LogsQueryPanelProps) => {
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
   const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: user?.id },
-    subject: { id: user?.id },
+    resource: { type: 'log_sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   return (

@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, checkPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useUser } from 'lib/auth'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import SavingIndicator from './SavingIndicator'
 import FavouriteButton from './FavouriteButton'
@@ -15,12 +15,12 @@ export interface UtilityActionsProps {
 }
 
 const UtilityActions = ({ updateSqlSnippet }: UtilityActionsProps) => {
-  const user = useUser()
+  const { data: profile } = useProfileQuery()
   const sqlEditorStore: any = useSqlStore()
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: user?.id },
-    subject: { id: user?.id },
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   useKeyboardShortcuts(
