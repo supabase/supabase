@@ -1,17 +1,21 @@
-import { FC, useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { isEqual } from 'lodash'
 import { Button, IconPlus, IconFilter, Popover } from 'ui'
 import update from 'immutability-helper'
 import { useUrlState } from 'hooks'
 
 import FilterRow from './FilterRow'
-import { useTrackedState } from 'components/grid/store'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import { Filter } from 'components/grid/types'
+import { Filter, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
 
-const FilterPopover: FC = () => {
-  const [{ filter: filters }]: any = useUrlState({ arrayKeys: ['filter'] })
+export interface FilterPopoverProps {
+  table: SupaTable
+  filters: string[]
+  setParams: ReturnType<typeof useUrlState>[1]
+}
+
+const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const btnText =
     (filters || []).length > 0
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
@@ -22,7 +26,7 @@ const FilterPopover: FC = () => {
       size="large"
       align="start"
       className="sb-grid-filter-popover"
-      overlay={<FilterOverlay />}
+      overlay={<FilterOverlay table={table} filters={filters} setParams={setParams} />}
     >
       <Button
         as="span"
@@ -38,12 +42,12 @@ const FilterPopover: FC = () => {
     </Popover>
   )
 }
+
 export default FilterPopover
 
-const FilterOverlay: FC = () => {
-  const state = useTrackedState()
+export interface FilterOverlayProps extends FilterPopoverProps {}
 
-  const [{ filter: filtersFromUrl }, setParams] = useUrlState({ arrayKeys: ['filter'] })
+const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOverlayProps) => {
   const initialFilters = useMemo(
     () => formatFilterURLParams((filtersFromUrl as string[]) ?? []),
     [filtersFromUrl]
@@ -51,7 +55,7 @@ const FilterOverlay: FC = () => {
   const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
   function onAddFilter() {
-    const column = state.table?.columns[0]?.name
+    const column = table.columns[0]?.name
 
     if (column) {
       setFilters([
@@ -104,6 +108,7 @@ const FilterOverlay: FC = () => {
         {filters.map((filter, index) => (
           <FilterRow
             key={`filter-${filter.column}-${[index]}`}
+            table={table}
             filter={filter}
             filterIdx={index}
             onChange={onChangeFilter}
