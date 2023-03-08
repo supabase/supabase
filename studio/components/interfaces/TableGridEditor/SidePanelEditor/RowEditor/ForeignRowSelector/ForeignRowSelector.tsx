@@ -56,7 +56,14 @@ const ForeignRowSelector = ({
       encryptedColumns
     )
 
-  const [params, setParams] = useState<any>({ filter: [], sort: [] })
+  const [params, setParams] = useState<any>(() => {
+    const targetColName = referenceRow?.foreignKey?.target_column_name
+    const value = referenceRow?.value
+
+    const initialFilters = targetColName && value ? [`${targetColName}:eq:${value}`] : []
+
+    return { filter: initialFilters, sort: [] }
+  })
 
   const sorts = formatSortURLParams(params.sort ?? [])
   const filters = formatFilterURLParams(params.filter ?? [])
