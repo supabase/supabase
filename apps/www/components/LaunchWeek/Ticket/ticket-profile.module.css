@@ -7,8 +7,8 @@
 
 @media (min-width: 768px) {
   .image {
-    width: calc(80px * var(--size));
-    height: calc(80px * var(--size));
+    width: calc(100px * var(--size));
+    height: calc(100px * var(--size));
   }
 }
 
@@ -135,16 +135,16 @@
 
 .rounded,
 .rounded.wrapper::before {
-  width: 62px;
-  height: 62px;
+  width: 100px;
+  height: 100px;
   border-radius: 50% !important;
 }
 
 @media (min-width: 768px) {
   .rounded,
   .rounded.wrapper::before {
-    width: calc(82px * var(--size));
-    height: calc(82px * var(--size));
+    width: calc(110px * var(--size));
+    height: calc(110px * var(--size));
     border-radius: 50% !important;
   }
 }
