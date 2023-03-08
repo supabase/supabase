@@ -1,4 +1,6 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { IconHelpCircle } from 'ui'
 import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
 
 export const generateDeletionActionDescription = (deletionAction: string, reference: string) => {
@@ -29,7 +31,26 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
           <code className="text-xs text-scale-1100">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent deletion</span> of existing
-          referencing rows from this table
+          referencing rows from this table.
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="translate-y-[2px] ml-1">
+              <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'w-[300px] space-y-2 border border-scale-200',
+                ].join(' ')}
+              >
+                <p className="text-xs text-scale-1200">
+                  This is similar to no action, but the restrict check cannot be deferred till later
+                  in the transaction
+                </p>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
         </>
       )
     case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
@@ -37,7 +58,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
         <>
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
           <code className="text-xs text-scale-1100">{reference}</code> will set the value of any
-          existing records in this table referencing it back to their{' '}
+          existing records in this table referencing it to their{' '}
           <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
