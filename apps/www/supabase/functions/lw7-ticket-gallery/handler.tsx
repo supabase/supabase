@@ -10,65 +10,29 @@ const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
 export async function handler(req: Request) {
-  const url = new URL(req.url)
-  const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumeGolden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
-  const userAgent = req.headers.get('user-agent')
-
   try {
-    if (!username) throw new Error('missing username param')
-    // Track social shares
-    const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-    if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-      const { error } = await supabaseAdminClient
-        .from('lw7_tickets')
-        .update({ sharedOnTwitter: 'now' })
-        .eq('username', username)
-        .is('sharedOnTwitter', null)
-      if (error) console.log(error.message)
-    } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-      const { error } = await supabaseAdminClient
-        .from('lw7_tickets')
-        .update({ sharedOnLinkedIn: 'now' })
-        .eq('username', username)
-        .is('sharedOnLinkedIn', null)
-      if (error) console.log(error.message)
-    }
-
-    // Try to get image from Supabase Storage CDN.
-    let storageResponse: Response
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/${username}.png`)
-    if (storageResponse.ok) return storageResponse
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
-    if (!assumeGolden && storageResponse.ok) return storageResponse
-
-    // Get ticket data
-    const { data, error } = await supabaseAdminClient
-      .from('lw7_tickets_golden')
-      .select('name, ticketNumber, golden, bg_image_id')
-      .eq('username', username)
-      .maybeSingle()
-    if (error) console.log(error.message)
-    if (!data) throw new Error('user not found')
-    const { name, ticketNumber, bg_image_id } = data
-    const golden = data?.golden ?? false
-
-    if (assumeGolden && !golden) return await fetch(`${STORAGE_URL}/golden_no_meme.png`)
+    if (req.method !== 'POST') throw new Error('method not supported')
+    const {
+      username = 'thorwebdev',
+      name = 'Thorsten Schaeff',
+      ticketNumber = 1234,
+      golden = true,
+      bg_image_id = 80,
+    }: {
+      username: string
+      name: string
+      ticketNumber: number
+      golden: boolean
+      bg_image_id: number
+    } = await req.json()
 
     // Else, generate image ad upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/reg_bg.png`,
         AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/reg_ticket.png`,
       },
       GOLD: {
-        BG: `${STORAGE_URL}/gold_bg.png`,
         // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
         AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket.png`,
@@ -95,18 +59,6 @@ export async function handler(req: Request) {
               justifyContent: 'center',
             }}
           >
-            {/* Background gradient  */}
-            <img
-              width="1200"
-              height="630"
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                zIndex: '-9000',
-              }}
-              src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
-            />
             {/* Background ai  */}
             <img
               width="1027"
@@ -227,7 +179,7 @@ export async function handler(req: Request) {
       ),
       {
         width: 1200,
-        height: 630,
+        height: 608,
         fonts: [
           {
             name: 'Circular',
@@ -244,32 +196,25 @@ export async function handler(req: Request) {
     )
 
     // Upload image to storage.
+    const supabaseAdminClient = createClient(
+      // Supabase API URL - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_URL') ?? '',
+      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`lw7/tickets/${golden ? `golden/${username}` : username}.png`, generatedImage.body!, {
+      .upload(`lw7/tickets/gallery/${username}.png`, generatedImage.body!, {
         contentType: 'image/png',
         cacheControl: '31536000',
-        upsert: false,
+        upsert: true,
       })
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
-    // Generate imgae for gallery
-    fetch('https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-gallery', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I',
-      },
-      body: JSON.stringify({
-        username,
-        name,
-        ticketNumber,
-        bg_image_id,
-        golden,
-      }),
-    })
 
-    return await fetch(`${STORAGE_URL}/tickets/${golden ? `golden/${username}` : username}.png`)
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
