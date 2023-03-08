@@ -65,7 +65,7 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            username ? 'h-[420px]' : 'h-[395px]',
+            username ? 'h-[400px]' : 'h-[395px]',
             'relative flex flex-col gap-2 w-full h-full rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"

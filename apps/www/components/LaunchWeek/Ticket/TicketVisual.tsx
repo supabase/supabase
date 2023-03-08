@@ -57,28 +57,10 @@ export default function TicketVisual({
       }}
       id="wayfinding--ticket-visual-inner-container"
     >
-      <div id="wayfinding--ticket-dynamic-bg-image">
-        <Image
-          src={
-            golden
-              ? `${storageBaseFilepath}/golden/_jpg/gold_bg_${goldenImageId}.jpg`
-              : `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`
-          }
-          layout="fill"
-          objectFit="cover"
-          placeholder="blur"
-          blurDataURL="/images/blur.png"
-          className={[
-            'duration-700 ease-in-out rounded-xl',
-            imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0 scale-100',
-          ].join(' ')}
-          onLoadingComplete={() => setImageIsLoading(false)}
-        />
-      </div>
       <div className="relative z-10 flex flex-col items-center justify-between w-full h-full flex-1 md:pr-[110px]">
         {username && <TicketHeader />}
         <div
-          className="flex-1 w-full h-full md:h-auto flex flex-col justify-center"
+          className="flex-1 w-full h-full md:h-auto flex md:pl-2 flex-col justify-center"
           id="wayfinding--TicketProfile-container"
         >
           <TicketProfile
@@ -97,6 +79,40 @@ export default function TicketVisual({
       </div>
       <div className="flex md:hidden absolute inset-0">
         <TicketMonoMobile golden={golden} />
+      </div>
+      <div
+        id="wayfinding--ticket-dynamic-bg-image"
+        className="absolute inset-0 z-0 rounded-2xl overflow-hidden"
+      >
+        <Image
+          src={
+            golden
+              ? `/images/launchweek/seven/ticket-overlay-gold.png`
+              : `/images/launchweek/seven/ticket-overlay-reg.png`
+          }
+          layout="fill"
+          objectFit="cover"
+          placeholder="blur"
+          blurDataURL="/images/blur.png"
+          className="absolute inset-0 z-[1] rounded-xl"
+        />
+
+        <Image
+          src={
+            golden
+              ? `${storageBaseFilepath}/golden/_jpg/gold_bg_${goldenImageId}.jpg`
+              : `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`
+          }
+          layout="fill"
+          objectFit="cover"
+          placeholder="blur"
+          blurDataURL="/images/blur.png"
+          className={[
+            'duration-700 ease-in-out rounded-xl transform scale-105',
+            imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0',
+          ].join(' ')}
+          onLoadingComplete={() => setImageIsLoading(false)}
+        />
       </div>
     </div>
   )
