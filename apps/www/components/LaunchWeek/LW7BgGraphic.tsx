@@ -46,6 +46,7 @@ export default function LW7BgGraphic() {
           loading="eager"
           layout="fill"
           objectFit="cover"
+          objectPosition="top"
           quality={100}
           unoptimized
           priority
