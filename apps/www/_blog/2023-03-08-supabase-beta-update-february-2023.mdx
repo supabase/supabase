@@ -1,0 +1,135 @@
+---
+title: Supabase Beta February 2023
+description: WIP
+author: ant_wilson
+image: WIP
+thumb: WIP
+tags:
+  - release-notes
+date: '2023-03-08'
+toc_depth: 3
+---
+
+There’s something for everybody this month: AI, Auth, Database, Edge Functions, GraphQL … you name it!
+
+## GraphiQL editor in the dashboard
+
+IMAGE
+
+The most popular GraphQL IDE/API explorer is now built into the dashboard! You can now explore and query your GraphQL API produced by `pg_graphql`.
+
+[Try it now](https://app.supabase.com/project/_/api/graphiql).
+
+## Supabase + OpenAI search
+
+We've updated our Docs search functionality to use `pgvector` + OpenAI. Still no cease and desist from Microsoft, so you can continue to ask Clippy any Supabase-specific questions 📎💚
+
+## Made with Supabase
+
+[Ask Clippy.](https://supabase.com/docs)
+
+
+
+
+## Serve all the functions!
+IMAGE
+
+Do you use multiple Edge Functions in your project? Then celebrate! Supabase CLI 1.36+ now supports serving multiple Edge Functions at the same time.
+
+To enable the feature, just run supabase functions serve in your project.
+
+[Check the docs.](https://supabase.com/docs/reference/cli/supabase-functions-serve)
+
+## Smaller Postgres docker images for everyone
+IMAGE
+
+We rewrote the Postgres Dockerfile with multi-stage builds so that each extension is compiled in its own separate stage. This reduces the size of the image from 1.3GB to 250MB, enabling a much faster boot time.
+
+[See it yourself](https://hub.docker.com/r/supabase/postgres/tags)
+
+## New UI for Postgres Roles
+IMAGE
+
+We've improved database role management. You can create, update, and delete database roles through the dashboard. Just one small step towards column-level security
+
+[Check it out.](https://app.supabase.com/project/_/editor)
+
+## API docs in the table editor
+IMAGE
+
+API docs got a light touchup and were moved to the table editor. You can now look up API methods and generate & download type files right there ✨
+
+[Check it out.](https://app.supabase.com/project/_/editor)
+
+## Quick product updates
+
+- **Postgres Extensions**: We're rolling out some fixes for several Postgres extensions. Check your Dashboard notifications to see if you need to take any actions.
+
+- **Auth**: Added full OpenAPI 3.0 spec which provides a comprehensive overview of the API with documentation on each request. [PR](https://github.com/supabase/gotrue/pull/918)
+
+- **Database**: supabase-js now infers the response type from your query. If the inferred type is incorrect, you can use `.returns<MyType>()` to override it. [Doc](https://supabase.com/docs/reference/javascript/db-returns)
+
+- **Dashboard**: Improved database roles management, you can now create, update and delete database roles through the dashboard. [Dashboard](https://app.supabase.com/project/_/database/roles)
+
+- **Dashboard**: We've provided a reference panel showing all available paths that can be queried from each respective source that improves the Logs Explorer experience. [Dashboard](https://app.supabase.com/project/_/logs/explorer)
+
+- **Edge Functions**: upgraded to Deno 1.30.3, that supports TypeScript 4.9.x and introduces `satisfies`. Thanks to [Benjamin Dobell](https://github.com/Benjamin-Dobell) 🙏. [PR](https://github.com/supabase/functions-relay/pull/30)
+
+- Realtime: Broadcast only primary key(s) for deleting records when RLS is enabled and replica identity is full. [PR](https://github.com/supabase/realtime/pull/461)
+
+## Next.js with Supabase
+
+Building the next big thing with Supabase and Next.js? Then make sure to check Jon's new video series to help get you (and your app directory) off the ground.
+
+- [Fetching and Caching data in Next.js Async Server Components](https://www.youtube.com/watch?v=GniRj1jIhFw)
+
+- [Client vs Server Components in Next.js app directory // Merging server state with realtime updates](https://www.youtube.com/watch?v=YR-xP6PPXXA)
+
+- [Delicious Server Component Cookies // Auth in the Next.js app directory](https://www.youtube.com/watch?v=Bh1TOpOcGJQ)
+
+## Launch Week 7: coming soon
+
+You want it, we want it, everyone wants it... it's time for a new Launch Week. April is the month, stay tuned for the full date 🔜
+
+![Made with Supabase](/images/blog/2022-12-07-november-beta-update/madewithsupabase.jpg)
+
+[Domain-specific ChatGPT](https://github.com/gannonh/gpt3.5-turbo-pgvector) | This starter app uses embeddings coupled with vector search to show how the OpenAI API can be used to create a conversational interface to domain-specific knowledge. Built by [Gannon Hall](https://github.com/gannonh) with Next.js, Vercel, gpt-3.5-turbo, pgvector, and Supabase.
+
+Discover 100+ other apps in this [tweet](https://twitter.com/supabase/status/1628843899996209155).
+
+## Extended Community Highlights
+
+![Community](/images/blog/2022-june/community.jpg)
+
+- refine week: building a CRUD app with refine & Supabase. [Full series](https://refine.dev/week-of-refine/)
+- Build an Instagram Web App with Supabase and Next.js. [Tutorial](https://livecycle.io/blogs/nextjs-supabase-instagram/)
+- Supabase GeoQueries with PostGIS and Storage Upload. [Video](https://www.youtube.com/watch?v=-_Wpr7rwU8I)
+- How I used Supabase to build a winning hackathon project. [Article](https://blog.matt.lgbt/how-i-used-supabase-to-build-a-winning-hackathon-project)
+- Using a Supabase API within FlutterFlow. [Video](https://www.youtube.com/watch?v=YzSXwlA3vWM)
+- Building a CRUD API with FastAPI and Supabase: A Step-by-Step Guide. [Tutorial](https://blog.theinfosecguy.xyz/building-a-crud-api-with-fastapi-and-supabase-a-step-by-step-guide)
+- How to build a collaborative SaaS product using Next.js and ZenStack's access control policy. [Tutorial](https://zenstack.dev/blog/saas-demo)
+
+
+- 
+-
+-
+-
+-
+
+## We're Hiring
+
+Come join one of the fastest-growing open source projects ever 🤗
+
+- [Integrations / Marketplace Lead](https://boards.greenhouse.io/supabase/jobs/4775849004) <br/>
+- [Cloud Platform / Site Reliability Engineer](https://boards.greenhouse.io/supabase/jobs/4307459004) <br/>
+- [Social Media and Community Manager](https://boards.greenhouse.io/supabase/jobs/4777008004)
+
+We've redesigned our [Careers page](https://supabase.com/careers) to better reflect our mission, values, and culture.
+
+## Meme Zone
+
+As always, one of our favorite memes from last month. [Follow us on Twitter](https://twitter.com/supabase) for more.
+
+![Best meme from January 2023](/images/blog/2023-02-08-january-beta-update/beta-update-january-meme.jpeg)
+
+See you next month!
