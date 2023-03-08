@@ -52,7 +52,13 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
   }))
 
   return (
-    <DataGrid columns={columns} rows={rows} style={{ height: '100%' }} onRowClick={onRowSelect} />
+    <DataGrid
+      columns={columns}
+      rows={rows}
+      style={{ height: '100%' }}
+      onRowClick={onRowSelect}
+      rowClass={() => 'cursor-pointer'}
+    />
   )
 }
 
