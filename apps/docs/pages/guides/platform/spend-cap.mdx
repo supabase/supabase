@@ -5,9 +5,9 @@ export const meta = {
   description: 'Learn about the cost control of Supabase.',
 }
 
-For managing cost control for each project, there is a Spend Cap to manage your usage and costs.
+Supabase offers a "Spend Cap" on each project to manage your usage and costs.
 
-Each project's Spend Cap determines wether your project can exceed the free quota allowance of any paid [line item](#what-can-i-be-charged-for) in a given billing cycle.
+This Spend Cap determines whether your project can exceed the free quota allowance of any [line item](#what-can-i-be-charged-for) in a given billing cycle.
 If you exceed the free quota allowance of a line item, and the Spend Cap is **"off"**, then you will be billed for any additional usage on that line item.
 
 ## What additional usage can I be charged for?
@@ -34,7 +34,7 @@ This will show you how much you have spent so far in the current billing cycle, 
 To set up a Spend Cap in your project, navigate to the [Subscription section](https://app.supabase.com/project/_/settings/billing/subscription) of your project.
 From there, you can click on "Change subscription" to select the plan you want to use and, at the same time, turn on or off the Spend Cap.
 
-## What happens when the Spend Cap is on
+## What happens when the Spend Cap is on?
 
 Once you use all your free quota allowance for a [line item](#what-can-i-be-charged-for), your project will not allow any further usage on that line item until the next billing cycle begins.
 
@@ -42,11 +42,11 @@ This can help you to avoid unexpected costs and manage your expenses more effect
 
 ## What happens when Spend Cap is off?
 
-Once you use all the free quota allowance for a [line item](#what-can-i-be-charged-for), your project will continually be able to make further usage.
+Your project will continue to operate after using all the free quota allowance for each [line item](#what-can-i-be-charged-for).
 This additional usage will be charged based on the line item's cost per unit outlined on the [pricing page](/pricing).
 
 <Admonition type="note">
-  It is advised, when your Spend Cap is **off**, to monitor your usage and costs using the [Usage
+  When your Spend Cap is **off**, we recommend monitoring your consumption and costs using the [Usage
   section of your project](https://app.supabase.com/project/_/settings/billing/usage) in the
   dashboard.
 </Admonition>
