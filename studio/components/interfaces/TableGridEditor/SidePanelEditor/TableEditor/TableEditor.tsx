@@ -80,7 +80,7 @@ const TableEditor: FC<Props> = ({
     connectionString: project?.connectionString,
     schema: table?.schema,
   })
-  const foreignKeyMeta = data?.result ?? []
+  const foreignKeyMeta = data || []
 
   useEffect(() => {
     if (visible) {
