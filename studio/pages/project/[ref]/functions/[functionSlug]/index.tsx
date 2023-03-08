@@ -6,13 +6,14 @@ import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams } from 'hooks'
-import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 import { ChartIntervals, NextPageWithLayout } from 'types'
 import { DATE_FORMAT } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 import NoPermission from 'components/ui/NoPermission'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -49,11 +50,13 @@ function calculateHighlightedValue(array: any, attribute: string, options?: { su
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef, id } = useParams()
+  const { ref: projectRef, functionSlug } = useParams()
 
   const [interval, setInterval] = useState<string>('15min')
-
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
+
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const id = selectedFunction?.id
 
   const { data, error } = useFunctionsInvStatsQuery({
     projectRef,
@@ -86,7 +89,7 @@ const PageLayout: NextPageWithLayout = () => {
     }
   }
 
-  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, id as string)
+  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
   if (!canReadFunction) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
