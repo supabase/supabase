@@ -13,8 +13,9 @@
     "config": "*",
     "next": "^12.1.0",
     "next-transpile-modules": "^10.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "react-use-id-hook": "^1.0.1",
     "ui": "*"
   },
   "devDependencies": {

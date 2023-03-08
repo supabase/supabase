@@ -1,45 +1,7 @@
-// import React from 'react'
-// import { Command } from 'cmdk'
-
-// const CommandMenu = () => {
-//   const [open, setOpen] = React.useState(false)
-
-//   // Toggle the menu when ⌘K is pressed
-//   React.useEffect(() => {
-//     const down = (e) => {
-//       if (e.key === 'k' && e.metaKey) {
-//         setOpen((open) => !open)
-//       }
-//     }
-
-//     document.addEventListener('keydown', down)
-//     return () => document.removeEventListener('keydown', down)
-//   }, [])
-
-//   return (
-//     <Command.Dialog open={open} onOpenChange={setOpen} label="Global Command Menu">
-//       <Command.Input />
-//       <Command.List>
-//         <Command.Empty>No results found.</Command.Empty>
-
-//         <Command.Group heading="Letters">
-//           <Command.Item>a</Command.Item>
-//           <Command.Item>b</Command.Item>
-//           <Command.Separator />
-//           <Command.Item>c</Command.Item>
-//         </Command.Group>
-
-//         <Command.Item>Apple</Command.Item>
-//       </Command.List>
-//     </Command.Dialog>
-//   )
-// }
-
-// export { CommandMenu }
 import React from 'react'
 
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
-import { useCommandState } from 'cmdk'
+import { useCommandState } from 'cmdk-supabase'
 import {
   CommandDialog,
   CommandEmpty,
@@ -56,7 +18,7 @@ import { IconBook } from '../Icon/icons/IconBook'
 import { IconInbox } from '../Icon/icons/IconInbox'
 import { Input } from '../Input'
 import { AiCommand } from './AiCommand'
-import { SearchProvider } from './SearchProvider'
+// import { SearchProvider } from './SearchProvider'
 
 const SubItem = (props) => {
   const search = useCommandState((state) => state.search)
@@ -87,8 +49,49 @@ function CommandMenu() {
     if (!keepSearch) setSearch('')
   }
 
+  const AiIcon = () => (
+    // <svg
+    //   xmlns="http://www.w3.org/2000/svg"
+    //   fill="none"
+    //   viewBox="0 0 24 24"
+    //   stroke-width="1.5"
+    //   stroke="currentColor"
+    //   className="w-6 h-6 mr-2 text-brand-900"
+    // >
+    //   <path
+    //     stroke-linecap="round"
+    //     stroke-linejoin="round"
+    //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+    //   />
+    // </svg>
+    <div
+      className="w-7 h-7 mr-2 
+                    
+                    bg-gradient-to-r from-purple-900 to-pink-900
+                    
+                    rounded-lg border border-pink-400 flex items-center justify-center
+                    shadow-sm
+                    "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        className="w-2 h-2 text-white"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+        />
+      </svg>
+    </div>
+  )
+
   const AiItem = () => (
-    <CommandItem onSelect={() => handleSetPages([...pages, 'ai'], true)}>
+    <CommandItem onSelect={() => handleSetPages([...pages, 'Ask anything'], true)}>
       {/* <IconCloudDrizzle strokeWidth={2} className="text-brand-900 mr-2 h-4 w-4" /> */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -124,18 +127,28 @@ function CommandMenu() {
         onOpenChange={setOpen}
         onCancel={() => setOpen(!open)}
         size={'xlarge'}
+        className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
         onKeyDown={(e) => {
           // Escape goes to previous page
           // Backspace goes to previous page when search is empty
-          if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
+          if (
+            e.key === 'Escape'
+            // || (e.key === 'Backspace' && !search)
+          ) {
             e.preventDefault()
             if (!page) setOpen(false)
             setPages((pages) => pages.slice(0, -1))
           }
         }}
       >
+        <div className="flex w-full gap-3 px-4 pt-2 justify-items-start flex-row">
+          {pages.length > 0 && <CommandShortcut>{'Home'}</CommandShortcut>}
+          {pages.map((page) => (
+            <CommandShortcut>{page}</CommandShortcut>
+          ))}
+        </div>
         {/* <CommandShortcut>Docs</CommandShortcut> */}
-        {page !== 'ai' && (
+        {page !== 'Ask anything' && (
           <CommandInput
             placeholder="Type a command or search..."
             value={search}
@@ -148,26 +161,28 @@ function CommandMenu() {
           <SubItem>Change theme to light</SubItem>
         </CommandList> */}
 
-        <CommandList className={['my-2', page !== 'ai' && 'max-h-[300px]'].join(' ')}>
-          {page !== 'ai' && <CommandEmpty>No results found.</CommandEmpty>}
+        <CommandList className={['my-2', page !== 'Ask anything' && 'max-h-[300px]'].join(' ')}>
           {!page && (
             <>
-              {search && (
-                <>
-                  <CommandGroup>
-                    <AiItem />
-                  </CommandGroup>
-                  <div className="h-px w-full bg-scale-500 mb-3"></div>
-                </>
-              )}
-              {/* <CommandSeparator>hello</CommandSeparator> */}
-              <CommandGroup heading="Suggestions">
-                <CommandItem>
+              <CommandGroup heading="Suggestions" forceMount>
+                <CommandItem
+                  onSelect={() => handleSetPages([...pages, 'Supabase AI'], false)}
+                  forceMount
+                >
+                  <AiIcon />
+                  <span>
+                    Ask Supabase AI...
+                    <span className="text-scale-1200 font-semibold">{search}</span>
+                  </span>
+                </CommandItem>
+                <CommandItem forceMount>
                   <IconInbox className="text-scale-900 mr-2 h-4 w-4" />
                   <span>See what's new</span>
                 </CommandItem>
-                <CommandItem onSelect={() => handleSetPages([...pages, 'docs-search'], true)}>
-                  {/* <IconCloudDrizzle strokeWidth={2} className="text-brand-900 mr-2 h-4 w-4" /> */}
+                <CommandItem
+                  onSelect={() => handleSetPages([...pages, 'docs-search'], true)}
+                  forceMount
+                >
                   <IconBook className="mr-2" />
 
                   <span>
@@ -176,9 +191,13 @@ function CommandMenu() {
                   </span>
                 </CommandItem>
               </CommandGroup>
-              <CommandSeparator />
+              <CommandGroup heading="General">
+                <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
+                  Change theme
+                </CommandItem>
+                <CommandItem>Copy current page URL</CommandItem>
+              </CommandGroup>
               <CommandGroup heading="Settings">
-                {!search && <AiItem />}
                 <CommandItem onSelect={() => handleSetPages([...pages, 'api-keys'], true)}>
                   <CreditCard className="text-scale-900 mr-2 h-4 w-4" />
                   <span>API keys</span>
@@ -242,7 +261,7 @@ function CommandMenu() {
               </CommandGroup>
             </>
           )}
-          {page === 'ai' && (
+          {page === 'Ask anything' && (
             <>
               <div className="min-h-[300px] flex flex-col">
                 <div className="">
@@ -251,8 +270,8 @@ function CommandMenu() {
                 <div className="grow">
                   <div className="mx-3">Something</div>
                 </div>
-                <div className="mx-3">
-                  <SearchProvider />
+                <div className="">
+                  <AiCommand />
                 </div>
 
                 {/* <div className="bg-scale-100 rounded mx-3">
@@ -311,6 +330,44 @@ function CommandMenu() {
               </CommandGroup>
             </>
           )}
+
+          {page === 'Supabase AI' && (
+            <>
+              <CommandGroup>
+                <CommandItem onSelect={() => handleSetPages([...pages, 'Ask anything'], true)}>
+                  <AiIcon />
+                  Ask Supabase AI anything...
+                </CommandItem>
+                <CommandItem>
+                  {' '}
+                  <AiIcon />
+                  Help me make an RLS policy
+                </CommandItem>
+                <CommandItem>
+                  {' '}
+                  <AiIcon />
+                  Help me make an Postgres function
+                </CommandItem>
+                <CommandItem>
+                  {' '}
+                  <AiIcon />
+                  Help me make an Postgres trigger
+                </CommandItem>
+                <CommandItem>
+                  {' '}
+                  <AiIcon />
+                  Help me make a table
+                </CommandItem>
+              </CommandGroup>
+            </>
+          )}
+          {page === 'Theme' && (
+            <CommandGroup>
+              <CommandItem>Change Theme to dark</CommandItem>
+              <CommandItem>Change Theme to light</CommandItem>
+            </CommandGroup>
+          )}
+          {page !== 'Ask anything' && <CommandEmpty>No results found.</CommandEmpty>}
         </CommandList>
       </CommandDialog>
       {/* <AiCommand /> */}

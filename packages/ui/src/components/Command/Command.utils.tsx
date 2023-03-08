@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { DialogProps } from '@radix-ui/react-dialog'
-import { Command as CommandPrimitive, useCommandState } from 'cmdk'
+import { Command as CommandPrimitive, useCommandState } from 'cmdk-supabase'
 
 import { cn } from './../../utils/cn'
 import { Dialog, DialogContent } from './../Dialog'
@@ -49,14 +49,16 @@ const CommandInput = React.forwardRef<
     className="flex items-center border-b border-b-scale-500 px-4 dark:border-b-scale-500"
     cmdk-input-wrapper=""
   >
-    <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" />
+    {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
     <CommandPrimitive.Input
       value={value}
       autoFocus
       onValueChange={onValueChange}
       ref={ref}
       className={cn(
-        'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+        'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none',
+        'px-0 focus-visible:none focus:ring-none border-none',
+        'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
         className
       )}
       {...props}
@@ -98,6 +100,7 @@ const CommandGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
+    forceMount={props.forceMount}
     className={cn(
       'overflow-hidden py-3 px-2 text-scale-700 dark:text-scale-800 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-scale-900 [&_[cmdk-group-heading]]:dark:text-sca-300',
       className
@@ -132,6 +135,7 @@ const CommandItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
+    forceMount={props.forceMount}
     className={cn(
       'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
       className
@@ -159,10 +163,7 @@ CommandItem.displayName = CommandPrimitive.Item.displayName
 const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span
-      className={cn(
-        'bg-scale-500 px-1.5 py-0.5 rounded ml-auto text-xs tracking-widest text-scale-900',
-        className
-      )}
+      className={cn('bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900', className)}
       {...props}
     />
   )
