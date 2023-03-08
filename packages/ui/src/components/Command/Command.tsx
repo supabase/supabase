@@ -20,7 +20,7 @@ import { Input } from '../Input'
 import { AiCommand } from './AiCommand'
 // import { SearchProvider } from './SearchProvider'
 
-const SubItem = (props) => {
+const SubItem = (props: any) => {
   const search = useCommandState((state) => state.search)
   if (!search) return null
   return <CommandItem {...props} />
@@ -44,7 +44,7 @@ function CommandMenu() {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
-  function handleSetPages(pages, keepSearch) {
+  function handleSetPages(pages: any, keepSearch: any) {
     setPages(pages)
     if (!keepSearch) setSearch('')
   }
@@ -128,6 +128,7 @@ function CommandMenu() {
         onCancel={() => setOpen(!open)}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
+        // @ts-expect-error
         onKeyDown={(e) => {
           // Escape goes to previous page
           // Backspace goes to previous page when search is empty

@@ -3,6 +3,7 @@ import type { CreateCompletionResponse } from 'openai'
 import { FC, useCallback, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+// @ts-ignore
 import { SSE } from 'sse.js'
 // import clippyImageDark from '../../public/img/clippy-dark.png'
 // import clippyImage from '../../public/img/clippy.png'
@@ -24,7 +25,7 @@ import {
 } from 'ui'
 // import components from '~/components'
 // import { IS_PLATFORM } from '~/lib/constants'
-import { SearchContextValue, useSearch } from './SearchProvider'
+// import { SearchContextValue } from './SearchProvider'
 import SearchResult, { SearchResultType } from './SearchResult'
 import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
@@ -43,6 +44,7 @@ function getEdgeFunctionUrl() {
 
   //   if (IS_PLATFORM) {
   if (true) {
+    // @ts-ignore
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
     return `${schemeAndProjectId}.functions.${domain}.${tld}`
   } else {
@@ -52,7 +54,15 @@ function getEdgeFunctionUrl() {
 
 const edgeFunctionUrl = getEdgeFunctionUrl()
 
-function promptDataReducer(state, action) {
+function promptDataReducer(
+  state: any[],
+  action: {
+    index?: number
+    answer?: string | undefined
+    status?: string
+    query?: string | undefined
+  }
+) {
   // console.log('running reducer')
   // console.log('what is currently in', ...state)
   console.log('what is the action payload', action)
@@ -80,11 +90,11 @@ function promptDataReducer(state, action) {
   throw Error('Unknown action.')
 }
 
-const AiCommand: FC<SearchContextValue> = () => {
+const AiCommand: FC = () => {
   const { isDarkMode } = useTheme()
   const [query, setQuery] = useState('')
   // const { close, query, setQuery } = useSearch()
-  const [answer, setAnswer] = useState('')
+  const [answer, setAnswer] = useState<string | undefined>('')
   const [results, setResults] = useState<any[]>()
   const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
@@ -176,7 +186,7 @@ const AiCommand: FC<SearchContextValue> = () => {
     }
 
     eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e) => {
+    eventSource.addEventListener('message', (e: any) => {
       try {
         setIsLoading(false)
 
@@ -468,9 +478,9 @@ const AiCommand: FC<SearchContextValue> = () => {
               Sorry, looks like Clippy is having a hard time!
             </p>
             <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
               Try again?
-            </Button>
+            </Button> */}
           </div>
         )}
         <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block">

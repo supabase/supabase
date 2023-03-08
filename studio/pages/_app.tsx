@@ -41,6 +41,7 @@ import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'component
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
+import { CommandMenu } from 'ui'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -131,6 +132,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <PageTelemetry>
               <RouteValidationWrapper>
                 <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                <CommandMenu />
               </RouteValidationWrapper>
             </PageTelemetry>
 

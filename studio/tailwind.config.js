@@ -37,6 +37,8 @@ module.exports = ui({
     './lib/**/*.{js,ts,jsx,tsx}',
     './lib/**/**/*.{js,ts,jsx,tsx}',
     './../packages/ui/src/lib/theme/defaultTheme.ts',
+
+    './../packages/ui/src/components/Command/**/*.{ts,tsx}',
     // purge styles from supabase ui theme
     // './../node_modules/ui/dist/config/default-theme.js',
     // purge styles from grid library

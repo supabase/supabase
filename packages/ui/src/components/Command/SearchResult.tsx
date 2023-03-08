@@ -3,7 +3,7 @@ import React from 'react'
 import Link from 'next/link'
 import { FC } from 'react'
 import { IconBookOpen, IconHash } from '~/../../packages/ui'
-import { useSearch } from './SearchProvider'
+// import { useSearch } from './SearchProvider'
 
 export enum SearchResultType {
   Document = 'document',

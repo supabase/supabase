@@ -20,7 +20,9 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
-interface CommandDialogProps extends ModalProps {}
+interface CommandDialogProps extends ModalProps {
+  onKeyDown: any
+}
 
 const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) => {
   return (
