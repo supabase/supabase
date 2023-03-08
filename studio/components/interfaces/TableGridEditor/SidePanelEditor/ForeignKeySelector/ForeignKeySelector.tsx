@@ -301,7 +301,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                     </ul>
                     <p className="mt-2">
                       Typically, restricting and cascading deletes are the most common options, but
-                      the default behaviour is no action
+                      the default behavior is no action
                     </p>
                   </>
                 }
