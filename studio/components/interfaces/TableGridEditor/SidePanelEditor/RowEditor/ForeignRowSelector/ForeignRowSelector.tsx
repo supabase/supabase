@@ -82,17 +82,17 @@ const ForeignRowSelector = ({
 
   return (
     <SidePanel
+      key="ForeignRowSelector"
       visible={visible}
       size="large"
       header={
         <div>
-          Selecting foreign key from{' '}
-          <code className="text-sm">
+          Selecting a record to reference from{' '}
+          <code className="font-mono text-sm">
             {schemaName}.{tableName}
           </code>
         </div>
       }
-      hideFooter={false}
       onCancel={closePanel}
       customFooter={<ActionBar hideApply backButtonLabel="Close" closePanel={closePanel} />}
     >
