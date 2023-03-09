@@ -8,28 +8,29 @@ import { Member, Role } from 'types'
 import { useStore, useParams } from 'hooks'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 
 interface SelectedMember extends Member {
   oldRoleId: number
   newRoleId: number
 }
 
-interface Props {
+export interface MembersViewProps {
   roles: Role[]
   members: Member[]
   searchString: string
 }
 
-const MembersView: FC<Props> = ({ searchString, roles, members }) => {
+const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const user = ui.profile
+  const { data: profile } = useProfileQuery()
 
   const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
@@ -108,7 +109,7 @@ const MembersView: FC<Props> = ({ searchString, roles, members }) => {
               ...filteredMembers.map((x: Member, i: number) => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
-                const memberIsUser = x.primary_email == user?.primary_email
+                const memberIsUser = x.primary_email == profile?.primary_email
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
