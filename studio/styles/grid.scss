@@ -572,62 +572,6 @@
 }
 
 /*
-  ForeignTableModal
-*/
-
-.foreign-table-modal__content-container {
-  @apply w-full;
-}
-
-/* .foreign-table-modal__content-container__inner {
-@apply px-6;
-} */
-
-.foreign-table-modal__content-container__inner__overflow {
-  @apply w-full overflow-auto;
-}
-
-.foreign-table-modal__filter {
-  @apply mt-2 flex items-center space-x-2;
-}
-
-.foreign-table-modal__filter__trigger-content {
-  @apply space-x-2;
-}
-
-.foreign-table-modal__filter__trigger-content__label {
-  @apply text-typography-body-light dark:text-typography-body-dark;
-}
-
-.foreign-table-modal__filter__trigger-content__name {
-  @apply text-typography-body-strong-light dark:text-typography-body-strong-dark font-bold;
-}
-
-.foreign-table-modal__filter__search-input {
-  @apply flex-grow;
-}
-
-.foreign-table-modal__menu {
-  @apply flex flex-col space-y-2;
-}
-
-.foreign-table-modal__row-item {
-  @apply border-scale-400 dark:border-scale-500 overflow-auto rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
-}
-
-.foreign-table-modal__row-item__inner {
-  @apply flex space-x-4;
-}
-
-.foreign-table-modal__row-item__inner__key-item {
-  @apply flex flex-initial flex-col;
-}
-
-.foreign-table-modal__row-item__inner__key-item__key {
-  @apply font-mono;
-}
-
-/*
   header/filter/FilterDropdown
 */
 
