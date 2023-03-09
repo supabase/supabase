@@ -35,6 +35,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { StoreProvider } from 'components/grid/store'
 
 interface Props {
   /** Theme for the editor */
@@ -82,6 +83,8 @@ const TableGridEditor: FC<Props> = ({
   onExpandJSONEditor = () => {},
   onClosePanel = () => {},
 }) => {
+  console.log('TableGridEditor:selectedTable', selectedTable?.name)
+
   const { project } = useProjectContext()
   const { meta, ui, vault } = useStore()
   const router = useRouter()
@@ -298,9 +301,7 @@ const TableGridEditor: FC<Props> = ({
   const onSelectEditColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    // @ts-ignore
-    const table = tables.find((table) => table.id === Number(tableId))
+    const table = meta.tables.byId(id as string)
     const column = find(table!.columns, { name }) as PostgresColumn
     if (column) {
       onEditColumn(column)
@@ -312,8 +313,7 @@ const TableGridEditor: FC<Props> = ({
   const onSelectDeleteColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    const table = tables.find((table) => table.id === Number(tableId))
+    const table = meta.tables.byId(id as string)
     const column = find(table!.columns, { name }) as PostgresColumn
     onDeleteColumn(column)
   }
@@ -352,7 +352,7 @@ const TableGridEditor: FC<Props> = ({
   }
 
   return (
-    <>
+    <StoreProvider>
       <SupabaseGrid
         key={gridKey}
         ref={gridRef}
@@ -476,7 +476,7 @@ const TableGridEditor: FC<Props> = ({
           </SidePanel.Content>
         </div>
       </SidePanel>
-    </>
+    </StoreProvider>
   )
 }
 

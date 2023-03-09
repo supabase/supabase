@@ -8,7 +8,7 @@ import { DataGridHandle } from '@supabase/react-data-grid'
 import { useUrlState } from 'hooks'
 import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { StoreProvider, useDispatch, useTrackedState } from './store'
+import { useDispatch, useTrackedState } from './store'
 import { Shortcuts } from './components/common'
 import { Grid } from './components/grid'
 import Header from './components/header'
@@ -49,11 +49,9 @@ export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((prop
   }, [monaco, theme])
 
   return (
-    <StoreProvider>
-      <DndProvider backend={HTML5Backend}>
-        <SupabaseGridLayout ref={ref} {..._props} />
-      </DndProvider>
-    </StoreProvider>
+    <DndProvider backend={HTML5Backend}>
+      <SupabaseGridLayout ref={ref} {..._props} />
+    </DndProvider>
   )
 })
 

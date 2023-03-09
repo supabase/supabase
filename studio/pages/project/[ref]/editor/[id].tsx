@@ -14,6 +14,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { StoreProvider } from 'components/grid/store'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()

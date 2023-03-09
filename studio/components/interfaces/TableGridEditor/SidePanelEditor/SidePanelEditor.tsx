@@ -1,10 +1,11 @@
+import md5 from 'blueimp-md5'
 import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { useStore, useUrlState } from 'hooks'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
@@ -21,6 +22,8 @@ import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
 import { JsonEditValue } from './RowEditor/RowEditor.types'
 import { useQueryClient } from '@tanstack/react-query'
 import { sqlKeys } from 'data/sql/keys'
+import { useTrackedState } from 'components/grid/store'
+import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 
 interface Props {
   selectedSchema: string
@@ -67,6 +70,11 @@ const SidePanelEditor: FC<Props> = ({
   const { project } = useProjectContext()
   const { mutateAsync: createTableRow } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation()
+
+  const state = useTrackedState()
+  const [{ sort, filter }] = useUrlState({ arrayKeys: ['sort', 'filter'] })
+  const sorts = formatSortURLParams(sort as string[])
+  const filters = formatFilterURLParams(filter as string[])
 
   const saveRow = async (
     payload: any,
@@ -181,6 +189,22 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
+      if (payload.name) {
+        // { table: { name: selectedTable?.name, schema: selectedTable?.schema }, ...args }
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            selectedTable?.schema,
+            selectedTable?.name,
+            {
+              table: { name: selectedTable?.name, schema: selectedTable?.schema },
+              sorts,
+              filters,
+              page: state.page,
+              limit: state.rowsPerPage,
+            },
+          ])
+        )
+      }
       await meta.tables.loadById(selectedTable!.id)
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
       onColumnSaved(configuration.isEncrypted)
