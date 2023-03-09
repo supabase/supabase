@@ -175,9 +175,9 @@ Update your `src/routes/+layout.svelte`:
 	import '../styles.css';
 	import { invalidate } from '$app/navigation'
 	import { onMount } from 'svelte'
-	import type { PageData } from './$types'
+	import type { LayoutData } from './$types'
 	
-	export let data: PageData
+	export let data: LayoutData
 
 	$: ({ supabase } = data)
 
@@ -560,7 +560,7 @@ And then we can add the widget to the Account page:
 
 ```svelte title=src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
-<script>
+<script lang="ts">
   // Import the new component
   import Avatar from './Avatar.svelte'
 </script>
