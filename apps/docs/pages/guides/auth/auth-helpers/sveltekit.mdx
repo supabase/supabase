@@ -91,13 +91,12 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 };
 ```
 
-#### Shared Load functions and pages
+### Shared Load functions and pages
 
 To be able to use Supabase in shared load functions and inside pages you need to create a Supabase client in the root layout load:
 
 ```ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation';
 import {
   PUBLIC_SUPABASE_ANON_KEY,
   PUBLIC_SUPABASE_URL
@@ -113,10 +112,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event: { fetch },
-    serverSession: data.session,
-    onAuthStateChange() {
-      invalidate('supabase:auth');
-    }
+    serverSession: data.session
   });
 
   const {
@@ -129,9 +125,40 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data: PageData`.
 
-The usage of `depends` and `invalidate` tells sveltekit that this load function should be executed whenever the session updates to keep the page store in sync.
+The usage of `depends` tells sveltekit that this load function should be executed whenever `invalidate` is called to keep the page store in sync.
 
 `createSupabaseLoadClient` caches the client when running in a browser environment and therefore does not create a new client for every time the load function runs.
+
+### Setting up the event listener on the client side
+
+We need to create an event listener in the root `+layout.svelte` file in order catch supabase events being triggered.
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script>
+  import { invalidate } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
+
+  $: ({ supabase } = data);
+
+  onMount(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      invalidate('supabase:auth');
+    });
+
+    return () => subscription.unsubscribe();
+  });
+</script>
+
+<slot />
+```
+
+The usage of `invalidate` tells sveltekit that the root `+layout.ts` load function should be executed whenever the session updates to keep the page store in sync.
 
 ### Generate types from your database
 
@@ -461,7 +488,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ### Initialize the client [#migration-initialize-client]
 
-In order to use the Supabase library in your client code you will need to setup a shared load function inside the root `+layout.ts` file. 
+In order to use the Supabase library in your client code you will need to setup a shared load function inside the root `+layout.ts` and create a `+layout.svelte` to handle our event listening for Auth events. 
 
 <Tabs
   scrollable
@@ -515,10 +542,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event: { fetch },
-    serverSession: data.session,
-    onAuthStateChange() {
-      invalidate('supabase:auth');
-    }
+    serverSession: data.session
   });
 
   const {
@@ -527,6 +551,31 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
   return { supabase, session };
 };
+```
+
+```svelte title=src/routes/+layout.svelte
+<!-- src/routes/+layout.svelte -->
+<script>
+  import { invalidate } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
+
+  $: ({ supabase } = data);
+
+  onMount(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      invalidate('supabase:auth');
+    });
+
+    return () => subscription.unsubscribe();
+  });
+</script>
+
+<slot />
 ```
 
 </TabPanel>
