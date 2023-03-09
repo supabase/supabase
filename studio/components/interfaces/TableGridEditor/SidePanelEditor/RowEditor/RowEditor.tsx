@@ -201,7 +201,6 @@ const RowEditor = ({
       </form>
 
       <ForeignRowSelector
-        key={`foreign-row-selector-${referenceRow?.name}`}
         visible={isSelectingForeignKey}
         referenceRow={referenceRow}
         onSelect={onSelectForeignRowValue}
