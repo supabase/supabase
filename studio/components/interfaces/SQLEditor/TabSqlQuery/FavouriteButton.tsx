@@ -5,11 +5,12 @@ import { Button, IconHeart } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 
 const FavouriteButton = () => {
   const { ui, content: contentStore } = useStore()
-  const { profile: user } = ui
+  const { data: profile } = useProfileQuery()
 
   const sqlEditorStore: any = useSqlStore()
 
@@ -44,12 +45,15 @@ const FavouriteButton = () => {
        */
       const { query, name, desc } = sqlEditorStore.activeTab || {}
       sqlEditorStore.addToFavorite(id, query, name, desc)
-      Telemetry.sendEvent('sql_editor', 'sql_favourited', name)
+      Telemetry.sendEvent(
+        { category: 'sql_editor', action: 'sql_favourited', label: name },
+        ui.googleAnalyticsProps
+      )
 
       /*
        * reload sql data in store and re-select tab
        */
-      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, profile?.id), false)
       sqlEditorStore.selectTab(id)
 
       setLoading(false)
@@ -82,12 +86,15 @@ const FavouriteButton = () => {
        */
       const { name } = sqlEditorStore.activeTab || {}
       sqlEditorStore.unFavorite(id)
-      Telemetry.sendEvent('sql_editor', 'sql_unfavourited', name)
+      Telemetry.sendEvent(
+        { category: 'sql_editor', action: 'sql_unfavourited', label: name },
+        ui.googleAnalyticsProps
+      )
 
       /*
        * reload sql data in store and re-select tab
        */
-      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, profile?.id), false)
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error: any) {

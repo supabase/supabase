@@ -51,7 +51,7 @@ export const gettingstarted = {
     {
       name: 'Framework Quickstarts',
       items: [
-        { name: 'ReactJS', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
+        { name: 'React', url: '/guides/getting-started/quickstarts/reactjs', items: [] },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs', items: [] },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter', items: [] },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit', items: [] },
@@ -63,7 +63,7 @@ export const gettingstarted = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'Next.js',
+          name: 'NextJS',
           url: '/guides/getting-started/tutorials/with-nextjs',
           items: [],
         },
@@ -308,6 +308,17 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        {
+          name: 'Enterprise SSO',
+          url: '/guides/auth/enterprise-sso',
+          items: [
+            {
+              name: 'SAML 2.0 (Beta)',
+              url: '/guides/auth/sso/auth-sso-saml',
+              items: [],
+            },
+          ],
+        },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
@@ -379,8 +390,8 @@ export const database = {
       name: 'Serverless APIs',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/api', items: [] },
-        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+        { name: 'Overview', url: '/guides/database/api', items: [] },
+        { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
       ],
     },
     {
@@ -389,14 +400,54 @@ export const database = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions', items: [] },
         {
+          name: 'HypoPG: Hypothetical indexes',
+          url: '/guides/database/extensions/hypopg',
+          items: [],
+        },
+        {
           name: 'plv8: Javascript Language',
           url: '/guides/database/extensions/plv8',
           items: [],
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http', items: [] },
         {
+          name: 'PGAudit: Postgres Auditing',
+          url: '/guides/database/extensions/pgaudit',
+          items: [],
+        },
+        {
+          name: 'pgjwt: JSON Web Tokens',
+          url: '/guides/database/extensions/pgjwt',
+          items: [],
+        },
+        {
+          name: 'PGroonga: Multilingual Full Text Search',
+          url: '/guides/database/extensions/pgroonga',
+          items: [],
+        },
+        {
+          name: 'pgRouting: Geospatial Routing',
+          url: '/guides/database/extensions/pgrouting',
+          items: [],
+        },
+        {
           name: 'pg_cron: Job Scheduling',
           url: '/guides/database/extensions/pgcron',
+          items: [],
+        },
+        {
+          name: 'pg_graphql: GraphQL Support',
+          url: '/guides/database/extensions/pg_graphql',
+          items: [],
+        },
+        {
+          name: 'pg_hashids: Short UIDs',
+          url: '/guides/database/extensions/pg_hashids',
+          items: [],
+        },
+        {
+          name: 'pg_jsonschema: JSON Schema Validation',
+          url: '/guides/database/extensions/pg_jsonschema',
           items: [],
         },
         {
@@ -405,15 +456,92 @@ export const database = {
           items: [],
         },
         {
+          name: 'pg_plan_filter: Restrict Total Cost',
+          url: '/guides/database/extensions/pg_plan_filter',
+          items: [],
+        },
+        {
+          name: 'pg_stat_monitor: Extended Query Performance Monitoring',
+          url: '/guides/database/extensions/pg_stat_monitor',
+          items: [],
+        },
+        {
+          name: 'pgvector: Embeddings and vector similarity',
+          url: '/guides/database/extensions/pgvector',
+          items: [],
+        },
+        {
+          name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+          url: '/guides/database/extensions/pg_stat_statements',
+          items: [],
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pgrepack',
+          items: [],
+        },
+        {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
           items: [],
         },
+        {
+          name: 'pg-safeupdate: Required Where Clauses',
+          url: '/guides/database/extensions/pg-safeupdate',
+          items: [],
+        },
+        {
+          name: 'pgsodium: Encryption Features',
+          url: '/guides/database/extensions/pgsodium',
+          items: [],
+        },
         { name: 'pgTAP: Unit Testing', url: '/guides/database/extensions/pgtap', items: [] },
+        {
+          name: 'plpgsql_check: PL/pgSQL Linter',
+          url: '/guides/database/extensions/plpgsql_check',
+          items: [],
+        },
+        {
+          name: 'timescaledb: Time-series data',
+          url: '/guides/database/extensions/timescaledb',
+          items: [],
+        },
         {
           name: 'uuid-ossp: Unique Identifiers',
           url: '/guides/database/extensions/uuid-ossp',
           items: [],
+        },
+        {
+          name: 'RUM: inverted index for full-text search',
+          url: '/guides/database/extensions/rum',
+          items: [],
+        },
+        {
+          name: 'wrappers: 3rd Party Integrations',
+          url: '/guides/database/extensions/wrappers',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Postgres resources',
+      url: undefined,
+      items: [
+        {
+          name: 'Managing Indexes',
+          url: '/guides/database/postgres/indexes',
+        },
+        {
+          name: 'Drop All Tables in Schema',
+          url: '/guides/database/postgres/dropping-all-tables-in-schema',
+        },
+        {
+          name: 'Select First Row per Group',
+          url: '/guides/database/postgres/first-row-in-group',
+        },
+        {
+          name: 'Print PostgreSQL Version',
+          url: '/guides/database/postgres/which-version-of-postgres',
         },
       ],
     },
@@ -458,11 +586,14 @@ export const functions = {
           url: '/guides/functions/examples/connect-to-postgres',
           items: [],
         },
+        { name: 'Discord Bot', url: '/guides/functions/examples/discord-bot', items: [] },
         { name: 'GitHub Actions', url: '/guides/functions/examples/github-actions', items: [] },
         { name: 'OG Image', url: '/guides/functions/examples/og-image', items: [] },
+        { name: 'OpenAI', url: '/guides/functions/examples/openai', items: [] },
         { name: 'Storage Caching', url: '/guides/functions/examples/storage-caching', items: [] },
         { name: 'Stripe Webhooks', url: '/guides/functions/examples/stripe-webhooks', items: [] },
         { name: 'Telegram Bot', url: '/guides/functions/examples/telegram-bot', items: [] },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis', items: [] },
       ],
     },
   ],
@@ -479,6 +610,8 @@ export const realtime = {
       name: 'Channels',
       url: undefined,
       items: [
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
@@ -537,7 +670,7 @@ export const platform = {
       url: undefined,
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control', items: [] },
-        { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'Database Size', url: '/guides/platform/database-size', items: [] },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
@@ -549,6 +682,7 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
     },
     {
@@ -593,8 +727,7 @@ export const resources = {
   label: 'Resources',
   url: '/guides/resources',
   items: [
-    // removing until the examples page is reworked
-    // { name: 'Examples', url: '/guides/resources/examples', items: [] },
+    { name: 'Examples', url: '/guides/resources/examples', items: [] },
     { name: 'Glossary', url: '/guides/resources/glossary', items: [] },
     {
       name: 'Migrate to Supabase',
@@ -618,6 +751,11 @@ export const resources = {
         {
           name: 'Heroku',
           url: '/guides/resources/migrating-to-supabase/heroku',
+          items: [],
+        },
+        {
+          name: 'Render',
+          url: '/guides/resources/migrating-to-supabase/render',
           items: [],
         },
       ],
@@ -664,6 +802,7 @@ export const migrate = {
     { name: 'Firestore Data', url: '/guides/migrations/firestore-data', items: [] },
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
     { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
+    { name: 'Render', url: '/guides/migrations/render', items: [] },
   ],
 }
 
@@ -699,6 +838,7 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Estuary', url: '/guides/integrations/estuary', items: [] },
+        { name: 'OpenAI', url: '/guides/functions/examples/openai', items: [] },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard', items: [] },
         { name: 'Prisma', url: '/guides/integrations/prisma', items: [] },
         { name: 'Sequin', url: '/guides/integrations/sequin', items: [] },
@@ -763,7 +903,7 @@ export const reference = {
           url: '/reference/python/start',
           level: 'reference_python',
           items: [],
-          icon: 'docs/img/icons/javascript.svg',
+          icon: '/img/icons/menu/reference-python',
         },
         // {
         //   name: 'supabase-python',
@@ -796,14 +936,14 @@ export const reference = {
 
 export const reference_javascript_v1 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
 
 export const reference_javascript_v2 = {
   icon: 'reference-javascript',
-  title: 'javascript',
+  title: 'JavaScript',
   url: '/guides/reference/javascript',
   parent: '/reference',
 }
@@ -824,7 +964,7 @@ export const reference_dart_v1 = {
 
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
-  title: 'c#',
+  title: 'C#',
   url: 'guides/reference/csharp',
   parent: '/reference',
 }

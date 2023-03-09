@@ -12,9 +12,9 @@
 - [x] Banco de dados hospedado de Postgres. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autenticação e Autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs auto-geradas.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funções.
   - [x] Funções do Banco de Dados [Docs]https://supabase.com/docs/guides/database/functions)
   - [x] Funções de borda [Docs](https://supabase.com/docs/guides/functions)
@@ -153,6 +153,15 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
+  </tr>
+  <tr>
+    <td>PHP</td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/postgrest-php" target="_blank" rel="noopener noreferrer">postgrest-php</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-php" target="_blank" rel="noopener noreferrer">gotrue-php</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-php" target="_blank" rel="noopener noreferrer">storage-php</a></td>
+    <td>-</td>
   </tr>
   <tr>
     <td>Python</td>

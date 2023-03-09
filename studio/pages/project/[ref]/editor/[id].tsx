@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -12,11 +11,13 @@ import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { SchemaView } from 'types'
+import { NextPageWithLayout, SchemaView } from 'types'
+import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 
-const TableEditorPage: NextPage = () => {
+const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { id } = useParams()
+  const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { meta, ui } = useStore()
@@ -29,12 +30,12 @@ const TableEditorPage: NextPage = () => {
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
-  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table'>()
+  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table' | 'json'>()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
+  const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
 
-  const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
   const views: SchemaView[] = meta.views.list()
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
@@ -103,6 +104,11 @@ const TableEditorPage: NextPage = () => {
     setSidePanelKey('table')
     setIsDuplicating(true)
     setSelectedTableToEdit(table)
+  }
+
+  const onExpandJSONEditor = (column: string, row: any) => {
+    setSidePanelKey('json')
+    setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
   }
 
   const onClosePanel = () => {
@@ -204,11 +210,13 @@ const TableEditorPage: NextPage = () => {
         selectedRowToEdit={selectedRowToEdit}
         selectedColumnToEdit={selectedColumnToEdit}
         selectedTableToEdit={selectedTableToEdit}
+        selectedValueForJsonEdit={selectedValueForJsonEdit}
         onAddRow={onAddRow}
         onEditRow={onEditRow}
         onAddColumn={onAddColumn}
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
+        onExpandJSONEditor={onExpandJSONEditor}
         onClosePanel={onClosePanel}
         theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />
@@ -311,5 +319,9 @@ const TableEditorPage: NextPage = () => {
     </TableEditorLayout>
   )
 }
+
+TableEditorPage.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
+)
 
 export default withAuth(observer(TableEditorPage))

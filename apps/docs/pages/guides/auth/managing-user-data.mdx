@@ -38,6 +38,12 @@ Primary keys are **guaranteed not to change**. Columns, indices, constraints or 
 
 You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do considering making use of a Row Level Security policy as described below.
 
+<Admonition type="caution">
+You cannot delete a user if they are the owner of any objects in Supabase Storage.
+
+You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
+</Admonition>
+
 ## Public access
 
 Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies.
@@ -86,6 +92,32 @@ const { data: profile } = await supabase
 If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security.
 
 Make sure you _NEVER_ expose this publicly. But it can be used on the server-side to fetch all of the profiles.
+
+## Accessing User Metadata
+
+You can assign metadata to users on sign up:
+
+```js
+const { data, error } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+  options: {
+    data: {
+      first_name: 'John',
+      age: 27,
+    },
+  },
+})
+```
+
+User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+let metadata = user.user_metadata
+```
 
 ## Advanced techniques
 

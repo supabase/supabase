@@ -238,7 +238,7 @@ function RealtimePage() {
               </p>,
             ]}
             // [TODO] Point to the correct docs URL
-            documentation_link={'/docs/guides/realtime#broadcast'}
+            documentation_link={'/docs/guides/realtime/broadcast'}
           />
         </SectionContainer>
 

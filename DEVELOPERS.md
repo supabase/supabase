@@ -57,7 +57,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 [Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
-1. Install the dependences in the root of the repo.
+1. Install the dependencies in the root of the repo.
 
    ```sh
    npm install # install dependencies
@@ -113,7 +113,7 @@ Following the changes to the [Supabase docs](https://supabase.com/blog/new-supab
 
 - Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
 
-Now when you run a local devlopment docs server you will see the new docs site.
+Now when you run a local development docs server you will see the new docs site.
 
 ---
 
