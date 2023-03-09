@@ -128,9 +128,7 @@ const RowEditor = ({
       onCancel={closePanel}
       onInteractOutside={(event) => {
         const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) {
-          event.preventDefault()
-        }
+        if (isToast) event.preventDefault()
       }}
     >
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
@@ -190,17 +188,6 @@ const RowEditor = ({
                 setSelectedValueForJsonEdit(undefined)
               }}
             />
-
-            <ForeignRowSelector
-              key={`foreign-row-selector-${referenceRow?.name}`}
-              visible={isSelectingForeignKey}
-              referenceRow={referenceRow}
-              onSelect={onSelectForeignRowValue}
-              closePanel={() => {
-                setIsSelectingForeignKey(false)
-                setReferenceRow(undefined)
-              }}
-            />
           </div>
           <div className="flex-shrink">
             <ActionBar
@@ -212,6 +199,17 @@ const RowEditor = ({
           </div>
         </div>
       </form>
+
+      <ForeignRowSelector
+        key={`foreign-row-selector-${referenceRow?.name}`}
+        visible={isSelectingForeignKey}
+        referenceRow={referenceRow}
+        onSelect={onSelectForeignRowValue}
+        closePanel={() => {
+          setIsSelectingForeignKey(false)
+          setReferenceRow(undefined)
+        }}
+      />
     </SidePanel>
   )
 }
