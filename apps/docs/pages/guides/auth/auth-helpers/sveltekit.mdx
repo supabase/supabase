@@ -135,12 +135,12 @@ We need to create an event listener in the root `+layout.svelte` file in order c
 
 ```svelte
 <!-- src/routes/+layout.svelte -->
-<script>
+<script lang="ts">
   import { invalidate } from '$app/navigation';
   import { onMount } from 'svelte';
-  import type { PageData } from './$types';
+  import type { LayoutData } from './$types';
 
-  export let data: PageData;
+  export let data: LayoutData;
 
   $: ({ supabase } = data);
 
@@ -210,7 +210,7 @@ You can now determine if a user is authenticated on the client-side by checking 
 For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```html
-<script>
+<script lang="ts">
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -500,7 +500,7 @@ In order to use the Supabase library in your client code you will need to setup 
 
 ```html title=src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
-<script>
+<script lang="ts">
   import { supabaseClient } from '$lib/db'
   import { invalidate } from '$app/navigation'
   import { onMount } from 'svelte'
@@ -555,12 +555,12 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 ```svelte title=src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
-<script>
+<script lang="ts">
   import { invalidate } from '$app/navigation';
   import { onMount } from 'svelte';
-  import type { PageData } from './$types';
+  import type { LayoutData } from './$types';
 
-  export let data: PageData;
+  export let data: LayoutData;
 
   $: ({ supabase } = data);
 
@@ -655,7 +655,7 @@ declare global {
 
 ```html title=src/routes/profile/+page.svelte
 <!-- src/routes/profile/+page.svelte -->
-<script>
+<script lang="ts">
   /** @type {import('./$types').PageData} */
   export let data
   $: ({ user, tableData } = data)
