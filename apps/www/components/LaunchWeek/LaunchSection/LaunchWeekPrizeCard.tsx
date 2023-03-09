@@ -5,17 +5,19 @@ import { motion } from 'framer-motion'
 type animateFromType = 'left' | 'right' | 'up' | 'down' | 'opacityOnly'
 
 export default function LaunchWeekPrizeCard({
-  imageUrl,
+  imageUrl = '',
   imageWrapperClassName,
   content,
   className,
   animateFrom,
+  imgObjectPosition = 'center',
 }: {
   imageUrl: string
   imageWrapperClassName?: string
   content: any
   className?: string
   animateFrom?: animateFromType
+  imgObjectPosition?: string
 }) {
   const finalState = { x: 0, y: 0, opacity: 1 }
 
@@ -52,7 +54,12 @@ export default function LaunchWeekPrizeCard({
             imageWrapperClassName && imageWrapperClassName,
           ].join(' ')}
         >
-          <Image src={imageUrl ?? ''} layout="fill" objectFit="cover" />
+          <Image
+            src={imageUrl}
+            layout="fill"
+            objectFit="cover"
+            objectPosition={imgObjectPosition}
+          />
         </div>
         <div className="p-4">{content && content}</div>
       </div>
