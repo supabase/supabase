@@ -28,12 +28,9 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
     case FOREIGN_KEY_DELETION_ACTION.RESTRICT:
       return (
         <>
-          <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
-          <code className="text-xs text-scale-1100">{reference}</code> will{' '}
-          <span className="text-amber-900 opacity-75">prevent deletion</span> of existing
-          referencing rows from this table.
+          <span className="text-scale-1100">{actionName}</span>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="translate-y-[2px] ml-1">
+            <Tooltip.Trigger className="translate-y-[3px] mx-1">
               <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom">
@@ -51,6 +48,9 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
               </div>
             </Tooltip.Content>
           </Tooltip.Root>
+          : Deleting a record from <code className="text-xs text-scale-1100">{reference}</code> will{' '}
+          <span className="text-amber-900 opacity-75">prevent deletion</span> of existing
+          referencing rows from this table.
         </>
       )
     case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
