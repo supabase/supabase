@@ -74,7 +74,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                       width={16}
                       height={16}
                     />
-                    Mechanical Keyboard <LabelBadge text="3 pieces" />
+                    Mechanical Keyboard <LabelBadge text="3 keyboards" />
                   </h4>
                   <p className="text-[#707070] mt-1">
                     Increase your chances of winning limited edition 62-Key ISO Custom Mechanical
@@ -88,20 +88,21 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <LaunchWeekPrizeCard
                   imageUrl="/images/launchweek/seven/tshirt.jpg"
-                  imageWrapperClassName="h-[40vw] md:h-[30vw] lg:max-h-[175px] lg:h-auto"
+                  imageWrapperClassName="h-[40vw] md:h-[30vw] lg:h-auto"
+                  imgObjectPosition="right"
                   content={
                     <h3 className="text-sm flex items-center gap-4">
-                      Supa T-shirt <LabelBadge text="10 shirts" />
+                      Supabase T-shirt <LabelBadge text="25 shirts" />
                     </h3>
                   }
                   animateFrom="up"
                 />
                 <LaunchWeekPrizeCard
                   imageUrl="/images/launchweek/seven/socks.jpg"
-                  imageWrapperClassName="h-[40vw] md:h-[30vw] lg:max-h-[175px] lg:h-auto"
+                  imageWrapperClassName="h-[40vw] md:h-[30vw] lg:h-auto"
                   content={
                     <h3 className="text-sm flex items-center gap-4">
-                      Supa Socks <LabelBadge text="5 pairs" />
+                      Supabase Socks <LabelBadge text="15 pairs" />
                     </h3>
                   }
                   animateFrom="right"
@@ -109,11 +110,11 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               </div>
               <LaunchWeekPrizeCard
                 imageUrl="/images/launchweek/seven/stickers.jpg"
-                imageWrapperClassName="h-[40vw] lg:max-h-[175px] lg:h-auto"
+                imageWrapperClassName="h-[40vw] lg:h-auto"
                 animateFrom="down"
                 content={
                   <h3 className="text-sm flex items-center gap-4">
-                    Launch Week 7 Limited Edition Sticker Pack <LabelBadge text="20 packs" />
+                    Launch Week 7 Limited Edition Sticker Pack <LabelBadge text="25 packs" />
                   </h3>
                 }
               />
