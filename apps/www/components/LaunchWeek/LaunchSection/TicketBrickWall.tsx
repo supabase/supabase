@@ -1,4 +1,5 @@
 import React from 'react'
+import { useMobileViewport } from '../../../hooks/useMobileViewport'
 import { UserData } from '../Ticket/hooks/use-conf-data'
 import { TicketBrickWallRow } from './TicketBrickWallRow'
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function TicketBrickWall({ users }: Props) {
+  const isMobile = useMobileViewport(768)
   return (
     <div className="relative py-36">
       <div className="mx-auto bg-[#1C1C1C]">
@@ -23,8 +25,13 @@ export default function TicketBrickWall({ users }: Props) {
             after:content-[' '] after:absolute after:inset-0 after:left-auto after:w-1/4 after:bg-gradient-to-l after:from-[#1C1C1C] after:to-[#1C1C1C00] after:z-10 after:pointer-events-none
           "
         >
-          <TicketBrickWallRow users={users.slice(0, 5)} />
-          <TicketBrickWallRow users={users.slice(5, 12)} reverse />
+          <TicketBrickWallRow
+            users={users.slice(0, isMobile ? 5 : 7)}
+            xOffset={isMobile ? 50 : 250}
+          />
+          {/* TODO: set the correct amount of users when enough data */}
+          <TicketBrickWallRow users={users.slice(isMobile ? 5 : 3, isMobile ? 11 : 14)} reverse />
+          {isMobile && <TicketBrickWallRow users={users.slice(3, 15)} />}
         </div>
       </div>
     </div>
