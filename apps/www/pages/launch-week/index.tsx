@@ -83,7 +83,7 @@ export default function TicketHome({ users }: Props) {
           url: `${SITE_URL}/tickets`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/og-image.jpg`, // TODO
+              url: `https://supabase.com/images/launchweek/seven/launch-week-7.jpg`,
             },
           ],
         }}
