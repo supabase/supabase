@@ -1,20 +1,10 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
-import { useWindowSize } from 'react-use'
+import { useMobileViewport } from '../../hooks/useMobileViewport'
 
 export default function LW7BgGraphic() {
   const { scrollYProgress } = useScroll()
-  const [isMobile, setIsMobile] = useState(false)
-  const { width } = useWindowSize()
-
-  useEffect(() => {
-    if (width <= 768) {
-      setIsMobile(true)
-    } else {
-      setIsMobile(false)
-    }
-  }, [width])
+  const isMobile = useMobileViewport(768)
 
   const graphicsScale = useTransform(
     scrollYProgress,
