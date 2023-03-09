@@ -33,15 +33,16 @@ const columnRender = (name: string, isPrimaryKey = false) => {
         </Tooltip.Root>
       )}
 
-      <span className="font-mono">{name}</span>
+      <span className="sb-grid-column-header__inner__name">{name}</span>
     </div>
   )
 }
 
 const formatter = (column: string, row: any) => {
+  const formattedValue = typeof row[column] === 'object' ? JSON.stringify(row[column]) : row[column]
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
-      <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
+      <span className="text-sm truncate">{formattedValue}</span>
     </div>
   )
 }
