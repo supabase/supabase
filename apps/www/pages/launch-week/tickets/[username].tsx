@@ -15,6 +15,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
+import CTABanner from '../../../components/CTABanner'
 
 interface Props {
   user: UserData
@@ -46,8 +47,10 @@ export default function TicketShare({ user, users }: Props) {
   )}${golden ? '&golden=true' : ''}`
 
   useEffect(() => {
-    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
+    document.body.className = isDarkMode ? 'dark bg-[#1C1C1C]' : 'light bg-[#fff]'
   }, [isDarkMode])
+
+  console.log('isDarkMode', isDarkMode)
 
   return (
     <>
@@ -99,6 +102,7 @@ export default function TicketShare({ user, users }: Props) {
           <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
           <TicketBrickWall users={users} />
         </div>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

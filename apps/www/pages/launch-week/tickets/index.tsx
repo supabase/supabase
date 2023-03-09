@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
 import { useTheme } from 'common/Providers'
+import CTABanner from '../../../components/CTABanner'
 
 export default function TicketHome() {
   const { isDarkMode } = useTheme()
@@ -77,7 +78,7 @@ export default function TicketHome() {
               src="/images/launchweek/launchweek-logo--dark.svg"
               className="hidden w-40 dark:flex lg:w-80"
             />
-            <p className="text-scale-1100 text-sm">Dec 12 – 16 at 8 AM PT | 11 AM ET</p>
+            <p className="text-scale-1100 text-sm">Dec 12 - 16 at 8 AM PT | 11 AM ET</p>
           </div>
 
           {supabase && (
@@ -89,6 +90,7 @@ export default function TicketHome() {
             />
           )}
         </SectionContainer>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

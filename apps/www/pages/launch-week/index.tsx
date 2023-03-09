@@ -14,6 +14,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 import LW7BgGraphic from '../../components/LaunchWeek/LW7BgGraphic'
+import CTABanner from '../../components/CTABanner'
 
 interface Props {
   users: UserData[]
@@ -27,13 +28,12 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketHome({ users }: Props) {
-  const { isDarkMode } = useTheme()
-
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const { query, pathname } = useRouter()
-  const isLauchWeekPage = pathname.includes('launch-week')
+  const { isDarkMode } = useTheme()
+  // const isLauchWeekPage = pathname.includes('launch-week')
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
 
@@ -128,6 +128,7 @@ export default function TicketHome({ users }: Props) {
 
           {users && <TicketBrickWall users={users} />}
         </div>
+        <CTABanner />
       </DefaultLayout>
     </>
   )
