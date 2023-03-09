@@ -27,7 +27,7 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export default function TicketShare({ user, users }: Props) {
+export default function UsernamePage({ user, users }: Props) {
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
 
   const [supabase] = useState(() =>
@@ -140,6 +140,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         bg_image_id,
       },
       users,
+      key: username,
     },
     revalidate: 5,
   }
