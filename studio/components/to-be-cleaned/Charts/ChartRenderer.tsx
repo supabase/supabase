@@ -126,6 +126,9 @@ const Header = ({
   )
 }
 
+/**
+ * @deprecated please use studio/components/ui/Charts/BarChart.tsx instead
+ */
 export function BarChart({
   data,
   attribute,

@@ -19,10 +19,11 @@ GRANT SELECT ON "private_schema"."table" TO authenticated;
 ```
 
 <Admonition type="caution">
-
-We strongly encourage you to enable RLS and create policies for tables in private schemas. Otherwise, any role you grant access to will have unfettered read access to the table.
-
+  We strongly encourage you to enable RLS and create policies for tables in private schemas.
+  Otherwise, any role you grant access to will have unfettered read access to the table.
 </Admonition>
+
+## Replication Setup
 
 You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
 
@@ -39,12 +40,16 @@ commit;
 alter publication supabase_realtime add table messages;
 ```
 
+### Full `old` Record
+
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record,
 you can set the `replica identity` of your table to `full`:
 
 ```sql
 alter table messages replica identity full;
 ```
+
+## Schema Changes
 
 To listen to all changes in the `public` schema:
 
@@ -74,6 +79,8 @@ const channel = supabase
   .subscribe()
 ```
 
+## Table Changes
+
 To listen to changes on a table in the `public` schema:
 
 ```js
@@ -93,13 +100,19 @@ const channel = supabase
   .subscribe()
 ```
 
-To listen to changes when a column's value in a table matches a client-specified value:
+## Filter Changes
+
+Realtime offers filters so you can specify the data your client receives at a more granular level.
+
+### eq
+
+To listen to changes when a column's value in a table equals a client-specified value:
 
 ```js
 // Supabase client setup
 
 const channel = supabase
-  .channel('value-db-changes')
+  .channel('changes')
   .on(
     'postgres_changes',
     {
@@ -112,6 +125,168 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+<Admonition type="note">
+  This filter uses Postgres' `=`.
+</Admonition>
+
+### neq
+
+To listen to changes when a column's value in a table does not equal a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=neq.bye',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `!=`.
+</Admonition>
+
+### lt
+
+To listen to changes when a column's value in a table is less than a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'id=lt.100',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `<` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### lte
+
+To listen to changes when a column's value in a table is less than or equal to a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'profiles',
+      filter: 'age=lte.65',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `<=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### gt
+
+To listen to changes when a column's value in a table is greater than a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: 'quantity=gt.10',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `>` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### gte
+
+To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: 'quantity=gte.10',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `>=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+</Admonition>
+
+### in
+
+To listen to changes when a column's value in a table equals any client-specified values:
+
+```js
+// Supabase client setup
+
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'colors',
+      filter: 'name=in.(red, blue, yellow)',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+<Admonition type="note">
+  This filter uses Postgres' `= ANY`. Realtime allows a maximum of 100 values for this filter.
+</Admonition>
+
+## Combination Changes
 
 To listen to different events and schema/tables/filters combinations with the same channel:
 
@@ -130,7 +305,8 @@ const channel = supabase
     },
     (payload) => console.log(payload)
   )
-  .on('postgres_changes',
+  .on(
+    'postgres_changes',
     {
       event: 'INSERT',
       schema: 'public',
@@ -139,6 +315,38 @@ const channel = supabase
     (payload) => console.log(payload)
   )
   .subscribe()
+```
+
+## Custom Tokens
+
+You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
+In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
+
+The `apikey` in `headers` must be either the `anon` or `service_role` token that Supabase signed.
+This will authenticate your request in the API gateway.
+
+<Admonition type="caution">
+  Do not expose the `service_role` token on the client because the role is authorized to bypass
+  row-level security.
+</Admonition>
+
+The `apikey` in `params` can be your custom token signed with the JWT secret of your Supabase project.
+This is forwarded to the Realtime server and it will verify your custom token and use its claims to authorize database changes
+when RLS is enabled.
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
+  realtime: {
+    headers: {
+      apikey: 'supabase-signed-token',
+    },
+    params: {
+      apikey: 'your-custom-token',
+    },
+  },
+})
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

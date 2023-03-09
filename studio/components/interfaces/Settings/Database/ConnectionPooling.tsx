@@ -1,6 +1,6 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
@@ -11,6 +11,8 @@ import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { Input } from 'ui'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {}
 
@@ -32,7 +34,32 @@ const ConnectionPooling: FC<Props> = () => {
     setIsLoading(false)
   }
 
-  if (isLoading) return <Loading />
+  if (isLoading) {
+    return (
+      <Panel
+        title={
+          <h5 key="panel-title" className="mb-0">
+            Connection Pooling
+          </h5>
+        }
+      >
+        <Panel.Content className="space-y-8">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Fragment key={i}>
+              <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
+                <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+              </div>
+              <Divider light />
+            </Fragment>
+          ))}
+
+          <ShimmeringLoader className="h-8 w-full" />
+        </Panel.Content>
+      </Panel>
+    )
+  }
+
   if (poolingConfiguration.error) {
     return (
       <div className="p-4">
@@ -100,6 +127,11 @@ interface ConfigProps {
 export const PgbouncerConfig: FC<ConfigProps> = observer(
   ({ projectRef, bouncerInfo, connectionInfo }) => {
     const { ui } = useStore()
+
+    const canUpdateConnectionPoolingConfiguration = checkPermissions(
+      PermissionAction.UPDATE,
+      'projects'
+    )
 
     const [updates, setUpdates] = useState<any>({
       pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
@@ -172,6 +204,8 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           onChangeModel={(model: any) => setUpdates(model)}
           onSubmit={(model: any) => updateConfig(model)}
           onReset={() => setUpdates(bouncerInfo)}
+          disabled={!canUpdateConnectionPoolingConfiguration}
+          disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
             <ToggleField name="pgbouncer_enabled" />

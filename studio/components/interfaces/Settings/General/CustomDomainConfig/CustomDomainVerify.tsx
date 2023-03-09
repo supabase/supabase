@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Alert, Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
 
 import { useStore } from 'hooks'
-import { ProjectSettingsResponse } from 'data/config/project-settings-query'
+import { ProjectApiResponse } from 'data/config/project-api-query'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
@@ -15,7 +15,7 @@ import InformationBox from 'components/ui/InformationBox'
 export type CustomDomainVerifyProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
-  settings?: ProjectSettingsResponse
+  settings?: ProjectApiResponse
 }
 
 const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
@@ -122,7 +122,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           >
             Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
             <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
-            <code className="text-xs">0 issue "digitcert.com"</code>
+            <code className="text-xs">0 issue "digicert.com"</code>
           </Alert>
         )}
 

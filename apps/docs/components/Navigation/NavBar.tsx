@@ -5,9 +5,9 @@ import { useState, useEffect, FC } from 'react'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
 import { useTheme } from 'common/Providers'
 import { REFERENCES } from './Navigation.constants'
-import { SearchButton } from '../DocSearch'
 
 import { getPageType } from '~/lib/helpers'
+import SearchButton from '../Search/SearchButton'
 
 const NavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()

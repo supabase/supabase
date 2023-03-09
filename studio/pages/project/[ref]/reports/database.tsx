@@ -1,19 +1,23 @@
 import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
-import { IconArrowRight } from 'ui'
+import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
-import { useStore, useProjectUsage } from 'hooks'
+import { useParams, useStore } from 'hooks'
+import {
+  PRICING_TIER_PRODUCT_IDS,
+  TIME_PERIODS_INFRA,
+  USAGE_APPROACHING_THRESHOLD,
+} from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ReportsLayout } from 'components/layouts'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -35,13 +39,12 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default observer(DatabaseReport)
 
 const DatabaseUsage: FC<any> = () => {
-  const router = useRouter()
   const { meta, ui } = useStore()
   const [databaseSize, setDatabaseSize] = useState<any>(0)
   const [dateRange, setDateRange] = useState<any>(undefined)
 
-  const { ref } = router.query
-  const { usage } = useProjectUsage(ref as string)
+  const { ref: projectRef } = useParams()
+  const { data: usage } = useProjectUsageQuery({ projectRef })
 
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
   const databaseEgressLimit = usage?.db_egress?.limit ?? 0
@@ -72,6 +75,10 @@ const DatabaseUsage: FC<any> = () => {
   const egressIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
   const egressIsExceeded = databaseSizeUsageRatio >= 1
 
+  const subscriptionTier = ui.selectedProject?.subscription_tier
+
+  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+
   return (
     <>
       <div>
@@ -95,6 +102,26 @@ const DatabaseUsage: FC<any> = () => {
                   labelTop={databaseSizeLimit > 0 ? formatBytes(databaseSizeLimit) : ''}
                 />
               </div>
+
+              {isPaidTier && (
+                <div className="flex justify-between items-center mt-3">
+                  <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    {usage?.disk_volume_size_gb && (
+                      <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
+                    )}
+                    <Badge>Auto-Scaling</Badge>
+                  </div>
+
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                    <a
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/platform/database-usage"
+                    >
+                      What is disk size?
+                    </a>
+                  </Button>
+                </div>
+              )}
             </Panel.Content>
             <Panel.Content>
               <div className="space-y-1">

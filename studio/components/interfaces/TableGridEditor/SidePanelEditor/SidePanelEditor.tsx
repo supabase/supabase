@@ -5,10 +5,15 @@ import { Modal } from 'ui'
 import type { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditValue } from './RowEditor/RowEditor.types'
 
 interface Props {
   selectedSchema: string
@@ -16,7 +21,8 @@ interface Props {
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
-  sidePanelKey?: 'row' | 'column' | 'table'
+  selectedValueForJsonEdit?: JsonEditValue
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -34,6 +40,7 @@ const SidePanelEditor: FC<Props> = ({
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
   sidePanelKey,
   isDuplicating = false,
   closePanel,
@@ -49,13 +56,19 @@ const SidePanelEditor: FC<Props> = ({
 
   const tables = meta.tables.list()
 
+  const { project } = useProjectContext()
+  const { mutateAsync: createTableRow } = useTableRowCreateMutation()
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation()
+
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
     onComplete: Function
   ) => {
-    if (selectedTable === undefined) return
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
 
     let saveRowError = false
     // @ts-ignore
@@ -66,34 +79,40 @@ const SidePanelEditor: FC<Props> = ({
       .map((column) => column.name)
 
     if (isNewRecord) {
-      const insertQuery = new Query()
-        .from(selectedTable.name, selectedTable.schema)
-        .insert([payload], { returning: true, enumArrayColumns })
-        .toSql()
+      try {
+        const result = await createTableRow({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          payload,
+          enumArrayColumns,
+        })
 
-      const res: any = await meta.query(insertQuery)
-      if (res.error) {
+        onRowCreated(result[0])
+      } catch (error: any) {
         saveRowError = true
-        ui.setNotification({ category: 'error', message: res.error?.message })
-      } else {
-        onRowCreated(res[0])
+        ui.setNotification({ category: 'error', message: error?.message })
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
-          const updateQuery = new Query()
-            .from(selectedTable.name, selectedTable.schema)
-            .update(payload, { returning: true, enumArrayColumns })
-            .match(configuration.identifiers)
-            .toSql()
+          if (selectedTable!.primary_keys.length > 0) {
+            try {
+              const result = await updateTableRow({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table: selectedTable as any,
+                configuration,
+                payload,
+                enumArrayColumns,
+              })
 
-          const res: any = await meta.query(updateQuery)
-          if (res.error) {
-            saveRowError = true
-            ui.setNotification({ category: 'error', message: res.error?.message })
-          } else {
-            onRowUpdated(res[0], configuration.rowIdx)
+              onRowUpdated(result[0], configuration.rowIdx)
+            } catch (error: any) {
+              saveRowError = true
+              ui.setNotification({ category: 'error', message: error?.message })
+            }
           }
         } else {
           saveRowError = true
@@ -111,6 +130,22 @@ const SidePanelEditor: FC<Props> = ({
       setIsEdited(false)
       closePanel()
     }
+  }
+
+  const onSaveJSON = async (value: string | number) => {
+    if (selectedTable === undefined || selectedValueForJsonEdit === undefined) return
+
+    try {
+      const { row, column } = selectedValueForJsonEdit
+      const payload = { [column]: JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error: any) {}
   }
 
   const saveColumn = async (
@@ -286,6 +321,15 @@ const SidePanelEditor: FC<Props> = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+      />
+      <JsonEdit
+        visible={sidePanelKey === 'json'}
+        column={selectedValueForJsonEdit?.column ?? ''}
+        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+        backButtonLabel="Cancel"
+        applyButtonLabel="Save changes"
+        closePanel={onClosePanel}
+        onSaveJSON={onSaveJSON}
       />
       <ConfirmationModal
         visible={isClosingPanel}

@@ -35,7 +35,7 @@ const BackupsList: FC<Props> = ({}) => {
         icon={<IconClock size="large" />}
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
-        secondaryText="Please upgrade to the Pro plan for up to 7 days of scheduled backups."
+        secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
       />
     )
   }

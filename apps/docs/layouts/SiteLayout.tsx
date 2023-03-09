@@ -4,8 +4,6 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import FooterHelpCallout from '~/components/FooterHelpCallout'
-
 import { memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -334,7 +332,6 @@ const SiteLayout = ({ children }) => {
           </div>
           <div className="grow px-5 max-w-7xl mx-auto py-16">
             {children}
-            <FooterHelpCallout />
             <Footer />
           </div>
           <MobileMenuBackdrop />

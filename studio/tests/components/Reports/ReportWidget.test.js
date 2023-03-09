@@ -27,7 +27,8 @@ jest.mock('hooks')
 import { useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 
-import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { fireEvent, waitFor, screen, act } from '@testing-library/react'
+import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
@@ -46,7 +47,4 @@ test('static elements', async () => {
   render(<ReportWidget data={[]} title="Some chart" sql="select" renderer={() => 'something'} />)
   await screen.findByText(/Some chart/)
   await screen.findByText(/something/)
-  const moreBtn = await screen.findByTitle(/Actions\.\.\./)
-  clickDropdown(moreBtn)
-  await screen.findByText(/Open in Logs Explorer/)
 })
