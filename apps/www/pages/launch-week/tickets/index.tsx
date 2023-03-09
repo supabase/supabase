@@ -6,12 +6,9 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
-import { useTheme } from 'common/Providers'
 import CTABanner from '../../../components/CTABanner'
 
 export default function TicketHome() {
-  const { isDarkMode } = useTheme()
-
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
@@ -49,8 +46,8 @@ export default function TicketHome() {
   }, [supabase])
 
   useEffect(() => {
-    document.body.className = isDarkMode ? 'dark bg-[#121212]' : 'light bg-[#fff]'
-  }, [isDarkMode])
+    document.body.className = 'dark bg-[#1C1C1C]'
+  }, [])
 
   return (
     <>

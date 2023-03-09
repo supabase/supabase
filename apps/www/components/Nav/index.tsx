@@ -21,11 +21,12 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 const Nav = () => {
   const { isDarkMode } = useTheme()
   const { pathname } = useRouter()
-  const isLauchWeekPage = pathname.includes('launch-week')
   const [open, setOpen] = useState(false)
-
   const [openProduct, setOpenProduct] = useState(false)
   const [openDevelopers, setOpenDevelopers] = useState(false)
+
+  const isLaunchWeekPage = pathname.includes('launch-week')
+  const showLaunchWeekNavMode = isLaunchWeekPage && !open && !openProduct && !openDevelopers
 
   React.useEffect(() => {
     if (open) {
@@ -104,6 +105,7 @@ const Nav = () => {
 
   type HamburgerButtonProps = {
     toggleFlyOut: Function
+    showLaunchWeekNavMode?: boolean
   }
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
@@ -112,7 +114,10 @@ const Nav = () => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset"
+        className={[
+          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
+        ].join(' ')}
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -122,7 +127,7 @@ const Nav = () => {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor"
+          stroke={showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
           aria-hidden="true"
         >
           <path
@@ -163,7 +168,7 @@ const Nav = () => {
         px-1
         text-sm font-medium
         transition-colors`,
-        // isLauchWeekPage && '!text-white',
+        showLaunchWeekNavMode && '!text-white',
         props.active,
       ].join(' ')}
       onClick={props.onClick}
@@ -179,7 +184,7 @@ const Nav = () => {
           <IconChevronDown
             size={14}
             strokeWidth={2}
-            // className={isLauchWeekPage ? 'text-white' : ''}
+            className={showLaunchWeekNavMode ? 'text-white' : ''}
           />
         </div>
       </>
@@ -191,19 +196,24 @@ const Nav = () => {
       {/* <Announcement /> */}
       <div className="sticky top-0 z-50">
         <div
-          className={`${
-            isLauchWeekPage ? '!opacity-100 dark:bg-scale-200 bg-white' : 'bg-scale-200'
-          } absolute inset-0 h-full w-full opacity-80`}
+          className={[
+            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
+            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+          ].join(' ')}
         />
         <nav
           className={[
-            `border-scale-400 border-b backdrop-blur-sm`,
-            // isLauchWeekPage && 'border-[#be9eea]',
+            `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
+            showLaunchWeekNavMode && '!opacity-100 border-[#be9eea]',
           ].join(' ')}
         >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="relative mx-auto flex h-16 justify-between lg:container lg:px-16 xl:px-20">
-            <HamburgerButton toggleFlyOut={() => setOpen(true)} />
+            <HamburgerButton
+              toggleFlyOut={() => setOpen(true)}
+              showLaunchWeekNavMode={showLaunchWeekNavMode}
+            />
             <div className="flex flex-1 items-center justify-center sm:items-stretch lg:justify-between">
               <div className="flex items-center">
                 <div className="flex flex-shrink-0 items-center">
@@ -211,9 +221,11 @@ const Nav = () => {
                     <a className="block h-6 w-auto">
                       <Image
                         src={
-                          // isLauchWeekPage
-                          //   ? supabaseLogoWordmarkDark
-                          isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight
+                          isLaunchWeekPage
+                            ? supabaseLogoWordmarkDark
+                            : isDarkMode
+                            ? supabaseLogoWordmarkDark
+                            : supabaseLogoWordmarkLight
                         }
                         width={124}
                         height={24}
@@ -239,7 +251,7 @@ const Nav = () => {
                         `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
-                        // isLauchWeekPage && '!text-white',
+                        showLaunchWeekNavMode && '!text-white',
                       ].join(' ')}
                     >
                       Pricing
@@ -251,7 +263,7 @@ const Nav = () => {
                         `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
-                        // isLauchWeekPage && '!text-white',
+                        showLaunchWeekNavMode && '!text-white',
                       ].join(' ')}
                     >
                       Blog
@@ -281,7 +293,7 @@ const Nav = () => {
                           group-focus:w-4
 
                           group-focus:text-yellow-900`,
-                          // isLauchWeekPage && '!text-white',
+                          showLaunchWeekNavMode && '!text-white',
                         ].join(' ')}
                       >
                         <IconStar strokeWidth={2} />
@@ -290,7 +302,7 @@ const Nav = () => {
                   }
                 >
                   <span
-                  // className={isLauchWeekPage ? '!text-white' : ''}
+                  // className={isLaunchWeekPage ? '!text-white' : ''}
                   >
                     Star us on GitHub
                   </span>
@@ -327,7 +339,7 @@ const Nav = () => {
             <div
               className={[
                 'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
-                isLauchWeekPage && '!bg-scale-300',
+                open && '!bg-scale-300',
               ].join(' ')}
             >
               <div className="absolute right-4 top-4 items-center justify-between">

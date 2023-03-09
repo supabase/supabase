@@ -7,8 +7,6 @@ import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
 import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
 import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-import { FastGlobOptionsWithoutCwd } from 'globby'
-import { useTheme } from 'common/Providers'
 import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
@@ -31,7 +29,6 @@ const supabaseAdmin = createClient(
 
 export default function TicketShare({ user, users }: Props) {
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
-  const { isDarkMode } = useTheme()
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -47,10 +44,8 @@ export default function TicketShare({ user, users }: Props) {
   )}${golden ? '&golden=true' : ''}`
 
   useEffect(() => {
-    document.body.className = isDarkMode ? 'dark bg-[#1C1C1C]' : 'light bg-[#fff]'
-  }, [isDarkMode])
-
-  console.log('isDarkMode', isDarkMode)
+    document.body.className = 'dark bg-[#1C1C1C]'
+  }, [])
 
   return (
     <>
