@@ -1,12 +1,13 @@
 ---
 title: Supabase Beta February 2023
-description: WIP
+description: There’s something for everybody this month: AI, Auth, Database, Edge Functions, GraphQL … you name it!
+
 author: ant_wilson
-image: WIP
-thumb: WIP
+image: 2023-03-09-beta-update-february/supabase-beta-update-february-2023.jpg
+thumb: 2023-03-09-beta-update-february/supabase-beta-update-february-2023.jpg
 tags:
   - release-notes
-date: '2023-03-08'
+date: '2023-03-09'
 toc_depth: 3
 ---
 
@@ -14,7 +15,7 @@ There’s something for everybody this month: AI, Auth, Database, Edge Functions
 
 ## GraphiQL editor in the dashboard
 
-IMAGE
+![GraphiQL editor in the dashboard](/images/blog/2023-03-09-beta-update-february/graphiql-dashboard.png)
 
 The most popular GraphQL IDE/API explorer is now built into the dashboard! You can now explore and query your GraphQL API produced by `pg_graphql`.
 
@@ -22,17 +23,17 @@ The most popular GraphQL IDE/API explorer is now built into the dashboard! You c
 
 ## Supabase + OpenAI search
 
+![Supabase + OpenAI search](/images/blog/2023-03-09-beta-update-february/openai-supabase.png)
+
 We've updated our Docs search functionality to use `pgvector` + OpenAI. Still no cease and desist from Microsoft, so you can continue to ask Clippy any Supabase-specific questions 📎💚
 
 ## Made with Supabase
 
 [Ask Clippy.](https://supabase.com/docs)
 
-
-
-
 ## Serve all the functions!
-IMAGE
+
+![Serve all the functions!](/images/blog/2023-03-09-beta-update-february/supabase-cli-edge-functions.png)
 
 Do you use multiple Edge Functions in your project? Then celebrate! Supabase CLI 1.36+ now supports serving multiple Edge Functions at the same time.
 
@@ -41,21 +42,24 @@ To enable the feature, just run supabase functions serve in your project.
 [Check the docs.](https://supabase.com/docs/reference/cli/supabase-functions-serve)
 
 ## Smaller Postgres docker images for everyone
-IMAGE
+
+![Smaller Postgres docker images for everyone](/images/blog/2023-03-09-beta-update-february/postgres-docker-images.png)
 
 We rewrote the Postgres Dockerfile with multi-stage builds so that each extension is compiled in its own separate stage. This reduces the size of the image from 1.3GB to 250MB, enabling a much faster boot time.
 
 [See it yourself](https://hub.docker.com/r/supabase/postgres/tags)
 
 ## New UI for Postgres Roles
-IMAGE
+
+![New UI for Postgres Roles](/images/blog/2023-03-09-beta-update-february/postgres-roles.png)
 
 We've improved database role management. You can create, update, and delete database roles through the dashboard. Just one small step towards column-level security
 
 [Check it out.](https://app.supabase.com/project/_/editor)
 
 ## API docs in the table editor
-IMAGE
+
+![API docs in the table editor](/images/blog/2023-03-09-beta-update-february/api-docs.png)
 
 API docs got a light touchup and were moved to the table editor. You can now look up API methods and generate & download type files right there ✨
 
@@ -79,6 +83,8 @@ API docs got a light touchup and were moved to the table editor. You can now loo
 
 ## Next.js with Supabase
 
+![Next.js with Supabase](/images/blog/2023-03-09-beta-update-february/nextjs-supabase.png)
+
 Building the next big thing with Supabase and Next.js? Then make sure to check Jon's new video series to help get you (and your app directory) off the ground.
 
 - [Fetching and Caching data in Next.js Async Server Components](https://www.youtube.com/watch?v=GniRj1jIhFw)
@@ -86,10 +92,6 @@ Building the next big thing with Supabase and Next.js? Then make sure to check J
 - [Client vs Server Components in Next.js app directory // Merging server state with realtime updates](https://www.youtube.com/watch?v=YR-xP6PPXXA)
 
 - [Delicious Server Component Cookies // Auth in the Next.js app directory](https://www.youtube.com/watch?v=Bh1TOpOcGJQ)
-
-## Launch Week 7: coming soon
-
-You want it, we want it, everyone wants it... it's time for a new Launch Week. April is the month, stay tuned for the full date 🔜
 
 ![Made with Supabase](/images/blog/2022-12-07-november-beta-update/madewithsupabase.jpg)
 
@@ -102,34 +104,33 @@ Discover 100+ other apps in this [tweet](https://twitter.com/supabase/status/162
 ![Community](/images/blog/2022-june/community.jpg)
 
 - refine week: building a CRUD app with refine & Supabase. [Full series](https://refine.dev/week-of-refine/)
+- Langchain supports our database as a vector store, using `pgvector`. [Doc](https://hwchase17.github.io/langchainjs/docs/modules/indexes/vector_stores/supabase/)
 - Build an Instagram Web App with Supabase and Next.js. [Tutorial](https://livecycle.io/blogs/nextjs-supabase-instagram/)
 - Supabase GeoQueries with PostGIS and Storage Upload. [Video](https://www.youtube.com/watch?v=-_Wpr7rwU8I)
 - How I used Supabase to build a winning hackathon project. [Article](https://blog.matt.lgbt/how-i-used-supabase-to-build-a-winning-hackathon-project)
 - Using a Supabase API within FlutterFlow. [Video](https://www.youtube.com/watch?v=YzSXwlA3vWM)
+- Getting started with Supabase in Android. [Part 1](https://www.youtube.com/watch?v=SGr73sWMX6w) | [Part 2](https://www.youtube.com/watch?v=NWaIIRfVpuo)
+- Streaming User Events from PostgreSQL (Supabase) to Serverless Kafka. [Article](https://upstash.com/blog/postgre-supabase-connector)
 - Building a CRUD API with FastAPI and Supabase: A Step-by-Step Guide. [Tutorial](https://blog.theinfosecguy.xyz/building-a-crud-api-with-fastapi-and-supabase-a-step-by-step-guide)
 - How to build a collaborative SaaS product using Next.js and ZenStack's access control policy. [Tutorial](https://zenstack.dev/blog/saas-demo)
-
-
-- 
--
--
--
--
+- Nuxt 3, Tailwind, and Supabase Crash Course. [Course](https://dev.to/jacobandrewsky/nuxt-3-tailwind-and-supabase-crash-course-1482)
+- A sneak peek at the Supabase and Next.js RSC SaaS kit. [Article](https://makerkit.dev/blog/changelog/nextjs-supabase-kit-update)
+- Build a Fullstack serverless application using React, Chakra UI, Hookstate, and Supabase. [Tutorial](https://clx.hashnode.dev/build-a-fullstack-serverless-application-using-react-chakra-ui-hookstate-and-supabase)
+- Implement Sign in with Google using Supabase Auth in NextJS. (Tutorial)[https://dev.to/irwanphan/implement-sign-in-with-google-using-supabase-auth-in-nextjs-1jj1]
 
 ## We're Hiring
 
 Come join one of the fastest-growing open source projects ever 🤗
 
-- [Integrations / Marketplace Lead](https://boards.greenhouse.io/supabase/jobs/4775849004) <br/>
-- [Cloud Platform / Site Reliability Engineer](https://boards.greenhouse.io/supabase/jobs/4307459004) <br/>
-- [Social Media and Community Manager](https://boards.greenhouse.io/supabase/jobs/4777008004)
-
-We've redesigned our [Careers page](https://supabase.com/careers) to better reflect our mission, values, and culture.
+- [Technical partnerships lead (Next.js, Node,js, Supabase)](https://boards.greenhouse.io/supabase/jobs/4775849004)\
+- [Junior Developer Advocate (SMM & Community)](https://boards.greenhouse.io/supabase/jobs/4777008004)
 
 ## Meme Zone
 
 As always, one of our favorite memes from last month. [Follow us on Twitter](https://twitter.com/supabase) for more.
 
-![Best meme from January 2023](/images/blog/2023-02-08-january-beta-update/beta-update-january-meme.jpeg)
+![Best meme from February 2023](/images/blog/2023-03-09-beta-update-february/beta-update-february-meme.jpeg)
 
-See you next month!
+## It's happenning! Coming in April
+
+![Supabase Launch Week 7](/images/blog/2023-03-09-beta-update-february/supabase-launch-week-7.png)
