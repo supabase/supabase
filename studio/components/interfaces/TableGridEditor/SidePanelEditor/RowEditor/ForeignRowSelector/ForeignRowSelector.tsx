@@ -87,14 +87,14 @@ const ForeignRowSelector = ({
       size="large"
       header={
         <div>
-          Selecting a record to reference from{' '}
+          Select a record to reference from{' '}
           <code className="font-mono text-sm">
             {schemaName}.{tableName}
           </code>
         </div>
       }
       onCancel={closePanel}
-      customFooter={<ActionBar hideApply backButtonLabel="Close" closePanel={closePanel} />}
+      customFooter={<ActionBar hideApply backButtonLabel="Cancel" closePanel={closePanel} />}
     >
       <SidePanel.Content className="h-full !px-0">
         <div className="h-full">

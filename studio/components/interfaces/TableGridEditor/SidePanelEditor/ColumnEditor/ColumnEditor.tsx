@@ -199,9 +199,7 @@ const ColumnEditor: FC<Props> = ({
       }
       onInteractOutside={(event) => {
         const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) {
-          event.preventDefault()
-        }
+        if (isToast) event.preventDefault()
       }}
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
