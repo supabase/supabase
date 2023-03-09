@@ -154,7 +154,7 @@ export default function Ticket({
                       </>
                     ) : (
                       <p>
-                        We have some fantastic swag up for grabs, including 3 limited edition
+                        We have some fantastic swag up for grabs, including 3 limited-edition
                         mechanical keyboard that you won't want to miss.
                       </p>
                     )}
@@ -164,7 +164,7 @@ export default function Ticket({
             ) : (
               <>
                 <p>
-                  Get yours and win some fantastic swag, including a limited edition mechanical
+                  Get yours and win some fantastic swag, including a limited-edition mechanical
                   keyboard that you won't want to miss.
                 </p>
 
