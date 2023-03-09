@@ -42,8 +42,8 @@ export function getGridColumns(
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
-    onEditColumn: (column: string) => void
-    onDeleteColumn: (column: string) => void
+    onEditColumn?: (column: string) => void
+    onDeleteColumn?: (column: string) => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
