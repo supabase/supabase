@@ -675,7 +675,7 @@ export const platform = {
       ],
     },
     {
-      name: 'Billing Management',
+      name: 'Billing',
       url: undefined,
       items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap', items: [] }],
     },
