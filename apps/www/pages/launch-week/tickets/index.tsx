@@ -2,7 +2,7 @@ import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
@@ -11,7 +11,7 @@ import CTABanner from '../../../components/CTABanner'
 export default function TicketHome() {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
+  const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const defaultUserData = {
@@ -59,7 +59,7 @@ export default function TicketHome() {
           url: `${SITE_URL}/tickets`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/og-image.jpg`, // TODO
+              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7.jpg`,
             },
           ],
         }}

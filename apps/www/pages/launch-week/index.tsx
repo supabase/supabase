@@ -3,7 +3,7 @@ import { GetStaticProps } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
@@ -31,8 +31,7 @@ export default function TicketHome({ users }: Props) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 7 | 3-7 April 2023'
-  const { query, pathname } = useRouter()
-  // const isLauchWeekPage = pathname.includes('launch-week')
+  const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
 
@@ -73,6 +72,8 @@ export default function TicketHome({ users }: Props) {
     document.body.className = 'dark bg-[#1C1C1C]'
   }, [])
 
+  console.log('SITE_ORIGIN', SITE_ORIGIN)
+
   return (
     <>
       <NextSeo
@@ -83,7 +84,7 @@ export default function TicketHome({ users }: Props) {
           url: `${SITE_URL}/tickets`,
           images: [
             {
-              url: `https://supabase.com/images/launchweek/seven/launch-week-7.jpg`,
+              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7.jpg`,
             },
           ],
         }}
