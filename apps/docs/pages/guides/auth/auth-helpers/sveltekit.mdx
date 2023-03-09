@@ -140,9 +140,9 @@ We need to create an event listener in the root `+layout.svelte` file in order c
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
 
-	export let data: PageData;
+  export let data: PageData;
 
-	$: ({ supabase } = data);
+  $: ({ supabase } = data);
 
   onMount(() => {
     const {
