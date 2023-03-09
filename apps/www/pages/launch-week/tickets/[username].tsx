@@ -33,7 +33,7 @@ export default function TicketShare({ user, users }: Props) {
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
-  const description = 'Supabase Launch Week 6 | 12-16 Dec 2022'
+  const description = 'Supabase Launch Week 7 | 3-7 April 2023'
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
