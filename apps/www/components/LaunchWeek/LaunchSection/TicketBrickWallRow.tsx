@@ -31,8 +31,11 @@ export function TicketBrickWallRow({ users, reverse, speed = 50000 }: Props) {
       <div className="absolute flex h-fit w-fit">
         <motion.div className="flex gap-5 will-change-transform" style={{ x }}>
           {users.map((user, i) => (
-            <Link href={`/launch-week/tickets/${user.username}`} key={user.username}>
-              <a className="relative w-[450px] rounded-2xl overflow-hidden transform scale-100 hover:scale-[102%] transition-transform">
+            <div
+              key={user.username}
+              className="relative w-[450px] rounded-2xl overflow-hidden transform scale-100 hover:scale-[102%] transition-transform"
+            >
+              <Link href={`/launch-week/tickets/${user.username}`}>
                 <div className="relative inset-0 w-full pt-[50%] transform scale-[120%]">
                   <span className="absolute inset-0 flex items-center justify-center text-white">
                     {user.username}
@@ -47,8 +50,8 @@ export function TicketBrickWallRow({ users, reverse, speed = 50000 }: Props) {
                     blurDataURL="/images/blur.png"
                   />
                 </div>
-              </a>
-            </Link>
+              </Link>
+            </div>
           ))}
         </motion.div>
       </div>

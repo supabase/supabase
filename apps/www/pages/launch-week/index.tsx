@@ -7,7 +7,7 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
-import { IconArrowDown, useTheme } from 'ui'
+import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 
@@ -32,7 +32,6 @@ export default function TicketHome({ users }: Props) {
   const [session, setSession] = useState<Session | null>(null)
   const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const { query, pathname } = useRouter()
-  const { isDarkMode } = useTheme()
   // const isLauchWeekPage = pathname.includes('launch-week')
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
@@ -71,8 +70,8 @@ export default function TicketHome({ users }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.className = isDarkMode ? 'dark bg-[#1C1C1C]' : 'light bg-[#fff]'
-  }, [isDarkMode])
+    document.body.className = 'dark bg-[#1C1C1C]'
+  }, [])
 
   return (
     <>
