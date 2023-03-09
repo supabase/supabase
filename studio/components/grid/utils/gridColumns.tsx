@@ -42,6 +42,8 @@ export function getGridColumns(
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
+    onEditColumn: (column: string) => void
+    onDeleteColumn: (column: string) => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
@@ -75,6 +77,8 @@ export function getGridColumns(
           isEncrypted={x.isEncrypted}
           format={x.format}
           foreignKey={x.foreignKey}
+          onEditColumn={options?.onEditColumn}
+          onDeleteColumn={options?.onDeleteColumn}
         />
       ),
       editor: options?.editable

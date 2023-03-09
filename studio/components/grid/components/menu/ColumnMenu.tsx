@@ -15,13 +15,18 @@ import { useDispatch, useTrackedState } from '../../store'
 type ColumnMenuProps = {
   column: CalculatedColumn<any, unknown>
   isEncrypted?: boolean
+  onEditColumn?: (column: string) => void
+  onDeleteColumn?: (column: string) => void
 }
 
-const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
+const ColumnMenu: React.FC<ColumnMenuProps> = ({
+  column,
+  isEncrypted,
+  onEditColumn,
+  onDeleteColumn,
+}) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
-  const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
-
   const columnKey = column.key
 
   function onFreezeColumn() {
@@ -32,12 +37,12 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
     dispatch({ type: 'UNFREEZE_COLUMN', payload: { columnKey } })
   }
 
-  function onEditColumn() {
-    if (onEditColumnFunc) onEditColumnFunc(columnKey)
+  function onSelectEditColumn() {
+    if (onEditColumn) onEditColumn(columnKey)
   }
 
-  function onDeleteColumn() {
-    if (onDeleteColumnFunc) onDeleteColumnFunc(columnKey)
+  function onSelectDeleteColumn() {
+    if (onDeleteColumn) onDeleteColumn(columnKey)
   }
 
   function renderMenu() {
@@ -47,7 +52,7 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
               <Dropdown.Item
-                onClick={onEditColumn}
+                onClick={onSelectEditColumn}
                 disabled={isEncrypted}
                 icon={<IconEdit size="tiny" />}
               >
@@ -77,10 +82,13 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
         >
           {column.frozen ? 'Unfreeze column' : 'Freeze column'}
         </Dropdown.Item>
-        {state.editable && onDeleteColumn !== undefined && (
+        {state.editable && (
           <>
             <Divider light />
-            <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
+            <Dropdown.Item
+              onClick={onSelectDeleteColumn}
+              icon={<IconTrash size="tiny" stroke="red" />}
+            >
               Delete Column
             </Dropdown.Item>
           </>

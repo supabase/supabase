@@ -54,11 +54,11 @@ export interface SupabaseGridProps {
   /**
    * show delete column menu if available
    */
-  onDeleteColumn?: (columnName: string) => void
+  onDeleteColumn: (columnName: string) => void
   /**
    * show edit column menu if available
    */
-  onEditColumn?: (columnName: string) => void
+  onEditColumn: (columnName: string) => void
   /**
    * show edit row button if available
    */

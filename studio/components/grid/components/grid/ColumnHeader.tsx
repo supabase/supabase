@@ -17,6 +17,8 @@ export function ColumnHeader<R>({
   isEncrypted,
   format,
   foreignKey,
+  onEditColumn,
+  onDeleteColumn,
 }: ColumnHeaderProps<R>) {
   const ref = React.useRef<HTMLDivElement>(null)
   const dispatch = useDispatch()
@@ -166,7 +168,12 @@ export function ColumnHeader<R>({
             </Tooltip.Root>
           )}
         </div>
-        <ColumnMenu column={column} isEncrypted={isEncrypted} />
+        <ColumnMenu
+          column={column}
+          isEncrypted={isEncrypted}
+          onEditColumn={onEditColumn}
+          onDeleteColumn={onDeleteColumn}
+        />
       </div>
     </div>
   )

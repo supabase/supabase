@@ -68,4 +68,6 @@ export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
   isEncrypted: boolean | undefined
   format: string
   foreignKey?: GridForeignKey
+  onEditColumn?: (column: string) => void
+  onDeleteColumn?: (column: string) => void
 }
