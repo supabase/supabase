@@ -83,8 +83,6 @@ const TableGridEditor: FC<Props> = ({
   onExpandJSONEditor = () => {},
   onClosePanel = () => {},
 }) => {
-  console.log('TableGridEditor:selectedTable', selectedTable?.name)
-
   const { project } = useProjectContext()
   const { meta, ui, vault } = useStore()
   const router = useRouter()

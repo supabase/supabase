@@ -95,8 +95,6 @@ export async function initTable(
       }
     }
 
-    console.log('initTable', { props })
-
     const gridColumns = getGridColumns(table, {
       editable: props.editable,
       defaultWidth: props.gridProps?.defaultColumnWidth,
