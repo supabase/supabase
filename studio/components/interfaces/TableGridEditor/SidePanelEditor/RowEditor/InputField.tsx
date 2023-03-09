@@ -1,6 +1,5 @@
-import { FC } from 'react'
-import { isUndefined, includes, noop } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from 'ui'
+import { includes, noop } from 'lodash'
+import { Button, Select, Input, IconLink, IconEdit2 } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
@@ -73,34 +72,38 @@ const InputField = ({
     }
   }
 
-  if (!isUndefined(field.foreignKey)) {
+  if (field.foreignKey !== undefined) {
     return (
       <Input
         layout="horizontal"
         label={field.name}
         value={field.value ?? ''}
-        // @ts-ignore This is creating some validateDOMNesting errors
-        // because descriptionText is a <p> element as a parent
         descriptionText={
-          <div className="flex items-center space-x-1 opacity-50">
-            {field.comment && <p className="text-sm">{field.comment}</p>}
-            <p className="text-sm">({field.name}</p>
-            <p className="text-sm">
-              <IconArrowRight size={14} strokeWidth={2} />
-            </p>
-            <p className="text-sm">
+          <>
+            {field.comment && <span className="text-sm text-scale-900">{field.comment} </span>}
+            <span className="text-sm text-scale-900">
+              {field.comment && '('}Has a foreign key relation to
+            </span>
+            <span className="text-code font-mono text-xs text-scale-900">
               {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
-              {field.foreignKey.target_column_name})
-            </p>
-          </div>
+              {field.foreignKey.target_column_name}
+            </span>
+            {field.comment && <span className="text-sm text-scale-900">{`)`}</span>}
+          </>
         }
         labelOptional={field.format}
         disabled={!isEditable}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button type="default" htmlType="button" onClick={onSelectForeignKey} icon={<IconLink />}>
-            Select
+          <Button
+            type="default"
+            className="mr-1"
+            htmlType="button"
+            onClick={onSelectForeignKey}
+            icon={<IconLink />}
+          >
+            Select record
           </Button>
         }
       />
