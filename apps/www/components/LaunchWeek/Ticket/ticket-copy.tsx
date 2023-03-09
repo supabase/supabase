@@ -39,7 +39,7 @@ export default function TicketCopy({ username }: Props) {
     <button
       type="button"
       name="Copy"
-      className="bg-[#E6E8EB] text-scale-500 text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-lg"
+      className="bg-[#E6E8EB] text-[#2e2e2e] text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-lg"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -76,7 +76,7 @@ export default function TicketCopy({ username }: Props) {
       <div className="px-3 h-full flex items-center gap-3 w-full truncate relative pr-20 bg-[#D9D9D94D]">
         <div className="flex items-center truncate">
           <p
-            className={['text-xs font-mono text-scale-1200 truncate'].join(' ')}
+            className={['text-xs font-mono text-[#ededed] truncate'].join(' ')}
             ref={scrollRef}
             onScroll={() => {
               if (!scrolling) {

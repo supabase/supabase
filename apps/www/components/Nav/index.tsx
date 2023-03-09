@@ -154,7 +154,7 @@ const Nav = () => {
 
   const FlyOutNavButton = (props: any) => (
     <div
-      className={
+      className={[
         `
         text-scale-1200 hover:text-brand-900
         inline-flex cursor-pointer items-center
@@ -162,10 +162,10 @@ const Nav = () => {
         border-transparent
         px-1
         text-sm font-medium
-        transition-colors
-        ${isLauchWeekPage ? '!text-white' : ''}
-                ` + props.active
-      }
+        transition-colors`,
+        // isLauchWeekPage && '!text-white',
+        props.active,
+      ].join(' ')}
       onClick={props.onClick}
     >
       <>
@@ -179,7 +179,7 @@ const Nav = () => {
           <IconChevronDown
             size={14}
             strokeWidth={2}
-            className={isLauchWeekPage ? 'text-white' : ''}
+            // className={isLauchWeekPage ? 'text-white' : ''}
           />
         </div>
       </>
@@ -192,13 +192,14 @@ const Nav = () => {
       <div className="sticky top-0 z-50">
         <div
           className={`${
-            isLauchWeekPage ? '' : 'bg-scale-200'
-          } absolute top-0 h-full w-full opacity-80`}
-        ></div>
+            isLauchWeekPage ? '!opacity-100 dark:bg-scale-200 bg-white' : 'bg-scale-200'
+          } absolute inset-0 h-full w-full opacity-80`}
+        />
         <nav
-          className={`border-scale-400 border-b  backdrop-blur-sm ${
-            isLauchWeekPage ? 'border-[#be9eea]' : ''
-          }`}
+          className={[
+            `border-scale-400 border-b backdrop-blur-sm`,
+            // isLauchWeekPage && 'border-[#be9eea]',
+          ].join(' ')}
         >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="relative mx-auto flex h-16 justify-between lg:container lg:px-16 xl:px-20">
@@ -210,11 +211,9 @@ const Nav = () => {
                     <a className="block h-6 w-auto">
                       <Image
                         src={
-                          isLauchWeekPage
-                            ? supabaseLogoWordmarkDark
-                            : isDarkMode
-                            ? supabaseLogoWordmarkDark
-                            : supabaseLogoWordmarkLight
+                          // isLauchWeekPage
+                          //   ? supabaseLogoWordmarkDark
+                          isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight
                         }
                         width={124}
                         height={24}
@@ -236,24 +235,24 @@ const Nav = () => {
                   />
                   <Link href="/pricing">
                     <a
-                      className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium
-                        ${isLauchWeekPage ? '!text-white' : ''}
-                      `}
+                        text-sm font-medium`,
+                        // isLauchWeekPage && '!text-white',
+                      ].join(' ')}
                     >
                       Pricing
                     </a>
                   </Link>
                   <Link href="/blog">
                     <a
-                      className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium
-                        ${isLauchWeekPage ? '!text-white' : ''}
-                      `}
+                        text-sm font-medium`,
+                        // isLauchWeekPage && '!text-white',
+                      ].join(' ')}
                     >
                       Blog
                     </a>
@@ -271,25 +270,30 @@ const Nav = () => {
                   icon={
                     <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className={`text-scale-900 flex h-3 w-3 items-center justify-center
+                        className={[
+                          `text-scale-900 flex h-3 w-3 items-center justify-center
 
-                      transition-all
-                      group-hover:h-4
-                      group-hover:w-4
-                      group-hover:text-yellow-900
-                      group-focus:h-4
-                      group-focus:w-4
+                          transition-all
+                          group-hover:h-4
+                          group-hover:w-4
+                          group-hover:text-yellow-900
+                          group-focus:h-4
+                          group-focus:w-4
 
-                      group-focus:text-yellow-900"
-                      ${isLauchWeekPage ? '!text-white' : ''}
-                      `}
+                          group-focus:text-yellow-900`,
+                          // isLauchWeekPage && '!text-white',
+                        ].join(' ')}
                       >
                         <IconStar strokeWidth={2} />
                       </div>
                     </div>
                   }
                 >
-                  <span className={isLauchWeekPage ? '!text-white' : ''}>Star us on GitHub</span>
+                  <span
+                  // className={isLauchWeekPage ? '!text-white' : ''}
+                  >
+                    Star us on GitHub
+                  </span>
                 </Button>
 
                 <Link href="https://app.supabase.com/">
@@ -320,7 +324,12 @@ const Nav = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <div className="dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8">
+            <div
+              className={[
+                'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
+                isLauchWeekPage && '!bg-scale-300',
+              ].join(' ')}
+            >
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button

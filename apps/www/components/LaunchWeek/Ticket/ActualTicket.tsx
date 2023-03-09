@@ -81,38 +81,45 @@ export default function Ticket({
           flex flex-col
           w-full
           items-center
+          text-white
           text-center xl:text-left
           xl:items-start
           gap-3
           `}
         >
-          <h1 className={cn(styleUtils.appear, styleUtils['appear-first'], 'text-xl xl:text-3xl')}>
+          <h1
+            className={cn(
+              styleUtils.appear,
+              styleUtils['appear-first'],
+              'text-xl text-white xl:text-3xl'
+            )}
+          >
             {!sharePage ? (
               <>
                 {name ? (
                   <>
                     {winningChances === 1 && (
-                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                      <p className="text-2xl tracking-[0.02rem]">
                         You're <span className="gradient-text-purple-800">in the draw!</span> <br />
                         Now make it gold.
                       </p>
                     )}
                     {winningChances === 2 && (
-                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                      <p className="text-2xl tracking-[0.02rem]">
                         You've <span className="gradient-text-purple-800">doubled</span> your
                         <br />
                         chance! Almost gold.
                       </p>
                     )}
                     {winningChances === 3 && (
-                      <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                      <p className="text-2xl tracking-[0.02rem]">
                         You're <span className="gradient-text-gold-500">gold</span>!<br />
                         You've maxed your <br /> chances of winning!
                       </p>
                     )}
                   </>
                 ) : (
-                  <p className="text-2xl dark:text-scale-1200 tracking-[0.02rem]">
+                  <p className="text-2xl tracking-[0.02rem]">
                     Generate your ticket. <br />
                     Win the <span className="gradient-text-purple-800">SupaKeyboard</span>.
                   </p>
@@ -126,7 +133,7 @@ export default function Ticket({
             )}
           </h1>
 
-          <h2 className="text-base max-w-[520px]">
+          <div className="text-base text-white max-w-[520px]">
             {!sharePage ? (
               <>
                 {golden ? (
@@ -161,17 +168,17 @@ export default function Ticket({
                   keyboard that you won't want to miss.
                 </p>
 
-                <div className="mt-8 rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
+                <div className="mt-8 rounded-md bg-[#E6E8EB] py-1 px-3 border border-[#bbbbbb] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
                   <a
                     href={`${SITE_URL}`}
-                    className={`flex items-center justify-center gap-2 text-scale-500`}
+                    className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}
                   >
                     Get your ticket
                   </a>
                 </div>
               </>
             )}
-          </h2>
+          </div>
 
           {!sharePage && username && <ReferralIndicator />}
         </div>
