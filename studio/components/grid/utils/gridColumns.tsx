@@ -47,7 +47,6 @@ export function getGridColumns(
 ): any[] {
   const columns = table.columns.map((x, idx) => {
     const columnType = getColumnType(x)
-
     const columnDefaultWidth = getColumnDefaultWidth(x)
     const columnWidthBasedOnName =
       (x.name.length + x.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
@@ -75,6 +74,7 @@ export function getGridColumns(
           isPrimaryKey={x.isPrimaryKey}
           isEncrypted={x.isEncrypted}
           format={x.format}
+          foreignKey={x.foreignKey}
         />
       ),
       editor: options?.editable

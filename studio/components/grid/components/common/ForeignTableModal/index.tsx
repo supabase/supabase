@@ -31,7 +31,7 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
 
     if (defaultValue && columnDefinition) {
       fetchData({
-        column: columnDefinition.targetColumnName!,
+        column: columnDefinition?.foreignKey?.targetColumnName!,
         operator: '=',
         value: defaultValue,
       })
@@ -43,14 +43,14 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
   async function fetchColumns() {
     if (
       !state.metaService ||
-      !columnDefinition?.targetTableName ||
-      !columnDefinition?.targetTableSchema
+      !columnDefinition?.foreignKey?.targetTableName ||
+      !columnDefinition?.foreignKey?.targetTableSchema
     )
       return
 
     const { data } = await state.metaService.fetchColumns(
-      columnDefinition?.targetTableName,
-      columnDefinition?.targetTableSchema
+      columnDefinition?.foreignKey?.targetTableName,
+      columnDefinition?.foreignKey?.targetTableSchema
     )
     if (data && data.length > 0) {
       const columnNames = data.map((x) => x.name)
@@ -59,11 +59,14 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
   }
 
   async function fetchData(filter?: Filter) {
-    if (!state.onSqlQuery || !columnDefinition?.targetTableName) return
+    if (!state.onSqlQuery || !columnDefinition?.foreignKey?.targetTableName) return
 
     const query = new Query()
     let queryChains = query
-      .from(columnDefinition?.targetTableName, columnDefinition?.targetTableSchema ?? undefined)
+      .from(
+        columnDefinition?.foreignKey?.targetTableName,
+        columnDefinition?.foreignKey?.targetTableSchema ?? undefined
+      )
       .select()
 
     if (filter && filter.value && filter.value != '') {
@@ -88,8 +91,8 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
   }
 
   function onItemSelect(item: Dictionary<any>) {
-    if (item && columnDefinition && columnDefinition.targetColumnName) {
-      const value = item[columnDefinition.targetColumnName]
+    if (item && columnDefinition && columnDefinition.foreignKey?.targetColumnName) {
+      const value = item[columnDefinition.foreignKey?.targetColumnName]
       onChange(value)
     }
 
@@ -140,7 +143,7 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
       >
         <Modal.Content>
           <FilterHeader
-            defaultColumnName={columnDefinition?.targetColumnName ?? undefined}
+            defaultColumnName={columnDefinition?.foreignKey?.targetColumnName ?? undefined}
             defaultValue={defaultValue}
             foreignColumnNames={foreignColumnNames}
             onChange={onFilterChange}

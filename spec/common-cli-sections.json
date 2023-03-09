@@ -409,6 +409,29 @@
     ]
   },
   {
+    "title": "SSL Enforcement",
+    "items": [
+      {
+        "id": "supabase-ssl-enforcement",
+        "title": "Manage SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-ssl-enforcement-get",
+        "title": "Get the current SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement-get",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-ssl-enforcement-update",
+        "title": "Update SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement-update",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
     "title": "Autocompletion Scripts",
     "items": [
       {

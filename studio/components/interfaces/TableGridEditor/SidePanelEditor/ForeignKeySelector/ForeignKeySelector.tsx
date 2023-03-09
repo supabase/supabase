@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
+import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase, Toggle } from 'ui'
 import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -9,13 +9,18 @@ import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
 interface Props {
   column: ColumnField
   metadata?: any
   visible: boolean
   closePanel: () => void
-  saveChanges: (value: { table: PostgresTable; column: PostgresColumn } | undefined) => void
+  saveChanges: (
+    value: { table: PostgresTable; column: PostgresColumn; deletionAction: string } | undefined
+  ) => void
 }
 
 const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
@@ -25,6 +30,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
     schema: 'public',
     table: '',
     column: '',
+    deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
   })
 
   const schemas = meta.schemas.list()
@@ -51,12 +57,14 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
           schema: foreignKey.target_table_schema,
           table: foreignKey.target_table_name,
           column: foreignKey.target_column_name,
+          deletionAction: foreignKey.deletion_action,
         })
       } else {
         setSelectedForeignKey({
           schema: 'public',
           table: '',
           column: '',
+          deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
         })
       }
     }
@@ -64,7 +72,12 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
 
   const updateSelectedSchema = (schema: string) => {
     meta.tables.loadBySchema(schema)
-    const updatedForeignKey = { ...selectedForeignKey, schema, table: '', column: '' } as ForeignKey
+    const updatedForeignKey = {
+      schema,
+      table: '',
+      column: '',
+      deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+    }
     setSelectedForeignKey(updatedForeignKey)
   }
 
@@ -75,6 +88,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         schema: '',
         table: '',
         column: '',
+        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
       })
     }
     const table = find(tables, { id: tableId })
@@ -83,6 +97,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         schema: table.schema,
         table: table.name,
         column: table.columns?.length ? table.columns[0].name : undefined,
+        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
       })
     }
   }
@@ -94,6 +109,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
       const updatedForeignKey = { ...selectedForeignKey, column: column.name } as ForeignKey
       setSelectedForeignKey(updatedForeignKey)
     }
+  }
+
+  const updateDeletionAction = (value: string) => {
+    setErrors({})
+    setSelectedForeignKey({ ...selectedForeignKey, deletionAction: value })
   }
 
   const onSaveChanges = (resolve: () => void) => {
@@ -110,7 +130,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
         // Remove foreign key since no table selected
         saveChanges(undefined)
       } else {
-        saveChanges({ table: selectedTable, column: selectedColumn })
+        saveChanges({
+          table: selectedTable,
+          column: selectedColumn,
+          deletionAction: selectedForeignKey.deletionAction,
+        })
       }
     }
     resolve()
@@ -211,7 +235,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                   disabled
                   label={
                     <div>
-                      Select a column from <code>{selectedForeignKey?.table}</code> to reference to
+                      Select a column from{' '}
+                      <code className="text-xs">
+                        {selectedForeignKey?.schema}.{selectedForeignKey?.table}
+                      </code>{' '}
+                      to reference to
                     </div>
                   }
                   error={errors.column}
@@ -224,7 +252,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                   // @ts-ignore
                   label={
                     <div>
-                      Select a column from <code>{selectedForeignKey?.table}</code> to reference to
+                      Select a column from{' '}
+                      <code className="text-xs">
+                        {selectedForeignKey?.schema}.{selectedForeignKey?.table}
+                      </code>{' '}
+                      to reference to
                     </div>
                   }
                   error={errors.column}
@@ -240,6 +272,60 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                   ))}
                 </Listbox>
               )}
+              <SidePanel.Separator />
+              <InformationBox
+                icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+                title="Which action is most appropriate?"
+                description={
+                  <>
+                    <p>
+                      The choice of the action depends on what kinds of objects the related tables
+                      represent:
+                    </p>
+                    <ul className="mt-2 list-disc pl-4 space-y-1">
+                      <li>
+                        <code className="text-xs">Cascade</code>: if the referencing table
+                        represents something that is a component of what is represented by the
+                        referenced table and cannot exist independently
+                      </li>
+                      <li>
+                        <code className="text-xs">Restrict</code> or{' '}
+                        <code className="text-xs">No action</code>: if the two tables represent
+                        independent objects
+                      </li>
+                      <li>
+                        <code className="text-xs">Set NULL</code> or{' '}
+                        <code className="text-xs">Set default</code>: if a foreign-key relationship
+                        represents optional information
+                      </li>
+                    </ul>
+                    <p className="mt-2">
+                      Typically, restricting and cascading deletes are the most common options, but
+                      the default behavior is no action
+                    </p>
+                  </>
+                }
+                url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
+                urlLabel="More information"
+              />
+              <Listbox
+                id="deletionAction"
+                value={selectedForeignKey.deletionAction}
+                label="Action if referenced row is removed"
+                // @ts-ignore
+                descriptionText={generateDeletionActionDescription(
+                  selectedForeignKey.deletionAction,
+                  `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                )}
+                error={errors.column}
+                onChange={(value: string) => updateDeletionAction(value)}
+              >
+                {FOREIGN_KEY_DELETION_OPTIONS.map((option) => (
+                  <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                    <p className="text-scale-1200">{option.label}</p>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
             </>
           )}
         </div>

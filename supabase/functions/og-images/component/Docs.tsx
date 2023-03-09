@@ -9,6 +9,18 @@ type Props = {
 
 const Docs = (props: Props) => {
     const { type, title, description, icon } = props
+
+    let typeName: string | undefined = type?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    let typeIcon: string | undefined = type?.toLowerCase()
+
+    if (type === 'functions' || type === 'function') {
+      typeName = 'Edge Functions'
+    } else if (type === 'self-hosting') {
+      typeIcon = 'resources'
+    } else if (type === 'cli') {
+      typeName = 'CLI'
+      typeIcon = 'reference-cli'
+    }
     
     return (
         <div
@@ -34,9 +46,9 @@ const Docs = (props: Props) => {
           {type && (
             <>
                 <div tw="w-[50px] h-[50px] bg-[#164430] rounded-md flex items-center justify-center">
-                    <img src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${type.toLowerCase()}.svg`} width="80%" height="80%" />
+                    <img src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${typeIcon}.svg`} width="80%" height="80%" />
                 </div>
-                <span tw="text-[36px] text-[#ededed] ml-[16px]">{type.substring(0, 1).toUpperCase() + title.substring(1)}</span>
+                <span tw="text-[36px] text-[#ededed] ml-[16px]">{typeName}</span>
             </>
           )}
         </div>
