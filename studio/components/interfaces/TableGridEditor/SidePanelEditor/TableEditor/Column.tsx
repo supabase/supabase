@@ -157,7 +157,7 @@ const Column: FC<Props> = ({
           <InputWithSuggestions
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'Empty string'
+                ? 'EMPTY'
                 : 'NULL'
             }
             size="small"
