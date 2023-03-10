@@ -128,9 +128,9 @@ const InputField: FC<Props> = ({
           value={field.value ?? ''}
           placeholder={
             field.defaultValue === null
-              ? ''
+              ? 'NULL'
               : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-              ? 'Default: Empty string'
+              ? 'EMPTY'
               : `Default: ${field.defaultValue}`
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
