@@ -9,7 +9,7 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
   column,
   isNullable,
   onRowChange,
-}: EditorProps<TRow, TSummaryRow>) {
+}: EditorProps<TRow, TSummaryRow> & { isNullable?: boolean }) {
   const state = useTrackedState()
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
