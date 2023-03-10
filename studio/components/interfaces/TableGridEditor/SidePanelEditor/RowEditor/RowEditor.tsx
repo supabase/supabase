@@ -202,7 +202,7 @@ const RowEditor = ({
 
       <ForeignRowSelector
         visible={isSelectingForeignKey}
-        referenceRow={referenceRow}
+        foreignKey={referenceRow?.foreignKey}
         onSelect={onSelectForeignRowValue}
         closePanel={() => {
           setIsSelectingForeignKey(false)
