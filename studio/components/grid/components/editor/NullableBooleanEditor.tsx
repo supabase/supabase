@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { EditorProps } from '@supabase/react-data-grid'
-import { Button, IconX } from 'ui'
+import { Toggle, Button, IconX } from 'ui'
 
 export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -17,35 +18,41 @@ export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
     }
   }, [])
 
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    onRowChange({ ...row, [column.key]: event.target.checked })
-  }
-
-  function onBlur() {
-    onClose(true)
-  }
-
-  function onClear() {
-    onRowChange({ ...row, [column.key]: null }, true)
-  }
+  const onBlur = () => onClose(true)
+  const onClear = () => onRowChange({ ...row, [column.key]: null }, true)
+  const onChange = (value: boolean) => onRowChange({ ...row, [column.key]: value })
 
   return (
-    <div className="sb-grid-checkbox-editor">
-      <input
-        className="sb-grid-checkbox-editor__input"
-        checked={value === null ? false : value}
+    <div className="sb-grid-checkbox-editor flex items-center">
+      <Toggle
+        // @ts-ignore
         onChange={onChange}
         onBlur={onBlur}
-        type="checkbox"
-        style={{ margin: 'auto' }}
+        checked={row[column.key as keyof TRow] as unknown as boolean}
+        className="mx-auto translate-y-[1px]"
       />
-      <Button
-        type="text"
-        title="Clear"
-        icon={<IconX size="tiny" strokeWidth={2} />}
-        onClick={onClear}
-        style={{ padding: '3px', margin: 'auto 5px auto auto' }}
-      />
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger className="flex items-center">
+          <Button
+            type="text"
+            title="Set to NULL"
+            icon={<IconX size="tiny" strokeWidth={2} />}
+            className="px-1 mr-2"
+            onClick={onClear}
+          />
+        </Tooltip.Trigger>
+        <Tooltip.Content side="bottom">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+              'border border-scale-200',
+            ].join(' ')}
+          >
+            <span className="text-xs text-scale-1200">Set to NULL</span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Root>
     </div>
   )
 }

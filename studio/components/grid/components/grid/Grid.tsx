@@ -6,7 +6,6 @@ import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 
 function rowKeyGetter(row: SupaRow) {
   return row?.idx ?? -1
