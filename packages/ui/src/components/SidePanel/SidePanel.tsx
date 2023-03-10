@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '../../../index'
 import * as Dialog from '@radix-ui/react-dialog'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 export type SidePanelProps = RadixProps & CustomProps
 
@@ -54,7 +54,7 @@ const SidePanel = ({
   defaultOpen,
   ...props
 }: SidePanelProps) => {
-  const __styles = styleHandler('sidepanel')
+  const __styles = useStyles('sidepanel')
 
   // function stopPropagation(e: React.MouseEvent) {
   //   e.stopPropagation()
@@ -121,13 +121,13 @@ const SidePanel = ({
 }
 
 export function Separator() {
-  let __styles = styleHandler('sidepanel')
+  let __styles = useStyles('sidepanel')
 
   return <div className={__styles.separator}></div>
 }
 
 export function Content({ children }: { children: React.ReactNode }) {
-  let __styles = styleHandler('sidepanel')
+  let __styles = useStyles('sidepanel')
 
   return <div className={__styles.content}>{children}</div>
 }

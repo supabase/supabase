@@ -1,4 +1,4 @@
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface Props {
   color?:
@@ -39,7 +39,7 @@ interface Props {
 }
 
 function Badge({ color = 'brand', children, size, dot, className }: Props) {
-  const __styles = styleHandler('badge')
+  const __styles = useStyles('badge')
 
   let classes = [__styles.base]
   if (color) {

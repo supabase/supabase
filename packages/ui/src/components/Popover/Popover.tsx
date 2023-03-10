@@ -3,7 +3,7 @@ import * as RadixPopover from '@radix-ui/react-popover'
 import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
 
 import { IconX } from '../Icon/icons/IconX'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface RootProps {
   align?: RadixPopoverTypes.PopoverContentProps['align']
@@ -45,7 +45,7 @@ function Popover({
   footer,
   size = 'content',
 }: RootProps) {
-  const __styles = styleHandler('popover')
+  const __styles = useStyles('popover')
 
   let classes = [__styles.content, __styles.size[size]]
   if (className) {
@@ -90,7 +90,7 @@ function Popover({
 }
 
 function Close() {
-  const __styles = styleHandler('popover')
+  const __styles = useStyles('popover')
 
   return (
     <RadixPopover.Close className={__styles.close}>
@@ -100,7 +100,7 @@ function Close() {
 }
 
 function Separator() {
-  const __styles = styleHandler('popover')
+  const __styles = useStyles('popover')
 
   return <div className={__styles.separator}></div>
 }

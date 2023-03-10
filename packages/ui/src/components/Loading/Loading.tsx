@@ -1,5 +1,5 @@
 import React from 'react'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 import { IconLoader } from './../../../index'
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   active: boolean
 }
 export default function Loading({ children, active }: Props) {
-  const __styles = styleHandler('loading')
+  const __styles = useStyles('loading')
 
   let classNames = [__styles.base]
 

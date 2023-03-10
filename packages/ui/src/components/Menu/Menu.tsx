@@ -3,7 +3,7 @@ import { Space } from '../Space'
 import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface MenuProps {
   children: React.ReactNode
@@ -50,7 +50,7 @@ export function Item({
   showActiveBar = false,
   style,
 }: ItemProps) {
-  const __styles = styleHandler('menu')
+  const __styles = useStyles('menu')
 
   const { type } = useMenuContext()
 
@@ -100,12 +100,10 @@ interface GroupProps {
 }
 
 export function Group({ children, icon, title }: GroupProps) {
-  const __styles = styleHandler('menu')
+  const __styles = useStyles('menu')
   const { type } = useMenuContext()
   return (
-    <div
-      className={[__styles.group.base, __styles.group.variants[type]].join(' ')}
-    >
+    <div className={[__styles.group.base, __styles.group.variants[type]].join(' ')}>
       {icon && <span className={__styles.group.icon}>{icon}</span>}
       <span className={__styles.group.content}>{title}</span>
       {children}

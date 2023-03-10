@@ -3,7 +3,7 @@ import Typography from '../Typography'
 // @ts-ignore
 import CardStyles from './Card.module.css'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface CardProps {
   children?: React.ReactNode
@@ -16,16 +16,8 @@ interface CardProps {
   titleExtra?: React.ReactNode
 }
 
-function Card({
-  children,
-  className,
-  cover,
-  hoverable,
-  style,
-  title,
-  titleExtra,
-}: CardProps) {
-  let __styles = styleHandler('card')
+function Card({ children, className, cover, hoverable, style, title, titleExtra }: CardProps) {
+  let __styles = useStyles('card')
 
   let classes = [__styles.base]
   if (hoverable) classes.push(__styles.hoverable)

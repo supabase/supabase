@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 // @ts-ignore
 // import TabsStyles from './Tabs.module.css'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -56,7 +56,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   const router = useRouter()
   const hash = router?.asPath?.split('#')[1]?.toUpperCase()
 
-  let __styles = styleHandler('tabs')
+  let __styles = useStyles('tabs')
 
   // activeId state can be overriden externally with `active`
   // defaults to the first panelif we have one or url hash if not
@@ -73,6 +73,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   const underlined = type === 'underlined'
   // for styling the tabs for cards style
 
+  /* @ts-ignore 'cards' type doesn't exist */
   const listClasses = [__styles[type].list]
   if (scrollable) listClasses.push(__styles.scrollable)
   if (listClassNames) listClasses.push(listClassNames)
@@ -89,11 +90,13 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
         {addOnBefore}
         {children.map((tab) => {
           const activeMatch = active === tab.props.id
-
+          /* @ts-ignore 'cards' type doesn't exist */
           const triggerClasses = [__styles[type].base, __styles.size[size]]
           if (activeMatch) {
+            /* @ts-ignore 'cards' type doesn't exist */
             triggerClasses.push(__styles[type].active)
           } else {
+            /* @ts-ignore 'cards' type doesn't exist */
             triggerClasses.push(__styles[type].inactive)
           }
           if (block) {
@@ -139,7 +142,7 @@ interface PanelProps {
 }
 
 export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
-  let __styles = styleHandler('tabs')
+  let __styles = useStyles('tabs')
 
   return (
     <TabsContext.Consumer>

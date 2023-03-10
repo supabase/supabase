@@ -6,7 +6,7 @@ import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import { useFormContext } from '../Form/FormContext'
 
 import defaultTheme from '../../lib/theme/defaultTheme'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface OptionProps {
   value: string
@@ -95,7 +95,7 @@ function Select({
     if (validation) fieldLevelValidation(id, validation(value))
   }, [])
 
-  const __styles = styleHandler('select')
+  const __styles = useStyles('select')
 
   let classesContainer = [__styles.container]
   if (className) classesContainer.push(className)

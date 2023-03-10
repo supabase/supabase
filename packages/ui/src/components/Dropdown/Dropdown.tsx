@@ -8,7 +8,7 @@ import { IconCheck } from '../Icon/icons/IconCheck'
 
 import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 import { IconTarget } from '../Icon/icons/IconTarget'
 
 interface RootProps {
@@ -40,7 +40,7 @@ function Dropdown({
   arrow,
   isNested,
 }: RootProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   let classes = [__styles.content, __styles.size[size]]
   if (className) {
@@ -75,7 +75,7 @@ function Dropdown({
 }
 
 export function RightSlot({ children }: any) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
   return <div className={__styles.right_slot}>{children}</div>
 }
 
@@ -89,7 +89,7 @@ interface ItemProps {
 }
 
 export function Item({ className, children, icon, disabled, onClick, rightSlot }: ItemProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   return (
     <RadixDropdown.Item
@@ -104,7 +104,7 @@ export function Item({ className, children, icon, disabled, onClick, rightSlot }
 }
 
 export function TriggerItem({ children, icon, disabled }: ItemProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
   return (
     <div className={__styles.item}>
       {icon && icon}
@@ -114,7 +114,7 @@ export function TriggerItem({ children, icon, disabled }: ItemProps) {
 }
 
 export function Misc({ children, icon }: ItemProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
   return (
     <div className={__styles.misc}>
       {icon && icon}
@@ -132,7 +132,7 @@ interface CheckboxProps {
 }
 
 export function Separator() {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   return <RadixDropdown.Separator className={__styles.separator} />
 }
@@ -146,7 +146,7 @@ export function Checkbox({
 }: CheckboxProps) {
   const [checked, setChecked] = useState(propsChecked ? propsChecked : false)
 
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   const handleChange = (e: boolean) => {
     if (onChange) onChange(e)
@@ -177,7 +177,7 @@ interface RadioProps {
 }
 
 export function Radio({ children, value, ItemIndicator, disabled }: RadioProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   return (
     <RadixDropdown.RadioItem
@@ -219,7 +219,7 @@ interface LabelProps {
 }
 
 export function Label({ children }: LabelProps) {
-  let __styles = styleHandler('dropdown')
+  let __styles = useStyles('dropdown')
 
   return <RadixDropdown.Label className={__styles.label}>{children}</RadixDropdown.Label>
 }

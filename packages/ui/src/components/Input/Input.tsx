@@ -5,7 +5,7 @@ import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 import { useFormContext } from '../Form/FormContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -62,7 +62,7 @@ function Input({
   const [copyLabel, setCopyLabel] = useState('Copy')
   const [hidden, setHidden] = useState(true)
 
-  const __styles = styleHandler('input')
+  const __styles = useStyles('input')
 
   const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
     useFormContext()
@@ -270,7 +270,7 @@ function TextArea({
     if (validation) fieldLevelValidation(id, validation(value))
   }, [])
 
-  const __styles = styleHandler('input')
+  const __styles = useStyles('input')
 
   let classes = [__styles.base]
 

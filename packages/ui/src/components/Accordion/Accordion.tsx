@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 
 import { IconChevronUp } from '../Icon/icons/IconChevronUp'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import { IconChevronDown } from '../Icon/icons/IconChevronDown'
@@ -62,7 +62,7 @@ function Accordion({
 }: AccordionProps) {
   // const [currentItems, setCurrentItems] = useState(defaultValue || [])
 
-  const __styles = styleHandler('accordion')
+  const __styles = useStyles('accordion')
 
   let containerClasses = [__styles.variants[type].base]
 
@@ -116,7 +116,7 @@ interface ItemProps {
 }
 
 export function Item({ children, className, header, id, icon, disabled }: ItemProps) {
-  const __styles = styleHandler('accordion')
+  const __styles = useStyles('accordion')
   const [open, setOpen] = useState(false)
 
   const {

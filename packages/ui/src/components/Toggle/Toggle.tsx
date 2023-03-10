@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { useFormContext } from '../Form/FormContext'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   name?: string
@@ -45,7 +45,7 @@ function Toggle({
   labelLayout,
   ...props
 }: Props) {
-  const __styles = styleHandler('toggle')
+  const __styles = useStyles('toggle')
 
   const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
     useFormContext()

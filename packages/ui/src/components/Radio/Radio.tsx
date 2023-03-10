@@ -5,11 +5,11 @@ import { RadioContext } from './RadioContext'
 import { useFormContext } from '../Form/FormContext'
 
 import defaultTheme from '../../lib/theme/defaultTheme'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 import randomIdGenerator from './../../utils/randomIdGenerator'
 
-interface GroupProps {
+export interface RadioGroupProps {
   allowedValues?: any
   checkboxes?: any
   id?: any
@@ -54,10 +54,10 @@ function RadioGroup({
   validation,
   groupClassName,
   labelsLayout = 'vertical',
-}: GroupProps) {
+}: RadioGroupProps) {
   const [activeId, setActiveId] = useState('')
 
-  const __styles = styleHandler('radio')
+  const __styles = useStyles('radio')
 
   const {
     formContextOnChange,
@@ -164,7 +164,7 @@ function Radio({
   optionalLabel,
   addOnBefore,
 }: InputProps) {
-  const __styles = styleHandler('radio')
+  const __styles = useStyles('radio')
 
   const inputName = name
 
@@ -207,6 +207,7 @@ function Radio({
         if (active) {
           classes.push(__styles.variants[type].active)
         } else {
+          /* @ts-ignore This style isn't defined on every variant, but it doesn't really matter */
           classes.push(__styles.variants[type].inactive)
         }
 

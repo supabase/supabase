@@ -6,7 +6,7 @@ import { IconX } from '../Icon/icons/IconX'
 
 // @ts-ignore
 // import AlertStyles from './Alert.module.css'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
 import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
 
@@ -39,7 +39,7 @@ function Alert({
   icon,
   actions,
 }: Props) {
-  let __styles = styleHandler('alert')
+  let __styles = useStyles('alert')
 
   const [visible, setVisible] = useState(true)
 

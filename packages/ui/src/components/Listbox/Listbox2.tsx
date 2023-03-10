@@ -12,7 +12,7 @@ import { flatten } from 'lodash'
 
 import { SelectContext } from './SelectContext'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ')
@@ -68,7 +68,7 @@ function Listbox({
   const [selected, setSelected] = useState(undefined)
   const [selectedNode, setSelectedNode] = useState<any>({})
 
-  const __styles = styleHandler('listbox')
+  const __styles = useStyles('listbox')
 
   const triggerRef = useRef<HTMLButtonElement>(null)
 
@@ -284,7 +284,7 @@ function SelectOption({
   className = '',
   addOnBefore,
 }: OptionProps) {
-  const __styles = styleHandler('listbox')
+  const __styles = useStyles('listbox')
 
   return (
     <SelectContext.Consumer>

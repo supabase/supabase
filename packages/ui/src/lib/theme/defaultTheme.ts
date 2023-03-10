@@ -1,5 +1,5 @@
 /*
- * Globlal Variables
+ * Global Variables
  *
  */
 
@@ -94,7 +94,7 @@ const default___animations = {
  *
  */
 
-export default {
+const defaultTheme = {
   /*
    * Accordion
    *
@@ -1630,3 +1630,7 @@ export default {
     `,
   },
 }
+
+export type DefaultTheme = typeof defaultTheme
+export type StylesOf<T extends keyof DefaultTheme> = DefaultTheme[T]
+export default defaultTheme

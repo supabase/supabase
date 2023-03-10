@@ -1,5 +1,5 @@
 import React from 'react'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 import { IconContext } from './IconContext'
 // @ts-ignore
 // import IconStyles from './Icon.module.css'
@@ -8,30 +8,13 @@ const IconStyles = {}
 
 interface Props {
   className?: string
-  size?:
-    | 'tiny'
-    | 'small'
-    | 'medium'
-    | 'large'
-    | 'xlarge'
-    | 'xxlarge'
-    | 'xxxlarge'
-    | number
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | number
   type?: string
   color?: string
   strokeWidth?: number
   fill?: string
   stroke?: string
-  background?:
-    | 'brand'
-    | 'gray'
-    | 'red'
-    | 'yellow'
-    | 'green'
-    | 'blue'
-    | 'indigo'
-    | 'purple'
-    | 'pink'
+  background?: 'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'
   src: React.ReactNode
 }
 
@@ -51,7 +34,7 @@ function Icon({
   src,
   ...props
 }: Props) {
-  const __styles = styleHandler('icon')
+  const __styles = useStyles('icon')
 
   return (
     <IconContext.Consumer>
@@ -82,11 +65,7 @@ function Icon({
 
         // use size prop of this component if one exists
         if (size) {
-          iconSize = size
-            ? typeof size === 'string'
-              ? defaultSizes[size]
-              : size
-            : defaultSize
+          iconSize = size ? (typeof size === 'string' ? defaultSizes[size] : size) : defaultSize
         }
 
         // confitional used for Icons with no color settings

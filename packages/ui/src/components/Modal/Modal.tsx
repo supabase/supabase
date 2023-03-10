@@ -7,7 +7,7 @@ import { AnimationTailwindClasses } from '../../types'
 import * as Dialog from '@radix-ui/react-dialog'
 
 import { Transition } from '@headlessui/react'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 // import { Transition } from '@tailwindui/react'
 // Merge Radix Props to surface in the modal component
@@ -86,7 +86,7 @@ const Modal = ({
 }: ModalProps) => {
   const [open, setOpen] = React.useState(visible ? visible : false)
 
-  const __styles = styleHandler('modal')
+  const __styles = useStyles('modal')
 
   useEffect(() => {
     setOpen(visible)
@@ -188,12 +188,12 @@ const Modal = ({
 }
 
 function Content({ children }: { children: React.ReactNode }) {
-  const __styles = styleHandler('modal')
+  const __styles = useStyles('modal')
   return <div className={__styles.content}>{children}</div>
 }
 
 export function Separator() {
-  const __styles = styleHandler('modal')
+  const __styles = useStyles('modal')
 
   return <div className={__styles.separator}></div>
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import styleHandler from '../theme/styleHandler'
+import useStyles from '../theme/use-styles'
 // @ts-ignore
 import { IconAlertCircle } from './../../../index'
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function InputErrorIcon({ style, size }: Props) {
-  const __styles = styleHandler('inputErrorIcon')
+  const __styles = useStyles('inputErrorIcon')
 
   return (
     <div className={__styles.base} style={style}>

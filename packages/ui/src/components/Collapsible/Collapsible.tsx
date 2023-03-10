@@ -1,6 +1,6 @@
 import * as RadixCollapsible from '@radix-ui/react-collapsible'
 import React from 'react'
-import styleHandler from '../../lib/theme/styleHandler'
+import useStyles from '../../lib/theme/use-styles'
 
 export interface CollapsibleProps extends RadixCollapsible.CollapsibleProps {
   children: React.ReactNode
@@ -43,7 +43,7 @@ export function Content({
   children: React.ReactNode
   className?: string
 }) {
-  const __styles = styleHandler('collapsible')
+  const __styles = useStyles('collapsible')
   return (
     <RadixCollapsible.Content className={[__styles.content, className].join(' ')}>
       {children}
