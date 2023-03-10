@@ -42,7 +42,7 @@ const InputField: FC<Props> = ({
               field.defaultValue === null
                 ? ''
                 : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-                ? 'Default: Empty string'
+                ? 'EMPTY'
                 : `Default: ${field.defaultValue}`
             }
             onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
@@ -127,11 +127,26 @@ const InputField: FC<Props> = ({
           rows={5}
           value={field.value ?? ''}
           placeholder={
-            field.defaultValue === null
+            field.value === null && field.defaultValue === null
               ? 'NULL'
+              : field.value === ''
+              ? 'EMPTY'
               : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
               ? 'EMPTY'
-              : `Default: ${field.defaultValue}`
+              : `NULL (Default: ${field.defaultValue})`
+          }
+          actions={
+            <div className="mr-1 mt-0.5">
+              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
+                <Button
+                  type="default"
+                  size="tiny"
+                  onClick={() => onUpdateField({ [field.name]: null })}
+                >
+                  Set to NULL
+                </Button>
+              )}
+            </div>
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -148,7 +163,7 @@ const InputField: FC<Props> = ({
         descriptionText={field.comment}
         labelOptional={field.format}
         disabled={!isEditable}
-        placeholder={field?.defaultValue ?? ''}
+        placeholder={field?.defaultValue ?? 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -195,7 +210,7 @@ const InputField: FC<Props> = ({
           ? 'Automatically generated as identity'
           : field.defaultValue !== null
           ? `Default: ${field.defaultValue}`
-          : ''
+          : 'NULL'
       }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
