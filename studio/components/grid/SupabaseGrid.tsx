@@ -198,7 +198,13 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
       />
-      <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} updateRow={props.updateTableRow} />
+      <Grid
+        ref={gridRef}
+        {...gridProps}
+        rows={data?.rows ?? []}
+        updateRow={props.updateTableRow}
+        onEditForeignKeyColumnValue={props.onEditForeignKeyColumnValue}
+      />
       <Footer isLoading={isLoading || isRefetching} />
       <Shortcuts gridRef={gridRef} />
       {mounted &&
