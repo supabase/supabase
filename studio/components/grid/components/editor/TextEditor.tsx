@@ -7,6 +7,7 @@ import { Button, Popover } from 'ui'
 export function TextEditor<TRow, TSummaryRow = unknown>({
   row,
   column,
+  isNullable,
   onRowChange,
 }: EditorProps<TRow, TSummaryRow>) {
   const state = useTrackedState()
@@ -60,9 +61,11 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
               </div>
             </div>
             <div className="space-y-1">
-              <Button type="default" size="tiny" onClick={() => saveChanges(null)}>
-                Set to NULL
-              </Button>
+              {isNullable && (
+                <Button type="default" size="tiny" onClick={() => saveChanges(null)}>
+                  Set to NULL
+                </Button>
+              )}
             </div>
           </div>
         </BlockKeys>

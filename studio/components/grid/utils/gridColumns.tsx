@@ -130,7 +130,7 @@ function getColumnEditor(
       return NumberEditor
     }
     case 'text': {
-      return TextEditor
+      return (p: any) => <TextEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     default: {
       return undefined
