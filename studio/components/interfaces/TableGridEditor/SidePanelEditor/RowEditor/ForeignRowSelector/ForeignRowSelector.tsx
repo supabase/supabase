@@ -12,7 +12,6 @@ import { useStore } from 'hooks'
 import { IconLoader, SidePanel } from 'ui'
 
 import ActionBar from '../../ActionBar'
-import { RowField } from '../RowEditor.types'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
 import SelectorGrid from './SelectorGrid'
 import { useState } from 'react'
@@ -20,14 +19,18 @@ import Pagination from './Pagination'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
-  referenceRow?: RowField
+  foreignKey?: {
+    target_table_schema: string
+    target_table_name: string
+    target_column_name: string
+  }
   onSelect: (value: any) => void
   closePanel: () => void
 }
 
 const ForeignRowSelector = ({
   visible,
-  referenceRow,
+  foreignKey,
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
@@ -38,7 +41,7 @@ const ForeignRowSelector = ({
     target_table_schema: schemaName,
     target_table_name: tableName,
     target_column_name: columnName,
-  } = referenceRow?.foreignKey ?? {}
+  } = foreignKey ?? {}
 
   const tables = meta.tables.list()
   const table = tables.find((table) => table.schema === schemaName && table.name === tableName)
