@@ -319,6 +319,23 @@ And then we can share this instance across our application with Outlet Context.
 <Outlet context={{ supabase }} />
 ```
 
+Optionally, you can create custom hooks for accessing the context in a type-safe way.
+
+```tsx
+import { useOutletContext } from "@remix-run/react";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
+
+export function useSupabase() {
+  const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>();
+  return supabase;
+}
+
+export function useSession() {
+  const { session } = useOutletContext<{ session: Session }>();
+  return session;
+}
+```
+
 </TabPanel>
 </Tabs>
 
