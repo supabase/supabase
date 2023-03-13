@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isEmpty, isUndefined, noop } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { Modal } from 'ui'
@@ -75,7 +75,63 @@ const SidePanelEditor = ({
 
   const { project } = useProjectContext()
   const { mutateAsync: createTableRow } = useTableRowCreateMutation()
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation()
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+    async onMutate({ projectRef, table, configuration, payload }) {
+      closePanel()
+
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
+
+      await queryClient.cancelQueries(queryKey)
+
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+    },
+  })
 
   const saveRow = async (
     payload: any,
