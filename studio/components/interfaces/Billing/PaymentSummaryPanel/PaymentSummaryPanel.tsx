@@ -88,7 +88,11 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const totalMonthlyCost = Object.keys(selectedAddons)
+  const selectedPlanCost =
+    selectedPlan.prices.find(
+      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+    )?.unit_amount ?? 0
+  const totalSelectedAddonCost = Object.keys(selectedAddons)
     .map((productName) => {
       const product = (selectedAddons as any)[productName]
       const price = product.prices.find(
@@ -97,6 +101,7 @@ const PaymentSummaryPanel: FC<Props> = ({
       return price
     })
     .reduce((a, b) => a + b.unit_amount, 0)
+  const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
 
   const currentPITRDays =
     currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
