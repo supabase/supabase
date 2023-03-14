@@ -13,7 +13,6 @@ import {
   Modal,
   Form,
   Toggle,
-  IconHelpCircle,
   Input,
   IconExternalLink,
 } from 'ui'
@@ -127,7 +126,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
               if (selectedFunction !== undefined) {
                 const formValues = {
                   name: selectedFunction?.name,
-                  verifyJwt: selectedFunction?.verify_jwt,
+                  verify_jwt: selectedFunction?.verify_jwt,
                 }
                 resetForm({ values: formValues, initialValues: formValues })
               }
@@ -184,8 +183,8 @@ const EdgeFunctionDetails: FC<Props> = () => {
                   <FormSection header={<FormSectionLabel>Function Configuration</FormSectionLabel>}>
                     <FormSectionContent loading={selectedFunction === undefined}>
                       <Toggle
-                        id="verifyJwt"
-                        name="verifyJwt"
+                        id="verify_jwt"
+                        name="verify_jwt"
                         label="Enforce JWT Verification"
                         descriptionText="Require a valid JWT in the authorization header when invoking the function"
                       />
