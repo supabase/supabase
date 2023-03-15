@@ -103,6 +103,8 @@ const PaymentSummaryPanel: FC<Props> = ({
     .reduce((a, b) => a + b.unit_amount, 0)
   const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
 
+  console.log({ selectedPlanCost, totalSelectedAddonCost })
+
   const currentPITRDays =
     currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
   const selectedPITRDays =
