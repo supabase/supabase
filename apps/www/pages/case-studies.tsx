@@ -15,6 +15,7 @@ import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
 import ImageGrid from '~/components/ImageGrid'
+import styles from './case-studies.module.css'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_case-studies')
@@ -75,20 +76,35 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Case studies" description="Latest customers using Supabase" />
       <DefaultLayout>
-        <div className="dark:bg-scale-200 bg-scale-100 overflow-hidden">
-          <div className="container mx-auto mt-32 px-8 sm:px-16 xl:px-20">
-            <div className="mx-auto max-w-7xl">
-              <div className="mx-auto max-w-3xl text-center">
+        <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
+          <div className="container mx-auto mt-40 px-8 sm:px-4 xl:px-20">
+            <div className="mx-auto relative z-10">
+              <div className="mx-auto max-w-2xl text-center">
                 <h1 className="text-scale-1200 mb-3 text-3xl">Case studies</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  Learn how teams behind everyone’s favorite products use Radix to save time, boost
-                  quality, and set the bar for accessibility.
+                  {/* Learn how teams behind everyone's favorite products use Radix to save time, boost
+                  quality, and set the bar for accessibility. */}
+                  Discover how supabase is being used around the world to quickly create outstanding
+                  products and set new industry standards.
                 </h2>
               </div>
-              <div className="mx-auto mt-12 grid max-w-lg lg:max-w-none lg:grid-cols-1">
-                <ImageGrid images={caseStudyThumbs} lgCols={4} padding={6} className="h-32" />
+              <div className="mx-auto mt-12 grid lg:grid-cols-1">
+                <ImageGrid
+                  images={caseStudyThumbs}
+                  mdCols={3}
+                  lgCols={4}
+                  padding={6}
+                  className="h-32"
+                  animated
+                />
               </div>
             </div>
+            <div
+              className={[
+                'absolute inset-0 h-[300px] dark:bg-scale-200 bg-bg-scale-200 z-0 after:!bg-scale-200',
+                styles['bg-visual'],
+              ].join(' ')}
+            />
           </div>
         </div>
       </DefaultLayout>

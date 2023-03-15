@@ -26,6 +26,7 @@
     "config": "*",
     "date-fns": "2.10.0",
     "dayjs": "^1.11.5",
+    "framer-motion": "^6.5.1",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
     "markdown-toc": "^1.2.0",
