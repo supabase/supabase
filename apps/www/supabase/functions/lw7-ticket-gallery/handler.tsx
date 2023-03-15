@@ -19,23 +19,23 @@ export async function handler(req: Request) {
       golden = true,
       bg_image_id = 80,
     }: {
-      username: string
-      name: string
-      ticketNumber: number
-      golden: boolean
-      bg_image_id: number
+      username?: string
+      name?: string
+      ticketNumber?: number
+      golden?: boolean
+      bg_image_id?: number
     } = await req.json()
 
     // Else, generate image ad upload to storage.
     const BACKGROUND = {
       REG: {
         AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
-        TICKET: `${STORAGE_URL}/reg_ticket.png`,
+        TICKET: `${STORAGE_URL}/reg_ticket_overlay.png`,
       },
       GOLD: {
         // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
-        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
-        TICKET: `${STORAGE_URL}/gold_ticket.png`,
+        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
+        TICKET: `${STORAGE_URL}/gold_ticket_overlay.png`,
       },
     }
 
@@ -48,8 +48,8 @@ export async function handler(req: Request) {
         <>
           <div
             style={{
-              width: '1200px',
-              height: '630px',
+              width: '1027px',
+              height: '520px',
               backgroundColor: '#000',
               color: '#F8F9FA',
               fontFamily: '"Circular"',
@@ -62,24 +62,23 @@ export async function handler(req: Request) {
             {/* Background ai  */}
             <img
               width="1027"
-              height="524"
+              height="520"
               style={{
-                borderRadius: '8px',
                 position: 'absolute',
-                top: '53',
-                left: '87',
+                top: '0',
+                left: '0',
                 zIndex: '-8000',
               }}
               src={golden ? BACKGROUND['GOLD']['AI'] : BACKGROUND['REG']['AI']}
             />
             {/* Background ticket  */}
             <img
-              width="1089"
-              height="586"
+              width="1027"
+              height="520"
               style={{
                 position: 'absolute',
-                top: '22',
-                left: '56',
+                top: '0',
+                left: '0',
                 zIndex: '-7000',
               }}
               src={golden ? BACKGROUND['GOLD']['TICKET'] : BACKGROUND['REG']['TICKET']}
@@ -90,8 +89,8 @@ export async function handler(req: Request) {
               height="166"
               style={{
                 position: 'absolute',
-                top: '210',
-                left: '484',
+                top: '160',
+                left: '400',
                 borderRadius: 83,
               }}
               src={`https://github.com/${username}.png`}
@@ -105,9 +104,9 @@ export async function handler(req: Request) {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: '350',
-                left: '210',
-                width: '727',
+                top: '285',
+                left: '200',
+                width: '570',
                 height: '200',
                 overflow: 'hidden',
                 textOverflow: 'clip',
@@ -159,8 +158,8 @@ export async function handler(req: Request) {
               alignItems: 'center',
               justifyContent: 'center',
               position: 'absolute',
-              bottom: '225',
-              right: '-130',
+              bottom: '175',
+              right: '-210',
               width: '575',
               height: '175',
               transform: 'rotate(90deg)',
@@ -169,7 +168,7 @@ export async function handler(req: Request) {
           >
             <p
               style={{
-                fontSize: '60',
+                fontSize: '66',
               }}
             >
               {`No ${prefix}${ticketNumber}`}
@@ -178,8 +177,8 @@ export async function handler(req: Request) {
         </>
       ),
       {
-        width: 1200,
-        height: 608,
+        width: 1027,
+        height: 520,
         fonts: [
           {
             name: 'Circular',
