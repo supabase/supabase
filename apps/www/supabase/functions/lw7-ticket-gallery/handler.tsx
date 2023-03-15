@@ -89,7 +89,7 @@ export async function handler(req: Request) {
               height="166"
               style={{
                 position: 'absolute',
-                top: '160',
+                top: '150',
                 left: '400',
                 borderRadius: 83,
               }}
@@ -98,7 +98,6 @@ export async function handler(req: Request) {
             {/* Name & username */}
             <div
               style={{
-                // border: '3px solid red',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -115,7 +114,6 @@ export async function handler(req: Request) {
             >
               <div
                 style={{
-                  // border: '3px solid green',
                   display: 'flex',
                   color: 'transparent',
                   backgroundImage:
@@ -127,7 +125,7 @@ export async function handler(req: Request) {
                   style={{
                     margin: '0',
                     fontSize: '50px',
-                    lineHeight: '65px',
+                    lineHeight: '50px',
                   }}
                 >
                   {name ?? username}
@@ -137,7 +135,6 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  // border: '3px solid blue',/
                   color: '#EDEDED',
                   opacity: 0.8,
                   display: 'flex',
@@ -152,7 +149,6 @@ export async function handler(req: Request) {
           {/* Ticket No  */}
           <div
             style={{
-              // border: '3px solid red',
               color: '#F8F9FA',
               display: 'flex',
               alignItems: 'center',
