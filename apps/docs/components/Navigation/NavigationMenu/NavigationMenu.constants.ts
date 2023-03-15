@@ -309,9 +309,9 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs' },
+        { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs' },
         {
-          name: 'Next.js Server Components',
+          name: 'Next.js (app)',
           url: '/guides/auth/auth-helpers/nextjs-server-components',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
