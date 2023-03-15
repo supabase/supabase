@@ -69,8 +69,7 @@ export async function handler(req: Request) {
       },
       GOLD: {
         BG: `${STORAGE_URL}/gold_bg.png`,
-        // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
-        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket.png`,
       },
     }
