@@ -79,7 +79,7 @@ export async function getEntityTypes(
     from records r;
   `
 
-  const { result } = await executeSql<EntityTypesResponse[]>(
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
@@ -88,7 +88,7 @@ export async function getEntityTypes(
     signal
   )
 
-  return result[0]
+  return result[0] as EntityTypesResponse
 }
 
 export type EntityTypesData = Awaited<ReturnType<typeof getEntityTypes>>
