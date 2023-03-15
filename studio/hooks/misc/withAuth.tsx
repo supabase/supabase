@@ -50,7 +50,7 @@ export function withAuth<T>(
       },
     })
 
-    const isLoggedIn = Boolean(session)
+    const isLoggedIn = IS_PLATFORM ? Boolean(session) : true
 
     const isAccessingBlockedPage =
       !IS_PLATFORM &&
