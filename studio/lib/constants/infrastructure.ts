@@ -3,7 +3,7 @@
 // and are afterward never referred to
 export const REGIONS = {
   WEST_US: 'West US (North California)',
-  // EAST_US: 'East US (North Virginia)',
+  EAST_US: 'East US (North Virginia)',
   CENTRAL_CANADA: 'Canada (Central)',
   WEST_EU: 'West EU (Ireland)',
   WEST_EU_2: 'West EU (London)',
