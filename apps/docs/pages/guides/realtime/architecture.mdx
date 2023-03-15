@@ -47,7 +47,7 @@ Every Realtime region has at least two nodes so if one node goes offline the oth
 
 A Postgres logical replication slot is acquired when connecting to your database.
 
-Realtime delivers changes by polling the replication slot and appending connection IDs to each wal record. Each connection ID is a WebSocket connection.
+Realtime delivers changes by polling the replication slot and appending channel subscription IDs to each wal record.
 
 Connection IDs are Erlang processes representing underlying sockets on the cluster. These IDs are globally unique and messages to processes are routed automatically by the Erlang virtual machine.
 
