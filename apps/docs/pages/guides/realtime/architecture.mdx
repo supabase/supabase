@@ -37,7 +37,7 @@ If you're using Broadcast, Presence, or streaming database changes, messages wil
 
 ## Connecting to a Database
 
-Realtime allows you to listen to changes from your Postgres database. When a new client connects to Realtime and initializes the `postgres_changes` Realtime Extentsion the cluster will connect to your Postgres database and start streaming changes from a replication slot.
+Realtime allows you to listen to changes from your Postgres database. When a new client connects to Realtime and initializes the `postgres_changes` Realtime Extension the cluster will connect to your Postgres database and start streaming changes from a replication slot.
 
 Realtime knows the region your database is in, and connects to it from the closest region possible.
 
