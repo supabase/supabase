@@ -10,68 +10,32 @@ const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
 export async function handler(req: Request) {
-  const url = new URL(req.url)
-  const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumeGolden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
-  const userAgent = req.headers.get('user-agent')
-
   try {
-    if (!username) throw new Error('missing username param')
-    // Track social shares
-    const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-    if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-      const { error } = await supabaseAdminClient
-        .from('lw7_tickets')
-        .update({ sharedOnTwitter: 'now' })
-        .eq('username', username)
-        .is('sharedOnTwitter', null)
-      if (error) console.log(error.message)
-    } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-      const { error } = await supabaseAdminClient
-        .from('lw7_tickets')
-        .update({ sharedOnLinkedIn: 'now' })
-        .eq('username', username)
-        .is('sharedOnLinkedIn', null)
-      if (error) console.log(error.message)
-    }
-
-    // Try to get image from Supabase Storage CDN.
-    let storageResponse: Response
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/${username}.png`)
-    if (storageResponse.ok) return storageResponse
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
-    if (!assumeGolden && storageResponse.ok) return storageResponse
-
-    // Get ticket data
-    const { data, error } = await supabaseAdminClient
-      .from('lw7_tickets_golden')
-      .select('name, ticketNumber, golden, bg_image_id')
-      .eq('username', username)
-      .maybeSingle()
-    if (error) console.log(error.message)
-    if (!data) throw new Error('user not found')
-    const { name, ticketNumber, bg_image_id } = data
-    const golden = data?.golden ?? false
-
-    if (assumeGolden && !golden) return await fetch(`${STORAGE_URL}/golden_no_meme.png`)
+    if (req.method !== 'POST') throw new Error('method not supported')
+    const {
+      username = 'thorwebdev',
+      name = 'Thorsten Schaeff',
+      ticketNumber = 1234,
+      golden = true,
+      bg_image_id = 80,
+    }: {
+      username?: string
+      name?: string
+      ticketNumber?: number
+      golden?: boolean
+      bg_image_id?: number
+    } = await req.json()
 
     // Else, generate image ad upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/reg_bg.png`,
         AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
-        TICKET: `${STORAGE_URL}/reg_ticket.png`,
+        TICKET: `${STORAGE_URL}/reg_ticket_overlay.png`,
       },
       GOLD: {
-        BG: `${STORAGE_URL}/gold_bg.png`,
         // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
-        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${Math.floor(Math.random() * 56)}.png`,
-        TICKET: `${STORAGE_URL}/gold_ticket.png`,
+        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
+        TICKET: `${STORAGE_URL}/gold_ticket_overlay.png`,
       },
     }
 
@@ -84,8 +48,8 @@ export async function handler(req: Request) {
         <>
           <div
             style={{
-              width: '1200px',
-              height: '630px',
+              width: '1027px',
+              height: '520px',
               backgroundColor: '#000',
               color: '#F8F9FA',
               fontFamily: '"Circular"',
@@ -95,39 +59,26 @@ export async function handler(req: Request) {
               justifyContent: 'center',
             }}
           >
-            {/* Background gradient  */}
+            {/* Background ai  */}
             <img
-              width="1200"
-              height="630"
+              width="1027"
+              height="520"
               style={{
                 position: 'absolute',
                 top: '0',
                 left: '0',
-                zIndex: '-9000',
-              }}
-              src={golden ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
-            />
-            {/* Background ai  */}
-            <img
-              width="1027"
-              height="524"
-              style={{
-                borderRadius: '8px',
-                position: 'absolute',
-                top: '53',
-                left: '87',
                 zIndex: '-8000',
               }}
               src={golden ? BACKGROUND['GOLD']['AI'] : BACKGROUND['REG']['AI']}
             />
             {/* Background ticket  */}
             <img
-              width="1089"
-              height="586"
+              width="1027"
+              height="520"
               style={{
                 position: 'absolute',
-                top: '22',
-                left: '56',
+                top: '0',
+                left: '0',
                 zIndex: '-7000',
               }}
               src={golden ? BACKGROUND['GOLD']['TICKET'] : BACKGROUND['REG']['TICKET']}
@@ -138,8 +89,8 @@ export async function handler(req: Request) {
               height="166"
               style={{
                 position: 'absolute',
-                top: '210',
-                left: '484',
+                top: '150',
+                left: '400',
                 borderRadius: 83,
               }}
               src={`https://github.com/${username}.png`}
@@ -147,15 +98,14 @@ export async function handler(req: Request) {
             {/* Name & username */}
             <div
               style={{
-                // border: '3px solid red',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: '350',
-                left: '210',
-                width: '727',
+                top: '285',
+                left: '200',
+                width: '570',
                 height: '200',
                 overflow: 'hidden',
                 textOverflow: 'clip',
@@ -164,7 +114,6 @@ export async function handler(req: Request) {
             >
               <div
                 style={{
-                  // border: '3px solid green',
                   display: 'flex',
                   color: 'transparent',
                   backgroundImage:
@@ -176,7 +125,7 @@ export async function handler(req: Request) {
                   style={{
                     margin: '0',
                     fontSize: '50px',
-                    lineHeight: '65px',
+                    lineHeight: '50px',
                   }}
                 >
                   {name ?? username}
@@ -186,7 +135,6 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  // border: '3px solid blue',/
                   color: '#EDEDED',
                   opacity: 0.8,
                   display: 'flex',
@@ -201,14 +149,13 @@ export async function handler(req: Request) {
           {/* Ticket No  */}
           <div
             style={{
-              // border: '3px solid red',
               color: '#F8F9FA',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'absolute',
-              bottom: '225',
-              right: '-130',
+              bottom: '175',
+              right: '-210',
               width: '575',
               height: '175',
               transform: 'rotate(90deg)',
@@ -217,7 +164,7 @@ export async function handler(req: Request) {
           >
             <p
               style={{
-                fontSize: '60',
+                fontSize: '66',
               }}
             >
               {`No ${prefix}${ticketNumber}`}
@@ -226,8 +173,8 @@ export async function handler(req: Request) {
         </>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: 1027,
+        height: 520,
         fonts: [
           {
             name: 'Circular',
@@ -244,32 +191,25 @@ export async function handler(req: Request) {
     )
 
     // Upload image to storage.
+    const supabaseAdminClient = createClient(
+      // Supabase API URL - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_URL') ?? '',
+      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`lw7/tickets/${golden ? `golden/${username}` : username}.png`, generatedImage.body!, {
+      .upload(`lw7/tickets/gallery/${username}.png`, generatedImage.body!, {
         contentType: 'image/png',
         cacheControl: '31536000',
-        upsert: false,
+        upsert: true,
       })
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
-    // Generate imgae for gallery
-    fetch('https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-gallery', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I',
-      },
-      body: JSON.stringify({
-        username,
-        name,
-        ticketNumber,
-        bg_image_id,
-        golden,
-      }),
-    })
 
-    return await fetch(`${STORAGE_URL}/tickets/${golden ? `golden/${username}` : username}.png`)
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
