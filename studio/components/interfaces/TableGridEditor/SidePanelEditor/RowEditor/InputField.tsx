@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined, includes } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2, Toggle } from 'ui'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2, Listbox } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
@@ -199,37 +199,31 @@ const InputField: FC<Props> = ({
 
   if (field.format === 'bool') {
     return (
-      <div className="text-sm grid gap-2 md:grid md:grid-cols-12">
-        <div className="flex flex-col space-y-2 col-span-4">
-          <label className="block text-scale-1100 text-sm">{field.name}</label>
-          <span className="text-scale-900 text-sm">{field.format}</span>
-        </div>
-        <div className="col-span-8 space-y-1">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-4">
-              <Toggle
-                checked={field.value === null ? false : field.value === 'true'}
-                // @ts-ignore
-                onChange={(value: boolean) =>
-                  onUpdateField({ [field.name]: value ? 'true' : 'false' })
-                }
-              />
-              {field.value === null && <p className="text-sm text-scale-1000">NULL</p>}
-            </div>
-            {field.isNullable && (
-              <Button
-                type="default"
-                size="tiny"
-                disabled={field.value === null}
-                onClick={() => onUpdateField({ [field.name]: null })}
-              >
-                Set to NULL
-              </Button>
-            )}
-          </div>
-          {field.comment && <p className="text-scale-900">{field.comment}</p>}
-        </div>
-      </div>
+      <Listbox
+        size="small"
+        layout="horizontal"
+        name={field.name}
+        label={field.name}
+        labelOptional={field.format}
+        descriptionText={field.comment}
+        defaultValue={field.value}
+        onChange={(value: string) => {
+          if (value === 'null') onUpdateField({ [field.name]: null })
+          else onUpdateField({ [field.name]: value })
+        }}
+      >
+        <Listbox.Option id="true" key="true" label="TRUE" value="true">
+          TRUE
+        </Listbox.Option>
+        <Listbox.Option id="false" key="false" label="FALSE" value="false">
+          FALSE
+        </Listbox.Option>
+        {field.isNullable && (
+          <Listbox.Option id="null" key="null" label="NULL" value="null">
+            NULL
+          </Listbox.Option>
+        )}
+      </Listbox>
     )
   }
 
