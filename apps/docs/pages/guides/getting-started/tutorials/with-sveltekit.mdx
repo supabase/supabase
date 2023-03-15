@@ -45,16 +45,6 @@ PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
 PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
-{/* Now that we have the API credentials in place, create a `src/lib/supabaseClient.ts` helper file to initialize the Supabase client.
-These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
-
-```js title=src/lib/supabaseClient.ts
-import { createClient } from '@supabase/auth-helpers-sveltekit'
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
-
-export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
-``` */}
-
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
 ### Supabase Auth Helpers
@@ -116,12 +106,11 @@ If you are using TypeScript the compiler might complain about `event.locals.supa
 // src/app.d.ts
 
 import { SupabaseClient, Session } from '@supabase/supabase-js';
-import { Database } from './DatabaseDefinitions';
 
 declare global {
   namespace App {
     interface Locals {
-      supabase: SupabaseClient<Database>;
+      supabase: SupabaseClient;
       getSession(): Promise<Session | null>;
     }
     interface PageData {
@@ -131,57 +120,6 @@ declare global {
     // interface Platform {}
   }
 }
-```
-
-Update your `src/routes/+layout.svelte`:
-
-```svelte title=src/routes/+layout.svelte
-<!-- src/routes/+layout.svelte -->
-<script lang="ts">
-	import '../styles.css';
-</script>
-
-<svelte:head>
-	<title>User Management</title>
-</svelte:head>
-
-<div class="container" style="padding: 50px 0 100px 0">
-	<slot />
-</div>
-```
-
-Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
-
-```ts title=src/routes/+layout.ts
-// src/routes/+layout.ts
-import { invalidate } from '$app/navigation';
-import {
-  PUBLIC_SUPABASE_ANON_KEY,
-  PUBLIC_SUPABASE_URL
-} from '$env/static/public';
-import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
-import type { LayoutLoad } from './$types';
-import type { Database } from '../DatabaseDefinitions';
-
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth');
-
-  const supabase = createSupabaseLoadClient<Database>({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-    event: { fetch },
-    serverSession: data.session,
-    onAuthStateChange() {
-      invalidate('supabase:auth');
-    }
-  });
-
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
-
-  return { supabase, session };
-};
 ```
 
 Create a new `src/routes/+layout.server.ts` file to handle the session on the server-side.
@@ -195,6 +133,70 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
     session: getSession()
   };
 };
+```
+
+> Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+
+Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
+
+```ts title=src/routes/+layout.ts
+// src/routes/+layout.ts
+import { invalidate } from '$app/navigation';
+import {
+  PUBLIC_SUPABASE_ANON_KEY,
+  PUBLIC_SUPABASE_URL
+} from '$env/static/public';
+import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
+import type { LayoutLoad } from './$types';
+
+export const load: LayoutLoad = async ({ fetch, data, depends }) => {
+  depends('supabase:auth');
+
+  const supabase = createSupabaseLoadClient({
+    supabaseUrl: PUBLIC_SUPABASE_URL,
+    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    event: { fetch },
+    serverSession: data.session
+  });
+
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  return { supabase, session };
+};
+```
+
+Update your `src/routes/+layout.svelte`:
+
+```svelte title=src/routes/+layout.svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+	import '../styles.css';
+	import { invalidate } from '$app/navigation'
+	import { onMount } from 'svelte'
+	import type { LayoutData } from './$types'
+	
+	export let data: LayoutData
+
+	$: ({ supabase } = data)
+
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange(() => {
+			invalidate('supabase:auth')
+		})
+
+		return () => data.subscription.unsubscribe()
+	})
+</script>
+
+<svelte:head>
+	<title>User Management</title>
+</svelte:head>
+
+<div class="container" style="padding: 50px 0 100px 0">
+	<slot />
+</div>
 ```
 
 ### Set up a Login page
@@ -249,10 +251,10 @@ and send it over to the server. This all happens behind the scenes and isn't som
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ parent, url }) => {
-	const { session } = await parent();
+export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
+	const session = await getSession();
 
-  // if the user is already logged in return them to the account page
+    // if the user is already logged in return them to the account page
 	if (session) {
 		throw redirect(303, '/account');
 	}
@@ -558,7 +560,7 @@ And then we can add the widget to the Account page:
 
 ```svelte title=src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
-<script>
+<script lang="ts">
   // Import the new component
   import Avatar from './Avatar.svelte'
 </script>

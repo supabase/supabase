@@ -8,8 +8,8 @@ export type EdgeFunctionsUpdateVariables = {
   slug: string
   payload: {
     name?: string
-    verifyJwt?: boolean
-    importMap?: boolean
+    verify_jwt?: boolean
+    import_map?: boolean
   }
 }
 
