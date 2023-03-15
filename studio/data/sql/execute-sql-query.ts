@@ -12,8 +12,12 @@ export type ExecuteSqlVariables = {
   queryKey?: QueryKey
 }
 
-export async function executeSql(
-  { projectRef, connectionString, sql }: ExecuteSqlVariables,
+export async function executeSql<T = any>(
+  {
+    projectRef,
+    connectionString,
+    sql,
+  }: Pick<ExecuteSqlVariables, 'projectRef' | 'connectionString' | 'sql'>,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -35,7 +39,7 @@ export async function executeSql(
     throw response.error
   }
 
-  return { result: response }
+  return { result: response as T }
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>

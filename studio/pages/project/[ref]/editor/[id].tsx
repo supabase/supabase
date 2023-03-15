@@ -7,6 +7,7 @@ import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
@@ -96,21 +97,27 @@ const TableEditorPage: NextPageWithLayout = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onEditTable = (table: PostgresTable) => {
+  const onEditTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(false)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
-  const onDeleteTable = (table: PostgresTable) => {
+  const onDeleteTable = (entity: Entity) => {
     setIsDeleting(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToDelete(table)
     setIsDeleteWithCascade(false)
   }
 
-  const onDuplicateTable = (table: PostgresTable) => {
+  const onDuplicateTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
