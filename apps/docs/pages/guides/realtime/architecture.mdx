@@ -45,7 +45,7 @@ Every Realtime region has at least two nodes so if one node goes offline the oth
 
 ## Streaming the Write-Ahead Log
 
-During the connection process a Postgres replication slot is acquired.
+A Postgres logical replication slot is acquired when connecting to your database.
 
 Realtime delivers changes by polling the replication slot and appending connection IDs to each wal record. Each connection ID is a WebSocket connection.
 
