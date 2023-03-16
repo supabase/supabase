@@ -109,8 +109,6 @@ const RowEditor = ({
         configuration.rowIdx = row!.idx
       }
 
-      console.log({ payload })
-
       saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
     } else {
       setLoading(false)
