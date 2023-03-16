@@ -6,5 +6,5 @@ import { NullValue } from '../common'
 export const BooleanFormatter = (p: React.PropsWithChildren<FormatterProps<SupaRow, unknown>>) => {
   const value = p.row[p.column.key] as boolean | null
   if (value === null) return <NullValue />
-  return <>{value ? 'true' : 'false'}</>
+  return <>{value ? 'TRUE' : 'FALSE'}</>
 }

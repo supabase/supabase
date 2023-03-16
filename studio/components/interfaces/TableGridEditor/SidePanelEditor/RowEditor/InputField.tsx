@@ -1,5 +1,6 @@
-import { includes, noop } from 'lodash'
-import { Button, Select, Input, IconLink, IconEdit2 } from 'ui'
+import { FC } from 'react'
+import { isUndefined, includes, noop } from 'lodash'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2, Listbox } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
@@ -41,7 +42,7 @@ const InputField = ({
               field.defaultValue === null
                 ? ''
                 : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-                ? 'Default: Empty string'
+                ? 'EMPTY'
                 : `Default: ${field.defaultValue}`
             }
             onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
@@ -124,11 +125,26 @@ const InputField = ({
           rows={5}
           value={field.value ?? ''}
           placeholder={
-            field.defaultValue === null
-              ? ''
+            field.value === null && field.defaultValue === null
+              ? 'NULL'
+              : field.value === ''
+              ? 'EMPTY'
               : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-              ? 'Default: Empty string'
-              : `Default: ${field.defaultValue}`
+              ? 'EMPTY'
+              : `NULL (Default: ${field.defaultValue})`
+          }
+          actions={
+            <div className="mr-1 mt-0.5">
+              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
+                <Button
+                  type="default"
+                  size="tiny"
+                  onClick={() => onUpdateField({ [field.name]: null })}
+                >
+                  Set to NULL
+                </Button>
+              )}
+            </div>
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -145,7 +161,7 @@ const InputField = ({
         descriptionText={field.comment}
         labelOptional={field.format}
         disabled={!isEditable}
-        placeholder={field?.defaultValue ?? ''}
+        placeholder={field?.defaultValue ?? 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -179,6 +195,36 @@ const InputField = ({
     )
   }
 
+  if (field.format === 'bool') {
+    return (
+      <Listbox
+        size="small"
+        layout="horizontal"
+        name={field.name}
+        label={field.name}
+        labelOptional={field.format}
+        descriptionText={field.comment}
+        defaultValue={field.value}
+        onChange={(value: string) => {
+          if (value === 'null') onUpdateField({ [field.name]: null })
+          else onUpdateField({ [field.name]: value })
+        }}
+      >
+        <Listbox.Option id="true" key="true" label="TRUE" value="true">
+          TRUE
+        </Listbox.Option>
+        <Listbox.Option id="false" key="false" label="FALSE" value="false">
+          FALSE
+        </Listbox.Option>
+        {field.isNullable && (
+          <Listbox.Option id="null" key="null" label="NULL" value="null">
+            NULL
+          </Listbox.Option>
+        )}
+      </Listbox>
+    )
+  }
+
   return (
     <Input
       layout="horizontal"
@@ -192,7 +238,7 @@ const InputField = ({
           ? 'Automatically generated as identity'
           : field.defaultValue !== null
           ? `Default: ${field.defaultValue}`
-          : ''
+          : 'NULL'
       }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
