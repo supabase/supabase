@@ -1,5 +1,6 @@
 import { Button, Tabs, Alert, GlassPanel } from 'ui'
 import Link from 'next/link'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 // Common components
 import Admonition from './Admonition'
@@ -50,6 +51,7 @@ const components = {
   ProjectSetup,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
+  StepHikeCompact,
   StorageManagement,
   Mermaid,
   Extensions,
