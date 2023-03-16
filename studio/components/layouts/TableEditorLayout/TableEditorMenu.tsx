@@ -289,7 +289,7 @@ const EntityListItem = ({
 
   return (
     <ProductMenuItem
-      url={`/project/${projectRef}/editor/${entity.id}?type=${entity.type}`}
+      url={`/project/${projectRef}/editor/${entity.id}`}
       name={entity.name}
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
