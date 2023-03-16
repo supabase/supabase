@@ -9,20 +9,23 @@ export type ForeignKeyConstraint = {
   id: number
   constraint_name: string
   deletion_action: string
+  source_id: string
   source_schema: string
   source_table: string
   source_columns: string
+  target_id: string
   target_schema: string
   target_table: string
   target_columns: string
 }
 
 export const getForeignKeyConstraintsQuery = ({ schema }: getForeignKeyConstraintsVariables) => {
-  const sql = `
+  const sql = /* SQL */ `
 SELECT 
   con.oid as id, 
   con.conname as constraint_name, 
   con.confdeltype as deletion_action, 
+  rel.oid as source_id,
   nsp.nspname as source_schema, 
   rel.relname as source_table, 
   (
@@ -38,6 +41,7 @@ SELECT
     WHERE 
       att.attrelid = rel.oid
   ) source_columns, 
+  frel.oid as target_id,
   fnsp.nspname as target_schema, 
   frel.relname as target_table, 
   (
@@ -86,7 +90,7 @@ export const useForeignKeyConstraintsQuery = <
       projectRef,
       connectionString,
       sql: getForeignKeyConstraintsQuery({ schema }),
-      queryKey: ['foreignKeyConstraints'],
+      queryKey: ['foreign-key-constraints'],
     },
     {
       select(data) {
@@ -112,6 +116,6 @@ export const useForeignKeyConstraintsPrefetch = ({
     projectRef,
     connectionString,
     sql: getForeignKeyConstraintsQuery({ schema }),
-    queryKey: ['foreignKeyConstraints'],
+    queryKey: ['foreign-key-constraints'],
   })
 }
