@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
@@ -134,14 +134,19 @@ export default function TicketHome({ users }: Props) {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select('*').limit(12)
+  const { data: users } = await supabaseAdmin!
+    .from('lw7_tickets_golden')
+    .select('*')
+    .order('createdAt', { ascending: false })
+    .limit(12)
+
+  res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
 
   return {
     props: {
       users,
     },
-    revalidate: 5,
   }
 }
