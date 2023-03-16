@@ -11,7 +11,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { GOTRUE_ERRORS } from './constants'
+import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -45,11 +45,7 @@ export type AuthContext = { refreshSession: () => Promise<Session | null> } & (
     }
   | {
       session: null
-      isLoading: true
-    }
-  | {
-      session: null
-      isLoading: false
+      isLoading: boolean
     }
 )
 
@@ -142,11 +138,15 @@ export const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>)
   }, [])
 
   const value = useMemo(() => {
-    if (session) {
-      return { session, isLoading: false, refreshSession } as const
+    if (IS_PLATFORM) {
+      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
+    } else {
+      if (session) {
+        return { session, isLoading: false, refreshSession } as const
+      } else {
+        return { session: null, isLoading: isLoading, refreshSession } as const
+      }
     }
-
-    return { session: DEFAULT_SESSION, isLoading: isLoading, refreshSession } as const
   }, [session, isLoading, refreshSession])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
