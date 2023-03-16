@@ -81,27 +81,26 @@ const ItemContextMenu: FC<Props> = ({ id = '' }) => {
           </Item>
         </Submenu>
       )}
-      {canUpdateFiles && (
-        <>
-          <Item onClick={({ props }) => onHandleClick('rename', props.item)}>
+      {canUpdateFiles &&
+        [
+          <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
             <IconEdit size="tiny" />
             <span className="ml-2 text-xs">Rename</span>
-          </Item>
-          <Item onClick={({ props }) => onHandleClick('move', props.item)}>
+          </Item>,
+          <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
             <IconMove size="tiny" />
             <span className="ml-2 text-xs">Move</span>
-          </Item>
-          <Item onClick={({ props }) => onHandleClick('download', props.item)}>
+          </Item>,
+          <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
             <IconDownload size="tiny" />
             <span className="ml-2 text-xs">Download</span>
-          </Item>
-          <Separator />
-          <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
+          </Item>,
+          <Separator />,
+          <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
             <IconTrash2 size="tiny" />
             <span className="ml-2 text-xs">Delete</span>
-          </Item>
-        </>
-      )}
+          </Item>,
+        ].map((x) => x)}
     </Menu>
   )
 }
