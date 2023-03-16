@@ -422,6 +422,7 @@ const SidePanelEditor = ({
         onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
+        key={`foreign-row-selector-${selectedForeignKeyToEdit?.foreignKey?.id ?? 'null'}`}
         visible={sidePanelKey === 'foreign-row-selector'}
         foreignKey={selectedForeignKeyToEdit?.foreignKey}
         closePanel={onClosePanel}

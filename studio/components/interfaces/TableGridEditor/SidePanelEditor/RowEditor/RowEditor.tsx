@@ -218,6 +218,7 @@ const RowEditor = ({
       </form>
 
       <ForeignRowSelector
+        key={`foreign-row-selector-${foreignKey?.id ?? 'null'}`}
         visible={isSelectingForeignKey}
         foreignKey={foreignKey}
         onSelect={onSelectForeignRowValue}
