@@ -139,13 +139,13 @@ export const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>)
 
   const value = useMemo(() => {
     if (IS_PLATFORM) {
-      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
-    } else {
       if (session) {
         return { session, isLoading: false, refreshSession } as const
       } else {
         return { session: null, isLoading: isLoading, refreshSession } as const
       }
+    } else {
+      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
     }
   }, [session, isLoading, refreshSession])
 
