@@ -7,6 +7,8 @@ import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 
 function rowKeyGetter(row: SupaRow) {
   return row?.idx ?? -1
@@ -77,14 +79,23 @@ export const Grid = memo(
 
       const table = state.table
 
-      function getColumnForeignKey(columnName: string) {
-        const foreignKey = table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
+      const { project } = useProjectContext()
+      const { data } = useForeignKeyConstraintsQuery({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: table?.schema ?? undefined,
+      })
 
-        return Boolean(
-          foreignKey.targetTableSchema && foreignKey.targetTableName && foreignKey.targetColumnName
+      function getColumnForeignKey(columnName: string) {
+        const { targetTableSchema, targetTableName, targetColumnName } =
+          table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
+
+        return data?.find(
+          (key) =>
+            key.target_schema == targetTableSchema &&
+            key.target_table == targetTableName &&
+            key.target_columns == targetColumnName
         )
-          ? foreignKey
-          : undefined
       }
 
       function onRowDoubleClick(row: any, column: any) {
@@ -92,11 +103,7 @@ export const Grid = memo(
 
         if (foreignKey) {
           onEditForeignKeyColumnValue({
-            foreignKey: {
-              target_column_name: foreignKey.targetColumnName!,
-              target_table_name: foreignKey.targetTableName!,
-              target_table_schema: foreignKey.targetTableSchema!,
-            },
+            foreignKey,
             row,
             column,
           })
