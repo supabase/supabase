@@ -89,7 +89,6 @@ const ForeignRowSelector = ({
 
   return (
     <SidePanel
-      key="ForeignRowSelector"
       visible={visible}
       size="large"
       header={
