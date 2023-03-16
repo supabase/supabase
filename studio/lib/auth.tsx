@@ -11,7 +11,30 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { GOTRUE_ERRORS } from './constants'
+import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
+
+const DEFAULT_SESSION: any = {
+  access_token: undefined,
+  expires_at: 0,
+  expires_in: 0,
+  refresh_token: '',
+  token_type: '',
+  user: {
+    aud: '',
+    app_metadata: {},
+    confirmed_at: '',
+    created_at: '',
+    email: '',
+    email_confirmed_at: '',
+    id: '',
+    identities: [],
+    last_signed_in_at: '',
+    phone: '',
+    role: '',
+    updated_at: '',
+    user_metadata: {},
+  },
+}
 
 /* Auth Context */
 
@@ -22,11 +45,7 @@ export type AuthContext = { refreshSession: () => Promise<Session | null> } & (
     }
   | {
       session: null
-      isLoading: true
-    }
-  | {
-      session: null
-      isLoading: false
+      isLoading: boolean
     }
 )
 
@@ -119,11 +138,15 @@ export const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>)
   }, [])
 
   const value = useMemo(() => {
-    if (session) {
-      return { session, isLoading: false, refreshSession } as const
+    if (IS_PLATFORM) {
+      if (session) {
+        return { session, isLoading: false, refreshSession } as const
+      } else {
+        return { session: null, isLoading: isLoading, refreshSession } as const
+      }
+    } else {
+      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
     }
-
-    return { session: null, isLoading: isLoading, refreshSession } as const
   }, [session, isLoading, refreshSession])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
