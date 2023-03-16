@@ -16,7 +16,8 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-use-id-hook": "^1.0.1",
-    "ui": "*"
+    "ui": "*",
+    "common": "*"
   },
   "devDependencies": {
     "eslint": "8.35.0",

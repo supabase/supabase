@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import type { CreateCompletionResponse } from 'openai'
 import { FC, useCallback, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -30,7 +30,18 @@ import SearchResult, { SearchResultType } from './SearchResult'
 import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
+import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
+
 const questions = [
+  'How do I get started with Supabase?',
+  'How do I run Supabase locally?',
+  'How do I connect to my database?',
+  'How do I run migrations? ',
+  'How do I listen to changes in a table?',
+  'How do I set up authentication?',
+]
+
+const RLSquestions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
   'How do I connect to my database?',
@@ -61,14 +72,32 @@ function promptDataReducer(
     answer?: string | undefined
     status?: string
     query?: string | undefined
+    type?: 'remove-last-item' | string
   }
 ) {
   // console.log('running reducer')
   // console.log('what is currently in', ...state)
-  console.log('what is the action payload', action)
-  if (action.index === undefined) return [...state]
-
+  // console.log('what is the action payload', action)
+  // set a standard state to use later
   let current = [...state]
+
+  console.log(action)
+
+  if (action.type) {
+    switch (action.type) {
+      case 'remove-last-item':
+        console.log('removing last item')
+        current.pop()
+        return [...current]
+        break
+
+      default:
+        break
+    }
+  }
+
+  // check that an index is present
+  if (action.index === undefined) return [...state]
 
   if (!current[action.index]) {
     current[action.index] = { query: '', answer: '', status: '' }
@@ -84,15 +113,22 @@ function promptDataReducer(
     current[action.index].status = action.status
   }
 
-  console.log('what i will update with', current)
+  // console.log('what i will update with', current)
+  console.log(current)
   return [...current]
 
   throw Error('Unknown action.')
 }
 
-const AiCommand: FC = () => {
+interface IAiCommand {
+  query?: string
+  setQuery?: () => void
+  page?: string
+}
+
+const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
   const { isDarkMode } = useTheme()
-  const [query, setQuery] = useState('')
+
   // const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState<string | undefined>('')
   const [results, setResults] = useState<any[]>()
@@ -105,9 +141,7 @@ const AiCommand: FC = () => {
   const supabaseClient = useSupabaseClient()
 
   const [promptIndex, setPromptIndex] = useState(0)
-  const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [
-    { query: '', answer: '', status: '' },
-  ])
+  const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
@@ -157,80 +191,105 @@ const AiCommand: FC = () => {
   //   [supabaseClient]
   // )
 
-  console.log('current index', promptIndex)
+  // console.log('current index', promptIndex)
 
-  const handleClippyConfirm = useCallback(async (query: string) => {
-    // setResults(undefined)
-    const _promptIndex = promptIndex
-    setAnswer(undefined)
-    dispatchPromptData({ index: _promptIndex, answer: undefined, query: query })
-    setIsResponding(false)
-    setHasClippyError(false)
-    setHasSearchError(false)
-    setIsLoading(true)
-
-    const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
-      headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      payload: JSON.stringify({ query }),
-    })
-
-    function handleError<T>(err: T) {
-      setIsLoading(false)
+  const handleClippyConfirm = useCallback(
+    async (query: string) => {
+      // setResults(undefined)
+      // const promptIndex = promptIndex
+      console.log('handleClippyConfirm ran')
+      console.log('promptIndex', promptIndex)
+      setAnswer(undefined)
+      setQuery('')
+      dispatchPromptData({ index: promptIndex, answer: undefined, query: query })
       setIsResponding(false)
-      setHasClippyError(true)
-      console.error(err)
-    }
+      setHasClippyError(false)
+      setHasSearchError(false)
+      setIsLoading(true)
 
-    eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e: any) => {
-      try {
-        setIsLoading(false)
+      let queryToSend = query
 
-        if (e.data === '[DONE]') {
-          // console.log('I HAVE FINSHED')
-          setIsResponding(false)
-          setPromptIndex((index) => {
-            return index + 1
-          })
-          return
-        }
+      switch (page) {
+        case COMMAND_ROUTES.AI_ASK_ANYTHING:
+          queryToSend = query
+          break
 
-        setIsResponding(true)
-
-        const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-        const [{ text }] = completionResponse.choices
-
-        setAnswer((answer) => {
-          dispatchPromptData({
-            // console.log('VERY FIRST data', 'data from dispatch', data)
-            index: _promptIndex,
-            answer: (answer ?? '') + text,
-          })
-
-          return (answer ?? '') + text
-        })
-        // console.log('new text going in', text)
-        const currentAnswer = promptData[promptIndex]?.answer
-        dispatchPromptData({
-          // console.log('VERY FIRST data', 'data from dispatch', data)
-          index: _promptIndex,
-          answer: (currentAnswer ?? '') + text,
-        })
-      } catch (err) {
-        handleError(err)
+        case COMMAND_ROUTES.AI_RLS_POLICY:
+          queryToSend = `Given this table schema:
+          
+          Schema STRIPE has tables: 
+            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
+            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
+          
+          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
+          break
+        default:
+          break
       }
-    })
 
-    eventSource.stream()
+      console.log('query to send:', queryToSend)
 
-    eventSourceRef.current = eventSource
+      const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
+        headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        payload: JSON.stringify({ query: queryToSend }),
+      })
 
-    setIsLoading(true)
-  }, [])
+      function handleError<T>(err: T) {
+        setIsLoading(false)
+        setIsResponding(false)
+        // setHasClippyError(true)
+        console.error(err)
+      }
+
+      eventSource.addEventListener('error', handleError)
+      eventSource.addEventListener('message', (e: any) => {
+        try {
+          setIsLoading(false)
+
+          if (e.data === '[DONE]') {
+            // console.log('I HAVE FINSHED')
+            setIsResponding(false)
+            setAnswer(undefined)
+            setPromptIndex((x) => {
+              return x + 1
+            })
+            return
+          }
+
+          setIsResponding(true)
+
+          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+          const [{ text }] = completionResponse.choices
+
+          console.log('Im going to use index:', promptIndex)
+
+          setAnswer((answer) => {
+            const currentAnswer = answer ?? ''
+
+            dispatchPromptData({
+              index: promptIndex,
+              answer: currentAnswer + text,
+            })
+
+            return (answer ?? '') + text
+          })
+        } catch (err) {
+          handleError(err)
+        }
+      })
+
+      eventSource.stream()
+
+      eventSourceRef.current = eventSource
+
+      setIsLoading(true)
+    },
+    [promptIndex, promptData]
+  )
 
   const handleConfirm = useCallback(
     (selectedTab: string, query: string) => {
@@ -260,9 +319,22 @@ const AiCommand: FC = () => {
 
   // console.log(promptData)
 
+  useEffect(() => {
+    if (query) {
+      handleClippyConfirm(query)
+    }
+  }, [])
+
+  const showActions =
+    !query &&
+    page === COMMAND_ROUTES.AI_RLS_POLICY &&
+    !isResponding &&
+    !isLoading &&
+    promptData.length > 0
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="relative pb-32">
+      <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">
         {/* <Tabs
           activeId={selectedTab}
           onChange={(tabId) => {
@@ -374,103 +446,181 @@ const AiCommand: FC = () => {
           </div>
         )} */}
 
-        {promptData.map((prompt) => {
-          return (
-            <>
-              {prompt.query && (
-                <div className="flex gap-6 mx-4 mb-6">
-                  <div className="w-7 h-7 bg-brand-900 rounded-full border border-brand-800 flex items-center justify-center text-brand-1200">
-                    <IconUser strokeWidth={2} size={16} />
+        <div className="flex flex-col gap-6">
+          {promptData.map((prompt, i) => {
+            if (!prompt.query) return <></>
+
+            return (
+              <>
+                {prompt.query && (
+                  <div className="flex gap-6 mx-4">
+                    <div className="w-7 h-7 bg-brand-900 rounded-full border border-brand-800 flex items-center justify-center text-brand-1200">
+                      <IconUser strokeWidth={2} size={16} />
+                    </div>
+                    <div className="prose text-scale-1000">{prompt.query}</div>
                   </div>
-                  <div className="prose text-scale-900">{prompt.query}</div>
-                </div>
-              )}
-              {prompt.answer && (
+                )}
+
                 <div className="px-4">
-                  {cantHelp ? (
-                    <p className="flex flex-col gap-4 items-center p-4">
-                      <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
-                        <IconAlertCircle />
-                        <p>Sorry, I don&apos;t know how to help with that.</p>
-                      </div>
-                      {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+                  {
+                    // cantHelp
+                    false ? (
+                      <p className="flex flex-col gap-4 items-center p-4">
+                        <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
+                          <IconAlertCircle />
+                          <p>Sorry, I don&apos;t know how to help with that.</p>
+                        </div>
+                        {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
                         Try again?
                       </Button> */}
-                    </p>
-                  ) : (
-                    <div className="flex gap-6">
-                      <div
-                        className="w-7 h-7 
+                      </p>
+                    ) : (
+                      <div className="flex gap-6">
+                        <AiIconChat />
+                        {/* <div
+                      className="w-7 h-7 
                         
                         bg-gradient-to-r from-purple-900 to-pink-900
                         
                         rounded-lg border border-pink-400 flex items-center justify-center
                         shadow-sm
                         "
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="w-4 h-4 text-white"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          className="w-4 h-4 text-white"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="prose dark:prose-dark">
-                        <ReactMarkdown
-                          linkTarget="_blank"
-                          remarkPlugins={[remarkGfm]}
-                          transformLinkUri={(href) => {
-                            const supabaseUrl = new URL('https://supabase.com')
-                            const linkUrl = new URL(href, 'https://supabase.com')
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                        />
+                      </svg>
+                    </div> */}
+                        <div className="w-full">
+                          {isLoading && promptIndex === i ? (
+                            <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                          ) : (
+                            <ReactMarkdown
+                              linkTarget="_blank"
+                              className="prose dark:prose-dark"
+                              remarkPlugins={[remarkGfm]}
+                              transformLinkUri={(href) => {
+                                const supabaseUrl = new URL('https://supabase.com')
+                                const linkUrl = new URL(href, 'https://supabase.com')
 
-                            if (linkUrl.origin === supabaseUrl.origin) {
-                              return linkUrl.toString()
-                            }
+                                if (linkUrl.origin === supabaseUrl.origin) {
+                                  return linkUrl.toString()
+                                }
 
-                            return href
-                          }}
-                          // components={components}
-                        >
-                          {prompt.answer}
-                        </ReactMarkdown>
+                                return href
+                              }}
+                              // components={components}
+                            >
+                              {prompt.answer}
+                            </ReactMarkdown>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )
+                  }
                 </div>
-              )}
-            </>
-          )
-        })}
 
-        {/* <CommandGroup heading="" forceMount>
-          <CommandItem onSelect={() => alert("You've selected me")} forceMount>
-            <IconCopy className="mr-2" />
-            <span>Copy SQL to clipboard</span>
-          </CommandItem>
-          <CommandItem forceMount>
-            <IconCopy className="mr-2" />
-            <span>Copy to SQL editor</span>
-          </CommandItem>
-          <CommandItem forceMount>
-            <IconCopy className="mr-2" />
-            <span>Execute this SQL now</span>
-          </CommandItem>
-        </CommandGroup> */}
+                {showActions && promptIndex === i + 1 && (
+                  <CommandGroup heading="" forceMount className="!pt-0 !pl-[60px]">
+                    <CommandItem
+                      onSelect={() => {
+                        if (!query) {
+                          alert("You've selected me")
+                        }
+                      }}
+                      forceMount
+                    >
+                      <IconCopy className="mr-2" />
+                      <span>Copy SQL to clipboard</span>
+                    </CommandItem>
+                    {promptData.length > 1 && (
+                      <CommandItem
+                        forceMount
+                        onSelect={() => {
+                          if (!query) {
+                            dispatchPromptData({ type: 'remove-last-item' })
+                            setPromptIndex((x) => {
+                              return x - 1
+                            })
+                            // alert('back to previous version')
+                          }
+                        }}
+                      >
+                        <IconCopy className="mr-2" />
+                        <span>Back to previous version</span>
+                      </CommandItem>
+                    )}
+                    <CommandItem forceMount>
+                      <IconCopy className="mr-2" />
+                      <span>Run in SQL editor</span>
+                    </CommandItem>
+                  </CommandGroup>
+                )}
+              </>
+            )
+          })}
+        </div>
 
-        {isLoading && (
+        {promptData.length <= 0 && page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
+          <CommandGroup heading="Examples" forceMount>
+            {questions.map((question) => {
+              const key = question.replace(/\s+/g, '_')
+              return (
+                <CommandItem
+                  onSelect={() => {
+                    if (!query) {
+                      handleClippyConfirm(question)
+                    }
+                  }}
+                  forceMount
+                  key={key}
+                >
+                  <AiIcon />
+                  {question}
+                </CommandItem>
+              )
+            })}
+          </CommandGroup>
+        )}
+
+        {/* {promptData.length <= 0 && page === COMMAND_ROUTES.AI_RLS_POLICY && (
+          <CommandGroup heading="Examples" forceMount>
+            {RLSquestions.map((question) => {
+              const key = question.replace(/\s+/g, '_')
+              return (
+                <CommandItem
+                  onSelect={() => {
+                    if (!query) {
+                      handleClippyConfirm(question)
+                    }
+                  }}
+                  forceMount
+                  key={key}
+                >
+                  <AiIcon />
+                  {question}
+                </CommandItem>
+              )
+            })}
+          </CommandGroup>
+        )} */}
+
+        {/* {isLoading && (
           <div className="p-6 grid gap-6 mt-4">
             <Loading active>{}</Loading>
             <p className="text-lg text-center">Searching for results</p>
           </div>
-        )}
+        )} */}
         {hasClippyError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />

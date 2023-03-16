@@ -24,7 +24,7 @@
     "@tailwindcss/typography": "^0.5.0",
     "autoprefixer": "^10.4.2",
     "clsx": "^1.2.1",
-    "cmdk-supabase": "^0.2.1",
+    "cmdk-supabase": "^0.2.2",
     "deepmerge": "^4.2.2",
     "formik": "^2.2.9",
     "lodash": "^4.17.20",

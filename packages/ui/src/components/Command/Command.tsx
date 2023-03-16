@@ -9,6 +9,7 @@ import {
   CommandInput,
   CommandItem,
   CommandItemStale,
+  CommandLabel,
   CommandList,
   CommandSeparator,
   CommandShortcut,
@@ -16,8 +17,12 @@ import {
 import { IconCloudDrizzle } from '../Icon/icons/IconCloudDrizzle'
 import { IconBook } from '../Icon/icons/IconBook'
 import { IconInbox } from '../Icon/icons/IconInbox'
+import { IconMonitor } from '../Icon/icons/IconMonitor'
 import { Input } from '../Input'
 import { AiCommand } from './AiCommand'
+import { IconSun } from '../Icon/icons/IconSun'
+import { IconMoon } from '../Icon/icons/IconMoon'
+import { IconCopy } from '../Icon/icons/IconCopy'
 // import { SearchProvider } from './SearchProvider'
 
 const SubItem = (props: any) => {
@@ -26,7 +31,96 @@ const SubItem = (props: any) => {
   return <CommandItem {...props} />
 }
 
-function CommandMenu() {
+export const AiIcon = () => (
+  // <svg
+  //   xmlns="http://www.w3.org/2000/svg"
+  //   fill="none"
+  //   viewBox="0 0 24 24"
+  //   stroke-width="1.5"
+  //   stroke="currentColor"
+  //   className="w-6 h-6 mr-2 text-brand-900"
+  // >
+  //   <path
+  //     stroke-linecap="round"
+  //     stroke-linejoin="round"
+  //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+  //   />
+  // </svg>
+
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    className="w-6 h-6 text-purple-900"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+    />
+  </svg>
+)
+
+export const COMMAND_ROUTES = {
+  AI_HOME: 'Supabase AI',
+  AI_ASK_ANYTHING: 'Ask me anything',
+  AI_RLS_POLICY: 'Help me make a RLS policy',
+}
+
+const AI_CHAT_ROUTES = [COMMAND_ROUTES.AI_ASK_ANYTHING, COMMAND_ROUTES.AI_RLS_POLICY]
+
+export const AiIconChat = () => (
+  // <svg
+  //   xmlns="http://www.w3.org/2000/svg"
+  //   fill="none"
+  //   viewBox="0 0 24 24"
+  //   stroke-width="1.5"
+  //   stroke="currentColor"
+  //   className="w-6 h-6 mr-2 text-brand-900"
+  // >
+  //   <path
+  //     stroke-linecap="round"
+  //     stroke-linejoin="round"
+  //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+  //   />
+  // </svg>
+
+  <div
+    className="w-7 h-7
+                    
+                    bg-gradient-to-r from-purple-900 to-purple-800
+
+                    ring-purple-600
+                    ring-1
+                    
+                    rounded-md border border-purple-400 flex items-center justify-center
+                    shadow-sm
+                    "
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      className="w-4 h-4 text-white"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+      />
+    </svg>
+  </div>
+)
+
+interface IActions {
+  toggleTheme: () => void
+}
+
+function CommandMenu({ actions }: { actions: IActions }) {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const [aiSearch, setAiSearch] = React.useState('')
@@ -49,70 +143,9 @@ function CommandMenu() {
     if (!keepSearch) setSearch('')
   }
 
-  const AiIcon = () => (
-    // <svg
-    //   xmlns="http://www.w3.org/2000/svg"
-    //   fill="none"
-    //   viewBox="0 0 24 24"
-    //   stroke-width="1.5"
-    //   stroke="currentColor"
-    //   className="w-6 h-6 mr-2 text-brand-900"
-    // >
-    //   <path
-    //     stroke-linecap="round"
-    //     stroke-linejoin="round"
-    //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-    //   />
-    // </svg>
-    <div
-      className="w-7 h-7 mr-2 
-                    
-                    bg-gradient-to-r from-purple-900 to-pink-900
-                    
-                    rounded-lg border border-pink-400 flex items-center justify-center
-                    shadow-sm
-                    "
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        className="w-2 h-2 text-white"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-        />
-      </svg>
-    </div>
-  )
+  console.log('page', page)
 
-  const AiItem = () => (
-    <CommandItem onSelect={() => handleSetPages([...pages, 'Ask anything'], true)}>
-      {/* <IconCloudDrizzle strokeWidth={2} className="text-brand-900 mr-2 h-4 w-4" /> */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        className="w-6 h-6 mr-2 text-brand-900"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-        />
-      </svg>
-
-      <span>
-        Ask Supabase AI... <span className="text-scale-1200 font-semibold">{search}</span>
-      </span>
-    </CommandItem>
-  )
+  const showCommandInput = page === undefined || !AI_CHAT_ROUTES.includes(page)
 
   return (
     <>
@@ -142,14 +175,13 @@ function CommandMenu() {
           }
         }}
       >
-        <div className="flex w-full gap-3 px-4 pt-2 justify-items-start flex-row">
+        <div className="flex w-full gap-2 px-4 pt-2 justify-items-start flex-row">
           {pages.length > 0 && <CommandShortcut>{'Home'}</CommandShortcut>}
           {pages.map((page) => (
             <CommandShortcut>{page}</CommandShortcut>
           ))}
         </div>
-        {/* <CommandShortcut>Docs</CommandShortcut> */}
-        {page !== 'Ask anything' && (
+        {showCommandInput && (
           <CommandInput
             placeholder="Type a command or search..."
             value={search}
@@ -162,29 +194,32 @@ function CommandMenu() {
           <SubItem>Change theme to light</SubItem>
         </CommandList> */}
 
-        <CommandList className={['my-2', page !== 'Ask anything' && 'max-h-[300px]'].join(' ')}>
+        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
           {!page && (
             <>
-              <CommandGroup heading="Suggestions" forceMount>
+              <CommandGroup heading="AI commands" forceMount>
                 <CommandItem
-                  onSelect={() => handleSetPages([...pages, 'Supabase AI'], false)}
+                  onSelect={() => {
+                    console.log('search', search)
+                    if (search) {
+                      handleSetPages([...pages, 'Supabase AI', 'Ask anything'], true)
+                    } else {
+                      handleSetPages([...pages, 'Supabase AI'], false)
+                    }
+                  }}
                   forceMount
                 >
                   <AiIcon />
-                  <span>
-                    Ask Supabase AI...
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-1100">
+                    Ask Supabase AI...{' '}
                     <span className="text-scale-1200 font-semibold">{search}</span>
                   </span>
-                </CommandItem>
-                <CommandItem forceMount>
-                  <IconInbox className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>See what's new</span>
                 </CommandItem>
                 <CommandItem
                   onSelect={() => handleSetPages([...pages, 'docs-search'], true)}
                   forceMount
                 >
-                  <IconBook className="mr-2" />
+                  <IconBook className="" />
 
                   <span>
                     Search the docs...
@@ -193,49 +228,58 @@ function CommandMenu() {
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="General">
+                <CommandItem forceMount>
+                  <IconInbox className="text-scale-900" />
+                  <CommandLabel>See what's new</CommandLabel>
+                </CommandItem>
                 <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
+                  <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
-                <CommandItem>Copy current page URL</CommandItem>
+                <CommandItem>
+                  <IconCopy />
+                  Copy current page URL
+                </CommandItem>
               </CommandGroup>
               <CommandGroup heading="Settings">
                 <CommandItem onSelect={() => handleSetPages([...pages, 'api-keys'], true)}>
-                  <CreditCard className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>API keys</span>
+                  <CreditCard className="text-scale-900" />
+                  <CommandLabel>API keys</CommandLabel>
                   <CommandShortcut>⌘B</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <User className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <User className="text-scale-900" />
+                  <CommandLabel>Profile</CommandLabel>
                   <CommandShortcut>⌘P</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <CreditCard className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Billing</span>
+                  <CreditCard className="text-scale-900" />
+                  <CommandLabel>Billing</CommandLabel>
                   <CommandShortcut>⌘B</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Settings</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="Settings2">
                 <CommandItem>
-                  <User className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Profile2</span>
+                  <User className="text-scale-900" />
+                  <CommandLabel>Profile2</CommandLabel>
                   <CommandShortcut>⌘P</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <CreditCard className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Billing2</span>
+                  <CreditCard className="text-scale-900" />
+                  <CommandLabel>Billing2</CommandLabel>
                   <CommandShortcut>⌘B</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Settings2</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Settings2</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
+                <SubItem>Set Dark Mode</SubItem>
               </CommandGroup>
             </>
           )}
@@ -243,60 +287,41 @@ function CommandMenu() {
             <>
               <CommandGroup heading="Database">
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Something database</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Something database</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="Auth">
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Something Auth</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Something Auth</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Something Auth 2</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Something Auth 2</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
             </>
           )}
-          {page === 'Ask anything' && (
+          {page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
             <>
-              <div className="min-h-[300px] flex flex-col">
-                <div className="">
-                  <div className="mx-3 text-scale-900">Back</div>
-                </div>
-                <div className="grow">
-                  <div className="mx-3">Something</div>
-                </div>
-                <div className="">
-                  <AiCommand />
-                </div>
-
-                {/* <div className="bg-scale-100 rounded mx-3">
-                  <Input
-                    placeholder="Ask Supabase AI something..."
-                    autoFocus
-                    value={aiSearch}
-                    actions={
-                      <div className="mr-3 flex items-center h-full">
-                        <span className="text-xs text-scale-800">Submit message</span>
-                      </div>
-                    }
-                    onChange={(e) => setAiSearch(e.target.value)}
-                  />
-                </div> */}
-              </div>
+              <AiCommand query={search} setQuery={setSearch} page={page} />
+            </>
+          )}
+          {page === COMMAND_ROUTES.AI_RLS_POLICY && (
+            <>
+              <AiCommand query={search} setQuery={setSearch} page={page} />
             </>
           )}
           {page === 'api-keys' && (
             <>
               <CommandGroup heading="">
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Copy Anon key</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Copy Anon key</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
@@ -307,8 +332,8 @@ function CommandMenu() {
               </div>
               <CommandGroup heading="">
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Copy Service role key</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Copy Service role key</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
@@ -319,13 +344,13 @@ function CommandMenu() {
               </div>
               <CommandGroup heading="">
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Roll new keys</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Roll new keys</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
                 <CommandItem>
-                  <Settings className="text-scale-900 mr-2 h-4 w-4" />
-                  <span>Switch project</span>
+                  <Settings className="text-scale-900" />
+                  <CommandLabel>Switch project</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
@@ -334,41 +359,61 @@ function CommandMenu() {
 
           {page === 'Supabase AI' && (
             <>
-              <CommandGroup>
-                <CommandItem onSelect={() => handleSetPages([...pages, 'Ask anything'], true)}>
+              <CommandGroup forceMount>
+                <CommandItem
+                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.AI_ASK_ANYTHING], true)}
+                  forceMount
+                >
                   <AiIcon />
-                  Ask Supabase AI anything...
+                  <CommandLabel className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-1100">
+                    Ask Supabase AI...{' '}
+                    <span className="text-scale-1200 font-semibold">{search}</span>
+                  </CommandLabel>
+                </CommandItem>
+                <CommandItem
+                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.AI_RLS_POLICY], false)}
+                >
+                  <AiIcon />
+                  <CommandLabel>Help me make an RLS policy</CommandLabel>
                 </CommandItem>
                 <CommandItem>
-                  {' '}
                   <AiIcon />
-                  Help me make an RLS policy
+                  <CommandLabel>Help me make an Postgres function</CommandLabel>
                 </CommandItem>
                 <CommandItem>
-                  {' '}
                   <AiIcon />
-                  Help me make an Postgres function
+                  <CommandLabel>Help me make an Postgres trigger</CommandLabel>
                 </CommandItem>
                 <CommandItem>
-                  {' '}
                   <AiIcon />
-                  Help me make an Postgres trigger
-                </CommandItem>
-                <CommandItem>
-                  {' '}
-                  <AiIcon />
-                  Help me make a table
+                  <CommandLabel>Help me make a table</CommandLabel>
                 </CommandItem>
               </CommandGroup>
             </>
           )}
           {page === 'Theme' && (
             <CommandGroup>
-              <CommandItem>Change Theme to dark</CommandItem>
-              <CommandItem>Change Theme to light</CommandItem>
+              <CommandItem
+                onSelect={() => {
+                  actions.toggleTheme()
+                  setOpen(false)
+                }}
+              >
+                <IconSun />
+                <CommandLabel>Change Theme to dark</CommandLabel>
+              </CommandItem>
+              <CommandItem
+                onSelect={() => {
+                  actions.toggleTheme()
+                  setOpen(false)
+                }}
+              >
+                <IconMoon />
+                <CommandLabel>Change Theme to light</CommandLabel>
+              </CommandItem>
             </CommandGroup>
           )}
-          {page !== 'Ask anything' && <CommandEmpty>No results found.</CommandEmpty>}
+          {page !== 'Ask anything' || (!page && <CommandEmpty>No results found.</CommandEmpty>)}
         </CommandList>
       </CommandDialog>
       {/* <AiCommand /> */}

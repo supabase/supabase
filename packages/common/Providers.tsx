@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-interface UseThemeProps {
+export interface UseThemeProps {
   isDarkMode?: boolean
   toggleTheme: () => void
 }
@@ -18,6 +18,8 @@ export const useTheme = () => useContext(ThemeContext)
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  console.log('isDarkMode', isDarkMode)
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')

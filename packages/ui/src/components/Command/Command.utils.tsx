@@ -31,10 +31,17 @@ const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) =>
       <Command
         onKeyDown={onKeyDown}
         // shouldFilter={false}
-        className="
-      [&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-input]]:h-12 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0
-      
-      "
+        className={[
+          '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-input]]:h-12',
+
+          '[&_[cmdk-item]_svg]:mr-3',
+          '[&_[cmdk-item]_svg]:h-5',
+          '[&_[cmdk-item]_svg]:w-5',
+          '[&_[cmdk-input-wrapper]_svg]:h-5',
+          '[&_[cmdk-input-wrapper]_svg]:w-5',
+
+          '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
+        ].join(' ')}
       >
         {children}
       </Command>
@@ -102,7 +109,7 @@ const CommandGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
-    forceMount={props.forceMount}
+    // forceMount={props.forceMount}
     className={cn(
       'overflow-hidden py-3 px-2 text-scale-700 dark:text-scale-800 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-scale-900 [&_[cmdk-group-heading]]:dark:text-sca-300',
       className
@@ -137,7 +144,7 @@ const CommandItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
-    forceMount={props.forceMount}
+    // forceMount={props.forceMount}
     className={cn(
       'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
       className
@@ -164,13 +171,23 @@ CommandItem.displayName = CommandPrimitive.Item.displayName
 
 const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
-    <span
-      className={cn('bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900', className)}
+    <div
+      className={cn(
+        '[&:not(:last-child)]:hover:bg-scale-600 [&:not(:last-child)]:hover:cursor-pointer',
+        'bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
+        'last:bg-scale-600 last:text-scale-900',
+        'justify-end',
+        className
+      )}
       {...props}
     />
   )
 }
 CommandShortcut.displayName = 'CommandShortcut'
+
+const CommandLabel = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+  return <span {...props} className={cn('grow', className)} />
+}
 
 export {
   Command,
@@ -183,4 +200,5 @@ export {
   CommandItemStale,
   CommandShortcut,
   CommandSeparator,
+  CommandLabel,
 }
