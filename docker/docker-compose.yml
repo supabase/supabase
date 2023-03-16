@@ -211,7 +211,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.42-rc2
+    image: supabase/postgres:15.1.0.54-rc0
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -236,8 +236,10 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/realtime.sql:Z
-      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql:Z
-      # Must be superuser to enable pg_net extension
-      - ./volumes/db/webhooks.sql:/etc/postgresql.schema.sql:Z
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      # Must be superuser to create event trigger
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      # Must be superuser to alter reserved role
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z

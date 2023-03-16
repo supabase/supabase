@@ -34,7 +34,7 @@ import {
   ForeignKeyFormatter,
 } from 'components/grid/components/formatter'
 
-const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
+export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
 export function getGridColumns(
   table: SupaTable,
@@ -180,7 +180,7 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
   } else return 'unknown'
 }
 
-function getColumnDefaultWidth(columnDef: SupaColumn): number {
+export function getColumnDefaultWidth(columnDef: SupaColumn): number {
   if (isNumericalColumn(columnDef.dataType)) {
     return 120
   } else if (

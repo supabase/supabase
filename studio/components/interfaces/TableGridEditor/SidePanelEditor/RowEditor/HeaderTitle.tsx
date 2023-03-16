@@ -11,7 +11,7 @@ const HeaderTitle: FC<Props> = ({ isNewRecord, tableName }) => {
   return (
     <>
       {header}
-      {tableName && <span className="text-code">{tableName}</span>}
+      {tableName && <span className="text-code font-mono">{tableName}</span>}
     </>
   )
 }
