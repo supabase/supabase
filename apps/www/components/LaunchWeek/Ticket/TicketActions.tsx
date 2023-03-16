@@ -27,7 +27,7 @@ export default function TicketActions({
   const permalink = (medium: string) =>
     encodeURIComponent(
       `${SITE_URL}/tickets/${username}?utm_source=lw7-ticket&utm_medium=${medium}&utm_campaign=launch-week-7&utm_content=${username}${
-        golden && `&golden=true`
+        golden ? `&golden=true` : ''
       }`
     )
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
