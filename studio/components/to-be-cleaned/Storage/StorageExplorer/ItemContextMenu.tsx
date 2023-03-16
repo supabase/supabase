@@ -94,7 +94,7 @@ const ItemContextMenu: FC<Props> = ({ id = '' }) => {
           <IconDownload size="tiny" />
           <span className="ml-2 text-xs">Download</span>
         </Item>,
-        <Separator />,
+        <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
           <IconTrash2 size="tiny" />
           <span className="ml-2 text-xs">Delete</span>
