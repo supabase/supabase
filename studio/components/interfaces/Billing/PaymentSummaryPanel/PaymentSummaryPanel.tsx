@@ -120,6 +120,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   const isChangingCustomDomains =
     currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
 
+  const togglingOnSpendCap =
+    currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG &&
+    selectedPlan &&
+    selectedPlan.metadata.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
+
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
     ? isChangingComputeSize || isChangingPITRDuration
@@ -314,6 +319,16 @@ const PaymentSummaryPanel: FC<Props> = ({
                   icon={<IconAlertCircle strokeWidth={2} />}
                   title="Changing your compute size"
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
+                />
+              )}
+
+              {togglingOnSpendCap && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Enabling spend cap"
+                  description="Exceeding your plan's quota will result in service restrictions. With the spend cap disabled, you'll be charged for usage beyond the quota."
                 />
               )}
             </div>
