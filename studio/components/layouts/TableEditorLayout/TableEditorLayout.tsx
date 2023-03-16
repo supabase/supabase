@@ -52,20 +52,10 @@ const TableEditorLayout = ({
     }
   }, [ui.selectedProject?.ref])
 
-  // useEffect(() => {
-  //   if (selectedSchema && ui.selectedProject?.ref) {
-  //     meta.tables.loadBySchema(selectedSchema)
-  //     meta.views.loadBySchema(selectedSchema)
-  //   }
-  // }, [ui.selectedProject?.ref, selectedSchema])
-
   useEffect(() => {
     if (ui.selectedProject?.ref && id) {
-      // [Joshen] This is a little silly, but because fetching tables/views/foreign-tables
-      // are all through different endpoints, we need to discern them
-      if (type !== 'view' && type !== 'foreign') {
-        meta.tables.loadById(Number(id))
-      }
+      meta.tables.loadById(Number(id))
+      meta.views.loadById(Number(id))
     }
   }, [ui.selectedProject?.ref, id])
 
