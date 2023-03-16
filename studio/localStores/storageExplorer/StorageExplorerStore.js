@@ -1256,7 +1256,7 @@ class StorageExplorerStore {
           path: prefix,
           options,
         })
-        if (res.error) console.error('Error at fetchFoldersByPath:', error)
+        if (res.error) console.error('Error at fetchFoldersByPath:', res.error)
         return res
       })
     )
