@@ -73,7 +73,7 @@ export default function Ticket({
       </div>
       <div
         ref={divRef}
-        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8"
+        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8 max-h-[400px]"
       >
         <div
           className={`

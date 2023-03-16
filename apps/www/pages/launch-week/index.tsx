@@ -72,8 +72,6 @@ export default function TicketHome({ users }: Props) {
     document.body.className = 'dark bg-[#1C1C1C]'
   }, [])
 
-  console.log('SITE_ORIGIN', SITE_ORIGIN)
-
   return (
     <>
       <NextSeo
@@ -93,7 +91,7 @@ export default function TicketHome({ users }: Props) {
         <div className="bg-[#1C1C1C] -mt-20">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-between items-center py-10 !pb-16 gap-8 lg:gap-16 !mx-auto !px-2">
+              <SectionContainer className="flex flex-col justify-between items-center py-10 !pb-16 gap-8 lg:gap-16 !mx-auto !px-2 min-h-[700px] md:min-h-[770px]">
                 <LaunchWeekLogoHeader />
 
                 {supabase && (
@@ -142,7 +140,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .order('createdAt', { ascending: false })
     .limit(12)
 
-  res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
+  // res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
 
   return {
     props: {
