@@ -263,7 +263,7 @@ const SidePanelEditor = ({
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
       await meta.tables.loadById(selectedTable!.id)
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
@@ -359,7 +359,7 @@ const SidePanelEditor = ({
           })
         }
       }
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
