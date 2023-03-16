@@ -363,6 +363,8 @@ export default function NewPost() {
 </TabPanel>
 </Tabs>
 
+> check out [this example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/supabase-provider.tsx) for making the user's session available to all Client Components.
+
 ### Server Components
 
 In order to use Supabase in Server Components, you need to have implemented the `middleware.ts` steps above 👆
@@ -419,6 +421,8 @@ export default async function ServerComponent() {
 
 </TabPanel>
 </Tabs>
+
+> check out [this example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/page.tsx) for redirecting unauthenticated users - protected pages.
 
 ### Route Handlers
 
@@ -478,7 +482,7 @@ export async function GET() {
 </TabPanel>
 </Tabs>
 
-> Check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for a full example including [authentication](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login.tsx) and [realtime](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
+> Check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for a full example including [authentication](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login.tsx), [realtime](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx) and [protected pages](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/page.tsx).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
