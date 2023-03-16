@@ -6,12 +6,6 @@ export interface JsonEditValue {
   jsonString: string
 }
 
-export interface ReferenceRow {
-  loading: boolean
-  foreignKey: any // ForeignKey
-  row: any // RowField
-}
-
 export interface RowField {
   id: string
   name: string

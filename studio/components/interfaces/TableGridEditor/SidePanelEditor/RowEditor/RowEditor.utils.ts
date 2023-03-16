@@ -78,26 +78,6 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-// Currently only used in ReferenceRowViewer for rows outside of public schema
-export const generateRowFieldsWithoutColumnMeta = (row: any): RowField[] => {
-  const properties = Object.keys(row)
-  return properties.map((property) => {
-    return {
-      id: uuidv4(),
-      value: row[property] || '',
-      name: property,
-      comment: '',
-      format: '',
-      enums: [],
-      defaultValue: '',
-      foreignKey: undefined,
-      isNullable: false,
-      isIdentity: false,
-      isPrimaryKey: false,
-    }
-  })
-}
-
 const parseValue = (originalValue: string, format: string) => {
   try {
     if (originalValue === null || originalValue.length === 0) {
