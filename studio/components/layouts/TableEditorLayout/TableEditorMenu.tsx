@@ -221,7 +221,9 @@ const TableEditorMenu = ({
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center space-x-1">
                     <p>Tables</p>
-                    <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
+                    {totalCount !== undefined && (
+                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
+                    )}
                   </div>
                   <button className="cursor-pointer" onClick={refreshTables}>
                     <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
