@@ -64,7 +64,7 @@ export async function getEntityTypes(
     )
     select
       jsonb_build_object(
-        'entities', jsonb_agg(
+        'entities', coalesce(jsonb_agg(
           jsonb_build_object(
             'id', r.id,
             'schema', r.schema,
@@ -73,8 +73,8 @@ export async function getEntityTypes(
             'comment', r.comment
           )
           order by r.name asc
-        ),
-        'count', min(r.count)
+        ), '[]'::jsonb),
+        'count', coalesce(min(r.count), 0)
       ) "data"
     from records r;
   `
