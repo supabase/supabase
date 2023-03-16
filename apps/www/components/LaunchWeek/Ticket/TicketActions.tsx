@@ -24,13 +24,20 @@ export default function TicketActions({
   const [imgReady, setImgReady] = useState(false)
   const [loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const permalink = encodeURIComponent(`${SITE_URL}/tickets/${username}?v=6`)
+  const permalink = (medium: string) =>
+    encodeURIComponent(
+      `${SITE_URL}/tickets/${username}?utm_source=lw7-ticket&utm_medium=${medium}&utm_campaign=launch-week-7&utm_content=${username}${
+        golden && `&golden=true`
+      }`
+    )
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
   const { userData } = useConfData()
-  const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${text}`
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
+  const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink(
+    'twitter'
+  )}&via=supabase&text=${text}`
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink('linkedin')}`
   const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
-    userData.username ?? ''
+    username
   )}`
   const params = useParams()
   const sharePage = params.username
