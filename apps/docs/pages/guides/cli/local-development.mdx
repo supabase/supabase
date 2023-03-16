@@ -216,6 +216,7 @@ create table
 employees (
 id integer primary key generated always as identity,
 name text
+email text not null
 );
 
 ````
@@ -352,7 +353,8 @@ supabase link --project-ref <project-id>
 # You can get <project-id> from your project's dashboard URL: https://app.supabase.com/project/<project-id>
 
 supabase db remote commit
-# Capture any changes that you have made to your database before setting up the CLI
+# Capture any changes that you have made to your remote database before you went through the steps above
+# If you have not made any changes to the remote database, skip this step
 ```
 
 `supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
@@ -371,6 +373,8 @@ Deploy any local database migrations using [`db push`](/docs/reference/cli/usage
 ```sh
 supabase db push
 ```
+
+Visiting your live project on [Supabase](https://app.supabase.com), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
 
 ### Deploy Edge Functions
 
