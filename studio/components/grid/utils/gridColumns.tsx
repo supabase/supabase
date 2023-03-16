@@ -19,7 +19,6 @@ import {
   DateTimeEditor,
   DateTimeWithTimezoneEditor,
   JsonEditor,
-  NullableBooleanEditor,
   NumberEditor,
   SelectEditor,
   TextEditor,
@@ -105,7 +104,7 @@ function getColumnEditor(
 
   switch (columnType) {
     case 'boolean': {
-      return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
+      return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
       return DateEditor
@@ -130,7 +129,7 @@ function getColumnEditor(
       return NumberEditor
     }
     case 'text': {
-      return TextEditor
+      return (p: any) => <TextEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     default: {
       return undefined

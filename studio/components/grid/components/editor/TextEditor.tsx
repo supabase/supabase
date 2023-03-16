@@ -2,13 +2,14 @@ import { useState, useCallback } from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 import { useTrackedState } from '../../store'
 import { BlockKeys, MonacoEditor, NullValue, EmptyValue } from '../common'
-import { Popover } from 'ui'
+import { Button, Popover } from 'ui'
 
 export function TextEditor<TRow, TSummaryRow = unknown>({
   row,
   column,
+  isNullable,
   onRowChange,
-}: EditorProps<TRow, TSummaryRow>) {
+}: EditorProps<TRow, TSummaryRow> & { isNullable?: boolean }) {
   const state = useTrackedState()
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
@@ -58,6 +59,13 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
                 </div>
                 <p className="text-xs text-scale-1100">Cancel changes</p>
               </div>
+            </div>
+            <div className="space-y-1">
+              {isNullable && (
+                <Button type="default" size="tiny" onClick={() => saveChanges(null)}>
+                  Set to NULL
+                </Button>
+              )}
             </div>
           </div>
         </BlockKeys>
