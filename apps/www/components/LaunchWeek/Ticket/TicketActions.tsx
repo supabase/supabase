@@ -62,18 +62,13 @@ export default function TicketActions({
     <div className="grid gap-1">
       {!sharePage ? (
         <>
-          <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
-            <a
-              href={tweetUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-              className="flex items-center justify-center gap-2"
-            >
+          <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1">
+            <div className="flex items-center justify-center gap-2">
               <div className="text-scale-900">
                 <IconCheckCircle size={10} strokeWidth={1} />
               </div>
               Connect with Github
-            </a>
+            </div>
           </div>
           <div
             className={`rounded-md ${
