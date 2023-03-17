@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -21,7 +22,8 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const router = useRouter()
 
   const slug = router.query.slug[0]
-
+  console.log('the props', props)
+  console.log('the router', slug)
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
@@ -30,51 +32,79 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
     }
   })
 
-  return (
-    <RefSubLayout>
-      {props.sections.map((x, i) => {
-        switch (x.type) {
-          case 'markdown':
-            const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+  function getPageTitle() {
+    if (props.type === 'client-lib') {
+      return props.spec.info.title
+    }
+    if (props.type === 'cli') {
+      return 'Supabase CLI reference'
+    }
 
-            return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
-            break
-          case 'function':
-            return (
-              <RefFunctionSection
-                key={x.id + i}
-                funcData={x}
-                commonFuncData={x}
-                spec={props.spec}
-                typeSpec={props.typeSpec}
-              />
-            )
-          case 'cli-command':
-            return <CliCommandSection key={x.id + i} funcData={x} commonFuncData={x} />
-            break
-          case 'operation':
-            return (
-              <ApiOperationSection
-                key={x.id + i}
-                funcData={x}
-                commonFuncData={x}
-                spec={props.spec}
-              />
-            )
-          default:
-            return (
-              <RefFunctionSection
-                key={x.id + i}
-                funcData={x}
-                commonFuncData={x}
-                spec={props.spec}
-                typeSpec={props.typeSpec}
-              />
-            )
-            break
-        }
-      })}
-    </RefSubLayout>
+    if (props.type === 'api') {
+      return 'Supabase API reference'
+    }
+    return 'Supabase Docs'
+  }
+
+  const pageTitle = getPageTitle()
+
+  return (
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        {/* <meta name="description" content={props.meta?.description} /> */}
+        {/* <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} /> */}
+        {/* <meta
+          name="twitter:image"
+          content={`https://supabase.com/docs/img/supabase-og-image.png`}
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" /> */}
+      </Head>
+      <RefSubLayout>
+        {props.sections.map((x, i) => {
+          switch (x.type) {
+            case 'markdown':
+              const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+
+              return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
+              break
+            case 'function':
+              return (
+                <RefFunctionSection
+                  key={x.id + i}
+                  funcData={x}
+                  commonFuncData={x}
+                  spec={props.spec}
+                  typeSpec={props.typeSpec}
+                />
+              )
+            case 'cli-command':
+              return <CliCommandSection key={x.id + i} funcData={x} commonFuncData={x} />
+              break
+            case 'operation':
+              return (
+                <ApiOperationSection
+                  key={x.id + i}
+                  funcData={x}
+                  commonFuncData={x}
+                  spec={props.spec}
+                />
+              )
+            default:
+              return (
+                <RefFunctionSection
+                  key={x.id + i}
+                  funcData={x}
+                  commonFuncData={x}
+                  spec={props.spec}
+                  typeSpec={props.typeSpec}
+                />
+              )
+              break
+          }
+        })}
+      </RefSubLayout>
+    </>
   )
 }
 

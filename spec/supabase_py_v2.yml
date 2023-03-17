@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/supabase-py
-  title: Supabase Client
+  title: Supabase Python Client
   description: |
 
     Supabase Python(Community).
@@ -519,21 +519,21 @@ functions:
           sql: |
             ```sql
             create table countries (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
             create table cities (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
-              "name" text, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
               "country_id" "uuid" references public.countries on delete cascade
             );
 
             with country as (
-              insert into countries (name) 
+              insert into countries (name)
               values ('united kingdom') returning id
             )
-            insert into cities (name, country_id) values 
+            insert into cities (name, country_id) values
             ('London', (select id from country)),
             ('Manchester', (select id from country)),
             ('Liverpool', (select id from country)),
@@ -543,7 +543,7 @@ functions:
           ```
           APIResponse(data=[{'id': 1, 'name': 'Germany', 'cities': [{'count': 1}]},
                             {'id': 2, 'name': 'Indonesia', 'cities': [{'count': 1}]}],
-                      count=None) 
+                      count=None)
           ```
         description: |
           You can get the number of rows in a related table by using the
