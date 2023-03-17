@@ -12,7 +12,7 @@ interface Props {
 export default function TicketBrickWall({ users }: Props) {
   const isMobile = useMobileViewport(768)
   return (
-    <div className="relative pt-28 pb-20 md:py-40">
+    <div className="relative pt-28 pb-20 md:pt-40">
       <div className="mx-auto bg-[#1C1C1C]">
         <div className="max-w-[38rem] mx-auto">
           <h2 className="radial-gradient-text-scale-500 text-center">

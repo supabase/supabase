@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import React from 'react'
 import LabelBadge from '../LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
@@ -69,11 +68,6 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     Main award
                   </h3>
                   <h4 className="flex items-center gap-3 text-[19px] mt-4">
-                    <Image
-                      src="/images/launchweek/seven/icons/compute-upgrade.svg"
-                      width={16}
-                      height={16}
-                    />
                     Mechanical Keyboard <LabelBadge text="3 keyboards" />
                   </h4>
                   <p className="text-[#707070] mt-1">
