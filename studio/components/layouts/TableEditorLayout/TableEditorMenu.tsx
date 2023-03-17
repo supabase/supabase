@@ -24,7 +24,8 @@ import type { PostgresSchema } from '@supabase/postgres-meta'
 
 import { checkPermissions, useStore, useParams } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { Entity, useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
 

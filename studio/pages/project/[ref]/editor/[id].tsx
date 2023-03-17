@@ -7,7 +7,7 @@ import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
+import { Entity } from 'data/entity-types/entity-type-query'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
