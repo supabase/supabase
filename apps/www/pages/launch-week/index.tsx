@@ -86,7 +86,7 @@ export default function TicketHome({ users }: Props) {
           url: `${SITE_URL}`,
           images: [
             {
-              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7.jpg`,
+              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`,
             },
           ],
         }}
