@@ -8,7 +8,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
   const finalAnimationState = { y: 0, opacity: 1 }
 
   return (
-    <div className={[className].join(' ')}>
+    <div id="lw-7-prizes" className={[className].join(' ')}>
       <div className="">
         <div className="text-center relative z-10 text-white">
           <motion.div
@@ -50,7 +50,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             <h2 className="text-4xl">
               Get your <span className="gradient-text-pink-500">winning ticket</span>
             </h2>
-            <p className="radial-gradient-text-scale-500" id="lw-7-prizes">
+            <p className="radial-gradient-text-scale-500">
               Mark your calendars for April 9th and join us on Discord for Launch Week 7's final day
               to find out if you're one of the lucky winners. Get sharing!
             </p>
