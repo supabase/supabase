@@ -1,4 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 type getForeignKeyConstraintsVariables = {
@@ -107,15 +108,17 @@ export const useForeignKeyConstraintsQuery = <
   )
 }
 
-export const useForeignKeyConstraintsPrefetch = ({
-  projectRef,
-  connectionString,
-  schema,
-}: ForeignKeyConstraintsVariables) => {
-  return useExecuteSqlPrefetch({
-    projectRef,
-    connectionString,
-    sql: getForeignKeyConstraintsQuery({ schema }),
-    queryKey: ['foreign-key-constraints'],
-  })
+export const useForeignKeyConstraintsPrefetch = () => {
+  const prefetch = useExecuteSqlPrefetch()
+
+  return useCallback(
+    ({ projectRef, connectionString, schema }: ForeignKeyConstraintsVariables) =>
+      prefetch({
+        projectRef,
+        connectionString,
+        sql: getForeignKeyConstraintsQuery({ schema }),
+        queryKey: ['foreign-key-constraints'],
+      }),
+    [prefetch]
+  )
 }

@@ -1,5 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
+import { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
@@ -8,14 +9,6 @@ export type EntityTypesVariables = {
   limit?: number
   page?: number
 } & Pick<ExecuteSqlVariables, 'connectionString'>
-
-export type Entity = {
-  id: number
-  schema: string
-  name: string
-  type: string
-  comment: string | null
-}
 
 export type EntityTypesResponse = {
   data: {
