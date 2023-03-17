@@ -67,6 +67,8 @@ const Wizard: NextPageWithLayout = () => {
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
+  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
@@ -122,10 +124,6 @@ const Wizard: NextPageWithLayout = () => {
     setProjectName(e.target.value)
   }
 
-  function onPostgresVersionChange(e: any) {
-    setPostgresVersion(e.target.value)
-  }
-
   function onDbPassChange(e: any) {
     const value = e.target.value
     setDbPass(value)
@@ -165,9 +163,9 @@ const Wizard: NextPageWithLayout = () => {
       data['custom_supabase_internal_requests'] = {
         ami: {
           search_tags: {
-            'tag:postgresVersion': postgresVersion
-          }
-        }
+            'tag:postgresVersion': postgresVersion,
+          },
+        },
       }
     }
     const response = await post(`${API_URL}/projects`, data)
@@ -302,15 +300,24 @@ const Wizard: NextPageWithLayout = () => {
                     'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                   ].join(' ')}
                 >
-                  <Input
-                    id="custom-postgres-version"
-                    layout="horizontal"
-                    label="Custom Postgres Version (non-prod only)"
-                    type="text"
-                    placeholder="Postgres Version"
-                    value={postgresVersion}
-                    onChange={onPostgresVersionChange}
-                  />
+                  {showCustomVersionInput && (
+                    <Input
+                      id="custom-postgres-version"
+                      layout="horizontal"
+                      label="Postgres Version"
+                      descriptionText={
+                        <p>
+                          Specify a custom version of Postgres (Defaults to the latest)
+                          <br />
+                          This is only applicable for local/staging projects
+                        </p>
+                      }
+                      type="text"
+                      placeholder="Postgres Version"
+                      value={postgresVersion}
+                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    />
+                  )}
                 </Panel.Content>
 
                 <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
