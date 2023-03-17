@@ -88,6 +88,11 @@ export const gettingstarted = {
           items: [],
         },
         {
+          name: 'Quasar',
+          url: '/guides/getting-started/tutorials/with-quasar',
+          items: [],
+        },
+        {
           name: 'RedwoodJS',
           url: '/guides/getting-started/tutorials/with-redwoodjs',
           items: [],

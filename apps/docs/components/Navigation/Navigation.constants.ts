@@ -60,6 +60,7 @@ export const menuItems: NavMenu = {
         { name: 'Ionic Vue', url: '/guides/with-ionic-vue', items: [] },
         { name: 'Next.js', url: '/guides/with-nextjs', items: [] },
         { name: 'Nuxt 3', url: '/guides/with-nuxt-3', items: [] },
+        { name: 'Quasar', url: '/guides/with-quasar', items: [] },
         { name: 'React', url: '/guides/with-react', items: [] },
         { name: 'RedwoodJS', url: '/guides/with-redwoodjs', items: [] },
         { name: 'SolidJS', url: '/guides/with-solidjs', items: [] },

@@ -1,0 +1,613 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Build a User Management App with Quasar v2',
+  description: 'Learn how to use Supabase in your Quasar v2 App.',
+}
+
+<QuickstartIntro />
+
+![Supabase User Management example](/docs/img/supabase-quasar-demo-avatar.png)
+
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/quasar-user-management).
+</Admonition>
+
+<ProjectSetup />
+
+## Building the App
+
+Let's start building the Quasar v2 app from scratch.
+
+### Initialize a Quasar v2 app
+
+We can quickly use [Quasar CLI](https://quasar.dev/start/quasar-cli) to initialize
+an app called `supabase-quasar`:
+
+```bash
+yarn global add @quasar/cli
+yarn create quasar
+
+✔ What would you like to build? › App with Quasar CLI, let's go!
+✔ Project folder: … supabase-quasar
+✔ Pick Quasar version: › Quasar v2 (Vue 3 | latest and greatest)
+✔ Pick script type: › Typescript
+✔ Pick Quasar App CLI variant: › Quasar App CLI with Vite
+✔ Package name: … supabase-quasar
+✔ Project product name: (must start with letter if building mobile apps) … Supabase Quasar App
+✔ Project description: … A Quasar Project using Supabase
+✔ Author: … Me <me@supabase.io>
+✔ Pick a Vue component style: › Composition API with <script setup>
+✔ Pick your CSS preprocessor: › Sass with SCSS syntax
+✔ Check the features needed for your project: › ESLint
+✔ Pick an ESLint preset: › Prettier
+
+? Install project dependencies? (recommended) › - Use arrow-keys. Return to submit.
+❯   Yes, use yarn
+
+cd supabase-quasar
+
+```
+
+
+
+Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+And finally we want to save the environment variables in a `.env`.
+All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+
+```bash title=.env
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+With the API credentials in place, create an `src/boot/supabase.js` helper file to initialize the Supabase client. These variables are exposed
+on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+
+```js title=src/boot/supabase.js
+import { boot } from 'quasar/wrappers';
+import { createClient } from '@supabase/supabase-js';
+import { ref } from 'vue';
+
+// declare module '@vue/runtime-core' {
+//   interface ComponentCustomProperties {
+//     $supabase: SupabaseClient<Database>;
+//   }
+// }
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+type Session = Awaited<
+  ReturnType<typeof supabase.auth.getSession>
+>['data']['session'];
+
+const session = ref<Session>();
+let setPasswordRequested: 'initial' | 'reset' | false = false;
+
+// Hack to process the #access_token and #error before vue-router "cleans up",
+// breaking supabase.auth token processing later on
+let indexSupabaseHash = window.location.hash.indexOf('#access_token');
+if (indexSupabaseHash < 0)
+  indexSupabaseHash = window.location.hash.indexOf('#error');
+const routerHash = window.location.hash.substring(
+  0,
+  indexSupabaseHash >= 0 ? indexSupabaseHash : undefined
+);
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// must be registered immediately before returning to the event loop because
+// otherwise changes triggered by the #access_token, e.g. PASSWORD_RECOVERY,
+// would be missed if the **async** supabase.auth._initialize() is processed
+// before the callback is registered.
+supabase.auth.onAuthStateChange(async (_event, _session) => {
+  // console.log('supabase.auth.onAuthStateChange', _event, _session);
+  session.value = _session;
+  if (_event === 'PASSWORD_RECOVERY') setPasswordRequested = 'reset';
+
+  const userMetaData = session.value?.user.user_metadata;
+  if (!userMetaData?.passwordSetup) {
+    setPasswordRequested = 'initial';
+  }
+});
+
+/**
+ * Finalize supabase init
+ *
+ * Shall be called from the router initialization before it is instantiated
+ * and mangles the hash parts of the window.location. This function also removes
+ * the supabase hash parts and reinstates the vue-router hash parts which are
+ * otherwise cleared out by supabase.auth.initialize().
+ */
+async function init() {
+  // this waits for the async init to finish:
+  const { error } = await supabase.auth.initialize();
+  if (error) window.alert(error.message);
+  window.location.hash = routerHash;
+}
+
+export default boot(({ router }) => {
+  // for use inside Vue files (Options API) through this.$supabase
+  // app.config.globalProperties.$supabase = supabase;
+  // ^ ^ ^ this will allow you to use this.$supabase (for Vue Options API form)
+  //       so you won't necessarily have to import supabase in each vue file
+  router.beforeEach((to) => {
+    if (setPasswordRequested) {
+      to.query.setPassword = setPasswordRequested;
+      setPasswordRequested = false;
+      return to;
+    }
+  });
+  router.afterEach((to) => {
+    if (to.query.setPassword ?? false) {
+      // to be implemented if you use password login:
+      // execChangePassword(
+      //   to.query.setPassword === 'initial'
+      //     ? 'Choose password'
+      //     : 'Forgot password'
+      // ).then(() => {
+      //   if (to.query.setPassword === 'initial')
+      //     supabase.auth.updateUser({ data: { passwordSetup: true } });
+      //   router.replace({ query: { setPassword: undefined } });
+      // });
+    }
+  });
+});
+
+export { init, supabase, session };
+```
+
+Also, create an `src/boot/router-auth.js` helper file to limit access to pages by authentication status.
+
+```js title=src/boot/router-auth.js
+import { boot } from 'quasar/wrappers';
+import { session } from './supabase';
+
+export default boot(({ router }) => {
+  router.beforeEach((to) => {
+    if (to.matched.some((record) => record.meta.requiresAuth ?? false)) {
+      // console.log('needs auth: ', to);
+      if (!session.value) {
+        // console.log('no session!');
+        return { name: 'auth', query: { redirect: to.fullPath } };
+      }
+    }
+  });
+});
+```
+
+Add these two files to the `boot` section of `quasar.config.js`:
+
+```js title=quasar.config.js
+    boot: [
+      'supabase',
+      'router-auth'
+    ],
+```
+
+Also, replace `router/index.ts` with the following in order to make sure, `supabase` can process the URL before the router works on it:
+
+```js title=router/index.ts
+import { route } from 'quasar/wrappers';
+import {
+  createMemoryHistory,
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+} from 'vue-router';
+
+import routes from './routes';
+
+import { init as supabaseInit } from 'boot/supabase';
+
+/*
+ * If not building with SSR mode, you can
+ * directly export the Router instantiation;
+ *
+ * The function below can be async too; either use
+ * async/await or return a Promise which resolves
+ * with the Router instance.
+ */
+
+export default route(async function (/* { store, ssrContext } */) {
+  await supabaseInit();
+
+  const createHistory = process.env.SERVER
+    ? createMemoryHistory
+    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
+
+  const Router = createRouter({
+    scrollBehavior: () => ({ left: 0, top: 0 }),
+    routes,
+
+    // Leave this as is and make changes in quasar.conf.js instead!
+    // quasar.conf.js -> build -> vueRouterMode
+    // quasar.conf.js -> build -> publicPath
+    history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  return Router;
+});
+```
+
+Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/vue3-user-management/src/style.css) to style the app.
+
+### Set up a Login page
+
+Set up an `src/pages/AuthPage.vue` page to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+
+```vue title=src/pages/AuthPage.vue
+<script setup>
+import { ref } from 'vue';
+import { supabase } from 'boot/supabase';
+
+const loading = ref(false);
+const email = ref('');
+
+const handleLogin = async () => {
+  try {
+    loading.value = true;
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.value,
+    });
+    if (error) throw error;
+    alert('Check your email for the login link!');
+  } catch (error) {
+    if (error instanceof Error) {
+      alert(error.message);
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
+<template>
+  <form class="q-pa-md column flex-center flex" @submit.prevent="handleLogin">
+    <q-card class="col-6 form-widget">
+      <q-card-section class="q-gutter-md">
+        <div class="text-h1">Supabase + Quasar</div>
+        <div>Sign in via magic link with your email below</div>
+        <q-input
+          lazy-rules
+          :rules="[
+            (val, rules) =>
+              rules.email(val) || 'Please enter a valid email address',
+          ]"
+          type="email"
+          label="Your email"
+          v-model="email"
+        />
+      </q-card-section>
+      <q-card-actions class="q-gutter-md">
+        <q-btn
+          type="submit"
+          color="primary"
+          :label="loading ? 'Loading' : 'Send magic link'"
+          :disabled="loading"
+        />
+      </q-card-actions>
+    </q-card>
+  </form>
+</template>
+```
+
+### Account page
+
+After a user is signed in, we can allow them to edit their profile details and manage their account.
+Create a new `src/pages/AccountPage.vue` page to handle this.
+
+```vue title=src/pages/AccountPage.vue
+<script setup>
+import { session, supabase } from 'boot/supabase';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const loading = ref(true);
+const username = ref('');
+const website = ref('');
+const avatar_url = ref('');
+
+const router = useRouter();
+
+onMounted(() => {
+  getProfile();
+});
+
+async function getProfile() {
+  try {
+    loading.value = true;
+    const { user } = session.value;
+
+    let { data, error, status } = await supabase
+      .from('profiles')
+      .select('username, website, avatar_url')
+      .eq('id', user.id)
+      .single();
+
+    if (error && status !== 406) throw error;
+
+    if (data) {
+      username.value = data.username;
+      website.value = data.website;
+      avatar_url.value = data.avatar_url;
+    }
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function updateProfile() {
+  try {
+    loading.value = true;
+    const { user } = session.value;
+
+    const updates = {
+      id: user.id,
+      username: username.value,
+      website: website.value,
+      avatar_url: avatar_url.value,
+      updated_at: new Date(),
+    };
+
+    let { error } = await supabase.from('profiles').upsert(updates);
+
+    if (error) throw error;
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function signOut() {
+  try {
+    loading.value = true;
+    let { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    loading.value = false;
+  }
+  router.go(0);
+}
+</script>
+
+<template>
+  <form class="q-pa-md column flex-center flex" @submit.prevent="updateProfile">
+    <q-card class="col-6 form-widget">
+      <q-card-section>
+        <div class="text-h2">Account</div>
+        <q-input
+          id="email"
+          label="Email"
+          type="text"
+          :model-value="session.user.email"
+          disable
+        />
+        <q-input id="username" label="Name" type="text" v-model="username" />
+        <q-input
+          id="website"
+          label="Website"
+          type="website"
+          v-model="website"
+        />
+      </q-card-section>
+      <q-card-actions class="q-gutter-md" align="right">
+        <q-btn
+          type="submit"
+          color="primary"
+          :label="loading ? 'Loading ...' : 'Update'"
+          :disabled="loading"
+        />
+        <q-btn flat label="Sign Out" @click="signOut" :disabled="loading" />
+      </q-card-actions>
+    </q-card>
+  </form>
+</template>
+```
+
+### Router
+
+Now, use those pages in the `src/router/routes.ts` route definitions:
+
+```ts title=src/router/routes.ts
+import { RouteRecordRaw } from 'vue-router';
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/AccountPage.vue') }],
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/auth',
+    name: 'auth',
+    component: () => import('pages/AuthPage.vue'),
+  },
+
+  // Always leave this as last one,
+  // but you can also remove it
+  {
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue'),
+  },
+];
+
+export default routes;
+```
+
+### Launch!
+
+Now that we have all the components in place, we can straight away run the app in a terminal window:
+
+```bash
+quasar dev
+```
+
+which will open the completed app in your browser.
+
+![Supabase Quasar](/docs/img/supabase-quasar-demo.png)
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Create a new `src/components/AvatarUploader.vue` component that allows users to upload profile photos:
+
+```vue title=src/components/AvatarUploader.vue
+<script setup>
+import { ref, toRefs, watch } from 'vue';
+import { supabase } from 'boot/supabase';
+
+const prop = defineProps(['path', 'size']);
+const { path, size } = toRefs(prop);
+
+const emit = defineEmits(['upload', 'update:path']);
+const uploading = ref(false);
+const src = ref('');
+const files = ref();
+const fileselector = ref();
+
+const downloadImage = async () => {
+  try {
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .download(path.value);
+    if (error) throw error;
+    src.value = URL.createObjectURL(data);
+  } catch (error) {
+    console.error('Error downloading image: ', error.message);
+  }
+};
+
+const uploadAvatar = async (evt) => {
+  files.value = evt.target.files;
+  try {
+    uploading.value = true;
+    if (!files.value || files.value.length === 0) {
+      throw new Error('You must select an image to upload.');
+    }
+
+    const file = files.value[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${Math.random()}.${fileExt}`;
+
+    let { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+    emit('update:path', filePath);
+    emit('upload');
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    uploading.value = false;
+  }
+};
+
+watch(path, () => {
+  if (path.value) downloadImage();
+});
+</script>
+
+<template>
+  <div>
+    <q-img
+      v-if="src"
+      :src="src"
+      alt="Avatar"
+      class="avatar image"
+      :style="{ height: size + 'em', width: size + 'em' }"
+    />
+    <div
+      v-else
+      class="non-selectable row avatar no-image justify-center items-center"
+      :style="{ height: size + 'em', width: size + 'em' }"
+      @click="fileselector.click()"
+    >
+      Photo
+    </div>
+
+    <div :style="{ width: size + 'em' }">
+      <q-btn
+        style="width: 100%"
+        :label="uploading ? 'Uploading ...' : 'Pick Photo'"
+        color="primary"
+        :disable="uploading"
+        @click="fileselector.click()"
+      />
+      <input
+        style="visibility: hidden; position: absolute; width: 0px"
+        type="file"
+        id="fileselector"
+        ref="fileselector"
+        accept="image/*"
+        @change="uploadAvatar"
+        :disabled="uploading"
+      />
+    </div>
+  </div>
+</template>
+
+<style>
+.avatar {
+  border-radius: var(--custom-border-radius);
+  overflow: hidden;
+  max-width: 100%;
+}
+.avatar.image {
+  object-fit: cover;
+}
+.avatar.no-image {
+  color: #eee;
+  background-color: #333;
+  border: 1px solid rgb(200, 200, 200);
+  border-radius: var(--custom-border-radius);
+}
+</style>
+```
+
+### Add the new widget
+
+And then we can add the widget to the Account page in `src/pages/AccountPage.vue`:
+
+```vue title=src/pages/AccountPage.vue
+<script>
+// Import the new component
+import AvatarUploader from 'components/AvatarUploader.vue';
+</script>
+
+<template>
+  <form class="form-widget" @submit.prevent="updateProfile">
+    <!-- Add to body -->
+    <avatar-uploader v-model:path="avatar_url" @upload="updateProfile" size="10" />
+
+    <!-- Other form elements -->
+  </form>
+</template>
+```
+
+### Storage management
+
+<StorageManagement />
+
+At this stage you have a fully functional application!
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

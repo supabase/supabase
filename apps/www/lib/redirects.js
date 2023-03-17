@@ -1659,6 +1659,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-quasar',
+    destination: '/docs/guides/getting-started/tutorials/with-quasar',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/with-react',
     destination: '/docs/guides/getting-started/tutorials/with-react',
   },

@@ -46,6 +46,14 @@ const Frameworks = () => {
       href: '/guides/with-nextjs',
     },
     {
+      name: 'Quasar',
+      logo: {
+        light: '/docs/img/icons/quasar-icon.svg',
+        dark: '/docs/img/icons/quasar-icon.svg',
+      },
+      href: '/guides/with-quasar',
+    },
+    {
       name: 'React',
       logo: {
         light: '/docs/img/icons/react-icon.svg',
