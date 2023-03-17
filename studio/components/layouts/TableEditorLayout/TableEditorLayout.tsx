@@ -1,13 +1,18 @@
-import { PropsWithChildren, useEffect } from 'react'
-import { isUndefined, noop } from 'lodash'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams, useStore } from 'hooks'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
+import { Entity } from 'data/entity-types/entity-type-query'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
+import useEntityType from 'hooks/misc/useEntityType'
+import Connecting from 'components/ui/Loading/Loading'
+import useTableRowsPrefetch from 'hooks/misc/useTableRowsPrefetch'
+import useLatest from 'hooks/misc/useLatest'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
@@ -28,7 +33,9 @@ const TableEditorLayout = ({
   children,
 }: PropsWithChildren<TableEditorLayoutProps>) => {
   const { vault, meta, ui } = useStore()
-  const { id, type } = useParams()
+  const router = useRouter()
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
 
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
@@ -42,22 +49,70 @@ const TableEditorLayout = ({
       meta.policies.load()
       meta.publications.load()
       meta.extensions.load()
-
-      // [Joshen] pg-meta doesn't support loading views nor foreign tables by a specific ID yet
-      // Separately, Alaister and I chatted that perhaps we leverage on pg-catalog's pg-class
-      // table directly, so we can fetch the schema of tables/views/foreign-tables in one call
-      // rather than trying to discern if the ID is a view, or foreign table (refer to below)
-      meta.views.load()
-      meta.foreignTables.load()
     }
   }, [ui.selectedProject?.ref])
 
+  const [loadedIds, setLoadedIds] = useState<Set<number>>(() => new Set())
+  const isLoaded = id !== undefined && loadedIds.has(id)
+
+  const entity = useEntityType(id, function onNotFound(id) {
+    setLoadedIds((loadedIds) => {
+      const newLoadedIds = new Set(loadedIds)
+      newLoadedIds.add(id)
+      return newLoadedIds
+    })
+  })
+
+  const prefetch = useLatest(useTableRowsPrefetch())
+
   useEffect(() => {
-    if (ui.selectedProject?.ref && id) {
-      meta.tables.loadById(Number(id))
-      meta.views.loadById(Number(id))
+    let mounted = true
+
+    function loadTable() {
+      if (entity?.type) {
+        switch (entity.type) {
+          case 'materialized_view':
+          case 'view':
+            return meta.views.loadById(entity.id)
+
+          case 'foreign_table':
+            return meta.foreignTables.loadById(entity.id)
+
+          default:
+            return meta.tables.loadById(entity.id)
+        }
+      }
     }
-  }, [ui.selectedProject?.ref, id])
+
+    loadTable()
+      ?.then(async (entity: any) => {
+        await prefetch.current(entity)
+
+        return entity
+      })
+      .then((entity: any) => {
+        if (mounted) {
+          setLoadedIds((loadedIds) => {
+            const newLoadedIds = new Set(loadedIds)
+            newLoadedIds.add(entity.id ?? entity?.id)
+            return newLoadedIds
+          })
+        }
+      })
+      .catch(() => {
+        if (mounted && entity?.id) {
+          setLoadedIds((loadedIds) => {
+            const newLoadedIds = new Set(loadedIds)
+            newLoadedIds.add(entity.id)
+            return newLoadedIds
+          })
+        }
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [entity])
 
   useEffect(() => {
     if (isVaultEnabled) {
@@ -75,7 +130,6 @@ const TableEditorLayout = ({
 
   return (
     <ProjectLayout
-      isLoading={isUndefined(selectedSchema)}
       product="Table editor"
       productMenu={
         <TableEditorMenu
@@ -88,7 +142,7 @@ const TableEditorLayout = ({
         />
       }
     >
-      {children}
+      {router.isReady && id !== undefined ? isLoaded ? children : <Connecting /> : children}
     </ProjectLayout>
   )
 }

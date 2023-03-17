@@ -6,7 +6,7 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { NextPageWithLayout } from 'types'
 import { useStore, withAuth } from 'hooks'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
+import { Entity } from 'data/entity-types/entity-type-query'
 import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'

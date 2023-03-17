@@ -42,7 +42,7 @@ import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
-import ForeignTableStore from './ForeignTableStore'
+import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import ViewStore, { IViewStore } from './ViewStore'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
@@ -57,7 +57,7 @@ export interface IMetaStore {
   columns: IPostgresMetaInterface<PostgresColumn>
   schemas: IPostgresMetaInterface<PostgresSchema>
   views: IViewStore
-  foreignTables: IPostgresMetaInterface<Partial<PostgresTable>>
+  foreignTables: IForeignTableStore
 
   hooks: IPostgresMetaInterface<any>
   roles: IRolesStore
