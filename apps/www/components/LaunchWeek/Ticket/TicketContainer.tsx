@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PageState, ConfDataContext, UserData } from './hooks/use-conf-data'
 import Ticket from './ActualTicket'
-import ConfContainer from './conf-container'
 import Form from './form'
 import { SupabaseClient, Session } from '@supabase/supabase-js'
 
@@ -22,6 +21,10 @@ export default function Conf({
 }: Props) {
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [pageState, setPageState] = useState<PageState>(defaultPageState)
+
+  useEffect(() => {
+    localStorage.setItem('isGolden', !!userData?.golden ? 'true' : 'false')
+  }, [userData])
 
   return (
     <ConfDataContext.Provider

@@ -34,6 +34,7 @@ export default function TicketHome({ users }: Props) {
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
+  const [isGolden, setIsGolden] = useState(false)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -70,6 +71,9 @@ export default function TicketHome({ users }: Props) {
 
   useEffect(() => {
     document.body.className = 'dark bg-[#1C1C1C]'
+    if (typeof window !== 'undefined') {
+      setIsGolden(localStorage?.getItem('isGolden') === 'true' ?? false)
+    }
   }, [])
 
   return (
@@ -79,7 +83,7 @@ export default function TicketHome({ users }: Props) {
         openGraph={{
           title: `Get your #SupaLaunchWeek Ticket`,
           description: description,
-          url: `${SITE_URL}/tickets`,
+          url: `${SITE_URL}`,
           images: [
             {
               url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7.jpg`,
@@ -115,10 +119,7 @@ export default function TicketHome({ users }: Props) {
               <LW7BgGraphic />
             </div>
             <div
-              className={[
-                'bg-lw7-gradient absolute inset-0 z-0',
-                defaultUserData?.golden && 'gold',
-              ].join(' ')}
+              className={['bg-lw7-gradient absolute inset-0 z-0', isGolden && 'gold'].join(' ')}
             />
           </div>
 

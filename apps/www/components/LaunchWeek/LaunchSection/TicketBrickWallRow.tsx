@@ -34,9 +34,6 @@ export function TicketBrickWallRow({ users, reverse, xOffset = 250 }: Props) {
             <Link href={`/launch-week/tickets/${user.username}`} key={user.username}>
               <a className="relative w-[230px] md:w-[450px] rounded-lg md:rounded-2xl overflow-hidden transform scale-100 md:hover:scale-[101%] transition-transform">
                 <div className="relative inset-0 w-full pt-[50%] transform scale-[120%]">
-                  <span className="absolute inset-0 flex items-center justify-center text-white">
-                    {user.username}
-                  </span>
                   <Image
                     src={getOgUrl(user.username!, !!user.golden)}
                     alt={user.username}

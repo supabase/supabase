@@ -155,7 +155,7 @@ export default function Ticket({
                     ) : (
                       <p>
                         We have some fantastic swag up for grabs, including 3 limited-edition
-                        mechanical keyboard that you won't want to miss.
+                        mechanical keyboards that you won't want to miss.
                       </p>
                     )}
                   </>
