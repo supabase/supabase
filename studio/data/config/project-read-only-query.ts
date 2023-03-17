@@ -1,4 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 // TODO: temporary solution to check if project is in read only mode
@@ -43,14 +44,17 @@ export const useProjectReadOnlyQuery = (
     }
   )
 
-export const useProjectReadOnlyPrefetch = ({
-  projectRef,
-  connectionString,
-}: ProjectReadOnlyVariables) => {
-  return useExecuteSqlPrefetch({
-    projectRef,
-    connectionString,
-    sql: getProjectReadOnlySql(),
-    queryKey: ['project-read-only'],
-  })
+export const useProjectReadOnlyPrefetch = () => {
+  const prefetch = useExecuteSqlPrefetch()
+
+  return useCallback(
+    ({ projectRef, connectionString }: ProjectReadOnlyVariables) =>
+      prefetch({
+        projectRef,
+        connectionString,
+        sql: getProjectReadOnlySql(),
+        queryKey: ['project-read-only'],
+      }),
+    [prefetch]
+  )
 }
