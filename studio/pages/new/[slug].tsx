@@ -161,11 +161,7 @@ const Wizard: NextPageWithLayout = () => {
     }
     if (postgresVersion) {
       data['custom_supabase_internal_requests'] = {
-        ami: {
-          search_tags: {
-            'tag:postgresVersion': postgresVersion,
-          },
-        },
+        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
       }
     }
     const response = await post(`${API_URL}/projects`, data)
