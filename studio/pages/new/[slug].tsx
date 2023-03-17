@@ -290,13 +290,13 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content
-                  className={[
-                    'Form section-block--body has-inputs-centered border-t border-b',
-                    'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                  ].join(' ')}
-                >
-                  {showCustomVersionInput && (
+                {showCustomVersionInput && (
+                  <Panel.Content
+                    className={[
+                      'Form section-block--body has-inputs-centered border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
                     <Input
                       id="custom-postgres-version"
                       layout="horizontal"
@@ -313,8 +313,8 @@ const Wizard: NextPageWithLayout = () => {
                       value={postgresVersion}
                       onChange={(event: any) => setPostgresVersion(event.target.value)}
                     />
-                  )}
-                </Panel.Content>
+                  </Panel.Content>
+                )}
 
                 <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
