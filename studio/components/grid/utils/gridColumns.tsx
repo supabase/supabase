@@ -19,7 +19,6 @@ import {
   DateTimeEditor,
   DateTimeWithTimezoneEditor,
   JsonEditor,
-  NullableBooleanEditor,
   NumberEditor,
   SelectEditor,
   TextEditor,
@@ -34,7 +33,7 @@ import {
   ForeignKeyFormatter,
 } from 'components/grid/components/formatter'
 
-const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
+export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
 export function getGridColumns(
   table: SupaTable,
@@ -105,7 +104,7 @@ function getColumnEditor(
 
   switch (columnType) {
     case 'boolean': {
-      return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
+      return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
       return DateEditor
@@ -130,7 +129,7 @@ function getColumnEditor(
       return NumberEditor
     }
     case 'text': {
-      return TextEditor
+      return (p: any) => <TextEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     default: {
       return undefined
@@ -180,7 +179,7 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
   } else return 'unknown'
 }
 
-function getColumnDefaultWidth(columnDef: SupaColumn): number {
+export function getColumnDefaultWidth(columnDef: SupaColumn): number {
   if (isNumericalColumn(columnDef.dataType)) {
     return 120
   } else if (
