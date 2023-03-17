@@ -162,7 +162,7 @@ Update your Prisma schema by setting the `directUrl` in the datasource block:
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  directURL         = env("DIRECT_URL")
+  directUrl         = env("DIRECT_URL")
 }
 ```
 
@@ -200,7 +200,7 @@ If you would like to use Supabase Auth and Prisma in your application, you will 
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  directURL         = env("DIRECT_URL")
+  directUrl         = env("DIRECT_URL")
 }
 
 generator client {
@@ -215,7 +215,7 @@ Next, specify the database schemas you would like to include in your Prisma sche
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  directURL         = env("DIRECT_URL")
+  directUrl         = env("DIRECT_URL")
   schemas           = ["public", "auth"]
 }
 
@@ -255,7 +255,7 @@ If you would like to use a PostgreSQL extension with Prisma, enable the `postgre
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  directURL         = env("DIRECT_URL")
+  directUrl         = env("DIRECT_URL")
 }
 
 generator client {
@@ -270,7 +270,7 @@ Next, specify the extensions you need in the `datasource` block:
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  directURL         = env("DIRECT_URL")
+  directUrl         = env("DIRECT_URL")
   extensions        = [hstore(schema: "myHstoreSchema"), pg_trgm, postgis(version: "2.1")]
 }
 
