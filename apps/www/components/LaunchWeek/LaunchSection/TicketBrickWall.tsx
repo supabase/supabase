@@ -29,9 +29,8 @@ export default function TicketBrickWall({ users }: Props) {
             users={users.slice(0, isMobile ? 5 : 7)}
             xOffset={isMobile ? 50 : 250}
           />
-          {/* TODO: set the correct amount of users when enough data */}
-          <TicketBrickWallRow users={users.slice(isMobile ? 5 : 3, isMobile ? 11 : 14)} reverse />
-          {isMobile && <TicketBrickWallRow users={users.slice(3, 15)} />}
+          <TicketBrickWallRow users={users.slice(isMobile ? 5 : 7, isMobile ? 11 : 14)} reverse />
+          {isMobile && <TicketBrickWallRow users={users.slice(11, 17)} />}
         </div>
       </div>
     </div>
