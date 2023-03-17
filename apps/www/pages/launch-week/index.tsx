@@ -139,7 +139,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .from('lw7_tickets_golden')
     .select('*')
     .order('createdAt', { ascending: false })
-    .limit(12)
+    .limit(17)
 
   // res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
 
