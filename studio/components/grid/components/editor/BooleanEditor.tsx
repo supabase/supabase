@@ -1,30 +1,46 @@
-import * as React from 'react'
+import { Select } from 'ui'
 import { EditorProps } from '@supabase/react-data-grid'
+import { useTrackedState } from 'components/grid/store'
+
+interface Props<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
+  isNullable?: boolean
+}
 
 export function BooleanEditor<TRow, TSummaryRow = unknown>({
   row,
   column,
+  isNullable,
   onRowChange,
   onClose,
-}: EditorProps<TRow, TSummaryRow>) {
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    onRowChange({ ...row, [column.key]: event.target.checked })
-  }
+}: Props<TRow, TSummaryRow>) {
+  const state = useTrackedState()
+  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
+  const value = row[column.key as keyof TRow] as unknown as string
 
-  function onBlur() {
-    onClose(true)
+  const onBlur = () => onClose(false)
+  const onChange = (event: any) => {
+    const value = event.target.value
+    if (value === 'null') {
+      onRowChange({ ...row, [column.key]: null }, true)
+    } else {
+      onRowChange({ ...row, [column.key]: value === 'true' }, true)
+    }
   }
 
   return (
-    <div className="sb-grid-checkbox-editor">
-      <input
-        className="sb-grid-checkbox-editor__input"
-        checked={row[column.key as keyof TRow] as unknown as boolean}
-        onChange={onChange}
-        onBlur={onBlur}
-        type="checkbox"
-        style={{ margin: 'auto' }}
-      />
-    </div>
+    <Select
+      autoFocus
+      id="boolean-editor"
+      name="boolean-editor"
+      size="small"
+      onBlur={onBlur}
+      onChange={onChange}
+      defaultValue={value === null ? 'null' : value.toString()}
+      style={{ width: `${gridColumn?.width || column.width}px` }}
+    >
+      <Select.Option value="true">TRUE</Select.Option>
+      <Select.Option value="false">FALSE</Select.Option>
+      {isNullable && <Select.Option value="null">NULL</Select.Option>}
+    </Select>
   )
 }

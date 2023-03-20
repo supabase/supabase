@@ -5,26 +5,26 @@ from `public.profiles` and the older versions getting orphaned.
 To automatically remove obsolete storage objects, extend the database
 triggers. Note that it is not sufficient to delete the objects from the
 `storage.objects` table because that would orphan and leak the actual storage objects in
-the S3 backend. Instead, invoke the storage API within Postgres via the `http` extension. 
+the S3 backend. Instead, invoke the storage API within Postgres via the `http` extension.
 
 Enable the [http extension for the `extensions` schema](https://app.supabase.com/project/_/database/extensions) in the Dashboard.
 Then, define the following SQL functions in the SQL Editor to delete
 storage objects via the API:
 
 ```SQL
-create or replace function delete_storage_object(bucket text, object text, out status int, out content varchar)
+create or replace function delete_storage_object(bucket text, object text, out status int, out content text)
 returns record
 language 'plpgsql'
 security definer
 as $$
 declare
-  project_url varchar := '<YOURPROJECTURL>';
-  service_role_key varchar := '<YOURSERVICEROLEKEY>'; --  full access needed
-  url varchar := project_url||'/storage/v1/object/'||bucket||'/'||object;
+  project_url text := '<YOURPROJECTURL>';
+  service_role_key text := '<YOURSERVICEROLEKEY>'; --  full access needed
+  url text := project_url||'/storage/v1/object/'||bucket||'/'||object;
 begin
   select
       into status, content
-           result.status::int, result.content::varchar
+           result.status::int, result.content::text
       FROM extensions.http((
     'DELETE',
     url,
@@ -34,7 +34,7 @@ begin
 end;
 $$;
 
-create or replace function delete_avatar(avatar_url text, out status int, out content varchar)
+create or replace function delete_avatar(avatar_url text, out status int, out content text)
 returns record
 language 'plpgsql'
 security definer
@@ -60,7 +60,7 @@ security definer
 as $$
 declare
   status int;
-  content varchar;
+  content text;
 begin
   if coalesce(old.avatar_url, '') <> ''
       and (tg_op = 'DELETE' or (old.avatar_url <> new.avatar_url)) then
