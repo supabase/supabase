@@ -41,6 +41,7 @@ export default function Ticket({
     <div
       className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
       id="wayfinding--ticket-visual-wrapper-container"
+      style={{ transform: 'translate3d(0,0,100px)' }}
     >
       <div
         className={cn(styles['ticket-visual-wrapper'], 'flex-1 col-span-8')}
