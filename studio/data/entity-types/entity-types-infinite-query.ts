@@ -6,6 +6,7 @@ import { entityTypeKeys } from './keys'
 export type EntityTypesVariables = {
   projectRef?: string
   schema?: string
+  search?: string
   limit?: number
   page?: number
 } & Pick<ExecuteSqlVariables, 'connectionString'>
@@ -18,7 +19,14 @@ export type EntityTypesResponse = {
 }
 
 export async function getEntityTypes(
-  { projectRef, connectionString, schema = 'public', limit = 100, page = 0 }: EntityTypesVariables,
+  {
+    projectRef,
+    connectionString,
+    schema = 'public',
+    search,
+    limit = 100,
+    page = 0,
+  }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
   const sql = /* SQL */ `
@@ -51,6 +59,7 @@ export async function getEntityTypes(
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
         and nc.nspname = '${schema}'
+        ${search ? `and c.relname ilike '%${search}%'` : ''}
       order by "name" asc
       limit ${limit}
       offset ${page * limit}
@@ -77,6 +86,7 @@ export async function getEntityTypes(
       projectRef,
       connectionString,
       sql,
+      queryKey: ['public', 'entity-types'],
     },
     signal
   )
@@ -92,6 +102,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     projectRef,
     connectionString,
     schema = 'public',
+    search,
     limit = 100,
   }: Omit<EntityTypesVariables, 'page'>,
   {
@@ -100,9 +111,12 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef),
+    entityTypeKeys.list(projectRef, search),
     ({ signal, pageParam }) =>
-      getEntityTypes({ projectRef, connectionString, schema, limit, page: pageParam }, signal),
+      getEntityTypes(
+        { projectRef, connectionString, schema, search, limit, page: pageParam },
+        signal
+      ),
     {
       enabled:
         enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',

@@ -52,13 +52,26 @@ const TableEditorMenu = ({
   const [searchText, setSearchText] = useState<string>('')
 
   const { project } = useProjectContext()
-  const { data, isLoading, refetch, isRefetching, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useEntityTypesQuery({
+  const {
+    data,
+    isLoading,
+    refetch,
+    isRefetching,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    isPreviousData: isSearching,
+  } = useEntityTypesQuery(
+    {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: selectedSchema,
-      // search: searchText.trim().toLowerCase()
-    })
+      search: searchText || undefined,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
 
   const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
@@ -183,9 +196,15 @@ const TableEditorMenu = ({
         <div className="mb-2 block px-3">
           <Input
             className="table-editor-search border-none"
-            icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
+            icon={
+              isSearching ? (
+                <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
+              ) : (
+                <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
+              )
+            }
             placeholder="Search tables"
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => setSearchText(e.target.value.trim())}
             value={searchText}
             size="tiny"
             actions={
@@ -208,6 +227,11 @@ const TableEditorMenu = ({
         <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
           <p className="text-xs">No entities available</p>
           <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
+        </div>
+      ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
+        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No results found</p>
+          <p className="text-xs text-scale-1100">There are no entities that match your search</p>
         </div>
       ) : (
         <Menu
@@ -253,13 +277,6 @@ const TableEditorMenu = ({
             />
           </div>
         </Menu>
-      )}
-
-      {searchText.length > 0 && (entityTypes?.length ?? 0) === 0 && (
-        <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No results found</p>
-          <p className="text-xs text-scale-1100">There are no entities that match your search</p>
-        </div>
       )}
     </div>
   )

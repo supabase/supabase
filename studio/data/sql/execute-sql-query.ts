@@ -23,7 +23,8 @@ export async function executeSql(
     projectRef,
     connectionString,
     sql,
-  }: Pick<ExecuteSqlVariables, 'projectRef' | 'connectionString' | 'sql'>,
+    queryKey,
+  }: Pick<ExecuteSqlVariables, 'projectRef' | 'connectionString' | 'sql' | 'queryKey'>,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -37,7 +38,9 @@ export async function executeSql(
   }
 
   const response = await post(
-    `${API_URL}/pg-meta/${projectRef}/query`,
+    `${API_URL}/pg-meta/${projectRef}/query${
+      queryKey ? `?key=${queryKey.filter((seg) => typeof seg === 'string').join('-')}` : ''
+    }`,
     { query: sql },
     { headers: Object.fromEntries(headers), signal }
   )
@@ -57,7 +60,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
 ) =>
   useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
-    ({ signal }) => executeSql({ projectRef, connectionString, sql }, signal),
+    ({ signal }) => executeSql({ projectRef, connectionString, sql, queryKey }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
@@ -66,7 +69,7 @@ export const prefetchExecuteSql = (
   { projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables
 ) => {
   return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
-    executeSql({ projectRef, connectionString, sql }, signal)
+    executeSql({ projectRef, connectionString, sql, queryKey }, signal)
   )
 }
 
