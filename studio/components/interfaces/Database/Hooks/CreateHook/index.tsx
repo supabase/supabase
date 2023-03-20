@@ -364,6 +364,8 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
 
         const body = _localState.formState.requestBody
 
+        console.log({ body })
+
         const response: any = _localState.isEditing
           ? await _localState.meta.hooks.update(body.id, body)
           : await _localState.meta.hooks.create(body)

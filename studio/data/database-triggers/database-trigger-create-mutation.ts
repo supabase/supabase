@@ -15,6 +15,7 @@ type createDatabaseTriggerResponse = PostgresTrigger & { error?: any }
 export async function createDatabaseTrigger({
   projectRef,
   connectionString,
+  payload,
 }: DatabaseTriggerCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!connectionString) throw new Error('connectionString is required')
@@ -22,7 +23,7 @@ export async function createDatabaseTrigger({
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, {
+  const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
     headers: Object.fromEntries(headers),
   })) as createDatabaseTriggerResponse
 
@@ -32,7 +33,7 @@ export async function createDatabaseTrigger({
 
 type DatabaseTriggerCreateData = Awaited<ReturnType<typeof createDatabaseTrigger>>
 
-export const useTableRowCreateMutation = ({
+export const useDatabaseTriggerCreateMutation = ({
   onSuccess,
   ...options
 }: Omit<
