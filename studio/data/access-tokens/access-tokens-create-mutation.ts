@@ -6,12 +6,13 @@ import { accessTokenKeys } from './keys'
 
 export type AccessTokenCreateVariables = {
   name: string
+  scope: 'V0' | undefined
 }
 
 export type NewAccessToken = AccessToken & { token: string }
 
-export async function createAccessToken({ name }: AccessTokenCreateVariables) {
-  const response = await post(`${API_URL}/profile/access-tokens`, { name })
+export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
+  const response = await post(`${API_URL}/profile/access-tokens`, { name, scope })
   if (response.error) {
     throw response.error
   }
