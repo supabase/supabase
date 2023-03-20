@@ -13,6 +13,7 @@ import NoPermission from 'components/ui/NoPermission'
 import CreateHook from 'components/interfaces/Database/Hooks/CreateHook'
 import DeleteHook from 'components/interfaces/Database/Hooks/DeleteHook'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
+import CreateHookPanel from 'components/interfaces/Database/Hooks/CreateHookPanel'
 
 const HooksPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
@@ -85,11 +86,12 @@ const HooksPage: NextPageWithLayout = () => {
         deleteHook={deleteHook}
         enableHooks={enableHooksForProject}
       />
-      <CreateHook
+      {/* <CreateHook
         hook={selectedHook}
         visible={showCreateHookForm}
         setVisible={setShowCreateHookForm}
-      />
+      /> */}
+      <CreateHookPanel visible={showCreateHookForm} onClose={() => setShowCreateHookForm(false)} />
       <DeleteHook
         hook={selectedHook}
         visible={showDeleteHookForm}
