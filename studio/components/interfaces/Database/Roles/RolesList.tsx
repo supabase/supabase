@@ -62,7 +62,7 @@ const RolesList = ({}) => {
           />
         </div>
 
-        <div className="mb-4 -mt-2 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Input
               size="small"

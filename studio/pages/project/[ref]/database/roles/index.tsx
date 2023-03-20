@@ -2,13 +2,18 @@ import { observer } from 'mobx-react-lite'
 import { DatabaseLayout } from 'components/layouts'
 import { RolesList } from 'components/interfaces/Database'
 import { NextPageWithLayout } from 'types'
-import { FormsContainer } from 'components/ui/Forms'
+import clsx from 'clsx'
 
 const DatabaseRoles: NextPageWithLayout = () => {
   return (
-    <FormsContainer>
+    <div
+      className={clsx(
+        'mx-auto flex flex-col px-5 pt-6 pb-14',
+        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32'
+      )}
+    >
       <RolesList />
-    </FormsContainer>
+    </div>
   )
 }
 
