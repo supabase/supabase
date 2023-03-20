@@ -236,8 +236,8 @@ export async function handler(req: Request) {
         ],
         headers: {
           'content-type': 'image/png',
-          'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
-          'cdn-cache-control': 'max-age=31536000',
+          // 'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
+          // 'cdn-cache-control': 'max-age=31536000',
         },
       }
     )
@@ -247,7 +247,7 @@ export async function handler(req: Request) {
       .from('images')
       .upload(`lw7/tickets/${golden ? `golden/${username}` : username}.png`, generatedImage.body!, {
         contentType: 'image/png',
-        cacheControl: '31536000',
+        // cacheControl: '31536000',
         upsert: false,
       })
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
