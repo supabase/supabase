@@ -7,21 +7,21 @@ export const meta = {
   video: 'https://www.youtube.com/v/vyHyYpvjaks',
 }
 
-Once you've moved beyond the initial "clicking around" stage and are ready to start building your project, we suggest following a workflow that involves working locally and deploying your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
+Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
 
-Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. We'll get into all of the details, but the gist is that you'll work locally, generate migrations as you change your tables, and apply those migrations to a linked project on the [Platform](https://app.supabase.io/).
+Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. Working locally, generating migrations as you change your tables, and appling those migrations to a linked project on the [Platform](https://app.supabase.io/) keeps everything nicely organized as you grow.
 
 ## Why develop locally?
 
-The Dashboard provides a wide range of features for setting up your project: creating tables, adding columns, changing existing columns, creating views, and more. Given all of the Dashboard's capabilities, you might question the need to work locally. Here's a few advantages to working this way:
+The Dashboard provides a wide range of features for setting up your project: creating tables, adding columns, changing existing columns, creating views, setting up RLS policies, and more. Given all of the Dashboard's capabilities, you might question the need to work locally. Here's a few advantages to working this way:
 
-1. **Faster Development**: Developing your project locally allows you to work without any network latency or internet disruptions.
+1. **Faster Development**: Developing locally allows you to work without any network latency or internet disruptions.
 
-2. **Easier Collaboration**: Developing your project locally can make it easier to collaborate with others on the same project.
+2. **Easier Collaboration**: Developing locally can make it easier to collaborate with others on the same project.
 
-3. **Cost-Effective**: While Supabase provides a generous free tier and gives you two free projects to get started, you may be working on many projects at once. Developing locally means that you can spin up unlimited projects locally and only link them with live projects when you're ready to launch.
+3. **Cost-Effective**: Supabase provides a generous free tier and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
 
-4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that is captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
+4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
 
 5. **Work offline**: Need to work from a train? A plain? An automobile? No problem. Developing your project locally allows you to work offline.
 
@@ -338,7 +338,29 @@ supabase db reset
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-You should now see the `employees` table, along with your seed data in the Dashboard! All of your database changes are captured in code, and you can reset to a known state at any time, complete with seed data. The last step is deploying these changes to a live Supabase project.
+You should now see the `employees` table, along with your seed data in the Dashboard! All of your database changes are captured in code, and you can reset to a known state at any time, complete with seed data.
+
+### Diffing changes
+
+This workflow is great if you know SQL and are comfortable creating tables and columns. If not, you can still use the Dashboard to create tables and columns, and then use the CLI to diff your changes and create migrations.
+
+Create a new table called `cities`, with columns `id`, `name` and `population`. To see the corresponding SQL for this, you can use the `supabase db diff --schema public` command. This will show you the SQL that will be run to create the table and columns. The output of `supabase db diff` will look something like this:
+
+```
+Diffing schemas: public
+Finished supabase db diff on branch main.
+
+create table "public"."cities" (
+    "id" bigint generated by default as identity not null,
+    "name" text,
+    "population" bigint
+);
+
+```
+
+You can then copy this SQL into a new migration file, and run `supabase db reset` to apply the changes.
+
+The last step is deploying these changes to a live Supabase project.
 
 ## Deploy your project
 
