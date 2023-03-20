@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from 'ui'
+import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus, Select } from 'ui'
 import { useStore } from 'hooks'
 import { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
@@ -68,6 +68,7 @@ const WrapperTableEditor = ({
       <SidePanel.Content>
         <div className="mt-4 space-y-6">
           <Listbox
+            size="small"
             label="Select a target the table will point to"
             value={selectedTableIndex}
             onChange={(value) => setSelectedTableIndex(value)}
@@ -105,6 +106,55 @@ const WrapperTableEditor = ({
 export default WrapperTableEditor
 
 const Option = ({ option }: { option: TableOption }) => {
+  if (option.type === 'select') {
+    // NOTE(alaister): We have this annoying workaround because Listbox
+    // doesn't support conditional rendering inside of it
+
+    return option.required ? (
+      <Listbox
+        key={option.name}
+        id={option.name}
+        name={option.name}
+        label={option.label}
+        defaultValue={option.defaultValue ?? ''}
+      >
+        {option.options.map((subOption) => (
+          <Listbox.Option
+            key={subOption.value}
+            id={option.name + subOption.value}
+            value={subOption.value}
+            label={subOption.label}
+          >
+            {subOption.label}
+          </Listbox.Option>
+        ))}
+      </Listbox>
+    ) : (
+      <Listbox
+        key={option.name}
+        id={option.name}
+        name={option.name}
+        label={option.label}
+        defaultValue={option.defaultValue ?? ''}
+      >
+        <Listbox.Option key="empty" value="" label="---">
+          ---
+        </Listbox.Option>
+
+        {option.options.map((subOption) => (
+          <Listbox.Option
+            key={subOption.value}
+            id={option.name + subOption.value}
+            value={subOption.value}
+            label={subOption.label}
+          >
+            {subOption.label}
+          </Listbox.Option>
+        ))}
+      </Listbox>
+    )
+  }
+
   return (
     <Input
       key={option.name}
@@ -139,7 +189,7 @@ const TableForm = ({
 
   const initialValues = initialData ?? {
     table_name: '',
-    columns: table.availableColumns.map((column) => column.name),
+    columns: table.availableColumns ? table.availableColumns.map((column) => column.name) : [],
     ...Object.fromEntries(table.options.map((option) => [option.name, option.defaultValue ?? ''])),
     schema: 'public',
     schema_name: '',
@@ -204,7 +254,7 @@ const TableForm = ({
             <div className="form-group">
               <label className="!w-full">Select the columns to be added to your table</label>
               <div className="flex flex-wrap gap-2">
-                {table.availableColumns.map((column) => {
+                {table.availableColumns?.map((column) => {
                   const isSelected = values.columns.includes(column.name)
                   return (
                     <div
