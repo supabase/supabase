@@ -1,5 +1,5 @@
 import { partition } from 'lodash'
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
@@ -14,11 +14,7 @@ import { SUPABASE_ROLES } from './Roles.constants'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 
-interface Props {
-  onSelectRole: (role: any) => void
-}
-
-const RolesList: FC<Props> = ({}) => {
+const RolesList = ({}) => {
   const { meta } = useStore()
 
   const [maxConnectionLimit, setMaxConnectionLimit] = useState(0)
