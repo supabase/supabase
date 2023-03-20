@@ -1,5 +1,4 @@
 import { GoTrueClient, User } from '@supabase/gotrue-js'
-import { useRouter } from 'next/router'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 
@@ -42,7 +41,6 @@ export const getIdentity = (gotrueUser: User) => {
 // NOTE: do not use any imports in this function,
 // as it is used standalone in the documents head
 export const getReturnToPath = (fallback = '/projects') => {
-  const { basePath } = useRouter()
   const searchParams = new URLSearchParams(location.search)
   let returnTo = searchParams.get('returnTo') ?? fallback
 
@@ -50,5 +48,5 @@ export const getReturnToPath = (fallback = '/projects') => {
 
   const remainingSearchParams = searchParams.toString()
 
-  return basePath + returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }
