@@ -12,8 +12,8 @@ export const SITE_URL =
 export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
 export const COOKIE = 'supa-launch-week-ticke-user-id'
-export const DATE = 'April 3rd 2023'
+export const DATE = 'April 10th 2023'
 export const TWEET_TEXT =
-  'It’s almost #SupaLaunchWeek 7! Generate your unique ticket here 👇 you can also win a mechanical keyboard 🤩'
+  "It's almost #SupaLaunchWeek 7! Generate your unique ticket here 👇 you can also win a mechanical keyboard 🤩"
 export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek 7 ticket Gold! Thrice the chance to win a mechanical keyboard 🤩 `
 export const SITE_NAME = 'Supabase'

@@ -22,7 +22,7 @@ export function LaunchWeekLogoHeader() {
             <Image src="/images/launchweek/seven/lw7-seven.svg" width={40} height={40} />
           </span>
         </h1>
-        <p className="text-white text-lg text-center">April 3rd - 7th at 7AM PT | 10AM ET</p>
+        <p className="text-white text-lg text-center">April 10th - 14th at 7AM PT | 10AM ET</p>
       </motion.div>
     </div>
   )
