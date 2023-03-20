@@ -2,7 +2,6 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { auth, getReturnToPath } from 'lib/gotrue'
-import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
@@ -13,7 +12,6 @@ const signInSchema = object({
 
 const SignInSSOForm = () => {
   const { ui } = useStore()
-  const { basePath } = useRouter()
   const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -37,7 +35,7 @@ const SignInSSOForm = () => {
         captchaToken: token ?? undefined,
         redirectTo: `${
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-            ? process.env.NEXT_PUBLIC_VERCEL_URL + (basePath && `${basePath}`)
+            ? process.env.NEXT_PUBLIC_VERCEL_URL
             : process.env.NEXT_PUBLIC_SITE_URL
         }${getReturnToPath()}`,
       },

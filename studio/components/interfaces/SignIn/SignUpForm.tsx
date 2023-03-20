@@ -8,7 +8,6 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-import { useRouter } from 'next/router'
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
@@ -16,7 +15,6 @@ const signUpSchema = passwordSchema.shape({
 
 const SignUpForm = () => {
   const { ui } = useStore()
-  const { basePath } = useRouter()
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -41,7 +39,7 @@ const SignUpForm = () => {
       hcaptchaToken: token ?? null,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? process.env.NEXT_PUBLIC_VERCEL_URL + (basePath && `${basePath}`)
+          ? process.env.NEXT_PUBLIC_VERCEL_URL
           : process.env.NEXT_PUBLIC_SITE_URL
       }/sign-in`,
     })
