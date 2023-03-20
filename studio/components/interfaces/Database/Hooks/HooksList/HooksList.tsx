@@ -10,6 +10,9 @@ import SchemaTable from './SchemaTable'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+
 function isHooksEnabled(schemas: any): boolean {
   return schemas.some((schema: any) => schema.name === 'supabase_functions')
 }
@@ -24,9 +27,19 @@ const HooksList: FC<any> = ({
   enableHooks = () => {},
 }) => {
   const { meta } = useStore()
-  const hooks = meta.hooks.list()
   const schemas = meta.schemas.list()
-  const filteredHooks = hooks.filter((x: any) =>
+
+  const { project } = useProjectContext()
+  const {
+    data: hooks,
+    isLoading,
+    isError,
+  } = useDatabaseHooks({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const filteredHooks = (hooks || []).filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
@@ -55,7 +68,7 @@ const HooksList: FC<any> = ({
     )
   }
 
-  if (meta.hooks.isLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
@@ -64,7 +77,7 @@ const HooksList: FC<any> = ({
     )
   }
 
-  if (meta.hooks.hasError) {
+  if (isError) {
     return (
       <p className="px-6 py-4">
         <p>Error connecting to API</p>
@@ -75,7 +88,7 @@ const HooksList: FC<any> = ({
 
   return (
     <>
-      {hooks.length == 0 ? (
+      {(hooks || []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Database Webhooks"

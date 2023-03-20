@@ -20,6 +20,7 @@ import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface Props {
   selectedSchema: string
@@ -39,6 +40,7 @@ const TableList: FC<Props> = ({
   onOpenTable = () => {},
 }) => {
   const { meta } = useStore()
+  const { isLoading } = meta.tables
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -150,7 +152,14 @@ const TableList: FC<Props> = ({
           </div>
         )}
       </div>
-      {tables.length === 0 ? (
+
+      {isLoading ? (
+        <div className="py-4 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : tables.length === 0 ? (
         <NoSearchResults />
       ) : (
         <div className="my-4 w-full">
