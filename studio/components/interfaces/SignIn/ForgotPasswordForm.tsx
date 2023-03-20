@@ -45,7 +45,7 @@ const ForgotPasswordForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'success',
-        message: `If you registered using your email and password, you should receive a password reset email.`,
+        message: `If you registered using your email and password, you will receive a password reset email.`,
       })
 
       await router.push('/sign-in')
