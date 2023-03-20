@@ -215,9 +215,12 @@ export function parseSupaTable(
       isEncrypted: encryptedColumns.includes(column.name),
       enum: column.enums,
       comment: column.comment,
-      targetTableSchema: null,
-      targetTableName: null,
-      targetColumnName: null,
+      foreignKey: {
+        targetTableSchema: null,
+        targetTableName: null,
+        targetColumnName: null,
+        deletionAction: undefined,
+      },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
@@ -230,9 +233,10 @@ export function parseSupaTable(
       )
     })
     if (relationship) {
-      temp.targetTableSchema = relationship.target_table_schema
-      temp.targetTableName = relationship.target_table_name
-      temp.targetColumnName = relationship.target_column_name
+      temp.foreignKey.targetTableSchema = relationship.target_table_schema
+      temp.foreignKey.targetTableName = relationship.target_table_name
+      temp.foreignKey.targetColumnName = relationship.target_column_name
+      temp.foreignKey.deletionAction = relationship.deletion_action
     }
     return temp
   })

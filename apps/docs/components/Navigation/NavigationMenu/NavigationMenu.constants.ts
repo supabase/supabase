@@ -308,6 +308,17 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        {
+          name: 'Enterprise SSO',
+          url: '/guides/auth/enterprise-sso',
+          items: [
+            {
+              name: 'SAML 2.0 (Beta)',
+              url: '/guides/auth/sso/auth-sso-saml',
+              items: [],
+            },
+          ],
+        },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
@@ -673,6 +684,11 @@ export const platform = {
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
+    },
+    {
+      name: 'Billing',
+      url: undefined,
+      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap', items: [] }],
     },
     {
       name: 'Single sign-on',

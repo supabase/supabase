@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'supabase/functions/og-images'
+      - 'supabase/functions/og-images/**'
   workflow_dispatch:
 
 jobs:
@@ -18,11 +18,11 @@ jobs:
 
     steps:
       - name: Check out repo
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Setup the Supabase CLI
-      - uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v1
         with:
-          version: 1.0.0
+          version: latest
 
       - run: supabase functions deploy og-images --project-ref $PROJECT_ID --no-verify-jwt

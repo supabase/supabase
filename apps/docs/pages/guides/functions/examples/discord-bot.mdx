@@ -50,7 +50,7 @@ This will register a Slash Command named `hello` that accepts a parameter named 
 import { json, serve, validateRequest } from 'sift'
 // TweetNaCl is a cryptography library that we use to verify requests
 // from Discord.
-import nacl from 'nacl'
+import nacl from 'tweetnacl'
 
 enum DiscordCommandType {
   Ping = 1,
