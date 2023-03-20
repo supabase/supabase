@@ -6,6 +6,8 @@ type Props = {
 export default function TicketNumber({ number, size }: Props) {
   const numDigits = `${number}`.length
   const prefix = `00000000`.slice(numDigits)
+  const ticketNumberText = `№ ${prefix}${number}`
+
   return (
     <>
       <div
@@ -85,12 +87,11 @@ export default function TicketNumber({ number, size }: Props) {
           </div>
           <div
             className={[
-              'md:absolute px-12 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA60] bg-clip-text text-transparent text-center',
+              'md:absolute px-12 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA50] bg-clip-text text-[#F8F9FA50] text-center',
               size === 'small' ? 'md:px-12' : 'xs:px-24',
             ].join(' ')}
           >
-            № {prefix}
-            {number}
+            {ticketNumberText}
           </div>
         </div>
       </div>
