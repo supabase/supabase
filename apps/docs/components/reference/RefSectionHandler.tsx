@@ -22,8 +22,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const router = useRouter()
 
   const slug = router.query.slug[0]
-  console.log('the props', props)
-  console.log('the router', slug)
+
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
@@ -52,13 +51,13 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
     <>
       <Head>
         <title>{pageTitle}</title>
-        {/* <meta name="description" content={props.meta?.description} /> */}
-        {/* <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} /> */}
-        {/* <meta
+        <meta name="description" content={pageTitle} />
+        <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} />
+        <meta
           name="twitter:image"
           content={`https://supabase.com/docs/img/supabase-og-image.png`}
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" /> */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <RefSubLayout>
         {props.sections.map((x, i) => {
