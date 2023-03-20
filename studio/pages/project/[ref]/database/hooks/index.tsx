@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -69,7 +70,12 @@ const HooksPage: NextPageWithLayout = () => {
   }
 
   return (
-    <>
+    <div
+      className={clsx(
+        'mx-auto flex flex-col px-5 pt-6 pb-14',
+        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32'
+      )}
+    >
       <HooksList
         hooksEnabled={hooksEnabled}
         filterString={filterString}
@@ -89,7 +95,7 @@ const HooksPage: NextPageWithLayout = () => {
         visible={showDeleteHookForm}
         setVisible={setShowDeleteHookForm}
       />
-    </>
+    </div>
   )
 }
 
