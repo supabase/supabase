@@ -8,7 +8,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: '/img/icons/stripe-icon.svg',
     extensionName: 'StripeFdw',
     label: 'Stripe',
-    docsUrl: 'https://supabase.com/docs/guides/database/wrappers/stripe',
+    docsUrl: 'https://supabase.github.io/wrappers/stripe/',
     server: {
       options: [
         {
@@ -57,6 +57,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'balance',
             editable: false,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -111,6 +112,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'balance_transactions',
             editable: false,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -165,6 +167,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'charges',
             editable: false,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -203,6 +206,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'customers',
             editable: false,
             required: true,
+            type: 'text',
           },
           // {
           //   name: 'rowid_column',
@@ -260,6 +264,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'invoices',
             editable: false,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -302,6 +307,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'payment_intents',
             editable: false,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -348,6 +354,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'products',
             editable: false,
             required: true,
+            type: 'text',
           },
           // {
           //   name: 'rowid_column',
@@ -393,6 +400,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'subscriptions',
             editable: false,
             required: true,
+            type: 'text',
           },
           // {
           //   name: 'rowid_column',
@@ -412,7 +420,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: '/img/icons/firebase-icon.svg',
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
-    docsUrl: 'https://supabase.com/docs/guides/database/wrappers/firebase',
+    docsUrl: 'https://supabase.github.io/wrappers/firebase/',
     server: {
       options: [
         {
@@ -470,6 +478,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'auth/users',
             editable: false,
             required: true,
+            type: 'text',
           },
           {
             name: 'base_url',
@@ -477,6 +486,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'https://identitytoolkit.googleapis.com/v1/projects',
             editable: true,
             required: true,
+            type: 'text',
           },
           {
             name: 'limit',
@@ -484,6 +494,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: '10000',
             editable: true,
             required: true,
+            type: 'text',
           },
         ],
       },
@@ -515,6 +526,7 @@ export const WRAPPERS: WrapperMeta[] = [
             placeholder: 'firestore/[collection_id]',
             editable: true,
             required: true,
+            type: 'text',
           },
           {
             name: 'base_url',
@@ -522,6 +534,7 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'https://firestore.googleapis.com/v1beta1/projects',
             editable: true,
             required: true,
+            type: 'text',
           },
           {
             name: 'limit',
@@ -529,6 +542,90 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: '10000',
             editable: true,
             required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 's3_wrapper',
+    handlerName: 's3_fdw_handler',
+    validatorName: 's3_fdw_validator',
+    icon: '/img/icons/s3-icon.svg',
+    extensionName: 'S3Fdw',
+    label: 'S3',
+    docsUrl: 'https://supabase.github.io/wrappers/s3/',
+    server: {
+      options: [
+        {
+          name: 'vault_access_key_id',
+          label: 'Access Key ID',
+          required: true,
+          encrypted: true,
+          hidden: false,
+        },
+        {
+          name: 'vault_secret_access_key',
+          label: 'Access Key Secret',
+          required: true,
+          encrypted: true,
+          hidden: false,
+        },
+        {
+          name: 'aws_region',
+          label: 'AWS Region',
+          required: true,
+          encrypted: false,
+          hidden: false,
+          defaultValue: 'us-east-1',
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'S3 File',
+        description: 'Map to a file in S3',
+        options: [
+          {
+            name: 'uri',
+            label: 'URI',
+            editable: true,
+            required: true,
+            placeholder: 's3://bucket/s3_table.csv',
+            type: 'text',
+          },
+          {
+            name: 'format',
+            label: 'Format',
+            editable: true,
+            required: true,
+            type: 'select',
+            defaultValue: 'csv',
+            options: [
+              { label: 'CSV', value: 'csv' },
+              { label: 'JSONL (JSON Lines)', value: 'jsonl' },
+            ],
+          },
+          {
+            name: 'has_header',
+            label: 'Has Header',
+            editable: true,
+            required: false,
+            type: 'select',
+            defaultValue: 'true',
+            options: [
+              { label: 'True', value: 'true' },
+              { label: 'False', value: 'false' },
+            ],
+          },
+          {
+            name: 'compress',
+            label: 'Compression',
+            editable: true,
+            required: false,
+            type: 'select',
+            options: [{ label: 'GZIP', value: 'gzip' }],
           },
         ],
       },
