@@ -147,6 +147,14 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+**Note**: The admin `createUser` SDK method modifies the following fields via an update rather than an insert statement.
+1. `raw_app_meta_data`
+2. `confirmation_token`
+3. `email_confirmed_at`
+4. `phone_confirmed_at`
+5. `banned_until`
+
+Please initialize a trigger which runs after update if you wish to capture any of these fields.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
