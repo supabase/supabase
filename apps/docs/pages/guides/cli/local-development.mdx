@@ -214,9 +214,10 @@ supabase migration new create_employees_table
 
 create table
 employees (
-id integer primary key generated always as identity,
+id bigint primary key generated always as identity,
 name text
 email text not null
+created_at timestampz default now()
 );
 
 ````
