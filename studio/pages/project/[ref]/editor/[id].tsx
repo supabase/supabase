@@ -58,7 +58,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         .concat(foreignTables)
         .find((table) => table.id === Number(id))
     : undefined
-  console.log('selectedTable', toJS(selectedTable))
+
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
       setSelectedSchema(selectedTable.schema)
