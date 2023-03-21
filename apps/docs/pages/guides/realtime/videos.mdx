@@ -1,0 +1,23 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'videos',
+  title: 'Videos',
+  description: 'Video guides for Supabase Realtime',
+  sidebar_label: 'Videos',
+}
+
+## Client & Server Components in Next.js with Realtime Updates
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/YR-xP6PPXXA"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
