@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
