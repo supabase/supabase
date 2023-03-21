@@ -11,6 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { isValidHttpUrl } from './Hooks.utils'
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
+import { ENABLED_MODE_OPTIONS } from './Hooks.constants'
 
 // Also see if we can add the input field for enabled_mode
 
@@ -264,7 +265,26 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                 header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
               >
                 <FormSectionContent loading={false} className="lg:!col-span-8">
-                  <Input id="name" name="name" label="Name" />
+                  <Input
+                    id="name"
+                    name="name"
+                    label="Name"
+                    descriptionText="Do not use spaces/whitespaces"
+                  />
+                  <Listbox
+                    size="medium"
+                    id="enabled_mode"
+                    name="enabled_mode"
+                    label="Enabled mode"
+                    descriptionText="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it"
+                  >
+                    {ENABLED_MODE_OPTIONS.map((option) => (
+                      <Listbox.Option key={option.value} value={option.value} label={option.label}>
+                        {option.label}
+                        <span className="block text-scale-900">{option.description}</span>
+                      </Listbox.Option>
+                    ))}
+                  </Listbox>
                 </FormSectionContent>
               </FormSection>
               <SidePanel.Separator />
