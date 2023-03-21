@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { isValidHttpUrl } from './Hooks.utils'
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { ENABLED_MODE_OPTIONS } from './Hooks.constants'
+import { AVAILABLE_WEBHOOK_TYPES, ENABLED_MODE_OPTIONS, HOOK_EVENTS } from './Hooks.constants'
 
 // Also see if we can add the input field for enabled_mode
 
@@ -339,27 +339,16 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     error={eventsError}
                     descriptionText="These are the events that are watched by the webhook, only the events selected above will fire the webhook on the table you've selected."
                   >
-                    <Checkbox
-                      value="INSERT"
-                      label="Insert"
-                      description="Any insert operation on the table"
-                      checked={events.includes('INSERT')}
-                      onChange={() => onUpdateSelectedEvents('INSERT')}
-                    />
-                    <Checkbox
-                      value="UPDATE"
-                      label="Update"
-                      description="Any update operation, of any column in the table"
-                      checked={events.includes('UPDATE')}
-                      onChange={() => onUpdateSelectedEvents('UPDATE')}
-                    />
-                    <Checkbox
-                      value="DELETE"
-                      label="Delete"
-                      description="Any deletion of a record"
-                      checked={events.includes('DELETE')}
-                      onChange={() => onUpdateSelectedEvents('DELETE')}
-                    />
+                    {HOOK_EVENTS.map((event) => (
+                      <Checkbox
+                        key={event.value}
+                        value={event.value}
+                        label={event.label}
+                        description={event.description}
+                        checked={events.includes(event.value)}
+                        onChange={() => onUpdateSelectedEvents(event.value)}
+                      />
+                    ))}
                   </Checkbox.Group>
                 </FormSectionContent>
               </FormSection>
@@ -376,59 +365,31 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     label="Type of hook"
                     type="cards"
                   >
-                    <Radio
-                      id="http_request"
-                      value="http_request"
-                      label=""
-                      beforeLabel={
-                        <>
+                    {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
+                      <Radio
+                        disabled={webhook.disabled}
+                        key={webhook.value}
+                        id={webhook.value}
+                        value={webhook.value}
+                        label=""
+                        beforeLabel={
                           <div className="flex items-center space-x-5">
-                            <Image
-                              src={`/img/function-providers/http-request.png`}
-                              layout="fixed"
-                              width="32"
-                              height="32"
-                            />
+                            <Image src={webhook.icon} layout="fixed" width="32" height="32" />
                             <div className="flex-col space-y-0">
-                              <div className="flex space-x-1">
-                                <span className="text-scale-1200">HTTP Request</span>
-                                <Badge color="green">Alpha</Badge>
+                              <div className="flex space-x-2">
+                                <p className="text-scale-1200">{webhook.label}</p>
+                                {webhook.disabled ? (
+                                  <Badge color="amber">Coming soon</Badge>
+                                ) : (
+                                  <Badge color="green">Alpha</Badge>
+                                )}
                               </div>
-                              <span className="text-scale-900">
-                                Send an HTTP request to any URL.
-                              </span>
+                              <p className="text-scale-1000">{webhook.description}</p>
                             </div>
                           </div>
-                        </>
-                      }
-                    />
-                    <Radio
-                      disabled
-                      id="supabase_function"
-                      value="supabase_function"
-                      label=""
-                      beforeLabel={
-                        <>
-                          <div className="flex items-center space-x-5">
-                            <Image
-                              src={`/img/function-providers/supabase-severless-function.png`}
-                              layout="fixed"
-                              width="32"
-                              height="32"
-                            />
-                            <div className="flex-col space-y-0">
-                              <div className="flex space-x-1">
-                                <span className="text-scale-1200">Supabase Edge Functions</span>
-                                <Badge color="amber">Coming soon</Badge>
-                              </div>
-                              <span className="text-scale-900">
-                                Choose a Supabase Function to run.
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      }
-                    />
+                        }
+                      />
+                    ))}
                   </Radio.Group>
                 </FormSectionContent>
               </FormSection>
