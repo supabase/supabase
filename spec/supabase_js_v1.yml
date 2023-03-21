@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/supabase-js
-  title: Supabase Client
+  title: Supabase Javascript Client
   description: |
 
     Supabase JavaScript.
@@ -61,7 +61,7 @@ functions:
           ```
         description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`. 
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
@@ -567,7 +567,7 @@ functions:
     notes: |
       Sends a password reset request to an email address.
       - When the user clicks the reset link in the email they are redirected back to your application.
-      You can configure the URL that the user is redirected to via the `redirectTo` param. 
+      You can configure the URL that the user is redirected to via the `redirectTo` param.
       See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
