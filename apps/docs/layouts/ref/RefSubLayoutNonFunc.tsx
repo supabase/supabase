@@ -37,7 +37,6 @@ const RefSubLayoutNonFunc: FC<RefSubLayoutNonFuncType> & RefSubLayoutNonFuncSubC
 }
 
 const Section: FC<ISectionContainer> = (props) => {
-  // console.log({ props })
   return (
     <article
       key={props.id}
