@@ -95,7 +95,7 @@ const HooksPage: NextPageWithLayout = () => {
       <DeleteHook
         hook={selectedHook}
         visible={showDeleteHookForm}
-        setVisible={setShowDeleteHookForm}
+        onClose={() => setShowDeleteHookForm(false)}
       />
     </div>
   )

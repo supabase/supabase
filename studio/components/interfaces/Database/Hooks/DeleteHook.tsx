@@ -1,32 +1,41 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 
-type DeleteHookProps = {
+interface DeleteHookProps {
   hook?: any
   visible: boolean
-  setVisible: (value: boolean) => void
-} & any
+  onClose: () => void
+}
 
-const DeleteHook: React.FC<DeleteHookProps> = ({ hook, visible, setVisible }) => {
-  const { ui, meta } = useStore()
-  const [loading, setLoading] = React.useState(false)
+const DeleteHook = ({ hook, visible, onClose }: DeleteHookProps) => {
+  const { ui } = useStore()
+  const [loading, setLoading] = useState(false)
   const { id, name, schema } = hook ?? {}
 
+  const { project } = useProjectContext()
+  const { mutateAsync: deleteDatabaseTrigger } = useDatabaseTriggerDeleteMutation()
+
   async function handleDelete() {
+    if (!project) {
+      return console.error('Project ref is required')
+    }
+    if (!id) {
+      return ui.setNotification({ category: 'error', message: 'Unable find selected hook' })
+    }
+
     try {
       setLoading(true)
-      if (!id) {
-        throw Error('Invalid hook info')
-      }
-      const response: any = await meta.hooks.del(id)
-      if (response.error) {
-        throw response.error
-      } else {
-        ui.setNotification({ category: 'success', message: `Successfully removed ${name}` })
-        setVisible(false)
-      }
+      await deleteDatabaseTrigger({
+        id,
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+      })
+      ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
+      onClose()
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -40,15 +49,16 @@ const DeleteHook: React.FC<DeleteHookProps> = ({ hook, visible, setVisible }) =>
   return (
     <TextConfirmModal
       visible={visible}
-      onCancel={() => setVisible(!visible)}
+      size="medium"
+      onCancel={() => onClose()}
       onConfirm={handleDelete}
-      title="Delete this hook"
+      title="Delete database webhook"
       loading={loading}
-      confirmLabel={`Delete hook ${name}`}
-      confirmPlaceholder="Type in name of hook"
+      confirmLabel={`Delete ${name}`}
+      confirmPlaceholder="Type in name of webhook"
       confirmString={name}
-      text={`This will delete your hook called ${name} of schema ${schema}.`}
-      alert="You cannot recover this hook once it is deleted!"
+      text={`This will delete the webhook "${name}" from the schema "${schema}".`}
+      alert="You cannot recover this webhook once it is deleted!"
     />
   )
 }

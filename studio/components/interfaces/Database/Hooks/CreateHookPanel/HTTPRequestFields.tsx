@@ -110,7 +110,7 @@ const HTTPRequestFields = ({
                 <Button
                   type="default"
                   size="medium"
-                  icon={<IconTrash />}
+                  icon={<IconTrash size="tiny" />}
                   className="px-[10px] py-[9px]"
                   onClick={() => onRemoveParameter(idx)}
                 />

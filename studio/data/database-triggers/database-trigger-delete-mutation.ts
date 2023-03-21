@@ -1,49 +1,49 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
+import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { databaseTriggerKeys } from './keys'
 
-export type DatabaseTriggerCreateVariables = {
+export type DatabaseTriggerDeleteVariables = {
+  id: number
   projectRef: string
   connectionString?: string
-  payload: any
 }
 
-type CreateDatabaseTriggerResponse = PostgresTrigger & { error?: any }
+type DeleteDatabaseTriggerResponse = PostgresTrigger & { error?: any }
 
-export async function createDatabaseTrigger({
+export async function deleteDatabaseTrigger({
+  id,
   projectRef,
   connectionString,
-  payload,
-}: DatabaseTriggerCreateVariables) {
+}: DatabaseTriggerDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
+  const response = (await delete_(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, undefined, {
     headers: Object.fromEntries(headers),
-  })) as CreateDatabaseTriggerResponse
+  })) as DeleteDatabaseTriggerResponse
 
   if (response?.error) throw response.error
   return response as PostgresTrigger
 }
 
-type DatabaseTriggerCreateData = Awaited<ReturnType<typeof createDatabaseTrigger>>
+type DatabaseTriggerDeleteData = Awaited<ReturnType<typeof deleteDatabaseTrigger>>
 
-export const useDatabaseTriggerCreateMutation = ({
+export const useDatabaseTriggerDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerCreateData, unknown, DatabaseTriggerCreateVariables>,
+  UseMutationOptions<DatabaseTriggerDeleteData, unknown, DatabaseTriggerDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerCreateData, unknown, DatabaseTriggerCreateVariables>(
-    (vars) => createDatabaseTrigger(vars),
+  return useMutation<DatabaseTriggerDeleteData, unknown, DatabaseTriggerDeleteVariables>(
+    (vars) => deleteDatabaseTrigger(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
