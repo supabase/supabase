@@ -812,9 +812,7 @@ functions:
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'signup',
             email: 'email@example.com',
-            options: {
-              'password': 'secret'
-            }
+            password: 'secret'
           })
           ```
       - id: generate-an-invite-link
