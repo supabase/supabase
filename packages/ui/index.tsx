@@ -55,6 +55,9 @@ export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
 
+// MISC
+export * from './src/components/ErrorPage'
+
 // config
 
 // export { default as Config } from './../ui.config'
