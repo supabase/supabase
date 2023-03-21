@@ -20,21 +20,6 @@ const Index = ({}: Props) => {
     <>
       <Layout>
         <Container>
-          <div className="m-3">
-            <div
-              className="
-              bg-UI-panel-bg 
-              w-32
-              rounded
-              border
-              border-UI-panel-border 
-              p-3
-              text-UI-text-body
-              "
-            >
-              panel
-            </div>
-          </div>
           <Hero />
           <Features />
           <TwitterSocialSection />

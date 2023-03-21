@@ -1,16 +1,22 @@
-// module.exports = {
-//   content: [
-//     "../../packages/ui/components/**/*.{ts,tsx}",
-//     "./src/**/*.{ts,tsx}",
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// }
-
 const ui = require('./ui.config.js')
 const svgToDataUri = require('mini-svg-data-uri')
+
+const twConfigRef = require('./tw-config-ref')
+const color = require('./../ui/styles/tw-extend/color')
+
+function generateTwClasses(globalKey, twAttributes) {
+  let classes = {}
+  Object.values(twAttributes).map((attr, i) => {
+    const attrKey = Object.keys(twAttributes)[i]
+    if (attrKey.includes(globalKey)) {
+      classes = {
+        ...classes,
+        [attrKey.split('-').splice(1).join('-')]: attr,
+      }
+    }
+  })
+  return classes
+}
 
 module.exports = ui({
   mode: 'JIT',
@@ -28,15 +34,49 @@ module.exports = ui({
   darkMode: 'class', // 'media' or 'class'
   // mode: 'jit',
   theme: {
+    accentColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('accentColor', color),
+    }),
+    backgroundColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('backgroundColor', color),
+    }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      DEFAULT: theme('colors.scale.300', 'currentColor'),
-      dark: theme('colors.scale.1200', 'currentColor'),
+      ...generateTwClasses('borderColor', color),
+    }),
+    boxShadowColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('boxShadowColor', color),
+    }),
+    caretColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('caretColor', color),
     }),
     divideColor: (theme) => ({
       ...theme('colors'),
-      DEFAULT: theme('colors.scale.300', 'currentColor'),
-      dark: theme('colors.scale.600', 'currentColor'),
+      ...generateTwClasses('divideColor', color),
+    }),
+    outlineColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('outlineColor', color),
+    }),
+    ringColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('ringColor', color),
+    }),
+    ringOffsetColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('ringOffsetColor', color),
+    }),
+    textColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('textColor', color),
+    }),
+    textDecorationColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwClasses('textDecorationColor', color),
     }),
     extend: {
       typography: ({ theme }) => ({
