@@ -14,6 +14,8 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
 import { FormHeader } from 'components/ui/Forms'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import ClientLoadingError from 'components/ui/ClientLoadingError'
 
 function isHooksEnabled(schemas: any): boolean {
   return schemas.some((schema: any) => schema.name === 'supabase_functions')
@@ -70,24 +72,6 @@ const HooksList: FC<any> = ({
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size={14} />
-        <p>Loading hooks...</p>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <p className="px-6 py-4">
-        <p>Error connecting to API</p>
-        <p>{`${meta.hooks.error?.message ?? 'Unknown error'}`}</p>
-      </p>
-    )
-  }
-
   return (
     <>
       <div className="flex items-center justify-between">
@@ -96,7 +80,18 @@ const HooksList: FC<any> = ({
           description="Send real-time data from your database to another system whenever a table event occurs"
         />
       </div>
-      {(hooks || []).length == 0 ? (
+      {isLoading ? (
+        <div className="py-4 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : isError ? (
+        <ClientLoadingError
+          projectRef={project?.ref ?? ''}
+          description="Failed to retrieve database webhooks"
+        />
+      ) : (hooks || []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Database Webhooks"
