@@ -177,9 +177,18 @@ function CommandMenu({ actions }: { actions: IActions }) {
       >
         {pages.length > 0 && (
           <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
-            <CommandShortcut>{'Home'}</CommandShortcut>
-            {pages.map((page) => (
-              <CommandShortcut>{page}</CommandShortcut>
+            <CommandShortcut onClick={() => setPages([])}>{'Home'}</CommandShortcut>
+            {pages.map((page, index) => (
+              <CommandShortcut
+                onClick={() => {
+                  if (index === pages.length - 1) {
+                    return
+                  }
+                  setPages((pages) => pages.slice(0, index - 1))
+                }}
+              >
+                {page}
+              </CommandShortcut>
             ))}
           </div>
         )}
