@@ -94,7 +94,15 @@ function Blog(props: any) {
                     <motion.a
                       className="col-span-12 md:col-span-4"
                       initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0, transition: { delay: 0.2 + i / 10 } }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                          duration: 0.4,
+                          ease: [0.24, 0.25, 0.05, 1],
+                          delay: 0.2 + i / 15,
+                        },
+                      }}
                     >
                       <GlassPanel
                         {...caseStudy}
