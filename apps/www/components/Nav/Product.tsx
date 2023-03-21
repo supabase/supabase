@@ -3,7 +3,7 @@ import SolutionsData from 'data/Solutions.json'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
-import { Badge } from 'ui'
+import { Badge, Button, IconArrowRight } from 'ui'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -46,7 +46,7 @@ const Product = () => {
         <div className="m-3 grid grid-cols-12 gap-x-8 gap-y-4 py-4 pr-3">{iconSections}</div>
       </nav>
       <div className="col-span-6">
-        <div className="m-3 mx-6">
+        <div className="m-3 mx-6 flex flex-col items-start">
           <p className="p">Latest case studies</p>
           <ul className="mt-6 space-y-3">
             {CaseStudiesData.map((caseStudy: any, idx: number) => {
@@ -77,6 +77,17 @@ const Product = () => {
               )
             })}
           </ul>
+          <Link href="/case-studies" passHref>
+            <Button
+              as="a"
+              size="tiny"
+              type="default"
+              iconRight={<IconArrowRight />}
+              className="mt-6"
+            >
+              View all
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
