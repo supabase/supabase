@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from './../Dialog'
 import { IconSearch } from '../Icon/icons/IconSearch'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
+import { KeyboardEventHandler } from 'react'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -21,7 +22,7 @@ const Command = React.forwardRef<
 Command.displayName = CommandPrimitive.displayName
 
 interface CommandDialogProps extends ModalProps {
-  onKeyDown: any
+  onKeyDown: KeyboardEventHandler<HTMLDivElement>
 }
 
 const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) => {
