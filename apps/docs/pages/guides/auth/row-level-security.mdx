@@ -328,6 +328,9 @@ Tip: Make sure to enable RLS for all your tables, so that your tables are inacce
 
 Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+<Admonition type="caution">
+Initializing a client with a Service Key will not override RLS if a user token is set. If a user is signed in with a client, Supabase will adhere to the RLS policy of the user.
+</Admonition>
 
 ### Testing policies
 
