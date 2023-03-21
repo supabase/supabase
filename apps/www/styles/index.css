@@ -23,7 +23,7 @@ html {
 }
 
 body {
-  @apply bg-UI-background-primary;
+  @apply bg-body;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

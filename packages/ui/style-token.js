@@ -9,6 +9,22 @@ const { parseToRgba } = require('color2k')
 const fs = require('fs')
 
 const basePath = 'styles/'
+const supportedTokenTypeList = [
+  'spacing',
+  'sizing',
+  'borderRadius',
+  'borderWidth',
+  'color',
+  'opacity',
+  'fontFamilies',
+  'lineHeights',
+  'letterSpacing',
+  'paragraphSpacing',
+  'fontWeights',
+  'fontSizes',
+  'textCase',
+  'textDecoration',
+]
 
 console.log('Build started...')
 console.log('\n==============================================')
@@ -21,6 +37,7 @@ const fontWeightMap = {
   light: 300,
   leicht: 300,
   normal: 400,
+  book: 400,
   regular: 400,
   buch: 400,
   medium: 500,
@@ -339,15 +356,15 @@ StyleDictionary.registerFormat({
   name: 'css/typographyClasses',
   formatter: (dictionary, config) =>
     dictionary.allProperties
-      .map(
-        (prop) => `
+      .map((prop) => {
+        return `
 .${prop.name} {
   font: var(--${prop.name});
   letter-spacing: ${convertToVariableIfNeeded(prop.original.value.letterSpacing)};
   text-transform: ${convertToVariableIfNeeded(prop.original.value.textCase)};
   text-decoration: ${convertToVariableIfNeeded(prop.original.value.textDecoration)};
 }`
-      )
+      })
       .join('\n'),
 })
 
@@ -374,7 +391,7 @@ StyleDictionary.registerFormat({
 function getTypographyConfig() {
   console.log('Building: typography')
   return {
-    source: ['tokens/01_base/**/*.+(json)', 'tokens/03_semantic/typography.json'],
+    source: ['styles/tokens/01_base/**/*.+(json)', 'styles/tokens/03_semantic/typography.json'],
     platforms: {
       css: {
         transforms: [
@@ -429,17 +446,79 @@ function getCompositionConfig() {
   }
 }
 
-function getStyleDictionaryConfig(themePath, baseOnly = false) {
-  console.log('Building: ', themePath, `${baseOnly ? 'Base Only' : 'All sets'}`)
+const formatTailwindValue = (tokenType, value) => {
+  let formattedValue
+  switch (tokenType) {
+    case 'color':
+    default:
+      formattedValue = value
+  }
+  return formattedValue
+}
+
+/**
+ * Custom format that generate tailwind color config based on css variables
+ */
+StyleDictionary.registerFormat({
+  name: 'tw/css-variables',
+  formatter({ dictionary }) {
+    // console.log('dictionary', dictionary)
+    return (
+      'module.exports = ' +
+      `{\n${dictionary.allProperties
+        .map((token) => {
+          const value = formatTailwindValue(token.type, token.value)
+          return `"${token.path.slice(0).join('-')}": "var(--${token.name}, ${value});"`
+        })
+        .join(',\n')}\n}`
+    )
+  },
+})
+
+/**
+ * Returns the files configuration
+ * for generating seperated tailwind files.
+ */
+function getConfigTailwindFilesByType(typeList) {
+  console.log('\n')
+  console.log('tailwind typeList', typeList)
+  return typeList.map((typeName) => {
+    return {
+      destination: `tw-extend/${typeName}.js`,
+      format: 'tw/css-variables',
+      filter: {
+        type: typeName,
+      },
+    }
+  })
+}
+
+function getStyleDictionaryConfig(themePath, type, buildTailwindFiles = false, rootTheme = false) {
+  console.log('\n')
+  console.log('---')
+  console.log('\n')
+  console.log('Building: ', themePath, `type: ${type}`)
   const fileName = themePath.split('/').pop().replace('.json', '')
-  const sourceFiles = baseOnly
-    ? ['tokens/01_base/**/*.+(json)']
-    : [
-        'tokens/01_base/**/*.+(json)',
-        themePath,
-        ...semanticFiles,
-        'tokens/04_component/**/*.+(json)',
-      ]
+  const sourceFiles =
+    type === 'base'
+      ? ['styles/tokens/01_base/**/*.+(json)']
+      : type === 'semantic'
+      ? ['styles/tokens/01_base/**/*.+(json)', themePath]
+      : [
+          // 'styles/tokens/01_base/**/*.+(json)',
+          themePath,
+          // 'styles/tokens/03_semantic/**/*.+(json)',
+          // ...semanticFiles,
+          // 'styles/tokens/04_component/**/*.+(json)',
+        ]
+
+  let configTailwindFilesByType = []
+
+  if (buildTailwindFiles) {
+    console.log(`\n`)
+    console.log(`Generating Tailwind Props ✨`)
+    configTailwindFilesByType = getConfigTailwindFilesByType(supportedTokenTypeList)
+  }
 
   return {
     source: sourceFiles,
@@ -458,12 +537,14 @@ function getStyleDictionaryConfig(themePath, baseOnly = false) {
         buildPath: basePath,
         files: [
           {
-            destination: baseOnly ? `base/${fileName}.css` : `themes/${fileName}.css`,
+            destination: `${type}/${fileName}.css`,
             format: 'css/variables',
-            selector: baseOnly ? ':root' : `.${fileName}-theme`,
+            selector:
+              type === 'base' || type === 'semantic' || rootTheme ? ':root' : `.${fileName}`,
             filter: (token) =>
               [themePath, ...semanticFiles, ...componentFiles].includes(token.filePath),
           },
+          ...configTailwindFilesByType,
         ],
       },
     },
@@ -471,12 +552,21 @@ function getStyleDictionaryConfig(themePath, baseOnly = false) {
 }
 
 baseFiles.map(function (file) {
-  const SD = StyleDictionary.extend(getStyleDictionaryConfig(file, true))
+  const SD = StyleDictionary.extend(getStyleDictionaryConfig(file, 'base', false))
   SD.buildAllPlatforms()
 })
 
-themeFiles.map(function (theme) {
-  const SD = StyleDictionary.extend(getStyleDictionaryConfig(theme))
+semanticFiles.map(function (file) {
+  const SD = StyleDictionary.extend(getStyleDictionaryConfig(file, 'semantic', false))
+  SD.buildAllPlatforms()
+})
+
+themeFiles.map(function (file, i) {
+  const buildTailwindFiles = i === 0
+  const rootTheme = file.includes('light')
+  const SD = StyleDictionary.extend(
+    getStyleDictionaryConfig(file, 'themes', buildTailwindFiles, rootTheme)
+  )
   SD.buildAllPlatforms()
 })
 
