@@ -10,7 +10,6 @@ import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { DatabaseLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
-import CreateHook from 'components/interfaces/Database/Hooks/CreateHook'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
@@ -25,7 +24,6 @@ const HooksPage: NextPageWithLayout = () => {
   const [filterString, setFilterString] = useState<string>('')
   const [selectedHook, setSelectedHook] = useState<any>()
   const [showCreateHookForm, setShowCreateHookForm] = useState<boolean>(false)
-  const [showUpdateHookForm, setShowUpdateHookForm] = useState<boolean>(false)
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
   const canReadWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
@@ -87,11 +85,6 @@ const HooksPage: NextPageWithLayout = () => {
         deleteHook={deleteHook}
         enableHooks={enableHooksForProject}
       />
-      {/* <CreateHook
-        hook={selectedHook}
-        visible={showCreateHookForm}
-        setVisible={setShowCreateHookForm}
-      /> */}
       <EditHookPanel
         visible={showCreateHookForm}
         selectedHook={selectedHook}
