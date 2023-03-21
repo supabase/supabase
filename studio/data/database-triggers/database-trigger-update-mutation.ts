@@ -11,6 +11,8 @@ export type DatabaseTriggerUpdateVariables = {
   payload: any
 }
 
+type UpdateDatabaseTriggerResponse = PostgresTrigger & { error?: any }
+
 export async function updateDatabaseTrigger({
   id,
   projectRef,
@@ -24,9 +26,11 @@ export async function updateDatabaseTrigger({
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
-  const response = await patch(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, { payload })
-  if (response.error) throw response.error
+  const response = (await patch(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, payload, {
+    headers: Object.fromEntries(headers),
+  })) as UpdateDatabaseTriggerResponse
 
+  if (response.error) throw response.error
   return response as PostgresTrigger
 }
 
@@ -45,13 +49,8 @@ export const useDatabaseTriggerUpdateMutation = ({
     (vars) => updateDatabaseTrigger(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, id } = variables
-
-        await Promise.all([
-          queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef)),
-          // queryClient.invalidateQueries(databaseTriggerKeys.resource(projectRef, id)),
-        ])
-
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       ...options,

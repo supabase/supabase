@@ -4,17 +4,18 @@ import { useStore } from 'hooks'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 
-interface DeleteHookProps {
-  hook?: any
+interface DeleteHookModalProps {
   visible: boolean
+  selectedHook?: PostgresTrigger
   onClose: () => void
 }
 
-const DeleteHook = ({ hook, visible, onClose }: DeleteHookProps) => {
+const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
   const { ui } = useStore()
   const [loading, setLoading] = useState(false)
-  const { id, name, schema } = hook ?? {}
+  const { id, name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
   const { mutateAsync: deleteDatabaseTrigger } = useDatabaseTriggerDeleteMutation()
@@ -56,11 +57,11 @@ const DeleteHook = ({ hook, visible, onClose }: DeleteHookProps) => {
       loading={loading}
       confirmLabel={`Delete ${name}`}
       confirmPlaceholder="Type in name of webhook"
-      confirmString={name}
+      confirmString={name || ''}
       text={`This will delete the webhook "${name}" from the schema "${schema}".`}
       alert="You cannot recover this webhook once it is deleted!"
     />
   )
 }
 
-export default observer(DeleteHook)
+export default observer(DeleteHookModal)

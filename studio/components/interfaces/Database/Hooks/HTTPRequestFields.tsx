@@ -1,6 +1,6 @@
 import { Button, Listbox, Input, SidePanel, IconTrash, IconPlus } from 'ui'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
-import { HTTPArgument } from './CreateHookPanel'
+import { HTTPArgument } from './EditHookPanel'
 
 interface HTTPRequestFieldsProps {
   httpHeaders: HTTPArgument[]
