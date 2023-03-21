@@ -16,7 +16,7 @@
 </item>
 <item>
   <guid>https://supabase.com/case-studies/replenysh</guid>
-  <title>Replenysh uses Supabase to implement OTP in less than 24 hours</title>
+  <title>Replenysh uses Supabase to implement OTP in less than 24 hours.</title>
   <link>https://supabase.com/case-studies/replenysh</link>
   <description>With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.</description>
   <pubDate>Mon, 13 Feb 2023 23:11:00 +0000</pubDate>
