@@ -46,7 +46,7 @@ const GlassPanel = ({
 
   const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
     <div className="relative box-content p-8 pb-0">
-      <div className="relative h-[30px] w-auto max-w-[150px]">
+      <div className="relative h-[33px] w-auto max-w-[145px]">
         <Image
           src={logoImage}
           layout="fill"

@@ -218,9 +218,13 @@ function CaseStudyPage(props: any) {
                         <div className="">
                           <p>Ready to get started?</p>
                           <div>
-                            <Button type="default" iconRight={<IconChevronRight />}>
-                              Contact sales
-                            </Button>
+                            <Link href="https://supabase.com/contact/enterprise">
+                              <a className="no-underline">
+                                <Button type="default" iconRight={<IconChevronRight />}>
+                                  Contact sales
+                                </Button>
+                              </a>
+                            </Link>
                           </div>
                         </div>
                       </div>
