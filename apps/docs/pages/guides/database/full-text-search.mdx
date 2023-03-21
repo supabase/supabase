@@ -227,8 +227,7 @@ final result = await client
 
 ### Search multiple columns
 
-Right now there is no direct way to use JavaScript or Dart to search through multiple columns. A workaround exist where using SQL is required.
-The method involves creating [computed virtual columns](https://postgrest.org/en/stable/api.html#computed-virtual-columns).
+Right now there is no direct way to use JavaScript or Dart to search through multiple columns but you can do it by creating [computed columns](https://postgrest.org/en/stable/api.html#computed-virtual-columns) on the database.
 
 To find all `books` where `description` or `title` contain the word `little`:
 
@@ -256,7 +255,7 @@ where
 ```sql
 create function title_description(books) returns text as $$
   select $1.title || ' ' || $1.description;
-$$ language sql;
+$$ language sql immutable;
 ```
 
 ```js
@@ -272,7 +271,7 @@ const { data, error } = await supabase
 ```sql
 create function title_description(books) returns text as $$
   select $1.title || ' ' || $1.description;
-$$ language sql;
+$$ language sql immutable;
 ```
 
 ```dart
