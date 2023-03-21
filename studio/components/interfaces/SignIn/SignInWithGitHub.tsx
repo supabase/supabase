@@ -11,7 +11,7 @@ const SignInWithGitHub = () => {
         options: {
           redirectTo: `${
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-              ? process.env.NEXT_PUBLIC_VERCEL_URL + (basePath && `${basePath}`)
+              ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL + (basePath && `${basePath}`)
               : process.env.NEXT_PUBLIC_SITE_URL
           }${getReturnToPath()}`,
         },
