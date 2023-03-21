@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,6 +8,7 @@ import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
@@ -21,6 +23,8 @@ const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const queryClient = useQueryClient()
 
   const { meta, ui } = useStore()
   const [selectedSchema, setSelectedSchema] = useState<string>()
@@ -201,6 +205,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+
+      await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 
       // For simplicity for now, we just open the first table within the same schema
       if (tables.length > 0) {
