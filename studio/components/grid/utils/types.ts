@@ -65,6 +65,6 @@ export function isEnumColumn(type: string) {
 }
 
 export function isForeignKeyColumn(columnDef: SupaColumn) {
-  const { targetTableSchema, targetTableName, targetColumnName } = columnDef
+  const { targetTableSchema, targetTableName, targetColumnName } = columnDef?.foreignKey ?? {}
   return !!targetTableSchema && !!targetTableName && !!targetColumnName
 }

@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react'
+import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -9,7 +9,7 @@ import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
-import { SubscriptionAddon } from '../AddOns/AddOns.types'
+import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
@@ -87,6 +87,21 @@ const PaymentSummaryPanel: FC<Props> = ({
   )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const selectedPlanCost =
+    selectedPlan.prices.find(
+      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+    )?.unit_amount ?? 0
+  const totalSelectedAddonCost = Object.keys(selectedAddons)
+    .map((productName) => {
+      const product = (selectedAddons as any)[productName]
+      const price = product.prices.find(
+        (price: AddonPrice) => price.id === product.metadata.default_price_id
+      )
+      return price
+    })
+    .reduce((a, b) => a + b.unit_amount, 0)
+  const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
 
   const currentPITRDays =
     currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
@@ -308,6 +323,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="w-full h-px bg-scale-600" />
 
         <PaymentTotal
+          totalMonthlyCost={totalMonthlyCost / 100}
           subscriptionPreview={subscriptionPreview}
           isRefreshingPreview={isRefreshingPreview}
           isSpendCapEnabled={isSpendCapEnabled}
