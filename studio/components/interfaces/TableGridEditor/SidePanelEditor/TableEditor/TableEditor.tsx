@@ -56,7 +56,6 @@ const TableEditor: FC<Props> = ({
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
 
-  const tables = meta.tables.list()
   const enumTypes = meta.types.list(
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
