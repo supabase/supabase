@@ -15,6 +15,7 @@ import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { toJS } from 'mobx'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -57,7 +58,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         .concat(foreignTables)
         .find((table) => table.id === Number(id))
     : undefined
-
+  console.log('selectedTable', toJS(selectedTable))
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
       setSelectedSchema(selectedTable.schema)
