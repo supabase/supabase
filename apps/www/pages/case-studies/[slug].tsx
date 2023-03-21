@@ -183,6 +183,7 @@ function CaseStudyPage(props: any) {
                             <a
                               href={props.blog.company_url}
                               className=" flex cursor-pointer items-center space-x-1 opacity-50 transition-opacity hover:opacity-100"
+                              target="_blank"
                             >
                               <span>{props.blog.company_url}</span>
                               <IconExternalLink size={14} />
