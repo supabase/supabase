@@ -14,8 +14,10 @@ import { Typography, Badge, Space, Select } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogHeader from '~/components/Blog/BlogHeader'
-import ImageGrid from '~/components/ImageGrid'
+import { motion } from 'framer-motion'
 import styles from './case-studies.module.css'
+import Link from 'next/link'
+import { GlassPanel } from 'ui'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_case-studies')
@@ -37,7 +39,6 @@ export async function getStaticProps() {
 function Blog(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
-
   const { basePath } = useRouter()
 
   useEffect(() => {
@@ -52,17 +53,14 @@ function Blog(props: any) {
     )
   }, [category])
 
-  console.log(blogs)
-
   const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
     return {
-      image: blog.logo,
-      name: blog.title,
+      logo: blog.logo,
+      logoInverse: blog.logo_inverse,
+      title: blog.title,
       link: blog.url,
     }
   })
-
-  // console.log('caseStudyThumbs', caseStudyThumbs)
 
   return (
     <>
@@ -77,26 +75,39 @@ function Blog(props: any) {
       <NextSeo title="Case studies" description="Latest customers using Supabase" />
       <DefaultLayout>
         <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
-          <div className="container mx-auto mt-40 px-8 sm:px-4 xl:px-20">
+          <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
             <div className="mx-auto relative z-10">
-              <div className="mx-auto max-w-2xl text-center">
+              <motion.div
+                className="mx-auto max-w-2xl text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
+              >
                 <h1 className="text-scale-1200 mb-3 text-3xl">Case studies</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  {/* Learn how teams behind everyone's favorite products use Radix to save time, boost
-                  quality, and set the bar for accessibility. */}
                   Discover how supabase is being used around the world to quickly create outstanding
                   products and set new industry standards.
                 </h2>
-              </div>
-              <div className="mx-auto mt-12 grid lg:grid-cols-1">
-                <ImageGrid
-                  images={caseStudyThumbs}
-                  mdCols={3}
-                  lgCols={4}
-                  padding={6}
-                  className="h-32"
-                  animated
-                />
+              </motion.div>
+              <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
+                {caseStudyThumbs.map((caseStudy: any, i: number) => (
+                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
+                    <motion.a
+                      className="col-span-12 md:col-span-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0, transition: { delay: i / 10 } }}
+                    >
+                      <GlassPanel
+                        {...caseStudy}
+                        background={true}
+                        showIconBg={true}
+                        showLink={true}
+                        hasLightIcon
+                      >
+                        {caseStudy.description}
+                      </GlassPanel>
+                    </motion.a>
+                  </Link>
+                ))}
               </div>
             </div>
             <div
