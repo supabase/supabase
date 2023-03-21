@@ -32,17 +32,16 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   })
 
   function getPageTitle() {
-    if (props.type === 'client-lib') {
-      return props.spec.info.title
+    switch (props.type) {
+      case 'client-lib':
+        return props.spec.info.title
+      case 'cli':
+        return 'Supabase CLI reference'
+      case 'api':
+        return 'Supabase API reference'
+      default:
+        return 'Supabase Docs'
     }
-    if (props.type === 'cli') {
-      return 'Supabase CLI reference'
-    }
-
-    if (props.type === 'api') {
-      return 'Supabase API reference'
-    }
-    return 'Supabase Docs'
   }
 
   const pageTitle = getPageTitle()
