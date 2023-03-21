@@ -45,6 +45,7 @@ const Wizard: NextPageWithLayout = () => {
     useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
+  const [postgresVersion, setPostgresVersion] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
@@ -65,6 +66,8 @@ const Wizard: NextPageWithLayout = () => {
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+
+  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
@@ -147,7 +150,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const onClickNext = async () => {
     setNewProjectLoading(true)
-    const data = {
+    const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
       name: projectName,
@@ -155,6 +158,11 @@ const Wizard: NextPageWithLayout = () => {
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
       kps_enabled: kpsEnabled,
+    }
+    if (postgresVersion) {
+      data['custom_supabase_internal_requests'] = {
+        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+      }
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -281,6 +289,32 @@ const Wizard: NextPageWithLayout = () => {
                     autoFocus
                   />
                 </Panel.Content>
+
+                {showCustomVersionInput && (
+                  <Panel.Content
+                    className={[
+                      'Form section-block--body has-inputs-centered border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Input
+                      id="custom-postgres-version"
+                      layout="horizontal"
+                      label="Postgres Version"
+                      descriptionText={
+                        <p>
+                          Specify a custom version of Postgres (Defaults to the latest)
+                          <br />
+                          This is only applicable for local/staging projects
+                        </p>
+                      }
+                      type="text"
+                      placeholder="Postgres Version"
+                      value={postgresVersion}
+                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    />
+                  </Panel.Content>
+                )}
 
                 <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input

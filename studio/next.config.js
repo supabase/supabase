@@ -24,6 +24,7 @@ const csp = [
   .join(' ')
 
 const nextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   async redirects() {
     return [
       {
