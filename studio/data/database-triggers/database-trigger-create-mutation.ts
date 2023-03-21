@@ -27,7 +27,7 @@ export async function createDatabaseTrigger({
     headers: Object.fromEntries(headers),
   })) as CreateDatabaseTriggerResponse
 
-  if (response?.error) throw response.error
+  if (response.error) throw response.error
   return response as PostgresTrigger
 }
 

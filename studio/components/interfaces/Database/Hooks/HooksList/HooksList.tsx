@@ -17,6 +17,8 @@ import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import ClientLoadingError from 'components/ui/ClientLoadingError'
 
+// [Joshen] Can we somehow merge the hooksEnabled check from the index.tsx page file and this?
+
 function isHooksEnabled(schemas: any): boolean {
   return schemas.some((schema: any) => schema.name === 'supabase_functions')
 }
