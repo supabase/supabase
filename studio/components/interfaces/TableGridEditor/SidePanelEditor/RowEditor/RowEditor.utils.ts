@@ -33,7 +33,6 @@ export const generateRowFields = (
         : DATETIME_TYPES.includes(column.format)
         ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
         : parseValue(row[column.name], column.format)
-    console.log(column.name, value)
 
     const foreignKey = find(relationships, (relationship) => {
       return (

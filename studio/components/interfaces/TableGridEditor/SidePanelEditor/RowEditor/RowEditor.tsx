@@ -55,7 +55,6 @@ const RowEditor = ({
     if (visible) {
       setErrors({})
       const rowFields = generateRowFields(row, selectedTable)
-      console.log({ rowFields })
       setRowFields(rowFields)
     }
   }, [visible])
@@ -100,7 +99,6 @@ const RowEditor = ({
       const payload = isNewRecord
         ? generateRowObjectFromFields(rowFields)
         : generateUpdateRowPayload(row, rowFields)
-      console.log({ payload })
 
       const configuration = { identifiers: {}, rowIdx: -1 }
       if (!isNewRecord) {
