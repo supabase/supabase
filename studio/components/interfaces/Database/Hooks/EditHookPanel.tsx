@@ -3,21 +3,26 @@ import { useState, useRef, useEffect } from 'react'
 import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge } from 'ui'
 
 import { useStore } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
+import { tryParseJson, uuidv4 } from 'lib/helpers'
 import HTTPRequestFields from './HTTPRequestFields'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { isValidHttpUrl } from '../Hooks.utils'
+import { isValidHttpUrl } from './Hooks.utils'
+import { PostgresTrigger } from '@supabase/postgres-meta'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 
-export interface CreateHookPanelProps {
+// Also see if we can add the input field for enabled_mode
+
+export interface EditHookPanelProps {
   visible: boolean
+  selectedHook?: PostgresTrigger
   onClose: () => void
 }
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
-const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
+const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   // [Joshen] Need to change to use RQ once Alaister's PR goes in
   const { meta, ui } = useStore()
   const submitRef: any = useRef()
@@ -34,26 +39,46 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
 
   const { project } = useProjectContext()
   const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
+  const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
 
   useEffect(() => {
     if (visible) {
+      setIsSubmitting(false)
       // Reset form fields outside of the Form context
-      setEvents([])
-      setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
-      setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
+      if (selectedHook !== undefined) {
+        setEvents(selectedHook.events)
+
+        const [url, method, headers, parameters] = selectedHook.function_args
+        const formattedHeaders = tryParseJson(headers) || {}
+        setHttpHeaders(
+          Object.keys(formattedHeaders).map((key) => {
+            return { id: uuidv4(), name: key, value: formattedHeaders[key] }
+          })
+        )
+        const formattedParameters = tryParseJson(parameters) || {}
+        setHttpParameters(
+          Object.keys(formattedParameters).map((key) => {
+            return { id: uuidv4(), name: key, value: formattedParameters[key] }
+          })
+        )
+      } else {
+        setEvents([])
+        setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
+        setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
+      }
     }
-  }, [visible])
+  }, [visible, selectedHook])
 
   const tables = meta.tables.list()
 
   const initialValues = {
-    name: '',
-    table_id: 0,
-    enabled_mode: 'ORIGIN',
-    function_name: 'http_request',
+    name: selectedHook?.name ?? '',
+    table_id: selectedHook?.table_id ?? '',
+    enabled_mode: selectedHook?.enabled_mode ?? 'ORIGIN',
+    function_name: selectedHook?.function_name ?? 'http_request',
 
-    http_method: '',
-    http_url: '',
+    http_url: selectedHook?.function_args?.[0] ?? '',
+    http_method: selectedHook?.function_args?.[1] ?? '',
   }
 
   const onUpdateSelectedEvents = (event: string) => {
@@ -143,26 +168,51 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
       payload.function_args = []
     }
 
-    try {
-      setIsSubmitting(true)
-      await createDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        payload,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created new webhook "${values.name}"`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create webhook: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(true)
+    if (selectedHook === undefined) {
+      try {
+        setIsSubmitting(true)
+        await createDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          payload,
+        })
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully created new webhook "${values.name}"`,
+        })
+        onClose()
+      } catch (error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to create webhook: ${error.message}`,
+        })
+      } finally {
+        setIsSubmitting(false)
+      }
+    } else {
+      try {
+        setIsSubmitting(true)
+        await updateDatabaseTrigger({
+          id: selectedHook.id,
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          payload,
+        })
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated webhook "${values.name}"`,
+        })
+        onClose()
+      } catch (error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update webhook: ${error.message}`,
+        })
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -170,7 +220,15 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
     <SidePanel
       size="xlarge"
       visible={visible}
-      header="Create a new database webhook"
+      header={
+        selectedHook === undefined ? (
+          'Create a new database webhook'
+        ) : (
+          <>
+            Update webhook <code className="text-sm">{selectedHook.name}</code>
+          </>
+        )
+      }
       className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
       onConfirm={() => {}}
       onCancel={() => onClose()}
@@ -193,21 +251,13 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
             loading={isSubmitting}
             onClick={() => submitRef?.current?.click()}
           >
-            Create hook
+            {selectedHook === undefined ? 'Create webhook' : 'Update webhook'}
           </Button>
         </div>
       }
     >
       <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
-        {({
-          isSubmitting,
-          values,
-          resetForm,
-        }: {
-          isSubmitting: boolean
-          values: any
-          resetForm: any
-        }) => {
+        {() => {
           return (
             <div>
               <FormSection
@@ -404,4 +454,4 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
   )
 }
 
-export default CreateHookPanel
+export default EditHookPanel
