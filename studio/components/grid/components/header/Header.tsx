@@ -3,7 +3,7 @@ import { useState, ReactNode } from 'react'
 import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -61,12 +61,16 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
+  const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <RefreshButton table={table} />
-        <FilterDropdown />
-        <SortPopover />
+        <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
+        <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
       {canAddNew && (
         <>

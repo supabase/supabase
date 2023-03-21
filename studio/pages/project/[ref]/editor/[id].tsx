@@ -14,6 +14,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -30,11 +31,18 @@ const TableEditorPage: NextPageWithLayout = () => {
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
-  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table' | 'json'>()
+  const [sidePanelKey, setSidePanelKey] = useState<
+    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+  >()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
+  const [selectedForeignKeyToEdit, setSelectedForeignKeyToEdit] = useState<{
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }>()
 
   const tables: PostgresTable[] = meta.tables.list()
   const views: SchemaView[] = meta.views.list()
@@ -109,6 +117,23 @@ const TableEditorPage: NextPageWithLayout = () => {
   const onExpandJSONEditor = (column: string, row: any) => {
     setSidePanelKey('json')
     setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+  }
+
+  const onEditForeignKeyColumnValue = ({
+    foreignKey,
+    row,
+    column,
+  }: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => {
+    setSidePanelKey('foreign-row-selector')
+    setSelectedForeignKeyToEdit({
+      foreignKey,
+      row,
+      column,
+    })
   }
 
   const onClosePanel = () => {
@@ -211,12 +236,14 @@ const TableEditorPage: NextPageWithLayout = () => {
         selectedColumnToEdit={selectedColumnToEdit}
         selectedTableToEdit={selectedTableToEdit}
         selectedValueForJsonEdit={selectedValueForJsonEdit}
+        selectedForeignKeyToEdit={selectedForeignKeyToEdit}
         onAddRow={onAddRow}
         onEditRow={onEditRow}
         onAddColumn={onAddColumn}
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
         onExpandJSONEditor={onExpandJSONEditor}
+        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
         theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />

@@ -160,7 +160,7 @@ curl -X POST \
   -H 'apikey: <anon-jwt>' \
   -H 'Authorization: Bearer <service_role-jwt>' \
   --data-binary '@/tmp/body.json' \
-    'https://<project>.supabase.co/auth/v1/admin/sso/providers/<provider-uuid>'
+    'https://<project>.supabase.co/auth/v1/admin/sso/providers'
 ```
 
 To create the `/tmp/body.json` file you can use this:

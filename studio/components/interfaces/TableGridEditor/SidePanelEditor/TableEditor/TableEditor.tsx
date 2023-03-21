@@ -17,7 +17,8 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
-import InformationBox from 'components/ui/InformationBox'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
   table?: PostgresTable
@@ -51,6 +52,7 @@ const TableEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
 
   const tables = meta.tables.list()
@@ -73,6 +75,13 @@ const TableEditor: FC<Props> = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
 
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: table?.schema,
+  })
+  const foreignKeyMeta = data || []
+
   useEffect(() => {
     if (visible) {
       setErrors({})
@@ -84,6 +93,7 @@ const TableEditor: FC<Props> = ({
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table!,
+          foreignKeyMeta,
           isDuplicating,
           isRealtimeEnabled
         )
@@ -253,7 +263,6 @@ const TableEditor: FC<Props> = ({
             {!isDuplicating && (
               <ColumnManagement
                 table={{ name: tableFields.name, schema: selectedSchema }}
-                tables={tables}
                 columns={tableFields?.columns}
                 enumTypes={enumTypes}
                 isNewRecord={isNewRecord}

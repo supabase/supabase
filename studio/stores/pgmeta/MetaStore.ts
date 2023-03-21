@@ -26,6 +26,7 @@ import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import {
   ColumnField,
   CreateColumnPayload,
+  ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
 import {
@@ -43,6 +44,7 @@ import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
 import ForeignTableStore from './ForeignTableStore'
 import ViewStore from './ViewStore'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -81,7 +83,7 @@ export interface IMetaStore {
   ) => Promise<any | { error: ResponseError }>
   removePrimaryKey: (schema: string, table: string) => Promise<any | { error: ResponseError }>
   addForeignKey: (
-    relationship: Partial<PostgresRelationship>
+    relationship: ExtendedPostgresRelationship
   ) => Promise<any | { error: ResponseError }>
   removeForeignKey: (
     relationship: Partial<PostgresRelationship>
@@ -92,15 +94,16 @@ export interface IMetaStore {
   createColumn: (
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
+    foreignKey?: ExtendedPostgresRelationship,
     securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
   ) => any
   updateColumn: (
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
-    skipPKCreation?: boolean
+    foreignKey?: ExtendedPostgresRelationship,
+    skipPKCreation?: boolean,
+    skipSuccessMessage?: boolean
   ) => any
   duplicateTable: (
     payload: any,
@@ -276,12 +279,25 @@ export default class MetaStore implements IMetaStore {
     return await this.query(query)
   }
 
-  async addForeignKey(relationship: Partial<PostgresRelationship>) {
+  // [Joshen TODO] Eventually need to extend this to composite foreign keys
+  async addForeignKey(relationship: ExtendedPostgresRelationship) {
+    const { deletion_action } = relationship
+    const deletionAction =
+      deletion_action === FOREIGN_KEY_DELETION_ACTION.CASCADE
+        ? 'ON DELETE CASCADE'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.RESTRICT
+        ? 'ON DELETE RESTRICT'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT
+        ? 'ON DELETE SET DEFAULT'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_NULL
+        ? 'ON DELETE SET NULL'
+        : ''
+
     const query = `
       ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
       ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
       FOREIGN KEY ("${relationship.source_column_name}")
-      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}");
+      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}") ${deletionAction};
     `
       .replace(/\s+/g, ' ')
       .trim()
@@ -360,7 +376,7 @@ export default class MetaStore implements IMetaStore {
   async createColumn(
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
+    foreignKey?: ExtendedPostgresRelationship,
     securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
   ) {
     const toastId = this.rootStore.ui.setNotification({
@@ -444,8 +460,9 @@ export default class MetaStore implements IMetaStore {
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
-    skipPKCreation?: boolean
+    foreignKey?: ExtendedPostgresRelationship,
+    skipPKCreation?: boolean,
+    skipSuccessMessage: boolean = false
   ) {
     try {
       const { isPrimaryKey, ...formattedPayload } = payload
@@ -474,14 +491,21 @@ export default class MetaStore implements IMetaStore {
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
-      if (!isUndefined(existingForeignKey)) {
+      if (existingForeignKey !== undefined) {
         const relation: any = await this.removeForeignKey(existingForeignKey)
         if (relation.error) throw relation.error
       }
 
-      if (!isUndefined(foreignKey)) {
+      if (foreignKey !== undefined) {
         const relation: any = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
+      }
+
+      if (!skipSuccessMessage) {
+        this.rootStore.ui.setNotification({
+          category: 'success',
+          message: `Successfully updated column "${column.name}"`,
+        })
       }
     } catch (error: any) {
       return { error }
@@ -516,6 +540,7 @@ export default class MetaStore implements IMetaStore {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
           source_table_name: duplicatedTableName,
+          deletion_action: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
         })
         if (relation.error) throw relation.error
       })
@@ -769,12 +794,14 @@ export default class MetaStore implements IMetaStore {
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
             const skipPKCreation = true
+            const skipSuccessMessage = true
             const res: any = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
               column.foreignKey,
-              skipPKCreation
+              skipPKCreation,
+              skipSuccessMessage
             )
             if (res?.error) {
               hasError = true

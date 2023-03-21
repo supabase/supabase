@@ -6,7 +6,7 @@ import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 
 function rowKeyGetter(row: SupaRow) {
   return row?.idx ?? -1
@@ -15,13 +15,27 @@ function rowKeyGetter(row: SupaRow) {
 interface IGrid extends GridProps {
   rows: any[]
   updateRow: (previousRow: any, updatedData: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
 export const Grid = memo(
   forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass, rows, updateRow },
+      {
+        width,
+        height,
+        containerClass,
+        gridClass,
+        rowClass,
+        rows,
+        updateRow,
+        onEditForeignKeyColumnValue,
+      },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
@@ -61,6 +75,34 @@ export const Grid = memo(
         })
       }
 
+      const table = state.table
+
+      function getColumnForeignKey(columnName: string) {
+        const foreignKey = table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
+
+        return Boolean(
+          foreignKey.targetTableSchema && foreignKey.targetTableName && foreignKey.targetColumnName
+        )
+          ? foreignKey
+          : undefined
+      }
+
+      function onRowDoubleClick(row: any, column: any) {
+        const foreignKey = getColumnForeignKey(column.name)
+
+        if (foreignKey) {
+          onEditForeignKeyColumnValue({
+            foreignKey: {
+              target_column_name: foreignKey.targetColumnName!,
+              target_table_name: foreignKey.targetTableName!,
+              target_table_schema: foreignKey.targetTableSchema!,
+            },
+            row,
+            column,
+          })
+        }
+      }
+
       if (!columnHeaders || columnHeaders.length == 0) {
         return (
           <div
@@ -93,6 +135,7 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
+            onRowDoubleClick={onRowDoubleClick}
             className={gridClass}
             rowClass={rowClass}
             style={{ height: '100%' }}

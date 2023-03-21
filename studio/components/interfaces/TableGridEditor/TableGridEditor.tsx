@@ -1,8 +1,8 @@
 import { FC, useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { find, isUndefined } from 'lodash'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isUndefined, noop } from 'lodash'
+import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 
@@ -30,8 +30,14 @@ import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from 'data/database/foreign-key-constraints-query'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 
-interface Props {
+export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
@@ -39,7 +45,7 @@ interface Props {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
@@ -47,6 +53,11 @@ interface Props {
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
   selectedValueForJsonEdit?: JsonEditValue
+  selectedForeignKeyToEdit?: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }
 
   onAddRow: () => void
   onEditRow: (row: Dictionary<any>) => void
@@ -54,10 +65,15 @@ interface Props {
   onEditColumn: (column: PostgresColumn) => void
   onDeleteColumn: (column: PostgresColumn) => void
   onExpandJSONEditor: (column: string, row: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
   onClosePanel: () => void
 }
 
-const TableGridEditor: FC<Props> = ({
+const TableGridEditor = ({
   theme = 'dark',
 
   selectedSchema,
@@ -68,15 +84,17 @@ const TableGridEditor: FC<Props> = ({
   selectedColumnToEdit,
   selectedTableToEdit,
   selectedValueForJsonEdit,
+  selectedForeignKeyToEdit,
 
-  onAddRow = () => {},
-  onEditRow = () => {},
-  onAddColumn = () => {},
-  onEditColumn = () => {},
-  onDeleteColumn = () => {},
-  onExpandJSONEditor = () => {},
-  onClosePanel = () => {},
-}) => {
+  onAddRow = noop,
+  onEditRow = noop,
+  onAddColumn = noop,
+  onEditColumn = noop,
+  onDeleteColumn = noop,
+  onExpandJSONEditor = noop,
+  onEditForeignKeyColumnValue = noop,
+  onClosePanel = noop,
+}: TableGridEditorProps) => {
   const { project } = useProjectContext()
   const { meta, ui, vault } = useStore()
   const router = useRouter()
@@ -198,14 +216,17 @@ const TableGridEditor: FC<Props> = ({
     error: jsonSchemaError,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef })
-
-  if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
+  if (jsonSchemaError) console.error('jsonSchemaError', jsonSchemaError)
 
   const resources = getResourcesFromJsonSchema(jsonSchema)
+  const refreshDocs = async () => await refetch()
 
-  const refreshDocs = async () => {
-    await refetch()
-  }
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
+  })
+  const foreignKeyMeta = data || []
 
   useEffect(() => {
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
@@ -228,6 +249,20 @@ const TableGridEditor: FC<Props> = ({
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
 
+  // [Joshen] We can tweak below to eventually support composite keys as the data
+  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
+  const formattedRelationships = (selectedTable?.relationships ?? []).map(
+    (relationship: PostgresRelationship) => {
+      const relationshipMeta = foreignKeyMeta.find(
+        (fk: ForeignKeyConstraint) => fk.id === relationship.id
+      )
+      return {
+        ...relationship,
+        deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      }
+    }
+  )
+
   const gridTable =
     !isViewSelected && !isForeignTableSelected
       ? parseSupaTable(
@@ -235,7 +270,7 @@ const TableGridEditor: FC<Props> = ({
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
             primaryKeys: (selectedTable as PostgresTable).primary_keys,
-            relationships: (selectedTable as PostgresTable).relationships,
+            relationships: formattedRelationships,
           },
           encryptedColumns
         )
@@ -360,6 +395,7 @@ const TableGridEditor: FC<Props> = ({
         onError={onError}
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}
+        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
       />
       {!isUndefined(selectedSchema) && (
         <SidePanelEditor
@@ -370,6 +406,7 @@ const TableGridEditor: FC<Props> = ({
           selectedColumnToEdit={selectedColumnToEdit}
           selectedTableToEdit={selectedTableToEdit}
           selectedValueForJsonEdit={selectedValueForJsonEdit}
+          selectedForeignKeyToEdit={selectedForeignKeyToEdit}
           sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}

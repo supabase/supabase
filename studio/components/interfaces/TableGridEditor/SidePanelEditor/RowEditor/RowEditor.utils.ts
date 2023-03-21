@@ -5,7 +5,12 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
-import { DATETIME_TYPES, TIME_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.constants'
+import {
+  DATETIME_TYPES,
+  TIME_TYPES,
+  TIMESTAMP_TYPES,
+  TEXT_TYPES,
+} from '../SidePanelEditor.constants'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -16,11 +21,14 @@ export const generateRowFields = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns!.map((column) => {
-    const value = isUndefined(row)
-      ? ''
-      : DATETIME_TYPES.includes(column.format)
-      ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-      : parseValue(row[column.name], column.format)
+    const value =
+      isUndefined(row) && TEXT_TYPES.includes(column.format)
+        ? null
+        : isUndefined(row)
+        ? ''
+        : DATETIME_TYPES.includes(column.format)
+        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+        : parseValue(row[column.name], column.format)
 
     const foreignKey = find(relationships, (relationship) => {
       return (
@@ -68,26 +76,6 @@ export const validateFields = (fields: RowField[]) => {
     if (field.isIdentity || field.defaultValue) return
   })
   return errors
-}
-
-// Currently only used in ReferenceRowViewer for rows outside of public schema
-export const generateRowFieldsWithoutColumnMeta = (row: any): RowField[] => {
-  const properties = Object.keys(row)
-  return properties.map((property) => {
-    return {
-      id: uuidv4(),
-      value: row[property] || '',
-      name: property,
-      comment: '',
-      format: '',
-      enums: [],
-      defaultValue: '',
-      foreignKey: undefined,
-      isNullable: false,
-      isIdentity: false,
-      isPrimaryKey: false,
-    }
-  })
 }
 
 const parseValue = (originalValue: string, format: string) => {
@@ -162,7 +150,14 @@ export const generateRowObjectFromFields = (
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
-    const value = (field?.value ?? '').length === 0 ? null : field.value
+
+    // Do not convert empty field inputs to NULL for text types
+    // so that we discern NULL and EMPTY
+    const value = TEXT_TYPES.includes(field.format)
+      ? field.value
+      : (field?.value ?? '').length === 0
+      ? null
+      : field.value
 
     if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
