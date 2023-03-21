@@ -24,7 +24,7 @@ export async function updateDatabaseTrigger({
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
-  const response = await patch(`${API_URL}/pg-meta/${projectRef}/triggers/?id=${id}`, { payload })
+  const response = await patch(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, { payload })
   if (response.error) throw response.error
 
   return response as PostgresTrigger

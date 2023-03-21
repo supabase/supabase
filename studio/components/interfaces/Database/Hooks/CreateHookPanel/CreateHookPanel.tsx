@@ -8,6 +8,7 @@ import HTTPRequestFields from './HTTPRequestFields'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { isValidHttpUrl } from '../Hooks.utils'
 
 export interface CreateHookPanelProps {
   visible: boolean
@@ -80,6 +81,8 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
         errors['http_url'] = 'Please provide a URL'
       } else if (!values.http_url.startsWith('http')) {
         errors['http_url'] = 'Please include HTTP/HTTPs to your URL'
+      } else if (!isValidHttpUrl(values.http_url)) {
+        errors['http_url'] = 'Please provide a valid URL'
       }
     } else if (values.function_name === 'supabase_function') {
       // For Supabase Edge Functions
@@ -117,14 +120,18 @@ const CreateHookPanel = ({ visible, onClose }: CreateHookPanelProps) => {
 
     if (values.function_name === 'http_request') {
       const serviceTimeoutMs = '1000'
-      const headers = httpHeaders.reduce((a: any, b: any) => {
-        a[b.name] = b.value
-        return a
-      }, {})
-      const parameters = httpParameters.reduce((a: any, b: any) => {
-        a[b.name] = b.value
-        return a
-      }, {})
+      const headers = httpHeaders
+        .filter((header) => header.name && header.value)
+        .reduce((a: any, b: any) => {
+          a[b.name] = b.value
+          return a
+        }, {})
+      const parameters = httpParameters
+        .filter((param) => param.name && param.value)
+        .reduce((a: any, b: any) => {
+          a[b.name] = b.value
+          return a
+        }, {})
       payload.function_args = [
         values.http_url,
         values.http_method,
