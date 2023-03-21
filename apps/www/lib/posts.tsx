@@ -111,8 +111,6 @@ export const getAllPostSlugs = (directory: Directories) => {
     }
   })
 
-  console.log('files', files)
-
   return files
 }
 
