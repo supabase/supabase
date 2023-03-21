@@ -44,11 +44,11 @@ const GlassPanel = ({
     </div>
   )
 
-  const LogoComponent = ({ logo, className }: { logo?: string; className?: string }) => (
+  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
     <div className="relative box-content p-8 pb-0">
       <div className="relative h-[40px] w-auto max-w-[100px]">
         <Image
-          src={logo}
+          src={logoImage}
           layout="fill"
           objectFit="contain"
           objectPosition="left"
@@ -74,9 +74,8 @@ const GlassPanel = ({
         'transition',
       ].join(' ')}
     >
-      {/* keep normal logo if no logoInverse present */}
-      {showLogo && <LogoComponent logo={logo} />}
-      {showLogoInverse && <LogoComponent logo={logoInverse} className="opacity-50" />}
+      {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
+      {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
 
       {header && (
         <img
