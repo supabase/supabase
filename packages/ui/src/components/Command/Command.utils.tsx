@@ -55,7 +55,7 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, value, onValueChange, ...props }, ref) => (
   <div
-    className="flex items-center border-b border-b-scale-500 px-4 dark:border-b-scale-500"
+    className="flex items-center border-b border-b-scale-500 dark:border-b-scale-500"
     cmdk-input-wrapper=""
   >
     {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
@@ -65,8 +65,8 @@ const CommandInput = React.forwardRef<
       onValueChange={onValueChange}
       ref={ref}
       className={cn(
-        'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none',
-        'px-0 focus-visible:none focus:ring-none border-none',
+        'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
+        'focus:shadow-none focus:ring-transparent',
         'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
         className
       )}

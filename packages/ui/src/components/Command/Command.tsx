@@ -175,12 +175,14 @@ function CommandMenu({ actions }: { actions: IActions }) {
           }
         }}
       >
-        <div className="flex w-full gap-2 px-4 pt-2 justify-items-start flex-row">
-          {pages.length > 0 && <CommandShortcut>{'Home'}</CommandShortcut>}
-          {pages.map((page) => (
-            <CommandShortcut>{page}</CommandShortcut>
-          ))}
-        </div>
+        {pages.length > 0 && (
+          <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
+            <CommandShortcut>{'Home'}</CommandShortcut>
+            {pages.map((page) => (
+              <CommandShortcut>{page}</CommandShortcut>
+            ))}
+          </div>
+        )}
         {showCommandInput && (
           <CommandInput
             placeholder="Type a command or search..."
