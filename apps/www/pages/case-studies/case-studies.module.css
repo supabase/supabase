@@ -1,4 +1,5 @@
 .bg-visual {
+  animation: fadeIn 3s ease-out both;
   background-image:
     /* Bg glow */ radial-gradient(
       80% 100% at 50% 75%,
@@ -18,7 +19,7 @@
     radial-gradient(2px 2px at 49% 27%, #3ecf8e90 0%, #3ecf8e00 100%),
     radial-gradient(1px 1px at 52% 7%, #3ecf8e75 0%, #3ecf8e00 100%),
     radial-gradient(1px 1px at 55% 21%, #3ecf8e90 0%, #3ecf8e00 100%),
-    radial-gradient(2px 2px at 59% 27%, #3ecf8e 0%, #3ecf8e00 100%),
+    radial-gradient(1px 1px at 59% 27%, #3ecf8e 0%, #3ecf8e00 100%),
     radial-gradient(1px 1px at 61% 14%, #3ecf8e90 0%, #3ecf8e00 100%),
     radial-gradient(1px 1px at 64% 44%, #3ecf8e 0%, #3ecf8e00 100%),
     radial-gradient(1px 1px at 74% 15%, #3ecf8e 0%, #3ecf8e00 100%),
@@ -52,4 +53,13 @@
   border-radius: 100%;
   background: #7fe5b794;
   box-shadow: 0 -52px 0 -30vw #ffffff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
