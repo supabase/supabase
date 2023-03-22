@@ -27,7 +27,6 @@ const NewAccessTokenButton = observer(() => {
     setSubmitting(true)
 
     try {
-      console.log('submit tokenScope: ', tokenScope)
       const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
       setNewToken(response)
 
