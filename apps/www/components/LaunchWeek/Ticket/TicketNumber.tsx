@@ -11,7 +11,7 @@ export default function TicketNumber({ number, size }: Props) {
   return (
     <>
       <div
-        className="relative z-10 md:absolute md:flex inset-0 top-auto md:left-auto md:right-0 md:top-0 md:w-[110px] md:h-100% dark:text-white"
+        className="z-10 absolute md:flex inset-0 top-auto md:left-auto md:right-0 md:top-0 md:w-[110px] md:h-100% dark:text-white"
         id="wayfinding--ticket-number-outer"
       >
         <div
@@ -87,8 +87,8 @@ export default function TicketNumber({ number, size }: Props) {
           </div>
           <div
             className={[
-              'md:absolute px-12 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA50] bg-clip-text text-[#F8F9FA50] text-center',
-              size === 'small' ? 'md:px-12' : 'xs:px-24',
+              'md:absolute px-2 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA50] bg-clip-text text-[#F8F9FA50] text-center',
+              size === 'small' ? 'md:px-12' : 'lg:px-24',
             ].join(' ')}
           >
             {ticketNumberText}

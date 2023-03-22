@@ -39,9 +39,11 @@ export default function Ticket({
 
   return (
     <div
-      className="w-full max-w-[800px] xl:max-w-[1100px] flex flex-col items-center xl:grid xl:grid-cols-12 gap-4 xl:gap-8 p-2 bg-[#a988d748] rounded-2xl xl:items-stretch h-auto"
+      className={[
+        `relative w-full max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 p-2 rounded-3xl lg:items-stretch h-auto backdrop-blur"`,
+        styles['ticket-hero'],
+      ].join(' ')}
       id="wayfinding--ticket-visual-wrapper-container"
-      style={{ transform: 'translate3d(0,0,100px)' }}
     >
       <div
         className={cn(styles['ticket-visual-wrapper'], 'flex-1 col-span-8')}
@@ -52,7 +54,7 @@ export default function Ticket({
             styles['ticket-visual'],
             styleUtils.appear,
             styleUtils['appear-fourth'],
-            'relative flex flex-col gap-2 w-full h-fit rounded-xl'
+            'relative flex flex-col items-center gap-2 w-full h-fit rounded-xl'
           )}
           id="wayfinding--ticket-visual-outer-container"
         >
@@ -66,7 +68,7 @@ export default function Ticket({
             bgImageId={bgImageId}
           />
           {username && (
-            <div>
+            <div className="w-full">
               <TicketCopy username={username} />
             </div>
           )}
@@ -74,7 +76,7 @@ export default function Ticket({
       </div>
       <div
         ref={divRef}
-        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full xl:col-span-4 xl:pr-8 max-h-[400px]"
+        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full lg:col-span-4 mt-4 lg:pr-8 max-h-[400px]"
       >
         <div
           className={`
@@ -83,8 +85,8 @@ export default function Ticket({
           w-full
           items-center
           text-white
-          text-center xl:text-left
-          xl:items-start
+          text-center lg:text-left
+          lg:items-start
           gap-3
           `}
         >
@@ -92,7 +94,7 @@ export default function Ticket({
             className={cn(
               styleUtils.appear,
               styleUtils['appear-first'],
-              'text-xl text-white xl:text-3xl'
+              'text-xl text-white lg:text-3xl '
             )}
           >
             {!sharePage ? (
@@ -100,41 +102,43 @@ export default function Ticket({
                 {name ? (
                   <>
                     {winningChances === 1 && (
-                      <p className="text-2xl tracking-[0.02rem]">
+                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
                         You're <span className="gradient-text-purple-800">in the draw!</span> <br />
                         Now make it gold.
-                      </p>
+                      </span>
                     )}
                     {winningChances === 2 && (
-                      <p className="text-2xl tracking-[0.02rem]">
-                        You've <span className="gradient-text-purple-800">doubled</span> your
-                        <br />
-                        chance! Almost gold.
-                      </p>
+                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
+                        You've <span className="gradient-text-purple-800">doubled</span> your{' '}
+                        <br className="hidden lg:inline" />
+                        chance!
+                        <br className="inline lg:hidden" /> Almost{' '}
+                        <span className="gradient-text-gold-500">gold</span>.
+                      </span>
                     )}
                     {winningChances === 3 && (
-                      <p className="text-2xl tracking-[0.02rem]">
+                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
                         You're <span className="gradient-text-gold-500">gold</span>!<br />
                         You've maxed your <br /> chances of winning!
-                      </p>
+                      </span>
                     )}
                   </>
                 ) : (
-                  <p className="text-2xl tracking-[0.02rem]">
+                  <span className="text-2xl font-medium leading-7 block">
                     Generate your ticket. <br />
                     Win the <span className="gradient-text-purple-800">SupaKeyboard</span>.
-                  </p>
+                  </span>
                 )}
               </>
             ) : (
-              <>
-                {name ? name : username}'s <br />
+              <span className="font-medium tracking-[-0.02px] leading-7 block">
+                {name ? name : username}'s <br className="hidden lg:inline" />
                 unique ticket
-              </>
+              </span>
             )}
           </h1>
 
-          <div className="text-base text-white max-w-[520px]">
+          <div className="text-base text-white leading-5 max-w-[520px]">
             {!sharePage ? (
               <>
                 {golden ? (
@@ -169,7 +173,7 @@ export default function Ticket({
                   keyboard that you won't want to miss.
                 </p>
 
-                <div className="mt-8 rounded-md bg-[#E6E8EB] py-1 px-3 border border-[#bbbbbb] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
+                <div className="mt-4 lg:mt-8 rounded-md bg-[#E6E8EB] py-1 px-3 border border-[#bbbbbb] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
                   <a
                     href={`${SITE_URL}`}
                     className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}

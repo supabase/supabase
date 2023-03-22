@@ -6,13 +6,13 @@ export default function LW7BgGraphic() {
   const { scrollYProgress } = useScroll()
   const isMobile = useMobileViewport(768)
 
-  const graphicsScale = useTransform(
-    scrollYProgress,
-    // Map scrollYProgress from these values:
-    [0, 0.5],
-    // Into these scale values:
-    [1, isMobile ? 1.1 : 1.2]
-  )
+  // const graphicsScale = useTransform(
+  //   scrollYProgress,
+  //   // Map scrollYProgress from these values:
+  //   [0, 0.5],
+  //   // Into these scale values:
+  //   [1, isMobile ? 1.1 : 1.2]
+  // )
   const graphicsY = useTransform(
     scrollYProgress,
     // Map scrollYProgress from these values:
@@ -26,13 +26,14 @@ export default function LW7BgGraphic() {
       <motion.div
         className="absolute bottom-0 w-full h-full"
         style={{
-          scale: graphicsScale,
+          // scale: graphicsScale,
+          // scale: 1,
           y: graphicsY,
           willChange: 'transform',
         }}
       >
         <Image
-          src="/images/launchweek/seven/lw-7-bg.png"
+          src="/images/launchweek/seven/lw-7-bg-blur.png"
           loading="eager"
           layout="fill"
           objectFit="cover"
