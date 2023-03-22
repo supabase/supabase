@@ -27,7 +27,7 @@ import {
 // import { IS_PLATFORM } from '~/lib/constants'
 // import { SearchContextValue } from './SearchProvider'
 import SearchResult, { SearchResultType } from './SearchResult'
-import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
+import { CommandGroup, CommandItem, CommandInput, CommandLabel } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
 import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
@@ -125,15 +125,16 @@ interface IAiDocsSeach {
   query?: string
   setQuery?: () => void
   page?: string
+  isLoading?: boolean
+  setIsLoading?: () => void
 }
 
-const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page }) => {
+const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIsLoading }) => {
   const { isDarkMode } = useTheme()
 
   // const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState<string | undefined>('')
   const [results, setResults] = useState<any[]>()
-  const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const [hasSearchError, setHasSearchError] = useState(false)
@@ -218,87 +219,70 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page }) => {
     }
   }, [query])
 
-  const showActions =
-    !query &&
-    page === COMMAND_ROUTES.AI_RLS_POLICY &&
-    !isResponding &&
-    !isLoading &&
-    promptData.length > 0
-
   return (
-    <div onClick={(e) => e.stopPropagation()}>
-      <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">
-        {!isLoading && !hasSearchError && !results && (
-          <div className="p-10 grid">
-            <h2 className="text-lg text-center text-scale-1100">
-              Search Supabase guides & reference docs
-            </h2>
-          </div>
-        )}
-        {results && results.length > 0 && (
-          <div className="flex flex-col gap-3 max-h-[70vh] lg:max-h-[50vh] overflow-y-auto px-4 py-4 rounded-lg bg-scale-200">
-            {results.map((page) => {
-              const pageSections = page.sections.filter((section) => !!section.heading)
-              return (
-                <div key={page.id} className="flex flex-col gap-3">
-                  <SearchResult
-                    href={page.path}
-                    type={SearchResultType.Document}
-                    title={page.meta.title}
-                  />
-                  {pageSections.length > 0 && (
-                    <div className="flex flex-row">
-                      <div className="border bg-scale-300 rounded-xl self-stretch p-[1px] ml-4 mr-4"></div>
-                      <div className="flex flex-col gap-3 items-stretch grow">
-                        {pageSections.map((section) => (
-                          <SearchResult
-                            key={section.id}
-                            href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
-                              section.slug
-                            }`}
-                            type={SearchResultType.Section}
-                            title={section.heading}
-                            chip={page.meta.title}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {isLoading && (
-          <div className="p-6 grid gap-6 mt-4">
-            <Loading active>{}</Loading>
-            <p className="text-lg text-center">Searching for results</p>
-          </div>
-        )}
-        {results && results.length === 0 && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <IconAlertTriangle strokeWidth={1.5} size={40} />
-            <p className="text-lg text-center">No results found.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-              Try again?
-            </Button>
-          </div>
-        )}
-        {hasSearchError && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <IconAlertTriangle strokeWidth={1.5} size={40} />
-            <p className="text-lg text-center">
-              Sorry, looks like we&apos;re having some issues with search!
-            </p>
-            <p className="text-sm text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-              Try again?
-            </Button>
-          </div>
-        )}
+    <>
+      {results &&
+        results.length > 0 &&
+        results.map((page, i) => {
+          const pageSections = page.sections.filter((section) => !!section.heading)
+          return (
+            <CommandGroup heading="" forceMount _key={`${page.meta.title}-group-index-${i}`}>
+              <CommandItem forceMount _key={`${page.meta.title}-item-index-${i}`}>
+                <CommandLabel>{page.meta.title}</CommandLabel>
+                <div>{page.meta.description}</div>
+              </CommandItem>
+              {pageSections.length > 0 &&
+                pageSections.map((section, i) => (
+                  //       <SearchResult
+                  //         key={section.id}
+                  //         href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
+                  //           section.slug
+                  //         }`}
+                  //         type={SearchResultType.Section}
+                  //         title={section.heading}
+                  //         chip={page.meta.title}
+                  //       />
+                  <CommandItem
+                    forceMount
+                    className="ml-8"
+                    _key={`${section.heading}-item-index-${i}`}
+                  >
+                    <CommandLabel>{section.heading}</CommandLabel>
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          )
+        })}
+      {isLoading && (
+        <div className="p-6 grid gap-6 my-4">
+          {/* <Loading active>{}</Loading> */}
+          <p className="text-lg text-scale-900 text-center">Searching for results</p>
+        </div>
+      )}
+      {results && results.length === 0 && (
+        <div className="p-6 flex flex-col items-center gap-6 mt-4">
+          <IconAlertTriangle strokeWidth={1.5} size={40} />
+          <p className="text-lg text-center">No results found.</p>
+          <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            Try again?
+          </Button>
+        </div>
+      )}
+      {hasSearchError && (
+        <div className="p-6 flex flex-col items-center gap-6 mt-4">
+          <IconAlertTriangle strokeWidth={1.5} size={40} />
+          <p className="text-lg text-center">
+            Sorry, looks like we&apos;re having some issues with search!
+          </p>
+          <p className="text-sm text-center">Please try again in a bit.</p>
+          <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            Try again?
+          </Button>
+        </div>
+      )}
 
-        {/* <Tabs.Panel id="clippy-panel" label="Ask Clippy"> */}
-        {/* {!isLoading && !answer && !hasClippyError && (
+      {/* <Tabs.Panel id="clippy-panel" label="Ask Clippy"> */}
+      {/* {!isLoading && !answer && !hasClippyError && (
           <div className="">
             <div className="mt-2">
               <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
@@ -325,206 +309,20 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page }) => {
           </div>
         )} */}
 
-        <div className="flex flex-col gap-6">
-          {promptData.map((prompt, i) => {
-            if (!prompt.query) return <></>
-
-            return (
-              <>
-                {prompt.query && (
-                  <div className="flex gap-6 mx-4">
-                    <div className="w-7 h-7 bg-brand-900 rounded-full border border-brand-800 flex items-center justify-center text-brand-1200">
-                      <IconUser strokeWidth={2} size={16} />
-                    </div>
-                    <div className="prose text-scale-1000">{prompt.query}</div>
-                  </div>
-                )}
-
-                <div className="px-4">
-                  {
-                    // cantHelp
-                    false ? (
-                      <p className="flex flex-col gap-4 items-center p-4">
-                        <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
-                          <IconAlertCircle />
-                          <p>Sorry, I don&apos;t know how to help with that.</p>
-                        </div>
-                        {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-                        Try again?
-                      </Button> */}
-                      </p>
-                    ) : (
-                      <div className="flex gap-6">
-                        <AiIconChat />
-                        {/* <div
-                      className="w-7 h-7 
-                        
-                        bg-gradient-to-r from-purple-900 to-pink-900
-                        
-                        rounded-lg border border-pink-400 flex items-center justify-center
-                        shadow-sm
-                        "
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        className="w-4 h-4 text-white"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                        />
-                      </svg>
-                    </div> */}
-                        <div className="w-full">
-                          {isLoading && promptIndex === i ? (
-                            <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                          ) : (
-                            <ReactMarkdown
-                              linkTarget="_blank"
-                              className="prose dark:prose-dark"
-                              remarkPlugins={[remarkGfm]}
-                              transformLinkUri={(href) => {
-                                const supabaseUrl = new URL('https://supabase.com')
-                                const linkUrl = new URL(href, 'https://supabase.com')
-
-                                if (linkUrl.origin === supabaseUrl.origin) {
-                                  return linkUrl.toString()
-                                }
-
-                                return href
-                              }}
-                              // components={components}
-                            >
-                              {prompt.answer}
-                            </ReactMarkdown>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  }
-                </div>
-
-                {showActions && promptIndex === i + 1 && (
-                  <CommandGroup heading="" forceMount className="!pt-0 !pl-[60px]">
-                    <CommandItem
-                      onSelect={() => {
-                        if (!query) {
-                          alert("You've selected me")
-                        }
-                      }}
-                      forceMount
-                    >
-                      <IconCopy className="mr-2" />
-                      <span>Copy SQL to clipboard</span>
-                    </CommandItem>
-                    {promptData.length > 1 && (
-                      <CommandItem
-                        forceMount
-                        onSelect={() => {
-                          if (!query) {
-                            dispatchPromptData({ type: 'remove-last-item' })
-                            setPromptIndex((x) => {
-                              return x - 1
-                            })
-                            // alert('back to previous version')
-                          }
-                        }}
-                      >
-                        <IconCopy className="mr-2" />
-                        <span>Back to previous version</span>
-                      </CommandItem>
-                    )}
-                    <CommandItem forceMount>
-                      <IconCopy className="mr-2" />
-                      <span>Run in SQL editor</span>
-                    </CommandItem>
-                  </CommandGroup>
-                )}
-              </>
-            )
-          })}
-        </div>
-
-        {promptData.length <= 0 && page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
-          <CommandGroup heading="Examples" forceMount>
-            {questions.map((question) => {
-              const key = question.replace(/\s+/g, '_')
-              return (
-                <CommandItem
-                  onSelect={() => {
-                    if (!query) {
-                      handleClippyConfirm(question)
-                    }
-                  }}
-                  forceMount
-                  key={key}
-                >
-                  <AiIcon />
-                  {question}
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
-        )}
-
-        {/* {promptData.length <= 0 && page === COMMAND_ROUTES.AI_RLS_POLICY && (
-          <CommandGroup heading="Examples" forceMount>
-            {RLSquestions.map((question) => {
-              const key = question.replace(/\s+/g, '_')
-              return (
-                <CommandItem
-                  onSelect={() => {
-                    if (!query) {
-                      handleClippyConfirm(question)
-                    }
-                  }}
-                  forceMount
-                  key={key}
-                >
-                  <AiIcon />
-                  {question}
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
-        )} */}
-
-        {/* {isLoading && (
-          <div className="p-6 grid gap-6 mt-4">
-            <Loading active>{}</Loading>
-            <p className="text-lg text-center">Searching for results</p>
-          </div>
-        )} */}
-        {hasClippyError && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-scale-1200 text-center">
-              Sorry, looks like Clippy is having a hard time!
-            </p>
-            <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
-            {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+      {hasClippyError && (
+        <div className="p-6 flex flex-col items-center gap-6 mt-4">
+          <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
+          <p className="text-lg text-scale-1200 text-center">
+            Sorry, looks like Clippy is having a hard time!
+          </p>
+          <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
+          {/* <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
               Try again?
             </Button> */}
-          </div>
-        )}
-        <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block">
-          {/* <Button type="default" size="tiny" onClick={close}>
-            esc
-          </Button> */}
         </div>
-        {/* {!isLoading && answer && (
-          <div className="absolute right-0 top-0 mt-3 mr-16 hidden md:block">
-            <Button type="text" size="tiny" onClick={handleResetPrompt}>
-              Try again
-            </Button>
-          </div>
-        )} */}
-      </div>
+      )}
+      <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block"></div>
+
       <div className="absolute bottom-0 w-full">
         <div className="text-scale-1100 px-3">
           <div className="flex justify-between items-center text-xs">
@@ -544,7 +342,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page }) => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
