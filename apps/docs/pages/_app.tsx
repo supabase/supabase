@@ -1,3 +1,13 @@
+import '../../../packages/ui/styles/themes/light.css'
+import '../../../packages/ui/styles/themes/dark.css'
+
+import '../styles/algolia-search.scss'
+import '../styles/ch.scss'
+import '../styles/docsearch.scss'
+import '../styles/main.scss?v=1.0.0'
+import '../styles/new-docs.scss'
+import '../styles/prism-okaidia.scss'
+
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { ThemeProvider } from 'common/Providers'
@@ -11,15 +21,6 @@ import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import '../../../packages/ui/styles/base/global.css'
-import '../../../packages/ui/styles/themes/light.css'
-import '../../../packages/ui/styles/themes/dark.css'
-import '../styles/algolia-search.scss'
-import '../styles/ch.scss'
-import '../styles/docsearch.scss'
-import '../styles/main.scss?v=1.0.0'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()

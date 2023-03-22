@@ -10,7 +10,7 @@
     "build-transform-dark": "npx token-transformer tokens.json styles/tokens/02_themes/dark.json global,exported/dark,theme global",
     "build-transform-light": "npx token-transformer tokens.json styles/tokens/02_themes/light.json global,exported/light,theme global",
     "build-transform-typography": "npx token-transformer tokens.json styles/tokens/03_semantic/typography.json global,typography global --resolveReferences=false",
-    "build-transform": "npm run build-transform-global && npm run build-transform-typography && npm run build-transform-dark  && npm run build-transform-light",
+    "build-transform": "npm run build-transform-dark && npm run build-transform-light",
     "build-tailwind": "node style-token.js",
     "copy-tokens": "node copy-tokens.js --branch process.env.branch",
     "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js"
