@@ -28,6 +28,7 @@ export function withAuth<T>(
 ) {
   const WithAuthHOC: ComponentType<T> = (props: any) => {
     const router = useRouter()
+    const { basePath } = router
     const { ref, slug } = useParams()
     const rootStore = useStore()
     const { isLoading, session } = useAuth()
@@ -87,7 +88,7 @@ export function withAuth<T>(
           {IS_PLATFORM && (
             <script
               dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('/sign-in' + '?' + searchParams.toString())}`,
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${basePath}/sign-in' + '?' + searchParams.toString())}`,
               }}
             />
           )}
@@ -107,7 +108,7 @@ export function withAuth<T>(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/sign-in' : ref !== undefined ? `/project/${ref}` : '/projects'
+  return IS_PLATFORM ? `/sign-in` : ref !== undefined ? `/project/${ref}` : '/projects'
 }
 
 function checkRedirectTo(
