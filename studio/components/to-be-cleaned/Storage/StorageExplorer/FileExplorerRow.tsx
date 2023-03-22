@@ -1,4 +1,5 @@
 import { FC, useState, useRef, useEffect } from 'react'
+import Router from 'next/router'
 import { find, has, isEmpty, isEqual } from 'lodash'
 import {
   Checkbox,
@@ -41,10 +42,10 @@ const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
     const iconSrc =
       fileType === STORAGE_ROW_TYPES.BUCKET
-        ? '/img/bucket-filled.svg'
+        ? `${Router.basePath}/img/bucket-filled.svg`
         : fileType === STORAGE_ROW_TYPES.FOLDER
-        ? '/img/folder-filled.svg'
-        : '/img/file-filled.svg'
+        ? `${Router.basePath}/img/folder-filled.svg`
+        : `${Router.basePath}/img/file-filled.svg`
     return (
       <SVG
         src={iconSrc}

@@ -1,5 +1,6 @@
 import SVG from 'react-inlinesvg'
 import Link from 'next/link'
+import Router from 'next/router'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconLoader } from 'ui'
@@ -28,7 +29,7 @@ const SupportPage = () => {
         <div className="space-y-12 py-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
+              <SVG src={`${Router.basePath}/img/supabase-logo.svg`} className="h-4 w-4" />
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">

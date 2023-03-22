@@ -1,8 +1,9 @@
-import Snippets from '../Snippets'
-import CodeSnippet from '../CodeSnippet'
 import Image from 'next/image'
+import Router from 'next/router'
 import { useStore } from 'hooks'
 import { AutoApiService } from 'data/config/project-api-query'
+import Snippets from '../Snippets'
+import CodeSnippet from '../CodeSnippet'
 
 const libs = [
   {
@@ -64,7 +65,9 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
                   "
                 >
                   <Image
-                    src={`/img/icons/reference-${isDarkTheme ? lib.icon : `${lib.icon}-light`}.svg`}
+                    src={`${Router.basePath}/img/icons/reference-${
+                      isDarkTheme ? lib.icon : `${lib.icon}-light`
+                    }.svg`}
                     width={16}
                     height={16}
                     alt={lib.name}

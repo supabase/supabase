@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Router from 'next/router'
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Radio, Badge } from 'ui'
@@ -27,7 +28,7 @@ const RadioHookService: FC<Props> = observer(
             <div className="flex items-center space-x-5">
               {/* <div className="h-3 w-3"> */}
               <Image
-                src={`/img/function-providers/${img_url}`}
+                src={`${Router.basePath}/img/function-providers/${img_url}`}
                 layout="fixed"
                 width="32"
                 height="32"

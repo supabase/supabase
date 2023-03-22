@@ -14,7 +14,7 @@ import {
   Button,
 } from 'ui'
 import { Dictionary } from 'components/grid'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
@@ -545,7 +545,7 @@ const ListboxTable: FC = observer(({}) => {
             addOnBefore={() => (
               <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
                 <SVG
-                  src={'/img/table-editor.svg'}
+                  src={`${Router.basePath}/img/table-editor.svg`}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
                   preProcessor={(code) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
