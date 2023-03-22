@@ -1,0 +1,53 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-swift
+  title: Supabase Swift Client
+  description: |
+
+    Supabase Swift.
+
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_swift_v2.yml
+  slugPrefix: '/'
+  libraries:
+    - id: 'Swift'
+      version: '0.0.1'
+
+functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
+      The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: create-client
+        name: createClient()
+        code: |
+          ```js
+          let client = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
+          ```
+
+  - id: auth-api
+    title: 'Overview'
+    notes: |
+      - The auth methods can be accessed via the Supabase GoTrue Auth client.
+    examples:
+      - id: create-auth-client
+        name: Create auth client
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, anon_key)
+          ```
+      - id: create-auth-client-server-side
+        name: Create auth client (server-side)
+        isSpotlight: false
+        code: |
+          ```swift
+          let supabase = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
+          let auth = supabase.auth
+          ```
