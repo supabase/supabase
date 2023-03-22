@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
@@ -14,7 +14,6 @@ const forgotPasswordSchema = object({
 const ForgotPasswordForm = () => {
   const { ui } = useStore()
   const router = useRouter()
-  const { basePath } = router
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -38,7 +37,7 @@ const ForgotPasswordForm = () => {
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
           : process.env.NEXT_PUBLIC_SITE_URL
-      }${basePath}/reset-password`,
+      }${BASE_PATH}/reset-password`,
     })
     const error = response.error
 
