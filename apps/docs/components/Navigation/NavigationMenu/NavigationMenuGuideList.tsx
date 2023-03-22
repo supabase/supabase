@@ -6,8 +6,9 @@ import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 interface Props {
   id: string
   active: boolean
+  collapsible?: boolean
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, active, collapsible = true }) => {
   const router = useRouter()
 
   // get url
@@ -26,7 +27,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active }) => {
 
   return (
     <Accordion.Root
-      collapsible
+      collapsible={collapsible}
       key={id}
       type="single"
       value={firstLevelRoute}
