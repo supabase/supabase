@@ -20,9 +20,9 @@ const PausedProjectCard: FC<Props> = ({
         <div
           className={[
             'bg-panel-header-light dark:bg-panel-header-dark',
-            'hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark',
-            'border border-border-secondary-light dark:border-border-secondary-dark',
-            'hover:border-border-secondary-hover-light dark:hover:border-border-secondary-hover-dark',
+            'hover:bg-scale-200 dark:hover:bg-scale-200',
+            'border border-scale-700',
+            'hover:border-scale-900',
             'h-32 rounded p-4',
             'flex flex-col justify-between transition duration-150 ease-in-out',
           ].join(' ')}

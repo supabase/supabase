@@ -1,71 +1,67 @@
-const ui = require('./ui.config.js')
-const deepMerge = require('deepmerge')
+const { repeat } = require('lodash')
+const ui = require('../packages/config/ui.config.js')
 
-const color = require('./../ui/styles/tw-extend/color')
-
-function generateTwColorClasses(globalKey, twAttributes) {
-  let classes = {}
-  Object.values(twAttributes).map((attr, i) => {
-    const attrKey = Object.keys(twAttributes)[i]
-    if (attrKey.includes(globalKey)) {
-      classes = {
-        ...classes,
-        [attrKey.split('-').splice(1).join('-')]: attr,
-      }
-    }
-  })
-  return classes
+const blueGray = {
+  50: '#F8FAFC',
+  100: '#F1F5F9',
+  200: '#E2E8F0',
+  300: '#CBD5E1',
+  400: '#94A3B8',
+  500: '#64748B',
+  600: '#475569',
+  700: '#334155',
+  800: '#1E293B',
+  900: '#0F172A',
 }
 
-const uiConfig = ui({
-  mode: 'JIT',
-  darkMode: 'class',
+const coolGray = {
+  50: '#F9FAFB',
+  100: '#F3F4F6',
+  200: '#E5E7EB',
+  300: '#D1D5DB',
+  400: '#9CA3AF',
+  500: '#6B7280',
+  600: '#4B5563',
+  700: '#374151',
+  800: '#1F2937',
+  900: '#111827',
+}
+
+module.exports = ui({
+  darkMode: 'class', // or 'media' or 'class'
+  content: [
+    // purge styles from app
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './internals/**/*.{js,ts,jsx,tsx}',
+    './lib/**/*.{js,ts,jsx,tsx}',
+    './lib/**/**/*.{js,ts,jsx,tsx}',
+    './../packages/ui/src/lib/theme/defaultTheme.ts',
+    // purge styles from supabase ui theme
+    // './../node_modules/ui/dist/config/default-theme.js',
+    // purge styles from grid library
+    './../node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
+    './../node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
-    accentColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('accentColor', color),
-    }),
-    backgroundColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('backgroundColor', color),
-    }),
+    // maxHeight: {
+    //   12: '3rem',
+    //   48: '12rem',
+    // },
     borderColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('borderColor', color),
-    }),
-    boxShadowColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('boxShadowColor', color),
-    }),
-    caretColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('caretColor', color),
+      DEFAULT: 'var(--colors-scale5)',
+      dark: 'var(--colors-scale4)',
     }),
     divideColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('divideColor', color),
-    }),
-    outlineColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('outlineColor', color),
-    }),
-    ringColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringColor', color),
-    }),
-    ringOffsetColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringOffsetColor', color),
-    }),
-    textColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('textColor', color),
-    }),
-    textDecorationColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('textDecorationColor', color),
+      DEFAULT: 'var(--colors-scale6)',
+      dark: 'var(--colors-scale2)',
     }),
     extend: {
+      transitionProperty: {
+        height: 'height',
+      },
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
@@ -198,49 +194,6 @@ const uiConfig = ui({
             },
           },
         },
-
-        toc: {
-          css: {
-            ul: {
-              'list-style-type': 'none',
-              'padding-left': 0,
-              margin: 0,
-              li: {
-                'padding-left': 0,
-              },
-              a: {
-                display: 'block',
-                marginBottom: '0.4rem',
-                'text-decoration': 'none',
-                fontSize: '0.8rem',
-                fontWeight: '200',
-                color: theme('colors.scale[1100]'),
-                '&:hover': {
-                  color: theme('colors.scale[1200]'),
-                },
-                'font-weight': '400',
-              },
-              // margin: 0,
-              ul: {
-                'list-style-type': 'none',
-                li: {
-                  marginTop: '0.2rem',
-                  marginBottom: '0.2rem',
-                  'padding-left': '0 !important',
-                  'margin-left': '0.5rem',
-                },
-                a: {
-                  fontWeight: '200',
-                  color: theme('colors.scale[1000]'),
-                  '&:hover': {
-                    color: theme('colors.scale[1200]'),
-                  },
-                },
-              },
-            },
-          },
-        },
-        // used in auto docs
         docs: {
           css: {
             '--tw-prose-body': theme('colors.scale[1100]'),
@@ -284,41 +237,193 @@ const uiConfig = ui({
           },
         },
       }),
-      screens: {
-        xs: '480px',
+      fontSize: {
+        grid: '13px',
       },
-      fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+      gridTemplateColumns: {
+        billingWithTeam: 'repeat(3, minmax(0, 1fr)) 0.9fr',
+      },
+      colors: {
+        // gray: { ...gray },
+        // green: { ...green },
+        blueGray: { ...blueGray },
+        coolGray: { ...coolGray },
+
+        /*  typography */
+        'typography-body': {
+          light: 'var(--colors-scale11)',
+          dark: 'var(--colors-scale11)',
+        },
+        'typography-body-secondary': {
+          light: 'var(--colors-scale10)',
+          dark: 'var(--colors-scale10)',
+        },
+        'typography-body-strong': {
+          light: 'var(--colors-scale12)',
+          dark: 'var(--colors-scale12)',
+        },
+        'typography-body-faded': {
+          light: 'var(--colors-scale9)',
+          dark: 'var(--colors-scale9)',
+        },
+
+        /*  Nav */
+        sidebar: {
+          // light: 'white',
+          // dark: gray[800],
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale2)',
+        },
+        'sidebar-linkbar': {
+          // light: 'white',
+          // dark: gray[800],
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale2)',
+        },
+        // 'sidebar-active': {
+        //   light: 'var(--colors-scale12)',
+        //   dark: 'var(--colors-scale2)',
+        //   // dark: gray[700],
+        // },
+
+        /* borders */
+        'border-secondary': {
+          light: 'var(--colors-scale7)',
+          dark: 'var(--colors-scale7)',
+        },
+        'border-secondary-hover': {
+          light: 'var(--colors-scale9)',
+          dark: 'var(--colors-scale9)',
+        },
+
+        /*  app backgrounds */
+        'bg-primary': {
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale2)',
+        },
+        'bg-secondary': {
+          // light: blueGray[100],
+          // dark: gray[700],
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale2)',
+        },
+        'bg-alt': {
+          // light: blueGray[50], // gray[100],
+          // dark: gray[600],
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale2)',
+        },
+
+        /* Tables */
+        'table-body': {
+          light: 'var(--colors-scale1)',
+          dark: 'var(--colors-scale2)',
+        },
+        'table-header': {
+          light: 'var(--colors-scale2)', // gray[100],
+          dark: 'var(--colors-scale3)', // '#1a1a1a', //gray[700],
+        },
+        'table-footer': {
+          light: 'var(--colors-scale2)', // gray[100],
+          dark: 'var(--colors-scale4)', // '#1a1a1a',
+        },
+        'table-border': {
+          light: 'var(--colors-scale5)', // gray[100],
+          dark: 'var(--colors-scale4)', // '#1a1a1a',
+        },
+
+        /* Panels */
+        'panel-body': {
+          light: 'var(--colors-scale1)',
+          dark: 'var(--colors-scale3)',
+        },
+        'panel-header': {
+          light: 'var(--colors-scale1)',
+          dark: 'var(--colors-scale3)',
+        },
+        'panel-footer': {
+          light: 'var(--colors-scale1)',
+          dark: 'var(--colors-scale3)',
+        },
+        'panel-border': {
+          light: 'var(--colors-scale5)',
+          dark: 'var(--colors-scale4)',
+        },
+        'panel-border-interior': {
+          light: 'var(--colors-scale4)',
+          dark: 'var(--colors-scale4)',
+        },
+        'panel-border-hover': {
+          light: 'var(--colors-scale2)',
+          dark: 'var(--colors-scale4)',
+        },
+
+        /*
+          Forms
+        */
+        // form: {
+        //   light: coolGray[600],
+        //   dark: gray[200],
+        // },
+
+        // 'input-placeholder': {
+        //   light: coolGray[300],
+        //   dark: gray[400],
+        // },
+        // 'input-value': {
+        //   light: coolGray[600],
+        //   dark: gray[200],
+        // },
+        // 'input-border': {
+        //   light: coolGray[300],
+        //   dark: gray[500],
+        // },
+        // 'input-label': {
+        //   light: coolGray[600],
+        //   dark: gray[200],
+        // },
+        // 'input-border-hover': {
+        //   light: coolGray[400],
+        //   dark: gray[400],
+        // },
+        // 'input-border-focus': {
+        //   light: green[300],
+        //   dark: green[300],
+        // },
+      },
+      animation: {
+        shimmer: 'shimmer 2s infinite linear',
+        sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': {
+            'background-position': '-1000px 0',
+          },
+          '100%': {
+            'background-position': '1000px 0',
+          },
+        },
+        sway: {
+          '0%, 100%': {
+            transform: 'rotate(-10deg) scale(1.5) translateY(4rem)',
+          },
+          '50%': {
+            transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
+          },
+        },
       },
     },
+    fontFamily: {
+      sans: ['circular', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+      mono: ['source code pro', 'Menlo', 'monospace'],
+    },
   },
+  variants: {
+    extend: {},
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+    // ...
+  ],
 })
-
-function arrayMergeFn(destinationArray, sourceArray) {
-  return destinationArray.concat(sourceArray).reduce((acc, cur) => {
-    if (acc.includes(cur)) return acc
-    return [...acc, cur]
-  }, [])
-}
-
-/**
- * Merge Supabase UI and Tailwind CSS configurations
- * @param {object} tailwindConfig - Tailwind config object
- * @return {object} new config object
- */
-function wrapper(tailwindConfig) {
-  // let purge
-  // if (Array.isArray(tailwindConfig.purge)) {
-  //   purge = {
-  //     content: tailwindConfig.purge,
-  //   }
-  // } else {
-  //   purge = tailwindConfig.purge
-  // }
-  return deepMerge({ ...tailwindConfig }, uiConfig, {
-    arrayMerge: arrayMergeFn,
-  })
-}
-
-module.exports = wrapper

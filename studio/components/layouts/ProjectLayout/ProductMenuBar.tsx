@@ -15,8 +15,8 @@ const ProductMenuBar: FC<Props> = ({ title, children }) => {
       style={{ height: maxHeight, maxHeight }}
       className={[
         'hide-scrollbar flex w-64 flex-col border-r', // Layout
-        'bg-sidebar-linkbar-light', // Light mode
-        'dark:bg-sidebar-linkbar-dark dark:border-dark ', // Dark mode
+        'bg-scale-200', // Light mode
+        'dark:border-dark ', // Dark mode
       ].join(' ')}
     >
       <div

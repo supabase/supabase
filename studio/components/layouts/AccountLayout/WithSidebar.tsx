@@ -49,7 +49,7 @@ const WithSidebar: FC<Props> = ({
           id="with-sidebar"
           style={{ height: maxHeight, maxHeight }}
           className={[
-            'h-full bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
+            'h-full bg-scale-200',
             'hide-scrollbar w-64 overflow-auto border-r dark:border-dark',
           ].join(' ')}
         >

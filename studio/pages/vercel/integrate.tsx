@@ -280,8 +280,8 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full rounded-sm border border-border-secondary-light
-      bg-panel-header-light dark:border-border-secondary-dark dark:bg-panel-header-dark"
+        className="w-full rounded-sm border border-scale-700
+      bg-panel-header-light dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
           <h4 className="my-auto mr-8 text-lg capitalize">{name}</h4>
