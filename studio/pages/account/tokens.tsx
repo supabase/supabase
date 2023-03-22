@@ -9,6 +9,9 @@ import {
 } from 'components/interfaces/Account'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 
+import Link from 'next/link'
+import { Button, IconExternalLink } from 'ui'
+
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
 
@@ -19,7 +22,23 @@ const UserAccessTokens: NextPageWithLayout = () => {
           title="Access Tokens"
           description="Personal access tokens can be used with our management API or the Supabase CLI"
         />
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <Link href="https://supabase.com/docs/reference/api/introduction">
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  API Docs
+                </Button>
+              </a>
+            </Link>
+            <Link href="https://supabase.com/docs/reference/cli/start">
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  CLI docs
+                </Button>
+              </a>
+            </Link>
+          </div>
           <NewAccessTokenButton onCreateToken={setNewToken} />
         </div>
       </div>

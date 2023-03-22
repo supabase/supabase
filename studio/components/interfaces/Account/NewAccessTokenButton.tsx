@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown } from 'ui'
+import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown, IconExternalLink } from 'ui'
 import { useStore } from 'hooks'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -106,9 +107,21 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                   <Alert
                     withIcon
                     variant="warning"
-                    title="The experimental API provides endpoints that can delete your organizations and projects."
+                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
                   >
-                    These actions cannot be undone and hence, is reserved for advanced users only.
+                    <p>
+                      These include deleting organizations and projects which cannot be undone. As
+                      such, be very careful when using this API.
+                    </p>
+                    <div className="mt-4">
+                      <Link href="https://api.supabase.com/api/v0">
+                        <a target="_blank">
+                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                            Experimental API documentation
+                          </Button>
+                        </a>
+                      </Link>
+                    </div>
                   </Alert>
                 </Modal.Content>
               )}
