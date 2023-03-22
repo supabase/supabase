@@ -5,7 +5,7 @@ import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -386,7 +386,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`${Router.basePath}/img/payment-methods/${method.card.brand
+                          src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"

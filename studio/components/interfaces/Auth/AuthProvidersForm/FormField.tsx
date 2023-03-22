@@ -1,4 +1,4 @@
-import Router from 'next/router'
+import { BASE_PATH } from 'lib/constants'
 import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
@@ -125,7 +125,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
                 label={option.label}
                 value={option.value}
                 addOnBefore={() => (
-                  <img className="h-6 w-6" src={`${Router.basePath}/img/icons/${option.icon}`} />
+                  <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
                 )}
               >
                 {option.label}

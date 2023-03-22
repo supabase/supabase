@@ -1,13 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import Router from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
@@ -97,8 +96,8 @@ const SignInLayout = ({
                     <Image
                       src={
                         theme == 'dark'
-                          ? `${Router.basePath}/img/supabase-dark.svg`
-                          : `${Router.basePath}/img/supabase-light.svg`
+                          ? `${BASE_PATH}/img/supabase-dark.svg`
+                          : `${BASE_PATH}/img/supabase-light.svg`
                       }
                       alt="Supabase Logo"
                       height={24}
