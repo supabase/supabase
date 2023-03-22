@@ -477,7 +477,7 @@ StyleDictionary.registerFormat({
 
 /**
  * Returns the files configuration
- * for generating seperated tailwind files.
+ * for generating separated tailwind files.
  */
 function getConfigTailwindFilesByType(typeList) {
   console.log('\n')
