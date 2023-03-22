@@ -314,7 +314,7 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] bg-scale-800">
+        <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] text-scale-1100 bg-scale-800">
           {entity.type[0]?.toUpperCase()}
         </div>
       }
