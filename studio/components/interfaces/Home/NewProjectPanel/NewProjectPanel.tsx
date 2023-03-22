@@ -257,7 +257,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 <Button type="default">View API settings</Button>
               </a>
             </Link>
-            <Link href="https://supabase.com/docs/guides/api">
+            <Link href="https://supabase.com/docs/guides/database/api">
               <a target="_blank" rel="noreferrer">
                 <Button className="translate-y-[1px]" type="default" icon={<IconExternalLink />}>
                   About APIs

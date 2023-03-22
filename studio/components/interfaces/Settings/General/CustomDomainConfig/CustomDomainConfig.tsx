@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from 'ui'
 
 import { useParams, useStore } from 'hooks'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import Panel from 'components/ui/Panel'
 import { FormHeader } from 'components/ui/Forms'
@@ -20,7 +20,7 @@ const CustomDomainConfig = () => {
   const { ref } = useParams()
 
   const tier = ui.selectedProject?.subscription_tier
-  const { isLoading: isSettingsLoading, data: settings } = useProjectSettingsQuery({
+  const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
     projectRef: ref,
   })
 
@@ -37,7 +37,7 @@ const CustomDomainConfig = () => {
     <section>
       <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
       {data?.status === '0_no_hostname_configured' ? (
-        <CustomDomainsConfigureHostname projectRef={ref} />
+        <CustomDomainsConfigureHostname />
       ) : (
         <Panel>
           {isLoading && (

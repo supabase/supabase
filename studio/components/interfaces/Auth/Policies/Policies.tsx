@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { useParams, useStore } from 'hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'

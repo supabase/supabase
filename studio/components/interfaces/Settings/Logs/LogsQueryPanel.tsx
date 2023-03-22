@@ -6,17 +6,16 @@ import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
   LogsWarning,
-  LOGS_EXPLORER_DOCS_URL,
   LOGS_SOURCE_DESCRIPTION,
   LogTemplate,
 } from '.'
 import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
-import { checkPermissions, useStore } from 'hooks'
-import { IconBookOpen } from '@supabase/ui'
+import { checkPermissions } from 'hooks'
+import { useProfileQuery } from 'data/profile/profile-query'
 
-interface Props {
+export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
@@ -31,7 +30,7 @@ interface Props {
   warnings: LogsWarning[]
 }
 
-const LogsQueryPanel: React.FC<Props> = ({
+const LogsQueryPanel = ({
   templates = [],
   onSelectTemplate,
   hasEditorValue,
@@ -44,18 +43,15 @@ const LogsQueryPanel: React.FC<Props> = ({
   defaultTo,
   onDateChange,
   warnings,
-}) => {
-  const { ui } = useStore()
+}: LogsQueryPanelProps) => {
+  const { data: profile } = useProfileQuery()
   const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'log_sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   return (
-    <div
-      className=" rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark
-  "
-    >
+    <div className="rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
@@ -132,11 +128,6 @@ const LogsQueryPanel: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <a target="_blank" href={LOGS_EXPLORER_DOCS_URL}>
-                  <Button type="default" icon={<IconBookOpen size={12} />}>
-                    Docs
-                  </Button>
-                </a>
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>

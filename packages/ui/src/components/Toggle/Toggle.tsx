@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import clsx from 'clsx'
+import { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { useFormContext } from '../Form/FormContext'
-
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
@@ -11,7 +10,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   layout?: 'horizontal' | 'vertical' | 'flex'
   error?: string
   descriptionText?: string
-  label?: string
+  label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
   labelOptional?: string
@@ -129,7 +128,7 @@ function Toggle({
         type="button"
         id={id}
         name={name}
-        className={toggleClasses.join(' ')}
+        className={clsx(toggleClasses, disabled && 'opacity-50 cursor-default')}
         onClick={onClick}
         disabled={disabled}
         onBlur={handleBlurEvent}

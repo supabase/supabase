@@ -12,21 +12,33 @@ type JsonEditProps = {
   column: string
   jsonString: string
   visible: boolean
+  backButtonLabel?: string
+  applyButtonLabel?: string
   closePanel: () => void
   onSaveJSON: (value: string | number) => void
 }
 
-const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, onSaveJSON }) => {
+const JsonEdit: FC<JsonEditProps> = ({
+  column,
+  jsonString,
+  visible,
+  backButtonLabel,
+  applyButtonLabel,
+  closePanel,
+  onSaveJSON,
+}) => {
   const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
 
   useEffect(() => {
-    const temp = prettifyJSON(jsonString)
-    setJsonStr(temp)
-  }, [jsonString])
+    if (visible) {
+      const temp = prettifyJSON(jsonString)
+      setJsonStr(temp)
+    }
+  }, [visible])
 
-  function validateJSON(resolve: () => void) {
+  const validateJSON = async (resolve: () => void) => {
     try {
       const minifiedJSON = minifyJSON(jsonStr)
       if (onSaveJSON) onSaveJSON(minifiedJSON)
@@ -72,7 +84,14 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
       }
       visible={visible}
       onCancel={closePanel}
-      customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
+      customFooter={
+        <ActionBar
+          closePanel={closePanel}
+          backButtonLabel={backButtonLabel}
+          applyButtonLabel={applyButtonLabel}
+          applyFunction={validateJSON}
+        />
+      }
     >
       <div className="py-4">
         <SidePanel.Content>

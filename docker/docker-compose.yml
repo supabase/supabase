@@ -9,21 +9,24 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20221214-4eecc99
+    image: supabase/studio:20230216-e731b77
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-      DEFAULT_ORGANIZATION: ${STUDIO_DEFAULT_ORGANIZATION}
-      DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
+      DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
 
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
-      # Kept for backwards compatibility with studio:0.22.08
-      SUPABASE_REST_URL: ${API_EXTERNAL_URL}/rest/v1/
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
@@ -43,14 +46,20 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
-      - ./volumes/api:/var/lib/kong:ro
+      # https://github.com/supabase/supabase/issues/12661
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.40.1
+    image: supabase/gotrue:v2.47.0
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
@@ -91,7 +100,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v9.0.1.20220717
+    image: postgrest/postgrest:v10.1.2
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -105,10 +114,15 @@ services:
 
   realtime:
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.1.0
+    image: supabase/realtime:v2.5.1
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       PORT: 4000
@@ -131,12 +145,19 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.26.1
+    image: supabase/storage-api:v0.28.2
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
       rest:
         condition: service_started
+      imgproxy:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
@@ -154,21 +175,27 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.11
+    image: darthsim/imgproxy:v3.13
+    healthcheck:
+      test: [ "CMD", "imgproxy", "health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
       IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.52.1
+    image: supabase/postgres-meta:v0.60.7
     depends_on:
       db: # Disable this if you are using an external Postgres database
         condition: service_healthy
@@ -184,7 +211,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.89
+    image: supabase/postgres:15.1.0.54-rc0
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -209,6 +236,10 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/realtime.sql
-      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
-      - ./volumes/db/data:/var/lib/postgresql/data
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      # Must be superuser to create event trigger
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      # Must be superuser to alter reserved role
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      # PGDATA directory is persisted between restarts
+      - ./volumes/db/data:/var/lib/postgresql/data:Z

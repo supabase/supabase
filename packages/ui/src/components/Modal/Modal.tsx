@@ -125,7 +125,12 @@ const Modal = ({
       <Button type="default" onClick={onCancel} disabled={loading}>
         {cancelText}
       </Button>
-      <Button onClick={onConfirm} loading={loading} danger={variant === 'danger'}>
+      <Button
+        onClick={onConfirm}
+        disabled={loading}
+        loading={loading}
+        danger={variant === 'danger'}
+      >
         {confirmText}
       </Button>
     </Space>

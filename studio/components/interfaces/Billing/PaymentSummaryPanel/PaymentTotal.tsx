@@ -5,18 +5,20 @@ import { SubscriptionPreview } from '../Billing.types'
 import CostBreakdownModal from './CostBreakdownModal'
 
 interface Props {
+  totalMonthlyCost: number
   subscriptionPreview?: SubscriptionPreview
   isRefreshingPreview: boolean
   isSpendCapEnabled: boolean
 }
 
 const PaymentTotal: FC<Props> = ({
+  totalMonthlyCost,
   subscriptionPreview,
   isRefreshingPreview,
   isSpendCapEnabled,
 }) => {
   const hasChanges = subscriptionPreview?.has_changes ?? false
-  const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
+  // const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
   const amountDueImmediately = (subscriptionPreview?.amount_due_immediately ?? 0) / 100
   const billingDate = new Date((subscriptionPreview?.bill_on ?? 0) * 1000)
   const isBillingToday =

@@ -1,3 +1,4 @@
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import React from 'react'
 import { Dictionary } from './base'
 import { SupaRow, SupaTable } from './table'
@@ -15,8 +16,9 @@ export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string
+  table: SupaTable
   /**
+   *
    * run sql query
    */
   onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
@@ -25,9 +27,6 @@ export interface SupabaseGridProps {
    * Optional react node to display in grid header
    */
   headerActions?: React.ReactNode
-  /**
-   * enable table editor
-   */
   editable?: boolean
   /**
    * props to config grid view
@@ -65,10 +64,23 @@ export interface SupabaseGridProps {
    * show edit row button if available
    */
   onEditRow?: (row: SupaRow) => void
-  /**
-   * error handler
-   */
   onError?: (error: any) => void
+  /**
+   * Toggle api preview panel open
+   */
+  apiPreviewPanelOpen?: boolean
+  setApiPreviewPanelOpen?: () => void
+  /**
+   * Refresh the docs after a change is made to the table
+   */
+  refreshDocs: () => void
+  onExpandJSONEditor: (column: string, row: SupaRow) => void
+  updateTableRow: (previousRow: any, updatedData: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
 }
 
 export interface SupabaseGridRef {

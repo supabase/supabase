@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import {
@@ -12,9 +13,10 @@ import {
   IconMoreVertical,
   IconLoader,
 } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
-import { useParams, useStore } from 'hooks'
-import Link from 'next/link'
+import { useParams, useStore, checkPermissions } from 'hooks'
 
 interface Props {
   secret: VaultSecret
@@ -29,6 +31,8 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [revealedValue, setRevealedValue] = useState<string>()
   const name = secret?.name ?? 'No name provided'
+
+  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const revealSecret = async () => {
     setIsLoading(true)
@@ -106,15 +110,58 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
           className="w-[120px]"
           overlay={
             <>
-              <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => onSelectEdit(secret)}>
-                Edit
-              </Dropdown.Item>
-              <Dropdown.Item
-                icon={<IconTrash stroke="red" size="tiny" />}
-                onClick={() => onSelectRemove(secret)}
-              >
-                Delete
-              </Dropdown.Item>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Dropdown.Item
+                    icon={<IconEdit3 size="tiny" />}
+                    disabled={!canManageSecrets}
+                    onClick={() => onSelectEdit(secret)}
+                  >
+                    Edit
+                  </Dropdown.Item>
+                </Tooltip.Trigger>
+                {!canManageSecrets && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to edit secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Dropdown.Item
+                    disabled={!canManageSecrets}
+                    icon={<IconTrash stroke="red" size="tiny" />}
+                    onClick={() => onSelectRemove(secret)}
+                  >
+                    Delete
+                  </Dropdown.Item>
+                </Tooltip.Trigger>
+                {!canManageSecrets && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to delete secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </>
           }
         >

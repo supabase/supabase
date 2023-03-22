@@ -11,7 +11,6 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
-  const [filterString, setFilterString] = useState<string>('')
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
@@ -50,8 +49,6 @@ const FunctionsPage: NextPageWithLayout = () => {
   return (
     <>
       <FunctionsList
-        filterString={filterString}
-        setFilterString={setFilterString}
         createFunction={createFunction}
         editFunction={editFunction}
         deleteFunction={deleteFunction}

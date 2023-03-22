@@ -1,4 +1,4 @@
-import { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PostgresRelationship } from '@supabase/postgres-meta'
 
 export interface CreateColumnPayload {
   tableId: number
@@ -56,13 +56,17 @@ export interface Field {
   foreignKey?: { table: string; column: string }
 }
 
+export interface ExtendedPostgresRelationship extends PostgresRelationship {
+  deletion_action: string
+}
+
 export interface ColumnField {
   id: string
   name: string
   comment?: string
   format: string
   defaultValue: string | null
-  foreignKey: PostgresRelationship | undefined
+  foreignKey: ExtendedPostgresRelationship | undefined
   isNullable: boolean
   isUnique: boolean
   isArray: boolean

@@ -31,8 +31,7 @@ const uiConfig = ui({
     './_blog/*.mdx',
     // purge styles from supabase ui theme
   ],
-  darkMode: 'class', // 'media' or 'class'
-  // mode: 'jit',
+  darkMode: 'class',
   theme: {
     accentColor: (theme) => ({
       ...theme('colors'),
@@ -199,6 +198,7 @@ const uiConfig = ui({
               position: 'relative',
               transition: 'color 0.3s ease-in-out',
               paddingBottom: '2px',
+              fontWeight: '400',
               color: 'var(--colors-scale12)',
               textDecorationLine: 'underline',
               textDecorationColor: 'var(--colors-brand7)',
@@ -279,7 +279,18 @@ const uiConfig = ui({
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    function ({ addUtilities, addVariant }) {
+      addUtilities({
+        // prose (tailwind typography) helpers
+        // useful for removing margins in prose styled sections
+        '.prose--remove-p-margin p': {
+          margin: '0',
+        },
+      })
+    },
+  ],
 })
 
 /**

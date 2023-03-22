@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Button, Modal, IconTrash } from 'ui'
 import { useStore } from 'hooks'
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { AccessToken, useAccessTokens } from 'hooks/queries/useAccessTokens'
+import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -11,21 +10,21 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 const AccessTokenList = observer(() => {
   const { ui } = useStore()
-  const { mutateDeleteToken } = useAccessTokens()
-  const { tokens, isLoading } = useAccessTokens()
+  const { data: tokens, isLoading } = useAccessTokensQuery()
+  const { mutateAsync: deleteToken } = useAccessTokenDeleteMutation()
+
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   async function onDeleteToken(tokenId: number) {
-    const response = await delete_(`${API_URL}/profile/access-tokens/${tokenId}`)
-    if (response.error) {
+    try {
+      await deleteToken({ id: tokenId })
+      setIsOpen(false)
+    } catch (error: any) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to delete token: ${response.error.message}`,
+        message: `Failed to delete token: ${error.message}`,
       })
-    } else {
-      mutateDeleteToken(tokenId)
-      setIsOpen(false)
     }
   }
 
@@ -50,7 +49,7 @@ const AccessTokenList = observer(() => {
               </Table.tr>
             ) : (
               <>
-                {tokens?.map((x: AccessToken) => {
+                {tokens?.map((x) => {
                   return (
                     <Table.tr key={x.token_alias}>
                       <Table.td>

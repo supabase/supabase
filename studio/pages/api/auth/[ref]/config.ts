@@ -114,7 +114,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       '<h2>You have been invited</h2>\n\n<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>\n<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>',
     MAILER_TEMPLATES_CONFIRMATION: null,
     MAILER_TEMPLATES_CONFIRMATION_CONTENT:
-      '<h2>Confirm your signup</h2>\n\n<p>Follow this link to confirm your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>',
+      '<h2>Confirm your email</h2>\n\n<p>Follow this link to confirm your email:</p>\n\n<p><a href="{{ .ConfirmationURL }}">Confirm your email address</a></p>',
     MAILER_TEMPLATES_RECOVERY: null,
     MAILER_TEMPLATES_RECOVERY_CONTENT:
       '<h2>Reset Password</h2>\n\n<p>Follow this link to reset the password for your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>',

@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { IS_PLATFORM } from 'lib/constants'
@@ -8,7 +9,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
-import { useSWRConfig } from 'swr'
 import { Button, IconFileText } from 'ui'
 
 type SignInLayoutProps = {
@@ -27,7 +27,7 @@ const SignInLayout = ({
 }: PropsWithChildren<SignInLayoutProps>) => {
   const pushNext = usePushNext()
   const { ui } = useStore()
-  const { cache } = useSWRConfig()
+  const queryClient = useQueryClient()
   const { theme } = ui
 
   useEffect(() => {
@@ -54,9 +54,7 @@ const SignInLayout = ({
       } = await auth.getSession()
 
       if (session) {
-        // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
-        // @ts-ignore
-        cache.clear()
+        await queryClient.resetQueries()
 
         await pushNext()
       }
@@ -120,7 +118,7 @@ const SignInLayout = ({
 
         <div className="flex flex-1">
           <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-scale-200 border-scale-500">
-            <div className="flex-1 flex flex-col justify-center w-[384px]">
+            <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
                 <h2 className="text-sm text-scale-1100">{subheading}</h2>

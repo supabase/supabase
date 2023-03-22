@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions } from 'hooks'

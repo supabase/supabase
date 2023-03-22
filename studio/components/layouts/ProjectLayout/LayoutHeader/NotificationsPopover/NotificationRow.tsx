@@ -1,10 +1,11 @@
 import dayjs from 'dayjs'
-import useSWR from 'swr'
 import { FC, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
-import { useStore, useNotifications } from 'hooks'
+import { useStore } from 'hooks'
+import { notificationKeys } from 'data/notifications/keys'
 import { Project } from 'types'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 import NotificationActions from './NotificationActions'
@@ -28,7 +29,7 @@ const NotificationRow: FC<Props> = ({
   onSelectFinalizeMigration,
 }) => {
   const { app, ui } = useStore()
-  const { refresh } = useNotifications()
+  const queryClient = useQueryClient()
   const [dismissing, setDismissing] = useState(false)
   const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
 
@@ -36,14 +37,15 @@ const NotificationRow: FC<Props> = ({
   const changelogLink = (notification.data as any).changelog_link
   const availableActions = notification.meta?.actions_available ?? []
 
-  // [Joshen TODO] This should be removed after 5th November when the migration notifications
+  // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
   // Relevant PR: https://github.com/supabase/supabase/pull/9229
-  const { data: ownerReassignStatus } = useSWR(
-    (notification.data as any).upgrade_type === 'schema-migration'
-      ? `${API_URL}/database/${project.ref}/owner-reassign`
-      : null,
-    get
+  const { data: ownerReassignStatus } = useQuery(
+    ['projects', project.ref, 'owner-reassign'],
+    ({ signal }) => get(`${API_URL}/database/${project.ref}/owner-reassign`, { signal }),
+    {
+      enabled: (notification.data as any).upgrade_type === 'schema-migration',
+    }
   )
 
   const dismissNotification = async (notificationId: string) => {
@@ -58,7 +60,7 @@ const NotificationRow: FC<Props> = ({
         duration: 4000,
       })
     } else {
-      refresh()
+      await queryClient.invalidateQueries(notificationKeys.list())
     }
     setDismissing(false)
   }

@@ -5,7 +5,8 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { withAuth, useFlag, usePlatformStatus } from 'hooks'
+import { withAuth, useFlag } from 'hooks'
+import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 
@@ -15,7 +16,8 @@ const SupportPage = () => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
-  const { isHealthy, isLoading } = usePlatformStatus()
+  const { data, isLoading } = usePlatformStatusQuery()
+  const isHealthy = data?.isHealthy
 
   return (
     <div
@@ -27,7 +29,7 @@ const SupportPage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h4 className="m-0 text-lg">Supabase support</h4>
+              <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">
               <Tooltip.Root delayDuration={0}>

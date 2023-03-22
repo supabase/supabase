@@ -5,7 +5,7 @@ import { Button } from 'ui'
 
 import DefaultLayout from '../components/Layouts/Default'
 
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'

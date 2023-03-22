@@ -3,7 +3,7 @@ import { FC } from 'react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Badge, Button } from 'ui'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions } from 'hooks'
 

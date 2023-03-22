@@ -18,8 +18,7 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ')
 }
 
-export interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
+export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
   children: React.ReactNode
   descriptionText?: string
@@ -73,14 +72,8 @@ function Listbox({
 
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    handleBlur,
-    touched,
-    fieldLevelValidation,
-  } = useFormContext()
+  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
+    useFormContext()
 
   if (values && !value) {
     defaultValue = values[id || name]
@@ -158,7 +151,7 @@ function Listbox({
       /*
        * if no selected value (including a `defaultvalue`), then use first child
        */
-      setSelectedNode(content[0].props)
+      setSelectedNode(content[0]?.props)
       return
     }
   }, [selected])
@@ -257,9 +250,7 @@ function Listbox({
           className={__styles.options_container}
         >
           <div>
-            <SelectContext.Provider
-              value={{ onChange: handleOnChange, selected }}
-            >
+            <SelectContext.Provider value={{ onChange: handleOnChange, selected }}>
               {children}
             </SelectContext.Provider>
           </div>
@@ -313,9 +304,7 @@ function SelectOption({
             <div className={__styles.option_inner}>
               {addOnBefore && addOnBefore({ active, selected })}
               <span>
-                {typeof children === 'function'
-                  ? children({ active, selected })
-                  : children}
+                {typeof children === 'function' ? children({ active, selected }) : children}
               </span>
             </div>
 
@@ -326,10 +315,7 @@ function SelectOption({
                   active ? __styles.option_check_active : ''
                 )}
               >
-                <IconCheck
-                  className={__styles.option_check_icon}
-                  aria-hidden="true"
-                />
+                <IconCheck className={__styles.option_check_icon} aria-hidden="true" />
               </span>
             ) : null}
           </DropdownMenuPrimitive.Item>

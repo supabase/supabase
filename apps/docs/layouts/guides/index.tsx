@@ -1,14 +1,15 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
 import { IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
-import { getPageType } from '~/lib/helpers'
 
 interface Props {
   meta: {
@@ -17,6 +18,9 @@ interface Props {
     hide_table_of_contents?: boolean
     breadcrumb?: string
     subtitle?: string
+    footerHelpType?: FooterHelpCalloutType
+    video?: string
+    canonical?: string
   }
   children: any
   toc?: any
@@ -60,29 +64,45 @@ const Layout: FC<Props> = (props) => {
 
   const hasTableOfContents = tocList.length > 0
 
+  // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
+  // open graph image url constructor
+  const ogImageUrl = encodeURI(
+    `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+      ogPageType ? `&type=${ogPageType}` : ''
+    }&title=${props.meta?.title}&description=${props.meta?.description}`
+  )
 
   return (
     <>
+      <Head>
+        <title>{props.meta?.title} | Supabase Docs</title>
+        <meta name="description" content={props.meta?.description} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta name="twitter:image" content={ogImageUrl} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
       <NextSeo
-        title={`${props.meta?.title} | Supabase`}
-        description={props.meta?.description ? props.meta?.description : props.meta?.title}
+        canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
         openGraph={{
-          title: props.meta?.title,
-          description: props.meta?.description,
           url: `https://supabase.com/docs${asPath}`,
-          images: [
+          type: 'article',
+          videos: props.meta?.video && [
             {
-              url: `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
-                ogPageType ? `&type=${ogPageType}` : ''
-              }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(
-                props.meta?.description
-              )}`,
+              // youtube based video meta
+              url: props.meta?.video,
+              width: 640,
+              height: 385,
+              type: 'application/x-shockwave-flash',
             },
           ],
+          article: {
+            publishedTime: new Date().toISOString(),
+            modifiedTime: new Date().toISOString(),
+            authors: ['Supabase'],
+          },
         }}
       />
-
       <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
         <div
           className={[
@@ -145,6 +165,7 @@ const Layout: FC<Props> = (props) => {
           </div>
         )}
       </div>
+      <FooterHelpCallout footerHelpType={props.meta?.footerHelpType} title={props.meta?.title} />
     </>
   )
 }

@@ -394,7 +394,7 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Database space</p>
+                    <p className="w-[50%] text-sm">Database size</p>
                     <p className="w-[25%] text-sm">8GB</p>
                     <p className="w-[25%] text-sm">$0.125/GB</p>
                   </div>

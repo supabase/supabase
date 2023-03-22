@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
@@ -685,7 +685,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: listen-to-all-database-changes
@@ -700,8 +700,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         code: |
           ```dart
           final mySubscription = supabase
@@ -711,8 +711,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-inserts
-        name: Listening to inserts
+      - id: listen-to-inserts
+        name: Listen to inserts
         code: |
           ```dart
           final mySubscription = supabase
@@ -722,8 +722,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-updates
-        name: Listening to updates
+      - id: listen-to-updates
+        name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening too:
@@ -740,8 +740,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-deletes
-        name: Listening to deletes
+      - id: listen-to-deletes
+        name: Listen to deletes
         description: |
           By default, Supabase does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
@@ -758,8 +758,8 @@ functions:
             })
             .subscribe();
           ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```dart
@@ -770,7 +770,7 @@ functions:
             .subscribe();
           ```
       - id: listening-to-row-level-changes
-        name: Listening to row level changes
+        name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
           ```dart
@@ -816,8 +816,8 @@ functions:
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
       - Takes a list of primary key columns as its argument.
     examples:
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         isSpotlight: true
         code: |
           ```dart
@@ -1249,39 +1249,36 @@ functions:
     title: Using Filters
     description: |
       Filters can be used on `select()`, `update()`, and `delete()` queries.
-
       If a Stored Procedure returns a table response, you can also apply filters.
+      Filters must be applied to the end of queries and can also be chained together to produce advanced queries.
+    examples:
+      - id: applying-filters
+        name: Applying filters
+        code: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The Shire')    // Correct
+            .execute();
 
-      ### Applying Filters
-
-      You must apply your filters to the end of your query. For example:
-
-      ```dart
-      final res = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .eq('name', 'The Shire')    // Correct
-        .execute();
-
-      final res = await supabase
-        .from('cities')
-        .eq('name', 'The Shire')    // Incorrect
-        .select('name, country_id')
-        .execute();
-      ```
-
-      ### Chaining
-
-      Filters can be chained together to produce advanced queries. For example:
-
-      ```dart
-      final res = await supabase
-        .from('cities')
-        .select('name, country_id')
-        .gte('population', 1000)
-        .lt('population', 10000)
-        .execute();
-      ```
+          final res = await supabase
+            .from('cities')
+            .eq('name', 'The Shire')    // Incorrect
+            .select('name, country_id')
+            .execute();
+          ```
+      - id: chaining-filters
+        name: Chaining filters
+        code: |
+          ```dart
+          final res = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('population', 1000)
+            .lt('population', 10000)
+            .execute();
+          ```
 
   - id: or
     title: or()

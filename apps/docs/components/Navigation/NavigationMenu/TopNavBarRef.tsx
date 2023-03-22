@@ -1,12 +1,12 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
-import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
 
+import SearchButton from '~/components/Search/SearchButton'
 import { getPageType } from '~/lib/helpers'
 
 const TopNavBarRef: FC = () => {
@@ -84,8 +84,8 @@ const TopNavBarRef: FC = () => {
           {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}
         </div>
 
-        <div className="flex items-center gap-12">
-          <SearchButton className="w-full lg:w-96">
+        <div className="flex items-center gap-6">
+          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
             <div
               className="
               flex

@@ -1,4 +1,4 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'
