@@ -1,19 +1,18 @@
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge } from 'ui'
 
 import { useStore } from 'hooks'
 import { tryParseJson, uuidv4 } from 'lib/helpers'
 import HTTPRequestFields from './HTTPRequestFields'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { isValidHttpUrl } from './Hooks.utils'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { AVAILABLE_WEBHOOK_TYPES, ENABLED_MODE_OPTIONS, HOOK_EVENTS } from './Hooks.constants'
-
-// Also see if we can add the input field for enabled_mode
+import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -41,6 +40,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const { project } = useProjectContext()
   const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
   const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
+  const { mutateAsync: deleteDatabaseTrigger } = useDatabaseTriggerDeleteMutation()
 
   useEffect(() => {
     if (visible) {
@@ -75,7 +75,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const initialValues = {
     name: selectedHook?.name ?? '',
     table_id: selectedHook?.table_id ?? '',
-    enabled_mode: selectedHook?.enabled_mode ?? 'ORIGIN',
     function_name: selectedHook?.function_name ?? 'http_request',
 
     http_url: selectedHook?.function_args?.[0] ?? '',
@@ -134,11 +133,11 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       events,
       activation: 'AFTER',
       orientation: 'ROW',
+      enabled_mode: 'ORIGIN',
       name: values.name,
       table: selectedTable.name,
       schema: selectedTable.schema,
       table_id: values.table_id,
-      enabled_mode: values.enabled_mode,
       function_name: values.function_name,
       function_schema: 'supabase_functions',
       function_args: [],
@@ -169,51 +168,43 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       payload.function_args = []
     }
 
-    if (selectedHook === undefined) {
-      try {
-        setIsSubmitting(true)
-        await createDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
-        })
+    // [Joshen] As the PATCH triggers endpoint currently only supports updating of name
+    // and enabled_mode, we'll do a DELETE and POST behind the scenes as a workaround
+    try {
+      setIsSubmitting(true)
+      await createDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        payload,
+      })
+      if (selectedHook === undefined) {
         ui.setNotification({
           category: 'success',
           message: `Successfully created new webhook "${values.name}"`,
         })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to create webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
-    } else {
-      try {
-        setIsSubmitting(true)
-        await updateDatabaseTrigger({
+      } else {
+        await deleteDatabaseTrigger({
           id: selectedHook.id,
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
+          projectRef: project.ref,
+          connectionString: project.connectionString,
         })
         ui.setNotification({
           category: 'success',
           message: `Successfully updated webhook "${values.name}"`,
         })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
       }
+      onClose()
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message:
+          selectedHook === undefined
+            ? `Failed to create webhook: ${error.message}`
+            : `Failed to update webhook: ${error.message}`,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -271,21 +262,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     label="Name"
                     descriptionText="Do not use spaces/whitespaces"
                   />
-                  {/* [Joshen] Should we even expose this setting? Maybe just say active or not active */}
-                  <Listbox
-                    size="medium"
-                    id="enabled_mode"
-                    name="enabled_mode"
-                    label="Enabled mode"
-                    descriptionText="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it"
-                  >
-                    {ENABLED_MODE_OPTIONS.map((option) => (
-                      <Listbox.Option key={option.value} value={option.value} label={option.label}>
-                        {option.label}
-                        <span className="block text-scale-900">{option.description}</span>
-                      </Listbox.Option>
-                    ))}
-                  </Listbox>
                 </FormSectionContent>
               </FormSection>
               <SidePanel.Separator />
