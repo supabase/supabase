@@ -1,3 +1,6 @@
+import '../../packages/ui/styles/themes/light.css'
+import '../../packages/ui/styles/themes/dark.css'
+
 import 'styles/main.scss'
 import 'styles/editor.scss'
 import 'styles/ui.scss'

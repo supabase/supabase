@@ -1,13 +1,14 @@
+import '../../../packages/ui/styles/themes/light.css'
+import '../../../packages/ui/styles/themes/dark.css'
+
+import '../styles/index.css'
+
 import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
-import '../styles/index.css'
-import '../../../packages/ui/styles/base/global.css'
-import '../../../packages/ui/styles/themes/light.css'
-import '../../../packages/ui/styles/themes/dark.css'
 import { post } from './../lib/fetchWrapper'
 import { ThemeProvider } from 'common/Providers'
 import Head from 'next/head'
