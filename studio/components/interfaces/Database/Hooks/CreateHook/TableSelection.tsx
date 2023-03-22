@@ -6,6 +6,7 @@ import { Input, Listbox } from 'ui'
 
 import { CreateHookContext } from './'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 const TableSelection: FC = observer(({}) => {
   const { ui } = useStore()
@@ -73,7 +74,7 @@ const TableSelection: FC = observer(({}) => {
             addOnBefore={() => (
               <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
                 <SVG
-                  src={'/img/table-editor.svg'}
+                  src={`${BASE_PATH}/img/table-editor.svg`}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
                   preProcessor={(code) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')

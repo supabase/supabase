@@ -6,6 +6,7 @@ import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useParams, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {}
 
@@ -63,8 +64,8 @@ const VaultToggle: FC<Props> = () => {
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
           backgroundImage: ui.isDarkTheme
-            ? 'url("/img/vault-dark.png")'
-            : 'url("/img/vault-light.png")',
+            ? `url("${BASE_PATH}/img/vault-dark.png")`
+            : `url("${BASE_PATH}/img/vault-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
