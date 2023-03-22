@@ -67,7 +67,7 @@ export default function Home() {
           </a>
         </div>
 
-        <div class="path">
+        <div className="path">
           <span id="elem" class="shape trail"></span>
         </div>
       </main>

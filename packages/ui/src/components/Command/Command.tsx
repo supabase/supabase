@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
 import { useCommandState } from 'cmdk-supabase'
@@ -60,12 +61,12 @@ const AI_CHAT_ROUTES = [COMMAND_ROUTES.AI_ASK_ANYTHING, COMMAND_ROUTES.AI_RLS_PO
 
 export const AiIconChat = () => (
   <div
-    className="w-7 h-7                
+    className="w-7 h-7
     bg-gradient-to-r from-purple-900 to-purple-800
 
     ring-purple-600
     ring-1
-    
+
     rounded-md border border-purple-400 flex items-center justify-center
     shadow-sm
     "
@@ -98,6 +99,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
   const [pages, setPages] = React.useState([])
   const page = pages[pages.length - 1]
   const [isLoading, setIsLoading] = React.useState(false)
+  const router = useRouter()
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -406,6 +408,14 @@ function CommandMenu({ actions }: { actions: IActions }) {
               >
                 <IconMoon />
                 <CommandLabel>Change Theme to light</CommandLabel>
+              </CommandItem>
+              <CommandItem
+                onSelect={() => {
+                  router.push('https://supabase.com/docs')
+                  setOpen(false)
+                }}
+              >
+                <CommandLabel>Grab api keys</CommandLabel>
               </CommandItem>
             </CommandGroup>
           )}
