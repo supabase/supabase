@@ -14,6 +14,7 @@ const forgotPasswordSchema = object({
 const ForgotPasswordForm = () => {
   const { ui } = useStore()
   const router = useRouter()
+  const { basePath } = router
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -35,9 +36,9 @@ const ForgotPasswordForm = () => {
       hcaptchaToken: token ?? undefined,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
           : process.env.NEXT_PUBLIC_SITE_URL
-      }/reset-password`,
+      }${basePath}/reset-password`,
     })
     const error = response.error
 
