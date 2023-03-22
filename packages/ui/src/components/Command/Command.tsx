@@ -264,6 +264,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
                 <SubItem>Set Dark Mode</SubItem>
+                <SubItem>Set Light Mode</SubItem>
               </CommandGroup>
             </>
           )}
