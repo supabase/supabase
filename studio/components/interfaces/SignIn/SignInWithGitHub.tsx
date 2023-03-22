@@ -1,9 +1,8 @@
+import { BASE_PATH } from 'lib/constants'
 import { auth, getReturnToPath } from 'lib/gotrue'
-import { useRouter } from 'next/router'
 import { Button, IconGitHub } from 'ui'
 
 const SignInWithGitHub = () => {
-  const { basePath } = useRouter()
   async function handleGithubSignIn() {
     try {
       const { error } = await auth.signInWithOAuth({
@@ -11,9 +10,9 @@ const SignInWithGitHub = () => {
         options: {
           redirectTo: `${
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-              ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
+              ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
               : process.env.NEXT_PUBLIC_SITE_URL
-          }${basePath}${getReturnToPath()}`,
+          }${BASE_PATH}${getReturnToPath()}`,
         },
       })
       if (error) throw error
