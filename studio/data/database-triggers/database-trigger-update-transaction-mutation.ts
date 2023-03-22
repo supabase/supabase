@@ -20,7 +20,7 @@ export function getDatabaseTriggerUpdateSQL({
 }: Pick<DatabaseTriggerUpdateVariables, 'originalTrigger' | 'updatedTrigger'>) {
   const { name, activation, events, schema, table, function_schema, function_name, function_args } =
     updatedTrigger
-  return `
+  return /* SQL */ `
 BEGIN;
 DROP TRIGGER "${originalTrigger.name}" ON "${originalTrigger.schema}"."${originalTrigger.table}";
 CREATE TRIGGER "${name}" ${activation} ${events.join(' OR ')} ON "${schema}"."${table}" 
