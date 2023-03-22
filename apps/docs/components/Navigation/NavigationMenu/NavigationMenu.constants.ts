@@ -522,26 +522,40 @@ export const realtime = {
       url: undefined,
       items: [
         { name: 'Channels', url: '/guides/realtime/channels', items: [] },
-        { name: 'Extensions', url: '/guides/realtime/extensions', items: [] },
+        {
+          name: 'Extensions',
+          url: '/guides/realtime/extensions',
+          items: [
+            { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+            { name: 'Presence', url: '/guides/realtime/presence', items: [] },
+            { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+          ],
+        },
       ],
     },
     {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
-        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+        {
+          name: 'Subscribing to Database Changes',
+          url: '/guides/realtime/subscribing-to-database-changes',
+          items: [],
+        },
+        {
+          name: 'Using Realtime with Next.js',
+          url: '/guides/realtime/realtime-with-nextjs',
+          items: [],
+        },
       ],
     },
     {
-      name: 'Discover',
+      name: 'Deep dive',
       url: undefined,
       items: [
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
         { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
         { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
-        { name: 'Videos', url: '/guides/realtime/videos', items: [] },
       ],
     },
   ],
