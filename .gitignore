@@ -124,4 +124,5 @@ apps/new-docs/*
 
 # UI tokens
 
-packages/ui/styles/
+packages/ui/styles/tokens
+packages/tokens.json
