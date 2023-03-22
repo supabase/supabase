@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react'
 import Head from 'next/head'
-import Router from 'next/router'
 import Divider from 'components/ui/Divider'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {
   children: ReactNode
@@ -23,7 +23,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
                   <span className="sr-only">Supabase</span>
                   <img
                     className="h-6 w-auto sm:h-6"
-                    src={`${Router.basePath}/img/supabase-logo.svg`}
+                    src={`${BASE_PATH}/img/supabase-logo.svg`}
                     alt=""
                   />
                 </div>

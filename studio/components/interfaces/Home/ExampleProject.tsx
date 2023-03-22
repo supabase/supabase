@@ -1,8 +1,8 @@
 import { FC } from 'react'
-import Router from 'next/router'
 import { IconChevronRight } from 'ui'
 import { useStore } from 'hooks'
 import Link from 'next/link'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {
   framework: string
@@ -30,7 +30,7 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
           <div className="mr-4 flex flex-col">
             <img
               className="transition-all group-hover:scale-110"
-              src={`${Router.basePath}/img/libraries/${framework.toLowerCase()}${
+              src={`${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
                 ['expo', 'nextjs'].includes(framework.toLowerCase())
                   ? isDarkTheme
                     ? '-dark'

@@ -1,9 +1,9 @@
-import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
-import Router from 'next/router'
 import { PropsWithChildren } from 'react'
+import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 type ForgotPasswordLayoutProps = {
   heading: string
@@ -34,8 +34,8 @@ const ForgotPasswordLayout = ({
                   <Image
                     src={
                       theme == 'dark'
-                        ? `${Router.basePath}/img/supabase-dark.svg`
-                        : `${Router.basePath}/img/supabase-light.svg`
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
                     }
                     alt=""
                     height={24}
