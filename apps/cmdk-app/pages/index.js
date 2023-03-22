@@ -66,6 +66,10 @@ export default function Home() {
             <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
           </a>
         </div>
+
+        <div class="path">
+          <span id="elem" class="shape trail"></span>
+        </div>
       </main>
 
       <footer className={styles.footer}>

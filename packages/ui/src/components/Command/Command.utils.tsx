@@ -8,6 +8,7 @@ import { IconSearch } from '../Icon/icons/IconSearch'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { KeyboardEventHandler } from 'react'
+import { LoadingLine } from './LoadingLine'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -51,17 +52,20 @@ const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) =>
   )
 }
 
+interface iCommandInput extends React.ElementRef<typeof CommandPrimitive.Input> {
+  loading?: boolean
+  _key?: string | number
+}
+
 const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
+  iCommandInput,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, value, onValueChange, ...props }, ref) => (
-  <div
-    className="flex items-center border-b border-b-scale-500 dark:border-b-scale-500"
-    cmdk-input-wrapper=""
-  >
+>(({ className, value, loading, onValueChange, _key, ...props }, ref) => (
+  <div className="flex flex-col items-center" cmdk-input-wrapper="">
     {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
     <CommandPrimitive.Input
       value={value}
+      key={_key}
       autoFocus
       onValueChange={onValueChange}
       ref={ref}
@@ -73,6 +77,7 @@ const CommandInput = React.forwardRef<
       )}
       {...props}
     />
+    <LoadingLine loading={loading} />
   </div>
 ))
 
@@ -107,8 +112,9 @@ CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
->(({ className, ...props }, ref) => (
+>(({ className, _key, ...props }, ref) => (
   <CommandPrimitive.Group
+    key={_key}
     ref={ref}
     // forceMount={props.forceMount}
     className={cn(

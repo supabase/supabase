@@ -97,6 +97,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
   const [aiSearch, setAiSearch] = React.useState('')
   const [pages, setPages] = React.useState([])
   const page = pages[pages.length - 1]
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -168,6 +169,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
             placeholder="Type a command or search..."
             value={search}
             onValueChange={setSearch}
+            loading={isLoading}
           />
         )}
         {/* <CommandList>
@@ -295,7 +297,13 @@ function CommandMenu({ actions }: { actions: IActions }) {
           )}
           {page === COMMAND_ROUTES.DOCS_SEARCH && (
             <>
-              <AiDocsSeach query={search} setQuery={setSearch} page={page} />
+              <AiDocsSeach
+                query={search}
+                setQuery={setSearch}
+                page={page}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+              />
             </>
           )}
           {page === COMMAND_ROUTES.AI_RLS_POLICY && (
