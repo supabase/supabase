@@ -271,6 +271,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     label="Name"
                     descriptionText="Do not use spaces/whitespaces"
                   />
+                  {/* [Joshen] Should we even expose this setting? Maybe just say active or not active */}
                   <Listbox
                     size="medium"
                     id="enabled_mode"
