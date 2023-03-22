@@ -27,12 +27,6 @@ import { IconCopy } from '../Icon/icons/IconCopy'
 import { AiDocsSeach } from './AiDocsSearch'
 // import { SearchProvider } from './SearchProvider'
 
-const SubItem = (props: any) => {
-  const search = useCommandState((state) => state.search)
-  if (!search) return null
-  return <CommandItem {...props} />
-}
-
 export const AiIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -92,6 +86,12 @@ interface IActions {
   toggleTheme: () => void
 }
 
+const ItemHandler = (props: any) => {
+  const search = useCommandState((state) => state.search)
+  if (!search && props.isSubItem) return null
+  return <CommandItem {...props} />
+}
+
 function CommandMenu({ actions }: { actions: IActions }) {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
@@ -100,6 +100,31 @@ function CommandMenu({ actions }: { actions: IActions }) {
   const page = pages[pages.length - 1]
   const [isLoading, setIsLoading] = React.useState(false)
   const router = useRouter()
+
+  const ThemeOptions = ({ isSubItem = false }) => {
+    return (
+      <CommandGroup>
+        <ItemHandler
+          isSubItem={isSubItem}
+          onSelect={() => {
+            actions.toggleTheme()
+            setOpen(false)
+          }}
+        >
+          Change Theme to dark
+        </ItemHandler>
+        <ItemHandler
+          isSubItem={isSubItem}
+          onSelect={() => {
+            actions.toggleTheme()
+            setOpen(false)
+          }}
+        >
+          Change Theme to light
+        </ItemHandler>
+      </CommandGroup>
+    )
+  }
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -214,7 +239,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="General">
-                <CommandItem forceMount>
+                <CommandItem>
                   <IconInbox className="text-scale-900" />
                   <CommandLabel>See what's new</CommandLabel>
                 </CommandItem>
@@ -265,9 +290,9 @@ function CommandMenu({ actions }: { actions: IActions }) {
                   <CommandLabel>Settings2</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
-                <SubItem>Set Dark Mode</SubItem>
-                <SubItem>Set Light Mode</SubItem>
               </CommandGroup>
+
+              <ThemeOptions isSubItem />
             </>
           )}
           {page === 'docs-search' && (
@@ -390,34 +415,19 @@ function CommandMenu({ actions }: { actions: IActions }) {
             </>
           )}
           {page === 'Theme' && (
-            <CommandGroup>
-              <CommandItem
-                onSelect={() => {
-                  actions.toggleTheme()
-                  setOpen(false)
-                }}
-              >
-                <IconSun />
-                <CommandLabel>Change Theme to dark</CommandLabel>
-              </CommandItem>
-              <CommandItem
-                onSelect={() => {
-                  actions.toggleTheme()
-                  setOpen(false)
-                }}
-              >
-                <IconMoon />
-                <CommandLabel>Change Theme to light</CommandLabel>
-              </CommandItem>
-              <CommandItem
-                onSelect={() => {
-                  router.push('https://supabase.com/docs')
-                  setOpen(false)
-                }}
-              >
-                <CommandLabel>Grab api keys</CommandLabel>
-              </CommandItem>
-            </CommandGroup>
+            <>
+              <CommandGroup>
+                <CommandItem
+                  onSelect={() => {
+                    router.push('https://supabase.com/docs')
+                    setOpen(false)
+                  }}
+                >
+                  <CommandLabel>Grab api keys</CommandLabel>
+                </CommandItem>
+              </CommandGroup>
+              <ThemeOptions />
+            </>
           )}
           {page !== 'Ask anything' || (!page && <CommandEmpty>No results found.</CommandEmpty>)}
         </CommandList>
