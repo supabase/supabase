@@ -17,7 +17,7 @@ const DefaultLayout = (props: Props) => {
       // Default to dark mode if no preference config
       document.documentElement.className = 'dark'
     } else {
-      document.documentElement.className = key === 'true' ? 'dark dark-ui' : ''
+      document.documentElement.className = key === 'true' ? 'dark' : ''
     }
   }, [])
 
