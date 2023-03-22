@@ -1,10 +1,11 @@
 import { FC, useState } from 'react'
+import Router from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -119,6 +120,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   const isChangingPITRDuration = currentAddons.pitrDuration?.id !== selectedAddons.pitrDuration?.id
   const isChangingCustomDomains =
     currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
+
+  const togglingOnSpendCap =
+    currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG &&
+    selectedPlan &&
+    selectedPlan.metadata.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
@@ -316,6 +322,16 @@ const PaymentSummaryPanel: FC<Props> = ({
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
               )}
+
+              {togglingOnSpendCap && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Enabling spend cap"
+                  description="Exceeding your plan's quota will result in service restrictions. With the spend cap disabled, you'll be charged for usage beyond the quota."
+                />
+              )}
             </div>
           </div>
         )}
@@ -385,7 +401,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`/img/payment-methods/${method.card.brand
+                          src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"

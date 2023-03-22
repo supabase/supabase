@@ -15,7 +15,9 @@ Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes
 Postgres Changes works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
 
 ```sql
-GRANT SELECT ON "private_schema"."table" TO authenticated;
+grant
+select
+  on "private_schema"."table" to authenticated;
 ```
 
 <Admonition type="caution">
@@ -29,15 +31,19 @@ You can do this in the [Replication](https://app.supabase.com/project/_/database
 
 ```sql
 begin;
-  -- remove the supabase_realtime publication
-  drop publication if exists supabase_realtime;
 
-  -- re-create the supabase_realtime publication with no tables
-  create publication supabase_realtime;
+-- remove the supabase_realtime publication
+drop
+  publication if exists supabase_realtime;
+
+-- re-create the supabase_realtime publication with no tables
+create publication supabase_realtime;
+
 commit;
 
 -- add a table to the publication
-alter publication supabase_realtime add table messages;
+alter
+  publication supabase_realtime add table messages;
 ```
 
 ### Full `old` Record
@@ -46,8 +52,15 @@ By default, only `new` record changes are sent but if you want to receive the `o
 you can set the `replica identity` of your table to `full`:
 
 ```sql
-alter table messages replica identity full;
+alter table
+  messages replica identity full;
 ```
+
+<Admonition type="caution">
+
+RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+
+</Admonition>
 
 ## Schema Changes
 

@@ -6,6 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
@@ -65,8 +66,8 @@ const WrappersDisabledState = () => {
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
           backgroundImage: ui.isDarkTheme
-            ? 'url("/img/wrappers-dark.png")'
-            : 'url("/img/wrappers-light.png")',
+            ? `url("${BASE_PATH}/img/wrappers-dark.png")`
+            : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
