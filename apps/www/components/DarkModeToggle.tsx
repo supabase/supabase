@@ -9,7 +9,7 @@ function DarkModeToggle() {
     toggleTheme()
 
     const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark dark-ui' : ''
+    document.documentElement.className = key === 'true' ? 'dark' : ''
   }
 
   return (
