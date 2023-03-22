@@ -73,6 +73,11 @@ After developing your project and deciding it's Production Ready, you should run
 
 - Supabase provides CAPTCHA protection on the signup, sign-in and password reset endpoints. Please refer to [our guide](/docs/guides/auth/auth-captcha) on how to protect against abuse using this method.
 
+### Email Link Validity
+
+- When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign up link in your email. Since links in Supabase Auth are single use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem,
+  consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
+
 ## Next steps
 
 This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [GitHub](https://github.com/supabase/supabase).

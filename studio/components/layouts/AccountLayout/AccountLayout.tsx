@@ -5,9 +5,10 @@ import { observer } from 'mobx-react-lite'
 
 import { auth, STORAGE_KEY } from 'lib/gotrue'
 import { useStore, withAuth, useFlag } from 'hooks'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
 import { SidebarSection } from './AccountLayout.types'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   title: string
@@ -21,6 +22,7 @@ interface Props {
 const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const router = useRouter()
   const { app, ui } = useStore()
+  const queryClient = useQueryClient()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
@@ -28,7 +30,8 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const onClickLogout = async () => {
     await auth.signOut()
     localStorage.removeItem(STORAGE_KEY)
-    window.location.href = '/sign-in'
+    await router.push('/sign-in')
+    await queryClient.resetQueries()
   }
 
   const organizationsLinks = app.organizations
@@ -103,7 +106,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
+          href: 'https://supabase.com/docs/guides/database/api',
           isExternal: true,
         },
       ],

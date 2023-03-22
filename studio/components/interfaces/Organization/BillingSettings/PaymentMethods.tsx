@@ -104,7 +104,12 @@ const PaymentMethods: FC<Props> = ({
       <div className="space-y-2">
         <div>
           <h4>Payment methods</h4>
-          <p className="text-sm opacity-50">Charges will be deducted from the default card</p>
+          <p className="text-sm opacity-50">
+            When adding a new payment method, either remove the old one or go to your projects'
+            subscription to explicitly update the payment method. Marking a payment method as
+            "default" is only relevant for new projects or if there are no other payment methods on
+            your account.
+          </p>
         </div>
         {!canReadPaymentMethods ? (
           <Panel>

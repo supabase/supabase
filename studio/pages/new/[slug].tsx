@@ -21,13 +21,8 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import {
-  useStore,
-  useFlag,
-  withAuth,
-  checkPermissions,
-  useFreeProjectLimitCheck,
-} from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -41,15 +36,16 @@ import {
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useParams()
   const { app, ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const { membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheck(slug as string)
+  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
+  const [postgresVersion, setPostgresVersion] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
@@ -70,6 +66,8 @@ const Wizard: NextPageWithLayout = () => {
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+
+  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
@@ -152,7 +150,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const onClickNext = async () => {
     setNewProjectLoading(true)
-    const data = {
+    const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
       name: projectName,
@@ -160,6 +158,11 @@ const Wizard: NextPageWithLayout = () => {
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
       kps_enabled: kpsEnabled,
+    }
+    if (postgresVersion) {
+      data['custom_supabase_internal_requests'] = {
+        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+      }
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -197,17 +200,14 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={
-        !app.organizations.isInitialized ||
-        isLoadingFreeProjectLimitCheck
-      }
+      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
         </div>
       }
       footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
+        <div key="panel-footer" className="flex items-center justify-between w-full">
           <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
@@ -236,7 +236,7 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="border-t border-panel-border-interior-light pb-8 dark:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
@@ -290,7 +290,33 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                {showCustomVersionInput && (
+                  <Panel.Content
+                    className={[
+                      'Form section-block--body has-inputs-centered border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Input
+                      id="custom-postgres-version"
+                      layout="horizontal"
+                      label="Postgres Version"
+                      descriptionText={
+                        <p>
+                          Specify a custom version of Postgres (Defaults to the latest)
+                          <br />
+                          This is only applicable for local/staging projects
+                        </p>
+                      }
+                      type="text"
+                      placeholder="Postgres Version"
+                      value={postgresVersion}
+                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    />
+                  </Panel.Content>
+                )}
+
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -312,7 +338,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"

@@ -1,7 +1,7 @@
+import { QueryClient } from '@tanstack/react-query'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
-import { useSWRConfig } from 'swr'
 
 export function usePushNext() {
   const router = useRouter()
@@ -47,9 +47,8 @@ export function usePushNext() {
   )
 }
 
-function useAutoAuthRedirect() {
+function useAutoAuthRedirect(queryClient: QueryClient) {
   const pushNext = usePushNext()
-  const { cache } = useSWRConfig()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -75,9 +74,7 @@ function useAutoAuthRedirect() {
       } = await auth.getSession()
 
       if (session) {
-        // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
-        // @ts-ignore
-        cache.clear()
+        await queryClient.resetQueries()
 
         await pushNext()
       }

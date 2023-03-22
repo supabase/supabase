@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/supabase-js
-  title: Supabase Client
+  title: Supabase Javascript Client
   description: |
 
     Supabase JavaScript.
@@ -66,9 +66,9 @@ functions:
             db: { schema: 'other_schema' }
           })
           ```
-
+        description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+          Go to [Settings > API > Exposed schemas](https://app.supabase.com/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
@@ -81,7 +81,7 @@ functions:
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
-
+        description: |
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
@@ -101,7 +101,7 @@ functions:
             },
           });
           ```
-
+        description: |
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
   - id: auth-api
     title: 'Overview'
@@ -156,7 +156,7 @@ functions:
             password: 'example-password',
           })
           ```
-      - id: sign-up-with-additional-user-metadata.
+      - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         isSpotlight: false
         code: |
@@ -170,6 +170,22 @@ functions:
                   first_name: 'John',
                   age: 27,
                 }
+              }
+            }
+          )
+          ```
+      - id: sign-up-with-redirect
+        name: Sign up with a redirect URL
+        description: |
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp(
+            {
+              email: 'example@email.com',
+              password: 'example-password',
+              options: {
+                emailRedirectTo: 'https://example.com/welcome'
               }
             }
           )
@@ -217,6 +233,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -270,7 +287,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -339,6 +356,7 @@ functions:
     notes: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
+      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -794,9 +812,7 @@ functions:
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'signup',
             email: 'email@example.com',
-            options: {
-              'password': 'secret'
-            }
+            password: 'secret'
           })
           ```
       - id: generate-an-invite-link
@@ -955,6 +971,40 @@ functions:
             .from('countries')
             .select()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
@@ -962,6 +1012,37 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables
         name: Query foreign tables
@@ -977,6 +1058,54 @@ functions:
                 name
               )
             `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
           ```
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
@@ -1177,6 +1306,56 @@ functions:
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`*, cities(count)`)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
+              "name": "United Kingdom",
+              "cities": [
+                {
+                  "count": 4
+                }
+              ]
+            }
+          ]
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
       - id: querying-with-count-option
         name: Querying with count option
         code: |
@@ -1260,12 +1439,6 @@ functions:
   - id: insert
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    params:
-      - name: values
-        type: object | object []
-        isOptional: false
-        description: |
-          Bobby Bobby Bobby Bobby Bobby Bobby
     examples:
       - id: create-a-record
         name: Create a record
@@ -2083,6 +2256,9 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+        description: |
+          When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
+          to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
@@ -3711,7 +3887,7 @@ functions:
             }
             ```
         description: |
-          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. 
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests.
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
@@ -3826,6 +4002,25 @@ functions:
           ```
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: returns
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    title: returns()
+    examples:
+      - id: override-type-of-successful-response
+        name: Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .returns<MyType>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType | null
+          ```
         hideCodeBlock: true
         isSpotlight: true
 
@@ -3974,48 +4169,116 @@ functions:
     title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
-      - Row level security is not applied to delete statements.
-      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
-      - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
+      - By default, Broadcast and Presence are enabled for all projects.
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/database/api#realtime-api-overview).
+      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
     examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('any')
+            .on('broadcast', { event: 'cursor-pos' }, payload => {
+              console.log('Cursor position received!', payload)
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'sync' }, () => {
+              console.log('Synced presence state: ', channel.presenceState())
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+              }
+            })
+          ```
+      - id: listen-to-presence-join
+        name: Listen to presence join
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'join' }, ({ newPresences }) => {
+              console.log('Newly joined presences: ', newPresences)
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+              }
+            })
+          ```
+      - id: listen-to-presence-leave
+        name: Listen to presence leave
+        isSpotlight: true
+        code: |
+          ```js
+          const channel = supabase.channel('any')
+          channel
+            .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+              console.log('Newly left presences: ', leftPresences)
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                await channel.track({ online_at: new Date().toISOString() })
+                await channel.untrack()
+              }
+            })
+          ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         isSpotlight: true
         code: |
           ```js
           supabase
-            .channel('*')
+            .channel('any')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-a-specific-table
-        name: Listening to a specific table
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-inserts
-        name: Listening to inserts
+      - id: listen-to-inserts
+        name: Listen to inserts
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-updates
-        name: Listening to updates
+      - id: listen-to-updates
+        name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening to:
@@ -4026,14 +4289,14 @@ functions:
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-deletes
-        name: Listening to deletes
+      - id: listen-to-deletes
+        name: Listen to deletes
         description: |
           By default, Supabase does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
@@ -4044,32 +4307,32 @@ functions:
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
-      - id: listening-to-multiple-events
-        name: Listening to multiple events
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```js
           supabase
-            .channel('public:countries')
+            .channel('any')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
           ```
       - id: listening-to-row-level-changes
-        name: Listening to row level changes
+        name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```js
           supabase
-            .channel('public:countries:id=eq.200')
+            .channel('any')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
@@ -4127,7 +4390,7 @@ functions:
         name: List buckets
         isSpotlight: true
         code: |
-          ```js
+          ```ts
           const { data, error } = await supabase
             .storage
             .listBuckets()
@@ -4286,7 +4549,8 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              upsert: false
+              // Overwrite file if it exists
+              upsert: true
             })
           ```
       - id: update-file-using-arraybuffer-from-base64-file-data

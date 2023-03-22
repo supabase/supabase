@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
@@ -10,8 +10,7 @@ import ServiceList from 'components/interfaces/Settings/API/ServiceList'
 export const PageContext: any = createContext(null)
 
 const ApiSettings: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const { meta, ui } = useStore()
   const project = ui.selectedProject
@@ -37,8 +36,8 @@ const ApiSettings: NextPageWithLayout = () => {
 
   return (
     <PageContext.Provider value={PageState}>
-      <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-        <ServiceList projectRef={ref as string} />
+      <div className="flex flex-col gap-8 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
+        <ServiceList />
       </div>
     </PageContext.Provider>
   )

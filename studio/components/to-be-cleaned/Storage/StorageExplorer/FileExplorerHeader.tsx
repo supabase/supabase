@@ -18,6 +18,10 @@ import {
   IconChevronsUp,
   IconList,
 } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 
@@ -137,6 +141,7 @@ const FileExplorerHeader: FC<Props> = ({
 
   const breadcrumbs = columns.map((column: any) => column.name)
   const backDisabled = columns.length <= 1
+  const canUpdateStorage = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -392,22 +397,60 @@ const FileExplorerHeader: FC<Props> = ({
             {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
-          <Button
-            icon={<IconUpload size={16} strokeWidth={2} />}
-            type="text"
-            disabled={breadcrumbs.length === 0}
-            onClick={onSelectUpload}
-          >
-            Upload files
-          </Button>
-          <Button
-            icon={<IconFolderPlus size={16} strokeWidth={2} />}
-            type="text"
-            disabled={breadcrumbs.length === 0}
-            onClick={() => addNewFolderPlaceholder(-1)}
-          >
-            Create folder
-          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Button
+                icon={<IconUpload size={16} strokeWidth={2} />}
+                type="text"
+                disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                onClick={onSelectUpload}
+              >
+                Upload files
+              </Button>
+            </Tooltip.Trigger>
+            {!canUpdateStorage && (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to upload files
+                  </span>
+                </div>
+              </Tooltip.Content>
+            )}
+          </Tooltip.Root>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Button
+                icon={<IconFolderPlus size={16} strokeWidth={2} />}
+                type="text"
+                disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                onClick={() => addNewFolderPlaceholder(-1)}
+              >
+                Create folder
+              </Button>
+            </Tooltip.Trigger>
+            {!canUpdateStorage && (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to create folders
+                  </span>
+                </div>
+              </Tooltip.Content>
+            )}
+          </Tooltip.Root>
         </div>
 
         {/* Search: Disabled for now */}

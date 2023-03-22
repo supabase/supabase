@@ -117,6 +117,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
+  // [Joshen] Only used for tables and views for now
   async loadBySchema(schema: string) {
     let { LOADING, ERROR, LOADED } = this.STATES
     try {
@@ -132,7 +133,14 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const data = response as T[]
       const formattedData = keyBy(data, this.identifier)
 
-      this.data = { ...this.data, ...formattedData }
+      // Purge existing data that belongs to given schema, otherwise
+      // stale data will persist
+      const purgedData = Object.keys(this.data)
+        .map((identifier: any) => this.data[identifier])
+        .filter((item: any) => item.schema !== schema)
+      const formattedPurgedData = keyBy(purgedData, this.identifier)
+
+      this.data = { ...formattedPurgedData, ...formattedData }
       this.setState(LOADED)
 
       return data
@@ -200,10 +208,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
-  async update(id: number | string, updates: any) {
+  async update(id: number | string, payload: any) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      let payload = { ...updates, id }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
       if (response.error) throw response.error

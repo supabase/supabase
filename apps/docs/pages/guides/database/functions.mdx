@@ -4,6 +4,7 @@ export const meta = {
   id: 'functions',
   title: 'Database Functions',
   description: 'Creating and using Postgres functions.',
+  video: 'https://www.youtube.com/v/MJZCCpCYEqk',
 }
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
@@ -137,7 +138,8 @@ create table planets (
   name text
 );
 
-insert into planets (id, name)
+insert into planets
+  (id, name)
 values
   (1, 'Tattoine'),
   (2, 'Alderaan'),
@@ -149,7 +151,8 @@ create table people (
   planet_id bigint references planets
 );
 
-insert into people (id, name, planet_id)
+insert into people
+  (id, name, planet_id)
 values
   (1, 'Anakin Skywalker', 1),
   (2, 'Luke Skywalker', 1),

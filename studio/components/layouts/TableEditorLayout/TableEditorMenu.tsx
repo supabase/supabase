@@ -20,7 +20,7 @@ import {
 } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import { SchemaView } from 'types'
 import { checkPermissions, useStore, useParams } from 'hooks'
@@ -43,7 +43,7 @@ const TableEditorMenu: FC<Props> = ({
   onDeleteTable = () => {},
   onDuplicateTable = () => {},
 }) => {
-  const { meta, ui } = useStore()
+  const { meta } = useStore()
   const { id, ref } = useParams()
 
   const schemas: PostgresSchema[] = meta.schemas.list()

@@ -199,7 +199,7 @@ const Index = ({}: Props) => {
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
                   >
-                    <a href="mailto:support@supabase.io">
+                    <a href="https://app.supabase.com/support/new">
                       <Button size="medium" type="default" iconRight={<IconMail />}>
                         Email Support
                       </Button>

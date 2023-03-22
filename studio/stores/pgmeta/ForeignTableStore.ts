@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
 

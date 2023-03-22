@@ -178,8 +178,8 @@ export const menuItems: NavMenu = {
           name: 'Serverless APIs',
           url: undefined,
           items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+            { name: 'Overview', url: '/guides/database/api', items: [] },
+            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
           ],
         },
         {
@@ -243,6 +243,8 @@ export const menuItems: NavMenu = {
       items: [
         { name: 'Overview', url: '/guides/realtime', items: [] },
         { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
+        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
         { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
       ],
@@ -264,6 +266,7 @@ export const menuItems: NavMenu = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
@@ -275,6 +278,8 @@ export const menuItems: NavMenu = {
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
+        { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },
     {
@@ -339,6 +344,7 @@ export const menuItems: NavMenu = {
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
             { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+            { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
           ],
         },
       ],

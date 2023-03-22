@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState, useEffect } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams, useStore } from 'hooks'
@@ -37,7 +37,7 @@ const TableEditorLayout: FC<Props> = ({
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {

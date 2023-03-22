@@ -91,15 +91,11 @@ const ImageGrid = ({
                   ${x.link && 'dark:hover:bg-scale-600 hover:bg-gray-100'}
                   p-8 ${className}`}
             >
-              <div
-                className={`relative h-8 w-full overflow-auto
-                    ${imgPadding[padding]}
-                  `}
-              >
+              <div className={`relative h-8 w-full overflow-auto ${imgPadding[padding]}`}>
                 <Image
                   layout="fill"
                   src={`${x.image}`}
-                  alt={x.alt}
+                  alt={`${x.name} logo`}
                   objectFit="scale-down"
                   objectPosition="center"
                   className="

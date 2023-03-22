@@ -2,9 +2,11 @@ import { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useParams } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { checkPermissions, useParams } from 'hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
@@ -13,6 +15,7 @@ interface Props {}
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
+  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -33,19 +36,39 @@ const StorageMenu: FC<Props> = () => {
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
       <div className="mb-6 px-2">
-        <Button
-          block
-          type="default"
-          icon={
-            <div className="text-scale-900">
-              <IconEdit size={14} />
-            </div>
-          }
-          style={{ justifyContent: 'start' }}
-          onClick={openCreateBucketModal}
-        >
-          New bucket
-        </Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger className="w-full">
+            <Button
+              block
+              type="default"
+              icon={
+                <div className="text-scale-900">
+                  <IconEdit size={14} />
+                </div>
+              }
+              disabled={!canCreateBuckets}
+              style={{ justifyContent: 'start' }}
+              onClick={openCreateBucketModal}
+            >
+              New bucket
+            </Button>
+          </Tooltip.Trigger>
+          {!canCreateBuckets && (
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to create buckets
+                </span>
+              </div>
+            </Tooltip.Content>
+          )}
+        </Tooltip.Root>
       </div>
       <div className="space-y-6">
         <div className="">

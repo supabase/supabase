@@ -8,7 +8,7 @@ import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
 import { createClient } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { FastGlobOptionsWithoutCwd } from 'globby'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 type Props = {
   username: string | null

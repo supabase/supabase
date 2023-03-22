@@ -7,6 +7,7 @@ import BaseLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { IS_PLATFORM } from 'lib/constants'
 
 interface Props {
   title?: string
@@ -21,6 +22,9 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
+
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
@@ -34,10 +38,17 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       meta.extensions.load()
       meta.publications.load()
 
-      backups.load()
-      vault.load()
+      if (IS_PLATFORM) {
+        backups.load()
+      }
     }
   }, [ui.selectedProject?.ref])
+
+  useEffect(() => {
+    if (isVaultEnabled) {
+      vault.load()
+    }
+  }, [ui.selectedProject?.ref, isVaultEnabled])
 
   // Optimization required: load logic should be at the page level
   // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
