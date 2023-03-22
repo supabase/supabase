@@ -8,7 +8,8 @@
 }
 
 .bg-lw7-gradient {
-  background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%);
+  /* background: radial-gradient(72.03% 66.03% at 50% 69.72%, #3fcf8e 0%, transparent 100%); */
+  background: radial-gradient(72.03% 66.03% at 50% 69.72%, #dbb8bf 0%, transparent 100%);
 }
 
 .bg-lw7-gradient.gold {

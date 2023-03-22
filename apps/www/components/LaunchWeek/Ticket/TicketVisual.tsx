@@ -50,78 +50,76 @@ export default function TicketVisual({
   useEffect(() => {
     if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
       Tilt.init(ticketRef.current, {
-        glare: false,
+        glare: !golden,
         max: 4,
-        'max-glare': 0.1,
+        gyroscope: true,
+        'max-glare': 0.3,
         'full-page-listening': true,
       })
     }
   }, [ticketRef])
 
   return (
-    <div
-      ref={ticketRef}
-      className={[
-        styles.visual,
-        golden ? styles['visual--gold'] : '',
-        session ? styles['visual--logged-in'] : '',
-        'flex relative flex-col justify-between rounded-2xl w-full pt-0 md:pt-[50%] h-auto md:h-0 box-border before:rounded-2xl',
-      ].join(' ')}
-      style={{
-        ['--size' as string]: size,
-      }}
-      id="wayfinding--ticket-visual-inner-container"
-    >
-      <div className="relative md:absolute inset-0 z-10 flex flex-col items-center justify-between w-full h-full flex-1 md:pl-[6%] md:pr-[15%]">
-        {username && <TicketHeader />}
-        <div
-          className="flex-1 w-full h-full md:h-auto flex py-14 md:py-4 flex-col justify-center"
-          id="wayfinding--TicketProfile-container"
-        >
-          <TicketProfile
-            name={name}
-            username={username}
-            size={size}
-            ticketGenerationState={ticketGenerationState}
-            setTicketGenerationState={setTicketGenerationState}
-            golden={golden}
-          />
-        </div>
-      </div>
-      <TicketNumber number={ticketNumber} />
-      {/* <div className="hidden md:flex absolute inset-0" id="wayfinding--TicketMono-container">
-        <TicketMono golden={golden} />
-      </div>
-      <div className="flex md:hidden absolute inset-0">
-        <TicketMonoMobile golden={golden} />
-      </div> */}
+    <div className="flex relative flex-col w-[300px] md:w-full md:max-w-none h-auto">
       <div
-        id="wayfinding--ticket-dynamic-bg-image"
-        className="absolute inset-0 z-0 rounded-2xl overflow-hidden"
+        ref={ticketRef}
+        className={[
+          styles.visual,
+          golden ? styles['visual--gold'] : '',
+          session ? styles['visual--logged-in'] : '',
+          !golden && 'overflow-hidden',
+          'flex relative flex-col justify-between w-full pt-[150%] md:pt-[50%] before:rounded-2xl h-0 box-border',
+        ].join(' ')}
+        style={{
+          ['--size' as string]: size,
+        }}
+        id="wayfinding--ticket-visual-inner-container"
       >
-        {username && (
+        <div className="absolute inset-0 h-[calc(100%-100px)] z-10 flex flex-col items-center justify-between w-full md:h-full flex-1 md:pl-[6%] md:pr-[15%] overflow-hidden">
+          {username && <TicketHeader />}
+          <div
+            className="flex-1 w-full h-full md:h-auto flex py-6 md:py-4 flex-col justify-center"
+            id="wayfinding--TicketProfile-container"
+          >
+            <TicketProfile
+              name={name}
+              username={username}
+              size={size}
+              ticketGenerationState={ticketGenerationState}
+              setTicketGenerationState={setTicketGenerationState}
+              golden={golden}
+            />
+          </div>
+        </div>
+        <TicketNumber number={ticketNumber} />
+        <div
+          id="wayfinding--ticket-dynamic-bg-image"
+          className="absolute inset-0 z-0 rounded-2xl overflow-hidden"
+        >
+          {username && (
+            <Image
+              src={golden ? ticketBg.gold.overlay : ticketBg.regular.overlay}
+              layout="fill"
+              objectFit="cover"
+              placeholder="blur"
+              blurDataURL="/images/blur.png"
+              className="absolute inset-[1px] z-[1] "
+            />
+          )}
+
           <Image
-            src={golden ? ticketBg.gold.overlay : ticketBg.regular.overlay}
+            src={golden ? ticketBg.gold.image : ticketBg.regular.image}
             layout="fill"
             objectFit="cover"
             placeholder="blur"
             blurDataURL="/images/blur.png"
-            className="absolute inset-0 z-[1] rounded-2xl"
+            className={[
+              'duration-700 ease-in-out transform scale-105',
+              imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0',
+            ].join(' ')}
+            onLoadingComplete={() => setImageIsLoading(false)}
           />
-        )}
-
-        <Image
-          src={golden ? ticketBg.gold.image : ticketBg.regular.image}
-          layout="fill"
-          objectFit="cover"
-          placeholder="blur"
-          blurDataURL="/images/blur.png"
-          className={[
-            'duration-700 ease-in-out rounded-2xl transform scale-105',
-            imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0',
-          ].join(' ')}
-          onLoadingComplete={() => setImageIsLoading(false)}
-        />
+        </div>
       </div>
     </div>
   )

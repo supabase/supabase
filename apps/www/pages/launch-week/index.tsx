@@ -95,7 +95,7 @@ export default function TicketHome({ users }: Props) {
         <div className="bg-[#1C1C1C] -mt-20">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-between items-center py-10 !pb-16 gap-8 lg:gap-16 !mx-auto !px-2 min-h-[700px] md:min-h-[770px]">
+              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto lg:h-[calc(80vh-65px)] min-h-[600px] lg:min-h-[650px]">
                 <LaunchWeekLogoHeader />
 
                 {supabase && (
@@ -107,8 +107,11 @@ export default function TicketHome({ users }: Props) {
                   />
                 )}
 
-                <div>
-                  <a href="#lw-7-prizes" className="flex items-center text-white text-sm gap-4">
+                <div className="my-4">
+                  <a
+                    href="#lw-7-prizes"
+                    className="flex items-center text-white text-sm my-4 gap-4"
+                  >
                     More about the prizes{' '}
                     <span className="bounce-loop">
                       <IconArrowDown w={10} h={12} />

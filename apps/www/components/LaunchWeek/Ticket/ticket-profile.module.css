@@ -1,6 +1,6 @@
 .image {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: 1px solid #999;
 }
@@ -135,7 +135,15 @@
 
 .rounded,
 .rounded.wrapper::before {
-  width: calc(110px * var(--size));
-  height: calc(110px * var(--size));
+  width: calc(80px * var(--size));
+  height: calc(80px * var(--size));
   border-radius: 50% !important;
+}
+
+@media (min-width: 768px) {
+  .rounded,
+  .rounded.wrapper::before {
+    width: calc(110px * var(--size));
+    height: calc(110px * var(--size));
+  }
 }

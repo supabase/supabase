@@ -1,28 +1,32 @@
 import classNames from 'classnames'
-import styleUtils from '~/components/LaunchWeek/Ticket/utils.module.css'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useMobileViewport } from '../../../hooks/useMobileViewport'
 
 export function LaunchWeekLogoHeader() {
+  const isMobile = useMobileViewport(640)
+
   return (
-    <div className="flex flex-col gap-1 lg:gap-3 items-center justify-center xl:justify-start">
+    <div className="flex flex-col gap-1 md:gap-2 items-center my-4 lg:pt-8 justify-start">
       <motion.div
-        className={classNames(
-          styleUtils.appear,
-          styleUtils['appear-first'],
-          'flex flex-col justify-center gap-3'
-        )}
-        initial={{ y: -20, opacity: 0 }}
+        className={classNames('flex flex-col justify-center gap-3')}
+        initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ ease: 'circOut', delay: 0.2, duration: 0.8 }}
+        transition={{ duration: 0.4, ease: [0.24, 0.25, 0.05, 1], delay: 0.2 }}
       >
-        <h1 className="flex gap-[24px] justify-center font-normal uppercase text-[28px] md:text-[32px] items-center">
+        <h1 className="flex gap-4 justify-center font-normal uppercase text-[28px] sm:text-[32px] items-center">
           <span className="tracking-[4px] text-white">Launch week</span>
           <span className="flex justify-center">
-            <Image src="/images/launchweek/seven/lw7-seven.svg" width={40} height={40} />
+            <Image
+              src="/images/launchweek/seven/lw7-seven.svg"
+              width={isMobile ? 36 : 40}
+              height={isMobile ? 36 : 40}
+            />
           </span>
         </h1>
-        <p className="text-white text-lg text-center">April 10th - 14th at 7AM PT | 10AM ET</p>
+        <p className="text-white text-md sm:text-lg text-center">
+          April 10th - 14th at 7AM PT | 10AM ET
+        </p>
       </motion.div>
     </div>
   )
