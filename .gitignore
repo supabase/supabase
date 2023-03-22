@@ -121,3 +121,7 @@ typings/
 **/supabase/.temp
 
 apps/new-docs/*
+
+# UI tokens
+
+packages/ui/styles/
