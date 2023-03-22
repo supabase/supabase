@@ -37,9 +37,9 @@ const SignInSSOForm = () => {
         captchaToken: token ?? undefined,
         redirectTo: `${
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${basePath}`
+            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${getReturnToPath()}`,
+        }${basePath}${getReturnToPath()}`,
       },
     })
 
