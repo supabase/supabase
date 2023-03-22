@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import Router from 'next/router'
 import { get, sum } from 'lodash'
 import { Checkbox, IconUpload } from 'ui'
 import { Transition } from '@headlessui/react'
@@ -15,6 +14,7 @@ import {
   CONTEXT_MENU_KEYS,
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
   return (
@@ -223,7 +223,7 @@ const FileExplorerColumn = ({
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
         <div className="h-full w-full flex flex-col items-center justify-center">
           <img
-            src={`${Router.basePath}/img/storage-placeholder.svg`}
+            src={`${BASE_PATH}/img/storage-placeholder.svg`}
             className="opacity-75 pointer-events-none"
           />
           <p className="my-3 opacity-75">Drop your files here</p>

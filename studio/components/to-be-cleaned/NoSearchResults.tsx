@@ -1,11 +1,11 @@
-import Router from 'next/router'
 import SVG from 'react-inlinesvg'
+import { BASE_PATH } from 'lib/constants'
 
 export const NoSearchResults = () => {
   return (
     <div className="flex h-64 flex-col items-center justify-center">
       <SVG
-        src={`${Router.basePath}/img/no-search-results.svg`}
+        src={`${BASE_PATH}/img/no-search-results.svg`}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg className="mb-2 w-16 h-16 text-color-inherit"')
         }

@@ -1,4 +1,4 @@
-import Router from 'next/router'
+import { BASE_PATH } from 'lib/constants'
 import { WrapperMeta } from './Wrappers.types'
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -6,7 +6,7 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'stripe_wrapper',
     handlerName: 'stripe_fdw_handler',
     validatorName: 'stripe_fdw_validator',
-    icon: `${Router.basePath}/img/icons/stripe-icon.svg`,
+    icon: `${BASE_PATH}/img/icons/stripe-icon.svg`,
     extensionName: 'StripeFdw',
     label: 'Stripe',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/stripe',
@@ -410,7 +410,7 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'firebase_wrapper',
     handlerName: 'firebase_fdw_handler',
     validatorName: 'firebase_fdw_validator',
-    icon: `${Router.basePath}/img/icons/firebase-icon.svg`,
+    icon: `${BASE_PATH}/img/icons/firebase-icon.svg`,
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/firebase',

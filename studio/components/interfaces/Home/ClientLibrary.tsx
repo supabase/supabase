@@ -1,6 +1,6 @@
 import { FC } from 'react'
-import Router from 'next/router'
 import { IconBookOpen, IconGitHub, Button, Badge } from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {
   language: string
@@ -14,7 +14,7 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
   return (
     <div className="flex items-start space-x-6">
       <img
-        src={`${Router.basePath}/img/libraries/${language.toLowerCase()}-icon.svg`}
+        src={`${BASE_PATH}/img/libraries/${language.toLowerCase()}-icon.svg`}
         alt={`${language} logo`}
         width="21"
       />

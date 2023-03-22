@@ -1,10 +1,11 @@
 import Link from 'next/link'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 import { Button, IconPlus } from 'ui'
 
 import { withAuth, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import CardButton from 'components/ui/CardButton'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 
@@ -15,7 +16,7 @@ const Header = () => {
         <Link href="/projects">
           <a>
             <img
-              src={`${Router.basePath}/img/supabase-logo.svg`}
+              src={`${BASE_PATH}/img/supabase-logo.svg`}
               alt="Supabase"
               className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}

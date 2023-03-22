@@ -11,8 +11,8 @@ import {
   IconChevronDown,
 } from 'ui'
 import SVG from 'react-inlinesvg'
-import Router from 'next/router'
 import { formatBytes } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -25,7 +25,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   if (!mimeType || !previewUrl) {
     return (
       <SVG
-        src={`${Router.basePath}/img/file-filled.svg`}
+        src={`${BASE_PATH}/img/file-filled.svg`}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
         }
@@ -43,7 +43,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
-          src={`${Router.basePath}/img/file-filled.svg`}
+          src={`${BASE_PATH}/img/file-filled.svg`}
           preProcessor={(code) =>
             code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
           }
@@ -86,7 +86,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   }
   return (
     <SVG
-      src={`${Router.basePath}/img/file-filled.svg`}
+      src={`${BASE_PATH}/img/file-filled.svg`}
       preProcessor={(code) =>
         code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
       }

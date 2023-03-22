@@ -1,10 +1,11 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { NextPage } from 'next'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 
 interface Props {}
@@ -16,7 +17,7 @@ const Header: FC<Props> = () => {
         <Link href="/projects">
           <a>
             <img
-              src={`${Router.basePath}/img/supabase-logo.svg`}
+              src={`${BASE_PATH}/img/supabase-logo.svg`}
               alt="Supabase"
               className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}

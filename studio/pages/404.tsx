@@ -1,11 +1,11 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import Router from 'next/router'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 const Error404: NextPage = ({}) => {
   const { ui } = useStore()
@@ -29,8 +29,8 @@ const Error404: NextPage = ({}) => {
                 <Image
                   src={
                     theme == 'dark'
-                      ? `${Router.basePath}/img/supabase-dark.svg`
-                      : `${Router.basePath}/img/supabase-light.svg`
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
                   }
                   alt="supabase"
                   height={24}
