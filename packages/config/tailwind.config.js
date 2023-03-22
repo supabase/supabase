@@ -276,11 +276,6 @@ const uiConfig = ui({
             'h1, h2, h3, h4, h5': {
               fontWeight: '400',
             },
-            // '--tw-prose-invert-code': theme('colors.white'),
-            // '--tw-prose-invert-pre-code': theme('colors.scale[900]'),
-            // '--tw-prose-invert-pre-bg': 'rgb(0 0 0 / 50%)',
-            // '--tw-prose-invert-th-borders': theme('colors.scale[600]'),
-            // '--tw-prose-invert-td-borders': theme('colors.scale[700]'),
           },
         },
       }),
