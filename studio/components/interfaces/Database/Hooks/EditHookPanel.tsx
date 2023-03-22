@@ -11,8 +11,7 @@ import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -40,7 +39,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const { project } = useProjectContext()
   const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
   const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
-  const { mutateAsync: deleteDatabaseTrigger } = useDatabaseTriggerDeleteMutation()
 
   useEffect(() => {
     if (visible) {
@@ -78,7 +76,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_name: selectedHook?.function_name ?? 'http_request',
 
     http_url: selectedHook?.function_args?.[0] ?? '',
-    http_method: selectedHook?.function_args?.[1] ?? '',
+    http_method: selectedHook?.function_args?.[1] ?? 'GET',
   }
 
   const onUpdateSelectedEvents = (event: string) => {
@@ -168,43 +166,51 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       payload.function_args = []
     }
 
-    // [Joshen] As the PATCH triggers endpoint currently only supports updating of name
-    // and enabled_mode, we'll do a DELETE and POST behind the scenes as a workaround
-    try {
-      setIsSubmitting(true)
-      await createDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        payload,
-      })
-      if (selectedHook === undefined) {
+    if (selectedHook === undefined) {
+      try {
+        setIsSubmitting(true)
+        await createDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          payload,
+        })
         ui.setNotification({
           category: 'success',
           message: `Successfully created new webhook "${values.name}"`,
         })
-      } else {
-        await deleteDatabaseTrigger({
-          id: selectedHook.id,
-          projectRef: project.ref,
-          connectionString: project.connectionString,
+        onClose()
+      } catch (error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to create webhook: ${error.message}`,
+        })
+      } finally {
+        setIsSubmitting(false)
+      }
+    } else {
+      try {
+        setIsSubmitting(true)
+        await updateDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          originalTrigger: selectedHook,
+          updatedTrigger: payload,
         })
         ui.setNotification({
           category: 'success',
           message: `Successfully updated webhook "${values.name}"`,
         })
+        onClose()
+      } catch (error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update webhook: ${error.message}`,
+        })
+      } finally {
+        setIsSubmitting(false)
       }
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message:
-          selectedHook === undefined
-            ? `Failed to create webhook: ${error.message}`
-            : `Failed to update webhook: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
