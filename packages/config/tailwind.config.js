@@ -293,6 +293,7 @@ const uiConfig = ui({
       },
     },
   },
+  plugins: [require('@tailwindcss/typography')],
 })
 
 function arrayMergeFn(destinationArray, sourceArray) {

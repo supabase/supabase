@@ -11,7 +11,6 @@ module.exports = config({
     './docs/**/*.{tsx,mdx}',
   ],
   plugins: [
-    require('@tailwindcss/typography'),
     function ({ addUtilities, addVariant }) {
       addUtilities({
         // prose (tailwind typography) helpers
