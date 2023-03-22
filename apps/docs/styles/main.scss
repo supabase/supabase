@@ -23,7 +23,7 @@
 }
 
 body {
-  @apply bg-body #{!important};
+  @apply bg-body;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
