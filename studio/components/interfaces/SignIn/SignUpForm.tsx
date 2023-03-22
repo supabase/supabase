@@ -41,9 +41,9 @@ const SignUpForm = () => {
       hcaptchaToken: token ?? null,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${basePath}`
           : process.env.NEXT_PUBLIC_SITE_URL
-      }${basePath}/sign-in`,
+      }/sign-in`,
     })
     const error = response.error
 
