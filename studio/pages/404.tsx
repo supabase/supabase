@@ -1,7 +1,8 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import Router from 'next/router'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { useStore } from 'hooks'
@@ -26,7 +27,11 @@ const Error404: NextPage = ({}) => {
             <div className="flex w-full items-center justify-between md:w-auto">
               <a href="/projects">
                 <Image
-                  src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                  src={
+                    theme == 'dark'
+                      ? `${Router.basePath}/img/supabase-dark.svg`
+                      : `${Router.basePath}/img/supabase-light.svg`
+                  }
                   alt="supabase"
                   height={24}
                   width={120}

@@ -1,4 +1,5 @@
 import { FC, useState } from 'react'
+import Router from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -78,7 +79,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
               width={14}
             />
             <img
-              src={`/img/icons/${provider.misc.iconKey}.svg`}
+              src={`${Router.basePath}/img/icons/${provider.misc.iconKey}.svg`}
               width={18}
               alt={`${provider.title} auth icon`}
             />

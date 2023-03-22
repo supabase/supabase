@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Router from 'next/router'
 import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 import { observer } from 'mobx-react-lite'
@@ -65,8 +66,8 @@ const WrappersDisabledState = () => {
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
           backgroundImage: ui.isDarkTheme
-            ? 'url("/img/wrappers-dark.png")'
-            : 'url("/img/wrappers-light.png")',
+            ? `url("${Router.basePath}/img/wrappers-dark.png")`
+            : `url("${Router.basePath}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">

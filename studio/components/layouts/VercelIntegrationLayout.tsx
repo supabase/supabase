@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react'
 import Head from 'next/head'
+import Router from 'next/router'
 import Divider from 'components/ui/Divider'
 
 interface Props {
@@ -20,7 +21,11 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
               <div className="flex justify-start lg:w-0 lg:flex-1">
                 <div>
                   <span className="sr-only">Supabase</span>
-                  <img className="h-6 w-auto sm:h-6" src="/img/supabase-logo.svg" alt="" />
+                  <img
+                    className="h-6 w-auto sm:h-6"
+                    src={`${Router.basePath}/img/supabase-logo.svg`}
+                    alt=""
+                  />
                 </div>
               </div>
             </div>

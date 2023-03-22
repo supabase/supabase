@@ -1,4 +1,5 @@
 import { FC, useState } from 'react'
+import Router from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -385,7 +386,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`/img/payment-methods/${method.card.brand
+                          src={`${Router.basePath}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"

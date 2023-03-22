@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { withAuth } from 'hooks'
@@ -16,7 +16,7 @@ const Header: FC<Props> = () => {
         <Link href="/projects">
           <a>
             <img
-              src="/img/supabase-logo.svg"
+              src={`${Router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
               className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}
