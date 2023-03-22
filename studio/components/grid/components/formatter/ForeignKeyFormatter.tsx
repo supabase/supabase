@@ -34,7 +34,7 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
       <span className="sb-grid-foreign-key-formatter__text">
         {value === null ? <NullValue /> : value}
       </span>
-      {relationship !== undefined && targetTable !== undefined && (
+      {relationship !== undefined && targetTable !== undefined && value !== null && (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <Link
