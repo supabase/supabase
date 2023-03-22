@@ -9,6 +9,7 @@ import {
   IconUsers,
 } from 'ui'
 import SVG from 'react-inlinesvg'
+import Router from 'next/router'
 
 import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
@@ -27,7 +28,7 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
       label: 'Table Editor',
       icon: (
         <SVG
-          src="/img/table-editor.svg"
+          src={`${Router.basePath}/img/table-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
@@ -41,7 +42,7 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
       label: 'SQL Editor',
       icon: (
         <SVG
-          src="/img/sql-editor.svg"
+          src={`${Router.basePath}/img/sql-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />

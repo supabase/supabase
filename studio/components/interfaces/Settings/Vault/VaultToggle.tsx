@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Router from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -63,8 +64,8 @@ const VaultToggle: FC<Props> = () => {
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
           backgroundImage: ui.isDarkTheme
-            ? 'url("/img/vault-dark.png")'
-            : 'url("/img/vault-light.png")',
+            ? `url("${Router.basePath}/img/vault-dark.png")`
+            : `url("${Router.basePath}/img/vault-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">

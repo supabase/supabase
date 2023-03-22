@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
+import Router from 'next/router'
 import { IconChevronRight } from 'ui'
 import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
@@ -35,7 +36,7 @@ const Header: FC<any> = ({ organization, project }) => {
               <Link href="/projects">
                 <a>
                   <img
-                    src="/img/supabase-logo.svg"
+                    src={`${Router.basePath}/img/supabase-logo.svg`}
                     alt="Supabase"
                     className="rounded border p-1 hover:border-white dark:border-dark"
                     style={{ height: 24 }}

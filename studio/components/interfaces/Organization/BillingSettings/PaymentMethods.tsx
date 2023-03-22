@@ -1,4 +1,5 @@
 import { FC, useState } from 'react'
+import Router from 'next/router'
 import {
   Dropdown,
   IconPlus,
@@ -158,7 +159,7 @@ const PaymentMethods: FC<Props> = ({
                       <div key={paymentMethod.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                           <img
-                            src={`/img/payment-methods/${paymentMethod.card.brand
+                            src={`${Router.basePath}/img/payment-methods/${paymentMethod.card.brand
                               .replace(' ', '-')
                               .toLowerCase()}.png`}
                             width="32"

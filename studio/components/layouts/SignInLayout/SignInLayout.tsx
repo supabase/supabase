@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import Router from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
@@ -94,7 +95,11 @@ const SignInLayout = ({
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                   <a>
                     <Image
-                      src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                      src={
+                        theme == 'dark'
+                          ? `${Router.basePath}/img/supabase-dark.svg`
+                          : `${Router.basePath}/img/supabase-light.svg`
+                      }
                       alt="Supabase Logo"
                       height={24}
                       width={120}

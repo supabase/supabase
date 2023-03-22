@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import Router from 'next/router'
 import { IconChevronRight } from 'ui'
 import { useStore } from 'hooks'
 import Link from 'next/link'
@@ -29,8 +30,12 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
           <div className="mr-4 flex flex-col">
             <img
               className="transition-all group-hover:scale-110"
-              src={`/img/libraries/${framework.toLowerCase()}${
-                ['expo', 'nextjs'].includes(framework.toLowerCase()) ? (isDarkTheme ? '-dark' : '') : ''
+              src={`${Router.basePath}/img/libraries/${framework.toLowerCase()}${
+                ['expo', 'nextjs'].includes(framework.toLowerCase())
+                  ? isDarkTheme
+                    ? '-dark'
+                    : ''
+                  : ''
               }-icon.svg`}
               alt={`${framework} logo`}
               width={26}
