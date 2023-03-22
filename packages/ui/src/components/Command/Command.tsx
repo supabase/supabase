@@ -23,6 +23,7 @@ import { AiCommand } from './AiCommand'
 import { IconSun } from '../Icon/icons/IconSun'
 import { IconMoon } from '../Icon/icons/IconMoon'
 import { IconCopy } from '../Icon/icons/IconCopy'
+import { AiDocsSeach } from './AiDocsSearch'
 // import { SearchProvider } from './SearchProvider'
 
 const SubItem = (props: any) => {
@@ -32,21 +33,6 @@ const SubItem = (props: any) => {
 }
 
 export const AiIcon = () => (
-  // <svg
-  //   xmlns="http://www.w3.org/2000/svg"
-  //   fill="none"
-  //   viewBox="0 0 24 24"
-  //   stroke-width="1.5"
-  //   stroke="currentColor"
-  //   className="w-6 h-6 mr-2 text-brand-900"
-  // >
-  //   <path
-  //     stroke-linecap="round"
-  //     stroke-linejoin="round"
-  //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-  //   />
-  // </svg>
-
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -67,37 +53,22 @@ export const COMMAND_ROUTES = {
   AI_HOME: 'Supabase AI',
   AI_ASK_ANYTHING: 'Ask me anything',
   AI_RLS_POLICY: 'Help me make a RLS policy',
+  DOCS_SEARCH: 'Docs Search',
 }
 
 const AI_CHAT_ROUTES = [COMMAND_ROUTES.AI_ASK_ANYTHING, COMMAND_ROUTES.AI_RLS_POLICY]
 
 export const AiIconChat = () => (
-  // <svg
-  //   xmlns="http://www.w3.org/2000/svg"
-  //   fill="none"
-  //   viewBox="0 0 24 24"
-  //   stroke-width="1.5"
-  //   stroke="currentColor"
-  //   className="w-6 h-6 mr-2 text-brand-900"
-  // >
-  //   <path
-  //     stroke-linecap="round"
-  //     stroke-linejoin="round"
-  //     d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-  //   />
-  // </svg>
-
   <div
-    className="w-7 h-7
-                    
-                    bg-gradient-to-r from-purple-900 to-purple-800
+    className="w-7 h-7                
+    bg-gradient-to-r from-purple-900 to-purple-800
 
-                    ring-purple-600
-                    ring-1
-                    
-                    rounded-md border border-purple-400 flex items-center justify-center
-                    shadow-sm
-                    "
+    ring-purple-600
+    ring-1
+    
+    rounded-md border border-purple-400 flex items-center justify-center
+    shadow-sm
+    "
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +198,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
                   </span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleSetPages([...pages, 'docs-search'], true)}
+                  onSelect={() => handleSetPages([...pages, 'Docs Search'], true)}
                   forceMount
                 >
                   <IconBook className="" />
@@ -320,6 +291,11 @@ function CommandMenu({ actions }: { actions: IActions }) {
           {page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
             <>
               <AiCommand query={search} setQuery={setSearch} page={page} />
+            </>
+          )}
+          {page === COMMAND_ROUTES.DOCS_SEARCH && (
+            <>
+              <AiDocsSeach query={search} setQuery={setSearch} page={page} />
             </>
           )}
           {page === COMMAND_ROUTES.AI_RLS_POLICY && (
