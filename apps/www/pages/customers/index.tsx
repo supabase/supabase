@@ -16,13 +16,13 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_case-studies')
-  const categories = getAllCategories('_case-studies')
+  const allPostsData = getSortedPosts('_customers')
+  const categories = getAllCategories('_customers')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
-  fs.writeFileSync('./public/case-studies-rss.xml', rss)
+  fs.writeFileSync('./public/customers-rss.xml', rss)
 
   return {
     props: {
@@ -64,8 +64,8 @@ function CustomerStoriesPage(props: any) {
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="RSS feed for case studies"
-          href={`${basePath}/case-studies-rss.xml`}
+          title="RSS feed for customer stories"
+          href={`${basePath}/customers-rss.xml`}
         />
       </Head>
       <NextSeo

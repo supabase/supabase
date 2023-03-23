@@ -17,7 +17,7 @@ import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
-  const paths = getAllPostSlugs('_case-studies')
+  const paths = getAllPostSlugs('_customers')
   return {
     paths,
     fallback: false,
@@ -26,13 +26,13 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: any) {
   const filePath = `${params.slug}`
-  const postContent = await getPostdata(filePath, '_case-studies')
+  const postContent = await getPostdata(filePath, '_customers')
   const { data, content } = matter(postContent)
   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts('_case-studies', 5, mdxSource.scope.tags)
+  const relatedPosts = getSortedPosts('_customers', 5, mdxSource.scope.tags)
 
-  const allPosts = getSortedPosts('_case-studies')
+  const allPosts = getSortedPosts('_customers')
   const currentIndex = allPosts
     .map(function (e) {
       return e.slug
@@ -125,7 +125,7 @@ function CaseStudyPage(props: any) {
               {/* Back button */}
               <p>
                 <a
-                  href={'/case-studies'}
+                  href={'/customers'}
                   className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
@@ -142,8 +142,10 @@ function CaseStudyPage(props: any) {
               <div className="">
                 <article className="flex flex-col gap-8">
                   <div className="flex flex-col gap-8 max-w-xxl">
-                    <Link passHref href="/case-studies">
-                      <a className="text-brand-900 hover:text-brand-1000 mb-2 mt-0">Case Studies</a>
+                    <Link passHref href="/customers">
+                      <a className="text-brand-900 hover:text-brand-1000 mb-2 mt-0">
+                        Customer Stories
+                      </a>
                     </Link>
                     <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}
