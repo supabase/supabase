@@ -24,7 +24,7 @@ import { AiCommand } from './AiCommand'
 import { IconSun } from '../Icon/icons/IconSun'
 import { IconMoon } from '../Icon/icons/IconMoon'
 import { IconCopy } from '../Icon/icons/IconCopy'
-import { AiDocsSeach } from './AiDocsSearch'
+import DocsSearch from './DocsSearch'
 // import { SearchProvider } from './SearchProvider'
 
 export const AiIcon = () => (
@@ -327,7 +327,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
           )}
           {page === COMMAND_ROUTES.DOCS_SEARCH && (
             <>
-              <AiDocsSeach
+              <DocsSearch
                 query={search}
                 setQuery={setSearch}
                 page={page}

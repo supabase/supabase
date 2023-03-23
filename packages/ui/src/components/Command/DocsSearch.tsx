@@ -1,46 +1,20 @@
-import React, { useEffect, useMemo, useReducer } from 'react'
-import type { CreateCompletionResponse } from 'openai'
-import { FC, useCallback, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-// @ts-ignore
+import * as React from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
-// import clippyImageDark from '../../public/img/clippy-dark.png'
-// import clippyImage from '../../public/img/clippy.png'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTheme } from 'common/Providers'
-import Image from 'next/image'
 import {
-  Badge,
   Button,
-  IconAlertCircle,
   IconAlertTriangle,
   IconBook,
   IconChevronRight,
   IconHash,
   IconLoader,
   IconSearch,
-  IconUser,
-  Input,
-  Loading,
-  Modal,
-  Tabs,
 } from 'ui'
-// import components from '~/components'
-// import { IS_PLATFORM } from '~/lib/constants'
-// import { SearchContextValue } from './SearchProvider'
-import SearchResult, { SearchResultType } from './SearchResult'
-import {
-  CommandGroup,
-  CommandItem,
-  CommandInput,
-  CommandLabel,
-  CommandShortcut,
-} from './Command.utils'
-import { IconCopy } from '../Icon/icons/IconCopy'
+import { CommandGroup, CommandItem, CommandLabel } from './Command.utils'
 
-import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
 import { debounce } from 'lodash'
 
 const questions = [
@@ -122,22 +96,23 @@ function promptDataReducer(
   throw Error('Unknown action.')
 }
 
-interface IAiDocsSeach {
+export interface DocsSearchProps {
   query?: string
   setQuery?: () => void
   page?: string
   isLoading?: boolean
   setIsLoading?: () => void
+  router: any
 }
 
-const AiDocsSeach: FC<IAiDocsSeach> = ({
+const DocsSearch = ({
   query,
   setQuery,
   page,
   isLoading,
   setIsLoading,
   router,
-}) => {
+}: DocsSearchProps) => {
   const { isDarkMode } = useTheme()
 
   // const { close, query, setQuery } = useSearch()
@@ -488,4 +463,4 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
   )
 }
 
-export { AiDocsSeach }
+export default DocsSearch
