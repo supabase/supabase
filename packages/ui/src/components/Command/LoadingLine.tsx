@@ -3,11 +3,13 @@ import { cn } from '../../utils/cn'
 
 export const LoadingLine = ({ loading }: { loading: boolean }) => {
   return (
-    <div className="loading-line">
+    <div className="relative overflow-hidden w-full h-px bg-[#2e2e2e] m-auto">
       <span
         className={cn(
-          'loading-line--sprite transition-all',
-          loading && 'loading-line--stripe--animate opacity-100',
+          'absolute w-[80px] h-px ml-auto mr-auto left-0 right-0 text-center block top-0',
+          'transition-all',
+          'line-loading-bg',
+          loading && 'animate-line-loading opacity-100',
           loading ? 'opacity-100' : 'opacity-0'
         )}
       ></span>

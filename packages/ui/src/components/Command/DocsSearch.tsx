@@ -12,6 +12,7 @@ import {
   IconHash,
   IconLoader,
   IconSearch,
+  useCommandMenu,
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel } from './Command.utils'
 
@@ -100,19 +101,10 @@ export interface DocsSearchProps {
   query?: string
   setQuery?: () => void
   page?: string
-  isLoading?: boolean
-  setIsLoading?: () => void
   router: any
 }
 
-const DocsSearch = ({
-  query,
-  setQuery,
-  page,
-  isLoading,
-  setIsLoading,
-  router,
-}: DocsSearchProps) => {
+const DocsSearch = ({ query, setQuery, page, router }: DocsSearchProps) => {
   const { isDarkMode } = useTheme()
 
   // const { close, query, setQuery } = useSearch()
@@ -124,6 +116,7 @@ const DocsSearch = ({
   const [selectedTab, setSelectedTab] = useState('clippy-panel')
   const eventSourceRef = useRef<SSE>()
   const supabaseClient = useSupabaseClient()
+  const { isLoading, setIsLoading } = useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])

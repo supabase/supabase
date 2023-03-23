@@ -31,6 +31,7 @@ import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
 import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -132,13 +133,13 @@ const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
   // const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState<string | undefined>('')
   const [results, setResults] = useState<any[]>()
-  const [isLoading, setIsLoading] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const [hasSearchError, setHasSearchError] = useState(false)
   const [selectedTab, setSelectedTab] = useState('clippy-panel')
   const eventSourceRef = useRef<SSE>()
   const supabaseClient = useSupabaseClient()
+  const { isLoading, setIsLoading } = useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
