@@ -25,6 +25,7 @@ import type { PostgresSchema } from '@supabase/postgres-meta'
 import { checkPermissions, useStore, useParams } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -315,55 +316,53 @@ const EntityListItem = ({
       isActive={isActive}
       icon={
         <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] text-scale-1100 bg-scale-800">
-          {entity.type[0]?.toUpperCase()}
+          {Object.entries(ENTITY_TYPE)
+            .find(([, value]) => value === entity.type)?.[0]?.[0]
+            ?.toUpperCase()}
         </div>
       }
       action={
-        entity.type === 'table' &&
+        entity.type === ENTITY_TYPE.TABLE &&
         isActive &&
         !isLocked && (
           <Dropdown
             size="small"
             side="bottom"
             align="start"
-            overlay={
-              entity.type === 'table'
-                ? [
-                    <Dropdown.Item
-                      key="edit-table"
-                      icon={<IconEdit size="tiny" />}
-                      onClick={() => onEditTable(entity)}
-                      disabled={isLoadingTableMetadata}
-                    >
-                      Edit Table
-                    </Dropdown.Item>,
-                    <Dropdown.Item
-                      key="duplicate-table"
-                      icon={<IconCopy size="tiny" />}
-                      onClick={() => onDuplicateTable(entity)}
-                      disabled={isLoadingTableMetadata}
-                    >
-                      Duplicate Table
-                    </Dropdown.Item>,
-                    <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
-                      <a>
-                        <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
-                          View Policies
-                        </Dropdown.Item>
-                      </a>
-                    </Link>,
-                    <Dropdown.Separator key="separator" />,
-                    <Dropdown.Item
-                      key="delete-table"
-                      icon={<IconTrash size="tiny" />}
-                      onClick={() => onDeleteTable(entity)}
-                      disabled={isLoadingTableMetadata}
-                    >
-                      Delete Table
-                    </Dropdown.Item>,
-                  ]
-                : null
-            }
+            overlay={[
+              <Dropdown.Item
+                key="edit-table"
+                icon={<IconEdit size="tiny" />}
+                onClick={() => onEditTable(entity)}
+                disabled={isLoadingTableMetadata}
+              >
+                Edit Table
+              </Dropdown.Item>,
+              <Dropdown.Item
+                key="duplicate-table"
+                icon={<IconCopy size="tiny" />}
+                onClick={() => onDuplicateTable(entity)}
+                disabled={isLoadingTableMetadata}
+              >
+                Duplicate Table
+              </Dropdown.Item>,
+              <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
+                <a>
+                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
+                    View Policies
+                  </Dropdown.Item>
+                </a>
+              </Link>,
+              <Dropdown.Separator key="separator" />,
+              <Dropdown.Item
+                key="delete-table"
+                icon={<IconTrash size="tiny" />}
+                onClick={() => onDeleteTable(entity)}
+                disabled={isLoadingTableMetadata}
+              >
+                Delete Table
+              </Dropdown.Item>,
+            ]}
           >
             <div className="text-scale-900 transition-colors hover:text-scale-1200">
               <IconChevronDown size={14} strokeWidth={2} />
