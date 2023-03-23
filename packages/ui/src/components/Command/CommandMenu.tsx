@@ -1,32 +1,25 @@
-import * as React from 'react'
-import { createContext, useContext } from 'react'
 import { useRouter } from 'next/router'
+import * as React from 'react'
 
-import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
 import { useCommandState } from 'cmdk-supabase'
+import { CreditCard, Settings, User } from 'lucide-react'
+import { IconBook } from '../Icon/icons/IconBook'
+import { IconCopy } from '../Icon/icons/IconCopy'
+import { IconInbox } from '../Icon/icons/IconInbox'
+import { IconMonitor } from '../Icon/icons/IconMonitor'
+import AiCommand from './AiCommand'
 import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandItemStale,
   CommandLabel,
   CommandList,
-  CommandSeparator,
   CommandShortcut,
 } from './Command.utils'
-import { IconCloudDrizzle } from '../Icon/icons/IconCloudDrizzle'
-import { IconBook } from '../Icon/icons/IconBook'
-import { IconInbox } from '../Icon/icons/IconInbox'
-import { IconMonitor } from '../Icon/icons/IconMonitor'
-import { Input } from '../Input'
-import { AiCommand } from './AiCommand'
-import { IconSun } from '../Icon/icons/IconSun'
-import { IconMoon } from '../Icon/icons/IconMoon'
-import { IconCopy } from '../Icon/icons/IconCopy'
-import DocsSearch from './DocsSearch'
 import { useCommandMenu } from './CommandMenuProvider'
+import DocsSearch from './DocsSearch'
 
 export const AiIcon = () => (
   <svg
@@ -83,23 +76,18 @@ export const AiIconChat = () => (
   </div>
 )
 
-interface IActions {
-  toggleTheme: () => void
-}
-
 const ItemHandler = (props: any) => {
   const search = useCommandState((state) => state.search)
   if (!search && props.isSubItem) return null
   return <CommandItem {...props} />
 }
 
-function CommandMenu({ actions }: { actions: IActions }) {
+const CommandMenu = () => {
   const [search, setSearch] = React.useState('')
-  const [aiSearch, setAiSearch] = React.useState('')
   const [pages, setPages] = React.useState([])
   const page = pages[pages.length - 1]
   const router = useRouter()
-  const { isOpen, setIsOpen } = useCommandMenu()
+  const { isOpen, setIsOpen, actions } = useCommandMenu()
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -107,7 +95,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
         <ItemHandler
           isSubItem={isSubItem}
           onSelect={() => {
-            actions.toggleTheme()
+            actions.toggleTheme(true)
             setIsOpen(false)
           }}
         >
@@ -116,7 +104,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
         <ItemHandler
           isSubItem={isSubItem}
           onSelect={() => {
-            actions.toggleTheme()
+            actions.toggleTheme(false)
             setIsOpen(false)
           }}
         >
@@ -126,23 +114,10 @@ function CommandMenu({ actions }: { actions: IActions }) {
     )
   }
 
-  React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && e.metaKey) {
-        setIsOpen((open) => !open)
-      }
-    }
-
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
-
   function handleSetPages(pages: any, keepSearch: any) {
     setPages(pages)
     if (!keepSearch) setSearch('')
   }
-
-  console.log('page', page)
 
   const showCommandInput = page === undefined || !AI_CHAT_ROUTES.includes(page)
 
@@ -421,9 +396,8 @@ function CommandMenu({ actions }: { actions: IActions }) {
           {page !== 'Ask anything' || (!page && <CommandEmpty>No results found.</CommandEmpty>)}
         </CommandList>
       </CommandDialog>
-      {/* <AiCommand /> */}
     </>
   )
 }
 
-export { CommandMenu }
+export default CommandMenu

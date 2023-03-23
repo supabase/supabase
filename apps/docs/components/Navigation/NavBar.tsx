@@ -35,14 +35,6 @@ const NavBar: FC = () => {
     { text: 'Reference', key: 'reference', link: '/reference' },
   ]
 
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
-
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
     if (!library) return
@@ -182,7 +174,7 @@ const NavBar: FC = () => {
               </a>
             </li>
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon size={18} strokeWidth={2} className="text-scale-1200" />
                 ) : (
