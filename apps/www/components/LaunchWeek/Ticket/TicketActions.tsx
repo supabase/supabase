@@ -36,7 +36,7 @@ export default function TicketActions({
     'twitter'
   )}&via=supabase&text=${text}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink('linkedin')}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
     username
   )}`
   const params = useParams()

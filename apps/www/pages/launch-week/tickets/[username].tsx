@@ -39,7 +39,7 @@ export default function UsernamePage({ user, users }: Props) {
     return <Error statusCode={404} />
   }
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
     username ?? ''
   )}${golden ? '&golden=true' : ''}`
 
