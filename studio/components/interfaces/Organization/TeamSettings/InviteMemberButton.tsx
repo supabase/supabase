@@ -172,7 +172,6 @@ const InviteMemberButton = ({
                         )}
                       </div>
 
-
                       <Input
                         autoFocus
                         id="email"
