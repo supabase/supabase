@@ -255,8 +255,9 @@ const TableEditor: FC<Props> = ({
                 title="RLS is on. However, policies are required to query data."
               >
                 <p>
-                  You need to write a policy before you can query data from this table. Without a
-                  policy, querying this table will result in an <u>empty array</u> of results.
+                  You need to write an access policy before you can query data from this table.
+                  Without a policy, querying this table will result in an <u>empty array</u> of
+                  results.
                 </p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
