@@ -387,14 +387,6 @@ export const database = {
     { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
     { name: 'Database Testing', url: '/guides/database/testing', items: [] },
     {
-      name: 'Serverless APIs',
-      url: undefined,
-      items: [
-        { name: 'Overview', url: '/guides/database/api', items: [] },
-        { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
-      ],
-    },
-    {
       name: 'Extensions',
       url: undefined,
       items: [
@@ -555,6 +547,16 @@ export const database = {
         { name: 'Timezones', url: '/guides/database/managing-timezones', items: [] },
       ],
     },
+  ],
+}
+
+export const api = {
+  icon: 'database',
+  label: 'Serverless APIs',
+  url: '/guides/api',
+  items: [
+    { name: 'Overview', url: '/guides/api', items: [] },
+    { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
   ],
 }
 
