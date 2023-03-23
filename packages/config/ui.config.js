@@ -225,6 +225,26 @@ const uiConfig = {
           '0%': { transform: 'translate-x-0', opacity: 1 },
           '100%': { transform: 'translateX(100%)', opacity: 0 },
         },
+        lineLoading: {
+          '0%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+          '25%': {
+            width: ' 240px',
+          },
+          '50%': {
+            marginLeft: ' 100%',
+            width: '80px',
+          },
+          '75%': {
+            width: '240px',
+          },
+          '100%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+        },
       },
       animation: {
         'fade-in': 'fadeIn 300ms',
@@ -267,6 +287,14 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
+        '.loading-line--animate': {
+          xTransition: 'all 1s ease-in-out',
+          animation: 'ani 1.8s infinite',
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+          boxShadow: '1px 2px 0 0 white',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },

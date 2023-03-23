@@ -31,12 +31,12 @@ const SearchProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
   const [query, setQuery] = useState('')
 
   const open = useCallback(() => {
-    setIsOpen(true)
+    // setIsOpen(true)
     document.body.classList.add('DocSearch--active')
   }, [])
 
   const close = useCallback(() => {
-    setIsOpen(false)
+    // setIsOpen(false)
     document.body.classList.remove('DocSearch--active')
   }, [])
 
@@ -44,7 +44,6 @@ const SearchProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
     open,
     close,
   })
-
   return (
     <SearchContext.Provider value={{ isOpen, open, close, query, setQuery }}>
       {children}
