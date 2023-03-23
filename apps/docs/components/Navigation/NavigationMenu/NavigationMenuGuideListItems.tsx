@@ -143,9 +143,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 })
 
 const Content = (props) => {
-  const { id } = props
-
-  const menu = NavItems[id]
+  const { menu, id } = props
 
   return (
     <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
