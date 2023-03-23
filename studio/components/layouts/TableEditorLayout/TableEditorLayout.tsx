@@ -12,8 +12,8 @@ import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
 import useEntityType from 'hooks/misc/useEntityType'
 import Connecting from 'components/ui/Loading/Loading'
-import useTableRowsPrefetch from 'hooks/misc/useTableRowsPrefetch'
 import useLatest from 'hooks/misc/useLatest'
+import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
@@ -64,7 +64,7 @@ const TableEditorLayout = ({
     })
   })
 
-  const prefetch = useLatest(useTableRowsPrefetch())
+  const prefetch = useLatest(useTableRowsPrefetchWrapper())
 
   useEffect(() => {
     let mounted = true
