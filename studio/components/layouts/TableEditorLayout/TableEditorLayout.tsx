@@ -6,6 +6,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useParams, useStore } from 'hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
@@ -71,11 +72,11 @@ const TableEditorLayout = ({
     function loadTable() {
       if (entity?.type) {
         switch (entity.type) {
-          case 'materialized_view':
-          case 'view':
+          case ENTITY_TYPE.MATERIALIZED_VIEW:
+          case ENTITY_TYPE.VIEW:
             return meta.views.loadById(entity.id)
 
-          case 'foreign_table':
+          case ENTITY_TYPE.FOREIGN_TABLE:
             return meta.foreignTables.loadById(entity.id)
 
           default:

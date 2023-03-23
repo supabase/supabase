@@ -35,13 +35,7 @@ export async function getEntityTypes(
         c.oid::int8 as "id",
         nc.nspname as "schema",
         c.relname as "name",
-        case c.relkind
-          when 'r' then 'table'
-          when 'v' then 'view'
-          when 'm' then 'materialized_view'
-          when 'f' then 'foreign_table'
-          when 'p' then 'partitioned_table'
-        end as "type",
+        c.relkind as "type",
         obj_description(c.oid) as "comment",
         count(*) over() as "count"
       from
