@@ -1,6 +1,7 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ENTITY_TYPE } from './entity-type-constants'
 
 type EntityTypeArgs = {
   id?: number
@@ -12,13 +13,7 @@ export const entityTypeSqlQuery = ({ id }: EntityTypeArgs) => {
       c.oid::int8 as "id",
       nc.nspname as "schema",
       c.relname as "name",
-      case c.relkind
-        when 'r' then 'table'
-        when 'v' then 'view'
-        when 'm' then 'materialized_view'
-        when 'f' then 'foreign_table'
-        when 'p' then 'partitioned_table'
-      end as "type",
+      c.relkind as "type",
       obj_description(c.oid) as "comment",
       count(*) over() as "count"
     from
@@ -46,7 +41,7 @@ export type Entity = {
   id: number
   schema: string
   name: string
-  type: 'table' | 'view' | 'materialized_view' | 'foreign_table' | 'partitioned_table'
+  type: ENTITY_TYPE
   comment: string | null
 }
 
