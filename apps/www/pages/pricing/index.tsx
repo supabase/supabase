@@ -449,7 +449,8 @@ export default function IndexPage() {
             <p className="mt-3 prose lg:max-w-lg">
               The Pro tier has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
-              additional usage.
+              additional usage and scale seamlessly. Note that your project will run into
+              restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
           <div>

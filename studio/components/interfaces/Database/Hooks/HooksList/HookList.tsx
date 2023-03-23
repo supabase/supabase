@@ -5,8 +5,10 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
 
 interface Props {
   schema: string
@@ -21,12 +23,15 @@ const HookList: FC<Props> = ({
   editHook = () => {},
   deleteHook = () => {},
 }) => {
-  const { meta } = useStore()
-  const hooks = meta.hooks.list()
-  const filteredHooks = hooks.filter((x: any) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const { project } = useProjectContext()
+  const { data: hooks } = useDatabaseHooks({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const filteredHooks = (hooks ?? []).filter(
+    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema
   )
-  const _hooks = filteredHooks.filter((x: any) => x.schema == schema)
   const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   function onEdit(trigger: any) {
@@ -39,7 +44,7 @@ const HookList: FC<Props> = ({
 
   return (
     <>
-      {_hooks.map((x: any) => (
+      {filteredHooks.map((x: any) => (
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
             <p>{x.name}</p>

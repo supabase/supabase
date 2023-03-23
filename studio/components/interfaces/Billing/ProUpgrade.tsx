@@ -1,8 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
+import { IconHelpCircle, Toggle } from 'ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
@@ -30,6 +29,7 @@ import {
 import BackButton from 'components/ui/BackButton'
 import SupportPlan from './AddOns/SupportPlan'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import SpendCapModal from './SpendCapModal'
 
 // Do not allow compute size changes for af-south-1
 
@@ -263,7 +263,7 @@ const ProUpgrade: FC<Props> = ({
               <div className="flex items-center justify-between gap-16 px-6 py-4 border rounded border-panel-border-light border-panel-border-dark bg-panel-body-light drop-shadow-sm dark:bg-panel-body-dark">
                 <div>
                   <div className="flex items-center space-x-2">
-                    <p>Enable spend cap</p>
+                    <p>Spend cap</p>
                     <IconHelpCircle
                       size={16}
                       strokeWidth={1.5}
@@ -272,7 +272,10 @@ const ProUpgrade: FC<Props> = ({
                     />
                   </div>
                   <p className="text-sm text-scale-1100">
-                    If enabled, additional resources will not be charged on a per-usage basis
+                    By default, Pro projects have a spend cap enabled to control costs and prevent
+                    exceeding limits. This restricts usage upon exhausting the quota. To scale
+                    without restrictions, disable the spend cap and be charged for overusage beyond
+                    the quota.
                   </p>
                 </div>
                 <Toggle
@@ -364,103 +367,11 @@ const ProUpgrade: FC<Props> = ({
       />
 
       {/* Spend caps helper modal */}
-      <Modal
-        hideFooter
+
+      <SpendCapModal
         visible={showSpendCapHelperModal}
-        size="large"
-        header="Enabling spend cap"
-        onCancel={() => setShowSpendCapHelperModal(false)}
-      >
-        <div className="py-4 space-y-4">
-          <Modal.Content>
-            <div className="space-y-4">
-              <p className="text-sm">
-                A spend cap allows you to restrict your project's resource usage within the limits
-                of the Pro tier. Disabling the spend cap will then remove those limits and any
-                additional resources consumed beyond the Pro tier limits will be charged on a
-                per-usage basis
-              </p>
-              <p className="text-sm">
-                The table below shows an overview of which resources are chargeable, and how they
-                are charged:
-              </p>
-              {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
-              {/* Maybe ideate this in Figma first but this is good enough for now */}
-              <div className="border rounded border-scale-600 bg-scale-500">
-                <div className="flex items-center px-4 pt-2 pb-1">
-                  <p className="w-[50%] text-sm text-scale-1100">Item</p>
-                  <p className="w-[25%] text-sm text-scale-1100">Limit</p>
-                  <p className="w-[25%] text-sm text-scale-1100">Rate</p>
-                </div>
-                <div className="py-1">
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Database size</p>
-                    <p className="w-[25%] text-sm">8GB</p>
-                    <p className="w-[25%] text-sm">$0.125/GB</p>
-                  </div>
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Data transfer</p>
-                    <p className="w-[25%] text-sm">50GB</p>
-                    <p className="w-[25%] text-sm">$0.09/GB</p>
-                  </div>
-                </div>
-                <div className="py-1">
-                  <div className="flex items-center px-4 py-1">
-                    <div className="flex w-[50%] items-center space-x-2">
-                      <p className="text-sm">Auth MAUs</p>
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger>
-                          <IconHelpCircle
-                            size={16}
-                            strokeWidth={1.5}
-                            className="transition opacity-50 cursor-pointer hover:opacity-100"
-                          />
-                        </Tooltip.Trigger>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                              'border border-scale-200 ', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-scale-1200">
-                              Monthly Active Users: A user that has made an API request in the last
-                              month
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </div>
-                    <p className="w-[25%] text-sm">100,000</p>
-                    <p className="w-[25%] text-sm">$0.00325/user</p>
-                  </div>
-                </div>
-                <div className="py-1">
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Storage size</p>
-                    <p className="w-[25%] text-sm">100GB</p>
-                    <p className="w-[25%] text-sm">$0.021/GB</p>
-                  </div>
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Data Transfer</p>
-                    <p className="w-[25%] text-sm">50GB</p>
-                    <p className="w-[25%] text-sm">$0.09/GB</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <div className="flex items-center gap-2">
-              <Button block type="primary" onClick={() => setShowSpendCapHelperModal(false)}>
-                Understood
-              </Button>
-            </div>
-          </Modal.Content>
-        </div>
-      </Modal>
+        onHide={() => setShowSpendCapHelperModal(false)}
+      />
     </>
   )
 }

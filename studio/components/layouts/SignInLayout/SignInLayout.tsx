@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
@@ -94,7 +94,11 @@ const SignInLayout = ({
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                   <a>
                     <Image
-                      src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                      src={
+                        theme == 'dark'
+                          ? `${BASE_PATH}/img/supabase-dark.svg`
+                          : `${BASE_PATH}/img/supabase-light.svg`
+                      }
                       alt="Supabase Logo"
                       height={24}
                       width={120}
