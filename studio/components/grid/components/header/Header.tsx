@@ -17,6 +17,7 @@ import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-a
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import RLSBannerWarning from './RLSBannerWarning'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -37,13 +38,16 @@ const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }:
   const { selectedRows } = state
 
   return (
-    <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-      {selectedRows.size > 0 ? (
-        <RowHeader table={table} sorts={sorts} filters={filters} />
-      ) : (
-        <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
-      )}
-      <div className="sb-grid-header__inner">{headerActions}</div>
+    <div>
+      <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
+        {selectedRows.size > 0 ? (
+          <RowHeader table={table} sorts={sorts} filters={filters} />
+        ) : (
+          <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
+        )}
+        <div className="sb-grid-header__inner">{headerActions}</div>
+      </div>
+      <RLSBannerWarning />
     </div>
   )
 }
