@@ -1,0 +1,48 @@
+{
+  "items": [
+    {
+      "label": "Home",
+      "icon": "home",
+      "url": "http://www.example.com/home",
+      "sites": ["docs", "dashboard"],
+      "subItems": [
+        {
+          "label": "About",
+          "icon": "book",
+          "url": "http://www.example.com/about",
+          "sites": ["docs", "dashboard"]
+        },
+        {
+          "label": "Services",
+          "icon": "services",
+          "url": "http://www.example.com/services",
+          "sites": ["docs", "dashboard"]
+        },
+        {
+          "label": "Contact",
+          "icon": "contact",
+          "url": "http://www.example.com/contact",
+          "sites": ["docs", "dashboard"]
+        }
+      ]
+    },
+    {
+      "label": "Products",
+      "icon": "products",
+      "url": "http://www.example.com/products",
+      "sites": ["dashboard"],
+      "subItems": [
+        {
+          "label": "Mobile",
+          "icon": "mobile",
+          "url": "http://www.example.com/products/mobile"
+        },
+        {
+          "label": "In person",
+          "icon": "person",
+          "url": "http://www.example.com/products/in-person"
+        }
+      ]
+    }
+  ]
+}
