@@ -234,7 +234,7 @@ const uiConfig = {
             width: ' 240px',
           },
           '50%': {
-            marginLeft: ' 100%',
+            marginLeft: '100%',
             width: '80px',
           },
           '75%': {
@@ -270,6 +270,8 @@ const uiConfig = {
         'panel-slide-right-out': 'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
+        'line-loading': 'lineLoading 1.8s infinite',
+
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
         // tailwind class for this is `animate-dropdownFadeOut`
@@ -287,13 +289,10 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
-        '.loading-line--animate': {
-          xTransition: 'all 1s ease-in-out',
-          animation: 'ani 1.8s infinite',
+        '.line-loading-bg': {
           background: 'rgb(0, 0, 0)',
           background:
             'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
-          boxShadow: '1px 2px 0 0 white',
         },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
@@ -301,7 +300,6 @@ const uiConfig = {
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-
         "[data-state='open'] .accordion-content-animation": {
           animation: 'slideDown 200ms ease-out',
         },
