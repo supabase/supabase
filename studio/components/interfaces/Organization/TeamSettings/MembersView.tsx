@@ -1,8 +1,17 @@
 import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState, FC, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from 'ui'
+import {
+  Badge,
+  Button,
+  Loading,
+  Listbox,
+  IconUser,
+  Modal,
+  IconAlertCircle,
+  IconHelpCircle,
+} from 'ui'
 
 import { Member, Role } from 'types'
 import { useStore, useParams } from 'hooks'
@@ -176,8 +185,7 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
                       </Table.td>
 
                       <Table.td>
-                        {!role && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
-                        {role && (
+                        {role !== undefined ? (
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger className="w-[140px]">
                               <Listbox
@@ -231,6 +239,29 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
                               <></>
                             )}
                           </Tooltip.Root>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm text-scale-1100">Invalid role</p>
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <IconAlertCircle size={16} strokeWidth={1.5} />
+                              </Tooltip.Trigger>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                    'border border-scale-200 ', //border
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    This user has an invalid role, please reach out to us via
+                                    support
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Root>
+                          </div>
                         )}
                       </Table.td>
                       <Table.td>
