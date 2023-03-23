@@ -50,26 +50,27 @@ function Dropdown({
   return (
     <RadixDropdown.Root onOpenChange={onOpenChange} open={open}>
       {isNested ? (
-        <RadixDropdown.TriggerItem className={[__styles.item_nested].join(' ')}>
+        <RadixDropdown.Trigger className={[__styles.item_nested].join(' ')}>
           {children}
-        </RadixDropdown.TriggerItem>
+        </RadixDropdown.Trigger>
       ) : (
         <RadixDropdown.Trigger className={__styles.trigger}>{children}</RadixDropdown.Trigger>
       )}
 
-      <RadixDropdown.Content
-        portalled={true}
-        sideOffset={sideOffset}
-        side={side}
-        align={align}
-        className={classes.join(' ')}
-        style={style}
-      >
-        {arrow && (
-          <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
-        )}
-        {overlay}
-      </RadixDropdown.Content>
+      <RadixDropdown.Portal>
+        <RadixDropdown.Content
+          sideOffset={sideOffset}
+          side={side}
+          align={align}
+          className={classes.join(' ')}
+          style={style}
+        >
+          {arrow && (
+            <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
+          )}
+          {overlay}
+        </RadixDropdown.Content>
+      </RadixDropdown.Portal>
     </RadixDropdown.Root>
   )
 }
