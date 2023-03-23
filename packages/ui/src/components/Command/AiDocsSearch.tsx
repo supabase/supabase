@@ -176,7 +176,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
       console.log('query', query)
       // console.log('query', query)
 
-      setResults(undefined)
+      // setResults(undefined)
       setAnswer(undefined)
       setIsResponding(false)
       setHasClippyError(false)
@@ -205,6 +205,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
         return
       }
 
+      setResults(undefined)
       setResults(pageSections)
     },
     [supabaseClient]
@@ -253,19 +254,19 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
   const IconContainer = (props) => (
     <div
       className="
-                    transition
-                  w-6 h-6 
-                  bg-scale-100 
-                  group-aria-selected:scale-[105%]
-                  group-aria-selected:bg-scale-1200
-                  text-scale-1200
-                  group-aria-selected:text-scale-100
-                  rounded flex 
-                  items-center 
-                  justify-center
-                  
-                  group-aria-selected:[&_svg]:scale-[105%]
-                  "
+        transition
+        w-6 h-6 
+        bg-scale-100 
+        group-aria-selected:scale-[105%]
+        group-aria-selected:bg-scale-1200
+        text-scale-1200
+        group-aria-selected:text-scale-100
+        rounded flex 
+        items-center 
+        justify-center
+        
+        group-aria-selected:[&_svg]:scale-[105%]
+        "
       {...props}
     />
   )
@@ -281,6 +282,9 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
       if (!query) {
         return text
       }
+
+      if (!text) return ``
+
       const regex = new RegExp(query, 'gi')
       return text.replace(
         regex,
