@@ -73,7 +73,7 @@ const GridHeaderActions: FC<Props> = ({
       <div className="mt-[1px]">
         <RenderAPIPreviewToggle />
       </div>
-      <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
+      <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
         <a>
           <Button
             type={table.rls_enabled ? 'link' : 'warning'}
