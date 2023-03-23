@@ -7,15 +7,11 @@ import Head from 'next/head'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts, getAllCategories } from '~/lib/posts'
-import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Badge, Space, Select } from '@supabase/ui'
 import PostTypes from '~/types/post'
-import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogHeader from '~/components/Blog/BlogHeader'
 import { motion } from 'framer-motion'
-import styles from './case-studies.module.css'
+import styles from './customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui'
 
@@ -36,7 +32,7 @@ export async function getStaticProps() {
   }
 }
 
-function Blog(props: any) {
+function CustomerStoriesPage(props: any) {
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
@@ -72,7 +68,10 @@ function Blog(props: any) {
           href={`${basePath}/case-studies-rss.xml`}
         />
       </Head>
-      <NextSeo title="Case studies" description="Latest customers using Supabase" />
+      <NextSeo
+        title="Customer stories"
+        description="See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work."
+      />
       <DefaultLayout>
         <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
           <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
@@ -82,9 +81,9 @@ function Blog(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
-                <h1 className="text-scale-1200 mb-3 text-3xl">Case studies</h1>
+                <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  Discover how supabase is being used around the world to quickly create outstanding
+                  Discover how Supabase is being used around the world to quickly create outstanding
                   products and set new industry standards.
                 </h2>
               </motion.div>
@@ -131,4 +130,4 @@ function Blog(props: any) {
   )
 }
 
-export default Blog
+export default CustomerStoriesPage
