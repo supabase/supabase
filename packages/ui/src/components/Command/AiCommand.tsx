@@ -30,7 +30,8 @@ import SearchResult, { SearchResultType } from './SearchResult'
 import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
-import { AiIcon, AiIconChat, COMMAND_ROUTES, useCommandMenu } from './Command'
+import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
   'How do I get started with Supabase?',

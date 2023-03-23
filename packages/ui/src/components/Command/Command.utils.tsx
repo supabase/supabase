@@ -9,7 +9,7 @@ import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { KeyboardEventHandler } from 'react'
 import { LoadingLine } from './LoadingLine'
-import { useCommandMenu } from './Command'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
