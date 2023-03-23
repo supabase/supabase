@@ -208,7 +208,9 @@ const CommandItem = React.forwardRef<
           cursor-default select-none items-center 
           rounded-md text-sm outline-none 
 
-          aria-selected:bg-[#323232]/80
+          aria-selected:bg-scale-400
+
+          dark:aria-selected:bg-[#323232]/80
 
           aria-selected:backdrop-filter
           aria-selected:backdrop-blur-md
