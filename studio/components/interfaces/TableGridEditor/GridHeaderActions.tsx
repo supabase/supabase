@@ -85,7 +85,6 @@ const GridHeaderActions: FC<Props> = ({
               )
             }
           >
-            {/* RLS {table.rls_enabled ? 'is' : 'not'} enabled */}
             {!table.rls_enabled
               ? 'RLS is not enabled'
               : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
