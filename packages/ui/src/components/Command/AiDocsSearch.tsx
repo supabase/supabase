@@ -226,8 +226,17 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIs
         results.map((page, i) => {
           const pageSections = page.sections.filter((section) => !!section.heading)
           return (
-            <CommandGroup heading="" forceMount _key={`${page.meta.title}-group-index-${i}`}>
-              <CommandItem forceMount _key={`${page.meta.title}-item-index-${i}`}>
+            <CommandGroup
+              heading=""
+              forceMount
+              key={`${page.meta.title}-group-index-${i}`}
+              value={`${page.meta.title}-group-index-${i}`}
+            >
+              <CommandItem
+                forceMount
+                key={`${page.meta.title}-item-index-${i}`}
+                value={`${page.meta.title}-item-index-${i}`}
+              >
                 <CommandLabel>{page.meta.title}</CommandLabel>
                 <div>{page.meta.description}</div>
               </CommandItem>
@@ -245,7 +254,8 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIs
                   <CommandItem
                     forceMount
                     className="ml-8"
-                    _key={`${section.heading}-item-index-${i}`}
+                    key={`${section.heading}-item-index-${i}`}
+                    value={`${section.heading}-item-index-${i}`}
                   >
                     <CommandLabel>{section.heading}</CommandLabel>
                   </CommandItem>
