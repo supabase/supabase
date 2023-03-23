@@ -295,15 +295,6 @@ const DocsSearch = ({ query, setQuery, page, router }: DocsSearchProps) => {
               {pageSections.length > 0 && (
                 <div className="border-l border-scale-500 ml-3 pt-3">
                   {pageSections.map((section, i) => (
-                    //       <SearchResult
-                    //         key={section.id}
-                    //         href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
-                    //           section.slug
-                    //         }`}
-                    //         type={SearchResultType.Section}
-                    //         title={section.heading}
-                    //         chip={page.meta.title}
-                    //       />
                     <CommandItem
                       forceMount
                       className="ml-3 mb-3"

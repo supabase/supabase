@@ -27,7 +27,6 @@ import { IconMoon } from '../Icon/icons/IconMoon'
 import { IconCopy } from '../Icon/icons/IconCopy'
 import DocsSearch from './DocsSearch'
 import { useCommandMenu } from './CommandMenuProvider'
-// import { SearchProvider } from './SearchProvider'
 
 export const AiIcon = () => (
   <svg

@@ -25,8 +25,6 @@ import {
 } from 'ui'
 // import components from '~/components'
 // import { IS_PLATFORM } from '~/lib/constants'
-// import { SearchContextValue } from './SearchProvider'
-import SearchResult, { SearchResultType } from './SearchResult'
 import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
