@@ -1478,6 +1478,7 @@ export default {
       opacity-75
       data-closed:animate-fade-out-overlay-bg
       data-open:animate-fade-in-overlay-bg
+      z-40
     `,
     scroll_overlay: `
       fixed
