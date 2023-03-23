@@ -8,22 +8,19 @@ import SortPopover from 'components/grid/components/header/sort'
 import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
 import { IconLoader, SidePanel } from 'ui'
 
 import ActionBar from '../../ActionBar'
 import { useEncryptedColumns } from './ForeignRowSelector.utils'
 import SelectorGrid from './SelectorGrid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Pagination from './Pagination'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
-  foreignKey?: {
-    target_table_schema: string
-    target_table_name: string
-    target_column_name: string
-  }
+  foreignKey?: ForeignKeyConstraint
   onSelect: (value: any) => void
   closePanel: () => void
 }
@@ -38,13 +35,20 @@ const ForeignRowSelector = ({
   const { project } = useProjectContext()
 
   const {
-    target_table_schema: schemaName,
-    target_table_name: tableName,
-    target_column_name: columnName,
+    target_id: tableId,
+    target_schema: schemaName,
+    target_table: tableName,
+    target_columns: columnName,
   } = foreignKey ?? {}
 
-  const tables = meta.tables.list()
-  const table = tables.find((table) => table.schema === schemaName && table.name === tableName)
+  const table = tableId ? meta.tables.byId(tableId) : undefined
+
+  useEffect(() => {
+    if (!table && tableId) {
+      meta.tables.loadById(tableId)
+    }
+  }, [table, tableId])
+
   const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
 
   const supaTable =
@@ -85,7 +89,6 @@ const ForeignRowSelector = ({
 
   return (
     <SidePanel
-      key="ForeignRowSelector"
       visible={visible}
       size="large"
       header={

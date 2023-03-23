@@ -621,9 +621,13 @@ export const realtime = {
           name: 'Extensions',
           url: '/guides/realtime/extensions',
           items: [
-            { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
-            { name: 'Presence', url: '/guides/realtime/presence', items: [] },
-            { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+            { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast', items: [] },
+            { name: 'Presence', url: '/guides/realtime/extensions/presence', items: [] },
+            {
+              name: 'Postgres Changes',
+              url: '/guides/realtime/extensions/postgres-changes',
+              items: [],
+            },
           ],
         },
       ],
