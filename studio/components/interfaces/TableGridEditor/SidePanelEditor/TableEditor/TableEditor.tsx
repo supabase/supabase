@@ -1,6 +1,17 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button } from 'ui'
+import {
+  Badge,
+  Checkbox,
+  SidePanel,
+  Input,
+  Alert,
+  IconBookOpen,
+  Button,
+  Modal,
+  IconLock,
+  IconUnlock,
+} from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -20,6 +31,7 @@ import {
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Link from 'next/link'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 interface Props {
   table?: PostgresTable
@@ -74,6 +86,7 @@ const TableEditor: FC<Props> = ({
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -226,55 +239,54 @@ const TableEditor: FC<Props> = ({
                   <p>
                     Restrict access to your table by enabling RLS and writing Postgres policies.
                   </p>
-
-                  {tableFields.isRLSEnabled ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      className="!px-4 !py-3 mt-3"
-                      title="RLS policies are required to query data"
-                    >
-                      <p>
-                        You need to write a policy before you can query data from this table.
-                        Without a policy, querying this table will result in an <u>empty array</u>{' '}
-                        of results.
-                      </p>
-                      <p className="mt-4">
-                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                          <a target="_blank">
-                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </p>
-                    </Alert>
-                  ) : (
-                    <Alert
-                      withIcon
-                      variant="danger"
-                      className="!px-4 !py-3 mt-3"
-                      title="Turning off RLS means that you are allowing anonymous access to your table"
-                    >
-                      <p>As such, anyone with the anonymous key can modify or delete your data.</p>
-                      <p className="mt-4">
-                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                          <a target="_blank">
-                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </p>
-                    </Alert>
-                  )}
                 </>
               }
               checked={tableFields.isRLSEnabled}
-              onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
+              onChange={() => {
+                setRlsConfirmVisible(true)
+              }}
               size="medium"
             />
-
+            {tableFields.isRLSEnabled ? (
+              <Alert
+                withIcon
+                variant="info"
+                className="!px-4 !py-3 mt-3"
+                title="RLS is on. However, policies are required to query data."
+              >
+                <p>
+                  You need to write a policy before you can query data from this table. Without a
+                  policy, querying this table will result in an <u>empty array</u> of results.
+                </p>
+                <p className="mt-4">
+                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                        RLS Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </p>
+              </Alert>
+            ) : (
+              <Alert
+                withIcon
+                variant="danger"
+                className="!px-4 !py-3 mt-3"
+                title="RLS is off. You are allowing anonymous access to your table."
+              >
+                <p>Anyone with the anon key can modify or delete your data.</p>
+                <p className="mt-4">
+                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                        RLS Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </p>
+              </Alert>
+            )}
             <Checkbox
               id="enable-realtime"
               label="Enable Realtime"
@@ -325,6 +337,82 @@ const TableEditor: FC<Props> = ({
                 setIsImportingSpreadsheet(false)
               }}
               closePanel={() => setIsImportingSpreadsheet(false)}
+            />
+
+            <ConfirmationModal
+              visible={rlsConfirmVisible}
+              header={`Confirm turning RLS ${
+                tableFields.isRLSEnabled ? 'off' : 'on'
+              } for this table`}
+              buttonLabel="Confirm"
+              size="medium"
+              onSelectCancel={() => setRlsConfirmVisible(false)}
+              onSelectConfirm={() => {
+                onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+                setRlsConfirmVisible(false)
+              }}
+              children={
+                <Modal.Content>
+                  <div className="flex gap-4 my-6">
+                    <div>
+                      <div className="w-16 h-16 bg-scale-300 flex flex-col justify-center text-center items-center rounded-full">
+                        {tableFields.isRLSEnabled ? (
+                          <IconUnlock strokeWidth={2} size={24} />
+                        ) : (
+                          <IconLock strokeWidth={2} size={24} />
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-sm text-scale-1100 grid gap-4">
+                      {tableFields.isRLSEnabled ? (
+                        <div className="grid gap-3">
+                          <p>
+                            You are turning Row Level Security(RLS){' '}
+                            <u>
+                              <strong>off</strong>
+                            </u>{' '}
+                            for this table.
+                          </p>
+                          <p className="mt-4">
+                            <strong>Important: </strong> <br />
+                            Anyone with the anon key can modify or delete data. We recommend using
+                            RLS policies to control access to your data.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="grid gap-3">
+                          <p>
+                            You are turning Row Level Security(RLS){' '}
+                            <u>
+                              <strong>on</strong>
+                            </u>{' '}
+                            for this table.
+                          </p>
+                          <p className="mt-4">
+                            <strong>Important: </strong> <br />
+                            Before querying data from this table, it is necessary to write RLS
+                            policies. If access policies are not in place, your queries will always
+                            return an <u>empty array</u> of results.
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="border-t pt-3">
+                        <p>Learn more about RLS:</p>
+                        <p className="mt-2">
+                          <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                            <a target="_blank">
+                              <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                                RLS Documentation
+                              </Button>
+                            </a>
+                          </Link>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Modal.Content>
+              }
             />
           </div>
         </SidePanel.Content>
