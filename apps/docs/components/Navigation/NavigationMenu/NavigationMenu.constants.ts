@@ -556,7 +556,22 @@ export const api = {
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
-    { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+    {
+      name: 'REST',
+      url: undefined,
+      items: [
+        { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
+        { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
+        { name: 'Joins and Nested Tables', url: '/guides/api/rest/joins-and-nesting', items: [] },
+        { name: 'Caching', url: '/guides/api/rest/caching', items: [] },
+      ],
+    },
+    {
+      name: 'GRAPHQL',
+      url: undefined,
+      items: [{ name: 'GraphiQL', url: '/guides/api/graphql/graphiql', items: [] }],
+    },
   ],
 }
 
