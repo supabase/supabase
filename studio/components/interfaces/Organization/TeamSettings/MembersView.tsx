@@ -179,7 +179,7 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
                         {!role && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
                         {role && (
                           <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger>
+                            <Tooltip.Trigger className="w-[140px]">
                               <Listbox
                                 className={disableRoleEdit ? 'pointer-events-none' : ''}
                                 disabled={disableRoleEdit}
