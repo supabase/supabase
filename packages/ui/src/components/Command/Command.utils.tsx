@@ -9,6 +9,7 @@ import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { KeyboardEventHandler } from 'react'
 import { LoadingLine } from './LoadingLine'
+import { useCommandMenu } from './Command'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -71,33 +72,36 @@ const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogPro
 type CommandPrimitiveInputProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 
 type CommandInputProps = CommandPrimitiveInputProps & {
-  loading?: boolean
   _key?: string | number
 }
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   CommandInputProps
->(({ className, value, loading, onValueChange, _key, ...props }, ref) => (
-  <div className="flex flex-col items-center" cmdk-input-wrapper="">
-    {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
-    <CommandPrimitive.Input
-      value={value}
-      key={_key}
-      autoFocus
-      onValueChange={onValueChange}
-      ref={ref}
-      className={cn(
-        'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
-        'focus:shadow-none focus:ring-transparent',
-        'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
-        className
-      )}
-      {...props}
-    />
-    <LoadingLine loading={loading} />
-  </div>
-))
+>(({ className, value, onValueChange, _key, ...props }, ref) => {
+  const { isLoading } = useCommandMenu()
+
+  return (
+    <div className="flex flex-col items-center" cmdk-input-wrapper="">
+      {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
+      <CommandPrimitive.Input
+        value={value}
+        key={_key}
+        autoFocus
+        onValueChange={onValueChange}
+        ref={ref}
+        className={cn(
+          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
+          'focus:shadow-none focus:ring-transparent',
+          'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          className
+        )}
+        {...props}
+      />
+      <LoadingLine loading={isLoading} />
+    </div>
+  )
+})
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
