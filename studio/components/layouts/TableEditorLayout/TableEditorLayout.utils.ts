@@ -6,9 +6,9 @@ import { useUrlState } from 'hooks'
 import { useCallback } from 'react'
 
 /**
- * useTableRowsPrefetch is a wrapper around the base useTableRowsPrefetch that prefills the sort and filter params
+ * useTableRowsPrefetchWrapper is a wrapper around the base useTableRowsPrefetch that prefills the sort and filter params
  */
-function useTableRowsPrefetch() {
+function useTableRowsPrefetchWrapper() {
   const [{ sort, filter }] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
@@ -34,4 +34,4 @@ function useTableRowsPrefetch() {
   )
 }
 
-export default useTableRowsPrefetch
+export default useTableRowsPrefetchWrapper
