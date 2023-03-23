@@ -9,7 +9,15 @@ export interface CommandMenuContextValue {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue>(undefined)
-export const useCommandMenu = () => useContext(CommandMenuContext)
+export const useCommandMenu = () => {
+  const context = useContext(CommandMenuContext)
+
+  if (context === undefined) {
+    throw new Error('useCommandMenu was used outside of CommandMenuProvider')
+  }
+
+  return context
+}
 
 const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
   const [isOpen, setIsOpen] = useState(false)
