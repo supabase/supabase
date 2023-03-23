@@ -1,53 +1,53 @@
 [
   {
     "type": "Customer Story",
-    "title": "A web crawler handling millions of API requests.",
-    "description": "See how Monitoro built and automated a scraping platform using Supabase.",
-    "imgUrl": "images/case-study-monitoro.jpg",
-    "logoUrl": "images/logos/monitoro.png",
-    "organization": "Monitoro",
-    "url": "/blog/case-study-monitoro",
-    "path": "/blog/case-study-monitoro",
+    "title": "HappyTeams unlocks better performance and reduces cost with Supabase.",
+    "description": "How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.",
+    "imgUrl": "images/case-studies/logos/happyteams.png",
+    "logoUrl": "images/case-studies/logos/happyteams.png",
+    "organization": "HappyTeams",
+    "url": "/customers/happyteams",
+    "path": "/customers/happyteams",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Mar 16, 2020",
+      "publishDate": "Feb 16, 2023",
       "readLength": 6
     },
-    "ctaText": "View case study"
+    "ctaText": "View story"
   },
   {
     "type": "Customer Story",
-    "title": "Counter-fraud watchlists for the fintech industry.",
-    "description": "See how Xendit use Supabase to build a full-text search engine.",
-    "imgUrl": "images/case-study-xendit.jpg",
-    "logoUrl": "images/logos/xendit.png",
-    "organization": "Llama Lab",
-    "url": "/blog/case-study-xendit",
-    "path": "/blog/case-study-xendit",
+    "title": "Xendit use Supabase and create a full solution shipped to production in less than one week.",
+    "description": "As a payment processor, Xendit are responsible for verifying that all transactions are legal.",
+    "imgUrl": "images/case-studies/logos/xendit.png",
+    "logoUrl": "images/case-studies/logos/xendit.png",
+    "organization": "Xendit",
+    "url": "/customers/xendit",
+    "path": "/customers/xendit",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Mar 20, 2020",
-      "readLength": 10
+      "publishDate": "Feb 14, 2023",
+      "readLength": 6
     },
-    "ctaText": "View case study"
+    "ctaText": "View story"
   },
   {
     "type": "Customer Story",
-    "title": "A no-code website builder, deployed in seven days.",
-    "description": "See how Tayfa went from idea to paying customer in less than 30 days.",
-    "imgUrl": "images/case-study-tayfab.jpg",
-    "logoUrl": "images/logos/monitoro.png",
-    "organization": "Tayfab",
-    "url": "/blog/case-study-tayfa",
-    "path": "/blog/case-study-tayfa",
+    "title": "Replenysh uses Supabase to implement OTP in less than 24 hours.",
+    "description": "With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.",
+    "imgUrl": "images/case-studies/logos/replenysh.png",
+    "logoUrl": "images/case-studies/logos/replenysh.png",
+    "organization": "Replenysh",
+    "url": "/customers/replenysh",
+    "path": "/customers/replenysh",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Mar 27, 2020",
-      "readLength": 5
+      "publishDate": "Feb 14, 2023",
+      "readLength": 6
     },
-    "ctaText": "View case study"
+    "ctaText": "View story"
   }
 ]

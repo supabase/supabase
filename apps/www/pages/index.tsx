@@ -37,7 +37,7 @@ const Index = ({ customerStories }: Props) => {
 }
 
 export async function getStaticProps() {
-  const customerStories = getSortedPosts('_case-studies', 3)
+  const customerStories = getSortedPosts('_customers', 3)
 
   return {
     props: {

@@ -1,11 +1,12 @@
 import React from 'react'
 import SolutionsData from 'data/Solutions.json'
-import CaseStudiesData from 'data/CaseStudies.json'
+import CustomerStoriesData from 'data/CustomerStories.json'
 import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
-import { Badge, Button, IconArrowRight } from 'ui'
+import { Badge } from 'ui'
 import Image from 'next/image'
 import Link from 'next/link'
+import TextLink from '../TextLink'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -47,9 +48,9 @@ const Product = () => {
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6 flex flex-col items-start">
-          <p className="p">Latest case studies</p>
+          <p className="p">Latest customer stories</p>
           <ul className="mt-6 space-y-3">
-            {CaseStudiesData.map((caseStudy: any, idx: number) => {
+            {CustomerStoriesData.map((caseStudy: any, idx: number) => {
               if (idx > 1) {
                 return null
               }
@@ -57,19 +58,20 @@ const Product = () => {
                 <li className="flow-root" key={`flyout_case_${idx}`}>
                   <Link href={caseStudy.url}>
                     <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
-                      <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
+                      <div className="relative hidden mx-2 h-12 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                         <Image
                           src={`${basePath}/${caseStudy.imgUrl}`}
                           alt="caseStudyThumb"
                           layout="fill"
-                          objectFit="cover"
+                          objectFit="contain"
+                          className="dark:brightness-200 dark:contrast-0 dark:filter"
                         />
                       </div>
                       <div className="min-w-0 flex-1 sm:ml-4">
                         <h4 className="text-scale-1200 text-normal mb-0 text-base">
                           {caseStudy.title}
                         </h4>
-                        <p className="p text-sm">{caseStudy.description}</p>
+                        <p className="p text-sm !mb-0">{caseStudy.description}</p>
                       </div>
                     </a>
                   </Link>
@@ -77,17 +79,9 @@ const Product = () => {
               )
             })}
           </ul>
-          <Link href="/case-studies" passHref>
-            <Button
-              as="a"
-              size="tiny"
-              type="default"
-              iconRight={<IconArrowRight />}
-              className="mt-6"
-            >
-              Explore more
-            </Button>
-          </Link>
+          <div className="mt-6">
+            <TextLink url="/customers" label="Explore more" />
+          </div>
         </div>
       </div>
     </div>
