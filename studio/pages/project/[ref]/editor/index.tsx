@@ -6,6 +6,7 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { NextPageWithLayout } from 'types'
 import { useStore, withAuth } from 'hooks'
+import { Entity } from 'data/entity-types/entity-type-query'
 import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -27,20 +28,26 @@ const TableEditorPage: NextPageWithLayout = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onEditTable = (table: PostgresTable) => {
+  const onEditTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(false)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
-  const onDeleteTable = (table: PostgresTable) => {
+  const onDeleteTable = (entity: Entity) => {
     setIsDeleting(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToDelete(table)
   }
 
-  const onDuplicateTable = (table: PostgresTable) => {
+  const onDuplicateTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 

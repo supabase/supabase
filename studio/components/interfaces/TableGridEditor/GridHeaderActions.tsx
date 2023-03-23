@@ -73,7 +73,7 @@ const GridHeaderActions: FC<Props> = ({
       <div className="mt-[1px]">
         <RenderAPIPreviewToggle />
       </div>
-      <Link href={`/project/${projectRef}/auth/policies#${table.id}`}>
+      <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
         <a>
           <Button
             type={table.rls_enabled ? 'link' : 'warning'}
@@ -85,7 +85,6 @@ const GridHeaderActions: FC<Props> = ({
               )
             }
           >
-            {/* RLS {table.rls_enabled ? 'is' : 'not'} enabled */}
             {!table.rls_enabled
               ? 'RLS is not enabled'
               : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${

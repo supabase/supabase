@@ -12,7 +12,7 @@ import SVG from 'react-inlinesvg'
 
 import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -27,7 +27,7 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
       label: 'Table Editor',
       icon: (
         <SVG
-          src="/img/table-editor.svg"
+          src={`${BASE_PATH}/img/table-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
@@ -41,7 +41,7 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
       label: 'SQL Editor',
       icon: (
         <SVG
-          src="/img/sql-editor.svg"
+          src={`${BASE_PATH}/img/sql-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
