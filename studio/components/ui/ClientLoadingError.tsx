@@ -8,7 +8,7 @@ export interface ClientLoadingErrorProps {
 
 const ClientLoadingError = ({
   projectRef,
-  description = 'An error has occured',
+  description = 'An error has occurred',
 }: ClientLoadingErrorProps) => {
   return (
     <div className="px-6 py-4 bg-scale-400 border border-scale-600 rounded flex justify-between items-center">
