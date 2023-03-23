@@ -11,6 +11,7 @@ import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import { CommandMenu } from 'ui'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -84,6 +85,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           </SearchProvider>
         </ThemeProvider>
       )}
+      <CommandMenu />
     </>
   )
 }
