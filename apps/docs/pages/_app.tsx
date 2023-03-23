@@ -85,6 +85,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           </SearchProvider>
         </ThemeProvider>
       )}
+
       <CommandMenu />
     </>
   )
