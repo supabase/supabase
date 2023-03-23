@@ -34,7 +34,7 @@ const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) =>
         onKeyDown={onKeyDown}
         // shouldFilter={false}
         className={[
-          '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-input]]:h-12',
+          '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
 
           '[&_[cmdk-item]_svg]:mr-3',
           '[&_[cmdk-item]_svg]:h-5',
@@ -156,12 +156,32 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
+>(({ className, type, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
     // forceMount={props.forceMount}
     className={cn(
-      'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
+      type === 'link'
+        ? `
+        bg-scale-400
+        text-scale-1100 relative flex 
+        border border-scale-400
+        cursor-default select-none 
+        items-center rounded-md 
+        py-3 px-5 text-sm 
+        transition-all
+        outline-none 
+        aria-selected:bg-scale-600 
+        aria-selected:border-scale-700
+        aria-selected:scale-[100.3%]
+        group
+        data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+        : `
+          py-3 px-2
+          text-scale-1100 relative flex 
+          cursor-default select-none items-center 
+          rounded-md text-sm outline-none 
+          aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500`,
       className
     )}
     {...props}

@@ -12,9 +12,13 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import {
+  Badge,
   Button,
   IconAlertCircle,
   IconAlertTriangle,
+  IconBook,
+  IconChevronRight,
+  IconHash,
   IconLoader,
   IconSearch,
   IconUser,
@@ -27,7 +31,13 @@ import {
 // import { IS_PLATFORM } from '~/lib/constants'
 // import { SearchContextValue } from './SearchProvider'
 import SearchResult, { SearchResultType } from './SearchResult'
-import { CommandGroup, CommandItem, CommandInput, CommandLabel } from './Command.utils'
+import {
+  CommandGroup,
+  CommandItem,
+  CommandInput,
+  CommandLabel,
+  CommandShortcut,
+} from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
 
 import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
@@ -129,7 +139,14 @@ interface IAiDocsSeach {
   setIsLoading?: () => void
 }
 
-const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIsLoading }) => {
+const AiDocsSeach: FC<IAiDocsSeach> = ({
+  query,
+  setQuery,
+  page,
+  isLoading,
+  setIsLoading,
+  router,
+}) => {
   const { isDarkMode } = useTheme()
 
   // const { close, query, setQuery } = useSearch()
@@ -219,6 +236,61 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIs
     }
   }, [query])
 
+  const ChevronArrow = () => (
+    <IconChevronRight
+      strokeWidth={1.5}
+      className="
+        text-scale-900
+        opacity-0 
+        -left-4
+        group-aria-selected:scale-[101%]
+        group-aria-selected:opacity-100
+        group-aria-selected:left-0 
+      "
+    />
+  )
+
+  const IconContainer = (props) => (
+    <div
+      className="
+                    transition
+                  w-6 h-6 
+                  bg-scale-100 
+                  group-aria-selected:scale-[105%]
+                  group-aria-selected:bg-scale-1200
+                  text-scale-1200
+                  group-aria-selected:text-scale-100
+                  rounded flex 
+                  items-center 
+                  justify-center
+                  
+                  group-aria-selected:[&_svg]:scale-[105%]
+                  "
+      {...props}
+    />
+  )
+
+  function TextHighlighter(props) {
+    const [searchText, setSearchText] = useState('')
+
+    // const handleSearch = (event) => {
+    //   setSearchText(event.target.value.trim().toLowerCase())
+    // }
+
+    const highlightMatches = (text) => {
+      if (!query) {
+        return text
+      }
+      const regex = new RegExp(query, 'gi')
+      return text.replace(
+        regex,
+        (match) => `<span class="font-bold text-scale-1200">${match}</span>`
+      )
+    }
+
+    return <span dangerouslySetInnerHTML={{ __html: highlightMatches(props.text) }} {...props} />
+  }
+
   return (
     <>
       {results &&
@@ -236,30 +308,72 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({ query, setQuery, page, isLoading, setIs
                 forceMount
                 key={`${page.meta.title}-item-index-${i}`}
                 value={`${page.meta.title}-item-index-${i}`}
+                type={'link'}
+                onSelect={() => {
+                  router.push(`${page.path}`)
+                }}
               >
-                <CommandLabel>{page.meta.title}</CommandLabel>
-                <div>{page.meta.description}</div>
+                <div className="grow flex gap-3 items-center">
+                  <IconContainer>
+                    <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+                  </IconContainer>
+                  <div className="flex flex-col gap-0">
+                    <CommandLabel>
+                      <TextHighlighter text={page.meta.title} />
+                    </CommandLabel>
+                    <div className="text-xs text-scale-900">
+                      <TextHighlighter text={page.meta.description} />
+                    </div>
+                  </div>
+                </div>
+
+                <ChevronArrow />
               </CommandItem>
-              {pageSections.length > 0 &&
-                pageSections.map((section, i) => (
-                  //       <SearchResult
-                  //         key={section.id}
-                  //         href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
-                  //           section.slug
-                  //         }`}
-                  //         type={SearchResultType.Section}
-                  //         title={section.heading}
-                  //         chip={page.meta.title}
-                  //       />
-                  <CommandItem
-                    forceMount
-                    className="ml-8"
-                    key={`${section.heading}-item-index-${i}`}
-                    value={`${section.heading}-item-index-${i}`}
-                  >
-                    <CommandLabel>{section.heading}</CommandLabel>
-                  </CommandItem>
-                ))}
+              {pageSections.length > 0 && (
+                <div className="border-l border-scale-500 ml-3 pt-3">
+                  {pageSections.map((section, i) => (
+                    //       <SearchResult
+                    //         key={section.id}
+                    //         href={`${page.path}${page.type === 'reference' ? '/' : '#'}${
+                    //           section.slug
+                    //         }`}
+                    //         type={SearchResultType.Section}
+                    //         title={section.heading}
+                    //         chip={page.meta.title}
+                    //       />
+                    <CommandItem
+                      forceMount
+                      className="ml-3 mb-3"
+                      onSelect={() => {
+                        router.push(
+                          `${page.path}${page.type === 'reference' ? '/' : '#'}${section.slug}`
+                        )
+                      }}
+                      key={`${page.meta.title}__${section.heading}-item-index-${i}`}
+                      value={`${page.meta.title}__${section.heading}-item-index-${i}`}
+                      type="link"
+                    >
+                      <div className="grow flex gap-3 items-center">
+                        <IconContainer>
+                          <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+                        </IconContainer>
+                        <div className="flex flex-col gap-2">
+                          <cite>
+                            <TextHighlighter
+                              className="not-italic text-xs rounded-full px-2 py-1 bg-scale-500 text-scale-1200"
+                              text={page.meta.title}
+                            />
+                          </cite>
+                          <CommandLabel>
+                            <TextHighlighter text={section.heading} />
+                          </CommandLabel>
+                        </div>
+                      </div>
+                      <ChevronArrow />
+                    </CommandItem>
+                  ))}
+                </div>
+              )}
             </CommandGroup>
           )
         })}

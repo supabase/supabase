@@ -331,6 +331,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
                 page={page}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
+                router={router}
               />
             </>
           )}
