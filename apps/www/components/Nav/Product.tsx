@@ -85,7 +85,7 @@ const Product = () => {
               iconRight={<IconArrowRight />}
               className="mt-6"
             >
-              View all
+              Explore more
             </Button>
           </Link>
         </div>
