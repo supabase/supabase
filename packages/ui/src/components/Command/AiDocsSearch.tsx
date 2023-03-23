@@ -52,15 +52,6 @@ const questions = [
   'How do I set up authentication?',
 ]
 
-const RLSquestions = [
-  'How do I get started with Supabase?',
-  'How do I run Supabase locally?',
-  'How do I connect to my database?',
-  'How do I run migrations? ',
-  'How do I listen to changes in a table?',
-  'How do I set up authentication?',
-]
-
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
@@ -151,7 +142,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
 
   // const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState<string | undefined>('')
-  const [results, setResults] = useState<any[]>()
+  const [results, setResults] = useState<any[]>([])
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const [hasSearchError, setHasSearchError] = useState(false)
@@ -381,6 +372,29 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
             </CommandGroup>
           )
         })}
+      {results?.length <= 0 && (
+        <CommandGroup heading="" forceMount>
+          {questions.map((question) => {
+            const key = question.replace(/\s+/g, '_')
+            return (
+              <CommandItem
+                disabled={isLoading}
+                onSelect={() => {
+                  if (!query) {
+                    handleSearchConfirm(question)
+                    setQuery(question)
+                  }
+                }}
+                forceMount
+                key={key}
+              >
+                <AiIcon />
+                {question}
+              </CommandItem>
+            )
+          })}
+        </CommandGroup>
+      )}
       {isLoading && (
         <div className="p-6 grid gap-6 my-4">
           {/* <Loading active>{}</Loading> */}

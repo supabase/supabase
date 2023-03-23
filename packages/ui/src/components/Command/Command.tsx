@@ -169,6 +169,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
           ) {
             e.preventDefault()
             if (!page) setOpen(false)
+            setSearch('')
             setPages((pages) => pages.slice(0, -1))
           }
         }}

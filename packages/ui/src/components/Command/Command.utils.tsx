@@ -28,7 +28,11 @@ interface CommandDialogProps extends ModalProps {
 
 const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) => {
   return (
-    <Modal {...props} hideFooter>
+    <Modal
+      {...props}
+      hideFooter
+      className="!bg-[#1c1c1c]/90 backdrop-blur-md !border-[#282828]/90 transiton-all"
+    >
       {/* <DialogContent className="p-0 shadow-2xl [&_[dialog-overlay]]:bg-red-100"> */}
       <Command
         onKeyDown={onKeyDown}
@@ -163,25 +167,37 @@ const CommandItem = React.forwardRef<
     className={cn(
       type === 'link'
         ? `
-        bg-scale-400
+        bg-[#232323]/90
+        border border-[#282828]/90
+        backdrop-blur-md
         text-scale-1100 relative flex 
-        border border-scale-400
+        
         cursor-default select-none 
         items-center rounded-md 
         py-3 px-5 text-sm 
         transition-all
         outline-none 
-        aria-selected:bg-scale-600 
-        aria-selected:border-scale-700
+        aria-selected:bg-[#323232]
+        aria-selected:border-[#323232]
         aria-selected:scale-[100.3%]
         group
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
         : `
           py-3 px-2
-          text-scale-1100 relative flex 
+          text-scale-1100 
+          relative flex 
           cursor-default select-none items-center 
           rounded-md text-sm outline-none 
-          aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500`,
+
+          aria-selected:bg-[#323232]
+          
+          data-[disabled]:pointer-events-none 
+          data-[disabled]:opacity-50 
+          
+
+          
+          
+          `,
       className
     )}
     {...props}
