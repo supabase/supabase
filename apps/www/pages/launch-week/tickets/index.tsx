@@ -12,6 +12,7 @@ import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../../components/CTABanner'
 import Link from 'next/link'
 import Image from 'next/image'
+import { debounce } from 'lodash'
 
 interface Props {
   users: UserData[]
@@ -35,46 +36,63 @@ export const getPagination = (page: number = 1, size: number) => {
 const loadUsers = async (offset = 0, pageCount: number) => {
   const { from, to } = getPagination(offset, pageCount)
 
-  console.log('from: ', from, ',to: ', to)
-
   return await supabaseAdmin!
     .from('lw7_tickets_golden')
     .select('*')
-    .range(from, to)
+    .range(from, to - 1)
     .order('createdAt', { ascending: false })
 }
 
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
-  const PAGE_COUNT = 5
+  const PAGE_COUNT = 10
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
+  const [isLast, setIsLast] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const [loadedUsers, setLoadedUsers] = useState<any[]>(users)
 
-  // useEffect(() => {
-  //   loadMoreUsers(offset)
-  // }, [])
+  useEffect(() => {
+    loadMoreUsers(offset)
+  }, [hasLoaded])
 
   const loadMoreUsers = async (offset: number) => {
+    if (isLast) return
     setOffset((prev) => prev + 1)
     setIsLoading(true)
     const { data: users } = await loadUsers(offset, PAGE_COUNT)
     console.log(`loaded users (offset ${offset}): `, users)
     setLoadedUsers((prevUsers) => [...prevUsers, ...(users as any[])])
     setIsLoading(false)
+    if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
   }
 
-  const getOgUrl = (username: string, isGold: boolean) =>
-    `${STORAGE_URL}/tickets/gallery/${username}.png`
+  const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
 
   useEffect(() => {
     document.body.className = 'dark bg-[#1C1C1C]'
   }, [])
 
-  // TODO: trigger load more when scrolling to bottom
-  // const isInView = useInView(ref, { margin: '100% 0px 0px 0px' })
+  const isBottomInView = () => {
+    if (ref.current && window) {
+      const rect = ref.current.getBoundingClientRect()
+      const isInView = rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+      setHasLoaded((prev) => !prev && isInView)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener(
+      'scroll',
+      debounce(() => !isLast && isBottomInView(), 500)
+    )
+
+    return () => {
+      window.removeEventListener('scroll', isBottomInView)
+    }
+  }, [])
 
   return (
     <>
@@ -136,7 +154,10 @@ export default function TicketsPage({ users }: Props) {
                   </motion.a>
                 </Link>
               ))}
-              {isLoading && <div>loading...</div>}
+              {/* TODO: Add PAGE_COUNT length skeleton loaders when loading */}
+              {isLoading && (
+                <div className="relative rounded-lg bg-slate-100 h-0 w-full pt-[50%]" />
+              )}
             </div>
           </SectionContainer>
         </div>
