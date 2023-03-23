@@ -1,17 +1,14 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { ThemeProvider } from 'common/Providers'
-import { DefaultSeo } from 'next-seo'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
+import { CommandMenuProvider } from 'ui'
 import Favicons from '~/components/Favicons'
-import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import { CommandMenu } from 'ui'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
@@ -69,23 +66,22 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       {IS_PLATFORM || LOCAL_SUPABASE ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>
-            <SearchProvider>
+            <CommandMenuProvider>
               <SiteLayout>
                 <Component {...pageProps} />
               </SiteLayout>
-            </SearchProvider>
+            </CommandMenuProvider>
           </ThemeProvider>
         </SessionContextProvider>
       ) : (
         <ThemeProvider>
-          <SearchProvider>
+          <CommandMenuProvider>
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
-          </SearchProvider>
+          </CommandMenuProvider>
         </ThemeProvider>
       )}
-      <CommandMenu />
     </>
   )
 }

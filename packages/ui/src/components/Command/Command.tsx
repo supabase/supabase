@@ -26,6 +26,7 @@ import { IconSun } from '../Icon/icons/IconSun'
 import { IconMoon } from '../Icon/icons/IconMoon'
 import { IconCopy } from '../Icon/icons/IconCopy'
 import DocsSearch from './DocsSearch'
+import { useCommandMenu } from './CommandMenuProvider'
 // import { SearchProvider } from './SearchProvider'
 
 export const AiIcon = () => (
@@ -93,21 +94,13 @@ const ItemHandler = (props: any) => {
   return <CommandItem {...props} />
 }
 
-export interface CommandMenuContextValue {
-  isLoading: boolean
-  setIsLoading: (isLoading: boolean) => void
-}
-export const CommandMenuContext = createContext<CommandMenuContextValue>(undefined)
-export const useCommandMenu = () => useContext(CommandMenuContext)
-
 function CommandMenu({ actions }: { actions: IActions }) {
-  const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const [aiSearch, setAiSearch] = React.useState('')
   const [pages, setPages] = React.useState([])
   const page = pages[pages.length - 1]
-  const [isLoading, setIsLoading] = React.useState(false)
   const router = useRouter()
+  const { isOpen, setIsOpen } = useCommandMenu()
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -116,7 +109,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
           isSubItem={isSubItem}
           onSelect={() => {
             actions.toggleTheme()
-            setOpen(false)
+            setIsOpen(false)
           }}
         >
           Change Theme to dark
@@ -125,7 +118,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
           isSubItem={isSubItem}
           onSelect={() => {
             actions.toggleTheme()
-            setOpen(false)
+            setIsOpen(false)
           }}
         >
           Change Theme to light
@@ -137,7 +130,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && e.metaKey) {
-        setOpen((open) => !open)
+        setIsOpen((open) => !open)
       }
     }
 
@@ -155,18 +148,12 @@ function CommandMenu({ actions }: { actions: IActions }) {
   const showCommandInput = page === undefined || !AI_CHAT_ROUTES.includes(page)
 
   return (
-    <CommandMenuContext.Provider value={{ isLoading, setIsLoading }}>
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        Press{' '}
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-100 bg-slate-100 px-1.5 font-mono text-[10px] font-medium text-slate-600 opacity-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-          <span className="text-xs">⌘</span>J
-        </kbd>
-      </p>
+    <>
       <CommandDialog
         page={page}
-        visible={open}
-        onOpenChange={setOpen}
-        onCancel={() => setOpen(!open)}
+        visible={isOpen}
+        onOpenChange={setIsOpen}
+        onCancel={() => setIsOpen(!open)}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
         onKeyDown={(e) => {
@@ -177,7 +164,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
             // || (e.key === 'Backspace' && !search)
           ) {
             e.preventDefault()
-            if (!page) setOpen(false)
+            if (!page) setIsOpen(false)
             setSearch('')
             setPages((pages) => pages.slice(0, -1))
           }
@@ -423,7 +410,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
                 <CommandItem
                   onSelect={() => {
                     router.push('https://supabase.com/docs')
-                    setOpen(false)
+                    setIsOpen(false)
                   }}
                 >
                   <CommandLabel>Grab api keys</CommandLabel>
@@ -436,7 +423,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
         </CommandList>
       </CommandDialog>
       {/* <AiCommand /> */}
-    </CommandMenuContext.Provider>
+    </>
   )
 }
 
