@@ -26,12 +26,24 @@ interface CommandDialogProps extends ModalProps {
   onKeyDown: KeyboardEventHandler<HTMLDivElement>
 }
 
-const CommandDialog = ({ children, onKeyDown, ...props }: CommandDialogProps) => {
+const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
+  const [animateBounce, setAnimateBounce] = React.useState(false)
+
+  React.useEffect(() => {
+    setAnimateBounce(true)
+    setTimeout(() => setAnimateBounce(false), 126)
+  }, [page])
+
   return (
     <Modal
       {...props}
       hideFooter
-      className="!bg-[#1c1c1c]/90 backdrop-blur-md !border-[#282828]/90 transiton-all"
+      className={cn(
+        '!bg-[#f8f9fa]/80 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
+        '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
+        'transition ease-out',
+        animateBounce ? 'scale-[101.5%]' : 'scale-100'
+      )}
     >
       {/* <DialogContent className="p-0 shadow-2xl [&_[dialog-overlay]]:bg-red-100"> */}
       <Command
@@ -169,6 +181,8 @@ const CommandItem = React.forwardRef<
         ? `
         bg-[#232323]/90
         border border-[#282828]/90
+
+        backdrop-filter
         backdrop-blur-md
         text-scale-1100 relative flex 
         
@@ -189,14 +203,12 @@ const CommandItem = React.forwardRef<
           cursor-default select-none items-center 
           rounded-md text-sm outline-none 
 
-          aria-selected:bg-[#323232]
-          
-          data-[disabled]:pointer-events-none 
-          data-[disabled]:opacity-50 
-          
+          aria-selected:bg-[#323232]/80
 
-          
-          
+          aria-selected:backdrop-filter
+          aria-selected:backdrop-blur-md
+          data-[disabled]:pointer-events-none 
+          data-[disabled]:opacity-50  
           `,
       className
     )}

@@ -155,6 +155,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
         </kbd>
       </p>
       <CommandDialog
+        page={page}
         visible={open}
         onOpenChange={setOpen}
         onCancel={() => setOpen(!open)}

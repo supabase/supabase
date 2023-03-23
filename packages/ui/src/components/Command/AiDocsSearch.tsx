@@ -388,7 +388,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
                 forceMount
                 key={key}
               >
-                <AiIcon />
+                <IconSearch />
                 {question}
               </CommandItem>
             )
