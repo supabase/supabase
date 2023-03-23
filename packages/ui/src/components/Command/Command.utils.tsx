@@ -193,6 +193,7 @@ const CommandItem = React.forwardRef<
         outline-none 
         aria-selected:bg-[#323232]
         aria-selected:border-[#323232]
+        aria-selected:shadow-md
         aria-selected:scale-[100.3%]
         group
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`

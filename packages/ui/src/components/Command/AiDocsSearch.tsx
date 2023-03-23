@@ -256,7 +256,7 @@ const AiDocsSeach: FC<IAiDocsSeach> = ({
         items-center 
         justify-center
         
-        group-aria-selected:[&_svg]:scale-[105%]
+        group-aria-selected:[&_svg]:scale-[103%]
         "
       {...props}
     />
