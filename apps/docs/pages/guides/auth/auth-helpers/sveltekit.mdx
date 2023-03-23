@@ -91,13 +91,12 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 };
 ```
 
-#### Shared Load functions and pages
+### Shared Load functions and pages
 
 To be able to use Supabase in shared load functions and inside pages you need to create a Supabase client in the root layout load:
 
 ```ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation';
 import {
   PUBLIC_SUPABASE_ANON_KEY,
   PUBLIC_SUPABASE_URL
@@ -113,10 +112,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event: { fetch },
-    serverSession: data.session,
-    onAuthStateChange() {
-      invalidate('supabase:auth');
-    }
+    serverSession: data.session
   });
 
   const {
@@ -129,9 +125,40 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data: PageData`.
 
-The usage of `depends` and `invalidate` tells sveltekit that this load function should be executed whenever the session updates to keep the page store in sync.
+The usage of `depends` tells sveltekit that this load function should be executed whenever `invalidate` is called to keep the page store in sync.
 
 `createSupabaseLoadClient` caches the client when running in a browser environment and therefore does not create a new client for every time the load function runs.
+
+### Setting up the event listener on the client side
+
+We need to create an event listener in the root `+layout.svelte` file in order catch supabase events being triggered.
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+  import { invalidate } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import type { LayoutData } from './$types';
+
+  export let data: LayoutData;
+
+  $: ({ supabase } = data);
+
+  onMount(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      invalidate('supabase:auth');
+    });
+
+    return () => subscription.unsubscribe();
+  });
+</script>
+
+<slot />
+```
+
+The usage of `invalidate` tells sveltekit that the root `+layout.ts` load function should be executed whenever the session updates to keep the page store in sync.
 
 ### Generate types from your database
 
@@ -183,7 +210,7 @@ You can now determine if a user is authenticated on the client-side by checking 
 For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```html
-<script>
+<script lang="ts">
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -272,7 +299,7 @@ Wrap an Action to check that the user has a valid session. If they're not logged
 ```ts
 // src/routes/posts/+page.server.ts
 import type { Actions } from './$types';
-import { error, invalid } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const actions: Actions = {
   createPost: async ({ request, locals: { supabase, getSession } }) => {
@@ -291,7 +318,7 @@ export const actions: Actions = {
       .insert({ content });
 
     if (createPostError) {
-      return invalid(500, {
+      return fail(500, {
         supabaseErrorMessage: createPostError.message
       });
     }
@@ -308,7 +335,7 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 
 ```ts
 import type { Actions } from './$types';
-import { invalid, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { AuthApiError } from '@supabase/supabase-js';
 
 export const actions: Actions = {
@@ -325,14 +352,14 @@ export const actions: Actions = {
 
     if (error) {
       if (error instanceof AuthApiError && error.status === 400) {
-        return invalid(400, {
+        return fail(400, {
           error: 'Invalid credentials.',
           values: {
             email
           }
         });
       }
-      return invalid(500, {
+      return fail(500, {
         error: 'Server error. Try again later.',
         values: {
           email
@@ -461,7 +488,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ### Initialize the client [#migration-initialize-client]
 
-In order to use the Supabase library in your client code you will need to setup a shared load function inside the root `+layout.ts` file. 
+In order to use the Supabase library in your client code you will need to setup a shared load function inside the root `+layout.ts` and create a `+layout.svelte` to handle our event listening for Auth events. 
 
 <Tabs
   scrollable
@@ -473,7 +500,7 @@ In order to use the Supabase library in your client code you will need to setup 
 
 ```html title=src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
-<script>
+<script lang="ts">
   import { supabaseClient } from '$lib/db'
   import { invalidate } from '$app/navigation'
   import { onMount } from 'svelte'
@@ -515,10 +542,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event: { fetch },
-    serverSession: data.session,
-    onAuthStateChange() {
-      invalidate('supabase:auth');
-    }
+    serverSession: data.session
   });
 
   const {
@@ -527,6 +551,31 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
   return { supabase, session };
 };
+```
+
+```svelte title=src/routes/+layout.svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+  import { invalidate } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import type { LayoutData } from './$types';
+
+  export let data: LayoutData;
+
+  $: ({ supabase } = data);
+
+  onMount(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      invalidate('supabase:auth');
+    });
+
+    return () => subscription.unsubscribe();
+  });
+</script>
+
+<slot />
 ```
 
 </TabPanel>
@@ -606,7 +655,7 @@ declare global {
 
 ```html title=src/routes/profile/+page.svelte
 <!-- src/routes/profile/+page.svelte -->
-<script>
+<script lang="ts">
   /** @type {import('./$types').PageData} */
   export let data
   $: ({ user, tableData } = data)

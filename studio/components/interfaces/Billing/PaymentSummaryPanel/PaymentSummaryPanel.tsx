@@ -1,15 +1,16 @@
-import { FC, useRef, useState } from 'react'
+import { FC, useState } from 'react'
+import Router from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
-import { SubscriptionAddon } from '../AddOns/AddOns.types'
+import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
@@ -88,6 +89,21 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  const selectedPlanCost =
+    selectedPlan.prices.find(
+      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+    )?.unit_amount ?? 0
+  const totalSelectedAddonCost = Object.keys(selectedAddons)
+    .map((productName) => {
+      const product = (selectedAddons as any)[productName]
+      const price = product.prices.find(
+        (price: AddonPrice) => price.id === product.metadata.default_price_id
+      )
+      return price
+    })
+    .reduce((a, b) => a + b.unit_amount, 0)
+  const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
+
   const currentPITRDays =
     currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
   const selectedPITRDays =
@@ -104,6 +120,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   const isChangingPITRDuration = currentAddons.pitrDuration?.id !== selectedAddons.pitrDuration?.id
   const isChangingCustomDomains =
     currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
+
+  const togglingOnSpendCap =
+    currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG &&
+    selectedPlan &&
+    selectedPlan.metadata.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
@@ -301,6 +322,16 @@ const PaymentSummaryPanel: FC<Props> = ({
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
               )}
+
+              {togglingOnSpendCap && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Enabling spend cap"
+                  description="Exceeding your plan's quota will result in service restrictions. With the spend cap disabled, you'll be charged for usage beyond the quota."
+                />
+              )}
             </div>
           </div>
         )}
@@ -308,6 +339,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="w-full h-px bg-scale-600" />
 
         <PaymentTotal
+          totalMonthlyCost={totalMonthlyCost / 100}
           subscriptionPreview={subscriptionPreview}
           isRefreshingPreview={isRefreshingPreview}
           isSpendCapEnabled={isSpendCapEnabled}
@@ -369,7 +401,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`/img/payment-methods/${method.card.brand
+                          src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"

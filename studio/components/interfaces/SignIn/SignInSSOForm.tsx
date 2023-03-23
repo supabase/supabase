@@ -1,6 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
@@ -35,9 +36,9 @@ const SignInSSOForm = () => {
         captchaToken: token ?? undefined,
         redirectTo: `${
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-            ? process.env.NEXT_PUBLIC_VERCEL_URL
+            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${getReturnToPath()}`,
+        }${BASE_PATH}${getReturnToPath()}`,
       },
     })
 

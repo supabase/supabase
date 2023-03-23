@@ -62,8 +62,9 @@ const AccessTokenList = observer(() => {
                       <Table.td>
                         <Button
                           as="span"
-                          type="danger"
-                          title="delete token"
+                          type="default"
+                          title="Delete token"
+                          className="px-1"
                           onClick={() => {
                             setToken(x)
                             setIsOpen(true)

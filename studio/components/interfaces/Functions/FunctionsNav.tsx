@@ -13,7 +13,7 @@ const FunctionsNav = ({ item }: any) => {
       size="medium"
       activeId={!activeRoute ? 'metrics' : activeRoute}
       onChange={(e: string) =>
-        router.push(`/project/${ref}/functions/${item.id}/${e === 'metrics' ? '' : e}`)
+        router.push(`/project/${ref}/functions/${item.slug}/${e === 'metrics' ? '' : e}`)
       }
     >
       <Tabs.Panel id="details" label="Details" />
