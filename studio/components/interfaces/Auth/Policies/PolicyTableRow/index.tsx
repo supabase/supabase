@@ -53,9 +53,10 @@ const PolicyTableRow: FC<Props> = ({
               withIcon
               variant="warning"
               className="!px-4 !py-3 !mt-3"
-              title="Warning: RLS is disabled"
+              title="Warning: RLS is disabled. Your table is publicly readable and writable."
             >
-              Anonymous access is allowed to this table
+              Anyone with the anon. key can modify or delete your data. You should turn on RLS and
+              create access policies to keep your data secure.
             </Alert>
           )}
         </div>

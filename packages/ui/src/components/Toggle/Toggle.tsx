@@ -9,7 +9,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   disabled?: boolean
   layout?: 'horizontal' | 'vertical' | 'flex'
   error?: string
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string

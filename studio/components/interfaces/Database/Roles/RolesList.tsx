@@ -1,5 +1,5 @@
 import { partition } from 'lodash'
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
@@ -13,12 +13,9 @@ import RoleRow from './RoleRow'
 import { SUPABASE_ROLES } from './Roles.constants'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
+import NoSearchResults from 'components/ui/NoSearchResults'
 
-interface Props {
-  onSelectRole: (role: any) => void
-}
-
-const RolesList: FC<Props> = ({}) => {
+const RolesList = ({}) => {
   const { meta } = useStore()
 
   const [maxConnectionLimit, setMaxConnectionLimit] = useState(0)
@@ -66,7 +63,7 @@ const RolesList: FC<Props> = ({}) => {
           />
         </div>
 
-        <div className="mb-4 -mt-2 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Input
               size="small"
@@ -216,12 +213,7 @@ const RolesList: FC<Props> = ({}) => {
         </div>
 
         {filterString.length > 0 && filteredRoles.length === 0 && (
-          <div className="bg-scale-100 dark:bg-scale-300 border border-scale-300 dark:border-scale-500 px-6 py-4 rounded space-y-1">
-            <p className="text-sm text-scale-1100">No results found</p>
-            <p className="text-sm text-scale-1000">
-              Your search for "{filterString}" did not return any results
-            </p>
-          </div>
+          <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
         )}
       </div>
 
