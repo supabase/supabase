@@ -1,4 +1,5 @@
-import React from 'react'
+import * as React from 'react'
+import { createContext, useContext } from 'react'
 import { useRouter } from 'next/router'
 
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
@@ -92,6 +93,13 @@ const ItemHandler = (props: any) => {
   return <CommandItem {...props} />
 }
 
+export interface CommandMenuContextValue {
+  isLoading: boolean
+  setIsLoading: (isLoading: boolean) => void
+}
+export const CommandMenuContext = createContext<CommandMenuContextValue>(undefined)
+export const useCommandMenu = () => useContext(CommandMenuContext)
+
 function CommandMenu({ actions }: { actions: IActions }) {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
@@ -147,7 +155,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
   const showCommandInput = page === undefined || !AI_CHAT_ROUTES.includes(page)
 
   return (
-    <>
+    <CommandMenuContext.Provider value={{ isLoading, setIsLoading }}>
       <p className="text-sm text-slate-500 dark:text-slate-400">
         Press{' '}
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-100 bg-slate-100 px-1.5 font-mono text-[10px] font-medium text-slate-600 opacity-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
@@ -198,7 +206,6 @@ function CommandMenu({ actions }: { actions: IActions }) {
             placeholder="Type a command or search..."
             value={search}
             onValueChange={setSearch}
-            loading={isLoading}
           />
         )}
         {/* <CommandList>
@@ -327,14 +334,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
           )}
           {page === COMMAND_ROUTES.DOCS_SEARCH && (
             <>
-              <DocsSearch
-                query={search}
-                setQuery={setSearch}
-                page={page}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-                router={router}
-              />
+              <DocsSearch query={search} setQuery={setSearch} page={page} router={router} />
             </>
           )}
           {page === COMMAND_ROUTES.AI_RLS_POLICY && (
@@ -436,7 +436,7 @@ function CommandMenu({ actions }: { actions: IActions }) {
         </CommandList>
       </CommandDialog>
       {/* <AiCommand /> */}
-    </>
+    </CommandMenuContext.Provider>
   )
 }
 
