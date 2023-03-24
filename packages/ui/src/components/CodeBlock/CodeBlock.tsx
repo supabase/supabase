@@ -1,7 +1,8 @@
+import * as React from 'react'
 import { Children, FC } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
+import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import monokaiCustomTheme from './CodeBlock.utils'
+import { monokaiCustomTheme } from './CodeBlock.utils'
 import { Button, IconCheck, IconCopy } from 'ui'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
@@ -16,7 +17,7 @@ import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import { useState } from 'react'
 import { useTheme } from 'common/Providers'
 
-interface Props {
+export interface CodeBlockProps {
   title?: string
   language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp'
   linesToHighlight?: number[]
@@ -27,7 +28,7 @@ interface Props {
   children?: string
 }
 
-const CodeBlock: FC<Props> = ({
+export const CodeBlock = ({
   title,
   language,
   linesToHighlight = [],
@@ -36,7 +37,7 @@ const CodeBlock: FC<Props> = ({
   children,
   hideCopy = false,
   hideLineNumbers = false,
-}) => {
+}: CodeBlockProps) => {
   const { isDarkMode } = useTheme()
   const monokaiTheme = monokaiCustomTheme(isDarkMode)
 
@@ -156,5 +157,3 @@ const CodeBlock: FC<Props> = ({
     </>
   )
 }
-
-export default CodeBlock
