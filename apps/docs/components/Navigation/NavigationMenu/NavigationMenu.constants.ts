@@ -308,6 +308,17 @@ export const auth = {
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
         },
+        {
+          name: 'Enterprise SSO',
+          url: '/guides/auth/enterprise-sso',
+          items: [
+            {
+              name: 'SAML 2.0 (Beta)',
+              url: '/guides/auth/sso/auth-sso-saml',
+              items: [],
+            },
+          ],
+        },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates', items: [] },
       ],
     },
@@ -517,15 +528,19 @@ export const database = {
       url: undefined,
       items: [
         {
-          name: 'Drop all tables in schema',
+          name: 'Managing Indexes',
+          url: '/guides/database/postgres/indexes',
+        },
+        {
+          name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
         {
-          name: 'Select first row per group',
+          name: 'Select First Row per Group',
           url: '/guides/database/postgres/first-row-in-group',
         },
         {
-          name: 'Print PostgreSQL version',
+          name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
         },
       ],
@@ -589,16 +604,57 @@ export const realtime = {
   label: 'Realtime',
   url: '/guides/realtime',
   items: [
-    { name: 'Overview', url: '/guides/realtime', items: [] },
-    { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
     {
-      name: 'Channels',
+      name: 'Overview',
+      url: '/guides/realtime',
+    },
+    {
+      name: 'Quickstart',
+      url: '/guides/realtime/quickstart',
+    },
+    {
+      name: 'Features',
       url: undefined,
       items: [
-        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
-        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+        { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+        {
+          name: 'Extensions',
+          url: '/guides/realtime/extensions',
+          items: [
+            { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast', items: [] },
+            { name: 'Presence', url: '/guides/realtime/extensions/presence', items: [] },
+            {
+              name: 'Postgres Changes',
+              url: '/guides/realtime/extensions/postgres-changes',
+              items: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        {
+          name: 'Subscribing to Database Changes',
+          url: '/guides/realtime/subscribing-to-database-changes',
+          items: [],
+        },
+        {
+          name: 'Using Realtime with Next.js',
+          url: '/guides/realtime/realtime-with-nextjs',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'Deep dive',
+      url: undefined,
+      items: [
         { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
     },
   ],
@@ -669,6 +725,11 @@ export const platform = {
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
       ],
+    },
+    {
+      name: 'Billing',
+      url: undefined,
+      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap', items: [] }],
     },
     {
       name: 'Single sign-on',

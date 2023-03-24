@@ -351,7 +351,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                             <Table.td className="relative table-cell whitespace-nowrap">
                               <p className="w-48 block truncate font-mono">{item.query}</p>
                               <QueryActions
-                                sql={'item.query'}
+                                sql={item.query}
                                 className="absolute inset-y-0 right-0"
                               />
                             </Table.td>

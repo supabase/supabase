@@ -3,7 +3,7 @@ import { useState, ReactNode } from 'react'
 import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -15,9 +15,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
-import { useQueryClient } from '@tanstack/react-query'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import RLSBannerWarning from './RLSBannerWarning'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -38,13 +38,16 @@ const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }:
   const { selectedRows } = state
 
   return (
-    <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-      {selectedRows.size > 0 ? (
-        <RowHeader table={table} sorts={sorts} filters={filters} />
-      ) : (
-        <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
-      )}
-      <div className="sb-grid-header__inner">{headerActions}</div>
+    <div>
+      <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
+        {selectedRows.size > 0 ? (
+          <RowHeader table={table} sorts={sorts} filters={filters} />
+        ) : (
+          <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
+        )}
+        <div className="sb-grid-header__inner">{headerActions}</div>
+      </div>
+      <RLSBannerWarning />
     </div>
   )
 }
@@ -62,12 +65,16 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
+  const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <RefreshButton table={table} />
-        <FilterDropdown />
-        <SortPopover />
+        <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
+        <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
       {canAddNew && (
         <>
@@ -153,7 +160,6 @@ type RowHeaderProps = {
   filters: Filter[]
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()

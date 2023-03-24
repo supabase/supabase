@@ -1,4 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export const getFDWsSql = () => {
@@ -88,11 +89,17 @@ export const useFDWsQuery = <TData extends FDWsData = FDWsData>(
     options
   )
 
-export const useFDWsPrefetch = ({ projectRef, connectionString }: FDWsVariables) => {
-  return useExecuteSqlPrefetch({
-    projectRef,
-    connectionString,
-    sql: getFDWsSql(),
-    queryKey: ['fdws'],
-  })
+export const useFDWsPrefetch = () => {
+  const prefetch = useExecuteSqlPrefetch()
+
+  return useCallback(
+    ({ projectRef, connectionString }: FDWsVariables) =>
+      prefetch({
+        projectRef,
+        connectionString,
+        sql: getFDWsSql(),
+        queryKey: ['fdws'],
+      }),
+    [prefetch]
+  )
 }

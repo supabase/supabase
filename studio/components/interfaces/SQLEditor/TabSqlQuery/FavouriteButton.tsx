@@ -5,11 +5,12 @@ import { Button, IconHeart } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 
 const FavouriteButton = () => {
   const { ui, content: contentStore } = useStore()
-  const { profile: user } = ui
+  const { data: profile } = useProfileQuery()
 
   const sqlEditorStore: any = useSqlStore()
 
@@ -52,7 +53,7 @@ const FavouriteButton = () => {
       /*
        * reload sql data in store and re-select tab
        */
-      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, profile?.id), false)
       sqlEditorStore.selectTab(id)
 
       setLoading(false)
@@ -93,7 +94,7 @@ const FavouriteButton = () => {
       /*
        * reload sql data in store and re-select tab
        */
-      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, profile?.id), false)
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error: any) {
