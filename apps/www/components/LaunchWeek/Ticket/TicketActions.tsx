@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
-import { IconCheckCircle, IconDownload, IconGitHub, IconLinkedin, IconTwitter } from 'ui'
+import { IconCheckCircle } from 'ui'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
 import LoadingDots from './loading-dots'
 import { useParams } from '~/hooks/useParams'
@@ -59,10 +59,10 @@ export default function TicketActions({
   }, [downloadUrl])
 
   return (
-    <div className="grid gap-1">
+    <div className="grid gap-1 grid-cols-1 sm:grid-cols-3 lg:grid-cols-1">
       {!sharePage ? (
         <>
-          <div className="rounded-md bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1">
+          <div className="rounded-full bg-[#E6E8EB] text-scale-500 py-1 sm:py-2 lg:py-1 px-3 border border-[#dfe1e3] text-xs mb-1">
             <div className="flex items-center justify-center gap-2">
               <div className="text-scale-900">
                 <IconCheckCircle size={10} strokeWidth={1} />
@@ -71,9 +71,9 @@ export default function TicketActions({
             </div>
           </div>
           <div
-            className={`rounded-md ${
+            className={`rounded-full ${
               userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
-            }  text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
+            }  text-scale-500 py-1 sm:py-2 lg:py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
           >
             <a
               href={tweetUrl}
@@ -94,9 +94,9 @@ export default function TicketActions({
             </a>
           </div>
           <div
-            className={`rounded-md ${
+            className={`rounded-full ${
               userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
-            }  text-scale-500 py-1 px-3 border border-scale-1100 text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
+            }  text-scale-500 py-1 sm:py-2 lg:py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
           >
             <a
               href={linkedInUrl}

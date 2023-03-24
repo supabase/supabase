@@ -113,12 +113,12 @@ export default function Ticket({
                         <br className="hidden lg:inline" />
                         chance!
                         <br className="inline lg:hidden" /> Almost{' '}
-                        <span className="gradient-text-gold-500">gold</span>.
+                        <span className={styles['gold-text']}>gold</span>.
                       </span>
                     )}
                     {winningChances === 3 && (
                       <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
-                        You're <span className="gradient-text-gold-500">gold</span>!<br />
+                        You're <span className={styles['gold-text']}>gold</span>!<br />
                         You've maxed your <br /> chances of winning!
                       </span>
                     )}
