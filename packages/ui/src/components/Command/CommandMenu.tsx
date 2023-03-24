@@ -19,24 +19,13 @@ import {
   CommandShortcut,
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
+// import { SearchProvider } from './SearchProvider'
+import navItems from './command-nav-items.json'
+import { NavItem } from './Command.types'
+import { AiIcon } from './Command.icons'
+import { IconArrowRight } from '../Icon/icons/IconArrowRight'
+import { IconLifeBuoy } from '../Icon/icons/IconLifeBuoy'
 import DocsSearch from './DocsSearch'
-
-export const AiIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth="1.5"
-    stroke="currentColor"
-    className="w-6 h-6 text-purple-900"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-    />
-  </svg>
-)
 
 export const COMMAND_ROUTES = {
   AI_HOME: 'Supabase AI',
@@ -47,39 +36,38 @@ export const COMMAND_ROUTES = {
 
 const AI_CHAT_ROUTES = [COMMAND_ROUTES.AI_ASK_ANYTHING, COMMAND_ROUTES.AI_RLS_POLICY]
 
-export const AiIconChat = () => (
-  <div
-    className="w-7 h-7
-    bg-gradient-to-r from-purple-900 to-purple-800
+interface IActions {
+  toggleTheme: () => void
+}
 
-    ring-purple-600
-    ring-1
+const iconComponents = {
+  book: <IconBook />,
+}
 
-    rounded-md border border-purple-400 flex items-center justify-center
-    shadow-sm
-    "
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-4 h-4 text-white"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-      />
-    </svg>
-  </div>
-)
-
-const ItemHandler = (props: any) => {
+const SearchOnlyItem = (props: any) => {
+  const icon = iconComponents[props.icon]
+  console.log('props', props)
   const search = useCommandState((state) => state.search)
+  // if search is empty & items is marked as a subItem, don't show it
+  // ie: only show these items in search results, not top level
   if (!search && props.isSubItem) return null
-  return <CommandItem {...props} />
+  return <CommandItem>{props.label}</CommandItem>
+}
+
+//  <CommandItem onSelect={() => handleSetPages([...pages, 'Docs Search'], true)} forceMount>
+//   <IconBook className="" />
+
+//   <span>
+//     Search the docs...
+//     <span className="text-scale-1200 font-semibold">{search}</span>
+//   </span>
+// </CommandItem>
+
+{
+  /* <CommandItem>
+  <IconInbox className="text-scale-900" />
+  <CommandLabel>See what's new</CommandLabel>
+</CommandItem> */
 }
 
 const CommandMenu = () => {
@@ -92,7 +80,7 @@ const CommandMenu = () => {
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
       <CommandGroup>
-        <ItemHandler
+        <SearchOnlyItem
           isSubItem={isSubItem}
           onSelect={() => {
             actions.toggleTheme(true)
@@ -100,8 +88,8 @@ const CommandMenu = () => {
           }}
         >
           Change Theme to dark
-        </ItemHandler>
-        <ItemHandler
+        </SearchOnlyItem>
+        <SearchOnlyItem
           isSubItem={isSubItem}
           onSelect={() => {
             actions.toggleTheme(false)
@@ -109,7 +97,28 @@ const CommandMenu = () => {
           }}
         >
           Change Theme to light
-        </ItemHandler>
+        </SearchOnlyItem>
+      </CommandGroup>
+    )
+  }
+
+  const SearchableChildItems = ({ isSubItem = false }) => {
+    return (
+      <CommandGroup>
+        {/* output only subItems  */}
+        {navItems.items
+          .filter((item) => item.sites.includes('docs'))
+          .flatMap((item) => item.subItems)
+          .map((item) => (
+            <SearchOnlyItem
+              icon={item.icon}
+              label={item.label}
+              isSubItem={isSubItem}
+              onSelect={() => {
+                console.log('hay')
+              }}
+            />
+          ))}
       </CommandGroup>
     )
   }
@@ -208,18 +217,37 @@ const CommandMenu = () => {
                   </span>
                 </CommandItem>
               </CommandGroup>
+
+              <CommandGroup heading="Jump to">
+                {navItems.docsTools.map((item) => (
+                  <CommandItem onSelect={() => router.push(item.url)}>
+                    <IconArrowRight className="text-scale-900" />
+                    <CommandLabel>
+                      Go to <span className="font-bold"> {item.label}</span>
+                    </CommandLabel>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
+              <CommandGroup heading="Support">
+                {navItems.docsSupport.map((item) => (
+                  <CommandItem onSelect={() => router.push(item.url)}>
+                    <IconLifeBuoy className="text-scale-900" />
+                    <CommandLabel>
+                      Go to <span className="font-bold"> {item.label}</span>
+                    </CommandLabel>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
               <CommandGroup heading="General">
-                <CommandItem>
+                <CommandItem onSelect={() => router.push('https://supabase.com/changelog')}>
                   <IconInbox className="text-scale-900" />
-                  <CommandLabel>See what's new</CommandLabel>
+                  <CommandLabel>Read the Changelog</CommandLabel>
                 </CommandItem>
                 <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
                   <IconMonitor className="mr-2" />
                   Change theme
-                </CommandItem>
-                <CommandItem>
-                  <IconCopy />
-                  Copy current page URL
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="Settings">
@@ -244,25 +272,9 @@ const CommandMenu = () => {
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
-              <CommandGroup heading="Settings2">
-                <CommandItem>
-                  <User className="text-scale-900" />
-                  <CommandLabel>Profile2</CommandLabel>
-                  <CommandShortcut>⌘P</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>Billing2</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Settings2</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
 
               <ThemeOptions isSubItem />
+              <SearchableChildItems isSubItem />
             </>
           )}
           {page === 'docs-search' && (
