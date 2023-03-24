@@ -99,6 +99,7 @@ const CommandMenu = () => {
           .flatMap((item) => item.subItems)
           .map((item) => (
             <SearchOnlyItem
+              key={item.url}
               icon={item.icon}
               isSubItem={isSubItem}
               onSelect={() => {
@@ -158,6 +159,7 @@ const CommandMenu = () => {
             <>
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
+                  type="command"
                   onSelect={() => {
                     handleSetPages([...pages, COMMAND_ROUTES.AI], false)
                   }}
@@ -177,6 +179,7 @@ const CommandMenu = () => {
                   </span>
                 </CommandItem>
                 <CommandItem
+                  type="command"
                   onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.DOCS_SEARCH], true)}
                   forceMount
                 >
@@ -198,7 +201,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="Navigation">
                 {navItems.docsTools.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconArrowRight className="text-scale-900" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
@@ -209,7 +212,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="Support">
                 {navItems.docsSupport.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconLifeBuoy className="text-scale-900" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
@@ -220,7 +223,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="General">
                 {navItems.docsGeneral.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     {item?.icon && iconPicker[item.icon]}
                     <CommandLabel>{item.label}</CommandLabel>
                   </CommandItem>
@@ -228,7 +231,10 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="Settings">
-                <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
+                <CommandItem
+                  type="link"
+                  onSelect={() => handleSetPages([...pages, 'Theme'], false)}
+                >
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
@@ -241,7 +247,7 @@ const CommandMenu = () => {
             <AiCommand query={search} setQuery={setSearch} page={page} />
           )}
           {page === COMMAND_ROUTES.DOCS_SEARCH && (
-            <DocsSearch query={search} setQuery={setSearch} page={page} router={router} />
+            <DocsSearch query={search} setQuery={setSearch} />
           )}
           {page === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
