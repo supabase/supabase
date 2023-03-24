@@ -556,15 +556,28 @@ export const api = {
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
+    { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
+    {
+      name: 'Guides',
+      url: '/guides/api',
+      items: [
+        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/api/joins-and-nesting',
+          items: [],
+        },
+      ],
+    },
     {
       name: 'REST',
       url: undefined,
       items: [
+        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
         { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
         { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
-        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-        { name: 'Joins and Nested Tables', url: '/guides/api/rest/joins-and-nesting', items: [] },
-        { name: 'Caching', url: '/guides/api/rest/caching', items: [] },
+        { name: 'Caching responses', url: '/guides/api/rest/caching', items: [] },
       ],
     },
     {
