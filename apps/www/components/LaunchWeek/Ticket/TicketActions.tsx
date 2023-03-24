@@ -80,9 +80,7 @@ export default function TicketActions({
               rel="noopener noreferrer"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
-                userData.sharedOnTwitter
-                  ? 'text-scale-500 pointer-events-none'
-                  : 'text-white hover:text-scale-500'
+                userData.sharedOnTwitter ? 'text-scale-500' : 'text-white hover:text-scale-500'
               }`}
             >
               {userData.sharedOnTwitter && (
@@ -103,9 +101,7 @@ export default function TicketActions({
               rel="noopener noreferrer"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
-                userData.sharedOnLinkedIn
-                  ? 'text-scale-500 pointer-events-none'
-                  : 'text-white hover:text-scale-500'
+                userData.sharedOnLinkedIn ? 'text-scale-500' : 'text-white hover:text-scale-500'
               }`}
             >
               {userData.sharedOnLinkedIn && (
@@ -118,17 +114,13 @@ export default function TicketActions({
           </div>
         </>
       ) : (
-        <>
-          {username ? (
-            <></>
-          ) : (
-            <TicketForm
-              defaultUsername={username ?? undefined}
-              ticketGenerationState={ticketGenerationState}
-              setTicketGenerationState={setTicketGenerationState}
-            />
-          )}
-        </>
+        !username && (
+          <TicketForm
+            defaultUsername={username ?? undefined}
+            ticketGenerationState={ticketGenerationState}
+            setTicketGenerationState={setTicketGenerationState}
+          />
+        )
       )}
     </div>
   )

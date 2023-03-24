@@ -29,11 +29,13 @@ const supabaseAdmin = createClient(
 
 export default function UsernamePage({ user, users }: Props) {
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
+  const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
+  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
+  const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase] = useState(() =>
     createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   )
-  const description = 'Supabase Launch Week 7 | 3-7 April 2023'
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
@@ -50,11 +52,11 @@ export default function UsernamePage({ user, users }: Props) {
   return (
     <>
       <NextSeo
-        title={`${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`}
+        title={TITLE}
         openGraph={{
-          title: `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`,
-          description: description,
-          url: `${SITE_URL}/tickets/${username}`,
+          title: TITLE,
+          description: DESCRIPTION,
+          url: OG_URL,
           images: [
             {
               url: ogImageUrl,

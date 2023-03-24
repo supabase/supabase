@@ -24,29 +24,13 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export const getPagination = (page: number = 1, size: number) => {
-  const limit = size ? +size : 3
-  const from = page ? page * limit : 0
-  const to = page ? from + size : size
-
-  return { from, to }
-}
-
-const loadUsers = async (offset = 0, pageCount: number) => {
-  const { from, to } = getPagination(offset, pageCount)
-
-  return await supabaseAdmin!
-    .from('lw7_tickets_golden')
-    .select('*')
-    .range(from, to - 1)
-    .order('createdAt', { ascending: false })
-}
-
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
-  const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
-  const description = 'Supabase Launch Week 7 | 3-7 April 2023'
+  const TITLE = '#SupaLaunchWeek Tickets'
+  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
+
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -56,6 +40,24 @@ export default function TicketsPage({ users }: Props) {
   useEffect(() => {
     loadMoreUsers(offset)
   }, [hasLoaded])
+
+  const getPagination = (page: number = 1, size: number) => {
+    const limit = size ? +size : 3
+    const from = page ? page * limit : 0
+    const to = page ? from + size : size
+
+    return { from, to }
+  }
+
+  const loadUsers = async (offset = 0, pageCount: number) => {
+    const { from, to } = getPagination(offset, pageCount)
+
+    return await supabaseAdmin!
+      .from('lw7_tickets_golden')
+      .select('*')
+      .range(from, to - 1)
+      .order('createdAt', { ascending: false })
+  }
 
   const loadMoreUsers = async (offset: number) => {
     if (isLast) return
@@ -67,8 +69,6 @@ export default function TicketsPage({ users }: Props) {
     setIsLoading(false)
     if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
   }
-
-  const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
 
   useEffect(() => {
     document.body.className = 'dark bg-[#1C1C1C]'
@@ -93,19 +93,17 @@ export default function TicketsPage({ users }: Props) {
     }
   }, [])
 
-  const finalAnimationState = { y: 0, opacity: 1 }
-
   return (
     <>
       <NextSeo
-        title={`#SupaLaunchWeek Tickets`}
+        title={TITLE}
         openGraph={{
-          title: `#SupaLaunchWeek Tickets`,
-          description: description,
+          title: TITLE,
+          description: DESCRIPTION,
           url: `${SITE_URL}/tickets`,
           images: [
             {
-              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`,
+              url: OG_IMAGE,
             },
           ],
         }}
@@ -122,11 +120,11 @@ export default function TicketsPage({ users }: Props) {
             <div className="bg-lw7-gradient absolute inset-0 z-0" />
           </div>
           <SectionContainer className="z-10 -mt-60 md:-mt-[500px] max-w-none overflow-hidden">
-            <div className="text-center relative z-10 text-white">
+            <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
               <motion.div
                 className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
                 initial={{ y: -20, opacity: 0 }}
-                whileInView={finalAnimationState}
+                whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true, margin: '-150px' }}
                 transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
               >

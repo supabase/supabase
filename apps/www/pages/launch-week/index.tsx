@@ -28,9 +28,11 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketHome({ users }: Props) {
+  const TITLE = 'Get your #SupaLaunchWeek Ticket'
+  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
@@ -79,14 +81,15 @@ export default function TicketHome({ users }: Props) {
   return (
     <>
       <NextSeo
-        title={`Get your #SupaLaunchWeek Ticket`}
+        title={TITLE}
+        description={DESCRIPTION}
         openGraph={{
-          title: `Get your #SupaLaunchWeek Ticket`,
-          description: description,
-          url: `${SITE_URL}`,
+          title: TITLE,
+          description: DESCRIPTION,
+          url: SITE_URL,
           images: [
             {
-              url: `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`,
+              url: OG_IMAGE,
             },
           ],
         }}
