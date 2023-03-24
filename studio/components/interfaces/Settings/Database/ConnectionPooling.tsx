@@ -204,7 +204,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                 <AutoField
                   name="pool_mode"
                   showInlineError
-                  errorMessage="You must select one of the three options"
+                  errorMessage="You must select one of the two options"
                 />
                 <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                   <p className="text-sm text-scale-900">
