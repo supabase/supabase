@@ -10,6 +10,7 @@ import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
 import { SITE_URL } from '~/lib/constants'
+import { useMobileViewport } from '../../../hooks/useMobileViewport'
 
 type TicketGenerationState = 'default' | 'loading'
 
@@ -32,6 +33,7 @@ export default function Ticket({
   bgImageId,
   referrals,
 }: Props) {
+  const isMobile = useMobileViewport(1023)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')
   const divRef = useRef<HTMLDivElement>(null)
@@ -40,8 +42,8 @@ export default function Ticket({
   return (
     <div
       className={[
-        `relative w-full max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 p-2 rounded-3xl lg:items-stretch h-auto backdrop-blur"`,
-        styles['ticket-hero'],
+        `relative w-full max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:p-2 rounded-3xl backdrop-blur lg:items-stretch h-auto"`,
+        !isMobile && styles['ticket-hero'],
       ].join(' ')}
       id="wayfinding--ticket-visual-wrapper-container"
     >
@@ -76,20 +78,12 @@ export default function Ticket({
       </div>
       <div
         ref={divRef}
-        className="flex flex-col !w-full h-full justify-center gap-6 col-span-full lg:col-span-4 mt-4 lg:pr-8 max-h-[400px]"
+        className={[
+          'flex flex-col !w-full h-full justify-center gap-6 col-span-full p-2 pt-4 lg:p-0 lg:col-span-4 mt-1 lg:m-0 lg:pr-8 max-h-[400px] rounded-3xl backdrop-blur lg:backdrop-blur-none',
+          isMobile && styles['ticket-hero'],
+        ].join(' ')}
       >
-        <div
-          className={`
-          text-scale-1200
-          flex flex-col
-          w-full
-          items-center
-          text-white
-          text-center lg:text-left
-          lg:items-start
-          gap-3
-          `}
-        >
+        <div className="text-scale-1200 flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-2 lg:gap-3">
           <h1
             className={cn(
               styleUtils.appear,
@@ -102,13 +96,13 @@ export default function Ticket({
                 {name ? (
                   <>
                     {winningChances === 1 && (
-                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
+                      <span className="text-2xl tracking-[0.02rem] leading-7 block">
                         You're <span className="gradient-text-purple-800">in the draw!</span> <br />
                         Now make it gold.
                       </span>
                     )}
                     {winningChances === 2 && (
-                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
+                      <span className="text-2xl tracking-[0.02rem] leading-7 block">
                         You've <span className="gradient-text-purple-800">doubled</span> your{' '}
                         <br className="hidden lg:inline" />
                         chance!
@@ -117,21 +111,21 @@ export default function Ticket({
                       </span>
                     )}
                     {winningChances === 3 && (
-                      <span className="text-2xl tracking-[0.02rem] font-medium leading-7 block">
+                      <span className="text-2xl tracking-[0.02rem] leading-7 block">
                         You're <span className={styles['gold-text']}>gold</span>!<br />
-                        You've maxed your <br /> chances of winning!
+                        You've maxed your <br className="hidden lg:inline" /> chances of winning!
                       </span>
                     )}
                   </>
                 ) : (
-                  <span className="text-2xl font-medium leading-7 block">
+                  <span className="text-2xl leading-7 block">
                     Generate your ticket. <br />
                     Win the <span className="gradient-text-purple-800">SupaKeyboard</span>.
                   </span>
                 )}
               </>
             ) : (
-              <span className="font-medium tracking-[-0.02px] leading-7 block">
+              <span className="tracking-[-0.02px] leading-7 block">
                 {name ? name : username}'s <br className="hidden lg:inline" />
                 unique ticket
               </span>
@@ -142,28 +136,20 @@ export default function Ticket({
             {!sharePage ? (
               <>
                 {golden ? (
-                  <>
-                    <p>
-                      You got a Golden ticket. This means you're in, and you also won a Supabase
-                      sticker pack!
-                    </p>
-                  </>
+                  <p>
+                    You got a Golden ticket. This means you're in, and you also won a Supabase
+                    sticker pack!
+                  </p>
+                ) : username ? (
+                  <p>
+                    Why stop there? Increase your chances of winning by sharing your unique ticket.
+                    Get sharing!
+                  </p>
                 ) : (
-                  <>
-                    {username ? (
-                      <>
-                        <p>
-                          Why stop there? Increase your chances of winning by sharing your unique
-                          ticket. Get sharing!
-                        </p>
-                      </>
-                    ) : (
-                      <p>
-                        We have some fantastic swag up for grabs, including 3 limited-edition
-                        mechanical keyboards that you won't want to miss.
-                      </p>
-                    )}
-                  </>
+                  <p>
+                    We have some fantastic swag up for grabs, including 3 limited-edition mechanical
+                    keyboards that you won't want to miss.
+                  </p>
                 )}
               </>
             ) : (
@@ -173,7 +159,7 @@ export default function Ticket({
                   keyboard that you won't want to miss.
                 </p>
 
-                <div className="mt-4 lg:mt-8 rounded-md bg-[#E6E8EB] py-1 px-3 border border-[#bbbbbb] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]">
+                <div className="mt-4 lg:mt-8 rounded-full bg-[#E6E8EB] py-1 px-3 -mb-3 border border-[#bbbbbb] text-xs transition-all ease-out hover:bg-[#dfe1e3]">
                   <a
                     href={`${SITE_URL}`}
                     className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}

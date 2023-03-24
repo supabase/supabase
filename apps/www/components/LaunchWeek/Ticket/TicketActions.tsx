@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
 import { IconCheckCircle } from 'ui'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
-import LoadingDots from './loading-dots'
 import { useParams } from '~/hooks/useParams'
 import TicketForm from './TicketForm'
 
@@ -25,11 +24,7 @@ export default function TicketActions({
   const [loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
   const permalink = (medium: string) =>
-    encodeURIComponent(
-      `${SITE_URL}/tickets/${username}?utm_source=lw7-ticket&utm_medium=${medium}&utm_campaign=launch-week-7&utm_content=${username}${
-        golden ? `&golden=true` : ''
-      }`
-    )
+    encodeURIComponent(`${SITE_URL}/tickets/${username}${golden ? `?golden=true` : ''}`)
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink(
