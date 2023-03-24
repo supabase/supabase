@@ -1,9 +1,9 @@
 // https://github.com/euank/node-parse-numeric-range/blob/master/index.js
-export function parseNumericRange(string) {
+export function parseNumericRange(value: string) {
   let res = []
   let m
 
-  for (let str of string.split(',').map((str) => str.trim())) {
+  for (let str of value.split(',').map((str) => str.trim())) {
     // just a number
     if (/^-?\d+$/.test(str)) {
       res.push(parseInt(str, 10))
@@ -27,7 +27,7 @@ export function parseNumericRange(string) {
   return res
 }
 
-const monokaiCustomTheme = (isDarkMode) => {
+export const monokaiCustomTheme = (isDarkMode: boolean) => {
   return {
     hljs: {
       display: 'block',
@@ -142,5 +142,3 @@ const monokaiCustomTheme = (isDarkMode) => {
     },
   }
 }
-
-export default monokaiCustomTheme
