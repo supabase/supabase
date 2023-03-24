@@ -159,11 +159,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
 
     const formSchema = {
       properties: {
-        pgbouncer_enabled: {
-          title: 'Enabled',
-          type: 'boolean',
-          help: 'Activates / deactivates Connection Pooling.',
-        },
         pool_mode: {
           title: 'Pool Mode',
           type: 'string',
@@ -175,10 +170,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
             {
               label: 'Session',
               value: 'session',
-            },
-            {
-              label: 'Statement',
-              value: 'statement',
             },
           ],
         },
@@ -208,10 +199,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
-            <ToggleField name="pgbouncer_enabled" />
-
-            <Divider light />
-
             {updates.pgbouncer_enabled && (
               <>
                 <AutoField
