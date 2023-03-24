@@ -1,6 +1,7 @@
 import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -63,6 +64,7 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 
 const CommandMenu = () => {
   const router = useRouter()
+  const commandInputRef = useRef<ElementRef<typeof CommandInput>>()
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
     useCommandMenu()
 
@@ -117,6 +119,7 @@ const CommandMenu = () => {
   function handleSetPages(pages: any, keepSearch: any) {
     setPages(pages)
     if (!keepSearch) setSearch('')
+    commandInputRef.current?.focus()
   }
 
   const showCommandInput = !CHAT_ROUTES.includes(currentPage)
@@ -152,6 +155,7 @@ const CommandMenu = () => {
         )}
         {showCommandInput && (
           <CommandInput
+            ref={commandInputRef}
             placeholder="Type a command or search..."
             value={search}
             onValueChange={setSearch}
