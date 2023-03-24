@@ -126,7 +126,9 @@ const CommandMenu = () => {
       <CommandDialog
         page={currentPage}
         visible={isOpen}
-        // onCancel={() => setIsOpen(!open)}
+        onInteractOutside={() => {
+          setIsOpen(!open)
+        }}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
       >
