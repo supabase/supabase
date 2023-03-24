@@ -80,5 +80,17 @@
       "label": "Github Discussions",
       "url": "https://github.com/supabase/supabase/discussions"
     }
+  ],
+  "docsGeneral": [
+    {
+      "icon": "arrowRight",
+      "label": "Go to the Dashboard",
+      "url": "https://app.supabase.io"
+    },
+    {
+      "icon": "inbox",
+      "label": "Read the Changelog",
+      "url": "https://supabase.com/changelog"
+    }
   ]
 }

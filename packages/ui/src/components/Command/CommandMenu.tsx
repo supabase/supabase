@@ -40,13 +40,13 @@ interface IActions {
   toggleTheme: () => void
 }
 
-const iconComponents = {
+const iconPicker = {
+  arrowRight: <IconArrowRight />,
   book: <IconBook />,
+  inbox: <IconInbox />,
 }
 
 const SearchOnlyItem = (props: any) => {
-  const icon = iconComponents[props.icon]
-  console.log('props', props)
   const search = useCommandState((state) => state.search)
   // if search is empty & items is marked as a subItem, don't show it
   // ie: only show these items in search results, not top level
@@ -218,7 +218,7 @@ const CommandMenu = () => {
                 </CommandItem>
               </CommandGroup>
 
-              <CommandGroup heading="Jump to">
+              <CommandGroup heading="Navigation">
                 {navItems.docsTools.map((item) => (
                   <CommandItem onSelect={() => router.push(item.url)}>
                     <IconArrowRight className="text-scale-900" />
@@ -241,35 +241,18 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="General">
-                <CommandItem onSelect={() => router.push('https://supabase.com/changelog')}>
-                  <IconInbox className="text-scale-900" />
-                  <CommandLabel>Read the Changelog</CommandLabel>
-                </CommandItem>
+                {navItems.docsGeneral.map((item) => (
+                  <CommandItem onSelect={() => router.push(item.url)}>
+                    {item.icon && iconPicker[item.icon]}
+                    <CommandLabel>{item.label}</CommandLabel>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
+              <CommandGroup heading="Settings">
                 <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
                   <IconMonitor className="mr-2" />
                   Change theme
-                </CommandItem>
-              </CommandGroup>
-              <CommandGroup heading="Settings">
-                <CommandItem onSelect={() => handleSetPages([...pages, 'api-keys'], true)}>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>API keys</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <User className="text-scale-900" />
-                  <CommandLabel>Profile</CommandLabel>
-                  <CommandShortcut>⌘P</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>Billing</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Settings</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
 
@@ -399,7 +382,7 @@ const CommandMenu = () => {
                     setIsOpen(false)
                   }}
                 >
-                  <CommandLabel>Grab api keys</CommandLabel>
+                  <CommandLabel>Toggle theme</CommandLabel>
                 </CommandItem>
               </CommandGroup>
               <ThemeOptions />
