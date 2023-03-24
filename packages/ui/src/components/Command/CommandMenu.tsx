@@ -250,12 +250,8 @@ const CommandMenu = () => {
               <SearchableChildItems isSubItem />
             </>
           )}
-          {currentPage === COMMAND_ROUTES.AI && (
-            <AiCommand query={search} setQuery={setSearch} page={currentPage} />
-          )}
-          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && (
-            <DocsSearch query={search} setQuery={setSearch} />
-          )}
+          {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
+          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && <DocsSearch />}
           {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
