@@ -31,6 +31,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
+import clsx from 'clsx'
 
 export interface TableEditorMenuProps {
   selectedSchema?: string
@@ -305,7 +306,7 @@ const TableEditorMenu = ({
                           </div>
                         </Tooltip.Trigger>
 
-                        <Tooltip.Content side="top">
+                        <Tooltip.Content side="bottom">
                           <Tooltip.Arrow className="radix-tooltip-arrow" />
                           <div
                             className={[
@@ -387,7 +388,16 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] text-scale-1100 bg-scale-800">
+        <div
+          className={clsx(
+            'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+            entity.type === ENTITY_TYPE.TABLE && 'text-green-1000 bg-green-500',
+            entity.type === ENTITY_TYPE.VIEW && 'text-blue-900 bg-blue-500',
+            entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+            entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+            entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+          )}
+        >
           {Object.entries(ENTITY_TYPE)
             .find(([, value]) => value === entity.type)?.[0]?.[0]
             ?.toUpperCase()}
