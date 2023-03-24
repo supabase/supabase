@@ -25,6 +25,7 @@ Command.displayName = CommandPrimitive.displayName
 
 interface CommandDialogProps extends ModalProps {
   onKeyDown: KeyboardEventHandler<HTMLDivElement>
+  page?: number
 }
 
 const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
@@ -162,7 +163,7 @@ const CommandSeparator = React.forwardRef<
   <CommandPrimitive.Separator
     ref={ref}
     className={cn(
-      `h-px 
+      `h-px
     w-full
     bg-scale-50
     `,
@@ -188,13 +189,13 @@ const CommandItem = React.forwardRef<
 
         backdrop-filter
         backdrop-blur-md
-        text-scale-1100 relative flex 
-        
-        cursor-default select-none 
-        items-center rounded-md 
-        py-3 px-5 text-sm 
+        text-scale-1100 relative flex
+
+        cursor-default select-none
+        items-center rounded-md
+        py-3 px-5 text-sm
         transition-all
-        outline-none 
+        outline-none
         aria-selected:bg-[#323232]
         aria-selected:border-[#323232]
         aria-selected:shadow-md
@@ -203,10 +204,10 @@ const CommandItem = React.forwardRef<
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
         : `
           py-3 px-2
-          text-scale-1100 
-          relative flex 
-          cursor-default select-none items-center 
-          rounded-md text-sm outline-none 
+          text-scale-1100
+          relative flex
+          cursor-default select-none items-center
+          rounded-md text-sm outline-none
 
           aria-selected:bg-scale-400
 
@@ -214,8 +215,8 @@ const CommandItem = React.forwardRef<
 
           aria-selected:backdrop-filter
           aria-selected:backdrop-blur-md
-          data-[disabled]:pointer-events-none 
-          data-[disabled]:opacity-50  
+          data-[disabled]:pointer-events-none
+          data-[disabled]:opacity-50
           `,
       className
     )}

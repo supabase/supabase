@@ -99,7 +99,7 @@ function promptDataReducer(
 
 export interface DocsSearchProps {
   query?: string
-  setQuery?: () => void
+  setQuery?: (query: string) => void
   page?: string
   router: any
 }
@@ -201,11 +201,11 @@ const DocsSearch = ({ query, setQuery, page, router }: DocsSearchProps) => {
       strokeWidth={1.5}
       className="
         text-scale-900
-        opacity-0 
+        opacity-0
         -left-4
         group-aria-selected:scale-[101%]
         group-aria-selected:opacity-100
-        group-aria-selected:left-0 
+        group-aria-selected:left-0
       "
     />
   )
@@ -214,16 +214,16 @@ const DocsSearch = ({ query, setQuery, page, router }: DocsSearchProps) => {
     <div
       className="
         transition
-        w-6 h-6 
-        bg-scale-100 
+        w-6 h-6
+        bg-scale-100
         group-aria-selected:scale-[105%]
         group-aria-selected:bg-scale-1200
         text-scale-1200
         group-aria-selected:text-scale-100
-        rounded flex 
-        items-center 
+        rounded flex
+        items-center
         justify-center
-        
+
         group-aria-selected:[&_svg]:scale-[103%]
         "
       {...props}
