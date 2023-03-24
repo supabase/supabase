@@ -143,7 +143,7 @@ const HTTPRequestFields = ({
                   side="bottom"
                   overlay={[
                     <Dropdown.Item
-                      key="experimental-token"
+                      key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
                           id: uuidv4(),
@@ -154,7 +154,28 @@ const HTTPRequestFields = ({
                     >
                       <div className="space-y-1">
                         <p className="block text-scale-1200">
-                          Add Authorization header with anon key
+                          Add authorization header with anon key
+                        </p>
+                        <p className="text-scale-1000">
+                          Required if your edge function enforces JWT verification
+                        </p>
+                      </div>
+                    </Dropdown.Item>,
+                    <Dropdown.Separator />,
+                    <Dropdown.Item
+                      key="add-source-header"
+                      onClick={() =>
+                        onAddHeader({
+                          id: uuidv4(),
+                          name: ' x-supabase-webhook-source',
+                          value: `database-webhook`,
+                        })
+                      }
+                    >
+                      <div className="space-y-1">
+                        <p className="block text-scale-1200">Add custom source header</p>
+                        <p className="text-scale-1000">
+                          Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
                     </Dropdown.Item>,
