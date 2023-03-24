@@ -1,0 +1,80 @@
+[api]
+enabled = true
+address = "0.0.0.0:9001"
+
+[sources.docker_syslog]
+type = "syslog"
+address = "0.0.0.0:9000"
+mode = "tcp"
+path = "/tmp/socket"
+
+[transforms.router]
+type = "route"
+inputs = [ "docker_syslog" ]
+    [transforms.router.route]
+    studio = '.appname == "studio"'
+    kong = '.appname == "kong"'
+    auth = '.appname == "auth"'
+    rest = '.appname == "rest"'
+    realtime = '.appname == "realtime"'
+    storage = '.appname == "storage"'
+    imgproxy = '.appname == "imgproxy"'
+    meta = '.appname == "meta"'
+    db = '.appname == "db"'
+
+[sinks.logflare_auth]
+type = "http"
+inputs = [ "router.auth" ]
+encoding.codec = "json"
+method = "post"
+uri = "http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=gd9tDpgiCVJe"
+
+[sinks.logflare_realtime]
+type = "http"
+inputs = [ "router.realtime" ]
+encoding.codec = "json"
+method = "post"
+uri = "http://logs:4000/api/logs?source_name=realtime.logs.prod&api_key=gd9tDpgiCVJe"
+
+[sinks.studio]
+inputs = ["router.studio"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.kong]
+inputs = ["router.kong"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.rest]
+inputs = ["router.rest"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.storage]
+inputs = ["router.storage"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.imgproxy]
+inputs = ["router.imgproxy"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.meta]
+inputs = ["router.meta"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
+[sinks.db]
+inputs = ["router.db"]
+target = "stdout"
+type = "console"
+encoding.codec = "json"
+
