@@ -54,7 +54,7 @@ export async function getEntityTypes(
         )
         and nc.nspname = '${schema}'
         ${search ? `and c.relname ilike '%${search}%'` : ''}
-      order by "name" asc
+      order by c.relkind asc, c.relname asc
       limit ${limit}
       offset ${page * limit}
     )
