@@ -64,7 +64,7 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 
 const CommandMenu = () => {
   const router = useRouter()
-  const commandInputRef = useRef<ElementRef<typeof CommandInput>>()
+  const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
     useCommandMenu()
 
@@ -122,7 +122,7 @@ const CommandMenu = () => {
     commandInputRef.current?.focus()
   }
 
-  const showCommandInput = !CHAT_ROUTES.includes(currentPage)
+  const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
     <>
