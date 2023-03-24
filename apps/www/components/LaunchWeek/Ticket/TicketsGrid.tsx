@@ -6,9 +6,10 @@ import { useMobileViewport } from '../../../hooks/useMobileViewport'
 interface Props {
   loadedUsers: any[]
   isLoading: boolean
+  pageCount: number
 }
 
-export default function TicketsGrid({ loadedUsers, isLoading }: Props) {
+export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props) {
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
   const isMobile = useMobileViewport(768)
@@ -58,7 +59,23 @@ export default function TicketsGrid({ loadedUsers, isLoading }: Props) {
         )
       })}
       {/* TODO: Add PAGE_COUNT length skeleton loaders when loading */}
-      {isLoading && <div className="relative rounded-lg bg-slate-100 h-0 w-full pt-[50%]" />}
+      {/* {isLoading && <IconLoader />} */}
+      {isLoading &&
+        Array.from({ length: pageCount }, (_, i) => (
+          <motion.div
+            className="relative rounded-lg bg-scale-500 h-0 w-full pt-[50%] shimmering-loader"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 0.4,
+                ease: [0.24, 0.25, 0.05, 1],
+                delay: i / 15,
+              },
+            }}
+          />
+        ))}
     </div>
   )
 }

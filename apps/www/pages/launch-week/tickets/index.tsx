@@ -61,13 +61,13 @@ export default function TicketsPage({ users }: Props) {
 
   const loadMoreUsers = async (offset: number) => {
     if (isLast) return
-    setOffset((prev) => prev + 1)
     setIsLoading(true)
+    setOffset((prev) => prev + 1)
     const { data: users } = await loadUsers(offset, PAGE_COUNT)
     console.log(`loaded users (offset ${offset}): `, users)
     setLoadedUsers((prevUsers) => [...prevUsers, ...(users as any[])])
-    setIsLoading(false)
     if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function TicketsPage({ users }: Props) {
   useEffect(() => {
     window.addEventListener(
       'scroll',
-      debounce(() => !isLast && isBottomInView(), 500)
+      debounce(() => !isLast && isBottomInView(), 200)
     )
 
     return () => {
@@ -138,7 +138,7 @@ export default function TicketsPage({ users }: Props) {
               </motion.div>
             </div>
             <div ref={ref}>
-              <TicketsGrid loadedUsers={loadedUsers} isLoading={isLoading} />
+              <TicketsGrid loadedUsers={loadedUsers} isLoading={isLoading} pageCount={PAGE_COUNT} />
             </div>
           </SectionContainer>
         </div>
