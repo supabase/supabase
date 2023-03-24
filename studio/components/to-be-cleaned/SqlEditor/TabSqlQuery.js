@@ -12,13 +12,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { copyToClipboard, timeout } from 'lib/helpers'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 import UtilityActions from 'components/interfaces/SQLEditor/TabSqlQuery/UtilityActions'
 
 const TabSqlQuery = observer(() => {
   const sqlEditorStore = useSqlStore()
-  const { ui, content: contentStore } = useStore()
+  const { data: profile } = useProfileQuery()
+  const { content: contentStore } = useStore()
   const { height: screenHeight } = useWindowDimensions()
 
   const snapOffset = 50
@@ -27,8 +29,8 @@ const TabSqlQuery = observer(() => {
   const offset = 3
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   useEffect(() => {

@@ -14,7 +14,8 @@ interface Props {
 
 const PlanCard: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
-  const teamTierEnabled = currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM || useFlag('teamTier')
+  const teamTierEnabled =
+    currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM || useFlag('teamTier')
 
   const planMeta = PRICING_META[plan.id]
   const isEnterprise = plan.id === 'Enterprise'
@@ -118,8 +119,29 @@ const PlanCard: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
       {!isEnterprise && (
         <div className="space-y-4 !mt-20">
           <div className="space-y-2">
-            <p className="text-sm text-scale-1100">{planMeta.additional}</p>
             <p className="text-xs text-scale-1000">{planMeta.scale}</p>
+
+            {planMeta.name === 'Pro' && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO && (
+              <div>
+                <p className="text-sm text-scale-1100">
+                  Need more? Turn off your spend cap to Pay As You Grow
+                </p>
+                <p className="text-xs text-scale-1000">
+                  Additional fees apply for spend beyond the limits above
+                </p>{' '}
+              </div>
+            )}
+
+            {planMeta.name === 'Pro' && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG && (
+              <div>
+                <p className="text-sm text-scale-1100">
+                  Spend cap is currently disabled
+                </p>
+                <p className="text-xs text-scale-1000">
+                  You will be charged for usage beyond the plan limits
+                </p>{' '}
+              </div>
+            )}
           </div>
 
           <PlanCTAButton plan={plan} currentPlan={currentPlan} onSelectPlan={onSelectPlan} />

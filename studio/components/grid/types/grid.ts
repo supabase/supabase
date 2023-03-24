@@ -1,3 +1,4 @@
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import React from 'react'
 import { Dictionary } from './base'
 import { SupaRow, SupaTable } from './table'
@@ -75,6 +76,11 @@ export interface SupabaseGridProps {
   refreshDocs: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   updateTableRow: (previousRow: any, updatedData: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
 }
 
 export interface SupabaseGridRef {

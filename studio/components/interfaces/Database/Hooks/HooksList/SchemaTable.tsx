@@ -20,13 +20,13 @@ const SchemaTable: FC<Props> = ({
   return (
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">
-        <div className="flex items-baseline space-x-1 py-2 px-6">
+        <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-scale-1000">schema</h5>
           <h4>{schema}</h4>
         </div>
       </div>
       <Table
-        className="table-fixed px-6"
+        className="table-fixed"
         head={
           <>
             <Table.th key="name" className="space-x-4">

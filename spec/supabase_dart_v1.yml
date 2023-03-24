@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
@@ -39,7 +39,7 @@ functions:
             runApp(MyApp());
           }
 
-          // Get a reference your Supabase client 
+          // Get a reference your Supabase client
           final supabase = Supabase.instance.client;
           ```
       - id: for-other-dart-projects

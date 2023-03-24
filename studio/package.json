@@ -29,7 +29,7 @@
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
-    "@supabase/shared-types": "^0.1.29",
+    "@supabase/shared-types": "^0.1.40",
     "@supabase/supabase-js": "^2.8.0",
     "@tanstack/react-query": "^4.22.0",
     "@tanstack/react-query-devtools": "^4.22.0",
