@@ -252,7 +252,9 @@ const TableEditor: FC<Props> = ({
                 withIcon
                 variant="info"
                 className="!px-4 !py-3 mt-3"
-                title="RLS is on. However, policies are required to query data."
+                title={`${
+                  isNewRecord ? 'Turning on RLS' : 'RLS is on'
+                }. Policies are required to query data.`}
               >
                 <p>
                   You need to write an access policy before you can query data from this table.
@@ -274,9 +276,11 @@ const TableEditor: FC<Props> = ({
                 withIcon
                 variant="danger"
                 className="!px-4 !py-3 mt-3"
-                title="RLS is off. You are allowing anonymous access to your table."
+                title={`${
+                  isNewRecord ? 'Turning off RLS' : 'RLS is off'
+                }. You are allowing anonymous access to your table.`}
               >
-                <p>Anyone with the anon key can modify or delete your data.</p>
+                <p>Anyone with the anon key will be able to modify or delete your data.</p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                     <a target="_blank">
@@ -368,16 +372,13 @@ const TableEditor: FC<Props> = ({
                       {tableFields.isRLSEnabled ? (
                         <div className="grid gap-3">
                           <p>
-                            You are turning Row Level Security(RLS){' '}
-                            <u>
-                              <strong>off</strong>
-                            </u>{' '}
-                            for this table.
+                            You are turning Row Level Security(RLS) <u>off</u> for this table.
                           </p>
-                          <p className="mt-4">
+
+                          <p className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
                             <strong>Important: </strong> <br />
-                            Anyone with the anon key can modify or delete data. We recommend using
-                            RLS policies to control access to your data.
+                            Anyone with the anon key can modify or delete data. <br />
+                            We recommend using RLS policies to control access to your data.
                           </p>
                         </div>
                       ) : (
@@ -389,7 +390,7 @@ const TableEditor: FC<Props> = ({
                             </u>{' '}
                             for this table.
                           </p>
-                          <p className="mt-4">
+                          <p className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
                             <strong>Important: </strong> <br />
                             Before querying data from this table, it is necessary to write RLS
                             policies. If access policies are not in place, your queries will always
@@ -398,7 +399,7 @@ const TableEditor: FC<Props> = ({
                         </div>
                       )}
 
-                      <div className="border-t pt-3">
+                      <div className="mt-3">
                         <p>Learn more about RLS:</p>
                         <p className="mt-2">
                           <Link href="https://supabase.com/docs/guides/auth/row-level-security">
