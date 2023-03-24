@@ -94,36 +94,38 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <StoreProvider rootStore={rootStore}>
           <AuthProvider>
             <FlagProvider>
-              <CommandMenuProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
+              <Head>
+                <title>Supabase</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              </Head>
 
-                <Script
-                  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
-                  strategy="afterInteractive"
-                />
-                <Script id="google-analytics" strategy="afterInteractive">
-                  {`
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="google-analytics" strategy="afterInteractive">
+                {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){window.dataLayer.push(arguments);}
                 gtag('js', new Date());
-
+                
                 gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}', { 'send_page_view': false });
-              `}
-                </Script>
+                `}
+              </Script>
 
-                <PageTelemetry>
-                  <RouteValidationWrapper>
-                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-                  </RouteValidationWrapper>
-                </PageTelemetry>
+              <PageTelemetry>
+                <RouteValidationWrapper>
+                  <AppBannerWrapper>
+                    <CommandMenuProvider>
+                      {getLayout(<Component {...pageProps} />)}
+                    </CommandMenuProvider>
+                  </AppBannerWrapper>
+                </RouteValidationWrapper>
+              </PageTelemetry>
 
-                <HCaptchaLoadedStore />
-                <PortalToast />
-                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-              </CommandMenuProvider>
+              <HCaptchaLoadedStore />
+              <PortalToast />
+              <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
             </FlagProvider>
           </AuthProvider>
         </StoreProvider>
