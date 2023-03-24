@@ -294,7 +294,7 @@ const TableEditorMenu = ({
                             setSort('grouped-alphabetical')
                           }}
                         >
-                          Grouped Alphabetical
+                          Entity Type
                         </Dropdown.Item>,
                       ]}
                     >
