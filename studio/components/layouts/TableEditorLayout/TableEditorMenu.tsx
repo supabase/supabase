@@ -5,7 +5,9 @@ import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
+  IconCheck,
   IconChevronDown,
+  IconChevronsDown,
   IconCopy,
   IconEdit,
   IconLoader,
@@ -22,7 +24,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
-import { checkPermissions, useStore, useParams } from 'hooks'
+import { checkPermissions, useStore, useParams, useLocalStorage } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -51,6 +53,10 @@ const TableEditorMenu = ({
   const { id } = useParams()
 
   const [searchText, setSearchText] = useState<string>('')
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
 
   const { project } = useProjectContext()
   const {
@@ -68,6 +74,7 @@ const TableEditorMenu = ({
       connectionString: project?.connectionString,
       schema: selectedSchema,
       search: searchText || undefined,
+      sort,
     },
     {
       keepPreviousData: true,
@@ -251,9 +258,74 @@ const TableEditorMenu = ({
                       <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
                     )}
                   </div>
-                  <button className="cursor-pointer" onClick={refreshTables}>
-                    <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-                  </button>
+
+                  <div className="flex gap-3 items-center">
+                    <Dropdown
+                      size="small"
+                      side="bottom"
+                      align="start"
+                      style={{ zIndex: 1 }}
+                      overlay={[
+                        <Dropdown.Item
+                          key="alphabetical"
+                          icon={
+                            sort === 'alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('alphabetical')
+                          }}
+                        >
+                          Alphabetical
+                        </Dropdown.Item>,
+                        <Dropdown.Item
+                          key="grouped-alphabetical"
+                          icon={
+                            sort === 'grouped-alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('grouped-alphabetical')
+                          }}
+                        >
+                          Grouped Alphabetical
+                        </Dropdown.Item>,
+                      ]}
+                    >
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <IconChevronsDown size={18} strokeWidth={1} />
+                          </div>
+                        </Tooltip.Trigger>
+
+                        <Tooltip.Content side="top">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs">Sort By</span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Dropdown>
+
+                    <button
+                      className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                      onClick={refreshTables}
+                    >
+                      <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
+                    </button>
+                  </div>
                 </div>
               </>
             }
