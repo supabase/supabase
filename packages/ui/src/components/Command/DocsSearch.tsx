@@ -124,7 +124,8 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
 
   return (
     <>
-      {results?.length > 0 &&
+      {results &&
+        results.length > 0 &&
         results.map((page, i) => {
           const pageSections = page.sections.filter((section) => !!section.heading)
           return (
@@ -203,8 +204,8 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
             </CommandGroup>
           )
         })}
-      {results?.length === 0 && (
-        <CommandGroup heading="" forceMount>
+      {!results && !hasSearchError && (
+        <CommandGroup forceMount>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
             return (
