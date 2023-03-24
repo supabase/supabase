@@ -1,4 +1,5 @@
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { observer } from 'mobx-react-lite'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 import { Project } from 'types'

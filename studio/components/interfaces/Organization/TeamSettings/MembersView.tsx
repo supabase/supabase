@@ -5,7 +5,8 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
 
 import { Member } from 'types'
-import { useStore, useParams } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Table from 'components/to-be-cleaned/Table'

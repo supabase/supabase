@@ -6,7 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
