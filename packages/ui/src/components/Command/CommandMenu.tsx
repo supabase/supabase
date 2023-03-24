@@ -41,10 +41,6 @@ export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI_RLS_POLICY,
 ]
 
-interface IActions {
-  toggleTheme: () => void
-}
-
 const iconPicker: { [key: string]: React.ReactNode } = {
   arrowRight: <IconArrowRight />,
   book: <IconBook />,
