@@ -804,6 +804,11 @@ export const resources = {
           url: '/guides/resources/migrating-to-supabase/render',
           items: [],
         },
+        {
+          name: 'Amazon RDS',
+          url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
       ],
     },
   ],
@@ -849,6 +854,7 @@ export const migrate = {
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage', items: [] },
     { name: 'Heroku', url: '/guides/migrations/heroku', items: [] },
     { name: 'Render', url: '/guides/migrations/render', items: [] },
+    { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds', items: [] },
   ],
 }
 
