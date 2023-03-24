@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
 interface UseThemeProps {
-  isDarkMode?: boolean
+  isDarkMode: boolean
   toggleTheme: () => void
 }
 
