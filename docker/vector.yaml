@@ -13,7 +13,7 @@ transforms:
     router:
         type: route
         inputs:
-            - "docker_syslog"
+            - docker_syslog
         route:
             studio: '.appname == "studio"'
             kong: '.appname == "kong"'
@@ -23,15 +23,38 @@ transforms:
             storage: '.appname == "storage"'
             meta: '.appname == "meta"'
             db: '.appname == "db"'
+    auth_logs:
+        type: remap
+        inputs:
+            - router.auth
+        source: |-
+            .message = parse_json!(.message)
+            .event_message = .message.msg
+            .metadata.level = .message.level
+            .metadata.timestamp = .message.time
+            .metadata.app = .appname
+            .metadata.ip = .source_ip
+            del(.message)
+            del(.procid)
+            del(.severity)
+            del(.source_id)
+            del(.source_type)
+            del(.timestamp)
+            del(.facility)
+            del(.host)
+            del(.id)
+            del(.appname)
 
 sinks:
     logflare_auth:
         type: "http"
         inputs:
-            - router.auth
+            - auth_logs
         encoding:
             codec: "json"
         method: "post"
+        request:
+            retry_max_duration_secs: 10
         uri: "http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=gd9tDpgiCVJe"
 
     logflare_realtime:
@@ -41,17 +64,45 @@ sinks:
         encoding:
             codec: "json"
         method: "post"
+        request:
+            retry_max_duration_secs: 10
         uri: "http://logs:4000/api/logs?source_name=realtime.logs.prod&api_key=gd9tDpgiCVJe"
-
-    console:
+    logflare_rest:
+        type: "http"
         inputs:
-            - router.studio
-            - router.kong
             - router.rest
-            - router.storage
-            - router.meta
-            - router.db
-        target: "stdout"
-        type: "console"
         encoding:
             codec: "json"
+        method: "post"
+        request:
+            retry_max_duration_secs: 10
+        uri: "http://logs:4000/api/logs?source_name=postgREST.logs.prod&api_key=gd9tDpgiCVJe"
+    logflare_db:
+        type: "http"
+        inputs:
+            - router.db
+        encoding:
+            codec: "json"
+        method: "post"
+        request:
+            retry_max_duration_secs: 10
+        uri: "http://logs:4000/api/logs?source_name=postgres.logs&api_key=gd9tDpgiCVJe"
+    logflare_storage:
+        type: "http"
+        inputs:
+            - router.storage
+        encoding:
+            codec: "json"
+        method: "post"
+        request:
+            retry_max_duration_secs: 10
+        uri: "http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=gd9tDpgiCVJe"
+    # console:
+    #     inputs:
+    #         # - router.studio
+    #         # - router.kong
+    #         # - router.meta
+    #     target: "stdout"
+    #     type: "console"
+    #     encoding:
+    #         codec: "json"
