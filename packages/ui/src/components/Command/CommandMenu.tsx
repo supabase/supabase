@@ -63,7 +63,8 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 
 const CommandMenu = () => {
   const router = useRouter()
-  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, page } = useCommandMenu()
+  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
+    useCommandMenu()
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -118,12 +119,12 @@ const CommandMenu = () => {
     if (!keepSearch) setSearch('')
   }
 
-  const showCommandInput = !CHAT_ROUTES.includes(page)
+  const showCommandInput = !CHAT_ROUTES.includes(currentPage)
 
   return (
     <>
       <CommandDialog
-        page={page}
+        page={currentPage}
         visible={isOpen}
         // onCancel={() => setIsOpen(!open)}
         size={'xlarge'}
@@ -155,7 +156,7 @@ const CommandMenu = () => {
           />
         )}
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
-          {!page && (
+          {!currentPage && (
             <>
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
@@ -243,13 +244,13 @@ const CommandMenu = () => {
               <SearchableChildItems isSubItem />
             </>
           )}
-          {page === COMMAND_ROUTES.AI && (
-            <AiCommand query={search} setQuery={setSearch} page={page} />
+          {currentPage === COMMAND_ROUTES.AI && (
+            <AiCommand query={search} setQuery={setSearch} page={currentPage} />
           )}
-          {page === COMMAND_ROUTES.DOCS_SEARCH && (
+          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && (
             <DocsSearch query={search} setQuery={setSearch} />
           )}
-          {page === COMMAND_ROUTES.THEME && <ThemeOptions />}
+          {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
     </>
