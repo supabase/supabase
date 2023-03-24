@@ -134,7 +134,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     )
 
     const [updates, setUpdates] = useState<any>({
-      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
       pool_mode: bouncerInfo.pool_mode || 'transaction',
       default_pool_size: bouncerInfo.default_pool_size || '',
       ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
@@ -199,7 +198,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
-            {updates.pgbouncer_enabled && (
+            {bouncerInfo.pgbouncer_enabled && (
               <>
                 <AutoField
                   name="pool_mode"
