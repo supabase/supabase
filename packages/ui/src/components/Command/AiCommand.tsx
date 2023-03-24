@@ -518,6 +518,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                 {showActions && promptIndex === i + 1 && (
                   <CommandGroup heading="" forceMount className="!pt-0 !pl-[60px]">
                     <CommandItem
+                      type="command"
                       onSelect={() => {
                         if (!query) {
                           alert("You've selected me")
@@ -530,6 +531,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                     </CommandItem>
                     {promptData.length > 1 && (
                       <CommandItem
+                        type="command"
                         forceMount
                         onSelect={() => {
                           if (!query) {
@@ -545,7 +547,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                         <span>Back to previous version</span>
                       </CommandItem>
                     )}
-                    <CommandItem forceMount>
+                    <CommandItem type="command" forceMount>
                       <IconCopy className="mr-2" />
                       <span>Run in SQL editor</span>
                     </CommandItem>
@@ -562,6 +564,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
               const key = question.replace(/\s+/g, '_')
               return (
                 <CommandItem
+                  type="command"
                   onSelect={() => {
                     if (!query) {
                       handleClippyConfirm(question)
