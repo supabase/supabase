@@ -60,6 +60,7 @@ export type RefIdOptions =
   | 'reference_self_hosting_auth'
   | 'reference_self_hosting_storage'
   | 'reference_self_hosting_realtime'
+  | 'reference_self_hosting_analytics'
 
 export type RefKeyOptions =
   | 'javascript'
@@ -201,6 +202,7 @@ const NavigationMenu = () => {
   const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
   const isReference_Self_Hosting_Storage = 'reference_self_hosting_storage' === level
   const isReference_Self_Hosting_Realtime = 'reference_self_hosting_realtime' === level
+  const isReference_Self_Hosting_Analytics = 'reference_self_hosting_analytics' === level
 
   return (
     <div className={['flex relative', 'justify-center lg:justify-start'].join(' ')}>
@@ -311,8 +313,8 @@ const NavigationMenu = () => {
       />
       <NavigationMenuRefList
         key={'reference-self-hosting-analytics-menu'}
-        id={'reference_self_hosting_realtime'}
-        active={isReference_Self_Hosting_Realtime}
+        id={'reference_self_hosting_analytics'}
+        active={isReference_Self_Hosting_Analytics}
         commonSections={analyticsServerCommonSections}
         lib="self-hosting-analytics"
       />

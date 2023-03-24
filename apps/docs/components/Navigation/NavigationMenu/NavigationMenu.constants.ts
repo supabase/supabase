@@ -1057,9 +1057,16 @@ export const reference_self_hosting_storage = {
 }
 
 export const reference_self_hosting_realtime = {
-  icon: 'reference-auth',
+  icon: 'reference-realtime',
   title: 'Self-Hosting Realtime',
   url: '/guides/reference/self-hosting/realtime',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_analytics = {
+  icon: 'reference-analytics',
+  title: 'Self-Hosting Analytics',
+  url: '/guides/reference/self-hosting/analytics',
   parent: '/reference',
 }
 
