@@ -116,7 +116,7 @@ const CommandMenu = () => {
     )
   }
 
-  function handleSetPages(pages: any, keepSearch: any) {
+  function handleSetPages(pages: string[], keepSearch?: boolean) {
     setPages(pages)
     if (!keepSearch) setSearch('')
     commandInputRef.current?.focus()
@@ -137,7 +137,7 @@ const CommandMenu = () => {
       >
         {pages.length > 0 && (
           <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
-            <CommandShortcut onClick={() => setPages([])}>{'Home'}</CommandShortcut>
+            <CommandShortcut onClick={() => handleSetPages([])}>{'Home'}</CommandShortcut>
             {pages.map((page, index) => (
               <CommandShortcut
                 key={page}
@@ -145,7 +145,7 @@ const CommandMenu = () => {
                   if (index === pages.length - 1) {
                     return
                   }
-                  setPages((pages) => pages.slice(0, index - 1))
+                  handleSetPages(pages.slice(0, index - 1))
                 }}
               >
                 {page}

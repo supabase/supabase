@@ -253,7 +253,7 @@ export const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HT
     <div
       className={cn(
         '[&:not(:last-child)]:hover:bg-scale-600 [&:not(:last-child)]:hover:cursor-pointer',
-        'bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
+        'cursor-default bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
         'last:bg-scale-600 last:text-scale-900',
         'justify-end',
         className
