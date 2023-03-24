@@ -13,7 +13,8 @@ import { IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 
 import { IconCopy } from '../Icon/icons/IconCopy'
 import { CommandGroup, CommandItem } from './Command.utils'
 
-import { AiIcon, AiIconChat, COMMAND_ROUTES } from './CommandMenu'
+import { COMMAND_ROUTES } from './CommandMenu'
+import { AiIcon, AiIconChat } from './Command.icons'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
