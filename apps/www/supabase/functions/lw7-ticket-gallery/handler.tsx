@@ -33,7 +33,6 @@ export async function handler(req: Request) {
         TICKET: `${STORAGE_URL}/reg_ticket_overlay.png`,
       },
       GOLD: {
-        // TODO: swap to bg_image_id when golden ticket backgrounds have been generated
         AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket_overlay.png`,
       },

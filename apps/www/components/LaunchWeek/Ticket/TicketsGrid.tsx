@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMobileViewport } from '../../../hooks/useMobileViewport'
-import styles from './tickets-grid.module.css'
 
 interface Props {
   loadedUsers: any[]
@@ -19,7 +18,6 @@ export default function TicketsGrid({ loadedUsers, isLoading }: Props) {
     <div
       className={[
         'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mx-[-10vw] gap-3 py-12 relative',
-        styles['tickets-grid'],
       ].join(' ')}
     >
       {loadedUsers?.map((user, i) => {
