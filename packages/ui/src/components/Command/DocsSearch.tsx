@@ -77,6 +77,13 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
+  // Search initial query immediately (note - empty useEffect deps)
+  useEffect(() => {
+    if (query) {
+      handleSearch(query)
+    }
+  }, [])
+
   // TODO: can we do this w/o useEffect if query comes from context?
   useEffect(() => {
     if (query) {
