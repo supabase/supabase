@@ -578,7 +578,6 @@ export const api = {
         { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
         { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
         { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
-        { name: 'Caching responses', url: '/guides/api/rest/caching', items: [] },
       ],
     },
     {
