@@ -11,3 +11,6 @@ export { default as DocsSearch } from './DocsSearch'
 export * from './DocsSearch'
 
 export { default as SearchButton } from './SearchButton'
+export * from './SearchButton'
+
+export * from './Command.icons'
