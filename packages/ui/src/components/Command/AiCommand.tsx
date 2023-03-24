@@ -1,34 +1,19 @@
-import React, { useEffect, useReducer } from 'react'
 import type { CreateCompletionResponse } from 'openai'
-import { FC, useCallback, useRef, useState } from 'react'
+import * as React from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-// @ts-ignore
 import { SSE } from 'sse.js'
-// import clippyImageDark from '../../public/img/clippy-dark.png'
-// import clippyImage from '../../public/img/clippy.png'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTheme } from 'common/Providers'
-import Image from 'next/image'
-import {
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconLoader,
-  IconSearch,
-  IconUser,
-  Input,
-  Loading,
-  Modal,
-  Tabs,
-} from 'ui'
+import { IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
 // import components from '~/components'
 // import { IS_PLATFORM } from '~/lib/constants'
-import { CommandGroup, CommandItem, CommandInput } from './Command.utils'
 import { IconCopy } from '../Icon/icons/IconCopy'
+import { CommandGroup, CommandItem } from './Command.utils'
 
-import { AiIcon, AiIconChat, COMMAND_ROUTES } from './Command'
+import { AiIcon, AiIconChat, COMMAND_ROUTES } from './CommandMenu'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
@@ -119,13 +104,13 @@ function promptDataReducer(
   throw Error('Unknown action.')
 }
 
-interface IAiCommand {
+export interface AiCommandProps {
   query?: string
   setQuery?: (query: string) => void
   page?: string
 }
 
-const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
+const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
   const { isDarkMode } = useTheme()
 
   // const { close, query, setQuery } = useSearch()
@@ -690,4 +675,4 @@ const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
   )
 }
 
-export { AiCommand }
+export default AiCommand
