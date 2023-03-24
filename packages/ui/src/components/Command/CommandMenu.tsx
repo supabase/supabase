@@ -1,11 +1,20 @@
+import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { IconHome } from '../Icon/icons/IconHome'
 
-import { useCommandState } from 'cmdk-supabase'
-import { IconBook } from '../Icon/icons/IconBook'
-import { IconInbox } from '../Icon/icons/IconInbox'
-import { IconMonitor } from '../Icon/icons/IconMonitor'
+import { IconArrowRight } from './../Icon/icons/IconArrowRight'
+import { IconBook } from './../Icon/icons/IconBook'
+import { IconColumns } from './../Icon/icons/IconColumns'
+import { IconInbox } from './../Icon/icons/IconInbox'
+import { IconLifeBuoy } from './../Icon/icons/IconLifeBuoy'
+import { IconMonitor } from './../Icon/icons/IconMonitor'
+import { IconPhone } from './../Icon/icons/IconPhone'
+import { IconUser } from './../Icon/icons/IconUser'
+
 import AiCommand from './AiCommand'
+import navItems from './command-nav-items.json'
+import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
   CommandGroup,
@@ -16,11 +25,6 @@ import {
   CommandShortcut,
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
-// import { SearchProvider } from './SearchProvider'
-import { IconArrowRight } from '../Icon/icons/IconArrowRight'
-import { IconLifeBuoy } from '../Icon/icons/IconLifeBuoy'
-import navItems from './command-nav-items.json'
-import { AiIcon } from './Command.icons'
 import DocsSearch from './DocsSearch'
 
 export const COMMAND_ROUTES = {
@@ -41,10 +45,16 @@ interface IActions {
   toggleTheme: () => void
 }
 
-const iconPicker = {
+const iconPicker: { [key: string]: React.ReactNode } = {
   arrowRight: <IconArrowRight />,
   book: <IconBook />,
   inbox: <IconInbox />,
+  mobile: <IconPhone />,
+  person: <IconUser />,
+  services: <IconColumns />,
+  contact: <IconMonitor />,
+  icon: <IconHome />,
+  products: <IconColumns />,
 }
 
 const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
@@ -229,7 +239,7 @@ const CommandMenu = () => {
               <CommandGroup heading="General">
                 {navItems.docsGeneral.map((item) => (
                   <CommandItem onSelect={() => router.push(item.url)}>
-                    {item.icon && iconPicker[item.icon]}
+                    {item?.icon && iconPicker[item.icon]}
                     <CommandLabel>{item.label}</CommandLabel>
                   </CommandItem>
                 ))}

@@ -179,6 +179,7 @@ interface ICommandItem extends React.ElementRef<typeof CommandPrimitive.Item> {
 const CommandItem = React.forwardRef<
   ICommandItem,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+  // @ts-ignore
 >(({ className, type, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
