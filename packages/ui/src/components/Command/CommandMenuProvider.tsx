@@ -1,12 +1,14 @@
+import { useTheme, UseThemeProps } from 'common'
 import * as React from 'react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { CommandMenu } from './Command'
+import CommandMenu from './CommandMenu'
 
 export interface CommandMenuContextValue {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  actions: CommandMenuActions
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue>(undefined)
 export const useCommandMenu = () => {
@@ -19,14 +21,23 @@ export const useCommandMenu = () => {
   return context
 }
 
+export interface CommandMenuActions {
+  toggleTheme: UseThemeProps['toggleTheme']
+}
+
 const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const { toggleTheme } = useTheme()
+
+  const actions: CommandMenuActions = {
+    toggleTheme,
+  }
 
   useKeyboardEvents({ setIsOpen })
 
   return (
-    <CommandMenuContext.Provider value={{ isOpen, setIsOpen, isLoading, setIsLoading }}>
+    <CommandMenuContext.Provider value={{ isOpen, setIsOpen, isLoading, setIsLoading, actions }}>
       {children}
       <CommandMenu />
     </CommandMenuContext.Provider>
