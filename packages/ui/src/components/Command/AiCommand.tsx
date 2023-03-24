@@ -1,13 +1,16 @@
-import type { CreateCompletionResponse } from 'openai'
-import * as React from 'react'
+import type {
+  ChatCompletionResponseMessage,
+  CreateChatCompletionResponse,
+  CreateChatCompletionResponseChoicesInner,
+} from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
 
 import { Button, IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
-import { CommandGroup, CommandItem } from './Command.utils'
 import { AiIcon, AiIconChat } from './Command.icons'
+import { CommandGroup, CommandItem } from './Command.utils'
 import { COMMAND_ROUTES } from './CommandMenu'
 import { useCommandMenu } from './CommandMenuProvider'
 
@@ -19,6 +22,13 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
+
+type CreateChatCompletionResponseChoicesInnerDelta = Omit<
+  CreateChatCompletionResponseChoicesInner,
+  'message'
+> & {
+  delta: Partial<ChatCompletionResponseMessage>
+}
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -142,8 +152,14 @@ const AiCommand = () => {
 
           setIsResponding(true)
 
-          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-          const [{ text }] = completionResponse.choices
+          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+          const [
+            {
+              delta: { content },
+            },
+          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+
+          const text = content ?? ''
 
           setAnswer((answer) => {
             const currentAnswer = answer ?? ''
@@ -194,33 +210,6 @@ const AiCommand = () => {
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">
-        {/* {!isLoading && !answer && !hasClippyError && (
-          <div className="">
-            <div className="mt-2">
-              <h2 className="text-sm text-scale-1100">Not sure where to start?</h2>
-
-              <ul className="text-sm mt-4 text-scale-1100 grid md:flex gap-4 flex-wrap max-w-3xl">
-                {questions.map((question) => {
-                  const key = question.replace(/\s+/g, '_')
-                  return (
-                    <li key={key}>
-                      <button
-                        className="hover:bg-slate-400 hover:dark:bg-slate-400 px-4 py-2 bg-slate-300 dark:bg-slate-200 rounded-lg transition-colors"
-                        onClick={() => {
-                          setQuery(question)
-                          handleClippyConfirm(question)
-                        }}
-                      >
-                        {question}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          </div>
-        )} */}
-
         <div className="flex flex-col gap-6">
           {promptData.map((prompt, i) => {
             if (!prompt.query) return <></>
