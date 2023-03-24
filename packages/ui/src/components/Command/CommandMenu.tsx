@@ -373,15 +373,15 @@ const CommandMenu = () => {
                   onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.AI_RLS_POLICY], false)}
                 >
                   <AiIcon />
-                  <CommandLabel>Help me make an RLS policy</CommandLabel>
+                  <CommandLabel>Help me write an RLS policy</CommandLabel>
                 </CommandItem>
                 <CommandItem>
                   <AiIcon />
-                  <CommandLabel>Help me make an Postgres function</CommandLabel>
+                  <CommandLabel>Help me write a Postgres function</CommandLabel>
                 </CommandItem>
                 <CommandItem>
                   <AiIcon />
-                  <CommandLabel>Help me make an Postgres trigger</CommandLabel>
+                  <CommandLabel>Help me write a Postgres trigger</CommandLabel>
                 </CommandItem>
                 <CommandItem>
                   <AiIcon />
