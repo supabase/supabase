@@ -128,23 +128,9 @@ const CommandMenu = () => {
       <CommandDialog
         page={page}
         visible={isOpen}
-        // onOpenChange={setIsOpen}
         // onCancel={() => setIsOpen(!open)}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
-        // onKeyDown={(e) => {
-        //   // Escape goes to previous page
-        //   // Backspace goes to previous page when search is empty
-        //   if (
-        //     e.key === 'Escape'
-        //     // || (e.key === 'Backspace' && !search)
-        //   ) {
-        //     e.preventDefault()
-        //     if (!page) setIsOpen(false)
-        //     setSearch('')
-        //     setPages((pages) => pages.slice(0, -1))
-        //   }
-        // }}
       >
         {pages.length > 0 && (
           <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
