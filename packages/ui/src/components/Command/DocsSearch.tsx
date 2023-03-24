@@ -24,16 +24,11 @@ const questions = [
   'How do I set up authentication?',
 ]
 
-export interface DocsSearchProps {
-  query?: string
-  setQuery?: (query: string) => void
-}
-
-const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
+const DocsSearch = () => {
   const [results, setResults] = useState<any[]>()
   const [hasSearchError, setHasSearchError] = useState(false)
   const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -67,7 +62,7 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
   )
 
   function handleResetPrompt() {
-    setQuery('')
+    setSearch('')
     setResults(undefined)
     setHasSearchError(false)
   }
@@ -76,17 +71,17 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
 
   // Search initial query immediately (note - empty useEffect deps)
   useEffect(() => {
-    if (query) {
-      handleSearch(query)
+    if (search) {
+      handleSearch(search)
     }
   }, [])
 
   // TODO: can we do this w/o useEffect if query comes from context?
   useEffect(() => {
-    if (query) {
-      debouncedSearch(query)
+    if (search) {
+      debouncedSearch(search)
     }
-  }, [query])
+  }, [search])
 
   const ChevronArrow = () => (
     <IconChevronRight
@@ -151,10 +146,10 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
                   </IconContainer>
                   <div className="flex flex-col gap-0">
                     <CommandLabel>
-                      <TextHighlighter text={page.meta.title} query={query} />
+                      <TextHighlighter text={page.meta.title} query={search} />
                     </CommandLabel>
                     <div className="text-xs text-scale-900">
-                      <TextHighlighter text={page.meta.description} query={query} />
+                      <TextHighlighter text={page.meta.description} query={search} />
                     </div>
                   </div>
                 </div>
@@ -188,11 +183,11 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
                             <TextHighlighter
                               className="not-italic text-xs rounded-full px-2 py-1 bg-scale-500 text-scale-1200"
                               text={page.meta.title}
-                              query={query}
+                              query={search}
                             />
                           </cite>
                           <CommandLabel>
-                            <TextHighlighter text={section.heading} query={query} />
+                            <TextHighlighter text={section.heading} query={search} />
                           </CommandLabel>
                         </div>
                       </div>
@@ -212,9 +207,9 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
               <CommandItem
                 disabled={isLoading}
                 onSelect={() => {
-                  if (!query) {
+                  if (!search) {
                     handleSearch(question)
-                    setQuery(question)
+                    setSearch(question)
                   }
                 }}
                 type="command"
