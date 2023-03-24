@@ -172,13 +172,16 @@ const CommandSeparator = React.forwardRef<
 ))
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
+interface ICommandItem extends React.ElementRef<typeof CommandPrimitive.Item> {
+  type: 'link' | 'command'
+}
+
 const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
+  ICommandItem,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
 >(({ className, type, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
-    // forceMount={props.forceMount}
     className={cn(
       type === 'link'
         ? `
