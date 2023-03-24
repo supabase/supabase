@@ -35,7 +35,9 @@
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
     "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./docs/reference/javascript/generated",
     "gen:realtime": "npm-run-all gen:realtime:config",
-    "gen:realtime:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/realtime_v0_config.yaml --output  ./docs/reference/realtime/generated/config.mdx"
+    "gen:realtime:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/realtime_v0_config.yaml --output  ./docs/reference/realtime/generated/config.mdx",
+    "gen:analytics": "npm-run-all gen:analytics:config",
+    "gen:analytics:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/analytics_v0_config.yaml --output  ./docs/reference/analytics/generated/config.mdx"
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",

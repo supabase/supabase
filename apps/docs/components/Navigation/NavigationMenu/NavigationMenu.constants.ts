@@ -837,6 +837,13 @@ export const self_hosting = {
         { name: 'Configuration', url: '/guides/self-hosting/realtime/config', items: [] },
       ],
     },
+    {
+      name: 'Analytics Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-analytics/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/analytics/config', items: [] },
+      ],
+    },
   ],
 }
 
