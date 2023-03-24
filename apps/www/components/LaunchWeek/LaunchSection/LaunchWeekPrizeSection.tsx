@@ -50,8 +50,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               Get your <span className="gradient-text-pink-500">winning ticket</span>
             </h2>
             <p className="radial-gradient-text-scale-500">
-              Mark your calendars for April 9th and join us on Discord for Launch Week 7's final day
-              to find out if you're one of the lucky winners. Get sharing!
+              Mark your calendars for April 16th and join us on Discord for Launch Week 7's final
+              day to find out if you're one of the lucky winners. Get sharing!
             </p>
           </motion.div>
         </div>

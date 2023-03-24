@@ -10,9 +10,8 @@ import { motion } from 'framer-motion'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../../components/CTABanner'
-import Link from 'next/link'
-import Image from 'next/image'
 import { debounce } from 'lodash'
+import TicketsGrid from '../../../components/LaunchWeek/Ticket/TicketsGrid'
 
 interface Props {
   users: UserData[]
@@ -45,7 +44,7 @@ const loadUsers = async (offset = 0, pageCount: number) => {
 
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
-  const PAGE_COUNT = 10
+  const PAGE_COUNT = 20
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const description = 'Supabase Launch Week 7 | 3-7 April 2023'
   const [isLoading, setIsLoading] = useState(false)
@@ -77,7 +76,7 @@ export default function TicketsPage({ users }: Props) {
 
   const isBottomInView = () => {
     if (ref.current && window) {
-      const rect = ref.current.getBoundingClientRect()
+      const rect = (ref.current as HTMLDivElement)?.getBoundingClientRect()
       const isInView = rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
       setHasLoaded((prev) => !prev && isInView)
     }
@@ -93,6 +92,8 @@ export default function TicketsPage({ users }: Props) {
       window.removeEventListener('scroll', isBottomInView)
     }
   }, [])
+
+  const finalAnimationState = { y: 0, opacity: 1 }
 
   return (
     <>
@@ -120,44 +121,26 @@ export default function TicketsPage({ users }: Props) {
             </div>
             <div className="bg-lw7-gradient absolute inset-0 z-0" />
           </div>
-          <SectionContainer className="z-10 -mt-20 md:-mt-60">
-            <div ref={ref} className="grid grid-cols-3 gap-3 py-12 relative">
-              {loadedUsers?.map((user, i) => (
-                <Link
-                  href={`/launch-week/tickets/${user.username}`}
-                  key={`${user.username}-000${i}`}
-                >
-                  <motion.a
-                    className="relative w-full rounded-lg overflow-hidden transform scale-100 md:hover:scale-[101%]"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.4,
-                        ease: [0.24, 0.25, 0.05, 1],
-                        delay: i / 15,
-                      },
-                    }}
-                  >
-                    <div className="relative inset-0 w-full pt-[50%] transform">
-                      <Image
-                        src={getOgUrl(user.username!, !!user.golden)}
-                        alt={user.username}
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="center"
-                        placeholder="blur"
-                        blurDataURL="/images/blur.png"
-                      />
-                    </div>
-                  </motion.a>
-                </Link>
-              ))}
-              {/* TODO: Add PAGE_COUNT length skeleton loaders when loading */}
-              {isLoading && (
-                <div className="relative rounded-lg bg-slate-100 h-0 w-full pt-[50%]" />
-              )}
+          <SectionContainer className="z-10 -mt-60 md:-mt-[500px] max-w-none overflow-hidden">
+            <div className="text-center relative z-10 text-white">
+              <motion.div
+                className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
+                initial={{ y: -20, opacity: 0 }}
+                whileInView={finalAnimationState}
+                viewport={{ once: true, margin: '-150px' }}
+                transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
+              >
+                <h2 className="text-4xl">
+                  Check out <span className="gradient-text-pink-500">all the tickets</span>
+                </h2>
+                <p className="radial-gradient-text-scale-500">
+                  Mark your calendars for April 16th and join us on Discord for Launch Week 7's
+                  final day to find out if you're one of the lucky winners. Get sharing!
+                </p>
+              </motion.div>
+            </div>
+            <div ref={ref}>
+              <TicketsGrid loadedUsers={loadedUsers} isLoading={isLoading} />
             </div>
           </SectionContainer>
         </div>
@@ -172,7 +155,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .from('lw7_tickets_golden')
     .select('*')
     .order('createdAt', { ascending: false })
-    .limit(6)
+    .limit(20)
 
   return {
     props: {
