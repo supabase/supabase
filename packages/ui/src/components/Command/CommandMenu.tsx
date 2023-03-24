@@ -1,6 +1,7 @@
 import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -41,10 +42,6 @@ export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI_RLS_POLICY,
 ]
 
-interface IActions {
-  toggleTheme: () => void
-}
-
 const iconPicker: { [key: string]: React.ReactNode } = {
   arrowRight: <IconArrowRight />,
   book: <IconBook />,
@@ -67,7 +64,9 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 
 const CommandMenu = () => {
   const router = useRouter()
-  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, page } = useCommandMenu()
+  const commandInputRef = useRef<ElementRef<typeof CommandInput>>()
+  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
+    useCommandMenu()
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -103,6 +102,7 @@ const CommandMenu = () => {
           .flatMap((item) => item.subItems)
           .map((item) => (
             <SearchOnlyItem
+              key={item.url}
               icon={item.icon}
               isSubItem={isSubItem}
               onSelect={() => {
@@ -116,25 +116,28 @@ const CommandMenu = () => {
     )
   }
 
-  function handleSetPages(pages: any, keepSearch: any) {
+  function handleSetPages(pages: string[], keepSearch?: boolean) {
     setPages(pages)
     if (!keepSearch) setSearch('')
+    commandInputRef.current?.focus()
   }
 
-  const showCommandInput = !CHAT_ROUTES.includes(page)
+  const showCommandInput = !CHAT_ROUTES.includes(currentPage)
 
   return (
     <>
       <CommandDialog
-        page={page}
+        page={currentPage}
         visible={isOpen}
-        // onCancel={() => setIsOpen(!open)}
+        onInteractOutside={() => {
+          setIsOpen(!open)
+        }}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
       >
         {pages.length > 0 && (
           <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
-            <CommandShortcut onClick={() => setPages([])}>{'Home'}</CommandShortcut>
+            <CommandShortcut onClick={() => handleSetPages([])}>{'Home'}</CommandShortcut>
             {pages.map((page, index) => (
               <CommandShortcut
                 key={page}
@@ -142,7 +145,7 @@ const CommandMenu = () => {
                   if (index === pages.length - 1) {
                     return
                   }
-                  setPages((pages) => pages.slice(0, index - 1))
+                  handleSetPages(pages.slice(0, index - 1))
                 }}
               >
                 {page}
@@ -152,16 +155,18 @@ const CommandMenu = () => {
         )}
         {showCommandInput && (
           <CommandInput
+            ref={commandInputRef}
             placeholder="Type a command or search..."
             value={search}
             onValueChange={setSearch}
           />
         )}
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
-          {!page && (
+          {!currentPage && (
             <>
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
+                  type="command"
                   onSelect={() => {
                     handleSetPages([...pages, COMMAND_ROUTES.AI], false)
                   }}
@@ -181,6 +186,7 @@ const CommandMenu = () => {
                   </span>
                 </CommandItem>
                 <CommandItem
+                  type="command"
                   onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.DOCS_SEARCH], true)}
                   forceMount
                 >
@@ -202,7 +208,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="Navigation">
                 {navItems.docsTools.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconArrowRight className="text-scale-900" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
@@ -213,7 +219,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="Support">
                 {navItems.docsSupport.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconLifeBuoy className="text-scale-900" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
@@ -224,7 +230,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="General">
                 {navItems.docsGeneral.map((item) => (
-                  <CommandItem onSelect={() => router.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     {item?.icon && iconPicker[item.icon]}
                     <CommandLabel>{item.label}</CommandLabel>
                   </CommandItem>
@@ -232,7 +238,10 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="Settings">
-                <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
+                <CommandItem
+                  type="link"
+                  onSelect={() => handleSetPages([...pages, 'Theme'], false)}
+                >
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
@@ -241,13 +250,13 @@ const CommandMenu = () => {
               <SearchableChildItems isSubItem />
             </>
           )}
-          {page === COMMAND_ROUTES.AI && (
-            <AiCommand query={search} setQuery={setSearch} page={page} />
+          {currentPage === COMMAND_ROUTES.AI && (
+            <AiCommand query={search} setQuery={setSearch} page={currentPage} />
           )}
-          {page === COMMAND_ROUTES.DOCS_SEARCH && (
-            <DocsSearch query={search} setQuery={setSearch} page={page} router={router} />
+          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && (
+            <DocsSearch query={search} setQuery={setSearch} />
           )}
-          {page === COMMAND_ROUTES.THEME && <ThemeOptions />}
+          {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
     </>
