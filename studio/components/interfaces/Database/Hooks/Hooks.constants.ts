@@ -42,7 +42,7 @@ export const AVAILABLE_WEBHOOK_TYPES = [
     description: 'Send an HTTP request to any URL.',
   },
   {
-    disabled: true,
+    disabled: false,
     value: 'supabase_function',
     icon: `${BASE_PATH}/img/function-providers/supabase-severless-function.png`,
     label: 'Supabase Edge Functions',

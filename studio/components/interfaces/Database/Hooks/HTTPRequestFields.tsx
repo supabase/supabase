@@ -1,11 +1,26 @@
-import { Button, Listbox, Input, SidePanel, IconTrash, IconPlus } from 'ui'
+import {
+  Button,
+  Listbox,
+  Input,
+  SidePanel,
+  IconTrash,
+  IconPlus,
+  Dropdown,
+  IconChevronDown,
+} from 'ui'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { HTTPArgument } from './EditHookPanel'
+import { useParams, useStore } from 'hooks'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import clsx from 'clsx'
+import { uuidv4 } from 'lib/helpers'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface HTTPRequestFieldsProps {
+  type: 'http_request' | 'supabase_function'
   httpHeaders: HTTPArgument[]
   httpParameters: HTTPArgument[]
-  onAddHeader: () => void
+  onAddHeader: (header?: any) => void
   onUpdateHeader: (idx: number, property: string, value: string) => void
   onRemoveHeader: (idx: number) => void
   onAddParameter: () => void
@@ -14,6 +29,7 @@ interface HTTPRequestFieldsProps {
 }
 
 const HTTPRequestFields = ({
+  type,
   httpHeaders = [],
   httpParameters = [],
   onAddHeader,
@@ -23,10 +39,28 @@ const HTTPRequestFields = ({
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
+  const { ui } = useStore()
+  const { ref } = useParams()
+  const { data: settings } = useProjectApiQuery({ projectRef: ref })
+  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : '[YOUR ANON KEY]'
+
   return (
     <>
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">HTTP Request</FormSectionLabel>}
+        header={
+          <FormSectionLabel className="lg:!col-span-4">
+            {type === 'http_request'
+              ? 'HTTP Request'
+              : type === 'supabase_function'
+              ? 'Edge Function'
+              : ''}
+          </FormSectionLabel>
+        }
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Listbox id="http_method" name="http_method" size="medium" label="Method">
@@ -37,13 +71,29 @@ const HTTPRequestFields = ({
               POST
             </Listbox.Option>
           </Listbox>
-          <Input
-            id="http_url"
-            name="http_url"
-            label="URL"
-            placeholder="http://api.com/path/resource"
-            descriptionText="URL of the HTTP request. Must include HTTP/HTTPS"
-          />
+          {type === 'http_request' ? (
+            <Input
+              id="http_url"
+              name="http_url"
+              label="URL"
+              placeholder="http://api.com/path/resource"
+              descriptionText="URL of the HTTP request. Must include HTTP/HTTPS"
+            />
+          ) : type === 'supabase_function' ? (
+            <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
+              {(functions ?? []).map((fn) => {
+                const restUrl = ui.selectedProject?.restUrl
+                const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+                const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+
+                return (
+                  <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
+                    {fn.name}
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox>
+          ) : null}
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
@@ -77,10 +127,46 @@ const HTTPRequestFields = ({
                 />
               </div>
             ))}
-            <div>
-              <Button type="dashed" size="tiny" icon={<IconPlus />} onClick={onAddHeader}>
+            <div className="flex items-center">
+              <Button
+                type="default"
+                size="tiny"
+                icon={<IconPlus />}
+                className={clsx(type === 'supabase_function' && 'rounded-r-none px-3')}
+                onClick={onAddHeader}
+              >
                 Add a new header
               </Button>
+              {type === 'supabase_function' && (
+                <Dropdown
+                  align="end"
+                  side="bottom"
+                  overlay={[
+                    <Dropdown.Item
+                      key="experimental-token"
+                      onClick={() =>
+                        onAddHeader({
+                          id: uuidv4(),
+                          name: ' Authorization',
+                          value: `Bearer ${anonKey}`,
+                        })
+                      }
+                    >
+                      <div className="space-y-1">
+                        <p className="block text-scale-1200">
+                          Add Authorization header with anon key
+                        </p>
+                      </div>
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                  />
+                </Dropdown>
+              )}
             </div>
           </div>
         </FormSectionContent>
