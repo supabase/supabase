@@ -28,13 +28,10 @@ import { IconLifeBuoy } from '../Icon/icons/IconLifeBuoy'
 import DocsSearch from './DocsSearch'
 
 export const COMMAND_ROUTES = {
-  AI_HOME: 'Supabase AI',
-  AI_ASK_ANYTHING: 'Ask me anything',
-  AI_RLS_POLICY: 'Help me make a RLS policy',
+  AI: 'Supabase AI',
   DOCS_SEARCH: 'Docs Search',
+  THEME: 'Theme',
 }
-
-const AI_CHAT_ROUTES = [COMMAND_ROUTES.AI_ASK_ANYTHING, COMMAND_ROUTES.AI_RLS_POLICY]
 
 interface IActions {
   toggleTheme: () => void
@@ -44,30 +41,12 @@ const iconComponents = {
   book: <IconBook />,
 }
 
-const SearchOnlyItem = (props: any) => {
-  const icon = iconComponents[props.icon]
-  console.log('props', props)
+const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
   const search = useCommandState((state) => state.search)
   // if search is empty & items is marked as a subItem, don't show it
   // ie: only show these items in search results, not top level
-  if (!search && props.isSubItem) return null
-  return <CommandItem>{props.label}</CommandItem>
-}
-
-//  <CommandItem onSelect={() => handleSetPages([...pages, 'Docs Search'], true)} forceMount>
-//   <IconBook className="" />
-
-//   <span>
-//     Search the docs...
-//     <span className="text-scale-1200 font-semibold">{search}</span>
-//   </span>
-// </CommandItem>
-
-{
-  /* <CommandItem>
-  <IconInbox className="text-scale-900" />
-  <CommandLabel>See what's new</CommandLabel>
-</CommandItem> */
+  if (!search && isSubItem) return null
+  return <CommandItem {...props}>{children}</CommandItem>
 }
 
 const CommandMenu = () => {
@@ -112,12 +91,13 @@ const CommandMenu = () => {
           .map((item) => (
             <SearchOnlyItem
               icon={item.icon}
-              label={item.label}
               isSubItem={isSubItem}
               onSelect={() => {
                 console.log('hay')
               }}
-            />
+            >
+              {item.label}
+            </SearchOnlyItem>
           ))}
       </CommandGroup>
     )
@@ -128,7 +108,7 @@ const CommandMenu = () => {
     if (!keepSearch) setSearch('')
   }
 
-  const showCommandInput = page === undefined || !AI_CHAT_ROUTES.includes(page)
+  const showCommandInput = page === undefined
 
   return (
     <>
@@ -178,42 +158,45 @@ const CommandMenu = () => {
             onValueChange={setSearch}
           />
         )}
-        {/* <CommandList>
-          <CommandItem>Change theme…</CommandItem>
-          <SubItem>Change theme to dark</SubItem>
-          <SubItem>Change theme to light</SubItem>
-        </CommandList> */}
-
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
           {!page && (
             <>
-              <CommandGroup heading="AI commands" forceMount>
+              <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   onSelect={() => {
-                    console.log('search', search)
-                    if (search) {
-                      handleSetPages([...pages, 'Supabase AI', 'Ask anything'], true)
-                    } else {
-                      handleSetPages([...pages, 'Supabase AI'], false)
-                    }
+                    handleSetPages([...pages, COMMAND_ROUTES.AI], false)
                   }}
                   forceMount
                 >
                   <AiIcon />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-1100">
-                    Ask Supabase AI...{' '}
-                    <span className="text-scale-1200 font-semibold">{search}</span>
+                    Ask Supabase AI
+                    {search ? (
+                      <>
+                        {': '}
+                        <span className="text-scale-1200 font-semibold">{search}</span>
+                      </>
+                    ) : (
+                      '...'
+                    )}
                   </span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleSetPages([...pages, 'Docs Search'], true)}
+                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.DOCS_SEARCH], true)}
                   forceMount
                 >
                   <IconBook className="" />
 
                   <span>
-                    Search the docs...
-                    <span className="text-scale-1200 font-semibold">{search}</span>
+                    Search the docs
+                    {search ? (
+                      <>
+                        {': '}
+                        <span className="text-scale-1200 font-semibold">{search}</span>
+                      </>
+                    ) : (
+                      '...'
+                    )}
                   </span>
                 </CommandItem>
               </CommandGroup>
@@ -245,167 +228,24 @@ const CommandMenu = () => {
                   <IconInbox className="text-scale-900" />
                   <CommandLabel>Read the Changelog</CommandLabel>
                 </CommandItem>
-                <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
+                <CommandItem
+                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.THEME], false)}
+                >
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
               </CommandGroup>
-              <CommandGroup heading="Settings">
-                <CommandItem onSelect={() => handleSetPages([...pages, 'api-keys'], true)}>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>API keys</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <User className="text-scale-900" />
-                  <CommandLabel>Profile</CommandLabel>
-                  <CommandShortcut>⌘P</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>Billing</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Settings</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-
               <ThemeOptions isSubItem />
               <SearchableChildItems isSubItem />
             </>
           )}
-          {page === 'docs-search' && (
-            <>
-              <CommandGroup heading="Database">
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Something database</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-              <CommandGroup heading="Auth">
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Something Auth</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Something Auth 2</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-            </>
-          )}
-          {page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
-            <>
-              <AiCommand query={search} setQuery={setSearch} page={page} />
-            </>
+          {page === COMMAND_ROUTES.AI && (
+            <AiCommand query={search} setQuery={setSearch} page={page} />
           )}
           {page === COMMAND_ROUTES.DOCS_SEARCH && (
-            <>
-              <DocsSearch query={search} setQuery={setSearch} page={page} router={router} />
-            </>
+            <DocsSearch query={search} setQuery={setSearch} page={page} router={router} />
           )}
-          {page === COMMAND_ROUTES.AI_RLS_POLICY && (
-            <>
-              <AiCommand query={search} setQuery={setSearch} page={page} />
-            </>
-          )}
-          {page === 'api-keys' && (
-            <>
-              <CommandGroup heading="">
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Copy Anon key</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-              <div className="w-full flex">
-                <code className="bg-scale-100 rounded mx-2 px-2 w-full text-scale-1200 text-sm py-3">
-                  I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM
-                </code>
-              </div>
-              <CommandGroup heading="">
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Copy Service role key</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-              <div className="w-full flex">
-                <code className="bg-scale-100 rounded mx-2 px-2 w-full text-scale-1200 text-sm py-3">
-                  I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM SOME KEYS I AM
-                </code>
-              </div>
-              <CommandGroup heading="">
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Roll new keys</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Switch project</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-            </>
-          )}
-
-          {page === 'Supabase AI' && (
-            <>
-              <CommandGroup forceMount>
-                <CommandItem
-                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.AI_ASK_ANYTHING], true)}
-                  forceMount
-                >
-                  <AiIcon />
-                  <CommandLabel className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-1100">
-                    Ask Supabase AI...{' '}
-                    <span className="text-scale-1200 font-semibold">{search}</span>
-                  </CommandLabel>
-                </CommandItem>
-                <CommandItem
-                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.AI_RLS_POLICY], false)}
-                >
-                  <AiIcon />
-                  <CommandLabel>Help me write an RLS policy</CommandLabel>
-                </CommandItem>
-                <CommandItem>
-                  <AiIcon />
-                  <CommandLabel>Help me write a Postgres function</CommandLabel>
-                </CommandItem>
-                <CommandItem>
-                  <AiIcon />
-                  <CommandLabel>Help me write a Postgres trigger</CommandLabel>
-                </CommandItem>
-                <CommandItem>
-                  <AiIcon />
-                  <CommandLabel>Help me make a table</CommandLabel>
-                </CommandItem>
-              </CommandGroup>
-            </>
-          )}
-          {page === 'Theme' && (
-            <>
-              <CommandGroup>
-                <CommandItem
-                  onSelect={() => {
-                    router.push('https://supabase.com/docs')
-                    setIsOpen(false)
-                  }}
-                >
-                  <CommandLabel>Grab api keys</CommandLabel>
-                </CommandItem>
-              </CommandGroup>
-              <ThemeOptions />
-            </>
-          )}
-          {page !== 'Ask anything' || (!page && <CommandEmpty>No results found.</CommandEmpty>)}
+          {page === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
     </>
