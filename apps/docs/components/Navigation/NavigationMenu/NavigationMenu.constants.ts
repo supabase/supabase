@@ -562,6 +562,7 @@ export const api = {
       url: '/guides/api',
       items: [
         { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
+        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
         { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
         {
           name: 'Querying joins and nested tables',
@@ -571,7 +572,7 @@ export const api = {
       ],
     },
     {
-      name: 'REST',
+      name: 'REST & REALTIME',
       url: undefined,
       items: [
         { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
@@ -583,7 +584,7 @@ export const api = {
     {
       name: 'GRAPHQL',
       url: undefined,
-      items: [{ name: 'GraphiQL', url: '/guides/api/graphql/graphiql', items: [] }],
+      items: [{ name: 'GraphiQL Documentation', url: '/guides/api/graphql/graphiql', items: [] }],
     },
   ],
 }

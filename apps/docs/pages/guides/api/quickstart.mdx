@@ -2,14 +2,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Query your database in less than 2 minutes.',
+  title: 'Build an API route in less than 2 minutes.',
   subtitle: 'Create your first API route by creating a table called `todos` to store tasks.',
   breadcrumb: 'API Quickstart',
 }
 
-Let's create our first API route by creating a table called `todos` to store tasks.
+Let's create our first REST route which we can query using `cURL` or the browser.
 
-This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
+We'll create a database table called `todos` for storing tasks. This creates a corresponding API route `/rest/v1/todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <StepHikeCompact>
 
@@ -130,6 +130,106 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## Bonus
+
+There are several options for accessing your data:
+
+### Browser
+
+You can query the route in your browser, by appending the `anon` key as a query parameter:
+
+`https://<PROJECT_REF>.supabase.co/rest/v1/users?apikey=<ANON_KEY>`
+
+### Client libraries
+
+We provide a numerous [Client Libraries](https://github.com/supabase/supabase#client-libraries).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('todos').select()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.from('todos').select('*');
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.table('todos').select("*").execute()
+```
+
+</TabPanel>
+</Tabs>
+
+### GraphQL
+
+Every table can be accessed through the GraphQL API by switching `/rest/v1` with `/graphql/v1`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="urql"
+>
+<TabPanel id="urql" label="urql">
+
+```javascript
+import { createClient, useQuery } from 'urql'
+
+const URL = '<SUPABASE_URL>/graphql/v1'
+const ANON_KEY = '<SUPABASE_ANON_KEY>'
+
+// Prepare API key and Authorization header
+const headers = {
+  apikey: `${ANON_KEY}`,
+  authorization: `Bearer ${ANON_KEY}`,
+}
+
+const client = createClient({
+  url: URL,
+  fetchOptions: function createFetchOptions() {
+    return { headers }
+  },
+})
+
+// Prepare our GraphQL query
+const TodosQuery = `
+  query {
+    todosCollection {
+      edges {
+        node {
+          id
+          task
+        }
+      }
+    }
+  }
+`
+
+// Query for the data (React)
+const [result, reexecuteQuery] = useQuery({
+  query: TodosQuery,
+})
+
+// Read the result
+const { data, fetching, error } = result
+```
+
+</TabPanel>
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
