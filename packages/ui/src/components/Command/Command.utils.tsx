@@ -1,15 +1,13 @@
+import { Command as CommandPrimitive } from 'cmdk-supabase'
 import * as React from 'react'
-import { DialogProps } from '@radix-ui/react-dialog'
-import { Command as CommandPrimitive, useCommandState } from 'cmdk-supabase'
 
 import { cn } from './../../utils/cn'
-import { Dialog, DialogContent } from './../Dialog'
-import { IconSearch } from '../Icon/icons/IconSearch'
+
+import { KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
-import { KeyboardEventHandler } from 'react'
-import { LoadingLine } from './LoadingLine'
 import { useCommandMenu } from './CommandMenuProvider'
+import { LoadingLine } from './LoadingLine'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -24,8 +22,8 @@ const Command = React.forwardRef<
 Command.displayName = CommandPrimitive.displayName
 
 interface CommandDialogProps extends ModalProps {
-  onKeyDown: KeyboardEventHandler<HTMLDivElement>
-  page?: number
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>
+  page?: number | string
 }
 
 const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
@@ -49,7 +47,7 @@ const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogPro
     >
       {/* <DialogContent className="p-0 shadow-2xl [&_[dialog-overlay]]:bg-red-100"> */}
       <Command
-        onKeyDown={onKeyDown}
+        // onKeyDown={onKeyDown}
         // shouldFilter={false}
         className={[
           '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
@@ -174,13 +172,17 @@ const CommandSeparator = React.forwardRef<
 ))
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
+interface ICommandItem extends React.ElementRef<typeof CommandPrimitive.Item> {
+  type: 'link' | 'command'
+}
+
 const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
+  ICommandItem,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+  // @ts-ignore
 >(({ className, type, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
-    // forceMount={props.forceMount}
     className={cn(
       type === 'link'
         ? `

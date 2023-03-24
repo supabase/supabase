@@ -1,16 +1,22 @@
+import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { IconHome } from '../Icon/icons/IconHome'
 
-import { useCommandState } from 'cmdk-supabase'
-import { CreditCard, Settings, User } from 'lucide-react'
-import { IconBook } from '../Icon/icons/IconBook'
-import { IconCopy } from '../Icon/icons/IconCopy'
-import { IconInbox } from '../Icon/icons/IconInbox'
-import { IconMonitor } from '../Icon/icons/IconMonitor'
+import { IconArrowRight } from './../Icon/icons/IconArrowRight'
+import { IconBook } from './../Icon/icons/IconBook'
+import { IconColumns } from './../Icon/icons/IconColumns'
+import { IconInbox } from './../Icon/icons/IconInbox'
+import { IconLifeBuoy } from './../Icon/icons/IconLifeBuoy'
+import { IconMonitor } from './../Icon/icons/IconMonitor'
+import { IconPhone } from './../Icon/icons/IconPhone'
+import { IconUser } from './../Icon/icons/IconUser'
+
 import AiCommand from './AiCommand'
+import navItems from './command-nav-items.json'
+import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -19,28 +25,36 @@ import {
   CommandShortcut,
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
-// import { SearchProvider } from './SearchProvider'
-import navItems from './command-nav-items.json'
-import { NavItem } from './Command.types'
-import { AiIcon } from './Command.icons'
-import { IconArrowRight } from '../Icon/icons/IconArrowRight'
-import { IconLifeBuoy } from '../Icon/icons/IconLifeBuoy'
 import DocsSearch from './DocsSearch'
 
 export const COMMAND_ROUTES = {
   AI: 'Supabase AI',
   DOCS_SEARCH: 'Docs Search',
   THEME: 'Theme',
+  AI_ASK_ANYTHING: 'Ask anything',
+  AI_RLS_POLICY: 'Help me create a RLS policy',
 }
+
+export const CHAT_ROUTES = [
+  COMMAND_ROUTES.AI, // this one is temporary
+  COMMAND_ROUTES.AI_ASK_ANYTHING,
+  COMMAND_ROUTES.AI_RLS_POLICY,
+]
 
 interface IActions {
   toggleTheme: () => void
 }
 
-const iconPicker = {
+const iconPicker: { [key: string]: React.ReactNode } = {
   arrowRight: <IconArrowRight />,
   book: <IconBook />,
   inbox: <IconInbox />,
+  mobile: <IconPhone />,
+  person: <IconUser />,
+  services: <IconColumns />,
+  contact: <IconMonitor />,
+  icon: <IconHome />,
+  products: <IconColumns />,
 }
 
 const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
@@ -52,11 +66,8 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 }
 
 const CommandMenu = () => {
-  const [search, setSearch] = React.useState('')
-  const [pages, setPages] = React.useState([])
-  const page = pages[pages.length - 1]
   const router = useRouter()
-  const { isOpen, setIsOpen, actions } = useCommandMenu()
+  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, page } = useCommandMenu()
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -110,30 +121,16 @@ const CommandMenu = () => {
     if (!keepSearch) setSearch('')
   }
 
-  const showCommandInput = page === undefined
+  const showCommandInput = !CHAT_ROUTES.includes(page)
 
   return (
     <>
       <CommandDialog
         page={page}
         visible={isOpen}
-        onOpenChange={setIsOpen}
-        onCancel={() => setIsOpen(!open)}
+        // onCancel={() => setIsOpen(!open)}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
-        onKeyDown={(e) => {
-          // Escape goes to previous page
-          // Backspace goes to previous page when search is empty
-          if (
-            e.key === 'Escape'
-            // || (e.key === 'Backspace' && !search)
-          ) {
-            e.preventDefault()
-            if (!page) setIsOpen(false)
-            setSearch('')
-            setPages((pages) => pages.slice(0, -1))
-          }
-        }}
       >
         {pages.length > 0 && (
           <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
@@ -228,7 +225,7 @@ const CommandMenu = () => {
               <CommandGroup heading="General">
                 {navItems.docsGeneral.map((item) => (
                   <CommandItem onSelect={() => router.push(item.url)}>
-                    {item.icon && iconPicker[item.icon]}
+                    {item?.icon && iconPicker[item.icon]}
                     <CommandLabel>{item.label}</CommandLabel>
                   </CommandItem>
                 ))}
