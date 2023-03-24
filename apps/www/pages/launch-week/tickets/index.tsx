@@ -12,6 +12,8 @@ import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../../components/CTABanner'
 import { debounce } from 'lodash'
 import TicketsGrid from '../../../components/LaunchWeek/Ticket/TicketsGrid'
+import { Button } from 'ui'
+import Link from 'next/link'
 
 interface Props {
   users: UserData[]
@@ -64,7 +66,6 @@ export default function TicketsPage({ users }: Props) {
     setIsLoading(true)
     setOffset((prev) => prev + 1)
     const { data: users } = await loadUsers(offset, PAGE_COUNT)
-    console.log(`loaded users (offset ${offset}): `, users)
     setLoadedUsers((prevUsers) => [...prevUsers, ...(users as any[])])
     if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
     setIsLoading(false)
@@ -135,6 +136,13 @@ export default function TicketsPage({ users }: Props) {
                   Mark your calendars for April 16th and join us on Discord for Launch Week 7's
                   final day to find out if you're one of the lucky winners. Get sharing!
                 </p>
+                <div className="mt-1">
+                  <Link href="/launch-week">
+                    <Button as="a" type="outline" size="medium">
+                      Get your ticket now
+                    </Button>
+                  </Link>
+                </div>
               </motion.div>
             </div>
             <div ref={ref}>
