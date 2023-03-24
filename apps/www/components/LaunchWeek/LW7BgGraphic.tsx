@@ -1,18 +1,12 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 import { useMobileViewport } from '../../hooks/useMobileViewport'
+import styles from './lw7-bg-graphic.module.css'
 
 export default function LW7BgGraphic() {
   const { scrollYProgress } = useScroll()
   const isMobile = useMobileViewport(768)
 
-  // const graphicsScale = useTransform(
-  //   scrollYProgress,
-  //   // Map scrollYProgress from these values:
-  //   [0, 0.5],
-  //   // Into these scale values:
-  //   [1, isMobile ? 1.1 : 1.2]
-  // )
   const graphicsY = useTransform(
     scrollYProgress,
     // Map scrollYProgress from these values:
@@ -22,12 +16,15 @@ export default function LW7BgGraphic() {
   )
 
   return (
-    <div className="relative h-[300px] md:h-[700px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[200px] md:before:h-[400px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent">
+    <div
+      className={[
+        "relative h-[300px] md:h-[700px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[200px] md:before:h-[600px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent",
+        styles['gradient-overlay'],
+      ].join(' ')}
+    >
       <motion.div
         className="absolute bottom-0 w-full h-full"
         style={{
-          // scale: graphicsScale,
-          // scale: 1,
           y: graphicsY,
           willChange: 'transform',
         }}

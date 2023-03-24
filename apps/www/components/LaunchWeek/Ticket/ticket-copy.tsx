@@ -2,8 +2,6 @@ import { useEffect, useState, useRef } from 'react'
 import cn from 'classnames'
 import { SITE_URL } from '~/lib/constants'
 import styleUtils from './utils.module.css'
-// import IconCopy from '~/components/LaunchWeek/Ticket/icons/icon-copy'
-import styles from './ticket-copy.module.css'
 import { IconCopy, IconCheck } from 'ui'
 
 type Props = {
@@ -24,22 +22,11 @@ export default function TicketCopy({ username }: Props) {
     }
   }, [])
 
-  // background: none;
-  // outline: none;
-  // border: none;
-  // z-index: 2;
-  // border-radius: var(--space-2x);
-  // width: 40px;
-  // display: flex;
-  // align-items: center;
-  // justify-content: center;
-  // margin-right: -10px;
-
   const copyButton = (
     <button
       type="button"
       name="Copy"
-      className="bg-[#E6E8EB] text-[#2e2e2e] text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-lg"
+      className="bg-[#E6E8EB] text-[#2e2e2e] text-xs w-21 flex items-center cursor-pointer py-1 px-2 rounded-full"
       ref={buttonRef}
       onClick={() => {
         navigator.clipboard.writeText(url).then(() => {
@@ -69,7 +56,7 @@ export default function TicketCopy({ username }: Props) {
       className={cn(
         styleUtils.appear,
         styleUtils['appear-third'],
-        'bg-scaleA-200 h-8 rounded-xl border border-scale-1100 w-full overflow-hidden'
+        'bg-scaleA-200 h-8 rounded-full border border-scale-1100 w-full overflow-hidden'
       )}
       id="wayfinding--ticket-copy"
     >
