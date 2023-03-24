@@ -121,7 +121,7 @@ function promptDataReducer(
 
 interface IAiCommand {
   query?: string
-  setQuery?: () => void
+  setQuery?: (query: string) => void
   page?: string
 }
 
@@ -215,11 +215,11 @@ const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
 
         case COMMAND_ROUTES.AI_RLS_POLICY:
           queryToSend = `Given this table schema:
-          
-          Schema STRIPE has tables: 
+
+          Schema STRIPE has tables:
             CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
             CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
-          
+
           \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
           break
         default:
@@ -477,10 +477,10 @@ const AiCommand: FC<IAiCommand> = ({ query, setQuery, page }) => {
                       <div className="flex gap-6">
                         <AiIconChat />
                         {/* <div
-                      className="w-7 h-7 
-                        
+                      className="w-7 h-7
+
                         bg-gradient-to-r from-purple-900 to-pink-900
-                        
+
                         rounded-lg border border-pink-400 flex items-center justify-center
                         shadow-sm
                         "

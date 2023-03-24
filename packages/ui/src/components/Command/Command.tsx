@@ -31,6 +31,8 @@ import { useCommandMenu } from './CommandMenuProvider'
 import navItems from './command-nav-items.json'
 import { NavItem } from './Command.types'
 import { AiIcon } from './Command.icons'
+import { IconArrowRight } from '../Icon/icons/IconArrowRight'
+import { IconLifeBuoy } from '../Icon/icons/IconLifeBuoy'
 
 export const COMMAND_ROUTES = {
   AI_HOME: 'Supabase AI',
@@ -236,18 +238,37 @@ function CommandMenu({ actions }: { actions: IActions }) {
                   </span>
                 </CommandItem>
               </CommandGroup>
+
+              <CommandGroup heading="Jump to">
+                {navItems.docsTools.map((item) => (
+                  <CommandItem onSelect={() => router.push(item.url)}>
+                    <IconArrowRight className="text-scale-900" />
+                    <CommandLabel>
+                      Go to <span className="font-bold"> {item.label}</span>
+                    </CommandLabel>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
+              <CommandGroup heading="Support">
+                {navItems.docsSupport.map((item) => (
+                  <CommandItem onSelect={() => router.push(item.url)}>
+                    <IconLifeBuoy className="text-scale-900" />
+                    <CommandLabel>
+                      Go to <span className="font-bold"> {item.label}</span>
+                    </CommandLabel>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
               <CommandGroup heading="General">
-                <CommandItem>
+                <CommandItem onSelect={() => router.push('https://supabase.com/changelog')}>
                   <IconInbox className="text-scale-900" />
-                  <CommandLabel>See what's new</CommandLabel>
+                  <CommandLabel>Read the Changelog</CommandLabel>
                 </CommandItem>
                 <CommandItem onSelect={() => handleSetPages([...pages, 'Theme'], false)}>
                   <IconMonitor className="mr-2" />
                   Change theme
-                </CommandItem>
-                <CommandItem>
-                  <IconCopy />
-                  Copy current page URL
                 </CommandItem>
               </CommandGroup>
               <CommandGroup heading="Settings">
@@ -269,23 +290,6 @@ function CommandMenu({ actions }: { actions: IActions }) {
                 <CommandItem>
                   <Settings className="text-scale-900" />
                   <CommandLabel>Settings</CommandLabel>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
-              <CommandGroup heading="Settings2">
-                <CommandItem>
-                  <User className="text-scale-900" />
-                  <CommandLabel>Profile2</CommandLabel>
-                  <CommandShortcut>⌘P</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <CreditCard className="text-scale-900" />
-                  <CommandLabel>Billing2</CommandLabel>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings className="text-scale-900" />
-                  <CommandLabel>Settings2</CommandLabel>
                   <CommandShortcut>⌘S</CommandShortcut>
                 </CommandItem>
               </CommandGroup>
