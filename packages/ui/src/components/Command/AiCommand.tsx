@@ -107,7 +107,7 @@ function promptDataReducer(
 
 export interface AiCommandProps {
   query?: string
-  setQuery?: (query: string) => void
+  setQuery: (query: string) => void
   page?: string
 }
 
@@ -216,7 +216,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
 
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },

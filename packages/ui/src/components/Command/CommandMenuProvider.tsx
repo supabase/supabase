@@ -15,7 +15,7 @@ export interface CommandMenuContextValue {
   setPages: React.Dispatch<React.SetStateAction<string[]>>
   page: string
 }
-export const CommandMenuContext = createContext<CommandMenuContextValue>(undefined)
+export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
   const context = useContext(CommandMenuContext)
 
