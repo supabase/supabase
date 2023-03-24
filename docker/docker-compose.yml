@@ -11,6 +11,14 @@ services:
     container_name: supabase-studio
     image: supabase/studio:20230216-e731b77
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: studio
+    depends_on:
+      logs:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -40,6 +48,14 @@ services:
     container_name: supabase-kong
     image: kong:2.8.1
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: kong
+    depends_on:
+      logs:
+        condition: service_healthy
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
@@ -62,6 +78,13 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      logs:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: auth
     healthcheck:
       test:
         [
@@ -120,7 +143,14 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      logs:
+        condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: rest
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -135,6 +165,13 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      logs:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: realtime
     healthcheck:
       test:
         [
@@ -168,7 +205,7 @@ services:
 
   logs:
     container_name: supabase-logs
-    image: supabase/logflare:1.0.0
+    image: supabase/logflare:latest
     healthcheck:
       test:
         [
@@ -188,6 +225,8 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      vector:
+        condition: service_healthy
     ports:
       - ${LOGFLARE_HTTP_PORT}:4000/tcp
     volumes:
@@ -205,6 +244,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
       LOGFLARE_SINGLE_TENANT: true
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       GOOGLE_PROJECT_ID: logflare-dev-238720
       GOOGLE_PROJECT_NUMBER: 1023172132421
 
@@ -219,6 +259,13 @@ services:
         condition: service_started
       imgproxy:
         condition: service_started
+      logs:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: storage
     healthcheck:
       test:
         [
@@ -274,6 +321,14 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      logs:
+        condition: service_healthy
+
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: meta
     restart: unless-stopped
     environment:
       PG_META_PORT: 8080
@@ -287,11 +342,19 @@ services:
   db:
     container_name: supabase-db
     image: supabase/postgres:15.1.0.54-rc0
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: db
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
       timeout: 5s
       retries: 10
+    depends_on:
+      vector:
+        condition: service_healthy
     command:
       - postgres
       - -c
@@ -318,3 +381,26 @@ services:
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
+  vector:
+    container_name: supabase-vector
+    image: timberio/vector:0.28.1-alpine
+    healthcheck:
+      test:
+        [
+
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9001/health"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+    ports:
+      - ${VECTOR_PORT}:${VECTOR_PORT}
+      - ${VECTOR_API_PORT}:${VECTOR_API_PORT}
+    volumes:
+      - $PWD/vector.toml:/etc/vector/vector.toml:ro
