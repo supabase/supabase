@@ -316,11 +316,11 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                       className="lg:!col-span-4"
                       description={
                         <p className="text-sm text-scale-1000">
-                          Select which table and events will trigger your function hook
+                          Select which table and events will trigger your webhook
                         </p>
                       }
                     >
-                      Conditions to fire hook
+                      Conditions to fire webhook
                     </FormSectionLabel>
                   }
                 >
@@ -378,7 +378,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                 <FormSection
                   header={
                     <FormSectionLabel className="lg:!col-span-4">
-                      Hook configuration
+                      Webhook configuration
                     </FormSectionLabel>
                   }
                 >
@@ -386,7 +386,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     <Radio.Group
                       id="function_type"
                       name="function_type"
-                      label="Type of hook"
+                      label="Type of webhook"
                       type="cards"
                     >
                       {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
