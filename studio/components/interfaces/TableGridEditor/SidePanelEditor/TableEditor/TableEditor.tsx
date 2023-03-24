@@ -375,11 +375,11 @@ const TableEditor: FC<Props> = ({
                             You are turning Row Level Security(RLS) <u>off</u> for this table.
                           </p>
 
-                          <p className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
-                            <strong>Important: </strong> <br />
+                          <div className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
+                            <h3 className="text-base text-scale-1200">Important</h3>
                             Anyone with the anon key can modify or delete data. <br />
                             We recommend using RLS policies to control access to your data.
-                          </p>
+                          </div>
                         </div>
                       ) : (
                         <div className="grid gap-3">
@@ -390,12 +390,12 @@ const TableEditor: FC<Props> = ({
                             </u>{' '}
                             for this table.
                           </p>
-                          <p className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
-                            <strong>Important: </strong> <br />
+                          <div className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
+                            <h3 className="text-base text-scale-1200">Important</h3>
                             Before querying data from this table, it is necessary to write RLS
                             policies. If access policies are not in place, your queries will always
                             return an <u>empty array</u> of results.
-                          </p>
+                          </div>
                         </div>
                       )}
 
