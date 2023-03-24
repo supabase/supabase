@@ -205,7 +205,7 @@ const Nav = () => {
         <nav
           className={[
             `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 border-[#be9eea]',
+            showLaunchWeekNavMode && '!opacity-100 border-[#e0d2f430]',
           ].join(' ')}
         >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}

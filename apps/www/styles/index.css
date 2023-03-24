@@ -713,4 +713,7 @@ launch week
   .radial-gradient-text-scale-500 {
     background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.35) 100%);
   }
+  .radial-gradient-text-scale-600 {
+    background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.6) 100%);
+  }
 }
