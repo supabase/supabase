@@ -105,16 +105,9 @@ function promptDataReducer(
   throw Error('Unknown action.')
 }
 
-export interface AiCommandProps {
-  query?: string
-  setQuery: (query: string) => void
-  page?: string
-}
-
-const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
+const AiCommand = () => {
   const { isDarkMode } = useTheme()
 
-  // const { close, query, setQuery } = useSearch()
   const [answer, setAnswer] = useState<string | undefined>('')
   const [results, setResults] = useState<any[]>()
   const [isResponding, setIsResponding] = useState(false)
@@ -122,8 +115,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
   const [hasSearchError, setHasSearchError] = useState(false)
   const [selectedTab, setSelectedTab] = useState('clippy-panel')
   const eventSourceRef = useRef<SSE>()
-  const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading } = useCommandMenu()
+  const { isLoading, setIsLoading, currentPage, search, setSearch } = useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
@@ -185,7 +177,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
       console.log('handleClippyConfirm ran')
       console.log('promptIndex', promptIndex)
       setAnswer(undefined)
-      setQuery('')
+      setSearch('')
       dispatchPromptData({ index: promptIndex, answer: undefined, query: query })
       setIsResponding(false)
       setHasClippyError(false)
@@ -194,7 +186,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
 
       let queryToSend = query
 
-      switch (page) {
+      switch (currentPage) {
         case COMMAND_ROUTES.AI_ASK_ANYTHING:
           queryToSend = query
           break
@@ -305,14 +297,14 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
   // console.log(promptData)
 
   useEffect(() => {
-    if (query) {
-      handleClippyConfirm(query)
+    if (search) {
+      handleClippyConfirm(search)
     }
   }, [])
 
   const showActions =
-    !query &&
-    page === COMMAND_ROUTES.AI_RLS_POLICY &&
+    !search &&
+    currentPage === COMMAND_ROUTES.AI_RLS_POLICY &&
     !isResponding &&
     !isLoading &&
     promptData.length > 0
@@ -520,7 +512,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                     <CommandItem
                       type="command"
                       onSelect={() => {
-                        if (!query) {
+                        if (!search) {
                           alert("You've selected me")
                         }
                       }}
@@ -534,7 +526,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                         type="command"
                         forceMount
                         onSelect={() => {
-                          if (!query) {
+                          if (!search) {
                             dispatchPromptData({ type: 'remove-last-item' })
                             setPromptIndex((x) => {
                               return x - 1
@@ -558,7 +550,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
           })}
         </div>
 
-        {promptData.length <= 0 && page === COMMAND_ROUTES.AI_ASK_ANYTHING && (
+        {promptData.length <= 0 && currentPage === COMMAND_ROUTES.AI_ASK_ANYTHING && (
           <CommandGroup heading="Examples" forceMount>
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
@@ -566,7 +558,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    if (!query) {
+                    if (!search) {
                       handleClippyConfirm(question)
                     }
                   }}
@@ -641,16 +633,16 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
           autoFocus
           type="textarea"
           placeholder={selectedTab === 'search-panel' ? 'Search documentation' : 'Ask a question'}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           // icon={<IconSearch size="small" />}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!query) {
+                if (!search) {
                   return
                 }
-                handleConfirm(selectedTab, query)
+                handleConfirm(selectedTab, search)
                 return
               default:
                 return
