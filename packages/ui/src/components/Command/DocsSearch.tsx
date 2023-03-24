@@ -1,20 +1,17 @@
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { SSE } from 'sse.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useTheme } from 'common/Providers'
 import {
   Button,
   IconAlertTriangle,
   IconBook,
   IconChevronRight,
   IconHash,
-  IconLoader,
   IconSearch,
   useCommandMenu,
 } from 'ui'
-import { CommandGroup, CommandItem, CommandLabel } from './Command.utils'
+import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 
 import { debounce } from 'lodash'
 
@@ -125,26 +122,6 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
     />
   )
 
-  function TextHighlighter(props) {
-    const [searchText, setSearchText] = useState('')
-
-    const highlightMatches = (text) => {
-      if (!query) {
-        return text
-      }
-
-      if (!text) return ``
-
-      const regex = new RegExp(query, 'gi')
-      return text.replace(
-        regex,
-        (match) => `<span class="font-bold text-scale-1200">${match}</span>`
-      )
-    }
-
-    return <span dangerouslySetInnerHTML={{ __html: highlightMatches(props.text) }} {...props} />
-  }
-
   return (
     <>
       {results?.length > 0 &&
@@ -173,10 +150,10 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
                   </IconContainer>
                   <div className="flex flex-col gap-0">
                     <CommandLabel>
-                      <TextHighlighter text={page.meta.title} />
+                      <TextHighlighter text={page.meta.title} query={query} />
                     </CommandLabel>
                     <div className="text-xs text-scale-900">
-                      <TextHighlighter text={page.meta.description} />
+                      <TextHighlighter text={page.meta.description} query={query} />
                     </div>
                   </div>
                 </div>
@@ -210,10 +187,11 @@ const DocsSearch = ({ query, setQuery }: DocsSearchProps) => {
                             <TextHighlighter
                               className="not-italic text-xs rounded-full px-2 py-1 bg-scale-500 text-scale-1200"
                               text={page.meta.title}
+                              query={query}
                             />
                           </cite>
                           <CommandLabel>
-                            <TextHighlighter text={section.heading} />
+                            <TextHighlighter text={section.heading} query={query} />
                           </CommandLabel>
                         </div>
                       </div>

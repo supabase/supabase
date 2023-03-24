@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { cn } from './../../utils/cn'
 
-import { KeyboardEventHandler } from 'react'
+import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -270,3 +270,26 @@ export const CommandLabel = ({ className, ...props }: React.HTMLAttributes<HTMLS
 }
 
 CommandShortcut.displayName = 'CommandLabel'
+
+export interface TextHighlighterProps
+  extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
+  text: string | undefined
+  query: string | undefined
+}
+
+export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps) => {
+  const highlightMatches = (text) => {
+    if (!query) {
+      return text
+    }
+
+    if (!text) return ''
+
+    const regex = new RegExp(query, 'gi')
+    return text.replace(regex, (match) => `<span class="font-bold text-scale-1200">${match}</span>`)
+  }
+
+  return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
+}
+
+TextHighlighter.displayName = 'TextHighlighter'
