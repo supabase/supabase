@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'

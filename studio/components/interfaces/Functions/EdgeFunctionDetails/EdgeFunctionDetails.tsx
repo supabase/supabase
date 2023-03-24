@@ -17,7 +17,8 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useStore, useParams, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'

@@ -4,7 +4,8 @@ import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useFlag, useParams, useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import {
   FormHeader,

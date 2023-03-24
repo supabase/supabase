@@ -5,7 +5,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 
 interface Props {}

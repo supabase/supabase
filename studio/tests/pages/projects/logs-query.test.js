@@ -8,7 +8,7 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 
 const defaultRouterMock = () => {
   const router = jest.fn()

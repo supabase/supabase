@@ -5,7 +5,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
 
 import { Member, Role } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
