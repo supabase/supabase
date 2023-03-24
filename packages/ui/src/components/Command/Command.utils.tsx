@@ -184,9 +184,9 @@ const CommandItem = React.forwardRef<
     className={cn(
       type === 'link'
         ? `
-        bg-[#232323]/90
-        border border-[#282828]/90
-
+        bg-scale-300/90
+        border border-[#ddd]/90
+        dark:border-[#282828]/90
         backdrop-filter
         backdrop-blur-md
         text-scale-1100 relative flex
@@ -196,9 +196,11 @@ const CommandItem = React.forwardRef<
         py-3 px-5 text-sm
         transition-all
         outline-none
-        aria-selected:bg-[#323232]
-        aria-selected:border-[#323232]
-        aria-selected:shadow-md
+        aria-selected:bg-scale-300
+        aria-selected:border-[#ccc]
+        dark:aria-selected:bg-[#323232]
+        dark:aria-selected:border-[#323232]
+        aria-selected:shadow-sm
         aria-selected:scale-[100.3%]
         group
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
