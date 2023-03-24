@@ -630,7 +630,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
           </div>
         )} */}
       </div>
-      <div className="absolute bottom-0 w-full">
+      <div className="absolute bottom-0 w-full bg-scale-200">
         {/* <Input */}
         <Input
           className="bg-scale-100 rounded mx-3"

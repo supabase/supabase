@@ -424,7 +424,7 @@ const DocsSearch = ({ query, setQuery, page, router }: DocsSearchProps) => {
       )}
       <div className="absolute right-0 top-0 mt-3 mr-4 hidden md:block"></div>
 
-      <div className="absolute bottom-0 w-full">
+      <div className="absolute bottom-0 w-full bg-scale-200">
         <div className="text-scale-1100 px-3">
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-centerp gap-1 py-2 text-scale-800">
