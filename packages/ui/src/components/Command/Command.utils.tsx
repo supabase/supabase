@@ -3,30 +3,33 @@ import * as React from 'react'
 
 import { cn } from './../../utils/cn'
 
-import { KeyboardEventHandler } from 'react'
+import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
 import { LoadingLine } from './LoadingLine'
 
-const Command = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive
-    ref={ref}
-    className={cn('flex h-full w-full flex-col overflow-hidden', className)}
-    {...props}
-  />
-))
+type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
+type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+
+export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
+  ({ className, ...props }, ref) => (
+    <CommandPrimitive
+      ref={ref}
+      className={cn('flex h-full w-full flex-col overflow-hidden', className)}
+      {...props}
+    />
+  )
+)
+
 Command.displayName = CommandPrimitive.displayName
 
-interface CommandDialogProps extends ModalProps {
+export interface CommandDialogProps extends ModalProps {
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
   page?: number | string
 }
 
-const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
+export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
   const [animateBounce, setAnimateBounce] = React.useState(false)
 
   React.useEffect(() => {
@@ -45,10 +48,7 @@ const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogPro
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
-      {/* <DialogContent className="p-0 shadow-2xl [&_[dialog-overlay]]:bg-red-100"> */}
       <Command
-        // onKeyDown={onKeyDown}
-        // shouldFilter={false}
         className={[
           '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
 
@@ -63,29 +63,25 @@ const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogPro
       >
         {children}
       </Command>
-      {/* </DialogContent> */}
     </Modal>
   )
 }
 
+CommandDialog.displayName = 'CommandDialog'
+
+type CommandPrimitiveInputElement = React.ElementRef<typeof CommandPrimitive.Input>
 type CommandPrimitiveInputProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 
-type CommandInputProps = CommandPrimitiveInputProps & {
-  _key?: string | number
-}
-
-const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  CommandInputProps
->(({ className, value, onValueChange, _key, ...props }, ref) => {
+export const CommandInput = React.forwardRef<
+  CommandPrimitiveInputElement,
+  CommandPrimitiveInputProps
+>(({ className, value, onValueChange, ...props }, ref) => {
   const { isLoading } = useCommandMenu()
 
   return (
     <div className="flex flex-col items-center" cmdk-input-wrapper="">
-      {/* <IconSearch strokeWidth={2} className="text-scale-1200 mr-2 h-4 w-4 shrink-0 opacity-50" /> */}
       <CommandPrimitive.Input
         value={value}
-        key={_key}
         autoFocus
         onValueChange={onValueChange}
         ref={ref}
@@ -104,22 +100,27 @@ const CommandInput = React.forwardRef<
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
-const CommandList = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.List
-    ref={ref}
-    className={cn('overflow-y-auto overflow-x-hidden', className)}
-    {...props}
-  />
-))
+type CommandPrimitiveListElement = React.ElementRef<typeof CommandPrimitive.List>
+type CommandPrimitiveListProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
+
+export const CommandList = React.forwardRef<CommandPrimitiveListElement, CommandPrimitiveListProps>(
+  ({ className, ...props }, ref) => (
+    <CommandPrimitive.List
+      ref={ref}
+      className={cn('overflow-y-auto overflow-x-hidden', className)}
+      {...props}
+    />
+  )
+)
 
 CommandList.displayName = CommandPrimitive.List.displayName
 
-const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+type CommandPrimitiveEmptyElement = React.ElementRef<typeof CommandPrimitive.Empty>
+type CommandPrimitiveEmptyProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+
+export const CommandEmpty = React.forwardRef<
+  CommandPrimitiveEmptyElement,
+  CommandPrimitiveEmptyProps
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
@@ -130,20 +131,15 @@ const CommandEmpty = React.forwardRef<
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
+type CommandPrimitiveGroupElement = React.ElementRef<typeof CommandPrimitive.Group>
 type CommandPrimitiveGroupProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
 
-type CommandGroupProps = CommandPrimitiveGroupProps & {
-  _key?: string | number
-}
-
-const CommandGroup = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
-  CommandGroupProps
->(({ className, _key, ...props }, ref) => (
+export const CommandGroup = React.forwardRef<
+  CommandPrimitiveGroupElement,
+  CommandPrimitiveGroupProps
+>(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
-    key={_key}
     ref={ref}
-    // forceMount={props.forceMount}
     className={cn(
       'overflow-hidden py-3 px-2 text-scale-700 dark:text-scale-800 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-scale-900 [&_[cmdk-group-heading]]:dark:text-sca-300',
       className
@@ -154,9 +150,14 @@ const CommandGroup = React.forwardRef<
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
 
-const CommandSeparator = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
+type CommandPrimitiveSeparatorElement = React.ElementRef<typeof CommandPrimitive.Separator>
+type CommandPrimitiveSeparatorProps = React.ComponentPropsWithoutRef<
+  typeof CommandPrimitive.Separator
+>
+
+export const CommandSeparator = React.forwardRef<
+  CommandPrimitiveSeparatorElement,
+  CommandPrimitiveSeparatorProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
@@ -170,22 +171,23 @@ const CommandSeparator = React.forwardRef<
     {...props}
   />
 ))
+
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
-interface ICommandItem extends React.ElementRef<typeof CommandPrimitive.Item> {
+type CommandPrimitiveItemElement = React.ElementRef<typeof CommandPrimitive.Item>
+type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+
+export interface CommandItemProps extends CommandPrimitiveItemProps {
   type: 'link' | 'command'
 }
 
-const CommandItem = React.forwardRef<
-  ICommandItem,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
-  // @ts-ignore
->(({ className, type, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      type === 'link'
-        ? `
+export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
+  ({ className, type, ...props }, ref) => (
+    <CommandPrimitive.Item
+      ref={ref}
+      className={cn(
+        type === 'link'
+          ? `
         bg-scale-300/90
         border border-[#ddd]/90
         dark:border-[#282828]/90
@@ -206,7 +208,7 @@ const CommandItem = React.forwardRef<
         aria-selected:scale-[100.3%]
         group
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
-        : `
+          : `
           py-3 px-2
           text-scale-1100
           relative flex
@@ -222,34 +224,36 @@ const CommandItem = React.forwardRef<
           data-[disabled]:pointer-events-none
           data-[disabled]:opacity-50
           `,
-      className
-    )}
-    {...props}
-  />
-))
-
-const CommandItemStale = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
-      className
-    )}
-    {...props}
-  />
-))
+        className
+      )}
+      {...props}
+    />
+  )
+)
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
-const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
+  ({ className, ...props }, ref) => (
+    <CommandPrimitive.Item
+      ref={ref}
+      className={cn(
+        'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
+        className
+      )}
+      {...props}
+    />
+  )
+)
+
+CommandItemStale.displayName = 'CommandItemStale'
+
+export const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={cn(
         '[&:not(:last-child)]:hover:bg-scale-600 [&:not(:last-child)]:hover:cursor-pointer',
-        'bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
+        'cursor-default bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
         'last:bg-scale-600 last:text-scale-900',
         'justify-end',
         className
@@ -258,22 +262,34 @@ const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLDivEl
     />
   )
 }
+
 CommandShortcut.displayName = 'CommandShortcut'
 
-const CommandLabel = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+export const CommandLabel = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return <span {...props} className={cn('grow', className)} />
 }
 
-export {
-  Command,
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandItemStale,
-  CommandShortcut,
-  CommandSeparator,
-  CommandLabel,
+CommandShortcut.displayName = 'CommandLabel'
+
+export interface TextHighlighterProps
+  extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
+  text: string | undefined
+  query: string | undefined
 }
+
+export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps) => {
+  const highlightMatches = (text) => {
+    if (!query) {
+      return text
+    }
+
+    if (!text) return ''
+
+    const regex = new RegExp(query, 'gi')
+    return text.replace(regex, (match) => `<span class="font-bold text-scale-1200">${match}</span>`)
+  }
+
+  return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
+}
+
+TextHighlighter.displayName = 'TextHighlighter'
