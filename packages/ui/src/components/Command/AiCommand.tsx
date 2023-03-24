@@ -13,7 +13,8 @@ import { IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 
 import { IconCopy } from '../Icon/icons/IconCopy'
 import { CommandGroup, CommandItem } from './Command.utils'
 
-import { AiIcon, AiIconChat, COMMAND_ROUTES } from './CommandMenu'
+import { COMMAND_ROUTES } from './CommandMenu'
+import { AiIcon, AiIconChat } from './Command.icons'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
@@ -106,7 +107,7 @@ function promptDataReducer(
 
 export interface AiCommandProps {
   query?: string
-  setQuery?: (query: string) => void
+  setQuery: (query: string) => void
   page?: string
 }
 
@@ -215,7 +216,7 @@ const AiCommand = ({ query, setQuery, page }: AiCommandProps) => {
 
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
