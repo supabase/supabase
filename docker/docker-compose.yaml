@@ -398,9 +398,9 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
-
     ports:
       - ${VECTOR_PORT}:${VECTOR_PORT}
       - ${VECTOR_API_PORT}:${VECTOR_API_PORT}
     volumes:
-      - $PWD/vector.toml:/etc/vector/vector.toml:ro
+      - $PWD/vector.yaml:/etc/vector/vector.yaml:ro
+    command: [ "--config", "etc/vector/vector.yaml" ]
