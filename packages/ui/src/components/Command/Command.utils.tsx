@@ -278,12 +278,14 @@ export interface TextHighlighterProps
 }
 
 export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps) => {
-  const highlightMatches = (text) => {
+  const highlightMatches = (text?: string) => {
+    if (!text) {
+      return ''
+    }
+
     if (!query) {
       return text
     }
-
-    if (!text) return ''
 
     const regex = new RegExp(query, 'gi')
     return text.replace(regex, (match) => `<span class="font-bold text-scale-1200">${match}</span>`)
