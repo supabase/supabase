@@ -1,0 +1,4 @@
+.tickets-grid {
+  grid-template-rows: masonry;
+  masonry-auto-flow: ordered;
+}
