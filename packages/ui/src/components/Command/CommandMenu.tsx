@@ -15,6 +15,7 @@ import { IconUser } from './../Icon/icons/IconUser'
 
 import AiCommand from './AiCommand'
 import navItems from './utils/docs-nav-items.json'
+import sharedItems from './utils/shared-nav-items.json'
 import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
@@ -63,6 +64,8 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
   if (!search && isSubItem) return null
   return <CommandItem {...props}>{children}</CommandItem>
 }
+
+const projectRef = ''
 
 const CommandMenu = () => {
   const router = useRouter()
@@ -199,7 +202,22 @@ const CommandMenu = () => {
                 ))}
               </CommandGroup>
 
-              <DashboardTableEditor />
+              <CommandGroup heading="Actual Dashboard Items">
+                {sharedItems.sharedTools.map((item) => {
+                  const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
+
+                  return (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <IconArrowRight className="text-scale-900" />
+                      <CommandLabel>
+                        Dashboard: <span className="font-bold"> {item.label}</span>
+                      </CommandLabel>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+
+              {/* <DashboardTableEditor /> */}
 
               <CommandGroup heading="Support">
                 {navItems.docsSupport.map((item) => (
