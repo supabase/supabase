@@ -13,7 +13,7 @@ export interface CommandMenuContextValue {
   setSearch: React.Dispatch<React.SetStateAction<string>>
   pages: string[]
   setPages: React.Dispatch<React.SetStateAction<string[]>>
-  page: string
+  currentPage?: string
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -34,15 +34,15 @@ const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = React.useState('')
-  const [pages, setPages] = React.useState([])
+  const [pages, setPages] = React.useState<string[]>([])
   const { toggleTheme } = useTheme()
-  const page = pages[pages.length - 1]
+  const currentPage = pages[pages.length - 1]
 
   const actions: CommandMenuActions = {
     toggleTheme,
   }
 
-  useKeyboardEvents({ setIsOpen, page, setSearch, setPages })
+  useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
 
   return (
     <CommandMenuContext.Provider
@@ -56,7 +56,7 @@ const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
         search,
         pages,
         setPages,
-        page,
+        currentPage,
       }}
     >
       {children}
@@ -67,14 +67,14 @@ const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
 
 function useKeyboardEvents({
   setIsOpen,
-  page,
+  currentPage,
   setSearch,
   setPages,
 }: {
   setIsOpen: (isOpen: boolean) => void
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setPages: React.Dispatch<React.SetStateAction<string[]>>
-  page: string
+  currentPage?: string
 }) {
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -82,7 +82,7 @@ function useKeyboardEvents({
         case 'Escape':
           event.preventDefault()
           // if on homepage, close the command palette
-          if (!page) setIsOpen(false)
+          if (!currentPage) setIsOpen(false)
           setSearch('')
           // if NOT on homepage, return to last page
           setPages((pages) => pages.slice(0, -1))
@@ -101,7 +101,7 @@ function useKeyboardEvents({
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [setIsOpen, page])
+  }, [setIsOpen, currentPage])
 }
 
 export default CommandMenuProvider
