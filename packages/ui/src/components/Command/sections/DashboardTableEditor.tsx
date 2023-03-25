@@ -8,8 +8,6 @@ import { useCommandMenu } from '../CommandMenuProvider'
 export default function DashboardTableEditor() {
   const router = useRouter()
   const { setPages, currentPage, pages } = useCommandMenu()
-  console.log('currentPage', currentPage)
-  console.log('pages', pages)
 
   return (
     <CommandGroup heading={dashboardItems.tools.label}>
@@ -27,11 +25,6 @@ export default function DashboardTableEditor() {
 
         {currentPage === 'projects' && (
           <>
-            <CommandItem type="link">
-              <CommandLabel>
-                <span className="font-bold"> projects sub item</span>
-              </CommandLabel>
-            </CommandItem>
             <CommandItem type="link">Project B</CommandItem>
           </>
         )}
