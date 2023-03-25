@@ -14,7 +14,7 @@ import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
 
 import AiCommand from './AiCommand'
-import navItems from './command-nav-items.json'
+import navItems from './utils/docs-nav-items.json'
 import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
@@ -27,6 +27,8 @@ import {
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import DocsSearch from './DocsSearch'
+import DashboardTableEditor from './sections/DashboardTableEditor'
+import CommandMenuShortcuts from './CommandMenuShortcuts'
 
 export const COMMAND_ROUTES = {
   AI: 'Supabase AI',
@@ -135,24 +137,7 @@ const CommandMenu = () => {
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
       >
-        {pages.length > 0 && (
-          <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
-            <CommandShortcut onClick={() => handleSetPages([])}>{'Home'}</CommandShortcut>
-            {pages.map((page, index) => (
-              <CommandShortcut
-                key={page}
-                onClick={() => {
-                  if (index === pages.length - 1) {
-                    return
-                  }
-                  handleSetPages(pages.slice(0, index - 1))
-                }}
-              >
-                {page}
-              </CommandShortcut>
-            ))}
-          </div>
-        )}
+        {pages.length > 0 && <CommandMenuShortcuts />}
         {showCommandInput && (
           <CommandInput
             ref={commandInputRef}
@@ -206,7 +191,7 @@ const CommandMenu = () => {
                 </CommandItem>
               </CommandGroup>
 
-              <CommandGroup heading="Navigation">
+              <CommandGroup heading="Main Navigation item">
                 {navItems.docsTools.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconArrowRight className="text-scale-900" />
@@ -216,6 +201,8 @@ const CommandMenu = () => {
                   </CommandItem>
                 ))}
               </CommandGroup>
+
+              <DashboardTableEditor />
 
               <CommandGroup heading="Support">
                 {navItems.docsSupport.map((item) => (
