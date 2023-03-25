@@ -4,7 +4,18 @@
     "items": [
       {
         "label": "dashboard - Database",
-        "url": "https://supabase.com/docs/guides/database"
+        "url": "https://supabase.com/docs/guides/database",
+        "subItems": [
+          {
+            "label": "Triggers",
+            "url": "http://www.example.com/triggers"
+          },
+          {
+            "label": "Functions",
+            "icon": "functions",
+            "url": "http://www.example.com/functions"
+          }
+        ]
       },
       {
         "label": "dashboard - Auth",
@@ -20,6 +31,43 @@
       },
       {
         "label": "dashboard - Storage",
+        "url": "https://supabase.com/docs/guides/storage"
+      }
+    ]
+  },
+  "settings": {
+    "label": "Dashboard Settings",
+    "items": [
+      {
+        "label": "settings - Database general",
+        "url": "https://supabase.com/docs/guides/database"
+      },
+      {
+        "label": "settings - Database settings",
+        "url": "https://supabase.com/docs/guides/auth/overview"
+      },
+      {
+        "label": "settings - API settings",
+        "url": "https://supabase.com/docs/guides/functions"
+      },
+      {
+        "label": "settings - Auth settings",
+        "url": "https://supabase.com/docs/guides/realtime"
+      },
+      {
+        "label": "settings - Storage settings",
+        "url": "https://supabase.com/docs/guides/storage"
+      },
+      {
+        "label": "settings - subscription settings",
+        "url": "https://supabase.com/docs/guides/storage"
+      },
+      {
+        "label": "settings - usage settings",
+        "url": "https://supabase.com/docs/guides/storage"
+      },
+      {
+        "label": "settings - invoices settings",
         "url": "https://supabase.com/docs/guides/storage"
       }
     ]

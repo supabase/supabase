@@ -70,6 +70,9 @@ const CommandMenu = () => {
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
     useCommandMenu()
 
+  console.log('currentPage page', currentPage)
+  console.log('pages page', pages)
+
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
       <CommandGroup>
