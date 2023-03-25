@@ -118,12 +118,6 @@ const CommandMenu = () => {
     )
   }
 
-  function handleSetPages(pages: string[], keepSearch?: boolean) {
-    setPages(pages)
-    if (!keepSearch) setSearch('')
-    commandInputRef.current?.focus()
-  }
-
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
@@ -153,7 +147,7 @@ const CommandMenu = () => {
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    handleSetPages([...pages, COMMAND_ROUTES.AI], true)
+                    setPages([...pages, COMMAND_ROUTES.AI])
                   }}
                   forceMount
                 >
@@ -172,7 +166,7 @@ const CommandMenu = () => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.DOCS_SEARCH], true)}
+                  onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                   forceMount
                 >
                   <IconBook className="" />
@@ -225,10 +219,7 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="Settings">
-                <CommandItem
-                  type="link"
-                  onSelect={() => handleSetPages([...pages, 'Theme'], false)}
-                >
+                <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
