@@ -24,8 +24,30 @@ const questions = [
   'How do I set up authentication?',
 ]
 
+export enum PageType {
+  Markdown = 'markdown',
+  Reference = 'reference',
+}
+
+export interface PageSection {
+  slug: string
+  heading: string
+}
+
+export interface PageMetadata {
+  title: string
+  description: string
+}
+
+export interface PageResult {
+  type: PageType
+  path: string
+  meta: PageMetadata
+  sections: PageSection[]
+}
+
 const DocsSearch = () => {
-  const [results, setResults] = useState<any[]>()
+  const [results, setResults] = useState<PageResult[]>()
   const [hasSearchError, setHasSearchError] = useState(false)
   const supabaseClient = useSupabaseClient()
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
@@ -97,7 +119,9 @@ const DocsSearch = () => {
     />
   )
 
-  const IconContainer = (props) => (
+  const IconContainer = (
+    props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+  ) => (
     <div
       className="
         transition
@@ -165,7 +189,7 @@ const DocsSearch = () => {
                       onSelect={() => {
                         // TODO: replace with Next.js router/Link when cross-project link logic solved
                         window.location.assign(
-                          `/docs/${page.path}${page.type === 'reference' ? '/' : '#'}${
+                          `/docs/${page.path}${page.type === PageType.Reference ? '/' : '#'}${
                             section.slug
                           }`
                         )
