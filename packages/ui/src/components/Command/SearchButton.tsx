@@ -8,7 +8,7 @@ const SearchButton = ({
 }: PropsWithChildren<
   DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
 >) => {
-  const searchButtonRef = useRef<HTMLButtonElement>()
+  const searchButtonRef = useRef<HTMLButtonElement>(null)
   const { setIsOpen } = useCommandMenu()
 
   return (

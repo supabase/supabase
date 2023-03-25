@@ -64,7 +64,7 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
 
 const CommandMenu = () => {
   const router = useRouter()
-  const commandInputRef = useRef<ElementRef<typeof CommandInput>>()
+  const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
     useCommandMenu()
 
@@ -122,7 +122,7 @@ const CommandMenu = () => {
     commandInputRef.current?.focus()
   }
 
-  const showCommandInput = !CHAT_ROUTES.includes(currentPage)
+  const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
     <>
@@ -168,7 +168,7 @@ const CommandMenu = () => {
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    handleSetPages([...pages, COMMAND_ROUTES.AI], false)
+                    handleSetPages([...pages, COMMAND_ROUTES.AI], true)
                   }}
                   forceMount
                 >
@@ -250,12 +250,8 @@ const CommandMenu = () => {
               <SearchableChildItems isSubItem />
             </>
           )}
-          {currentPage === COMMAND_ROUTES.AI && (
-            <AiCommand query={search} setQuery={setSearch} page={currentPage} />
-          )}
-          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && (
-            <DocsSearch query={search} setQuery={setSearch} />
-          )}
+          {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
+          {currentPage === COMMAND_ROUTES.DOCS_SEARCH && <DocsSearch />}
           {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
