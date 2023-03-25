@@ -200,13 +200,6 @@ const AiCommand = () => {
     }
   }, [])
 
-  const showActions =
-    !search &&
-    currentPage === COMMAND_ROUTES.AI_RLS_POLICY &&
-    !isResponding &&
-    !isLoading &&
-    promptData.length > 0
-
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">

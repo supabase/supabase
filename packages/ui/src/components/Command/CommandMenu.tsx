@@ -168,7 +168,7 @@ const CommandMenu = () => {
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    handleSetPages([...pages, COMMAND_ROUTES.AI], false)
+                    handleSetPages([...pages, COMMAND_ROUTES.AI], true)
                   }}
                   forceMount
                 >
