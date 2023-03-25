@@ -1,0 +1,28 @@
+{
+  "sharedTools": [
+    {
+      "label": "Table Editor",
+      "url": "https://app.supabase.com/project/_/editor"
+    },
+    {
+      "label": "SQL Editor",
+      "url": "https://app.supabase.com/project/_/sql"
+    },
+    {
+      "label": "Database",
+      "url": "https://app.supabase.com/project/_/database/tables"
+    },
+    {
+      "label": "Auth",
+      "url": "https://app.supabase.com/project/_/auth/users"
+    },
+    {
+      "label": "Storage",
+      "url": "https://app.supabase.com/project/_/storage"
+    },
+    {
+      "label": "Project Settings",
+      "url": "https://app.supabase.com/project/_/settings/general"
+    }
+  ]
+}
