@@ -1,0 +1,27 @@
+{
+  "tools": {
+    "label": "Dashboard Tools",
+    "items": [
+      {
+        "label": "dashboard - Database",
+        "url": "https://supabase.com/docs/guides/database"
+      },
+      {
+        "label": "dashboard - Auth",
+        "url": "https://supabase.com/docs/guides/auth/overview"
+      },
+      {
+        "label": "dashboard - Edge Functions",
+        "url": "https://supabase.com/docs/guides/functions"
+      },
+      {
+        "label": "dashboard - Realtime",
+        "url": "https://supabase.com/docs/guides/realtime"
+      },
+      {
+        "label": "dashboard - Storage",
+        "url": "https://supabase.com/docs/guides/storage"
+      }
+    ]
+  }
+}
