@@ -11,7 +11,6 @@ import { SSE } from 'sse.js'
 import { Button, IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
-import { COMMAND_ROUTES } from './CommandMenu'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
@@ -264,7 +263,7 @@ const AiCommand = () => {
           })}
         </div>
 
-        {promptData.length <= 0 && currentPage === COMMAND_ROUTES.AI_ASK_ANYTHING && (
+        {promptData.length === 0 && !hasClippyError && (
           <CommandGroup heading="Examples" forceMount>
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
