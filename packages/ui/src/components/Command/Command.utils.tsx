@@ -189,8 +189,6 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         type === 'link'
           ? `
         bg-scale-300/90
-        border border-[#ddd]/90
-        dark:border-[#282828]/90
         backdrop-filter
         backdrop-blur-md
         text-scale-1100 relative flex
@@ -215,7 +213,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
           cursor-default select-none items-center
           rounded-md text-sm outline-none
 
-          aria-selected:bg-scale-400
+          aria-selected:bg-scale-300
 
           dark:aria-selected:bg-[#323232]/80
 
