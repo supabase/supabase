@@ -4,6 +4,7 @@ import { Button } from 'ui'
 import { useMobileViewport } from '../../../hooks/useMobileViewport'
 import { UserData } from '../Ticket/hooks/use-conf-data'
 import { TicketBrickWallRow } from './TicketBrickWallRow'
+import { TicketBrickWallSlider } from './TicketBrickWallSlider'
 
 type user = UserData
 
@@ -27,12 +28,15 @@ export default function TicketBrickWall({ users }: Props) {
             after:content-[' '] after:absolute after:inset-0 after:left-auto after:w-1/4 after:bg-gradient-to-l after:from-[#1C1C1C] after:to-[#1C1C1C00] after:z-10 after:pointer-events-none
           "
         >
-          <TicketBrickWallRow
+          <TicketBrickWallSlider
             users={users.slice(0, isMobile ? 5 : 7)}
             xOffset={isMobile ? 50 : 250}
           />
-          <TicketBrickWallRow users={users.slice(isMobile ? 5 : 7, isMobile ? 11 : 14)} reverse />
-          {isMobile && <TicketBrickWallRow users={users.slice(11, 17)} />}
+          <TicketBrickWallSlider
+            users={users.slice(isMobile ? 5 : 7, isMobile ? 11 : 14)}
+            reverse
+          />
+          {isMobile && <TicketBrickWallSlider users={users.slice(11, 17)} speed={16000} />}
         </div>
         <div className="w-full mt-2 lg:mt-4 mx-auto flex justify-center">
           <Link href="/launch-week/tickets">
