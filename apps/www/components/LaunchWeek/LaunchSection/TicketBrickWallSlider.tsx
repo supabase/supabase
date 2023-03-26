@@ -19,7 +19,7 @@ interface Props {
 
 export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 10000 }: Props) {
   const ref = useRef(null)
-  const [swiperInstace, setSwiperInstance] = useState<SwiperCore | null>(null)
+  const [swiperInstace, setSwiperInstance] = useState<SwiperCore | any | null>(null)
   const { width } = useWindowSize()
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
