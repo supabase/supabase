@@ -59,35 +59,7 @@ export async function getStaticProps({ params }: any) {
 
 function CaseStudyPage(props: any) {
   const content = props.blog.content
-
   const { basePath } = useRouter()
-
-  // const NextCard = (props: any) => {
-  //   const { post, label, className } = props
-  //   return (
-  //     <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
-  //       <div className={className}>
-  //         <div className="bg-scale-100 hover:bg-scale-200 dark:bg-scale-200 dark:hover:bg-scale-300 flex cursor-pointer items-center justify-center rounded-lg border p-3 drop-shadow-none transition-all hover:drop-shadow-lg ">
-  //           <div className="relative flex h-40 w-40">
-  //             <Image
-  //               layout="fill"
-  //               src={`${post.logo}`}
-  //               alt={`${post.title} logo`}
-  //               objectFit="scale-down"
-  //               objectPosition="center"
-  //               className="
-  //                     bg-no-repeat
-  //                     dark:brightness-200
-  //                     dark:contrast-0
-  //                     dark:filter
-  //                   "
-  //             />
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </Link>
-  //   )
-  // }
 
   return (
     <>
@@ -201,21 +173,6 @@ function CaseStudyPage(props: any) {
                             </div>
                           )
                         })}
-                        <div className="flex flex-col md:flex-row lg:flex-col gap-8 justify-between">
-                          {/* {props.blog.stats.map((x: any) => {
-                        return (
-                          <div className="flex space-x-3">
-                            <div className="bg-brand-900 mt-0.5 h-8 w-0.5"></div>
-                            <div className="flex flex-col gap-2">
-                              <span className="text-scale-1200 text-2xl leading-none">
-                                {x.stat}
-                              </span>
-                              <span>{x.label}</span>
-                            </div>
-                          </div>
-                        )
-                      })} */}
-                        </div>
 
                         <div className="">
                           <p>Ready to get started?</p>
@@ -234,22 +191,12 @@ function CaseStudyPage(props: any) {
                     <div className="xm:col-span-7 col-span-12 lg:col-span-8 xl:col-span-8 ">
                       <MDXRemote {...content} components={mdxComponents()} />
                     </div>
-                    {/* Sidebar */}
                   </div>
                 </article>
               </div>
             </div>
           </div>
         </div>
-
-        {/* <div className="mt-32">
-          <h3 className="text-2xl">Read more case studies</h3>
-          <div className="grid grid-cols-3 gap-8">
-            {props.relatedPosts.map((post) => {
-                return <NextCard post={post} />
-              })}
-          </div>
-        </div> */}
 
         <CTABanner />
       </DefaultLayout>
