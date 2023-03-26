@@ -1523,9 +1523,23 @@ export const OLD = {
   },
 }
 
+export const PROVIDER_SAML = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'SAML 2.0',
+  properties: {
+    SAML_ENABLED: {
+      type: 'boolean',
+      title: 'Enabled',
+      help: 'Allows the use of SAML 2.0 Single Sign-On',
+    },
+  },
+}
+
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
+  PROVIDER_SAML,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,

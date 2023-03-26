@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import { PROVIDERS_SCHEMAS } from 'stores/authConfig/schema'
+import { useStore, useFlag } from 'hooks'
+import { PROVIDERS_SCHEMAS, PROVIDER_SAML } from 'stores/authConfig/schema'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import ProviderForm from './ProviderForm'
@@ -8,7 +8,15 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 
 const AuthProvidersForm = () => {
   const { authConfig } = useStore()
-  const providers = PROVIDERS_SCHEMAS
+  const isSamlEnabled = useFlag('isSamlEnabled')
+
+  let providers: typeof PROVIDERS_SCHEMAS | null = null
+
+  if (isSamlEnabled) {
+    providers = PROVIDERS_SCHEMAS
+  } else {
+    providers = PROVIDERS_SCHEMAS.filter((provider) => provider !== PROVIDER_SAML)
+  }
 
   return (
     <div>
