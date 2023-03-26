@@ -6,7 +6,7 @@ import { Button } from 'ui'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
-export const ErrorPage = (isDarkMode) => {
+export const ErrorPage = (isDarkMode: any) => {
   const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
