@@ -246,7 +246,7 @@ Next, we need to create a single instance of Supabase to use client-side. Let's 
 ```jsx title=components/supabase-provider.jsx
 'use client'
 
-import { createS, useContext, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { createClient } from '../utils/supabase-browser'
 
 const Context = createContext()
