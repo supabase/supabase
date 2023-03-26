@@ -90,28 +90,32 @@ const RedirectDomains = () => {
           title="Redirect URLs"
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-              Add URL
-            </Button>
-          </Tooltip.Trigger>
-          {!canUpdateConfig && (
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200">
-                  You need additional permissions to update redirect URLs
-                </span>
-              </div>
-            </Tooltip.Content>
-          )}
-        </Tooltip.Root>
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
+                Add URL
+              </Button>
+            </Tooltip.Trigger>
+            {!canUpdateConfig && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to update redirect URLs
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        </Tooltip.Provider>
       </div>
       <DomainList canUpdate={canUpdateConfig} onSelectDomainToDelete={setSelectedDomainToDelete} />
       <Modal

@@ -73,28 +73,32 @@ const TriggersList: FC<any> = ({
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
             />
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
-                  Create a new trigger
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateTriggers && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to create triggers
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              )}
-            </Tooltip.Root>
+            <Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
+                    Create a new trigger
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreateTriggers && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to create triggers
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            </Tooltip.Provider>
           </div>
           {filteredTriggers.length <= 0 && (
             <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">

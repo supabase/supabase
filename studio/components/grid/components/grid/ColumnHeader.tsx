@@ -124,46 +124,54 @@ export function ColumnHeader<R>({
         <div className="sb-grid-column-header__inner">
           {renderColumnIcon(columnType, { name: column.name as string, foreignKey })}
           {isPrimaryKey && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <div className="sb-grid-column-header__inner__primary-key">
-                  <IconKey size="tiny" strokeWidth={2} />
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Primary key</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
+            <Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <div className="sb-grid-column-header__inner__primary-key">
+                    <IconKey size="tiny" strokeWidth={2} />
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">Primary key</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
           )}
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
           <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
           {isEncrypted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <IconLock size="tiny" strokeWidth={2} />
-              </Tooltip.Trigger>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Encrypted column</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
+            <Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <IconLock size="tiny" strokeWidth={2} />
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">Encrypted column</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
           )}
         </div>
         <ColumnMenu column={column} isEncrypted={isEncrypted} />
@@ -180,37 +188,41 @@ function renderColumnIcon(
   switch (type) {
     case 'foreign_key':
       return (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <IconLink size="tiny" strokeWidth={2} />
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <div>
-                <p className="text-xs text-scale-1100">Foreign key relation:</p>
-                <div className="flex items-center space-x-1">
-                  <p className="text-xs text-scale-1200">{name}</p>
-                  <IconArrowRight size="tiny" strokeWidth={1.5} />
-                  <p className="text-xs text-scale-1200">
-                    {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
-                    {foreignKey?.targetColumnName}
-                  </p>
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconLink size="tiny" strokeWidth={2} />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <div>
+                    <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                    <div className="flex items-center space-x-1">
+                      <p className="text-xs text-scale-1200">{name}</p>
+                      <IconArrowRight size="tiny" strokeWidth={1.5} />
+                      <p className="text-xs text-scale-1200">
+                        {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
+                        {foreignKey?.targetColumnName}
+                      </p>
+                    </div>
+                    {foreignKey?.deletionAction !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                      <p className="text-xs text-scale-1200 mt-1">
+                        On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                {foreignKey?.deletionAction !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
-                  <p className="text-xs text-scale-1200 mt-1">
-                    On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
-                  </p>
-                )}
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       )
     default:
       return null

@@ -110,58 +110,66 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
           className="w-[120px]"
           overlay={
             <>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Dropdown.Item
-                    icon={<IconEdit3 size="tiny" />}
-                    disabled={!canManageSecrets}
-                    onClick={() => onSelectEdit(secret)}
-                  >
-                    Edit
-                  </Dropdown.Item>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Dropdown.Item
+                      icon={<IconEdit3 size="tiny" />}
+                      disabled={!canManageSecrets}
+                      onClick={() => onSelectEdit(secret)}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to edit secrets
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Dropdown.Item
-                    disabled={!canManageSecrets}
-                    icon={<IconTrash stroke="red" size="tiny" />}
-                    onClick={() => onSelectRemove(secret)}
-                  >
-                    Delete
-                  </Dropdown.Item>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
+                      Edit
+                    </Dropdown.Item>
+                  </Tooltip.Trigger>
+                  {!canManageSecrets && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to edit secrets
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Dropdown.Item
+                      disabled={!canManageSecrets}
+                      icon={<IconTrash stroke="red" size="tiny" />}
+                      onClick={() => onSelectRemove(secret)}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to delete secrets
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
+                      Delete
+                    </Dropdown.Item>
+                  </Tooltip.Trigger>
+                  {!canManageSecrets && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to delete secrets
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </>
           }
         >

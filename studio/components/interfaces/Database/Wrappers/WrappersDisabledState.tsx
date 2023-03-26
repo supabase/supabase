@@ -119,33 +119,37 @@ const WrappersDisabledState = () => {
                   </Button>
                 </a>
               </Link>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    type="primary"
-                    loading={isEnabling}
-                    disabled={isNotAvailable || isEnabling || !canToggleWrappers}
-                    onClick={() => onEnableWrappers()}
-                  >
-                    Enable Wrappers
-                  </Button>
-                </Tooltip.Trigger>
-                {!canToggleWrappers && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      type="primary"
+                      loading={isEnabling}
+                      disabled={isNotAvailable || isEnabling || !canToggleWrappers}
+                      onClick={() => onEnableWrappers()}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to enable Wrappers for this project
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
+                      Enable Wrappers
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canToggleWrappers && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to enable Wrappers for this project
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </div>
           )}
         </div>

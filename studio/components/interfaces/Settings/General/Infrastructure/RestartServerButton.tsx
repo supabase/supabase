@@ -78,65 +78,69 @@ const RestartServerButton: FC<Props> = ({ project }) => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
-          <div className="flex items-center">
-            <Button
-              type="default"
-              className="rounded-r-none px-3"
-              disabled={!canRestartProject}
-              onClick={() => setServiceToRestart('project')}
-            >
-              Restart project
-            </Button>
-            {canRestartProject && (
-              <Dropdown
-                align="end"
-                side="bottom"
-                overlay={[
-                  <Dropdown.Item
-                    key="database"
-                    disabled={loading}
-                    onClick={() => {
-                      setServiceToRestart('database')
-                    }}
-                  >
-                    <div className="space-y-1">
-                      <p className="block text-scale-1200">Fast database reboot</p>
-                      <p className="block text-scale-1100">
-                        Restarts only the database - faster but may not be able to recover from all
-                        failure modes
-                      </p>
-                    </div>
-                  </Dropdown.Item>,
-                ]}
+      <Tooltip.Provider>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <div className="flex items-center">
+              <Button
+                type="default"
+                className="rounded-r-none px-3"
+                disabled={!canRestartProject}
+                onClick={() => setServiceToRestart('project')}
               >
-                <Button
-                  type="default"
-                  className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
-                  disabled={!canRestartProject}
-                />
-              </Dropdown>
-            )}
-          </div>
-        </Tooltip.Trigger>
-        {!canRestartProject && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to restart this project
-              </span>
+                Restart project
+              </Button>
+              {canRestartProject && (
+                <Dropdown
+                  align="end"
+                  side="bottom"
+                  overlay={[
+                    <Dropdown.Item
+                      key="database"
+                      disabled={loading}
+                      onClick={() => {
+                        setServiceToRestart('database')
+                      }}
+                    >
+                      <div className="space-y-1">
+                        <p className="block text-scale-1200">Fast database reboot</p>
+                        <p className="block text-scale-1100">
+                          Restarts only the database - faster but may not be able to recover from
+                          all failure modes
+                        </p>
+                      </div>
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                    disabled={!canRestartProject}
+                  />
+                </Dropdown>
+              )}
             </div>
-          </Tooltip.Content>
-        )}
-      </Tooltip.Root>
+          </Tooltip.Trigger>
+          {!canRestartProject && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                    'border border-scale-200 ', //border
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to restart this project
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+      </Tooltip.Provider>
       <ConfirmModal
         danger
         visible={serviceToRestart !== undefined}

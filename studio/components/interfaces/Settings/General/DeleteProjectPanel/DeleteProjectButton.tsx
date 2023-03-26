@@ -81,9 +81,9 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     if (!isFree) {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-	additionalFeedback: cancellationMessage,
-	exitAction: 'delete',
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: cancellationMessage,
+        exitAction: 'delete',
       })
       if (feedbackRes.error) throw feedbackRes.error
     }
@@ -91,28 +91,32 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
-          <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
-            Delete project
-          </Button>
-        </Tooltip.Trigger>
-        {!canDeleteProject && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to delete this project
-              </span>
-            </div>
-          </Tooltip.Content>
-        )}
-      </Tooltip.Root>
+      <Tooltip.Provider>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
+              Delete project
+            </Button>
+          </Tooltip.Trigger>
+          {!canDeleteProject && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                    'border border-scale-200 ', //border
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to delete this project
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+      </Tooltip.Provider>
       <TextConfirmModal
         visible={isOpen}
         loading={loading}
@@ -134,7 +138,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
         onConfirm={handleDeleteProject}
         onCancel={toggle}
       >
-        {/* 
+        {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.

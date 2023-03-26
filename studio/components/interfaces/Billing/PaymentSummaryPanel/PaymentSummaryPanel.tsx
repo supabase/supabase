@@ -360,34 +360,38 @@ const PaymentSummaryPanel: FC<Props> = ({
                 <p className="text-sm">No saved payment methods</p>
               </div>
 
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    type="default"
-                    disabled={!canUpdatePaymentMethods}
-                    icon={<IconCreditCard />}
-                    onClick={onSelectAddNewPaymentMethod}
-                  >
-                    Add new
-                  </Button>
-                </Tooltip.Trigger>
-                {!canUpdatePaymentMethods && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-scale-200 text-center', //border
-                      ].join(' ')}
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      type="default"
+                      disabled={!canUpdatePaymentMethods}
+                      icon={<IconCreditCard />}
+                      onClick={onSelectAddNewPaymentMethod}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to add new payment methods to this
-                        organization
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
+                      Add new
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canUpdatePaymentMethods && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                            'w-48 border border-scale-200 text-center', //border
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to add new payment methods to this
+                            organization
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </div>
           ) : (
             <Listbox value={selectedPaymentMethod?.id} onChange={onSelectPaymentMethod}>
@@ -429,54 +433,62 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="self-center">{captcha}</div>
 
         <div className="flex items-center justify-end">
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Button
-                block
-                type="primary"
-                size="medium"
-                loading={isSubmitting}
-                disabled={
-                  isSubmitting ||
-                  isLoadingPaymentMethods ||
-                  !hasChangesToPlan ||
-                  !selectedPaymentMethod
-                }
-                onClick={() => validateOrder()}
-              >
-                Confirm payment
-              </Button>
-            </Tooltip.Trigger>
-            {!hasChangesToPlan ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+          <Tooltip.Provider>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  block
+                  type="primary"
+                  size="medium"
+                  loading={isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    isLoadingPaymentMethods ||
+                    !hasChangesToPlan ||
+                    !selectedPaymentMethod
+                  }
+                  onClick={() => validateOrder()}
                 >
-                  <span className="text-xs text-scale-1200">
-                    No changes made to your subscription
-                  </span>
-                </div>
-              </Tooltip.Content>
-            ) : !selectedPaymentMethod ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Please select a payment method</span>
-                </div>
-              </Tooltip.Content>
-            ) : (
-              <></>
-            )}
-          </Tooltip.Root>
+                  Confirm payment
+                </Button>
+              </Tooltip.Trigger>
+              {!hasChangesToPlan ? (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        No changes made to your subscription
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              ) : !selectedPaymentMethod ? (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Please select a payment method
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              ) : (
+                <></>
+              )}
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </div>
       </div>
 

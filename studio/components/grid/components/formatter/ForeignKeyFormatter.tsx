@@ -35,35 +35,39 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
         {value === null ? <NullValue /> : value}
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Link
-              href={`/project/${ref}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
-            >
-              <a>
-                <Button
-                  type="default"
-                  size="tiny"
-                  className="translate-y-[2px]"
-                  onClick={() => {}}
-                  icon={<IconArrowRight size="tiny" />}
-                  style={{ padding: '3px' }}
-                />
-              </a>
-            </Link>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">View referencing record</span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <Link
+                href={`/project/${ref}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+              >
+                <a>
+                  <Button
+                    type="default"
+                    size="tiny"
+                    className="translate-y-[2px]"
+                    onClick={() => {}}
+                    icon={<IconArrowRight size="tiny" />}
+                    style={{ padding: '3px' }}
+                  />
+                </a>
+              </Link>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">View referencing record</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       )}
     </div>
   )

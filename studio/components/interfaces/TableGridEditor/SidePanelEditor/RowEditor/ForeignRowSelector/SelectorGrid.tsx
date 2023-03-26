@@ -18,19 +18,23 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   return (
     <div className="flex h-full items-center justify-center gap-2">
       {isPrimaryKey && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <div className="text-brand-900">
-              <IconKey size="tiny" strokeWidth={2} />
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div className="rounded bg-scale-100 py-1 px-2 leading-none shadow border border-scale-200">
-              <span className="text-xs text-scale-1200">Primary key</span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <div className="text-brand-900">
+                <IconKey size="tiny" strokeWidth={2} />
+              </div>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div className="rounded bg-scale-100 py-1 px-2 leading-none shadow border border-scale-200">
+                  <span className="text-xs text-scale-1200">Primary key</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       )}
 
       <span className="sb-grid-column-header__inner__name">{name}</span>

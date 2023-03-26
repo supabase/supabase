@@ -44,32 +44,36 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
     return (
       <>
         {state.editable && onEditColumn !== undefined && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
-              <Dropdown.Item
-                onClick={onEditColumn}
-                disabled={isEncrypted}
-                icon={<IconEdit size="tiny" />}
-              >
-                Edit column
-              </Dropdown.Item>
-            </Tooltip.Trigger>
-            {isEncrypted && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+          <Tooltip.Provider>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
+                <Dropdown.Item
+                  onClick={onEditColumn}
+                  disabled={isEncrypted}
+                  icon={<IconEdit size="tiny" />}
                 >
-                  <span className="text-xs text-scale-1200">
-                    Encrypted columns cannot be edited
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
+                  Edit column
+                </Dropdown.Item>
+              </Tooltip.Trigger>
+              {isEncrypted && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Encrypted columns cannot be edited
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+          </Tooltip.Provider>
         )}
         <Dropdown.Item
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}

@@ -81,49 +81,53 @@ const Subscription: FC<Props> = ({
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
             <div className="flex flex-col items-end space-y-2">
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    disabled={!canUpdateSubscription || projectUpdateDisabled}
-                    onClick={() => {
-                      const url = isEnterprise
-                        ? `/project/${project.ref}/settings/billing/update/enterprise`
-                        : `/project/${project.ref}/settings/billing/update`
-                      router.push(url)
-                    }}
-                    type="primary"
-                  >
-                    {isEnterprise ? 'Change add-ons' : 'Change subscription'}
-                  </Button>
-                </Tooltip.Trigger>
-                {!canUpdateSubscription || projectUpdateDisabled ? (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'border border-scale-200 text-center', //border
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      ].join(' ')}
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      disabled={!canUpdateSubscription || projectUpdateDisabled}
+                      onClick={() => {
+                        const url = isEnterprise
+                          ? `/project/${project.ref}/settings/billing/update/enterprise`
+                          : `/project/${project.ref}/settings/billing/update`
+                        router.push(url)
+                      }}
+                      type="primary"
                     >
-                      <span className="text-xs text-scale-1200">
-                        {projectUpdateDisabled ? (
-                          <>
-                            Subscription changes are currently disabled.
-                            <br />
-                            Our engineers are working on a fix.
-                          </>
-                        ) : !canUpdateSubscription ? (
-                          'You need additional permissions to amend subscriptions'
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                ) : (
-                  <></>
-                )}
-              </Tooltip.Root>
+                      {isEnterprise ? 'Change add-ons' : 'Change subscription'}
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canUpdateSubscription || projectUpdateDisabled ? (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'border border-scale-200 text-center', //border
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            {projectUpdateDisabled ? (
+                              <>
+                                Subscription changes are currently disabled.
+                                <br />
+                                Our engineers are working on a fix.
+                              </>
+                            ) : !canUpdateSubscription ? (
+                              'You need additional permissions to amend subscriptions'
+                            ) : (
+                              ''
+                            )}
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  ) : (
+                    <></>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </div>
           </div>
           {paid && (

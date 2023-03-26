@@ -85,33 +85,37 @@ const TeamSettings = () => {
               </div>
             )}
             <div>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    type="default"
-                    disabled={!canLeave}
-                    onClick={() => leaveTeam()}
-                    loading={isLeaving}
-                  >
-                    Leave team
-                  </Button>
-                </Tooltip.Trigger>
-                {!canLeave && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
+              <Tooltip.Provider>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      type="default"
+                      disabled={!canLeave}
+                      onClick={() => leaveTeam()}
+                      loading={isLeaving}
                     >
-                      <span className="text-xs text-scale-1200">
-                        An organization requires at least 1 owner
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                )}
-              </Tooltip.Root>
+                      Leave team
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canLeave && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            An organization requires at least 1 owner
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </div>
           </div>
         </div>

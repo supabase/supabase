@@ -49,26 +49,30 @@ const GridHeaderActions: FC<Props> = ({
   return (
     <div className="flex items-center space-x-3">
       {isReadOnly && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-full">
-            <div className="border border-scale-700 rounded bg-scale-500 px-3 py-1 text-xs">
-              Viewing as read-only
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to manage your project's data
-              </span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <div className="border border-scale-700 rounded bg-scale-500 px-3 py-1 text-xs">
+                Viewing as read-only
+              </div>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to manage your project's data
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       )}
       <div className="mt-[1px]">
         <RenderAPIPreviewToggle />

@@ -36,39 +36,43 @@ const StorageMenu: FC<Props> = () => {
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
       <div className="mb-6 px-2">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-full">
-            <Button
-              block
-              type="default"
-              icon={
-                <div className="text-scale-900">
-                  <IconEdit size={14} />
-                </div>
-              }
-              disabled={!canCreateBuckets}
-              style={{ justifyContent: 'start' }}
-              onClick={openCreateBucketModal}
-            >
-              New bucket
-            </Button>
-          </Tooltip.Trigger>
-          {!canCreateBuckets && (
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Button
+                block
+                type="default"
+                icon={
+                  <div className="text-scale-900">
+                    <IconEdit size={14} />
+                  </div>
+                }
+                disabled={!canCreateBuckets}
+                style={{ justifyContent: 'start' }}
+                onClick={openCreateBucketModal}
               >
-                <span className="text-xs text-scale-1200">
-                  You need additional permissions to create buckets
-                </span>
-              </div>
-            </Tooltip.Content>
-          )}
-        </Tooltip.Root>
+                New bucket
+              </Button>
+            </Tooltip.Trigger>
+            {!canCreateBuckets && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to create buckets
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        </Tooltip.Provider>
       </div>
       <div className="space-y-6">
         <div className="">

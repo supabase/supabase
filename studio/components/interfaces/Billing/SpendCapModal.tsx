@@ -47,29 +47,33 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                 <div className="flex items-center px-4 py-1">
                   <div className="flex w-[50%] items-center space-x-2">
                     <p className="text-sm">Auth MAUs</p>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <IconHelpCircle
-                          size={16}
-                          strokeWidth={1.5}
-                          className="transition opacity-50 cursor-pointer hover:opacity-100"
-                        />
-                      </Tooltip.Trigger>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                            'border border-scale-200 ', //border
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-scale-1200">
-                            Monthly Active Users: A user that has made an API request in the last
-                            month
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Root>
+                    <Tooltip.Provider>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger>
+                          <IconHelpCircle
+                            size={16}
+                            strokeWidth={1.5}
+                            className="transition opacity-50 cursor-pointer hover:opacity-100"
+                          />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                'border border-scale-200 ', //border
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-scale-1200">
+                                Monthly Active Users: A user that has made an API request in the
+                                last month
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </div>
                   <p className="w-[25%] text-sm">100,000</p>
                   <p className="w-[25%] text-sm">$0.00325/user</p>

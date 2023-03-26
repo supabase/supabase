@@ -111,69 +111,77 @@ const RolesList = ({}) => {
             </div>
           </div>
           <div className="flex items-center space-x-6">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <div className="w-42">
-                  <SparkBar
-                    type="horizontal"
-                    max={maxConnectionLimit}
-                    value={totalActiveConnections}
-                    barClass={
-                      maxConnectionLimit === 0
-                        ? 'bg-gray-100 dark:bg-gray-600'
-                        : totalActiveConnections > 0.9 * maxConnectionLimit
-                        ? 'bg-red-800'
-                        : totalActiveConnections > 0.75 * maxConnectionLimit
-                        ? 'bg-amber-900'
-                        : 'bg-green-800'
-                    }
-                    labelTop={`${totalActiveConnections}/${maxConnectionLimit}`}
-                    labelBottom="Active connections"
-                  />
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content align="start" side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 space-y-1',
-                  ].join(' ')}
-                >
-                  <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
-                  {rolesWithActiveConnections.map((role: PostgresRole) => (
-                    <div key={role.id} className="text-xs text-scale-1200">
-                      {role.name}: {role.active_connections}
-                    </div>
-                  ))}
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button
-                  type="primary"
-                  disabled={!canUpdateRoles}
-                  icon={<IconPlus size="tiny" />}
-                  onClick={() => setIsCreatingRole(true)}
-                >
-                  Add role
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdateRoles && (
-                <Tooltip.Content align="start" side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200 text-xs',
-                    ].join(' ')}
-                  >
-                    You need additional permissions to add a new role
+            <Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <div className="w-42">
+                    <SparkBar
+                      type="horizontal"
+                      max={maxConnectionLimit}
+                      value={totalActiveConnections}
+                      barClass={
+                        maxConnectionLimit === 0
+                          ? 'bg-gray-100 dark:bg-gray-600'
+                          : totalActiveConnections > 0.9 * maxConnectionLimit
+                          ? 'bg-red-800'
+                          : totalActiveConnections > 0.75 * maxConnectionLimit
+                          ? 'bg-amber-900'
+                          : 'bg-green-800'
+                      }
+                      labelTop={`${totalActiveConnections}/${maxConnectionLimit}`}
+                      labelBottom="Active connections"
+                    />
                   </div>
-                </Tooltip.Content>
-              )}
-            </Tooltip.Root>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content align="start" side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200 space-y-1',
+                      ].join(' ')}
+                    >
+                      <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
+                      {rolesWithActiveConnections.map((role: PostgresRole) => (
+                        <div key={role.id} className="text-xs text-scale-1200">
+                          {role.name}: {role.active_connections}
+                        </div>
+                      ))}
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+            <Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="primary"
+                    disabled={!canUpdateRoles}
+                    icon={<IconPlus size="tiny" />}
+                    onClick={() => setIsCreatingRole(true)}
+                  >
+                    Add role
+                  </Button>
+                </Tooltip.Trigger>
+                {!canUpdateRoles && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content align="start" side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200 text-xs',
+                        ].join(' ')}
+                      >
+                        You need additional permissions to add a new role
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            </Tooltip.Provider>
           </div>
         </div>
 

@@ -180,33 +180,37 @@ const PITRSelection = ({}) => {
                   <Button type="default" onClick={onCancel}>
                     Cancel
                   </Button>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Button
-                        as="span"
-                        type="warning"
-                        disabled={isSelectedOutOfRange || !selectedDate}
-                        onClick={() => setShowConfirmation(true)}
-                      >
-                        Review restore details
-                      </Button>
-                    </Tooltip.Trigger>
-                    {isSelectedOutOfRange && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border w-48 text-center',
-                          ].join(' ')}
+                  <Tooltip.Provider>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          as="span"
+                          type="warning"
+                          disabled={isSelectedOutOfRange || !selectedDate}
+                          onClick={() => setShowConfirmation(true)}
                         >
-                          <span className="text-scale-1200 text-xs">
-                            Selected date is out of range where backups are available
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    )}
-                  </Tooltip.Root>
+                          Review restore details
+                        </Button>
+                      </Tooltip.Trigger>
+                      {isSelectedOutOfRange && (
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                                'border-scale-200 border w-48 text-center',
+                              ].join(' ')}
+                            >
+                              <span className="text-scale-1200 text-xs">
+                                Selected date is out of range where backups are available
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      )}
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
                 </div>
               }
             >

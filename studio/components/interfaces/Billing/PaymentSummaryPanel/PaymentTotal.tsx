@@ -45,27 +45,31 @@ const PaymentTotal: FC<Props> = ({
               <div className="flex items-center space-x-2">
                 <p>Total amount due</p>
                 {hasChanges && (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 transition hover:opacity-100"
-                        onClick={() => setShowCostBreakdown(true)}
-                      />
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                          'border border-scale-200 ', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">How is this calculated?</span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Root>
+                  <Tooltip.Provider>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="cursor-pointer opacity-50 transition hover:opacity-100"
+                          onClick={() => setShowCostBreakdown(true)}
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                              'border border-scale-200 ', //border
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">How is this calculated?</span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
                 )}
               </div>
               {hasChanges ? (

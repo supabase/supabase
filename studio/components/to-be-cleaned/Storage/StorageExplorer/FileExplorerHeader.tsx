@@ -397,60 +397,68 @@ const FileExplorerHeader: FC<Props> = ({
             {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Button
-                icon={<IconUpload size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={onSelectUpload}
-              >
-                Upload files
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateStorage && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+          <Tooltip.Provider>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  icon={<IconUpload size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={onSelectUpload}
                 >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to upload files
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Button
-                icon={<IconFolderPlus size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={() => addNewFolderPlaceholder(-1)}
-              >
-                Create folder
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateStorage && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
+                  Upload files
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateStorage && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to upload files
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+          </Tooltip.Provider>
+          <Tooltip.Provider>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  icon={<IconFolderPlus size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={() => addNewFolderPlaceholder(-1)}
                 >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to create folders
-                  </span>
-                </div>
-              </Tooltip.Content>
-            )}
-          </Tooltip.Root>
+                  Create folder
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateStorage && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to create folders
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </div>
 
         {/* Search: Disabled for now */}

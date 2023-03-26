@@ -94,26 +94,30 @@ const Infrastructure: FC<Props> = ({}) => {
               label="Current version"
               actions={[
                 isOnLatestVersion && (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Badge color="green" className="mr-1">
-                        Latest
-                      </Badge>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200 w-[200px]',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          Project is on the latest version of Postgres that Supabase supports
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Root>
+                  <Tooltip.Provider>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Badge color="green" className="mr-1">
+                          Latest
+                        </Badge>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200 w-[200px]',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              Project is on the latest version of Postgres that Supabase supports
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
                 ),
               ]}
             />

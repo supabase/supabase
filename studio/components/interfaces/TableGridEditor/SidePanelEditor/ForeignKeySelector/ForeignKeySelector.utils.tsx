@@ -29,25 +29,29 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="translate-y-[3px] mx-1">
-              <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'w-[300px] space-y-2 border border-scale-200',
-                ].join(' ')}
-              >
-                <p className="text-xs text-scale-1200">
-                  This is similar to no action, but the restrict check cannot be deferred till later
-                  in the transaction
-                </p>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
+          <Tooltip.Provider>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="translate-y-[3px] mx-1">
+                <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'w-[300px] space-y-2 border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <p className="text-xs text-scale-1200">
+                      This is similar to no action, but the restrict check cannot be deferred till
+                      later in the transaction
+                    </p>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
           : Deleting a record from <code className="text-xs text-scale-1100">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent deletion</span> of existing
           referencing rows from this table.
