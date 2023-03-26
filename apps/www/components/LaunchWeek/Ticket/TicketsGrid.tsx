@@ -29,7 +29,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
         return (
           <Link href={`/launch-week/tickets/${user.username}`} key={`${user.username}-000${i}`}>
             <motion.a
-              className="relative w-full rounded-lg overflow-hidden transform scale-100 md:hover:scale-[101%]"
+              className="relative w-full rounded-lg overflow-hidden hover:cursor-pointer"
               initial={{ opacity: 0, y: 20, x: isOddRow ? 30 : -30 }}
               animate={{
                 opacity: !isTablet && (i === 0 || i === 4) ? 0 : 1,
@@ -42,7 +42,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
                 },
               }}
             >
-              <div className="relative inset-0 w-full pt-[50%] transform">
+              <div className="relative inset-0 w-full pt-[50%]">
                 <Image
                   src={getOgUrl(user.username!)}
                   alt={user.username}

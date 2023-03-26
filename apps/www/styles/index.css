@@ -717,3 +717,18 @@ launch week
     background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.6) 100%);
   }
 }
+
+/* LW7 Tickets Slider */
+.ticket-brick-swiper .swiper-slide {
+  width: 230px;
+}
+
+@media (min-width: 768px) {
+  .ticket-brick-swiper .swiper-slide {
+    width: 450px;
+  }
+}
+
+.ticket-brick-swiper .swiper-wrapper {
+  transition-timing-function: linear;
+}
