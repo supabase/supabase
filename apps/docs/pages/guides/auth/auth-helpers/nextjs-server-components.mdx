@@ -246,12 +246,12 @@ Next, we need to create a single instance of Supabase to use client-side. Let's 
 ```jsx title=components/supabase-provider.jsx
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createS, useContext, useState } from 'react'
 import { createClient } from '../utils/supabase-browser'
 
 const Context = createContext()
 
-export default function SupabaseProvider({ children }) {
+export default function SupabaseProvider({ children, session }) {
   const [supabase] = useState(() => createClient())
 
   useEffect(() => {
@@ -265,7 +265,7 @@ export default function SupabaseProvider({ children }) {
   }, [accessToken])
 
   return (
-    <Context.Provider value={{ supabase }}>
+    <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
   )
@@ -289,17 +289,20 @@ import { createClient } from '../utils/supabase-browser'
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '../lib/database.types'
 
+type MaybeSession = Session | null
+ 
 type SupabaseContext = {
   supabase: SupabaseClient<Database>
+  session: MaybeSession
 }
 
 const Context = createContext<SupabaseContext | undefined>(undefined)
 
-export default function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export default function SupabaseProvider({ children, session }: { children: React.ReactNode, session: MaybeSession }) {
   const [supabase] = useState(() => createClient())
 
   return (
-    <Context.Provider value={{ supabase }}>
+    <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
   )
@@ -364,7 +367,7 @@ export default async function RootLayout({ children }) {
     */}
       <head />
       <body>
-        <SupabaseProvider>
+        <SupabaseProvider session={session}>
           <SupabaseListener serverAccessToken={session?.access_token} />
           {children}
         </SupabaseProvider>
@@ -404,7 +407,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     */}
       <head />
       <body>
-        <SupabaseProvider>
+        <SupabaseProvider session={session}>
           <SupabaseListener serverAccessToken={session?.access_token} />
           {children}
         </SupabaseProvider>
