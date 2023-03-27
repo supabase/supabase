@@ -21,7 +21,7 @@ function classNames(...classes: any) {
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
   children: React.ReactNode
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode
   error?: string
   icon?: any
   id?: string
