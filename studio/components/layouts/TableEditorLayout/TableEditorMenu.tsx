@@ -382,6 +382,13 @@ const EntityListItem = ({
   isLoadingTableMetadata = false,
 }: EntityListItemProps) => {
   const isActive = Number(id) === entity.id
+  const formatTooltipText = (entityType: string) => {
+    return Object.entries(ENTITY_TYPE)
+      .find(([, value]) => value === entityType)?.[0]
+      ?.toLowerCase()
+      ?.split('_')
+      ?.join(' ')
+  }
 
   return (
     <ProductMenuItem
@@ -434,9 +441,7 @@ const EntityListItem = ({
               ].join(' ')}
             >
               <span className="text-xs text-scale-1200 capitalize">
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]
-                  ?.toLowerCase()}
+                {formatTooltipText(entity.type)}
               </span>
             </div>
           </Tooltip.Content>
