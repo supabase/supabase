@@ -850,7 +850,6 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'Dashibase', url: '/guides/integrations/dashibase' },
         { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },

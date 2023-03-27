@@ -383,7 +383,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Appsmith', url: '/guides/integrations/appsmith', items: [] },
-            { name: 'Dashibase', url: '/guides/integrations/dashibase', items: [] },
             { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
