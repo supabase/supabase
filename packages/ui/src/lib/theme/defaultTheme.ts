@@ -1478,7 +1478,6 @@ export default {
       opacity-75
       data-closed:animate-fade-out-overlay-bg
       data-open:animate-fade-in-overlay-bg
-      z-40
     `,
     scroll_overlay: `
       fixed
@@ -1487,7 +1486,7 @@ export default {
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
+  
     `,
     separator: `
       w-full
