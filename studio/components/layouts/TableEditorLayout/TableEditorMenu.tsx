@@ -1,3 +1,4 @@
+import SVG from 'react-inlinesvg'
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { noop, partition } from 'lodash'
@@ -24,6 +25,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
+import { BASE_PATH } from 'lib/constants'
 import { checkPermissions, useStore, useParams, useLocalStorage } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
@@ -388,20 +390,30 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        <div
-          className={clsx(
-            'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-            entity.type === ENTITY_TYPE.TABLE && 'text-green-1000 bg-green-500',
-            entity.type === ENTITY_TYPE.VIEW && 'text-blue-900 bg-blue-500',
-            entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-            entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-            entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
-          )}
-        >
-          {Object.entries(ENTITY_TYPE)
-            .find(([, value]) => value === entity.type)?.[0]?.[0]
-            ?.toUpperCase()}
-        </div>
+        entity.type === ENTITY_TYPE.VIEW ? (
+          <SVG
+            className="view-icon"
+            src={`${BASE_PATH}/img/icons/view-icon.svg`}
+            style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+            preProcessor={(code: any) =>
+              code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+            }
+          />
+        ) : (
+          <div
+            className={clsx(
+              'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+              entity.type === ENTITY_TYPE.TABLE && 'text-green-1000 bg-green-500',
+              entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+              entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+              entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+            )}
+          >
+            {Object.entries(ENTITY_TYPE)
+              .find(([, value]) => value === entity.type)?.[0]?.[0]
+              ?.toUpperCase()}
+          </div>
+        )
       }
       action={
         entity.type === ENTITY_TYPE.TABLE &&
