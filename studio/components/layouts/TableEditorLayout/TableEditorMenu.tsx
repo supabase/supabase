@@ -390,7 +390,16 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        entity.type === ENTITY_TYPE.VIEW ? (
+        entity.type === ENTITY_TYPE.TABLE ? (
+          <SVG
+            className="table-icon"
+            src={`${BASE_PATH}/img/icons/table-icon.svg`}
+            style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+            preProcessor={(code: any) =>
+              code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+            }
+          />
+        ) : entity.type === ENTITY_TYPE.VIEW ? (
           <SVG
             className="view-icon"
             src={`${BASE_PATH}/img/icons/view-icon.svg`}
@@ -403,7 +412,6 @@ const EntityListItem = ({
           <div
             className={clsx(
               'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-              entity.type === ENTITY_TYPE.TABLE && 'text-green-1000 bg-green-500',
               entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
               entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
               entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
