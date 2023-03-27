@@ -391,7 +391,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                     >
                       {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
                         <Radio
-                          disabled={webhook.disabled}
                           key={webhook.value}
                           id={webhook.value}
                           value={webhook.value}
@@ -402,11 +401,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                               <div className="flex-col space-y-0">
                                 <div className="flex space-x-2">
                                   <p className="text-scale-1200">{webhook.label}</p>
-                                  {webhook.disabled ? (
-                                    <Badge color="amber">Coming soon</Badge>
-                                  ) : (
-                                    <Badge color="green">Alpha</Badge>
-                                  )}
                                 </div>
                                 <p className="text-scale-1000">{webhook.description}</p>
                               </div>
