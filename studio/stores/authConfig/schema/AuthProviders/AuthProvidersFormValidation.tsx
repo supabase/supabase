@@ -1004,8 +1004,9 @@ export const PROVIDER_SAML = {
   title: 'SAML 2.0',
   properties: {
     SAML_ENABLED: {
-      title: 'Enable SAML SSO',
-      description: 'Allows the use of SAML 2.0 Single Sign-On',
+      title: 'Enable SAML 2.0 Single Sign-on',
+      description:
+        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
   },
