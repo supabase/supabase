@@ -9,10 +9,9 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 const AuthProvidersForm = () => {
   const { authConfig } = useStore()
   const isSamlEnabled = useFlag('isSamlEnabled')
-  const providers = PROVIDERS_SCHEMAS
-  // const providers = isSamlEnabled
-  //   ? PROVIDERS_SCHEMAS
-  //   : PROVIDERS_SCHEMAS.filter((provider) => provider !== PROVIDER_SAML)
+  const providers = isSamlEnabled
+    ? PROVIDERS_SCHEMAS
+    : PROVIDERS_SCHEMAS.filter((provider) => provider !== PROVIDER_SAML)
 
   return (
     <div>
