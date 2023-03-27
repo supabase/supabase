@@ -20,10 +20,7 @@ export function TicketBrickWallRow({ users, reverse, xOffset = 250 }: Props) {
   })
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const getOgUrl = (username: string, isGold: boolean) =>
-    isGold
-      ? `${STORAGE_URL}/tickets/golden/${username}.png`
-      : `${STORAGE_URL}/tickets/${username}.png`
-
+    `${STORAGE_URL}/tickets/gallery/${isGold ? 'golden' : 'regular'}/v1/${username}.png`
   const x = useTransform(scrollYProgress, [0, 1], reverse ? [-xOffset, 0] : [0, -xOffset])
 
   return (

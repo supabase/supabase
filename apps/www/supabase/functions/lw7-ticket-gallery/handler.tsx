@@ -14,7 +14,7 @@ export async function handler(req: Request) {
     if (req.method !== 'POST') throw new Error('method not supported')
     const {
       username = 'thorwebdev',
-      name = 'Thorsten Schaeff',
+      name = 'Thoggen Schaeppy',
       ticketNumber = 1234,
       golden = true,
       bg_image_id = 80,
@@ -29,11 +29,11 @@ export async function handler(req: Request) {
     // Else, generate image ad upload to storage.
     const BACKGROUND = {
       REG: {
-        AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/regular/png/reg_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/reg_ticket_overlay.png`,
       },
       GOLD: {
-        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/golden/png/gold_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket_overlay.png`,
       },
     }
@@ -88,7 +88,7 @@ export async function handler(req: Request) {
               height="166"
               style={{
                 position: 'absolute',
-                top: '150',
+                top: '145',
                 left: '400',
                 borderRadius: 83,
               }}
@@ -124,7 +124,7 @@ export async function handler(req: Request) {
                   style={{
                     margin: '0',
                     fontSize: '50px',
-                    lineHeight: '50px',
+                    lineHeight: '62px',
                   }}
                 >
                   {name ?? username}
@@ -198,11 +198,15 @@ export async function handler(req: Request) {
     )
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`lw7/tickets/gallery/${username}.png`, generatedImage.body!, {
-        contentType: 'image/png',
-        // cacheControl: '31536000',
-        upsert: true,
-      })
+      .upload(
+        `lw7/tickets/gallery/${golden ? 'golden' : 'regular'}/v1/${username}.png`,
+        generatedImage.body!,
+        {
+          contentType: 'image/png',
+          // cacheControl: '31536000',
+          upsert: true,
+        }
+      )
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     return new Response(JSON.stringify({ success: true }), {
