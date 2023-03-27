@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
   Button,
   Listbox,
@@ -44,6 +45,7 @@ const HTTPRequestFields = ({
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
 
+  const edgeFunctions = functions ?? []
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
@@ -79,9 +81,21 @@ const HTTPRequestFields = ({
               placeholder="http://api.com/path/resource"
               descriptionText="URL of the HTTP request. Must include HTTP/HTTPS"
             />
-          ) : type === 'supabase_function' ? (
+          ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
+            <div className="space-y-1">
+              <p className="text-sm text-scale-1100">Select which edge function to trigger</p>
+              <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
+                <p className="text-sm">No edge functions created yet</p>
+                <Link href={`/project/${ref}/functions`}>
+                  <a>
+                    <Button>Create an edge function</Button>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
-              {(functions ?? []).map((fn) => {
+              {edgeFunctions.map((fn) => {
                 const restUrl = ui.selectedProject?.restUrl
                 const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
                 const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
