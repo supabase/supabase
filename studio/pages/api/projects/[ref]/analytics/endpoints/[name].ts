@@ -10,9 +10,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      console.log(req)
-      const result = await proxyRequest(req)
-      return res.status(200).json(result)
+      const missingEnvVars = [
+        process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
+        process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
+      ].filter((v) => v)
+      if (missingEnvVars.length == 0) {
+        const result = await proxyRequest(req)
+        return res.status(200).json(result)
+      } else {
+        return res
+          .status(500)
+          .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
+      }
+
     default:
       res.setHeader('Allow', ['GET'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
@@ -26,7 +36,7 @@ const proxyRequest = async (req: NextApiRequest) => {
   const apiKey = process.env.LOGFLARE_API_KEY
   console.log('api key', apiKey)
   console.log('PROJECT_ANALYTICS_URL', PROJECT_ANALYTICS_URL)
-  const url = `${PROJECT_ANALYTICS_URL}api/endpoints/query/name/${name}${search}`
+  const url = `${PROJECT_ANALYTICS_URL}endpoints/query/name/${name}${search}`
   console.log('url', url)
   const result = await get(url, {
     headers: {
