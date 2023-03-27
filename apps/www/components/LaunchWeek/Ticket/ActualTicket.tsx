@@ -79,11 +79,11 @@ export default function Ticket({
       <div
         ref={divRef}
         className={[
-          'flex flex-col !w-full h-full justify-center gap-6 col-span-full p-2 pt-4 lg:p-0 lg:col-span-4 mt-1 lg:m-0 lg:pr-8 max-h-[400px] rounded-3xl backdrop-blur lg:backdrop-blur-none',
+          'flex flex-col !w-full h-full justify-center col-span-full p-2 pt-4 lg:p-0 lg:col-span-4 mt-1 lg:m-0 lg:pr-8 max-h-[400px] rounded-3xl backdrop-blur lg:backdrop-blur-none',
           isMobile && styles['ticket-hero'],
         ].join(' ')}
       >
-        <div className="text-scale-1200 flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-2 lg:gap-3">
+        <div className="text-scale-1200 flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-2 lg:gap-3 mb-3 lg:mb-6">
           <h1
             className={cn(
               styleUtils.appear,
@@ -173,7 +173,7 @@ export default function Ticket({
 
           {!sharePage && username && <ReferralIndicator />}
         </div>
-        <div className={cn(styleUtils.appear, styleUtils['appear-third'])}>
+        <div>
           {username && (
             <TicketActions
               username={username}

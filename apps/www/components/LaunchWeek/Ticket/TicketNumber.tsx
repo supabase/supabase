@@ -17,7 +17,7 @@ export default function TicketNumber({ number, size }: Props) {
         <div
           className={[
             'flex flex-col md:flex-row items-center justify-center w-full text-center',
-            size === 'small' ? 'text-[20px]' : 'text-[34px] md:text-[42px] ',
+            size === 'small' ? 'text-[20px]' : 'text-[32px] md:text-[42px] ',
           ].join(' ')}
           id="wayfinding--ticket-number-inner"
         >
@@ -85,12 +85,7 @@ export default function TicketNumber({ number, size }: Props) {
               </defs>
             </svg>
           </div>
-          <div
-            className={[
-              'md:absolute px-2 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA50] bg-clip-text text-[#F8F9FA50] text-center',
-              size === 'small' ? 'md:px-12' : 'lg:px-24',
-            ].join(' ')}
-          >
+          <div className="md:absolute px-2 py-8 md:w-[max-content] leading-[1] md:transform md:rotate-90 md:origin-center bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA50] bg-clip-text text-[#F8F9FA50] text-center">
             {ticketNumberText}
           </div>
         </div>
