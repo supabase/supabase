@@ -60,7 +60,13 @@ export default function TicketVisual({
   }, [ticketRef])
 
   return (
-    <div className="flex relative flex-col w-[300px] md:w-full md:max-w-none h-auto">
+    <div
+      className="flex relative flex-col w-[300px] md:w-full md:max-w-none h-auto"
+      style={{
+        transform: 'translate3d(0, 0, 100px)',
+        transformStyle: 'preserve-3d',
+      }}
+    >
       <div
         ref={ticketRef}
         className={[
