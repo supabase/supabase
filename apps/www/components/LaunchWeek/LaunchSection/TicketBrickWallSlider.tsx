@@ -25,7 +25,7 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
   const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
 
   useEffect(() => {
-    if (swiperInstace) swiperInstace?.autoplay.run()
+    if (swiperInstace) swiperInstace?.autoplay?.run()
   }, [width])
 
   return (
