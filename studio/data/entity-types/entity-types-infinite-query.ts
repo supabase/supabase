@@ -31,8 +31,8 @@ export async function getEntityTypes(
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
-  const innerOrderBy = sort === 'alphabetical' ? `c.relkind asc` : `c.relkind asc, c.relname asc`
-  const outerOrderBy = sort === 'alphabetical' ? `r.name asc` : `r.type asc, r.name asc`
+  const innerOrderBy = sort === 'alphabetical' ? `c.relname asc` : `"type_sort" asc, c.relname asc`
+  const outerOrderBy = sort === 'alphabetical' ? `r.name asc` : `r.type_sort asc, r.name asc`
 
   const sql = /* SQL */ `
     with records as (
@@ -41,6 +41,13 @@ export async function getEntityTypes(
         nc.nspname as "schema",
         c.relname as "name",
         c.relkind as "type",
+        case c.relkind
+          when 'r' then 1
+          when 'v' then 2
+          when 'm' then 3
+          when 'f' then 4
+          when 'p' then 5
+        end as "type_sort",
         obj_description(c.oid) as "comment",
         count(*) over() as "count"
       from
