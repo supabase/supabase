@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useCallback } from 'react'
 import { logKeys } from './keys'
 
@@ -22,9 +22,21 @@ export async function getProjectLogStats(
     throw new Error('interval is required')
   }
 
-  const response = await get(`${API_URL}/projects/${projectRef}/log-stats?interval=${interval}`, {
-    signal,
-  })
+  let response: any
+  if (!IS_PLATFORM) {
+    // query endpint directly without deprecated api-side transformation
+    response = await get(
+      `${API_URL}/projects/${projectRef}/analytics/endpoints/charts.usage?interval=${interval}`,
+      {
+        signal,
+      }
+    )
+  } else {
+    // use deprecated api-side transformation
+    response = await get(`${API_URL}/projects/${projectRef}/log-stats?interval=${interval}`, {
+      signal,
+    })
+  }
   if (response.error) {
     throw response.error
   }

@@ -5,10 +5,11 @@ import { useRouter } from 'next/router'
 import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import { DATE_FORMAT, METRICS } from 'lib/constants'
+import { DATE_FORMAT, IS_PLATFORM, METRICS } from 'lib/constants'
 import { ChartIntervals } from 'types'
 import { useParams } from 'hooks'
 import { useProjectLogStatsQuery } from 'data/logs/project-log-stats-query'
+import { useMemo } from 'react'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -29,7 +30,16 @@ const ProjectUsage: FC<Props> = ({}) => {
 
   const [interval, setInterval] = useState<string>('hourly')
 
-  const { data, error } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data: rawData, error } = useProjectLogStatsQuery({ projectRef, interval })
+
+  const data: {data: ChartData} = useMemo(() => {
+    if (isDailyStatsFormat(rawData)) {
+      return data
+    } else {
+      // not doing transformation on api or local studio
+      return convertToDailyStatsFormat(rawData?.result)
+    }
+  }, [JSON.stringify(rawData)])
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
@@ -213,4 +223,100 @@ const PanelHeader = (props: any) => {
       </div>
     </Tag>
   )
+}
+
+// utilty functions
+// placed here temporarily
+
+interface ChartData {
+  format: string
+  yAxisLimit?: number
+  maximum?: number
+  total: number
+  totalAverage: number
+  totalGrouped: Attribute
+  data: DataPoint[]
+}
+
+interface LogflareChartUsageDatum {
+  auth: number
+  storage: number
+  database: number
+  realtime: number
+  timestamp: number
+}
+
+interface Attribute {
+  [attribute: string]: number
+}
+
+interface Timestamp {
+  // ISO formatted
+  period_start: string
+  // unix timestamp (ms)
+  timestamp: number
+}
+
+type DataPoint = Timestamp | Attribute
+
+const isDailyStatsFormat = (data: any) => {
+  return (
+    !!data &&
+    ['data', 'format', 'total', 'totalGrouped', 'totalAverage'].every((key) => key in data)
+  )
+}
+const convertToDailyStatsFormat = (result: LogflareChartUsageDatum[]) => {
+  // return empty data when result is not available
+  if (!result) {
+    return {
+      data: {
+        data: [],
+        format: '',
+        total: 0,
+        totalGrouped: {},
+        totalAverage: 0,
+      },
+    }
+  }
+
+  // parse and reformat data into valid ChartData
+  // perform a map-reduce simultaneously
+  const [dataPoints, total, totalGrouped] = result.reduce(
+    ([dataAcc, totalAcc, groupedAcc], d) => {
+      // parse timestamp
+      const parsed: Record<string, any> = {
+        ...d,
+        timestamp: d.timestamp / 1000,
+        period_start: dayjs(d.timestamp / 1000).format(),
+      }
+
+      // add to dataPoints array
+      dataAcc.push(parsed)
+
+      // increment grouped totals
+      for (const k in parsed) {
+        if (k === 'timestamp' || k === 'period_start') continue
+        totalAcc += parsed[k]
+        if (k in groupedAcc) {
+          groupedAcc[k] += parsed[k]
+        } else {
+          groupedAcc[k] = parsed[k]
+        }
+      }
+
+      return [dataAcc, totalAcc, groupedAcc]
+    },
+    [[] as Record<string, any>[], 0, {} as Record<string, any>]
+  )
+
+  // transform data into chart-compatible format
+  const data: ChartData = {
+    data: dataPoints,
+    format: '',
+    total,
+    totalGrouped,
+    totalAverage: total / dataPoints.length,
+  }
+
+  return { data: data }
 }

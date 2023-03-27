@@ -10,6 +10,7 @@ import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { SHOW_O11Y } from 'components/interfaces/Settings/Logs'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -38,7 +39,8 @@ const Home: NextPageWithLayout = () => {
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 
       <div className="mx-6">
-        {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+        {((IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE) ||
+          (!IS_PLATFORM && SHOW_O11Y)) && <ProjectUsageSection />}
       </div>
 
       <div className="space-y-8">
