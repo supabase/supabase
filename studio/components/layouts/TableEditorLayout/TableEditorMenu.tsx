@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -73,6 +73,10 @@ const TableEditorMenu = ({
       keepPreviousData: true,
     }
   )
+
+  useEffect(() => {
+    refreshTables()
+  }, [selectedSchema])
 
   const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
