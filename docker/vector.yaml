@@ -97,12 +97,13 @@ sinks:
         request:
             retry_max_duration_secs: 10
         uri: "http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=gd9tDpgiCVJe"
-    # console:
-    #     inputs:
-    #         # - router.studio
-    #         # - router.kong
-    #         # - router.meta
-    #     target: "stdout"
-    #     type: "console"
-    #     encoding:
-    #         codec: "json"
+    logflare_kong:
+        type: "http"
+        inputs:
+            - router.kong
+        encoding:
+            codec: "json"
+        method: "post"
+        request:
+            retry_max_duration_secs: 10
+        uri: "http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=gd9tDpgiCVJe"
