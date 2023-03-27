@@ -102,7 +102,6 @@ const LogsQueryPanel = ({
                 }`}
               >
                 <Popover
-                  portalled
                   overlay={
                     <Alert variant="warning" title="">
                       <div className="flex flex-col gap-3">

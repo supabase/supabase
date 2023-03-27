@@ -14,7 +14,8 @@ import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
 
 import AiCommand from './AiCommand'
-import navItems from './command-nav-items.json'
+import navItems from './utils/docs-nav-items.json'
+import sharedItems from './utils/shared-nav-items.json'
 import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
@@ -27,6 +28,8 @@ import {
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import DocsSearch from './DocsSearch'
+import DashboardTableEditor from './sections/DashboardTableEditor'
+import CommandMenuShortcuts from './CommandMenuShortcuts'
 
 export const COMMAND_ROUTES = {
   AI: 'Supabase AI',
@@ -62,11 +65,16 @@ const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
   return <CommandItem {...props}>{children}</CommandItem>
 }
 
+const projectRef = ''
+
 const CommandMenu = () => {
   const router = useRouter()
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
     useCommandMenu()
+
+  console.log('currentPage page', currentPage)
+  console.log('pages page', pages)
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -116,12 +124,6 @@ const CommandMenu = () => {
     )
   }
 
-  function handleSetPages(pages: string[], keepSearch?: boolean) {
-    setPages(pages)
-    if (!keepSearch) setSearch('')
-    commandInputRef.current?.focus()
-  }
-
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
@@ -135,24 +137,7 @@ const CommandMenu = () => {
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
       >
-        {pages.length > 0 && (
-          <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row">
-            <CommandShortcut onClick={() => handleSetPages([])}>{'Home'}</CommandShortcut>
-            {pages.map((page, index) => (
-              <CommandShortcut
-                key={page}
-                onClick={() => {
-                  if (index === pages.length - 1) {
-                    return
-                  }
-                  handleSetPages(pages.slice(0, index - 1))
-                }}
-              >
-                {page}
-              </CommandShortcut>
-            ))}
-          </div>
-        )}
+        {pages.length > 0 && <CommandMenuShortcuts />}
         {showCommandInput && (
           <CommandInput
             ref={commandInputRef}
@@ -168,7 +153,7 @@ const CommandMenu = () => {
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    handleSetPages([...pages, COMMAND_ROUTES.AI], true)
+                    setPages([...pages, COMMAND_ROUTES.AI])
                   }}
                   forceMount
                 >
@@ -187,7 +172,7 @@ const CommandMenu = () => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  onSelect={() => handleSetPages([...pages, COMMAND_ROUTES.DOCS_SEARCH], true)}
+                  onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                   forceMount
                 >
                   <IconBook className="" />
@@ -206,7 +191,7 @@ const CommandMenu = () => {
                 </CommandItem>
               </CommandGroup>
 
-              <CommandGroup heading="Navigation">
+              <CommandGroup heading="Main Navigation item">
                 {navItems.docsTools.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconArrowRight className="text-scale-900" />
@@ -216,6 +201,23 @@ const CommandMenu = () => {
                   </CommandItem>
                 ))}
               </CommandGroup>
+
+              <CommandGroup heading="Actual Dashboard Items">
+                {sharedItems.sharedTools.map((item) => {
+                  const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
+
+                  return (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <IconArrowRight className="text-scale-900" />
+                      <CommandLabel>
+                        Dashboard: <span className="font-bold"> {item.label}</span>
+                      </CommandLabel>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+
+              {/* <DashboardTableEditor /> */}
 
               <CommandGroup heading="Support">
                 {navItems.docsSupport.map((item) => (
@@ -238,10 +240,7 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="Settings">
-                <CommandItem
-                  type="link"
-                  onSelect={() => handleSetPages([...pages, 'Theme'], false)}
-                >
+                <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
