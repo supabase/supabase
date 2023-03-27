@@ -1004,7 +1004,7 @@ export const PROVIDER_SAML = {
   title: 'SAML 2.0',
   properties: {
     SAML_ENABLED: {
-      title: 'Enabled',
+      title: 'Enable SAML SSO',
       description: 'Allows the use of SAML 2.0 Single Sign-On',
       type: 'boolean',
     },
