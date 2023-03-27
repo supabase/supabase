@@ -38,11 +38,11 @@ export default function TicketVisual({
 
   const ticketBg = {
     regular: {
-      image: `${storageBaseFilepath}/_jpg/reg_bg_${bgImageId}.jpg`,
+      image: `${storageBaseFilepath}/blurred/regular/jpg/reg_bg_${bgImageId}.jpg`,
       overlay: `/images/launchweek/seven/ticket-overlay-reg.png`,
     },
     gold: {
-      image: `${storageBaseFilepath}/golden/_jpg/gold_bg_${bgImageId}.jpg`,
+      image: `${storageBaseFilepath}/blurred/golden/jpg/gold_bg_${bgImageId}.jpg`,
       overlay: `/images/launchweek/seven/ticket-overlay-gold.png`,
     },
   }
@@ -109,7 +109,7 @@ export default function TicketVisual({
               objectFit="cover"
               placeholder="blur"
               blurDataURL="/images/blur.png"
-              className="absolute inset-[1px] z-[1] "
+              className="absolute inset-[1px] z-[1]"
             />
           )}
 
@@ -120,8 +120,8 @@ export default function TicketVisual({
             placeholder="blur"
             blurDataURL="/images/blur.png"
             className={[
-              'duration-700 ease-in-out transform scale-105',
-              imageIsLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0',
+              'duration-700 ease-in-out transform scale-110',
+              imageIsLoading ? 'grayscale blur-xl scale-110' : 'grayscale-0 blur-0',
             ].join(' ')}
             onLoadingComplete={() => setImageIsLoading(false)}
           />

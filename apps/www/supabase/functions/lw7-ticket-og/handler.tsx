@@ -42,9 +42,9 @@ export async function handler(req: Request) {
 
     // Try to get image from Supabase Storage CDN.
     let storageResponse: Response
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/${username}.png`)
+    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/v1/${username}.png`)
     if (storageResponse.ok) return storageResponse
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png`)
+    storageResponse = await fetch(`${STORAGE_URL}/tickets/regular/v1/${username}.png`)
     if (!assumeGolden && storageResponse.ok) return storageResponse
 
     // Get ticket data
@@ -64,12 +64,12 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       REG: {
         BG: `${STORAGE_URL}/reg_bg.png`,
-        AI: `${STORAGE_URL}/tickets_bg/reg_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/regular/png/reg_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/reg_ticket.png`,
       },
       GOLD: {
         BG: `${STORAGE_URL}/gold_bg.png`,
-        AI: `${STORAGE_URL}/tickets_bg/golden/gold_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/golden/png/gold_bg_${bg_image_id}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket.png`,
       },
     }
@@ -146,7 +146,6 @@ export async function handler(req: Request) {
             {/* Name & username */}
             <div
               style={{
-                // border: '3px solid red',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -163,7 +162,6 @@ export async function handler(req: Request) {
             >
               <div
                 style={{
-                  // border: '3px solid green',
                   display: 'flex',
                   color: 'transparent',
                   backgroundImage:
@@ -185,7 +183,6 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  // border: '3px solid blue',/
                   color: '#EDEDED',
                   opacity: 0.8,
                   display: 'flex',
@@ -200,7 +197,6 @@ export async function handler(req: Request) {
           {/* Ticket No  */}
           <div
             style={{
-              // border: '3px solid red',
               color: '#F8F9FA',
               display: 'flex',
               alignItems: 'center',
@@ -245,13 +241,17 @@ export async function handler(req: Request) {
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`lw7/tickets/${golden ? `golden/${username}` : username}.png`, generatedImage.body!, {
-        contentType: 'image/png',
-        // cacheControl: '31536000',
-        upsert: false,
-      })
+      .upload(
+        `lw7/tickets/${golden ? 'golden' : 'regular'}/v1/${username}.png`,
+        generatedImage.body!,
+        {
+          contentType: 'image/png',
+          // cacheControl: '31536000',
+          upsert: false,
+        }
+      )
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
-    // Generate imgae for gallery
+    // Generate image for gallery
     fetch('https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-gallery', {
       method: 'POST',
       headers: {
@@ -268,7 +268,7 @@ export async function handler(req: Request) {
       }),
     })
 
-    return await fetch(`${STORAGE_URL}/tickets/${golden ? `golden/${username}` : username}.png`)
+    return await fetch(`${STORAGE_URL}/tickets/${golden ? 'golden' : 'regular'}/v1/${username}.png`)
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

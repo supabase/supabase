@@ -22,7 +22,8 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
   const [swiperInstace, setSwiperInstance] = useState<SwiperCore | any | null>(null)
   const { width } = useWindowSize()
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
-  const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
+  const getOgUrl = (username: string, isGold: boolean) =>
+    `${STORAGE_URL}/tickets/gallery/${isGold ? 'golden' : 'regular'}/v1/${username}.png`
 
   useEffect(() => {
     if (swiperInstace) swiperInstace?.autoplay?.run()
@@ -65,7 +66,7 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
                 <a className="relative !w-[230px] md:w-[450px] !h-[200px] transform scale-100 md:hover:scale-[101%] transition-transform">
                   <div className="relative inset-0 w-full pt-[50%] transform rounded-md md:rounded-lg overflow-hidden">
                     <Image
-                      src={getOgUrl(user.username!)}
+                      src={getOgUrl(user.username!, !!user.golden)}
                       alt={user.username}
                       layout="fill"
                       objectFit="cover"

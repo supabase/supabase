@@ -2,16 +2,18 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { UserData } from './hooks/use-conf-data'
 
 interface Props {
-  loadedUsers: any[]
+  loadedUsers: UserData[]
   isLoading: boolean
   pageCount: number
 }
 
 export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props) {
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
-  const getOgUrl = (username: string) => `${STORAGE_URL}/tickets/gallery/${username}.png`
+  const getOgUrl = (username: string, isGold: boolean) =>
+    `${STORAGE_URL}/tickets/gallery/${isGold ? 'golden' : 'regular'}/v1/${username}.png`
   const isMobile = useMobileViewport(768)
   const isTablet = useMobileViewport(1024)
 
@@ -44,7 +46,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
             >
               <div className="relative inset-0 w-full pt-[50%]">
                 <Image
-                  src={getOgUrl(user.username!)}
+                  src={getOgUrl(user.username!, !!user.golden)}
                   alt={user.username}
                   layout="fill"
                   objectFit="cover"
