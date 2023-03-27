@@ -178,7 +178,7 @@ type CommandPrimitiveItemElement = React.ElementRef<typeof CommandPrimitive.Item
 type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
 
 export interface CommandItemProps extends CommandPrimitiveItemProps {
-  type: 'link' | 'command'
+  type: 'link' | 'block-link' | 'command'
 }
 
 export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
@@ -186,42 +186,54 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        type === 'link'
+        'cursor-default',
+        'select-none',
+        'items-center',
+        'rounded-md',
+        'text-sm',
+        'group',
+        'py-3',
+        'text-scale-1100',
+        'relative',
+        'flex',
+        type === 'block-link'
           ? `
-        bg-scale-300/90
+      bg-[#fbfcfd]/90
+      dark:bg-[#232323]/90
+        border 
+      border-[#ddd]/90
+      dark:border-[#282828]/90
         backdrop-filter
         backdrop-blur-md
-        text-scale-1100 relative flex
-
-        cursor-default select-none
-        items-center rounded-md
-        py-3 px-5 text-sm
+        px-5 
         transition-all
         outline-none
-        aria-selected:bg-scale-300
-        aria-selected:border-[#ccc]
-        dark:aria-selected:bg-[#323232]
-        dark:aria-selected:border-[#323232]
+      aria-selected:border-[#ccc]
+      dark:aria-selected:border-[#323232]
+      aria-selected:bg-[#f1f3f5]/90
+      dark:aria-selected:bg-[#323232]
         aria-selected:shadow-sm
         aria-selected:scale-[100.3%]
-        group
+        data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+          : type === 'link'
+          ? `
+        px-2 
+        backdrop-filter
+        backdrop-blur-md
+        transition-all
+        outline-none
+        aria-selected:bg-[#f1f3f5]/90
+        dark:aria-selected:bg-[#323232]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : `
-          py-3 px-2
-          text-scale-1100
-          relative flex
-          cursor-default select-none items-center
-          rounded-md text-sm outline-none
-
-          aria-selected:bg-scale-300
-
-          dark:aria-selected:bg-[#323232]/80
-
-          aria-selected:backdrop-filter
-          aria-selected:backdrop-blur-md
-          data-[disabled]:pointer-events-none
-          data-[disabled]:opacity-50
-          `,
+        px-2
+        aria-selected:bg-scale-300
+        dark:aria-selected:bg-[#323232]/80
+        aria-selected:backdrop-filter
+        aria-selected:backdrop-blur-md
+        data-[disabled]:pointer-events-none
+        data-[disabled]:opacity-50
+        `,
         className
       )}
       {...props}

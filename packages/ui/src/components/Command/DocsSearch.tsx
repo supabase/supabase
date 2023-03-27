@@ -158,7 +158,7 @@ const DocsSearch = () => {
                 forceMount
                 key={`${page.meta.title}-item-index-${i}`}
                 value={`${page.meta.title}-item-index-${i}`}
-                type="link"
+                type="block-link"
                 onSelect={() => {
                   // TODO: replace with Next.js router/Link when cross-project link logic solved
                   window.location.assign(`/docs/${page.path}`)
@@ -196,7 +196,7 @@ const DocsSearch = () => {
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
                       value={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      type="link"
+                      type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
                         <IconContainer>
