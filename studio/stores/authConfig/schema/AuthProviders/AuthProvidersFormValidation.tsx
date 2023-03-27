@@ -1004,11 +1004,14 @@ export const PROVIDER_SAML = {
   title: 'SAML 2.0',
   properties: {
     SAML_ENABLED: {
-      type: 'boolean',
       title: 'Enabled',
-      help: 'Allows the use of SAML 2.0 Single Sign-On',
+      description: 'Allows the use of SAML 2.0 Single Sign-On',
+      type: 'boolean',
     },
   },
+  validationSchema: object().shape({
+    SAML_ENABLED: boolean().required(),
+  }),
   misc: {
     iconKey: 'saml-icon',
   },
