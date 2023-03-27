@@ -2,14 +2,18 @@ import * as Accordion from '@radix-ui/react-accordion'
 import { useRouter } from 'next/router'
 import React from 'react'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
+import * as NavItems from './NavigationMenu.constants'
 
 interface Props {
   id: string
   active: boolean
   collapsible?: boolean
+  value?: string[]
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ id, active, collapsible = true }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, active, value }) => {
   const router = useRouter()
+
+  const menu = NavItems[id]
 
   // get url
   const url = router.asPath
@@ -27,10 +31,10 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active, collapsible = tr
 
   return (
     <Accordion.Root
-      collapsible={collapsible}
+      collapsible={true}
       key={id}
-      type="single"
-      value={firstLevelRoute}
+      type={value ? 'multiple' : 'single'}
+      value={value ?? firstLevelRoute}
       className={[
         'transition-all ml-8 duration-150 ease-out',
         // enabled
@@ -42,7 +46,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active, collapsible = tr
         !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
-      <NavigationMenuGuideListItems id={id} />
+      <NavigationMenuGuideListItems menu={menu} id={id} />
     </Accordion.Root>
   )
 }
