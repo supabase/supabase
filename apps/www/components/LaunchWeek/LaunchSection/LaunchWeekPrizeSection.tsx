@@ -50,8 +50,9 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               Get your <span className="gradient-text-pink-500">winning ticket</span>
             </h2>
             <p className="radial-gradient-text-scale-500">
-              Mark your calendars for April 16th and join us on Discord for Launch Week 7's final
-              day to find out if you're one of the lucky winners. Get sharing!
+              Join us on April 16th for Launch Week 7's final day
+              <br className="hidden md:inline-block" /> and find out if you are one of the lucky
+              winners. Get sharing!
             </p>
           </motion.div>
         </div>
@@ -72,7 +73,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                   </h4>
                   <p className="text-[#707070] mt-1">
                     Increase your chances of winning limited edition 62-Key ISO Custom Mechanical
-                    Keyboard by sharing your ticket on Twitter.
+                    Keyboard by sharing your ticket on Twitter and Linkedin.
                   </p>
                 </>
               }

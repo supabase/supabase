@@ -9,12 +9,12 @@ export default function ReferralIndicator() {
     <div className="bg-[#EAEAEA75] rounded-full mt-4 flex w-full">
       <div
         className={[
-          'bg-gradient-to-l from-[#A141E4] to-[#6300F569] rounded-full pl-4 pr-6 py-1.5 text-xs',
-          winningChances === 2 ? 'w-1/2' : '',
-          winningChances === 3 ? 'w-full bg-gradient-to-l from-[#E4B641] to-[#F5BF0069]' : '',
+          'bg-gradient-to-l from-[#A141E4] w-1/3 to-[#6300F569] flex items-center rounded-full pl-4 pr-6 py-1.5 text-xs shadow-[inset_0_0_2px_#ffffff50,0_0_1px_#00000050]',
+          winningChances === 2 && 'w-2/3',
+          winningChances === 3 && '!w-full bg-gradient-to-l from-[#E4B641] to-[#F5BF0069]',
         ].join(' ')}
       >
-        <span style={{ textShadow: '0 1px 1px rgba(0, 0, 0,0.5)' }}>{winningChances}x chance</span>
+        <span style={{ textShadow: '0 0 4px #00000050' }}>{winningChances}x chance</span>
       </div>
     </div>
   )

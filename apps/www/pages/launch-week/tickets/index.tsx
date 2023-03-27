@@ -133,8 +133,9 @@ export default function TicketsPage({ users }: Props) {
                   Check out <span className="gradient-text-pink-500">all the tickets</span>
                 </h2>
                 <p className="radial-gradient-text-scale-500">
-                  Mark your calendars for April 16th and join us on Discord for Launch Week 7's
-                  final day to find out if you're one of the lucky winners. Get sharing!
+                  Join us on April 16th for Launch Week 7's final day{' '}
+                  <br className="hidden md:inline-block" /> and find out if you are one of the lucky
+                  winners. Get sharing!
                 </p>
                 <div className="mt-1">
                   <Link href="/launch-week">
