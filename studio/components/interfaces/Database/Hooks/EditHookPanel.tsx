@@ -58,7 +58,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     name: selectedHook?.name ?? '',
     table_id: selectedHook?.table_id ?? '',
     http_url: selectedHook?.function_args?.[0] ?? '',
-    http_method: selectedHook?.function_args?.[1] ?? 'GET',
+    http_method: selectedHook?.function_args?.[1] ?? 'POST',
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
