@@ -13,6 +13,7 @@ import SVG from 'react-inlinesvg'
 import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { SHOW_O11Y } from 'components/interfaces/Settings/Logs'
 
 export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -139,18 +140,22 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
           },
         ]
       : []),
-    {
-      key: 'logs',
-      label: 'Logs',
-      icon: <IconList size={18} strokeWidth={2} />,
-      link:
-        ref &&
-        (isProjectPaused
-          ? homeUrl
-          : isProjectBuilding
-          ? buildingUrl
-          : `/project/${ref}/logs/explorer`),
-    },
+    ...(SHOW_O11Y
+      ? [
+          {
+            key: 'logs',
+            label: 'Logs',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/logs/explorer`),
+          },
+        ]
+      : []),
     {
       key: 'api',
       label: 'API Docs',
