@@ -390,38 +390,57 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        entity.type === ENTITY_TYPE.TABLE ? (
-          <SVG
-            className="table-icon"
-            src={`${BASE_PATH}/img/icons/table-icon.svg`}
-            style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-            preProcessor={(code: any) =>
-              code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-            }
-          />
-        ) : entity.type === ENTITY_TYPE.VIEW ? (
-          <SVG
-            className="view-icon"
-            src={`${BASE_PATH}/img/icons/view-icon.svg`}
-            style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-            preProcessor={(code: any) =>
-              code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-            }
-          />
-        ) : (
-          <div
-            className={clsx(
-              'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-              entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-              entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-              entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger className="w-full flex items-center">
+            {entity.type === ENTITY_TYPE.TABLE ? (
+              <SVG
+                className="table-icon"
+                src={`${BASE_PATH}/img/icons/table-icon.svg`}
+                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                preProcessor={(code: any) =>
+                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                }
+              />
+            ) : entity.type === ENTITY_TYPE.VIEW ? (
+              <SVG
+                className="view-icon"
+                src={`${BASE_PATH}/img/icons/view-icon.svg`}
+                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                preProcessor={(code: any) =>
+                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                }
+              />
+            ) : (
+              <div
+                className={clsx(
+                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+                )}
+              >
+                {Object.entries(ENTITY_TYPE)
+                  .find(([, value]) => value === entity.type)?.[0]?.[0]
+                  ?.toUpperCase()}
+              </div>
             )}
-          >
-            {Object.entries(ENTITY_TYPE)
-              .find(([, value]) => value === entity.type)?.[0]?.[0]
-              ?.toUpperCase()}
-          </div>
-        )
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200 capitalize">
+                {Object.entries(ENTITY_TYPE)
+                  .find(([, value]) => value === entity.type)?.[0]
+                  ?.toLowerCase()}
+              </span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
       }
       action={
         entity.type === ENTITY_TYPE.TABLE &&
