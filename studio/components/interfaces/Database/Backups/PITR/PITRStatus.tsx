@@ -48,32 +48,31 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
-            <Tooltip.Provider>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button disabled={!canTriggerPhysicalBackup} onClick={() => onSetConfiguration()}>
-                    Start a restore
-                  </Button>
-                </Tooltip.Trigger>
-                {!canTriggerPhysicalBackup && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to trigger a PITR recovery
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            </Tooltip.Provider>
+
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button disabled={!canTriggerPhysicalBackup} onClick={() => onSetConfiguration()}>
+                  Start a restore
+                </Button>
+              </Tooltip.Trigger>
+              {!canTriggerPhysicalBackup && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="left">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to trigger a PITR recovery
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
           </div>
         }
       >

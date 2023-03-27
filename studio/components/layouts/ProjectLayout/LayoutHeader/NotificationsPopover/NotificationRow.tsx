@@ -81,38 +81,36 @@ const NotificationRow: FC<Props> = ({
           </div>
           <div className="w-1/10 flex justify-end">
             <div>
-              <Tooltip.Provider>
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Button
-                      className="!px-1 group"
-                      type="text"
-                      loading={dismissing}
-                      icon={
-                        <IconX
-                          size={14}
-                          strokeWidth={2}
-                          className="text-scale-1100 group-hover:text-scale-1200 transition"
-                        />
-                      }
-                      onClick={() => dismissNotification(notification.id)}
-                    />
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">Dismiss</span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    className="!px-1 group"
+                    type="text"
+                    loading={dismissing}
+                    icon={
+                      <IconX
+                        size={14}
+                        strokeWidth={2}
+                        className="text-scale-1100 group-hover:text-scale-1200 transition"
+                      />
+                    }
+                    onClick={() => dismissNotification(notification.id)}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">Dismiss</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
             </div>
           </div>
         </div>

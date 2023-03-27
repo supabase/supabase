@@ -175,6 +175,11 @@ div[data-radix-portal]:not(.portal--toast) {
   z-index: 2147483646 !important;
 }
 
+// Radix doesn't set a z-index on tooltips
+div[data-radix-popper-content-wrapper] {
+  z-index: 2147483647 !important  ;
+}
+
 .billing-compute-radio {
   label {
     @apply items-center justify-between;

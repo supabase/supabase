@@ -92,34 +92,33 @@ export function JsonEditor<TRow, TSummaryRow = unknown>({
                 <p className="text-xs text-scale-1100">Cancel changes</p>
               </div>
             </div>
-            <Tooltip.Provider>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <div
+                  className={[
+                    'border border-scale-700 rounded p-1 flex items-center justify-center',
+                    'transition cursor-pointer bg-scale-600 hover:bg-scale-700',
+                  ].join(' ')}
+                  onClick={() => onSelectExpand()}
+                >
+                  <IconMaximize size={12} strokeWidth={2} />
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'border border-scale-700 rounded p-1 flex items-center justify-center',
-                      'transition cursor-pointer bg-scale-600 hover:bg-scale-700',
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
                     ].join(' ')}
-                    onClick={() => onSelectExpand()}
                   >
-                    <IconMaximize size={12} strokeWidth={2} />
+                    <span className="text-xs text-scale-1200">Expand editor</span>
                   </div>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">Expand editor</span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
           </div>
         </BlockKeys>
       }

@@ -20,30 +20,28 @@ const WrapperDropdown: FC<Props> = ({ buttonText = 'Add wrapper', align = 'end' 
 
   if (!canManageWrappers) {
     return (
-      <Tooltip.Provider>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button disabled type="primary" icon={<IconPlus strokeWidth={1.5} />}>
-              {buttonText}
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200">
-                  You need additional permissions to add wrappers
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      </Tooltip.Provider>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button disabled type="primary" icon={<IconPlus strokeWidth={1.5} />}>
+            {buttonText}
+          </Button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200">
+                You need additional permissions to add wrappers
+              </span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
     )
   }
 

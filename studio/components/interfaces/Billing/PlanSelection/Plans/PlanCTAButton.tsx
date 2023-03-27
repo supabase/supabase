@@ -100,37 +100,35 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
-      <Tooltip.Provider>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-full">
-            <Button
-              block
-              type={type}
-              disabled={disabled || projectUpdateDisabled}
-              onClick={() => onSelectPlan(plan)}
-            >
-              {ctaText}
-            </Button>
-          </Tooltip.Trigger>
-          {!disabled && projectUpdateDisabled && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 w-[260px] flex items-center justify-center',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200 text-center">
-                    Subscription changes are currently disabled, our engineers are working on a fix
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
-      </Tooltip.Provider>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger className="w-full">
+          <Button
+            block
+            type={type}
+            disabled={disabled || projectUpdateDisabled}
+            onClick={() => onSelectPlan(plan)}
+          >
+            {ctaText}
+          </Button>
+        </Tooltip.Trigger>
+        {!disabled && projectUpdateDisabled && (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200 w-[260px] flex items-center justify-center',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200 text-center">
+                  Subscription changes are currently disabled, our engineers are working on a fix
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        )}
+      </Tooltip.Root>
     </div>
   )
 }

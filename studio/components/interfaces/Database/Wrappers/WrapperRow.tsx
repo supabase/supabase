@@ -171,45 +171,13 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                         </a>
                       </Link>
                     ) : (
-                      <Tooltip.Provider>
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
-                            <Button
-                              type="default"
-                              disabled
-                              icon={<IconEdit strokeWidth={1.5} />}
-                              className="py-2"
-                            />
-                          </Tooltip.Trigger>
-                          {!canManageWrappers && (
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-scale-1200">
-                                    You need additional permissions to edit wrappers
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          )}
-                        </Tooltip.Root>
-                      </Tooltip.Provider>
-                    )}
-                    <Tooltip.Provider>
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger>
                           <Button
                             type="default"
-                            disabled={!canManageWrappers}
-                            icon={<IconTrash strokeWidth={1.5} />}
+                            disabled
+                            icon={<IconEdit strokeWidth={1.5} />}
                             className="py-2"
-                            onClick={() => onDeleteWrapper(wrapper)}
                           />
                         </Tooltip.Trigger>
                         {!canManageWrappers && (
@@ -223,14 +191,43 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-scale-1200">
-                                  You need additional permissions to add wrappers
+                                  You need additional permissions to edit wrappers
                                 </span>
                               </div>
                             </Tooltip.Content>
                           </Tooltip.Portal>
                         )}
                       </Tooltip.Root>
-                    </Tooltip.Provider>
+                    )}
+
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
+                        <Button
+                          type="default"
+                          disabled={!canManageWrappers}
+                          icon={<IconTrash strokeWidth={1.5} />}
+                          className="py-2"
+                          onClick={() => onDeleteWrapper(wrapper)}
+                        />
+                      </Tooltip.Trigger>
+                      {!canManageWrappers && (
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-scale-1200">
+                                You need additional permissions to add wrappers
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </div>
               )

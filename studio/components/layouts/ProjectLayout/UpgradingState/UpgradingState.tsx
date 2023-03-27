@@ -191,28 +191,26 @@ const UpgradingState = () => {
                   </div>
 
                   {initiated_at !== undefined && (
-                    <Tooltip.Provider>
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger className="w-full">
-                          <p className="text-center text-sm text-scale-1000">
-                            Started on: {initiatedAtUTC} (UTC)
-                          </p>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                'border border-scale-200 ', //border
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-scale-1200">{initiatedAt}</span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger className="w-full">
+                        <p className="text-center text-sm text-scale-1000">
+                          Started on: {initiatedAtUTC} (UTC)
+                        </p>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                              'border border-scale-200 ', //border
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">{initiatedAt}</span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
                   )}
                 </div>
               </div>

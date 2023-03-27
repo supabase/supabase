@@ -60,51 +60,47 @@ const SavingIndicator: FC<Props> = ({ updateSqlSnippet }) => {
         </Button>
       )}
       {(content.savingState === 'CREATING' || content.savingState === 'UPDATING') && (
-        <Tooltip.Provider>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Saving changes...</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">Saving changes...</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       )}
       {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
         <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
       )}
       {showSavedText && (
-        <Tooltip.Provider>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconCheck className="text-brand-900" size={14} strokeWidth={3} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 ',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">All changes saved</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconCheck className="text-brand-900" size={14} strokeWidth={3} />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200 ',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">All changes saved</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       )}
       <span className="text-sm text-scale-1000">
         {content.savingState === 'CREATING_FAILED' && 'Failed to create'}
