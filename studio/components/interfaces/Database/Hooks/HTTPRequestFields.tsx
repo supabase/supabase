@@ -182,7 +182,7 @@ const HTTPRequestFields = ({
                         onAddHeader({
                           id: uuidv4(),
                           name: ' x-supabase-webhook-source',
-                          value: `SECRET_VALUE`,
+                          value: `[Use a secret value]`,
                         })
                       }
                     >
