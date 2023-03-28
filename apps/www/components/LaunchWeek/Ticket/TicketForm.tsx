@@ -25,6 +25,9 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   const [formState, setFormState] = useState<FormState>('default')
   const [errorMsg] = useState('')
   const { supabase, session, setUserData, setPageState, userData } = useConfData()
+  const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
+    (typeof supabase)['channel']
+  > | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
 
@@ -65,7 +68,34 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           ).catch((_) => {})
 
           setPageState('ticket')
+
+          // Listen to realtime changes
+          const channel =
+            realtimeChannel ??
+            supabase
+              .channel('changes')
+              .on(
+                'postgres_changes',
+                {
+                  event: 'UPDATE',
+                  schema: 'public',
+                  table: 'lw7_tickets',
+                  filter: `username=eq.${username}`,
+                },
+                (payload) => {
+                  setUserData({
+                    ...payload.new,
+                    golden: !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn,
+                  })
+                }
+              )
+              .subscribe()
+          setRealtimeChannel(channel)
         })
+    }
+    return () => {
+      // Cleanup realtime subscription on unmount
+      realtimeChannel?.unsubscribe()
     }
   }, [session])
 
