@@ -175,7 +175,7 @@ const HTTPRequestFields = ({
                         </p>
                       </div>
                     </Dropdown.Item>,
-                    <Dropdown.Separator />,
+                    <Dropdown.Separator key="separator" />,
                     <Dropdown.Item
                       key="add-source-header"
                       onClick={() =>
