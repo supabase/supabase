@@ -68,6 +68,9 @@ dereference.auth.v1:
 dereference.storage.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
+dereference.analytics.v0:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
+
 # No longer updated
 # dereference.tsdoc.v1:
 # 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions:v1
