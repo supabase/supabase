@@ -5,6 +5,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { Provider } from './AuthProvidersForm.types'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import FormField from './FormField'
@@ -78,7 +79,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
               width={14}
             />
             <img
-              src={`/img/icons/${provider.misc.iconKey}.svg`}
+              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
               width={18}
               alt={`${provider.title} auth icon`}
             />

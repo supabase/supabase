@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-angular',
-  title: 'Quickstart: Angular',
+  title: 'Build a User Management App with Angular',
   description: 'Learn how to use Supabase in your Angular App.',
-  sidebar_label: 'Angular',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -192,11 +191,7 @@ export class AuthComponent {
         />
       </div>
       <div>
-        <button
-          type="submit"
-          class="button block"
-          [disabled]="loading"
-        >
+        <button type="submit" class="button block" [disabled]="loading">
           {{ loading ? 'Loading' : 'Send magic link' }}
         </button>
       </div>
@@ -529,12 +524,7 @@ export class AccountComponent implements OnInit {
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -52,17 +52,7 @@ export default class OpenApiStore implements IOpenApiStore {
   }
 
   async fetchData() {
-    const headers = { 'Content-Type': 'application/json', ...this.headers }
-    const projectConfig = await get(this.url, { headers })
-    if (projectConfig.error) throw projectConfig.error
-
-    const apiKey = projectConfig.autoApiService?.defaultApiKey
-    const restApiUrl = projectConfig.autoApiService?.restUrl
-
-    const response = await get<OpenAPIV2.Document>(`${restApiUrl}?apikey=${apiKey}`, {
-      headers: { ...headers, apiKey: apiKey, Authorization: `Bearer ${apiKey}` },
-      credentials: 'omit',
-    })
+    const response = await get<OpenAPIV2.Document>(this.url)
     if (response.error) throw response.error
 
     const tables = response.definitions

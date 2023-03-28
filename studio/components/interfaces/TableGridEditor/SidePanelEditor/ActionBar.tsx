@@ -63,7 +63,7 @@ const ActionBar: FC<ActionBarProps> = ({
         // Does not require applyFunction() callback
         <Button
           size="small"
-          disabled={disableApply}
+          disabled={loading || disableApply}
           loading={loading}
           htmlType="submit"
           form={formId}

@@ -1,14 +1,21 @@
 import Link from 'next/link'
 import { Button, IconCalendar } from 'ui'
 import { FormPanel } from 'components/ui/Forms'
-import { useParams } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { checkPermissions, useParams } from 'hooks'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { getPITRRetentionDuration } from './PITR.utils'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const PITRNotice = ({}) => {
   const { ref: projectRef } = useParams()
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const retentionPeriod = getPITRRetentionDuration(subscription?.addons ?? [])
+
+  const canUpdateSubscription = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   return (
     <FormPanel
@@ -18,13 +25,30 @@ const PITRNotice = ({}) => {
           <span className="text-sm text-scale-1000">
             You can also increase your recovery retention period updating your PITR add-on
           </span>
-          <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
-            <a>
-              <Button as="span" type="default">
-                Increase retention period
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <Button disabled={canUpdateSubscription} as="span" type="default">
+                <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
+                  <a>Increase retention period</a>
+                </Link>
               </Button>
-            </a>
-          </Link>
+            </Tooltip.Trigger>
+            {!canUpdateSubscription && (
+              <Tooltip.Content side="left">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to amend subscriptions
+                  </span>
+                </div>
+              </Tooltip.Content>
+            )}
+          </Tooltip.Root>
         </div>
       }
     >

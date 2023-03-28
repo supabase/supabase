@@ -1,4 +1,4 @@
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import { IconSun, IconMoon } from 'ui'
 
 function DarkModeToggle() {

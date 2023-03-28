@@ -1,6 +1,6 @@
 import createGlobe from 'cobe'
 import { useEffect, useRef } from 'react'
-import { useTheme } from './Providers/index'
+import { useTheme } from 'common/Providers'
 
 const Globe = () => {
   const { isDarkMode } = useTheme()

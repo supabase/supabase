@@ -138,7 +138,7 @@ As such, it is recommended that you schedule a downtime window of 20-30 minutes,
 The `activate` subcommand can be used to initiate the activation:
 
 ```bash
-supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt check-availability --desired-subdomain my-example-subdomain --experimental
+supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt activate --desired-subdomain my-example-subdomain --experimental
 ```
 
 ## Remove a Vanity Subdomain
@@ -155,6 +155,7 @@ As with the final activation stage of the process for setting up a vanity subdom
 
 - Edge functions do not honor the custom domain or the vanity subdomain setting and they still have to be invoked via the `foobarbaz.supabase.co` domain.
 - A Supabase project can—at this time—use either a Custom Domain or a Vanity Subdomain, but not both.
+- Some authentication flows like Sign-in with Twitter set cookies to track the progress of the flow. Make sure you use only one domain in your frontend application for this reason. Mixing calls to the Supabase domain `foobarbaz.supabase.co` and your custom domain could cause those flows to stop working due to the [Same Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) enforced on cookies by the browser.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

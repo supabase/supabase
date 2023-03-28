@@ -178,8 +178,8 @@ export const menuItems: NavMenu = {
           name: 'Serverless APIs',
           url: undefined,
           items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+            { name: 'Overview', url: '/guides/database/api', items: [] },
+            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
           ],
         },
         {
@@ -241,12 +241,57 @@ export const menuItems: NavMenu = {
     {
       label: 'Realtime',
       items: [
-        { name: 'Overview', url: '/guides/realtime', items: [] },
-        { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
-        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        {
+          name: 'Overview',
+          url: '/guides/realtime',
+          items: [],
+        },
+        {
+          name: 'Quickstart',
+          url: '/guides/realtime/quickstart',
+          items: [],
+        },
+        {
+          name: 'Features',
+          url: undefined,
+          items: [
+            { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+            {
+              name: 'Extensions',
+              url: '/guides/realtime/extensions',
+              items: [
+                { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+                { name: 'Presence', url: '/guides/realtime/presence', items: [] },
+                { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Guides',
+          url: undefined,
+          items: [
+            {
+              name: 'Subscribing to Database Changes',
+              url: '/guides/realtime/subscribing-to-database-changes',
+              items: [],
+            },
+            {
+              name: 'Using Realtime with Next.js',
+              url: '/guides/realtime/realtime-with-nextjs',
+              items: [],
+            },
+          ],
+        },
+        {
+          name: 'Deep dive',
+          url: undefined,
+          items: [
+            { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+            { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+            { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
+          ],
+        },
       ],
     },
     {

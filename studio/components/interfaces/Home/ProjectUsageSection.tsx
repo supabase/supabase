@@ -5,7 +5,7 @@ import { IconLoader, IconAlertCircle } from 'ui'
 import { useParams } from 'hooks'
 import { ProjectUsage, NewProjectPanel } from 'components/interfaces/Home'
 import InformationBox from 'components/ui/InformationBox'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const ProjectUsageSection: FC = observer(({}) => {
   const { ref: projectRef } = useParams()
@@ -24,7 +24,7 @@ const ProjectUsageSection: FC = observer(({}) => {
 
   const hasProjectData = usage
     ? Object.keys(usage)
-        .map((key) => usage[key as keyof ProjectUsageResponse].usage)
+        .map((key) => usage[key as ProjectUsageResponseUsageKeys].usage)
         .some((usage) => (usage ?? 0) > 0)
     : false
 

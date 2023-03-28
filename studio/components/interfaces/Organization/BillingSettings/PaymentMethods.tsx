@@ -17,7 +17,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { getURL } from 'lib/helpers'
-import { API_URL } from 'lib/constants'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
 import NoPermission from 'components/ui/NoPermission'
@@ -158,7 +158,7 @@ const PaymentMethods: FC<Props> = ({
                       <div key={paymentMethod.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                           <img
-                            src={`/img/payment-methods/${paymentMethod.card.brand
+                            src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
                               .replace(' ', '-')
                               .toLowerCase()}.png`}
                             width="32"
