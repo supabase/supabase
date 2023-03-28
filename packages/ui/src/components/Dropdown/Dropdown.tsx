@@ -130,7 +130,7 @@ export function Separator() {
   return <RadixDropdown.Separator className={__styles.separator} />
 }
 
-// to do  : remove onChange omit in favour of using onCheckedChange
+// to do  : remove onChange omit in favor of using onCheckedChange
 interface CheckboxProps extends Omit<RadixDropdownTypes.DropdownMenuCheckboxItemProps, 'onChange'> {
   ItemIndicator?: React.ReactNode
   onChange?(x: boolean): void
@@ -147,7 +147,7 @@ export function Checkbox({
   let __styles = styleHandler('dropdown')
 
   const handleChange = (e: any) => {
-    // to do  : remove onChange in favour of using onCheckedChange
+    // to do  : remove onChange in favor of using onCheckedChange
     if (onChange) onChange(e)
     if (props.onCheckedChange) props.onCheckedChange(e)
     setChecked(e)
@@ -186,7 +186,7 @@ export function Radio({ ItemIndicator, ...props }: RadioProps) {
   )
 }
 
-// to do  : remove onChange omit in favour of using onValueChange
+// to do  : remove onChange omit in favor of using onValueChange
 interface RadioGroupProps extends Omit<RadixDropdownTypes.DropdownMenuRadioGroupProps, 'onChange'> {
   onChange?(x: string): void
 }
@@ -195,7 +195,7 @@ export function RadioGroup({ value: propsValue, onChange, ...props }: RadioGroup
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
   const handleChange = (e: any) => {
-    // to do  : remove onChange in favour of using onValueChange
+    // to do  : remove onChange in favor of using onValueChange
     if (onChange) onChange(e)
     if (props.onValueChange) props.onValueChange(e)
     setValue(e)
