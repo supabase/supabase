@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 /**
- * Test renders can be wrapped in this container if it requires the Providers needed
+ * Test renders can be wrapped in this container if it requires a context Provider
  */
 
 export default (props) => (
