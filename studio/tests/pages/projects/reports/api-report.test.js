@@ -3,6 +3,7 @@ import { render } from '../../../helpers'
 import { waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
 import userEvent from '@testing-library/user-event'
+import Container from 'tests/setup/container'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -20,7 +21,11 @@ test(`static elements`, async () => {
 })
 
 test('refresh button', async () => {
-  render(<ApiReport />)
+  render(
+    <Container>
+      <ApiReport />
+    </Container>
+  )
   await waitFor(() => expect(get).toBeCalled())
   get.mockReset()
   userEvent.click(await screen.findByText(/Refresh/))
