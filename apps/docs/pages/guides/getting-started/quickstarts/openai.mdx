@@ -1,0 +1,163 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
+
+export const meta = {
+  title: 'Supabase with OpenAI',
+  subtitle: 'Using Supabase with OpenAI.',
+}
+
+AI products are transforming the world today with their amazing capabilities and benefits. AI products can help us solve complex problems, automate tedious tasks, enhance our creativity and productivity, and make our lives easier and more enjoyable. Some cool example of it is Supabase Clippy released not so long ago.
+
+But how can you create your own AI products without spending too much time and money? How can you leverage the power of AI to build innovative solutions for your business or personal needs? That's where Supabase comes in. It offers an easy and efficient way to manage your data for AI. Supabase is an open source platform that provides a variety of tools for data management, including data storage, authentication, and APIs.
+
+If you want to learn more about how to use Supabase for AI products, you're in luck. We have prepared a comprehensive guide that will teach you everything you need to know. You'll learn how to set up your Supabase project, use OpenAI to do natural language processing, text summarization, and more to make your own product for search and question answering.
+
+Ready to get started? Then don't miss this guide on how to use Supabase for AI products. It's the ultimate resource for anyone who wants to build awesome web applications with AI. Let's go!
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create Supabase project">
+
+    To create a project with Supabase, navigate to [Supabase](https://supabase.com/?ref=supabaseforai), click `Sign In` and authenticate with GitHub to login or register a new account.
+
+    From the Supabase dashboard, click `New project` and select an organization.
+
+    > Note: You may need to create an organization first.
+
+    Give your project a `name`, `password`, select a `region` close to your potential users and click `Create new project`.
+
+    Supabase will take a couple of minutes to configure the infrastructure.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Details>
+
+    ![Supabase New Project](/docs/img/supabase-new.png)
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Add PG-vector extension">
+
+    So PgVector is a great fit to store those and compare for similarity. To enable the `pgvector` extension, you can use the following code right from your Supabase Project's SQL Editor:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      create extension if not exists pgvector with schema extensions;
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="">
+
+    Or go to [Database > Extensions](https://app.supabase.com/project/_/database/extensions) and enable the Vector extension.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Create OpenAI account">
+
+    OpenAI is a research organization that aims to create safe and beneficial artificial general intelligence (AGI) that can benefit all of humanity. [OpenAI](https://openai.com) also offers various products and services that use its AI models, such as ChatGPT, Codex, and Playground. 
+
+    And we will use it to create embeddings, and generate text to answer users' queries.
+
+    To create an OpenAI account, you can follow these steps:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Details>
+
+    - Visit the [OpenAI sign up](https://platform.openai.com/signup) page in your web browser.
+    - Click the **sign up** link.
+    - You can use your e-mail to sign up, or an existing Google or Microsoft account.
+    - After signing up, you can view your API keys by clicking on your profile in the top-right corner and selecting **View API keys**.
+    - You can use your API keys to access the OpenAI services and products, such as ChatGPT, Codex, and Playground.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create embeddings">
+
+    To search through your texts base (like documentation or a book that you really like) you should create embeddings for it. Wonderful **[Greg Richardson](https://twitter.com/ggrdson)** already made a script to do that. The only thing left to do is to collect your documents as a bunch of Markdown files and pass them to it.
+
+    You can find the full code here: [Embeddings Generation Code](https://github.com/supabase/supabase/blob/6acc7332c6909030c1a2c69c561c27c39ff1f1ff/apps/docs/scripts/generate-embeddings.ts)
+
+    What it does is:
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Details>
+
+    1. Searches for all the Markdown files in the provided Path.
+    2. Parsing markdown files to split it into text blocks. It just uses headings for that.
+    3. Parsing these blocks by the type of the text and removes some additional blocs like JS components (Yes, you can pass MDX as well).
+    4. Uses `openai.createEmbedding` to actually generate embeddings from text blocks.
+    5. Saves the source page links, raw text blocks and embeddings to the Supabase Database using `supabase-js` library.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Details title="">
+
+    Don't forget to specify `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_KEY` environment variables.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Answering the User's Query">
+
+    We are all prepared now. The next thing is the actual user interface. The idea here is to find the most similar text blocks from our knowledge to the query entered by a user. How to do that? Here is the time for the real superpower of PgVector.
+
+    We can use the same OpenAI API `openai.createEmbedding` to vectorise users's query and create an embedding from it. And then use PgVector to compare its vectorized representation with all the knowledge base to find the most similar text blocks.
+
+    To do so you can use the following Postgres Function also provided by **[Greg Richardson](https://twitter.com/ggrdson)**:
+
+    [Embedding Similarity Search SQL](https://github.com/supabase/supabase/blob/6acc7332c6909030c1a2c69c561c27c39ff1f1ff/supabase/migrations/20230128004504_embedding_similarity_search.sql)
+
+    After you get Top-10 results, for example, you need to extract the real text blocks for these and put it into GPT-3.5 (a.k.a. ChatGPT) with the initial User's query and the following Prompt to get the comprehensive answer form your personal AI assistant:
+
+    And don't forget to use OpenAI `openai.createModeration` to verify that User's query not violates any policies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh
+        You are a very enthusiastic assistant who loves to help people! 
+        Given the following sections from the documentation, answer the 
+        question using only that information, outputted in markdown format. 
+        If you are unsure and the answer is not explicitly written in the 
+        documentation, say "Sorry, I don't know how to help with that."
+
+        Context sections:
+        ${contextText}
+
+        Question: """
+        ${sanitizedQuery}
+        """
+
+        Answer as markdown (including related code snippets if available):
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+export default Page
