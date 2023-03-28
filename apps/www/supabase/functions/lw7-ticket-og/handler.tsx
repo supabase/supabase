@@ -26,19 +26,17 @@ export async function handler(req: Request) {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
     if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-      const { error } = await supabaseAdminClient
+      supabaseAdminClient
         .from('lw7_tickets')
         .update({ sharedOnTwitter: 'now' })
         .eq('username', username)
         .is('sharedOnTwitter', null)
-      if (error) console.log(error.message)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-      const { error } = await supabaseAdminClient
+      supabaseAdminClient
         .from('lw7_tickets')
         .update({ sharedOnLinkedIn: 'now' })
         .eq('username', username)
         .is('sharedOnLinkedIn', null)
-      if (error) console.log(error.message)
     }
 
     // Try to get image from Supabase Storage CDN.
