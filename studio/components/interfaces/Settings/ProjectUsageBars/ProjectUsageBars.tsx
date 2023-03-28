@@ -136,7 +136,9 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             for a full breakdown of available plans.
                           </p>
                           <Link href={`/project/${projectRef}/settings/billing/update`}>
-                            <Button>Upgrade to Pro</Button>
+                            <a>
+                              <Button>Upgrade to Pro</Button>
+                            </a>
                           </Link>
                         </div>
                       ) : (
@@ -148,7 +150,9 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             spend cap and pay for over-usage beyond the quota.
                           </p>
                           <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
-                            <Button>Configure Spend Cap</Button>
+                            <a>
+                              <Button>Configure Spend Cap</Button>
+                            </a>
                           </Link>
                         </div>
                       )}
