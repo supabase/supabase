@@ -109,7 +109,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){window.dataLayer.push(arguments);}
                 gtag('js', new Date());
-                
+
                 gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}', { 'send_page_view': false });
                 `}
               </Script>
@@ -118,7 +118,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <TooltipProvider>
                   <RouteValidationWrapper>
                     <AppBannerWrapper>
-                      <CommandMenuProvider>
+                      <CommandMenuProvider site="studio">
                         {getLayout(<Component {...pageProps} />)}
                       </CommandMenuProvider>
                     </AppBannerWrapper>
