@@ -130,9 +130,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
-    ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets/${
-      golden ? 'golden' : 'regular'
-    }/v3/${username ?? ''}.png`
+    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+      username ?? ''
+    )}${golden ? '&golden=true' : ''}`
+    // ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets/${
+    //   golden ? 'golden' : 'regular'
+    // }/v3/${username ?? ''}.png`
   }
 
   return {
