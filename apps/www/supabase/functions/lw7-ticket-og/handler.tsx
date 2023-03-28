@@ -69,12 +69,12 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       REG: {
         BG: `${STORAGE_URL}/reg_bg.png`,
-        AI: `${STORAGE_URL}/tickets_bg/blurred/regular/png/reg_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/regular/png/reg_bg_${bg_image_id ?? '1'}.png`,
         TICKET: `${STORAGE_URL}/reg_ticket.png`,
       },
       GOLD: {
         BG: `${STORAGE_URL}/gold_bg.png`,
-        AI: `${STORAGE_URL}/tickets_bg/blurred/golden/png/gold_bg_${bg_image_id}.png`,
+        AI: `${STORAGE_URL}/tickets_bg/blurred/golden/png/gold_bg_${bg_image_id ?? '1'}.png`,
         TICKET: `${STORAGE_URL}/gold_ticket.png`,
       },
     }
@@ -238,8 +238,8 @@ export async function handler(req: Request) {
         ],
         headers: {
           'content-type': 'image/png',
-          // 'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
-          // 'cdn-cache-control': 'max-age=31536000',
+          'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
+          'cdn-cache-control': 'max-age=31536000',
         },
       }
     )
@@ -252,7 +252,7 @@ export async function handler(req: Request) {
         generatedImage.body!,
         {
           contentType: 'image/png',
-          // cacheControl: '31536000',
+          cacheControl: '31536000',
           upsert: false,
         }
       )
