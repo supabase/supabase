@@ -18,7 +18,7 @@ The Supabase Analytics server (Logflare) manages the ingest and query pipelines 
 
 Deployed in a self-hosted environment, with the exception of API edge logs, all logs and views supported by Logflare should match the Supabase Cloud.
 
-All logs are routed to Logflare via Vector. Kong routes API reque`sts to PostgREST so self-hosted or local deployments will use Kong request logs instead of the Supabase Cloud API gateway.
+All logs are routed to Logflare via Vector. Kong routes API requests to PostgREST so self-hosted or local deployments will use Kong request logs instead of the Supabase Cloud API gateway.
 
 There will be some differences in the log event payloads with self-hosted API requests vs requests handled by the Supbase Cloud API gateway.
 
