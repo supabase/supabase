@@ -24,15 +24,13 @@ export default function TicketActions({
   const [loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
   const permalink = (medium: string) =>
-    encodeURIComponent(`${SITE_URL}/tickets/${username}${golden ? `?golden=true` : ''}`)
+    encodeURIComponent(`${SITE_URL}/tickets/?lw=7${username}${golden ? `&golden=true` : ''}`)
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink(
     'twitter'
-  )}&via=supabase&text=${text}&lw=7`
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink(
-    'linkedin'
-  )}&text=${text}&lw=7`
+  )}&via=supabase&text=${text}`
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink('linkedin')}`
   const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
     username
   )}`
