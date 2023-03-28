@@ -120,8 +120,8 @@ export default function TicketVisual({
             placeholder="blur"
             blurDataURL="/images/blur.png"
             className={[
-              'duration-700 ease-in-out transform scale-110',
-              imageIsLoading ? 'grayscale blur-xl scale-110' : 'grayscale-0 blur-0',
+              'duration-700 ease-in-out transform transition-all',
+              imageIsLoading ? 'grayscale blur-xl scale-110' : 'scale-100 grayscale-0 blur-0',
             ].join(' ')}
             onLoadingComplete={() => setImageIsLoading(false)}
           />

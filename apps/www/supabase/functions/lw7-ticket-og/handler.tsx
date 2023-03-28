@@ -8,6 +8,7 @@ const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+const BUCKET_FOLDER_VERSION = 'v3'
 
 export async function handler(req: Request) {
   const url = new URL(req.url)
@@ -42,9 +43,13 @@ export async function handler(req: Request) {
 
     // Try to get image from Supabase Storage CDN.
     let storageResponse: Response
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/golden/v1/${username}.png`)
+    storageResponse = await fetch(
+      `${STORAGE_URL}/tickets/golden/${BUCKET_FOLDER_VERSION}/${username}.png`
+    )
     if (storageResponse.ok) return storageResponse
-    storageResponse = await fetch(`${STORAGE_URL}/tickets/regular/v1/${username}.png`)
+    storageResponse = await fetch(
+      `${STORAGE_URL}/tickets/regular/${BUCKET_FOLDER_VERSION}/${username}.png`
+    )
     if (!assumeGolden && storageResponse.ok) return storageResponse
 
     // Get ticket data
@@ -111,8 +116,9 @@ export async function handler(req: Request) {
               width="1027"
               height="524"
               style={{
-                borderRadius: '8px',
+                borderRadius: '24px',
                 position: 'absolute',
+                objectFit: 'cover',
                 top: '53',
                 left: '87',
                 zIndex: '-8000',
@@ -165,7 +171,7 @@ export async function handler(req: Request) {
                   display: 'flex',
                   color: 'transparent',
                   backgroundImage:
-                    'linear-gradient(180deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
+                    'linear-gradient(90deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
                   backgroundClip: 'text',
                 }}
               >
@@ -242,7 +248,7 @@ export async function handler(req: Request) {
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
-        `lw7/tickets/${golden ? 'golden' : 'regular'}/v1/${username}.png`,
+        `lw7/tickets/${golden ? 'golden' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
         generatedImage.body!,
         {
           contentType: 'image/png',
@@ -268,7 +274,11 @@ export async function handler(req: Request) {
       }),
     })
 
-    return await fetch(`${STORAGE_URL}/tickets/${golden ? 'golden' : 'regular'}/v1/${username}.png`)
+    return await fetch(
+      `${STORAGE_URL}/tickets/${
+        golden ? 'golden' : 'regular'
+      }/${BUCKET_FOLDER_VERSION}/${username}.png`
+    )
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

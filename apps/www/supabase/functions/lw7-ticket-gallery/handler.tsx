@@ -8,6 +8,7 @@ const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+const BUCKET_FOLDER_VERSION = 'v3'
 
 export async function handler(req: Request) {
   try {
@@ -66,6 +67,7 @@ export async function handler(req: Request) {
                 position: 'absolute',
                 top: '0',
                 left: '0',
+                objectFit: 'cover',
                 zIndex: '-8000',
               }}
               src={golden ? BACKGROUND['GOLD']['AI'] : BACKGROUND['REG']['AI']}
@@ -116,7 +118,7 @@ export async function handler(req: Request) {
                   display: 'flex',
                   color: 'transparent',
                   backgroundImage:
-                    'linear-gradient(180deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
+                    'linear-gradient(90deg, rgba(248, 249, 250, 0.66) -31.69%, #F8F9FA 22.14%, rgba(248, 249, 250, 0.5) 122.78%)',
                   backgroundClip: 'text',
                 }}
               >
@@ -199,7 +201,9 @@ export async function handler(req: Request) {
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
-        `lw7/tickets/gallery/${golden ? 'golden' : 'regular'}/v1/${username}.png`,
+        `lw7/tickets/gallery/${
+          golden ? 'golden' : 'regular'
+        }/${BUCKET_FOLDER_VERSION}/${username}.png`,
         generatedImage.body!,
         {
           contentType: 'image/png',

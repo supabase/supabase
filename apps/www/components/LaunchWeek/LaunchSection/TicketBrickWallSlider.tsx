@@ -22,8 +22,11 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
   const [swiperInstace, setSwiperInstance] = useState<SwiperCore | any | null>(null)
   const { width } = useWindowSize()
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
+  const BUCKET_FOLDER_VERSION = 'v3'
   const getOgUrl = (username: string, isGold: boolean) =>
-    `${STORAGE_URL}/tickets/gallery/${isGold ? 'golden' : 'regular'}/v1/${username}.png`
+    `${STORAGE_URL}/tickets/gallery/${
+      isGold ? 'golden' : 'regular'
+    }/${BUCKET_FOLDER_VERSION}/${username}.png`
 
   useEffect(() => {
     if (swiperInstace) swiperInstace?.autoplay?.run()
