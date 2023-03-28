@@ -59,6 +59,8 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           images: [
             {
               url: ogImageUrl,
+              width: 1200,
+              height: 630,
             },
           ],
         }}
@@ -128,9 +130,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
-    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
-      username ?? ''
-    )}${golden ? '&golden=true' : ''}`
+    ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets/${
+      golden ? 'golden' : 'regular'
+    }/v3/${username ?? ''}.png`
   }
 
   return {
