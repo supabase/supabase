@@ -7,7 +7,6 @@ import { useStore, useParams } from 'hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { get } from 'lib/common/fetch'
 
 interface Props {
   restrictedIps: string[]

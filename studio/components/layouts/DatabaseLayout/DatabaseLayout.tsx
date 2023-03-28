@@ -16,11 +16,15 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
+  const { isLoading } = meta.schemas
+  const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+
+  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
@@ -38,9 +42,14 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       if (IS_PLATFORM) {
         backups.load()
       }
-      vault.load()
     }
   }, [ui.selectedProject?.ref])
+
+  useEffect(() => {
+    if (isVaultEnabled) {
+      vault.load()
+    }
+  }, [ui.selectedProject?.ref, isVaultEnabled])
 
   // Optimization required: load logic should be at the page level
   // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data

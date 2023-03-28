@@ -2,11 +2,13 @@ import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { Timezone } from './PITR.types'
 import { FormPanel } from 'components/ui/Forms'
 import TimezoneSelection from './TimezoneSelection'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedTimezone: Timezone
@@ -29,6 +31,11 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
+  const canTriggerPhysicalBackup = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.walg.prepare_restore'
+  )
+
   return (
     <>
       <FormPanel
@@ -41,7 +48,28 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
-            <Button onClick={() => onSetConfiguration()}>Start a restore</Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button disabled={!canTriggerPhysicalBackup} onClick={() => onSetConfiguration()}>
+                  Start a restore
+                </Button>
+              </Tooltip.Trigger>
+              {!canTriggerPhysicalBackup && (
+                <Tooltip.Content side="left">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to trigger a PITR recovery
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         }
       >

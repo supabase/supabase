@@ -73,6 +73,7 @@ const Users = () => {
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
+            className="w-[200px]"
           >
             <Listbox.Option label="All Users" value="">
               All Users
@@ -99,7 +100,7 @@ const Users = () => {
           <AddUserDropdown projectKpsVersion={PageState?.projectKpsVersion} />
         </div>
       </div>
-      <section className="users-table-container mt-4 overflow-visible px-6">
+      <section className="thin-scrollbars mt-4 overflow-visible px-6">
         <div className="section-block--body relative overflow-x-auto rounded">
           <div className="inline-block min-w-full align-middle">
             <UsersList />

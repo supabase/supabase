@@ -7,6 +7,7 @@
 .DocSearch-Container {
   background: rgba(0, 0, 0, 0.3);
   @apply fixed top-0 left-0 z-[200] flex h-screen w-screen flex-col p-4 backdrop-blur-sm sm:p-6 md:p-[10vh] lg:p-[12vh];
+  @apply cursor-auto #{!important};
 }
 
 .DocSearch-LoadingIndicator svg {

@@ -6,7 +6,7 @@ import { SITE_URL } from '~/lib/constants'
 import { useRouter } from 'next/router'
 import { createClient, Session } from '@supabase/supabase-js'
 import { useState, useEffect } from 'react'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 export default function TicketHome() {
   const { isDarkMode } = useTheme()

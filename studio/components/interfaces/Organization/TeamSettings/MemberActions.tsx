@@ -15,12 +15,11 @@ import { isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
-  members: Member[]
   member: Member
   roles: Role[]
 }
 
-const MemberActions: FC<Props> = ({ members, member, roles }) => {
+const MemberActions: FC<Props> = ({ member, roles }) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const { rolesRemovable } = getRolesManagementPermissions(roles)

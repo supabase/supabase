@@ -12,9 +12,9 @@
 - [x] Isännöity Postgres-tietokanta [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentikointi ja valtuutus [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automaattisesti luodut rajapinnat
-  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funktiot
   - [x] Tietokantatoiminnot [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)

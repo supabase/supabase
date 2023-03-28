@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { isEmpty } from 'lodash'
 import {
   Button,
@@ -13,7 +12,12 @@ import {
 } from 'ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
@@ -21,7 +25,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   if (!mimeType || !previewUrl) {
     return (
       <SVG
-        src={'/img/file-filled.svg'}
+        src={`${BASE_PATH}/img/file-filled.svg`}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
         }
@@ -39,7 +43,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
-          src={'/img/file-filled.svg'}
+          src={`${BASE_PATH}/img/file-filled.svg`}
           preProcessor={(code) =>
             code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
           }
@@ -82,7 +86,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   }
   return (
     <SVG
-      src={'/img/file-filled.svg'}
+      src={`${BASE_PATH}/img/file-filled.svg`}
       preProcessor={(code) =>
         code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
       }
@@ -93,6 +97,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
 const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
+    downloadFile,
     selectedBucket,
     selectedFilePreview: file,
     copyFileURLToClipboard,
@@ -107,6 +112,7 @@ const PreviewPane = () => {
   const mimeType = file.metadata ? file.metadata.mimetype : null
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
+  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <>
@@ -176,17 +182,14 @@ const PreviewPane = () => {
 
             {/* Actions */}
             <div className="flex space-x-2 border-b border-panel-border-light pb-4 dark:border-panel-border-dark">
-              <Link href={`${file.previewUrl}&download`}>
-                <a>
-                  <Button
-                    type="default"
-                    icon={<IconDownload size={16} strokeWidth={2} />}
-                    disabled={file.isCorrupted}
-                  >
-                    Download
-                  </Button>
-                </a>
-              </Link>
+              <Button
+                type="default"
+                icon={<IconDownload size={16} strokeWidth={2} />}
+                disabled={file.isCorrupted}
+                onClick={async () => await downloadFile(file)}
+              >
+                Download
+              </Button>
               {selectedBucket.public ? (
                 <Button
                   type="outline"
@@ -238,15 +241,35 @@ const PreviewPane = () => {
                 </Dropdown>
               )}
             </div>
-            <Button
-              type="outline"
-              shadow={false}
-              size="tiny"
-              icon={<IconTrash2 size={16} strokeWidth={2} />}
-              onClick={() => setSelectedItemsToDelete([file])}
-            >
-              Delete file
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="outline"
+                  disabled={!canUpdateFiles}
+                  shadow={false}
+                  size="tiny"
+                  icon={<IconTrash2 size={16} strokeWidth={2} />}
+                  onClick={() => setSelectedItemsToDelete([file])}
+                >
+                  Delete file
+                </Button>
+              </Tooltip.Trigger>
+              {!canUpdateFiles && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to delete this file
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
       </Transition>

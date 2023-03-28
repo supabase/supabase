@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/supabase-js
-  title: Supabase Client
+  title: Supabase Javascript Client
   description: |
 
     Supabase JavaScript.
@@ -287,7 +287,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -356,6 +356,7 @@ functions:
     notes: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
+      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -811,9 +812,7 @@ functions:
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'signup',
             email: 'email@example.com',
-            options: {
-              'password': 'secret'
-            }
+            password: 'secret'
           })
           ```
       - id: generate-an-invite-link
@@ -1319,21 +1318,21 @@ functions:
           sql: |
             ```sql
             create table countries (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
             create table cities (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
-              "name" text, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
               "country_id" "uuid" references public.countries on delete cascade
             );
-            
+
             with country as (
-              insert into countries (name) 
+              insert into countries (name)
               values ('united kingdom') returning id
             )
-            insert into cities (name, country_id) values 
+            insert into cities (name, country_id) values
             ('London', (select id from country)),
             ('Manchester', (select id from country)),
             ('Liverpool', (select id from country)),
@@ -2257,6 +2256,9 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+        description: |
+          When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
+          to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
@@ -3885,7 +3887,7 @@ functions:
             }
             ```
         description: |
-          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. 
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests.
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
@@ -4168,7 +4170,7 @@ functions:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
-      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/database/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
     examples:

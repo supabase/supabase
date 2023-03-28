@@ -10,7 +10,6 @@ import {
   IconLock,
   IconUnlock,
 } from 'ui'
-import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 
 type ColumnMenuProps = {

@@ -1,22 +1,18 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
-import { SearchButton } from '~/components/DocSearch'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
-import clippyImageDark from '../../../public/img/clippy-dark.png'
-import clippyImage from '../../../public/img/clippy.png'
 
+import SearchButton from '~/components/Search/SearchButton'
 import { getPageType } from '~/lib/helpers'
-import { useClippy } from '~/components/Clippy/ClippyProvider'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { open: openClippy } = useClippy()
 
   const { asPath, push } = useRouter()
   const pathSegments = asPath.split('/')
@@ -117,16 +113,6 @@ const TopNavBarRef: FC = () => {
               </div>
             </div>
           </SearchButton>
-
-          <div className="flex cursor-pointer order-1 lg:order-2">
-            <Image
-              onClick={openClippy}
-              width={26}
-              height={29}
-              src={isDarkMode ? clippyImageDark : clippyImage}
-              alt="Clippy"
-            />
-          </div>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button

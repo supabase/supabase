@@ -12,6 +12,9 @@ export async function handleResponse<T>(
   response: Response,
   requestId: string
 ): Promise<SupaResponse<T>> {
+  const contentType = response.headers.get('Content-Type')
+  if (contentType === 'application/octet-stream') return response as any
+
   try {
     const resTxt = await response.text()
     try {

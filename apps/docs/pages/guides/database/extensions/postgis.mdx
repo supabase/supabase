@@ -14,9 +14,7 @@ While you may be able to store simple lat/long geographic coordinates as a set o
 
 The additional data types that PostGIS provides include [Point](https://postgis.net/docs/using_postgis_dbmanagement.html#Point), [Polygon](https://postgis.net/docs/using_postgis_dbmanagement.html#Polygon), [Linestring](https://postgis.net/docs/using_postgis_dbmanagement.html#LineString), and many more to represent different types of geographical data. In this guide, we will mainly focus on how to interact with `Point` type, which represents a single set of latitude and longitude. If you are interested in digging deeper, you can learn more about different data types on the [data management section of PostGIS docs](https://postgis.net/docs/using_postgis_dbmanagement.html).
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 You can get started with PostGIS by enabling the PostGIS extension in your Supabase dashboard.
 
@@ -93,7 +91,7 @@ You can insert geographical data through SQL or through our API.
 
 ```sql
 insert into public.restaurants
-(name, location)
+  (name, location)
 values
   ('Supa Burger', st_point(-73.946823, 40.807416)),
   ('Supa Pizza', st_point(-73.94581, 40.807475)),

@@ -1829,6 +1829,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/api',
+    destination: '/docs/guides/database/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/database/api/generating-types',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1846,5 +1856,40 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/javascript/v0/rpc',
     destination: '/docs/reference/javascript/rpc',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/database-usage',
+    destination: '/docs/guides/platform/database-size',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
+    destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/first-row-in-group',
+    destination: '/docs/guides/database/postgres/first-row-in-group',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/which-version-of-postgres',
+    destination: '/docs/guides/database/postgres/which-version-of-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime/extensions/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime/extensions/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/extensions/postgres-changes',
   },
 ]
