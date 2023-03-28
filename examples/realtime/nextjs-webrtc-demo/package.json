@@ -1,0 +1,33 @@
+{
+  "name": "webrtc-demo",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/realtime-js": "^2.7.1",
+    "@supabase/supabase-js": "^2.7.1",
+    "@supabase/ui": "0.37.0-alpha.81",
+    "lodash.samplesize": "^4.2.0",
+    "next": "^12.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "simple-peer": "^9.11.1"
+  },
+  "devDependencies": {
+    "@types/lodash.samplesize": "^4.2.6",
+    "@types/node": "17.0.21",
+    "@types/react": "17.0.41",
+    "@types/simple-peer": "^9.11.5",
+    "autoprefixer": "^10.4.4",
+    "eslint": "8.11.0",
+    "eslint-config-next": "^12.3.4",
+    "postcss": "^8.4.12",
+    "tailwindcss": "^3.0.23",
+    "typescript": "4.6.2"
+  }
+}
