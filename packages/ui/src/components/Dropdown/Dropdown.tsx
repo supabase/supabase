@@ -3,23 +3,19 @@ import React, { useState } from 'react'
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu'
 import { IconCheck } from '../Icon/icons/IconCheck'
 
-// @ts-ignore
-// import DropdownStyles from './Dropdown.module.css'
-
 import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
 
-interface RootProps {
+interface RootProps extends RadixDropdownTypes.DropdownMenuProps {
   open?: boolean
   arrow?: boolean
-  onOpenChange?: RadixDropdownTypes.DropdownMenuProps['onOpenChange'] //   DropdownMenu['onOpenChange']
   side?: RadixDropdownTypes.DropdownMenuContentProps['side']
   align?: RadixDropdownTypes.DropdownMenuContentProps['align']
   sideOffset?: RadixDropdownTypes.DropdownMenuContentProps['sideOffset']
-  overlay?: React.ReactNode
-  children?: React.ReactNode
+  overlay?: RadixDropdownTypes.DropdownMenuContentProps['children']
+  children?: RadixDropdownTypes.DropdownMenuTriggerProps['children']
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
   className?: string
   style?: React.CSSProperties
@@ -27,8 +23,6 @@ interface RootProps {
 }
 
 function Dropdown({
-  open,
-  onOpenChange,
   align = 'center', //Default value
   side = 'bottom', //Default value
   sideOffset = 6,
@@ -39,6 +33,7 @@ function Dropdown({
   style,
   arrow,
   isNested,
+  ...props
 }: RootProps) {
   let __styles = styleHandler('dropdown')
 
@@ -48,7 +43,7 @@ function Dropdown({
   }
 
   return (
-    <RadixDropdown.Root onOpenChange={onOpenChange} open={open}>
+    <RadixDropdown.Root {...props}>
       {isNested ? (
         <RadixDropdown.Sub>
           <RadixDropdown.SubTrigger className={[__styles.item_nested].join(' ')}>
@@ -88,31 +83,23 @@ function Dropdown({
   )
 }
 
-export function RightSlot({ children }: any) {
+export function RightSlot({ children }: { children: React.ReactNode }) {
   let __styles = styleHandler('dropdown')
   return <div className={__styles.right_slot}>{children}</div>
 }
 
-interface ItemProps {
-  className?: string
+interface ItemProps extends RadixDropdownTypes.DropdownMenuItemProps {
   children: React.ReactNode
   icon?: React.ReactNode
-  disabled?: boolean
-  onClick?: (event: Event) => void
-  rightSlot?: React.ReactNode
 }
 
-export function Item({ className, children, icon, disabled, onClick, rightSlot }: ItemProps) {
+export function Item({ icon, ...props }: ItemProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.Item
-      className={`${__styles.item} ${className}`}
-      disabled={disabled}
-      onSelect={onClick}
-    >
+    <RadixDropdown.Item className={`${__styles.item} ${props.className}`} {...props}>
       {icon && icon}
-      <span>{children}</span>
+      <span>{props.children}</span>
     </RadixDropdown.Item>
   )
 }
@@ -137,33 +124,32 @@ export function Misc({ children, icon }: ItemProps) {
   )
 }
 
-interface CheckboxProps {
-  children: React.ReactNode
-  checked?: boolean
-  onChange?(x: boolean): void
-  disabled?: boolean
-  ItemIndicator?: React.ReactNode
-}
-
 export function Separator() {
   let __styles = styleHandler('dropdown')
 
   return <RadixDropdown.Separator className={__styles.separator} />
 }
 
+// to do  : remove onChange omit in favour of using onCheckedChange
+interface CheckboxProps extends Omit<RadixDropdownTypes.DropdownMenuCheckboxItemProps, 'onChange'> {
+  ItemIndicator?: React.ReactNode
+  onChange?(x: boolean): void
+}
+
 export function Checkbox({
-  children,
   checked: propsChecked,
-  onChange,
-  disabled,
   ItemIndicator,
+  onChange,
+  ...props
 }: CheckboxProps) {
-  const [checked, setChecked] = useState(propsChecked ? propsChecked : false)
+  const [checked, setChecked] = useState(propsChecked ?? false)
 
   let __styles = styleHandler('dropdown')
 
-  const handleChange = (e: boolean) => {
+  const handleChange = (e: any) => {
+    // to do  : remove onChange in favour of using onCheckedChange
     if (onChange) onChange(e)
+    if (props.onCheckedChange) props.onCheckedChange(e)
     setChecked(e)
   }
 
@@ -172,70 +158,58 @@ export function Checkbox({
       checked={checked}
       onCheckedChange={handleChange}
       className={`${__styles.item} ${__styles.input}`}
-      disabled={disabled}
+      {...props}
     >
       <RadixDropdown.ItemIndicator className={__styles.check}>
         {ItemIndicator ? ItemIndicator : <IconCheck size="tiny" strokeWidth={3} />}
         <RadixDropdown.CheckboxItem />
       </RadixDropdown.ItemIndicator>
-      <span>{children}</span>
+      <span>{props.children}</span>
     </RadixDropdown.CheckboxItem>
   )
 }
 
-interface RadioProps {
-  children: React.ReactNode
-  value: string
+interface RadioProps extends RadixDropdownTypes.DropdownMenuRadioItemProps {
   ItemIndicator?: React.ReactNode
-  disabled?: boolean
 }
 
-export function Radio({ children, value, ItemIndicator, disabled }: RadioProps) {
+export function Radio({ ItemIndicator, ...props }: RadioProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.RadioItem
-      value={value}
-      disabled={disabled}
-      className={`${__styles.item} ${__styles.input}`}
-    >
+    <RadixDropdown.RadioItem className={`${__styles.item} ${__styles.input}`} {...props}>
       <RadixDropdown.ItemIndicator className={__styles.check}>
         {ItemIndicator ? ItemIndicator : <IconTarget strokeWidth={6} size={10} />}
       </RadixDropdown.ItemIndicator>
-      <span>{children}</span>
+      <span>{props.children}</span>
     </RadixDropdown.RadioItem>
   )
 }
 
-interface RadioGroupProps {
-  children: React.ReactNode
-  value: string
+// to do  : remove onChange omit in favour of using onValueChange
+interface RadioGroupProps extends Omit<RadixDropdownTypes.DropdownMenuRadioGroupProps, 'onChange'> {
   onChange?(x: string): void
 }
 
-export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
+export function RadioGroup({ value: propsValue, onChange, ...props }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
-  const handleChange = (e: string) => {
+  const handleChange = (e: any) => {
+    // to do  : remove onChange in favour of using onValueChange
     if (onChange) onChange(e)
+    if (props.onValueChange) props.onValueChange(e)
     setValue(e)
   }
 
-  return (
-    <RadixDropdown.RadioGroup value={value} onValueChange={handleChange}>
-      {children}
-    </RadixDropdown.RadioGroup>
-  )
+  return <RadixDropdown.RadioGroup value={value} onValueChange={handleChange} {...props} />
 }
 
-interface LabelProps {
-  children: React.ReactNode
-}
+interface LabelProps extends RadixDropdownTypes.DropdownMenuLabelProps {}
 
-export function Label({ children }: LabelProps) {
+export function Label({ ...props }: LabelProps) {
   let __styles = styleHandler('dropdown')
 
-  return <RadixDropdown.Label className={__styles.label}>{children}</RadixDropdown.Label>
+  return <RadixDropdown.Label className={__styles.label} {...props} />
 }
 
 Dropdown.Item = Item
