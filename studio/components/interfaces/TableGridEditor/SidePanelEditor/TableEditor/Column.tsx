@@ -193,6 +193,7 @@ const Column: FC<Props> = ({
             <Popover
               size="xlarge"
               className="pointer-events-auto"
+              align="end"
               header={
                 <div className="flex items-center justify-center">
                   <h5 className="text-sm text-scale-1200">Extra options</h5>

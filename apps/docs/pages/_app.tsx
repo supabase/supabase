@@ -4,8 +4,9 @@ import { ThemeProvider } from 'common/Providers'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider } from 'ui'
+// import { CommandMenuProvider } from 'ui'
 import Favicons from '~/components/Favicons'
+import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
@@ -66,20 +67,24 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       {IS_PLATFORM || LOCAL_SUPABASE ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>
-            <CommandMenuProvider site="docs">
+            <SearchProvider>
+              {/* <CommandMenuProvider site="docs"> */}
               <SiteLayout>
                 <Component {...pageProps} />
               </SiteLayout>
-            </CommandMenuProvider>
+              {/* </CommandMenuProvider> */}
+            </SearchProvider>
           </ThemeProvider>
         </SessionContextProvider>
       ) : (
         <ThemeProvider>
-          <CommandMenuProvider site="docs">
+          <SearchProvider>
+            {/* <CommandMenuProvider site="docs"> */}
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
-          </CommandMenuProvider>
+            {/* </CommandMenuProvider> */}
+          </SearchProvider>
         </ThemeProvider>
       )}
     </>

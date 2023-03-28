@@ -80,6 +80,16 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/docs',
+        basePath: false,
+        permanent: false,
+      },
+    ]
+  },
 }
 
 // next.config.js

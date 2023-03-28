@@ -32,7 +32,7 @@
     "postcss": "^8.4.5",
     "prop-types": "^15.7.2",
     "react-feather": "^2.0.10",
-    "react-markdown": "^8.0.5",
+    "react-markdown": "^8.0.3",
     "remark-gfm": "^3.0.1",
     "sse.js": "^0.6.1",
     "tailwind-merge": "^1.10.0",
