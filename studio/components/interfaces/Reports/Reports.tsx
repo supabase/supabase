@@ -275,7 +275,7 @@ const Reports = () => {
                       return (
                         <Dropdown.Checkbox
                           key={metric.key}
-                          checked={config.layout?.find((x: any) => x.attribute === metric.key)}
+                          checked={config.layout?.some((x: any) => x.attribute === metric.key)}
                           onChange={(e) => handleChartSelection({ metric, value: e })}
                         >
                           <div className="flex flex-col space-y-0">
