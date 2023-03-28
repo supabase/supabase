@@ -66,7 +66,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       {IS_PLATFORM || LOCAL_SUPABASE ? (
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider>
-            <CommandMenuProvider>
+            <CommandMenuProvider site="docs">
               <SiteLayout>
                 <Component {...pageProps} />
               </SiteLayout>
@@ -75,7 +75,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         </SessionContextProvider>
       ) : (
         <ThemeProvider>
-          <CommandMenuProvider>
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
