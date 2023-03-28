@@ -128,7 +128,7 @@ Ready to get started? Then don't miss this guide on how to use Supabase for AI p
 
     [Embedding Similarity Search SQL](https://github.com/supabase/supabase/blob/6acc7332c6909030c1a2c69c561c27c39ff1f1ff/supabase/migrations/20230128004504_embedding_similarity_search.sql)
 
-    After you get Top-10 results, for example, you need to extract the real text blocks for these and put it into GPT-3.5 (a.k.a. ChatGPT) with the initial User's query and the following Prompt to get the comprehensive answer form your personal AI assistant:
+    After you get Top-10 results, for example, you need to extract the real text blocks for these and put it into GPT-3.5 (a.k.a. ChatGPT) with the initial User's query and the following Prompt to get the comprehensive answer form your personal AI assistant. The current implementation uses the `text-davinci-003` model (but we have plans to switch to gpt-3.5-turbo/gpt-4 in the future).
 
     And don't forget to use OpenAI `openai.createModeration` to verify that User's query not violates any policies.
 
