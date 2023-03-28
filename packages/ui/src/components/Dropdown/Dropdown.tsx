@@ -50,27 +50,40 @@ function Dropdown({
   return (
     <RadixDropdown.Root onOpenChange={onOpenChange} open={open}>
       {isNested ? (
-        <RadixDropdown.Trigger className={[__styles.item_nested].join(' ')}>
-          {children}
-        </RadixDropdown.Trigger>
+        <RadixDropdown.Sub>
+          <RadixDropdown.SubTrigger className={[__styles.item_nested].join(' ')}>
+            {children}
+          </RadixDropdown.SubTrigger>
+          <RadixDropdown.SubContent
+            sideOffset={sideOffset}
+            className={classes.join(' ')}
+            style={style}
+          >
+            {arrow && (
+              <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
+            )}
+            {overlay}
+          </RadixDropdown.SubContent>
+        </RadixDropdown.Sub>
       ) : (
-        <RadixDropdown.Trigger className={__styles.trigger}>{children}</RadixDropdown.Trigger>
+        <>
+          <RadixDropdown.Trigger className={__styles.trigger}>{children}</RadixDropdown.Trigger>
+          <RadixDropdown.Portal>
+            <RadixDropdown.Content
+              sideOffset={sideOffset}
+              side={side}
+              align={align}
+              className={classes.join(' ')}
+              style={style}
+            >
+              {arrow && (
+                <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
+              )}
+              {overlay}
+            </RadixDropdown.Content>
+          </RadixDropdown.Portal>
+        </>
       )}
-
-      <RadixDropdown.Portal>
-        <RadixDropdown.Content
-          sideOffset={sideOffset}
-          side={side}
-          align={align}
-          className={classes.join(' ')}
-          style={style}
-        >
-          {arrow && (
-            <RadixDropdown.Arrow className={__styles.arrow} offset={10}></RadixDropdown.Arrow>
-          )}
-          {overlay}
-        </RadixDropdown.Content>
-      </RadixDropdown.Portal>
     </RadixDropdown.Root>
   )
 }
