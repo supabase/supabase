@@ -3,16 +3,18 @@ import { useState, useRef, useEffect } from 'react'
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge, Modal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useParams, useStore } from 'hooks'
 import { tryParseJson, uuidv4 } from 'lib/helpers'
 import HTTPRequestFields from './HTTPRequestFields'
 import { isValidHttpUrl } from './Hooks.utils'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -24,6 +26,7 @@ export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   // [Joshen] Need to change to use RQ once Alaister's PR goes in
+  const { ref } = useParams()
   const { meta, ui } = useStore()
   const submitRef: any = useRef()
   const [isEdited, setIsEdited] = useState(false)
@@ -40,16 +43,25 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
 
   const { project } = useProjectContext()
+  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
   const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
   const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
 
-  const tables = meta.tables.list()
+  const tables = meta.tables.list().sort((a, b) => (a.schema > b.schema ? 0 : -1))
+  const restUrl = ui.selectedProject?.restUrl
+  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+
+  const isEdgeFunction = (url: string) =>
+    url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`)
+
   const initialValues = {
     name: selectedHook?.name ?? '',
     table_id: selectedHook?.table_id ?? '',
-    function_name: selectedHook?.function_name ?? 'http_request',
     http_url: selectedHook?.function_args?.[0] ?? '',
-    http_method: selectedHook?.function_args?.[1] ?? 'GET',
+    http_method: selectedHook?.function_args?.[1] ?? 'POST',
+    function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
+      ? 'supabase_function'
+      : 'http_request',
   }
 
   useEffect(() => {
@@ -107,7 +119,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       errors['table_id'] = 'Please select a table for which your webhook will trigger from'
     }
 
-    if (values.function_name === 'http_request') {
+    if (values.function_type === 'http_request') {
       // For HTTP requests
       if (!values.http_url) {
         errors['http_url'] = 'Please provide a URL'
@@ -116,8 +128,11 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       } else if (!isValidHttpUrl(values.http_url)) {
         errors['http_url'] = 'Please provide a valid URL'
       }
-    } else if (values.function_name === 'supabase_function') {
+    } else if (values.function_type === 'supabase_function') {
       // For Supabase Edge Functions
+      if (values.http_url.includes('undefined')) {
+        errors['http_url'] = 'No edge functions available for selection'
+      }
     }
 
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
@@ -137,6 +152,20 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }
 
+    const serviceTimeoutMs = '1000'
+    const headers = httpHeaders
+      .filter((header) => header.name && header.value)
+      .reduce((a: any, b: any) => {
+        a[b.name] = b.value
+        return a
+      }, {})
+    const parameters = httpParameters
+      .filter((param) => param.name && param.value)
+      .reduce((a: any, b: any) => {
+        a[b.name] = b.value
+        return a
+      }, {})
+
     const payload: any = {
       events,
       activation: 'AFTER',
@@ -146,34 +175,15 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       table: selectedTable.name,
       schema: selectedTable.schema,
       table_id: values.table_id,
-      function_name: values.function_name,
+      function_name: 'http_request',
       function_schema: 'supabase_functions',
-      function_args: [],
-    }
-
-    if (values.function_name === 'http_request') {
-      const serviceTimeoutMs = '1000'
-      const headers = httpHeaders
-        .filter((header) => header.name && header.value)
-        .reduce((a: any, b: any) => {
-          a[b.name] = b.value
-          return a
-        }, {})
-      const parameters = httpParameters
-        .filter((param) => param.name && param.value)
-        .reduce((a: any, b: any) => {
-          a[b.name] = b.value
-          return a
-        }, {})
-      payload.function_args = [
+      function_args: [
         values.http_url,
         values.http_method,
         JSON.stringify(headers),
         JSON.stringify(parameters),
         serviceTimeoutMs,
-      ]
-    } else if (values.function_name === 'supabase_function') {
-      payload.function_args = []
+      ],
     }
 
     if (selectedHook === undefined) {
@@ -266,7 +276,28 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         }
       >
         <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
-          {() => {
+          {({ values, resetForm, errors }: any) => {
+            useEffect(() => {
+              if (values.function_type === 'http_request') {
+                if (selectedHook !== undefined) {
+                  const [url, method] = selectedHook.function_args
+                  const updatedValues = { ...values, http_url: url, http_method: method }
+                  resetForm({ values: updatedValues, initialValues: updatedValues })
+                } else {
+                  const updatedValues = { ...values, http_url: '' }
+                  resetForm({ values: updatedValues, initialValues: updatedValues })
+                }
+              } else if (values.function_type === 'supabase_function') {
+                const fnSlug = (functions ?? [])[0]?.slug
+                const defaultFunctionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fnSlug}`
+                const updatedValues = {
+                  ...values,
+                  http_url: isEdgeFunction(values.http_url) ? values.http_url : defaultFunctionUrl,
+                }
+                resetForm({ values: updatedValues, initialValues: updatedValues })
+              }
+            }, [values.function_type])
+
             return (
               <div>
                 <FormSection
@@ -288,11 +319,11 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                       className="lg:!col-span-4"
                       description={
                         <p className="text-sm text-scale-1000">
-                          Select which table and events will trigger your function hook
+                          Select which table and events will trigger your webhook
                         </p>
                       }
                     >
-                      Conditions to fire hook
+                      Conditions to fire webhook
                     </FormSectionLabel>
                   }
                 >
@@ -320,8 +351,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                           label={table.name}
                         >
                           <div className="flex items-center space-x-2">
-                            <p>{table.name}</p>
-                            <p className="text-scale-1100">{table.schema}</p>
+                            <p className="text-scale-1000">{table.schema}</p>
+                            <p className="text-scale-1200">{table.name}</p>
                           </div>
                         </Listbox.Option>
                       ))}
@@ -350,20 +381,19 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                 <FormSection
                   header={
                     <FormSectionLabel className="lg:!col-span-4">
-                      Hook configuration
+                      Webhook configuration
                     </FormSectionLabel>
                   }
                 >
                   <FormSectionContent loading={false} className="lg:!col-span-8">
                     <Radio.Group
-                      id="function_name"
-                      name="function_name"
-                      label="Type of hook"
+                      id="function_type"
+                      name="function_type"
+                      label="Type of webhook"
                       type="cards"
                     >
                       {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
                         <Radio
-                          disabled={webhook.disabled}
                           key={webhook.value}
                           id={webhook.value}
                           value={webhook.value}
@@ -374,11 +404,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                               <div className="flex-col space-y-0">
                                 <div className="flex space-x-2">
                                   <p className="text-scale-1200">{webhook.label}</p>
-                                  {webhook.disabled ? (
-                                    <Badge color="amber">Coming soon</Badge>
-                                  ) : (
-                                    <Badge color="green">Alpha</Badge>
-                                  )}
                                 </div>
                                 <p className="text-scale-1000">{webhook.description}</p>
                               </div>
@@ -392,11 +417,14 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                 <SidePanel.Separator />
 
                 <HTTPRequestFields
+                  type={values.function_type}
+                  errors={errors}
                   httpHeaders={httpHeaders}
                   httpParameters={httpParameters}
-                  onAddHeader={() =>
-                    setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
-                  }
+                  onAddHeader={(header?: any) => {
+                    if (header) setHttpHeaders(httpHeaders.concat(header))
+                    else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
+                  }}
                   onUpdateHeader={(idx, property, value) =>
                     setHttpHeaders(
                       httpHeaders.map((header, i) => {
