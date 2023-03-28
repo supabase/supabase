@@ -18,6 +18,7 @@ import CTABanner from '../../../components/CTABanner'
 interface Props {
   user: UserData
   users: UserData[]
+  ogImageUrl: string
 }
 
 const supabaseAdmin = createClient(
@@ -27,7 +28,7 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export default function UsernamePage({ user, users }: Props) {
+export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
@@ -40,10 +41,6 @@ export default function UsernamePage({ user, users }: Props) {
   if (!ticketNumber) {
     return <Error statusCode={404} />
   }
-
-  const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
-    username ?? ''
-  )}${golden ? '&golden=true' : ''}`
 
   useEffect(() => {
     document.body.className = 'dark bg-[#1C1C1C]'
@@ -112,6 +109,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let golden = false
   let referrals = 0
   let bg_image_id
+  let ogImageUrl
 
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select().limit(17)
@@ -128,6 +126,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
+    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
+      username ?? ''
+    )}${golden ? '&golden=true' : ''}`
   }
 
   return {
@@ -141,6 +142,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         referrals,
         bg_image_id,
       },
+      ogImageUrl,
       users,
       key: username,
     },
