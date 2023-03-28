@@ -32,8 +32,6 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  console.log(data)
-
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
 
   const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
