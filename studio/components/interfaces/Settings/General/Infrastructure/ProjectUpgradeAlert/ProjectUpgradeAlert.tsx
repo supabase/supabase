@@ -32,6 +32,8 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
+  console.log(data)
+
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
 
   const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
@@ -79,6 +81,10 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
           {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+            const selectedVersion = (data?.target_upgrade_versions ?? []).find(
+              (x) => x.postgres_version === values.version
+            )
+
             return (
               <>
                 <div className="py-6">
@@ -130,7 +136,10 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                         id="version"
                         name="version"
                         label="Select the version of Postgres to upgrade to"
-                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${values.version}`}
+                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${
+                          selectedVersion?.app_version?.split('supabase-postgres-')[1] ??
+                          values.version
+                        }`}
                       >
                         {data?.target_upgrade_versions.map((version) => (
                           <Listbox.Option
