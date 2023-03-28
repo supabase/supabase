@@ -29,8 +29,10 @@ export default function TicketActions({
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink(
     'twitter'
-  )}&via=supabase&text=${text}`
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink('linkedin')}`
+  )}&via=supabase&text=${text}&lw=7`
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink(
+    'linkedin'
+  )}&text=${text}&lw=7`
   const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
     username
   )}`

@@ -26,6 +26,15 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
+const generateOgs = async (users: UserData[]) => {
+  users?.map(async (user) => {
+    const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
+      user.username ?? ''
+    )}${!!user.golden ? '&golden=true' : ''}`
+    return await fetch(ogImageUrl)
+  })
+}
+
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
@@ -163,6 +172,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .select('*')
     .order('createdAt', { ascending: false })
     .limit(20)
+
+  // Generate og images of not present
+  generateOgs(users as any[])
 
   return {
     props: {
