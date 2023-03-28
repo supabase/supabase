@@ -9,7 +9,7 @@ info:
   bugs: 'https://github.com/supabase/realtime/issues' # {string} Where developers can file bugs.
   spec: 'https://github.com/supabase/supabase/blob/master/spec/realtime_v0_config.yml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
-    You can use Environment Variables to configure your Analytics Server.
+    You can use environment variables to configure your Analytics Server.
   tags:
     - id: general
       title: General Settings
@@ -62,3 +62,12 @@ parameters:
     type: 'string'
     description: |
       This ENV variable sets the search path to a custom database schema. This allows you to customize the schema used on the database.
+  - id: 'LOGFLARE_LOG_LEVEL' # {string} A unique identifier for this param.
+    title: 'LOGFLARE_LOG_LEVEL' # {string} Any name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    links: [] # {string[]} These tags are useful for grouping parameters
+    required: true
+    default: 'info'
+    type: 'string'
+    description: |
+      Allows the setting of the log level at runtime. For production settings, we advise `warn`.
