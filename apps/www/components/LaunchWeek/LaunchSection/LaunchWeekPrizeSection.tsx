@@ -73,7 +73,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                   </h4>
                   <p className="text-[#707070] mt-1">
                     Increase your chances of winning limited edition 62-Key ISO Custom Mechanical
-                    Keyboard by sharing your ticket on Twitter and Linkedin.
+                    Keyboard by sharing your ticket on Twitter and LinkedIn.
                   </p>
                 </>
               }
