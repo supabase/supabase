@@ -126,7 +126,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
     referrals = user?.referrals ?? 0
-    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.in/lw7-ticket-og?username=${encodeURIComponent(
+    ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
       username ?? ''
     )}${golden ? '&golden=true' : ''}`
   }
