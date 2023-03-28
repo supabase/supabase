@@ -14,6 +14,7 @@ export interface CommandMenuContextValue {
   pages: string[]
   setPages: React.Dispatch<React.SetStateAction<string[]>>
   currentPage?: string
+  site: 'studio' | 'docs'
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -30,7 +31,10 @@ export interface CommandMenuActions {
   toggleTheme: UseThemeProps['toggleTheme']
 }
 
-const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
+const CommandMenuProvider = ({
+  children,
+  site,
+}: PropsWithChildren<{ site: 'studio' | 'docs' }>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = React.useState('')
@@ -57,6 +61,7 @@ const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
         pages,
         setPages,
         currentPage,
+        site,
       }}
     >
       {children}
@@ -64,7 +69,6 @@ const CommandMenuProvider = ({ children }: PropsWithChildren<{}>) => {
     </CommandMenuContext.Provider>
   )
 }
-
 function useKeyboardEvents({
   setIsOpen,
   currentPage,
