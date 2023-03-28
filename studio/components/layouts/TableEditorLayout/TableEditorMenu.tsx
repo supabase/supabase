@@ -1,3 +1,4 @@
+import SVG from 'react-inlinesvg'
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { noop, partition } from 'lodash'
@@ -5,7 +6,9 @@ import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
+  IconCheck,
   IconChevronDown,
+  IconChevronsDown,
   IconCopy,
   IconEdit,
   IconLoader,
@@ -22,13 +25,15 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
-import { checkPermissions, useStore, useParams } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { checkPermissions, useStore, useParams, useLocalStorage } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
+import clsx from 'clsx'
 
 export interface TableEditorMenuProps {
   selectedSchema?: string
@@ -51,6 +56,10 @@ const TableEditorMenu = ({
   const { id } = useParams()
 
   const [searchText, setSearchText] = useState<string>('')
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
 
   const { project } = useProjectContext()
   const {
@@ -68,6 +77,7 @@ const TableEditorMenu = ({
       connectionString: project?.connectionString,
       schema: selectedSchema,
       search: searchText || undefined,
+      sort,
     },
     {
       keepPreviousData: true,
@@ -251,9 +261,74 @@ const TableEditorMenu = ({
                       <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
                     )}
                   </div>
-                  <button className="cursor-pointer" onClick={refreshTables}>
-                    <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-                  </button>
+
+                  <div className="flex gap-3 items-center">
+                    <Dropdown
+                      size="small"
+                      side="bottom"
+                      align="start"
+                      style={{ zIndex: 1 }}
+                      overlay={[
+                        <Dropdown.Item
+                          key="alphabetical"
+                          icon={
+                            sort === 'alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('alphabetical')
+                          }}
+                        >
+                          Alphabetical
+                        </Dropdown.Item>,
+                        <Dropdown.Item
+                          key="grouped-alphabetical"
+                          icon={
+                            sort === 'grouped-alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('grouped-alphabetical')
+                          }}
+                        >
+                          Entity Type
+                        </Dropdown.Item>,
+                      ]}
+                    >
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <IconChevronsDown size={18} strokeWidth={1} />
+                          </div>
+                        </Tooltip.Trigger>
+
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs">Sort By</span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Dropdown>
+
+                    <button
+                      className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                      onClick={refreshTables}
+                    >
+                      <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
+                    </button>
+                  </div>
                 </div>
               </>
             }
@@ -307,6 +382,13 @@ const EntityListItem = ({
   isLoadingTableMetadata = false,
 }: EntityListItemProps) => {
   const isActive = Number(id) === entity.id
+  const formatTooltipText = (entityType: string) => {
+    return Object.entries(ENTITY_TYPE)
+      .find(([, value]) => value === entityType)?.[0]
+      ?.toLowerCase()
+      ?.split('_')
+      ?.join(' ')
+  }
 
   return (
     <ProductMenuItem
@@ -315,11 +397,55 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] text-scale-1100 bg-scale-800">
-          {Object.entries(ENTITY_TYPE)
-            .find(([, value]) => value === entity.type)?.[0]?.[0]
-            ?.toUpperCase()}
-        </div>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger className="w-full flex items-center">
+            {entity.type === ENTITY_TYPE.TABLE ? (
+              <SVG
+                className="table-icon"
+                src={`${BASE_PATH}/img/icons/table-icon.svg`}
+                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                preProcessor={(code: any) =>
+                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                }
+              />
+            ) : entity.type === ENTITY_TYPE.VIEW ? (
+              <SVG
+                className="view-icon"
+                src={`${BASE_PATH}/img/icons/view-icon.svg`}
+                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                preProcessor={(code: any) =>
+                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                }
+              />
+            ) : (
+              <div
+                className={clsx(
+                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+                )}
+              >
+                {Object.entries(ENTITY_TYPE)
+                  .find(([, value]) => value === entity.type)?.[0]?.[0]
+                  ?.toUpperCase()}
+              </div>
+            )}
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200 capitalize">
+                {formatTooltipText(entity.type)}
+              </span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
       }
       action={
         entity.type === ENTITY_TYPE.TABLE &&
