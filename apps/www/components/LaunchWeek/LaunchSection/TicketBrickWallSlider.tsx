@@ -74,7 +74,6 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
                         alt={user.username}
                         layout="fill"
                         objectFit="cover"
-                        quality={50}
                         objectPosition="center"
                         placeholder="blur"
                         blurDataURL="/images/blur.png"
