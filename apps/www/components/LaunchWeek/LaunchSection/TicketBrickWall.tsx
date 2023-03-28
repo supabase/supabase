@@ -28,10 +28,7 @@ export default function TicketBrickWall({ users }: Props) {
             after:content-[' '] after:absolute after:inset-0 after:left-auto after:w-1/4 after:bg-gradient-to-l after:from-[#1C1C1C] after:to-[#1C1C1C00] after:z-10 after:pointer-events-none
           "
         >
-          <TicketBrickWallSlider
-            users={users.slice(0, isMobile ? 5 : 7)}
-            xOffset={isMobile ? 50 : 250}
-          />
+          <TicketBrickWallSlider users={users.slice(0, isMobile ? 5 : 7)} />
           <TicketBrickWallSlider
             users={users.slice(isMobile ? 5 : 7, isMobile ? 11 : 14)}
             reverse

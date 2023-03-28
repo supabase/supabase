@@ -1,8 +1,6 @@
 import styles from './ticket-visual.module.css'
 import TicketProfile from './TicketProfile'
 import TicketNumber from './TicketNumber'
-// import TicketMono from './ticket-mono'
-// import TicketMonoMobile from './ticket-mono-mobile'
 import Tilt from 'vanilla-tilt'
 import useConfData from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketHeader from './TicketHeader'
@@ -74,7 +72,7 @@ export default function TicketVisual({
           golden ? styles['visual--gold'] : '',
           session ? styles['visual--logged-in'] : '',
           !golden && 'overflow-hidden',
-          'flex relative flex-col justify-between w-full pt-[150%] md:pt-[50%] before:rounded-2xl h-0 box-border',
+          'flex relative flex-col justify-between w-full pt-[150%] md:pt-[50%] bg-gradient-to-b from-[#ffffff80] to-[#ffffff20] before:rounded-2xl h-0 box-border',
         ].join(' ')}
         style={{
           ['--size' as string]: size,
@@ -100,7 +98,7 @@ export default function TicketVisual({
         <TicketNumber number={ticketNumber} />
         <div
           id="wayfinding--ticket-dynamic-bg-image"
-          className="absolute inset-0 z-0 rounded-2xl overflow-hidden"
+          className="absolute inset-[1px] z-0 rounded-2xl overflow-hidden"
         >
           {username && (
             <Image
@@ -112,7 +110,6 @@ export default function TicketVisual({
               className="absolute inset-[1px] z-[1]"
             />
           )}
-
           <Image
             src={golden ? ticketBg.gold.image : ticketBg.regular.image}
             layout="fill"
