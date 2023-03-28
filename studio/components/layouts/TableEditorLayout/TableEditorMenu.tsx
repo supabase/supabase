@@ -400,7 +400,7 @@ const EntityListItem = ({
       hoverText={entity.comment ? entity.comment : entity.name}
       isActive={isActive}
       icon={
-        <Tooltip.Root delayDuration={0}>
+        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="w-full flex items-center">
             {entity.type === ENTITY_TYPE.TABLE ? (
               <SVG
@@ -436,7 +436,7 @@ const EntityListItem = ({
             )}
           </Tooltip.Trigger>
           <Tooltip.Portal>
-            <Tooltip.Content side="top">
+            <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
                 className={[
