@@ -130,6 +130,9 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     } else if (values.function_type === 'supabase_function') {
       // For Supabase Edge Functions
+      if (values.http_url.includes('undefined')) {
+        errors['http_url'] = 'No edge functions available for selection'
+      }
     }
 
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
@@ -273,7 +276,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         }
       >
         <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
-          {({ values, resetForm }: any) => {
+          {({ values, resetForm, errors }: any) => {
             useEffect(() => {
               if (values.function_type === 'http_request') {
                 if (selectedHook !== undefined) {
@@ -415,6 +418,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
 
                 <HTTPRequestFields
                   type={values.function_type}
+                  errors={errors}
                   httpHeaders={httpHeaders}
                   httpParameters={httpParameters}
                   onAddHeader={(header?: any) => {
