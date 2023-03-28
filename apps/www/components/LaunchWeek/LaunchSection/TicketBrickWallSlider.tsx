@@ -13,11 +13,10 @@ SwiperCore.use([Autoplay])
 interface Props {
   users: UserData[]
   reverse?: boolean
-  xOffset?: number
   speed?: number
 }
 
-export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 10000 }: Props) {
+export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) {
   const ref = useRef(null)
   const [swiperInstace, setSwiperInstance] = useState<SwiperCore | any | null>(null)
   const { width } = useWindowSize()
@@ -29,6 +28,7 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
     }/${BUCKET_FOLDER_VERSION}/${username}.png`
 
   useEffect(() => {
+    // trigger autplay if viewport resize
     if (swiperInstace) swiperInstace?.autoplay?.run()
   }, [width])
 
@@ -66,18 +66,21 @@ export function TicketBrickWallSlider({ users, reverse, xOffset = 250, speed = 1
           {users.map((user, i) => (
             <SwiperSlide key={user.username}>
               <Link href={`/launch-week/tickets/${user.username}`} key={user.username}>
-                <a className="relative !w-[230px] md:w-[450px] !h-[200px] transform scale-100 md:hover:scale-[101%] transition-transform">
-                  <div className="relative inset-0 w-full pt-[50%] transform rounded-md md:rounded-lg overflow-hidden">
-                    <Image
-                      src={getOgUrl(user.username!, !!user.golden)}
-                      alt={user.username}
-                      layout="fill"
-                      objectFit="cover"
-                      quality={50}
-                      objectPosition="center"
-                      placeholder="blur"
-                      blurDataURL="/images/blur.png"
-                    />
+                <a className="relative !w-[230px] md:w-[450px] !h-[200px] rounded-md md:rounded-lg transition-transform">
+                  <div className="relative w-full pt-[50%] transform rounded-md md:rounded-lg overflow-hidden bg-gradient-to-b from-[#ffffff60] to-[#ffffff10]">
+                    <div className="absolute inset-[1px] w-full h-full rounded-md md:rounded-lg overflow-hidden p-[1px]">
+                      <Image
+                        src={getOgUrl(user.username!, !!user.golden)}
+                        alt={user.username}
+                        layout="fill"
+                        objectFit="cover"
+                        quality={50}
+                        objectPosition="center"
+                        placeholder="blur"
+                        blurDataURL="/images/blur.png"
+                        className="absolute inset-[1px] rounded-md md:rounded-lg"
+                      />
+                    </div>
                   </div>
                 </a>
               </Link>

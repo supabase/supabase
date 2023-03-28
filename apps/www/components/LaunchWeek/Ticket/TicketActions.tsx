@@ -24,7 +24,7 @@ export default function TicketActions({
   const [loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
   const permalink = (medium: string) =>
-    encodeURIComponent(`${SITE_URL}/tickets/?lw=7${username}${golden ? `&golden=true` : ''}`)
+    encodeURIComponent(`${SITE_URL}/tickets/${username}?lw=7${golden ? `&golden=true` : ''}`)
   const text = encodeURIComponent(golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT)
   const { userData } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink(
