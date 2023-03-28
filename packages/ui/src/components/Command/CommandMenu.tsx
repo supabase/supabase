@@ -30,6 +30,8 @@ import { useCommandMenu } from './CommandMenuProvider'
 import DocsSearch from './DocsSearch'
 import DashboardTableEditor from './sections/DashboardTableEditor'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
+import SearchOnlyItem from './SearchOnlyItem'
+import SearchableStudioItems from './SearchableStudioItems'
 
 export const COMMAND_ROUTES = {
   AI: 'Supabase AI',
@@ -57,20 +59,13 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-const SearchOnlyItem = ({ children, isSubItem, ...props }: any) => {
-  const search = useCommandState((state) => state.search)
-  // if search is empty & items is marked as a subItem, don't show it
-  // ie: only show these items in search results, not top level
-  if (!search && isSubItem) return null
-  return <CommandItem {...props}>{children}</CommandItem>
-}
-
 const projectRef = ''
 
 const CommandMenu = () => {
   const router = useRouter()
+
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage } =
+  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage, site } =
     useCommandMenu()
 
   console.log('currentPage page', currentPage)
@@ -97,29 +92,6 @@ const CommandMenu = () => {
         >
           Change Theme to light
         </SearchOnlyItem>
-      </CommandGroup>
-    )
-  }
-
-  const SearchableChildItems = ({ isSubItem = false }) => {
-    return (
-      <CommandGroup>
-        {/* output only subItems  */}
-        {navItems.items
-          .filter((item) => item.sites.includes('docs'))
-          .flatMap((item) => item.subItems)
-          .map((item) => (
-            <SearchOnlyItem
-              key={item.url}
-              icon={item.icon}
-              isSubItem={isSubItem}
-              onSelect={() => {
-                console.log('hay')
-              }}
-            >
-              {item.label}
-            </SearchOnlyItem>
-          ))}
       </CommandGroup>
     )
   }
@@ -191,31 +163,35 @@ const CommandMenu = () => {
                 </CommandItem>
               </CommandGroup>
 
-              <CommandGroup heading="Main Navigation item">
-                {navItems.docsTools.map((item) => (
-                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                    <IconArrowRight className="text-scale-900" />
-                    <CommandLabel>
-                      Go to <span className="font-bold"> {item.label}</span>
-                    </CommandLabel>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-
-              <CommandGroup heading="Actual Dashboard Items">
-                {sharedItems.sharedTools.map((item) => {
-                  const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
-
-                  return (
-                    <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+              {site === 'docs' && (
+                <CommandGroup heading="Studio tools">
+                  {sharedItems.tools.map((item) => (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                       <IconArrowRight className="text-scale-900" />
                       <CommandLabel>
-                        Dashboard: <span className="font-bold"> {item.label}</span>
+                        Go to <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
                     </CommandItem>
-                  )
-                })}
-              </CommandGroup>
+                  ))}
+                </CommandGroup>
+              )}
+
+              {site === 'studio' && (
+                <CommandGroup heading="Navigate">
+                  {sharedItems.tools.map((item) => {
+                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
+
+                    return (
+                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                        <IconArrowRight className="text-scale-900" />
+                        <CommandLabel>
+                          Go to <span className="font-bold"> {item.label}</span>
+                        </CommandLabel>
+                      </CommandItem>
+                    )
+                  })}
+                </CommandGroup>
+              )}
 
               {/* <DashboardTableEditor /> */}
 
@@ -246,7 +222,7 @@ const CommandMenu = () => {
                 </CommandItem>
               </CommandGroup>
               <ThemeOptions isSubItem />
-              <SearchableChildItems isSubItem />
+              {site === 'studio' && <SearchableStudioItems />}
             </>
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
