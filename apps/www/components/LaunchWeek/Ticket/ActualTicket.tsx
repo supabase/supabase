@@ -161,7 +161,7 @@ export default function Ticket({
 
                 <div className="mt-4 lg:mt-8 rounded-full bg-[#E6E8EB] py-1 px-3 -mb-3 border border-[#bbbbbb] text-xs transition-all ease-out hover:bg-[#dfe1e3]">
                   <a
-                    href={`${SITE_URL}`}
+                    href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}
                     className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}
                   >
                     Get your ticket
