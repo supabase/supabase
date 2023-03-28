@@ -4,14 +4,7 @@ import SearchOnlyItem from './SearchOnlyItem'
 import { useRouter } from 'next/router'
 
 import sharedItems from './utils/shared-nav-items.json'
-import { IconSearch } from '../Icon/icons/IconSearch'
-sharedItems.tools.map((item) => {
-  if (item.subItems) {
-    item.subItems.map((subItem) => {
-      console.log('sharedItems', subItem.label)
-    })
-  }
-})
+
 export default function SearchableStudioItems() {
   const router = useRouter()
   return (

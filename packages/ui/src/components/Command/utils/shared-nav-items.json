@@ -86,27 +86,27 @@
       "subItems": [
         {
           "label": "Postgres logs",
-          " url": "https://app.supabase.com/project/_/logs/postgres-logs"
+          "url": "https://app.supabase.com/project/_/logs/postgres-logs"
         },
         {
           "label": "PostgREST logs",
-          " url": "https://app.supabase.com/project/_/logs/postgrest-logs"
+          "url": "https://app.supabase.com/project/_/logs/postgrest-logs"
         },
         {
           "label": "Postgres logs",
-          " url": "https://app.supabase.com/project/_/logs/pgbouncer-logs"
+          "url": "https://app.supabase.com/project/_/logs/pgbouncer-logs"
         },
         {
           "label": "Auth logs logs",
-          " url": "https://app.supabase.com/project/_/logs/auth-logs"
+          "url": "https://app.supabase.com/project/_/logs/auth-logs"
         },
         {
           "label": "Storage logs",
-          " url": "https://app.supabase.com/project/_/logs/storage-logs"
+          "url": "https://app.supabase.com/project/_/logs/storage-logs"
         },
         {
           "label": "realtime logs",
-          " url": "https://app.supabase.com/project/_/logs/realtime-logs"
+          "url": "https://app.supabase.com/project/_/logs/realtime-logs"
         }
       ]
     },
