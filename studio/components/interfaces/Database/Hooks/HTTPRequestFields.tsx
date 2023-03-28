@@ -19,6 +19,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
+  errors: any
   httpHeaders: HTTPArgument[]
   httpParameters: HTTPArgument[]
   onAddHeader: (header?: any) => void
@@ -31,6 +32,7 @@ interface HTTPRequestFieldsProps {
 
 const HTTPRequestFields = ({
   type,
+  errors,
   httpHeaders = [],
   httpParameters = [],
   onAddHeader,
@@ -92,6 +94,7 @@ const HTTPRequestFields = ({
                   </a>
                 </Link>
               </div>
+              {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
           ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
