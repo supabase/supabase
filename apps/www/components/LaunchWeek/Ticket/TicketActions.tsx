@@ -72,7 +72,7 @@ export default function TicketActions({
           >
             <a
               href={tweetUrl}
-              rel="noopener noreferrer"
+              rel="noopener noreferrer prefetch"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
                 userData.sharedOnTwitter ? 'text-scale-500' : 'text-white hover:text-scale-500'
@@ -93,7 +93,7 @@ export default function TicketActions({
           >
             <a
               href={linkedInUrl}
-              rel="noopener noreferrer"
+              rel="noopener noreferrer prefetch"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
                 userData.sharedOnLinkedIn ? 'text-scale-500' : 'text-white hover:text-scale-500'
