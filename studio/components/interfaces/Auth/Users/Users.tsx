@@ -82,6 +82,7 @@ const Users = () => {
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
+            className="w-[200px]"
           >
             <Listbox.Option label="All Users" value="">
               All Users
