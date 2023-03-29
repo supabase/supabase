@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
-import { createGraphiQLFetcher } from '@graphiql/toolkit'
+import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 
 import { NextPageWithLayout } from 'types'
 import { useParams, useStore } from 'hooks'
@@ -10,6 +10,7 @@ import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -17,7 +18,14 @@ const GraphiQLPage: NextPageWithLayout = () => {
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
+
   const { data: accessToken } = useSessionAccessTokenQuery()
+  const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
+
+  const apiService = settings?.autoApiService
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.defaultApiKey
+    : undefined
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {
@@ -30,10 +38,23 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
 
   const fetcher = useMemo(() => {
-    return createGraphiQLFetcher({ url: graphqlUrl, fetch })
-  }, [graphqlUrl])
+    const fetcherFn = createGraphiQLFetcher({ url: graphqlUrl, fetch })
+    const customFetcher: Fetcher = (graphqlParams, opts) => {
+      return fetcherFn(graphqlParams, {
+        ...opts,
+        headers: {
+          ...opts?.headers,
+          Authorization: `Bearer ${accessToken}`,
+          'x-graphql-authorization':
+            opts?.headers?.['Authorization'] ?? opts?.headers?.['authorization'],
+        },
+      })
+    }
 
-  if (!accessToken || (isExtensionsLoading && !pgGraphqlExtension)) {
+    return customFetcher
+  }, [graphqlUrl, accessToken])
+
+  if (!accessToken || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
   }
 
@@ -55,7 +76,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={ui.theme} accessToken={accessToken} />
+  return <GraphiQL fetcher={fetcher} theme={ui.theme} accessToken={anonKey} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
