@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
@@ -19,10 +20,13 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
+  const { pathname } = useRouter()
   const [open, setOpen] = useState(false)
-
   const [openProduct, setOpenProduct] = useState(false)
   const [openDevelopers, setOpenDevelopers] = useState(false)
+
+  const isLaunchWeekPage = pathname.includes('launch-week')
+  const showLaunchWeekNavMode = isLaunchWeekPage && !open && !openProduct && !openDevelopers
 
   React.useEffect(() => {
     if (open) {
@@ -101,6 +105,7 @@ const Nav = () => {
 
   type HamburgerButtonProps = {
     toggleFlyOut: Function
+    showLaunchWeekNavMode?: boolean
   }
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
@@ -109,7 +114,10 @@ const Nav = () => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset"
+        className={[
+          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
+        ].join(' ')}
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -119,7 +127,7 @@ const Nav = () => {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor"
+          stroke={showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
           aria-hidden="true"
         >
           <path
@@ -151,7 +159,7 @@ const Nav = () => {
 
   const FlyOutNavButton = (props: any) => (
     <div
-      className={
+      className={[
         `
         text-scale-1200 hover:text-brand-900
         inline-flex cursor-pointer items-center
@@ -159,9 +167,10 @@ const Nav = () => {
         border-transparent
         px-1
         text-sm font-medium
-        transition-colors
-                ` + props.active
-      }
+        transition-colors`,
+        showLaunchWeekNavMode && '!text-white',
+        props.active,
+      ].join(' ')}
       onClick={props.onClick}
     >
       <>
@@ -172,7 +181,11 @@ const Nav = () => {
             (props.active && ' rotate-180 transform transition-all duration-100')
           }
         >
-          <IconChevronDown size={14} strokeWidth={2} />
+          <IconChevronDown
+            size={14}
+            strokeWidth={2}
+            className={showLaunchWeekNavMode ? 'text-white' : ''}
+          />
         </div>
       </>
     </div>
@@ -181,19 +194,39 @@ const Nav = () => {
   return (
     <>
       {/* <Announcement /> */}
-      <div className="sticky top-0 z-50">
-        <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
-        <nav className="border-scale-400 border-b backdrop-blur-sm">
+      <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
+        <div
+          className={[
+            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
+            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+          ].join(' ')}
+        />
+        <nav
+          className={[
+            `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
+            showLaunchWeekNavMode && '!opacity-100 border-[#e0d2f430]',
+          ].join(' ')}
+        >
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="relative mx-auto flex h-16 justify-between lg:container lg:px-16 xl:px-20">
-            <HamburgerButton toggleFlyOut={() => setOpen(true)} />
+            <HamburgerButton
+              toggleFlyOut={() => setOpen(true)}
+              showLaunchWeekNavMode={showLaunchWeekNavMode}
+            />
             <div className="flex flex-1 items-center justify-center sm:items-stretch lg:justify-between">
               <div className="flex items-center">
                 <div className="flex flex-shrink-0 items-center">
                   <Link href="/" as="/">
                     <a className="block h-6 w-auto">
                       <Image
-                        src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                        src={
+                          isLaunchWeekPage
+                            ? supabaseLogoWordmarkDark
+                            : isDarkMode
+                            ? supabaseLogoWordmarkDark
+                            : supabaseLogoWordmarkLight
+                        }
                         width={124}
                         height={24}
                         alt="Supabase Logo"
@@ -214,22 +247,24 @@ const Nav = () => {
                   />
                   <Link href="/pricing">
                     <a
-                      className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium
-                      `}
+                        text-sm font-medium`,
+                        showLaunchWeekNavMode && '!text-white',
+                      ].join(' ')}
                     >
                       Pricing
                     </a>
                   </Link>
                   <Link href="/blog">
                     <a
-                      className={`
-                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium
-                      `}
+                        text-sm font-medium`,
+                        showLaunchWeekNavMode && '!text-white',
+                      ].join(' ')}
                     >
                       Blog
                     </a>
@@ -247,23 +282,30 @@ const Nav = () => {
                   icon={
                     <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className="text-scale-900 flex h-3 w-3 items-center justify-center
+                        className={[
+                          `text-scale-900 flex h-3 w-3 items-center justify-center
 
-                      transition-all
-                      group-hover:h-4
-                      group-hover:w-4
-                      group-hover:text-yellow-900
-                      group-focus:h-4
-                      group-focus:w-4
+                          transition-all
+                          group-hover:h-4
+                          group-hover:w-4
+                          group-hover:text-yellow-900
+                          group-focus:h-4
+                          group-focus:w-4
 
-                      group-focus:text-yellow-900"
+                          group-focus:text-yellow-900`,
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
                       >
                         <IconStar strokeWidth={2} />
                       </div>
                     </div>
                   }
                 >
-                  Star us on GitHub
+                  <span
+                  // className={isLaunchWeekPage ? '!text-white' : ''}
+                  >
+                    Star us on GitHub
+                  </span>
                 </Button>
 
                 <Link href="https://app.supabase.com/">
@@ -294,7 +336,12 @@ const Nav = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <div className="dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8">
+            <div
+              className={[
+                'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
+                open && '!bg-scale-300',
+              ].join(' ')}
+            >
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button
