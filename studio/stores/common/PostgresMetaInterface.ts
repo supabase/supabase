@@ -69,6 +69,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       count: computed,
       hasError: computed,
       isLoading: computed,
+      isInitialized: observable,
       load: action,
       create: action,
       update: action,
