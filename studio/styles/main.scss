@@ -233,3 +233,7 @@ div[data-radix-portal]:not(.portal--toast) {
     @apply pr-7;
   }
 }
+
+[data-radix-popper-content-wrapper] {
+  @apply z-50 #{!important};
+}
