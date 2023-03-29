@@ -1531,7 +1531,7 @@ module.exports = [
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
-  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',

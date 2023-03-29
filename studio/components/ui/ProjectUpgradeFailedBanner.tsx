@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button, IconX } from 'ui'
 import { useParams } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
@@ -10,7 +11,7 @@ import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
-  const { data } = useProjectUpgradingStatusQuery({ projectRef: ref })
+  const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
@@ -39,7 +40,7 @@ const ProjectUpgradeFailedBanner = () => {
         variant={'warning'}
         title={`Postgres version upgrade to ${target_version} was not successful (Initiated at ${initiatedAtUTC} UTC)`}
         actions={
-          <div className="flex h-full items-center space-x-4">
+          <div className="flex items-center h-full space-x-4">
             <Link
               href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
             >

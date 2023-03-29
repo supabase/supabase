@@ -76,6 +76,7 @@ function Listbox({
     useFormContext()
 
   if (values && !value) {
+    value = values[id || name]
     defaultValue = values[id || name]
   }
 

@@ -2,7 +2,7 @@ import { ReactElement, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useFlag, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
@@ -12,8 +12,6 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   const router = useRouter()
   const { meta, ui } = useStore()
   const { data, isLoading, error } = meta.openApi
-
-  const graphiql = useFlag('graphiql')
 
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
@@ -49,7 +47,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
       productMenu={
         <ProductMenu
           page={getPage()}
-          menu={generateDocsMenu(projectRef, tableNames, functionNames, graphiql)}
+          menu={generateDocsMenu(projectRef, tableNames, functionNames)}
         />
       }
     >

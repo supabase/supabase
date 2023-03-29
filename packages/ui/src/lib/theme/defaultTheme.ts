@@ -972,6 +972,7 @@ export default {
 
   sidepanel: {
     base: `
+      z-50
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
@@ -1023,6 +1024,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-50
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1210,12 +1212,12 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
+      z-50
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1297,6 +1299,7 @@ export default {
 
     `,
     content: `
+      z-50
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1469,6 +1472,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-50
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1480,13 +1484,13 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-50
       fixed
       inset-0
       grid
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
     `,
     separator: `
       w-full
