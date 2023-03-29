@@ -1892,4 +1892,9 @@ module.exports = [
     source: '/docs/guides/realtime/postgres-changes',
     destination: '/docs/guides/realtime/extensions/postgres-changes',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
+  },
 ]

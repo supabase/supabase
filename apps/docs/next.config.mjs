@@ -88,12 +88,6 @@ const nextConfig = {
         basePath: false,
         permanent: false,
       },
-      {
-        source: '/guides/integrations/dashibase',
-        destination: '/docs',
-        basePath: false,
-        permanent: false,
-      },
     ]
   },
 }
