@@ -240,7 +240,7 @@ const JoinOrganizationPage = () => {
       <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
-            src="/img/supabase-logo.svg"
+            src={`${router.basePath}/img/supabase-logo.svg`}
             alt="Supabase"
             className="block h-[24px] cursor-pointer rounded"
           />

@@ -83,14 +83,16 @@ const HelpPopover: FC<Props> = () => {
                 >
                   <Image
                     className="absolute left-0 top-0 opacity-50"
-                    src={'/img/support/discord-bg-small.jpg'}
+                    src={`${router.basePath}/img/support/discord-bg-small.jpg`}
                     layout="fill"
                     objectFit="cover"
                     alt="discord illustration header"
                   />
                   <Button
                     type="secondary"
-                    icon={<SVG src={`/img/discord-icon.svg`} className="h-4 w-4" />}
+                    icon={
+                      <SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />
+                    }
                   >
                     <span style={{ color: '#404EED' }}>Join Discord server</span>
                   </Button>
@@ -106,7 +108,7 @@ const HelpPopover: FC<Props> = () => {
                 >
                   <Image
                     className="absolute left-0 top-0 opacity-50"
-                    src={'/img/support/github-bg.jpg?v-1'}
+                    src={`${router.basePath}/img/support/github-bg.jpg?v-1`}
                     layout="fill"
                     objectFit="cover"
                     alt="discord illustration header"

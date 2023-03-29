@@ -31,6 +31,7 @@ import {
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const RowIcon = ({ view, status, fileType, mimeType }: any) => {
@@ -41,10 +42,10 @@ const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
     const iconSrc =
       fileType === STORAGE_ROW_TYPES.BUCKET
-        ? '/img/bucket-filled.svg'
+        ? `${BASE_PATH}/img/bucket-filled.svg`
         : fileType === STORAGE_ROW_TYPES.FOLDER
-        ? '/img/folder-filled.svg'
-        : '/img/file-filled.svg'
+        ? `${BASE_PATH}/img/folder-filled.svg`
+        : `${BASE_PATH}/img/file-filled.svg`
     return (
       <SVG
         src={iconSrc}

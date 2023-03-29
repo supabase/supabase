@@ -7,7 +7,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useStore, checkPermissions, useParams } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
 
@@ -69,7 +69,9 @@ const Extensions: FC<Props> = ({}) => {
         </div>
       </div>
 
-      {extensions.length === 0 && <NoSearchResults />}
+      {extensions.length === 0 && (
+        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
+      )}
 
       <div className="my-8 w-full space-y-12">
         {enabledExtensions.length > 0 && (

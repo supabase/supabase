@@ -4,6 +4,14 @@ module.exports = [
     destination: `/:path*`,
   },
   {
+    source: '/dashboard',
+    destination: `${process.env.NEXT_PUBLIC_STUDIO_URL}`,
+  },
+  {
+    source: '/dashboard/:path*',
+    destination: `${process.env.NEXT_PUBLIC_STUDIO_URL}/:path*`,
+  },
+  {
     source: '/docs',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
   },
