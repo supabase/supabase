@@ -243,7 +243,11 @@ const TableEditor: FC<Props> = ({
               }
               checked={tableFields.isRLSEnabled}
               onChange={() => {
-                setRlsConfirmVisible(true)
+                // if isEnabled, show confirm modal to turn off
+                // if not enabled, allow turning on without modal confirmation
+                tableFields.isRLSEnabled
+                  ? setRlsConfirmVisible(true)
+                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
               }}
               size="medium"
             />
@@ -252,9 +256,7 @@ const TableEditor: FC<Props> = ({
                 withIcon
                 variant="info"
                 className="!px-4 !py-3 mt-3"
-                title={`${
-                  isNewRecord ? 'Turning on RLS' : 'RLS is on'
-                }. Policies are required to query data.`}
+                title="Policies are required to query data"
               >
                 <p>
                   You need to write an access policy before you can query data from this table.
@@ -274,11 +276,9 @@ const TableEditor: FC<Props> = ({
             ) : (
               <Alert
                 withIcon
-                variant="danger"
+                variant="warning"
                 className="!px-4 !py-3 mt-3"
-                title={`${
-                  isNewRecord ? 'Turning off RLS' : 'RLS is off'
-                }. You are allowing anonymous access to your table.`}
+                title="You are allowing anonymous access to your table"
               >
                 <p>Anyone with the anon key will be able to modify or delete your data.</p>
                 <p className="mt-4">
@@ -346,9 +346,7 @@ const TableEditor: FC<Props> = ({
 
             <ConfirmationModal
               visible={rlsConfirmVisible}
-              header={`Confirm turning RLS ${
-                tableFields.isRLSEnabled ? 'off' : 'on'
-              } for this table`}
+              header="Confirm"
               buttonLabel="Confirm"
               size="medium"
               onSelectCancel={() => setRlsConfirmVisible(false)}
@@ -361,43 +359,26 @@ const TableEditor: FC<Props> = ({
                   <div className="flex gap-4 my-6">
                     <div>
                       <div className="w-16 h-16 bg-scale-300 flex flex-col justify-center text-center items-center rounded-full">
-                        {tableFields.isRLSEnabled ? (
-                          <IconUnlock strokeWidth={2} size={24} />
-                        ) : (
-                          <IconLock strokeWidth={2} size={24} />
-                        )}
+                        <IconUnlock strokeWidth={2} size={24} />
                       </div>
                     </div>
                     <div className="text-sm text-scale-1100 grid gap-4">
-                      {tableFields.isRLSEnabled ? (
-                        <div className="grid gap-3">
-                          <p>
-                            You are turning Row Level Security(RLS) <u>off</u> for this table.
-                          </p>
+                      <div className="grid gap-1">
+                        <p>
+                          Row Level Security will be turned <u>off</u> for this table.
+                        </p>
 
-                          <div className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
-                            <h3 className="text-base text-scale-1200">Important</h3>
+                        <Alert
+                          variant="warning"
+                          className="!px-4 !py-3 mt-3"
+                          title=" You are allowing anonymous access to your table"
+                        >
+                          <p>
                             Anyone with the anon key can modify or delete data. <br />
                             We recommend using RLS policies to control access to your data.
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="grid gap-3">
-                          <p>
-                            You are turning Row Level Security(RLS){' '}
-                            <u>
-                              <strong>on</strong>
-                            </u>{' '}
-                            for this table.
                           </p>
-                          <div className="mt-4 bg-scale-300 dark:bg-scale-500 p-4">
-                            <h3 className="text-base text-scale-1200">Important</h3>
-                            Before querying data from this table, it is necessary to write RLS
-                            policies. If access policies are not in place, your queries will always
-                            return an <u>empty array</u> of results.
-                          </div>
-                        </div>
-                      )}
+                        </Alert>
+                      </div>
 
                       <div className="mt-3">
                         <p>Learn more about RLS:</p>
