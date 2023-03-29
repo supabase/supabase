@@ -1,3 +1,4 @@
 import tweets from './tweets'
+import logConstants from './logConstants'
 
-export { tweets }
+export { tweets, logConstants }

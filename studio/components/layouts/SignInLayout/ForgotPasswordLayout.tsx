@@ -1,8 +1,9 @@
-import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
+import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 
 type ForgotPasswordLayoutProps = {
   heading: string
@@ -31,7 +32,11 @@ const ForgotPasswordLayout = ({
               <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                 <a>
                   <Image
-                    src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                    src={
+                      theme == 'dark'
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
+                    }
                     alt=""
                     height={24}
                     width={120}

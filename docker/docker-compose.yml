@@ -46,7 +46,8 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
-      - ./volumes/api:/var/lib/kong:ro
+      # https://github.com/supabase/supabase/issues/12661
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
   auth:
     container_name: supabase-auth
@@ -174,11 +175,11 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.11
+    image: darthsim/imgproxy:v3.13
     healthcheck:
       test: [ "CMD", "imgproxy", "health" ]
       timeout: 5s
@@ -188,8 +189,9 @@ services:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
       IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
 
   meta:
     container_name: supabase-meta
@@ -209,7 +211,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.42-rc2
+    image: supabase/postgres:15.1.0.54-rc0
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -234,8 +236,10 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/realtime.sql
-      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/roles.sql
-      # Must be superuser to enable pg_net extension
-      - ./volumes/db/webhooks.sql:/etc/postgresql.schema.sql
-      - ./volumes/db/data:/var/lib/postgresql/data
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      # Must be superuser to create event trigger
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      # Must be superuser to alter reserved role
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      # PGDATA directory is persisted between restarts
+      - ./volumes/db/data:/var/lib/postgresql/data:Z

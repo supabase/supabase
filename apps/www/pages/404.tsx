@@ -61,9 +61,11 @@ const Error404 = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
-              <Button as="a" size="small" className="text-white">
-                Head back
-              </Button>
+              <a>
+                <Button size="small" className="text-white">
+                  Head back
+                </Button>
+              </a>
             </Link>
           </div>
         </div>

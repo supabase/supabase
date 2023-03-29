@@ -1,6 +1,7 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import SVG from 'react-inlinesvg'
+import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IconBook, IconBookOpen } from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 export const generateDocsMenu = (
   ref: string,
@@ -71,7 +72,7 @@ export const generateDocsMenu = (
                 url: `/project/${ref}/api/graphiql`,
                 icon: (
                   <SVG
-                    src="/img/graphql.svg"
+                    src={`${BASE_PATH}/img/graphql.svg`}
                     style={{ width: `${16}px`, height: `${16}px` }}
                     className="text-scale-1200"
                     preProcessor={(code) =>
