@@ -30,10 +30,8 @@ const supabaseAdmin = createClient(
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
-  const TITLE = `${
-    name ? name + '’s' : 'Get your'
-  } #SupaLaunchWeek Ticket | Share to win some fantastic swag`
-  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
+  const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
+  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023 | Generate your ticket. Win swag.'
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase] = useState(() =>
