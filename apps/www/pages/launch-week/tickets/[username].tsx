@@ -131,9 +131,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
       username ?? ''
     )}${golden ? '&golden=true' : ''}`
-    // ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets/${
-    //   golden ? 'golden' : 'regular'
-    // }/v3/${username ?? ''}.png`
   }
 
   return {
