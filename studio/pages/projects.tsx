@@ -10,6 +10,8 @@ import { NextPageWithLayout } from 'types'
 const ProjectsPage: NextPageWithLayout = () => {
   const { app } = useStore()
 
+  console.log({ isInitialized: app.organizations.isInitialized })
+
   return (
     <>
       {!app.organizations.isInitialized ? (
