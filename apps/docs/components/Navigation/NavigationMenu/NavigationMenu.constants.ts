@@ -48,6 +48,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    { name: 'Local Development', url: '/guides/cli/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
