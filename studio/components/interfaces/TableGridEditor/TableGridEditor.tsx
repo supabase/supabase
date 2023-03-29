@@ -36,6 +36,8 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import ViewDefinition from './ViewDefinition'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -119,6 +121,9 @@ const TableGridEditor = ({
 
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+
+  // When rendering a view in the grid
+  const [selectedView, setSelectedView] = useState<'data' | 'definition'>('data')
 
   const isReadOnly =
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
@@ -372,19 +377,30 @@ const TableGridEditor = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
+        showCustomChildren={isViewSelected && selectedView === 'definition'}
         editable={!isReadOnly && canUpdateTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         refreshDocs={refreshDocs}
         headerActions={
-          canEditViaTableEditor && (
+          isViewSelected ? (
+            <div>
+              <TwoOptionToggle
+                width={80}
+                options={['definition', 'data']}
+                activeOption={selectedView}
+                borderOverride="border-gray-500"
+                onClickOption={setSelectedView}
+              />
+            </div>
+          ) : canEditViaTableEditor ? (
             <GridHeaderActions
               table={selectedTable as PostgresTable}
               apiPreviewPanelOpen={apiPreviewPanelOpen}
               setApiPreviewPanelOpen={setApiPreviewPanelOpen}
               refreshDocs={refreshDocs}
             />
-          )
+          ) : null
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
@@ -396,7 +412,9 @@ const TableGridEditor = ({
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
-      />
+      >
+        <ViewDefinition />
+      </SupabaseGrid>
       {!isUndefined(selectedSchema) && (
         <SidePanelEditor
           selectedSchema={selectedSchema}
