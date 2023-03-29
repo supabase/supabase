@@ -34,7 +34,8 @@ This would include two additional docker services to your compose stack: Logflar
 ## Differences
 
 API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
-All logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
+
+Within the self-hosted setup, all logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
 This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
 
 ## Production Recommendations
