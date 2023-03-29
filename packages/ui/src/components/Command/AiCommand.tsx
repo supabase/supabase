@@ -9,7 +9,17 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
+import {
+  Button,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCommand,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSearch,
+  IconUser,
+  Input,
+} from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 import { COMMAND_ROUTES } from './CommandMenu'
@@ -105,13 +115,15 @@ const AiCommand = () => {
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
 
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
   const status = isLoading
-    ? 'Clippy is searching...'
+    ? 'AI is searching...'
     : isResponding
-    ? 'Clippy is responding...'
+    ? 'AI is responding...'
     : cantHelp || hasClippyError
-    ? 'Clippy has failed you'
+    ? 'AI has failed you'
     : undefined
 
   const handleConfirm = useCallback(
@@ -122,6 +134,29 @@ const AiCommand = () => {
       setIsResponding(false)
       setHasClippyError(false)
       setIsLoading(true)
+
+      let queryToSend = query
+
+      switch (currentPage) {
+        case COMMAND_ROUTES.AI:
+          queryToSend = query
+          break
+        case COMMAND_ROUTES.AI_ASK_ANYTHING:
+          queryToSend = query
+          break
+
+        case COMMAND_ROUTES.AI_RLS_POLICY:
+          queryToSend = `Given this table schema:
+
+          Schema STRIPE has tables:
+            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
+            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
+
+          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
+          break
+        default:
+          break
+      }
 
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
@@ -202,7 +237,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[70px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
         {promptData.map((prompt, i) => {
           if (!prompt.query) return <></>
 
@@ -299,18 +334,38 @@ const AiCommand = () => {
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
-      <div className="absolute bottom-0 w-full bg-scale-200">
+      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
-          type="textarea"
-          placeholder="Ask a question"
+          placeholder={
+            isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
+          }
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          actions={
+            <>
+              {!isLoading && !isResponding ? (
+                <div className="flex items-center gap-3 mr-3">
+                  <span className="text-scale-1200">Submit message</span>
+                  <div className="hidden text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                    <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                  </div>
+                </div>
+              ) : null}
+            </>
+          }
+          onChange={(e) => {
+            if (!isLoading || !isResponding) {
+              setSearch(e.target.value)
+            }
+          }}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
                 if (!search) {
+                  return
+                }
+                if (isLoading || isResponding) {
                   return
                 }
                 handleConfirm(search)
@@ -320,21 +375,6 @@ const AiCommand = () => {
             }
           }}
         />
-        <div className="text-scale-1100 px-3">
-          <div className="flex justify-between items-center text-xs">
-            <div className="flex items-center gap-1 py-2 text-scale-800">
-              <span>Powered by OpenAI.</span>
-            </div>
-            <div className="flex items-center gap-6 py-1">
-              {status && (
-                <span className="bg-scale-400 rounded-lg py-1 px-2 items-center gap-2 hidden md:flex">
-                  {(isLoading || isResponding) && <IconLoader size={14} className="animate-spin" />}
-                  {status}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
