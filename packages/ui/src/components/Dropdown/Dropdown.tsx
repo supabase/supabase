@@ -7,6 +7,7 @@ import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
+import { cn } from '../../utils/cn'
 
 interface RootProps extends RadixDropdownTypes.DropdownMenuProps {
   open?: boolean
@@ -93,11 +94,11 @@ interface ItemProps extends RadixDropdownTypes.DropdownMenuItemProps {
   icon?: React.ReactNode
 }
 
-export function Item({ icon, ...props }: ItemProps) {
+export function Item({ icon, className, ...props }: ItemProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.Item className={`${__styles.item} ${props.className}`} {...props}>
+    <RadixDropdown.Item className={cn(__styles.item, className)} {...props}>
       {icon && icon}
       <span>{props.children}</span>
     </RadixDropdown.Item>
@@ -140,6 +141,7 @@ export function Checkbox({
   checked: propsChecked,
   ItemIndicator,
   onChange,
+  className,
   ...props
 }: CheckboxProps) {
   const [checked, setChecked] = useState(propsChecked ?? false)
@@ -157,7 +159,7 @@ export function Checkbox({
     <RadixDropdown.CheckboxItem
       checked={checked}
       onCheckedChange={handleChange}
-      className={`${__styles.item} ${__styles.input}`}
+      className={cn(__styles.item, __styles.input, className)}
       {...props}
     >
       <RadixDropdown.ItemIndicator className={__styles.check}>
@@ -173,11 +175,11 @@ interface RadioProps extends RadixDropdownTypes.DropdownMenuRadioItemProps {
   ItemIndicator?: React.ReactNode
 }
 
-export function Radio({ ItemIndicator, ...props }: RadioProps) {
+export function Radio({ ItemIndicator, className, ...props }: RadioProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.RadioItem className={`${__styles.item} ${__styles.input}`} {...props}>
+    <RadixDropdown.RadioItem className={cn(__styles.item, __styles.input, className)} {...props}>
       <RadixDropdown.ItemIndicator className={__styles.check}>
         {ItemIndicator ? ItemIndicator : <IconTarget strokeWidth={6} size={10} />}
       </RadixDropdown.ItemIndicator>
@@ -206,10 +208,10 @@ export function RadioGroup({ value: propsValue, onChange, ...props }: RadioGroup
 
 interface LabelProps extends RadixDropdownTypes.DropdownMenuLabelProps {}
 
-export function Label({ ...props }: LabelProps) {
+export function Label({ className, ...props }: LabelProps) {
   let __styles = styleHandler('dropdown')
 
-  return <RadixDropdown.Label className={__styles.label} {...props} />
+  return <RadixDropdown.Label className={cn(__styles.label, className)} {...props} />
 }
 
 Dropdown.Item = Item
