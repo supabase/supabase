@@ -1,0 +1,5 @@
+.gradient-overlay::before {
+  background: linear-gradient(0deg, #1c1c1c 0%, #1c1c1c20 60%, transparent 100%),
+    linear-gradient(0deg, #1c1c1c 0%, #1c1c1c80 20%, #1c1c1c60 40%, #1c1c1c05 75%, transparent 100%),
+    linear-gradient(0deg, #1c1c1c 0%, #1c1c1c80 15%, #1c1c1c50 40%, #1c1c1c05 65%, transparent 100%);
+}
