@@ -15,6 +15,8 @@ import { CommandGroup, CommandItem } from './Command.utils'
 import { COMMAND_ROUTES } from './CommandMenu'
 import { useCommandMenu } from './CommandMenuProvider'
 
+import { cn } from './../../utils/cn'
+
 const questions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
@@ -127,7 +129,7 @@ const AiCommand = () => {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
-        payload: JSON.stringify({ query }),
+        payload: JSON.stringify({ query, context: promptData }),
       })
 
       function handleError<T>(err: T) {
@@ -200,67 +202,65 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">
-        <div className="flex flex-col gap-6">
-          {promptData.map((prompt, i) => {
-            if (!prompt.query) return <></>
+      <div className={cn('relative mb-[70px] py-4 max-h-[720px] overflow-auto')}>
+        {promptData.map((prompt, i) => {
+          if (!prompt.query) return <></>
 
-            return (
-              <>
-                {prompt.query && (
-                  <div className="flex gap-6 mx-4">
-                    <div className="w-7 h-7 bg-brand-900 rounded-full border border-brand-800 flex items-center justify-center text-brand-1200">
-                      <IconUser strokeWidth={2} size={16} />
+          return (
+            <>
+              {prompt.query && (
+                <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                  <div className="w-7 h-7 bg-scale-900 rounded-full border border-scale-800 flex items-center justify-center text-scale-1200">
+                    <IconUser strokeWidth={2} size={16} />
+                  </div>
+                  <div className="prose text-scale-1000">{prompt.query}</div>
+                </div>
+              )}
+
+              <div className="px-4 [overflow-anchor:none] mb-6">
+                {cantHelp ? (
+                  <p className="flex flex-col gap-4 items-center p-4">
+                    <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
+                      <IconAlertCircle />
+                      <p>Sorry, I don&apos;t know how to help with that.</p>
                     </div>
-                    <div className="prose text-scale-1000">{prompt.query}</div>
+                    <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+                      Try again?
+                    </Button>
+                  </p>
+                ) : (
+                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <AiIconChat />
+                    <>
+                      {isLoading && promptIndex === i ? (
+                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                      ) : (
+                        // TODO: pull in markdown components from docs for better styling (code blocks, etc)
+                        <ReactMarkdown
+                          linkTarget="_blank"
+                          className="prose dark:prose-dark"
+                          remarkPlugins={[remarkGfm]}
+                          transformLinkUri={(href) => {
+                            const supabaseUrl = new URL('https://supabase.com')
+                            const linkUrl = new URL(href, 'https://supabase.com')
+
+                            if (linkUrl.origin === supabaseUrl.origin) {
+                              return linkUrl.toString()
+                            }
+
+                            return href
+                          }}
+                        >
+                          {prompt.answer}
+                        </ReactMarkdown>
+                      )}
+                    </>
                   </div>
                 )}
-
-                <div className="px-4">
-                  {cantHelp ? (
-                    <p className="flex flex-col gap-4 items-center p-4">
-                      <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
-                        <IconAlertCircle />
-                        <p>Sorry, I don&apos;t know how to help with that.</p>
-                      </div>
-                      <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-                        Try again?
-                      </Button>
-                    </p>
-                  ) : (
-                    <div className="flex gap-6">
-                      <AiIconChat />
-                      <div className="w-full">
-                        {isLoading && promptIndex === i ? (
-                          <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          // TODO: pull in markdown components from docs for better styling (code blocks, etc)
-                          <ReactMarkdown
-                            linkTarget="_blank"
-                            className="prose dark:prose-dark"
-                            remarkPlugins={[remarkGfm]}
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
-                          >
-                            {prompt.answer}
-                          </ReactMarkdown>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )
-          })}
-        </div>
+              </div>
+            </>
+          )
+        })}
 
         {promptData.length === 0 && !hasClippyError && (
           <CommandGroup heading="Examples" forceMount>
@@ -296,6 +296,8 @@ const AiCommand = () => {
             </Button>
           </div>
         )}
+
+        <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200">
         <Input
