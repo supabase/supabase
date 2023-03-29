@@ -2,13 +2,27 @@ import { useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
 import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useViewDefinitionQuery } from 'data/database/view-definition-query'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
-const ViewDefinition = () => {
+export interface ViewDefinitionProps {
+  name: string
+}
+
+const ViewDefinition = ({ name }: ViewDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
 
   const { ui } = useStore()
   const { isDarkTheme } = ui
+
+  const { project } = useProjectContext()
+  const { data: definition, isLoading } = useViewDefinitionQuery({
+    name,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const handleEditorOnMount = async (editor: any, monaco: any) => {
     editorRef.current = editor
@@ -28,17 +42,24 @@ const ViewDefinition = () => {
     editor?.focus()
   }
 
-  return (
+  return isLoading ? (
+    <div className="py-4 space-y-2">
+      <ShimmeringLoader />
+      <ShimmeringLoader className="w-3/4" />
+      <ShimmeringLoader className="w-1/2" />
+    </div>
+  ) : (
     <div className="flex-grow overflow-y-auto border-t border-scale-400">
       <Editor
         className="monaco-editor"
         theme={isDarkTheme ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
-        defaultValue={'Hello'}
+        defaultValue={definition}
         path={''}
         options={{
           domReadOnly: true,
+          readOnly: true,
           tabSize: 2,
           fontSize: 13,
           minimap: { enabled: false },
