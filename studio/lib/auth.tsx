@@ -58,7 +58,7 @@ export const AuthContext = createContext<AuthContext>({
 export type AuthProviderProps = {}
 
 export const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
-  const { ui } = useStore()
+  const { ui, app } = useStore()
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -121,6 +121,12 @@ export const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>)
   useProfileQuery({
     onSuccess(profile) {
       ui.setProfile(profile)
+
+      // [Joshen] Temp fix: For new users, the GET profile call also creates a default org
+      // But because the dashboard's logged in state is using gotrue as the source of truth
+      // the home page loads before the GET profile call completes (and consequently before the
+      // creation of the default org). Hence why calling org load here
+      app.organizations.load()
     },
     // Never rerun the query
     staleTime: Infinity,

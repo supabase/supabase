@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { find, isUndefined, noop } from 'lodash'
