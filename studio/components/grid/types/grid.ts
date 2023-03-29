@@ -88,6 +88,11 @@ export interface SupabaseGridProps {
   showCustomChildren?: boolean
 
   /**
+   * Custom header left most actions component
+   */
+  customHeader?: ReactNode
+
+  /**
    * Custom component passed as children
    */
   children?: ReactNode
