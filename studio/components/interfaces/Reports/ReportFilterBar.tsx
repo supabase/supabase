@@ -164,7 +164,6 @@ const ReportFilterBar: FC<Props> = ({
                     key={productFilter.key}
                     disabled={productFilter.key === currentProductFilter?.key}
                     onClick={() => handleProductFilterChange(productFilter)}
-                    className="group relative text-xs text-scale-1100 px-4 py-1.5 flex items-center space-x-2 cursor-pointer focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200 border-none focus:outline-none hover:bg-scale-600"
                     icon={<Icon size={20} className="mr-2" />}
                   >
                     <p
