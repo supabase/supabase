@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type {
   ChatCompletionResponseMessage,
   CreateChatCompletionResponse,
@@ -345,9 +346,13 @@ const AiCommand = () => {
           actions={
             <>
               {!isLoading && !isResponding ? (
-                <div className="flex items-center gap-3 mr-3">
-                  <span className="text-scale-1200">Submit message</span>
-                  <div className="hidden text-scale-1200 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                <div
+                  className={`flex items-center gap-3 mr-3 transition-opacity duration-700 ${
+                    search ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <span className="text-scale-1100">Submit message</span>
+                  <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
                 </div>
