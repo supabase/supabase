@@ -4,7 +4,7 @@ import { checkPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
-import { Button, Dropdown, IconMail, IconPlus, IconUserPlus } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconMail, IconPlus, IconUserPlus } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
@@ -94,8 +94,8 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
           </>
         }
       >
-        <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
-          Add User
+        <Button type="primary" iconRight={<IconChevronDown strokeWidth={1.5} />}>
+          Add user
         </Button>
       </Dropdown>
 
