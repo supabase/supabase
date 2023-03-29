@@ -137,7 +137,7 @@ export default function Ticket({
               <>
                 {golden ? (
                   <p>
-                    You got a Golden ticket. This means you're in, and you also won a Supabase
+                    You got a Golden ticket. This means you're in, and you also have a chance to get a Supabase
                     sticker pack!
                   </p>
                 ) : username ? (
