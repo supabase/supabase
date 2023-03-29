@@ -31,7 +31,7 @@ export type HeaderProps = {
   onAddColumn?: () => void
   onAddRow?: () => void
   headerActions?: ReactNode
-  showCustomChildren?: boolean
+  customHeader: ReactNode
 }
 
 const Header = ({
@@ -41,7 +41,7 @@ const Header = ({
   onAddColumn,
   onAddRow,
   headerActions,
-  showCustomChildren,
+  customHeader,
 }: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
@@ -49,7 +49,9 @@ const Header = ({
   return (
     <div>
       <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-        {!showCustomChildren ? (
+        {customHeader ? (
+          <>{customHeader}</>
+        ) : (
           <>
             {selectedRows.size > 0 ? (
               <RowHeader table={table} sorts={sorts} filters={filters} />
@@ -57,8 +59,6 @@ const Header = ({
               <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
             )}
           </>
-        ) : (
-          <div></div>
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>

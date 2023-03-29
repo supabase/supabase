@@ -318,6 +318,11 @@ const TableGridEditor = ({
     })
   }
 
+  /** [Joshen] We're going to need to refactor SupabaseGrid eventually to make the code here more readable
+   * For context we previously built the SupabaseGrid as a reusable npm component, but eventually decided
+   * to just integrate it directly into the dashboard. The header, and body (+footer) should be decoupled.
+   */
+
   return (
     <>
       <SupabaseGrid
@@ -361,6 +366,16 @@ const TableGridEditor = ({
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         showCustomChildren={isViewSelected && selectedView === 'definition'}
+        customHeader={
+          isViewSelected && selectedView === 'definition' ? (
+            <div className="flex items-center space-x-2">
+              <p>
+                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+              </p>
+              <p className="text-scale-1000 text-sm">(Read only)</p>
+            </div>
+          ) : null
+        }
       >
         {isViewSelected && <ViewDefinition name={selectedTable.name} />}
       </SupabaseGrid>
