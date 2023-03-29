@@ -106,12 +106,13 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       this.setError(null)
       this.setState(LOADING)
       await this.fetchData()
-      if (!this.isInitialized) this.isInitialized = true
       this.setState(LOADED)
     } catch (e: any) {
       console.error('Load error message', e.message)
       this.setError(e)
       this.setState(ERROR)
+    } finally {
+      if (!this.isInitialized) this.isInitialized = true
     }
   }
 
