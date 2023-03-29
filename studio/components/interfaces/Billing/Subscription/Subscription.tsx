@@ -97,29 +97,31 @@ const Subscription: FC<Props> = ({
                   </Button>
                 </Tooltip.Trigger>
                 {!canUpdateSubscription || projectUpdateDisabled ? (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'border border-scale-200 text-center', //border
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        {projectUpdateDisabled ? (
-                          <>
-                            Subscription changes are currently disabled.
-                            <br />
-                            Our engineers are working on a fix.
-                          </>
-                        ) : !canUpdateSubscription ? (
-                          'You need additional permissions to amend subscriptions'
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'border border-scale-200 text-center', //border
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          {projectUpdateDisabled ? (
+                            <>
+                              Subscription changes are currently disabled.
+                              <br />
+                              Our engineers are working on a fix.
+                            </>
+                          ) : !canUpdateSubscription ? (
+                            'You need additional permissions to amend subscriptions'
+                          ) : (
+                            ''
+                          )}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 ) : (
                   <></>
                 )}

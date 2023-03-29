@@ -15,6 +15,7 @@ import { NextPageWithLayout } from 'types'
 import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import Link from 'next/link'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -62,13 +63,19 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const HeaderText = `Identify the queries that consume the most time and database resources.
-
-  It relies on the \`pg_stat_statements\` table. Read more about [examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
-
-  Consider resetting the analysis after optimizing any queries.
-
-`
+  const headerText = (
+    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-scale-1000">
+      Identify the queries that consume the most time and database resources.
+      {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
+      <Link
+        href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+        passHref
+      >
+        <a target="_blank">examining query performance</a>
+      </Link>
+      .{'\n\n'}Consider resetting the analysis after optimizing any queries.
+    </p>
+  )
 
   const TimeConsumingHelperText = `This table lists queries ordered by their cumulative total execution time.
 
@@ -84,7 +91,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
-
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
   const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
 
@@ -156,7 +162,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         </Accordion>
       )}
 
-      <ReactMarkdown className={helperTextClassNames} children={HeaderText} />
+      {headerText}
 
       <div className="mb-8">
         <Button type="default" onClick={() => setShowResetgPgStatStatements(true)}>
@@ -351,7 +357,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                             <Table.td className="relative table-cell whitespace-nowrap">
                               <p className="w-48 block truncate font-mono">{item.query}</p>
                               <QueryActions
-                                sql={'item.query'}
+                                sql={item.query}
                                 className="absolute inset-y-0 right-0"
                               />
                             </Table.td>
