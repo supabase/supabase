@@ -116,6 +116,7 @@ export default function TicketVisual({
             objectFit="cover"
             placeholder="blur"
             blurDataURL="/images/blur.png"
+            priority
             className={[
               'duration-700 ease-in-out transform transition-all',
               imageIsLoading ? 'grayscale blur-xl scale-110' : 'scale-100 grayscale-0 blur-0',
