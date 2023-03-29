@@ -197,6 +197,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         onAddRow={editable ? props.onAddRow : undefined}
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
+        showCustomChildren={showCustomChildren}
       />
       {showCustomChildren && children !== undefined ? (
         <>{children}</>
