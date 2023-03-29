@@ -263,8 +263,13 @@ const SidePanelEditor = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      await meta.tables.loadById(selectedTable!.id)
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedTable!.id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+      ])
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
