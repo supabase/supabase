@@ -2,6 +2,7 @@ import type {
   ChatCompletionResponseMessage,
   CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
+  CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -11,6 +12,7 @@ import { SSE } from 'sse.js'
 import { Button, IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
+import { COMMAND_ROUTES } from './CommandMenu'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const questions = [
@@ -151,12 +153,9 @@ const AiCommand = () => {
 
           setIsResponding(true)
 
-          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
-          const [
-            {
-              delta: { content },
-            },
-          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+
+          const [{ text: content }] = completionResponse.choices
 
           const text = content ?? ''
 
