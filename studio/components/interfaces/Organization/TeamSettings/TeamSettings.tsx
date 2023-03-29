@@ -117,7 +117,7 @@ const TeamSettings = () => {
         </div>
       </div>
       <div className="container my-4 max-w-4xl space-y-8">
-        <MembersView searchString={searchString} roles={roles} members={members} />
+        <MembersView searchString={searchString} />
       </div>
     </>
   )

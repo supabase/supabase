@@ -6,6 +6,7 @@ import { Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
@@ -262,8 +263,13 @@ const SidePanelEditor = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      await meta.tables.loadById(selectedTable!.id)
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedTable!.id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+      ])
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
@@ -297,21 +303,27 @@ const SidePanelEditor = ({
     try {
       if (isDuplicating) {
         const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+
         toastId = ui.setNotification({
           category: 'loading',
           message: `Duplicating table: ${duplicateTable.name}...`,
         })
+
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
           isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
+
+        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${duplicateTable.name} has been successfully duplicated into ${table.name}!`,
         })
+
         onTableCreated(table)
       } else if (isNewRecord) {
         toastId = ui.setNotification({
@@ -327,17 +339,22 @@ const SidePanelEditor = ({
           isRealtimeEnabled,
           importContent
         )
+
+        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${table.name} is good to go!`,
         })
+
         onTableCreated(table)
       } else if (selectedTableToEdit) {
         toastId = ui.setNotification({
           category: 'loading',
           message: `Updating table: ${selectedTableToEdit?.name}...`,
         })
+
         const { table, hasError }: any = await meta.updateTable(
           toastId,
           selectedTableToEdit,
@@ -345,6 +362,7 @@ const SidePanelEditor = ({
           columns,
           isRealtimeEnabled
         )
+
         if (hasError) {
           ui.setNotification({
             id: toastId,
@@ -352,6 +370,8 @@ const SidePanelEditor = ({
             message: `Table ${table.name} has been updated, but there were some errors`,
           })
         } else {
+          await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
           ui.setNotification({
             id: toastId,
             category: 'success',
@@ -359,7 +379,8 @@ const SidePanelEditor = ({
           })
         }
       }
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreignKeyConstraints']))
+
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
@@ -422,6 +443,7 @@ const SidePanelEditor = ({
         onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
+        key={`foreign-row-selector-${selectedForeignKeyToEdit?.foreignKey?.id ?? 'null'}`}
         visible={sidePanelKey === 'foreign-row-selector'}
         foreignKey={selectedForeignKeyToEdit?.foreignKey}
         closePanel={onClosePanel}
