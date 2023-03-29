@@ -137,8 +137,8 @@ export default function Ticket({
               <>
                 {golden ? (
                   <p>
-                    You got a Golden ticket. This means you're in, and you also won a Supabase
-                    sticker pack!
+                    Join us on April 16th for Launch Week 7's final day and find out if you are one
+                    of the lucky winners.
                   </p>
                 ) : username ? (
                   <p>
