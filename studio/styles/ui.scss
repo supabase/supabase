@@ -418,8 +418,9 @@
   rect {
     @apply fill-blue-500 stroke-blue-500;
   }
-  path, circle {
-    @apply stroke-blue-900 fill-blue-500;;
+  path,
+  circle {
+    @apply stroke-blue-900 fill-blue-500;
   }
 }
 

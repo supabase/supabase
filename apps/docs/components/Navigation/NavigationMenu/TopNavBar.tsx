@@ -1,13 +1,14 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Input, Listbox } from 'ui'
+import { Button, IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Listbox } from 'ui'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
 
 import { getPageType } from '~/lib/helpers'
-import SearchButton from '~/components/Search/SearchButton'
+
+import SearchButton from './../../Search/SearchButton'
 
 const TopNavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -35,14 +36,6 @@ const TopNavBar: FC = () => {
     { text: 'Guides', key: 'docs', link: '/' },
     { text: 'Reference', key: 'reference', link: '/reference' },
   ]
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -147,7 +140,7 @@ const TopNavBar: FC = () => {
           </Button>
           <ul className="flex items-center">
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon
                     size={16}

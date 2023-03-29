@@ -6,8 +6,9 @@ import { FC, useEffect, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 
-import SearchButton from '~/components/Search/SearchButton'
 import { getPageType } from '~/lib/helpers'
+
+import SearchButton from '~/components/Search/SearchButton'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -35,15 +36,6 @@ const TopNavBarRef: FC = () => {
     { text: 'Guides', key: 'docs', link: '/' },
     { text: 'Reference', key: 'reference', link: '/reference' },
   ]
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-    document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
-  }
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -149,7 +141,7 @@ const TopNavBarRef: FC = () => {
           </ul>
           <ul className="flex items-center">
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon
                     size={16}
