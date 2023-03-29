@@ -14,22 +14,47 @@ hideTitle: true
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-The Supabase Analytics server (Logflare) manages the ingestion and query pipelines for searching and aggregating structured analytical events.
+The Supabase Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytical events.
 
-Deployed in a self-hosted environment, except for API edge logs, all logs and views supported by Logflare should match those of the Supabase Cloud.
+When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
+However, do note that due the platform's infrastructure gives rise to certain [differences](#differences).
 
-All logs are routed to Logflare via Vector. Kong routes API requests to PostgREST, so self-hosted or local deployments will use Kong request logs instead of the Supabase Cloud API gateway.
 
-There may be differences in the log event payloads between self-hosted API requests and requests handled by the Supabase Cloud API gateway.
+## Getting Started
 
-### Docker Compose
-
-To start the whole Supabase stack with the Analytics server run:
+Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
 
 ```bash
+# assuming you clone the supabase/supabase repo.
 cd docker
 docker compose -f docker-compose-logging.yml up
 ```
+
+This would include two additional docker services to your compose stack: Logflare and Vector.
+
+## Differences
+
+API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
+All logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
+This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
+
+## Production Recommendations
+
+To self-host in a production setting, we recommend performing the following:
+
+1. Ensure that Logflare is behind a firewall and restrict all network access to it besides safe requests.
+
+This is because self-hosted Logflare has UI authentication disabled, and we recommend restricting accesss to the dashboard, accessible at the `/dashboard` path.
+
+
+2. Use a different Postgres Database to store Logflare data.
+
+Logflare requires a Postgres database to function. However, if there is an issue with you self-hosted Postgres service, you would not be able to debug it as it would also bring Logflare down together.
+
+The self-hosted example is only used as a minimal example on running the entire stack, however it is not recommended to use the same database server for both production and observability.
+
+
+
 
   </RefSubLayout.Details>
 
