@@ -42,7 +42,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       {...props}
       hideFooter
       className={cn(
-        '!bg-[#f8f9fa]/80 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
+        '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
         '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
         'transition ease-out',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
