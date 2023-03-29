@@ -156,7 +156,12 @@ export default function TicketsPage({ users }: Props) {
               </motion.div>
             </div>
             <div ref={ref}>
-              <TicketsGrid loadedUsers={loadedUsers} isLoading={isLoading} pageCount={PAGE_COUNT} />
+              <TicketsGrid
+                loadedUsers={loadedUsers}
+                isLoading={isLoading}
+                pageCount={PAGE_COUNT}
+                offset={offset}
+              />
             </div>
           </SectionContainer>
         </div>

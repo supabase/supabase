@@ -8,9 +8,10 @@ interface Props {
   loadedUsers: UserData[]
   isLoading: boolean
   pageCount: number
+  offset: number
 }
 
-export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props) {
+export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset }: Props) {
   const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7'
   const BUCKET_FOLDER_VERSION = 'v3'
   const getOgUrl = (username: string, isGold: boolean) =>
@@ -30,6 +31,8 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
         const rowTickets = isMobile ? 2 : isTablet ? 3 : 5
         const divider = Math.floor(i / rowTickets)
         const isOddRow = divider % 2 === 0
+        // Delay should be no more than pageCount for new loaded users
+        const recalculatedDelay = i >= pageCount * 2 ? (i - pageCount * (offset - 1)) / 15 : i / 15
 
         return (
           <Link href={`/launch-week/tickets/${user.username}`} key={`${user.username}-000${i}`}>
@@ -43,7 +46,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
                 transition: {
                   duration: 0.4,
                   ease: [0.24, 0.25, 0.05, 1],
-                  delay: i / 15,
+                  delay: recalculatedDelay,
                 },
               }}
             >
@@ -66,7 +69,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
       {isLoading &&
         Array.from({ length: pageCount }, (_, i) => (
           <motion.div
-            className="relative rounded-lg sm:rounded-xl bg-scale-500 h-0 w-full pt-[50%] bg-gradient-to-b from-[#ffffff60] to-[#ffffff10] p-[1px] overflow-hidden"
+            className="relative rounded-lg sm:rounded-xl overflow-hidden h-0 w-full pt-[50%]"
             initial={{ opacity: 0, y: 20 }}
             animate={{
               opacity: 1,
@@ -78,7 +81,9 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount }: Props
               },
             }}
           >
-            <div className="absolute inset-0 shimmering-loader bg-[#1C1C1C]" />
+            <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#ffffff60] to-[#ffffff10] p-[1px] overflow-hidden">
+              <div className="absolute inset-[1px] rounded-lg sm:rounded-xl bg-gradient-to-b from-[#3d3c3c] to-[#2f2e2e]" />
+            </div>
           </motion.div>
         ))}
     </div>
