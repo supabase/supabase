@@ -17,17 +17,19 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <Tooltip.Trigger>
         <IconInfo size={14} strokeWidth={2} />
       </Tooltip.Trigger>
-      <Tooltip.Content side="top">
-        <Tooltip.Arrow className="radix-tooltip-arrow" />
-        <div
-          className={[
-            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-            'border border-scale-200 ', //border
-          ].join(' ')}
-        >
-          <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
-        </div>
-      </Tooltip.Content>
+      <Tooltip.Portal>
+        <Tooltip.Content side="top">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+              'border border-scale-200 ', //border
+            ].join(' ')}
+          >
+            <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
     </Tooltip.Root>
   )
 

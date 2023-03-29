@@ -1,10 +1,7 @@
 import { Button } from '../Button'
-import { Divider } from '../Divider'
-import { IconChevronDown } from '../../index'
-import Typography from '../Typography'
+import { IconChevronDown } from '../Icon/icons/IconChevronDown'
 
 import { Popover } from '.'
-import { IconLogIn } from '../Icon/icons/IconLogIn'
 import { Input } from '../Input'
 
 export default {
@@ -19,7 +16,6 @@ export const Default = (args: any) => (
       side="bottom"
       align="end"
       size="content"
-      portalled
       showClose
       header={
         <div className="flex justify-between items-center">

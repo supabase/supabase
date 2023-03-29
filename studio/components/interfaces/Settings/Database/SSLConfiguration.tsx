@@ -152,20 +152,22 @@ const SSLConfiguration = () => {
                 </Button>
               </Tooltip.Trigger>
               {!hasSSLCertificate && (
-                <Tooltip.Content align="center" side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200 w-[250px]',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
-                      installed
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content align="center" side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200 w-[250px]',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
+                        installed
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>
