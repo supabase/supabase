@@ -57,7 +57,6 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
                   layout="fill"
                   objectFit="cover"
                   objectPosition="center"
-                  quality={50}
                   placeholder="blur"
                   blurDataURL="/images/blur.png"
                 />
