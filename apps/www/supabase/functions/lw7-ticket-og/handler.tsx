@@ -26,13 +26,13 @@ export async function handler(req: Request) {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
     if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-      supabaseAdminClient
+      await supabaseAdminClient
         .from('lw7_tickets')
         .update({ sharedOnTwitter: 'now' })
         .eq('username', username)
         .is('sharedOnTwitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-      supabaseAdminClient
+      await supabaseAdminClient
         .from('lw7_tickets')
         .update({ sharedOnLinkedIn: 'now' })
         .eq('username', username)
