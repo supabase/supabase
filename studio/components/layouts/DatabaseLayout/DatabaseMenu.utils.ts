@@ -59,7 +59,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 key: 'wrappers',
                 url: `/project/${ref}/database/wrappers`,
                 items: [],
-                label: 'ALPHA',
               },
             ]
           : []),
