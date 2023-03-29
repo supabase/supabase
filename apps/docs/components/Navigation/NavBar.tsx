@@ -1,12 +1,13 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, useEffect, FC } from 'react'
-import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
-import { useTheme } from 'common/Providers'
+import { FC, useEffect, useState } from 'react'
+import { IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Listbox } from 'ui'
 import { REFERENCES } from './Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
+
 import SearchButton from '../Search/SearchButton'
 
 const NavBar: FC = () => {
@@ -35,14 +36,6 @@ const NavBar: FC = () => {
     { text: 'Guides', key: 'docs', link: '/' },
     { text: 'Reference', key: 'reference', link: '/reference' },
   ]
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -183,7 +176,7 @@ const NavBar: FC = () => {
               </a>
             </li>
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon size={18} strokeWidth={2} className="text-scale-1200" />
                 ) : (

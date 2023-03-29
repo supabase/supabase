@@ -55,20 +55,24 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                           className="transition opacity-50 cursor-pointer hover:opacity-100"
                         />
                       </Tooltip.Trigger>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                            'border border-scale-200 ', //border
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-scale-1200">
-                            Monthly Active Users: A user that has made an API request in the last
-                            month
-                          </span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                'border border-scale-200 ', //border
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-scale-1200">
+                                Monthly Active Users: A user that has made an API request in the
+                                last month
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Portal>
                     </Tooltip.Root>
                   </div>
                   <p className="w-[25%] text-sm">100,000</p>

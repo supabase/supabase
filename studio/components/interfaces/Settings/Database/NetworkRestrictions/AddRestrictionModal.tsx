@@ -154,22 +154,24 @@ const AddRestrictionModal: FC<Props> = ({
                               <Tooltip.Trigger>
                                 <IconHelpCircle size="tiny" strokeWidth={2} />
                               </Tooltip.Trigger>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200 w-[300px]',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-scale-1200">
-                                    Classless inter-domain routing (CIDR) notation is the notation
-                                    used to identify networks and hosts in the networks. The block
-                                    size tells us how many bits we need to take for the network
-                                    prefix, and is a value between 0 to 32.
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                      'border border-scale-200 w-[300px]',
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      Classless inter-domain routing (CIDR) notation is the notation
+                                      used to identify networks and hosts in the networks. The block
+                                      size tells us how many bits we need to take for the network
+                                      prefix, and is a value between 0 to 32.
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
                             </Tooltip.Root>
                           </div>
                         }
