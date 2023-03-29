@@ -19,11 +19,10 @@ The Supabase Analytics server is a Logflare self-hostable instance that manages 
 When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
 However, do note that due the platform's infrastructure gives rise to certain [differences](#differences).
 
-
 <Admonition type="info" label="Logflare Technical Docs">
-All logflare technical docs are available at [https://docs.logflare.app](https://docs.logflare.app)
+  All logflare technical docs are available at
+  [https://docs.logflare.app](https://docs.logflare.app)
 </Admonition>
-
 
 ## Getting Started
 
@@ -37,12 +36,25 @@ docker compose -f docker-compose-logging.yml up
 
 This would include two additional docker services to your compose stack: Logflare and Vector.
 
+<Admonition type="info" label="Self-hosting">
+  Read more about [self-hosting Logflare](https://docs.logflare.app/self-hosting) as your analytics
+  server.
+</Admonition>
+
 ## Differences
 
 API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
 
 Within the self-hosted setup, all logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
 This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
+
+## BigQuery
+
+All log event data is stored in and queried from BigQuery. To use the Analytics server with Supabase you'll need a Google Cloud Platform account for access to BigQuery.
+
+Make sure to set the `GOOGLE_DATASET_ID_APPEND`, `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` environment variables.
+
+Download your Google Cloud API JWT and store it under gcloud.json in your working directory.
 
 ## Production Recommendations
 
