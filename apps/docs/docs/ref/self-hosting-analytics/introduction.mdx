@@ -19,7 +19,6 @@ The Supabase Analytics server is a Logflare self-hostable instance that manages 
 When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
 However, do note that due the platform's infrastructure gives rise to certain [differences](#differences).
 
-
 ## Getting Started
 
 Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
@@ -40,21 +39,18 @@ This would result in differences in the log event metadata between self-hosted A
 
 ## Production Recommendations
 
-To self-host in a production setting, we recommend performing the following:
+To self-host in a production setting, we recommend performing the following for a better experience.
 
-1. Ensure that Logflare is behind a firewall and restrict all network access to it besides safe requests.
+### Ensure that Logflare is behind a firewall and restrict all network access to it besides safe requests.
 
-This is because self-hosted Logflare has UI authentication disabled, and we recommend restricting accesss to the dashboard, accessible at the `/dashboard` path.
+Self-hosted Logflare has UI authentication disabled and is intended for exposure to the internet. We recommend restricting accesss to the dashboard, accessible at the `/dashboard` path.
+If dashboard access is required for managing sources, we recommend having an authentication layer, such as a VPN.
 
-
-2. Use a different Postgres Database to store Logflare data.
+### Use a different Postgres Database to store Logflare data.
 
 Logflare requires a Postgres database to function. However, if there is an issue with you self-hosted Postgres service, you would not be able to debug it as it would also bring Logflare down together.
 
 The self-hosted example is only used as a minimal example on running the entire stack, however it is not recommended to use the same database server for both production and observability.
-
-
-
 
   </RefSubLayout.Details>
 
