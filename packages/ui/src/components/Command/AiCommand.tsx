@@ -1,7 +1,7 @@
 import type {
   ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
+  CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -151,12 +151,8 @@ const AiCommand = () => {
 
           setIsResponding(true)
 
-          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
-          const [
-            {
-              delta: { content },
-            },
-          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+          const [{ text: content }] = completionResponse.choices
 
           const text = content ?? ''
 
