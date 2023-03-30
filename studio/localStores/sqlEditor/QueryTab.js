@@ -104,18 +104,10 @@ class QueryTab extends Tab {
       `
     })
 
-    const response = await fetch('/api/natural-language', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: naturalLanguageQuery,
-        tables: createTableQueries.join('\n'),
-      }),
+    const result = await post('/api/natural-language', {
+      query: naturalLanguageQuery,
+      tables: createTableQueries.join('\n'),
     })
-
-    const result = await response.json()
 
     return result
   }

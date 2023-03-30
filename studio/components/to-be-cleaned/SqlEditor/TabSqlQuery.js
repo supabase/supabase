@@ -6,7 +6,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard } from 'ui'
+import { Button, Dropdown, IconCheck, IconChevronDown, IconClipboard, IconDownload } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -252,7 +252,7 @@ const UtilityPanel = observer(({ updateSqlSnippet }) => {
 
   return (
     <>
-      <div className="flex justify-between overflow-visible px-6 py-2">
+      <div className="flex justify-between overflow-visible px-2 py-2">
         <ResultsDropdown />
         <div className="inline-flex items-center justify-end">
           <UtilityActions updateSqlSnippet={updateSqlSnippet} />
@@ -308,8 +308,12 @@ const ResultsDropdown = observer(() => {
       align="start"
       overlay={
         <>
-          <Dropdown.Item onClick={onDownloadCSV}>Download CSV</Dropdown.Item>
-          <Dropdown.Item onClick={onCopyAsMarkdown}>Copy as markdown</Dropdown.Item>
+          <Dropdown.Item icon={<IconDownload size="tiny" />} onClick={onDownloadCSV}>
+            Download CSV
+          </Dropdown.Item>
+          <Dropdown.Item icon={<IconClipboard size="tiny" />} onClick={onCopyAsMarkdown}>
+            Copy as markdown
+          </Dropdown.Item>
         </>
       }
     >

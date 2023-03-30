@@ -133,6 +133,7 @@ const FavouriteButton = () => {
             type="text"
             size="tiny"
             shadow={false}
+            className="px-1"
             onClick={isFavorite ? unFavorite : addToFavorite}
             loading={loading}
             icon={<IconHeart size="tiny" fill={isFavorite ? '#48bb78' : 'gray'} />}
