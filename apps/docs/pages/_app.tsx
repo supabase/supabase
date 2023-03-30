@@ -67,7 +67,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <AuthProvider>{props.children}</AuthProvider>
       </SessionContextProvider>
     ) : (
-      props.children
+      <AuthProvider>{props.children}</AuthProvider>
     )
   }
 
