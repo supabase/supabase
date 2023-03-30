@@ -3,8 +3,11 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { AuthProvider, ThemeProvider } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
+import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
@@ -15,9 +18,6 @@ import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import components from '~/components'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -72,25 +72,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <ThemeProvider>
               <CommandMenuProvider
                 site="docs"
-                MarkdownHandler={({ children }: { children: string }) => (
-                  <ReactMarkdown
-                    linkTarget="_blank"
-                    className="prose dark:prose-dark"
-                    remarkPlugins={[remarkGfm]}
-                    transformLinkUri={(href) => {
-                      const supabaseUrl = new URL('https://supabase.com')
-                      const linkUrl = new URL(href, 'https://supabase.com')
-
-                      if (linkUrl.origin === supabaseUrl.origin) {
-                        return linkUrl.toString()
-                      }
-
-                      return href
-                    }}
-                    components={components}
-                  >
-                    {children}
-                  </ReactMarkdown>
+                MarkdownHandler={({ ...props }) => (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
                 )}
               >
                 <SiteLayout>
