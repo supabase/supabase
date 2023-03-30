@@ -283,6 +283,7 @@ const AiCommand = () => {
                       {isLoading && promptIndex === i ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
+                        // @ts-expect-error
                         <MarkdownHandler>{prompt.answer}</MarkdownHandler>
                       )}
                     </>
