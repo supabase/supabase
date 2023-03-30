@@ -177,7 +177,6 @@ const AiCommand = () => {
           setIsResponding(true)
 
           const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-
           const [{ text: content }] = completionResponse.choices
 
           const text = content ?? ''
