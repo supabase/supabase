@@ -28,15 +28,13 @@ const FolderContextMenu: FC<Props> = ({ id = '' }) => {
         <IconDownload size="tiny" />
         <span className="ml-2 text-xs">Download</span>
       </Item>
-      {canUpdateFiles && (
-        <>
-          <Separator />
-          <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-            <IconTrash2 size="tiny" />
-            <span className="ml-2 text-xs">Delete</span>
-          </Item>
-        </>
-      )}
+      {canUpdateFiles && [
+        <Separator />,
+        <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
+          <IconTrash2 size="tiny" />
+          <span className="ml-2 text-xs">Delete</span>
+        </Item>,
+      ]}
     </Menu>
   )
 }
