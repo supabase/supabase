@@ -88,7 +88,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          'placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
           className
         )}
         {...props}
@@ -200,12 +200,12 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
           ? `
       bg-[#fbfcfd]/90
       dark:bg-[#232323]/90
-        border 
+        border
       border-[#ddd]/90
       dark:border-[#282828]/90
         backdrop-filter
         backdrop-blur-md
-        px-5 
+        px-5
         transition-all
         outline-none
       aria-selected:border-[#ccc]
@@ -217,7 +217,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
           ? `
-        px-2 
+        px-2
         backdrop-filter
         backdrop-blur-md
         transition-all
