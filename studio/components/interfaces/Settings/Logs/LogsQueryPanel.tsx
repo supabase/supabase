@@ -14,6 +14,7 @@ import Link from 'next/link'
 import React from 'react'
 import { checkPermissions } from 'hooks'
 import { useProfileQuery } from 'data/profile/profile-query'
+import { IS_PLATFORM } from 'lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -130,7 +131,7 @@ const LogsQueryPanel = ({
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>
-                {onSave && (
+                {IS_PLATFORM &&  onSave && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger>
                       <Button

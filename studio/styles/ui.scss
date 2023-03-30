@@ -414,6 +414,12 @@
   }
 }
 
+.form-field-markdown {
+  a {
+    @apply text-brand-900 transition opacity-75 hover:opacity-100 underline;
+  }
+}
+
 .view-icon {
   rect {
     @apply fill-blue-500 stroke-blue-500;
