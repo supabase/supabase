@@ -212,14 +212,14 @@ const JoinOrganizationPage = () => {
               </p>
               <div className="flex justify-center gap-3">
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Sign in
-                  </Button>
+                  <a>
+                    <Button type="default">Sign in</Button>
+                  </a>
                 </Link>
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Create an account
-                  </Button>
+                  <a>
+                    <Button type="default">Create an account</Button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -240,7 +240,7 @@ const JoinOrganizationPage = () => {
       <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
-            src="/img/supabase-logo.svg"
+            src={`${router.basePath}/img/supabase-logo.svg`}
             alt="Supabase"
             className="block h-[24px] cursor-pointer rounded"
           />

@@ -28,7 +28,11 @@ const Error500: NextPage = () => {
             <div className="flex w-full items-center justify-between md:w-auto">
               <a href="/projects">
                 <Image
-                  src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                  src={
+                    theme == 'dark'
+                      ? `${router.basePath}/img/supabase-dark.svg`
+                      : `${router.basePath}/img/supabase-light.svg`
+                  }
                   alt=""
                   height={24}
                   width={120}

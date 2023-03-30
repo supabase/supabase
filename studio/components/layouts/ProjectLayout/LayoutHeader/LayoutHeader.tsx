@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useParams, useStore } from 'hooks'
+import { useFlag, useParams, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
@@ -38,7 +38,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0
+    resourcesExceededLimits.length > 0 &&
+    useFlag('overusageBadge')
 
   return (
     <div
@@ -86,16 +87,15 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   </div>
                 )}
 
-                {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
-                {/* {showOverUsageBadge && (
+                {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
                         <Badge color="red">Project has exceeded usage limits </Badge>
                       </a>
                     </Link>
                   </div>
-                )} */}
+                )}
               </>
             )}
           </>

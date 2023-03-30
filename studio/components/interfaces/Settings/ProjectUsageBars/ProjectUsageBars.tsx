@@ -14,7 +14,7 @@ import {
   IconBookOpen,
 } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
@@ -24,6 +24,7 @@ import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.cons
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 
 interface Props {
   projectRef?: string
@@ -40,6 +41,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     connectionString: project?.connectionString,
   })
 
+  const overusageBadgeEnabled = useFlag('overusageBadge')
+
   const canUpdateSubscription = checkPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
@@ -50,6 +53,8 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.TEAM ||
     subscriptionTier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
+  const resourcesExceededLimits = getResourcesExceededLimits(usage)
 
   const showUsageExceedMessage = subscriptionTier !== undefined && !projectHasNoLimits
 
@@ -106,16 +111,58 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
     <Loading active={isLoading}>
       {usage && (
         <div>
-          {USAGE_BASED_PRODUCTS.map((product) => {
-            const isExceededUsage =
-              showUsageExceedMessage &&
-              product.features
-                .map((feature) => {
-                  const featureUsage = usage[feature.key as ProjectUsageResponseUsageKeys]
-                  return (featureUsage.usage ?? 0) / featureUsage.limit > 1
-                })
-                .some((x) => x === true)
+          {resourcesExceededLimits.length > 0 &&
+            showUsageExceedMessage &&
+            overusageBadgeEnabled && (
+              <div className="mb-10">
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="You are exceeding your plans quota"
+                  description={
+                    <div className="p-1">
+                      {subscriptionTier === PRICING_TIER_PRODUCT_IDS.FREE ? (
+                        <div>
+                          <p>
+                            Your project is currently on the Free tier - upgrade to the Pro tier for
+                            a greatly increased quota and continue to scale.
+                          </p>
+                          <p className="mb-4">
+                            See{' '}
+                            <Link href="https://supabase.com/pricing" passHref>
+                              <a className="text-brand-900">pricing page</a>
+                            </Link>{' '}
+                            for a full breakdown of available plans.
+                          </p>
+                          <Link href={`/project/${projectRef}/settings/billing/update`}>
+                            <a>
+                              <Button>Upgrade to Pro</Button>
+                            </a>
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <p>
+                            By default, Pro projects have spend caps to control costs. When enabled,
+                            usage is limited to the plan's quota, with restrictions when limits are
+                            exceeded. To scale beyond Pro limits without restrictions, disable the
+                            spend cap and pay for over-usage beyond the quota.
+                          </p>
+                          <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
+                            <a>
+                              <Button>Configure Spend Cap</Button>
+                            </a>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+              </div>
+            )}
 
+          {USAGE_BASED_PRODUCTS.map((product) => {
             return (
               <div
                 key={product.title}
@@ -141,12 +188,6 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                           <h5 className="mb-0">{product.title}</h5>
                         </div>
                       </th>
-                      {/* Plan Limits */}
-                      <th className="hidden p-3 text-xs font-medium leading-4 text-left text-gray-400 lg:table-cell">
-                        {isExceededUsage && <Badge color="red">Exceeded usage</Badge>}
-                      </th>
-                      {/* Usage */}
-                      <th className="p-3 text-xs font-medium leading-4 text-left text-gray-400" />
                     </tr>
                   </thead>
                   {/* Line items */}
@@ -226,21 +267,23 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                   <Tooltip.Trigger>
                                     <IconInfo className="ml-2" size={14} strokeWidth={2} />
                                   </Tooltip.Trigger>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'max-w-md', // size
-                                        'flex items-center justify-center',
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                        'border border-scale-200', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-center text-scale-1200">
-                                        {feature.tooltip}
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content side="bottom">
+                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                      <div
+                                        className={[
+                                          'max-w-md', // size
+                                          'flex items-center justify-center',
+                                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                          'border border-scale-200', //border
+                                        ].join(' ')}
+                                      >
+                                        <span className="text-xs text-center text-scale-1200">
+                                          {feature.tooltip}
+                                        </span>
+                                      </div>
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
                                 </Tooltip.Root>
                               )}
                             </td>

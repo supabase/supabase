@@ -99,7 +99,7 @@ export default function Auth() {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input
           label="Email"
@@ -234,7 +234,7 @@ export default function Account({ session }: { session: Session }) {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input label="Email" value={session?.user?.email} disabled />
       </View>
