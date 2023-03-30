@@ -42,13 +42,17 @@ const ViewDefinition = ({ name }: ViewDefinitionProps) => {
     editor?.focus()
   }
 
-  return isLoading ? (
-    <div className="py-4 space-y-2">
-      <ShimmeringLoader />
-      <ShimmeringLoader className="w-3/4" />
-      <ShimmeringLoader className="w-1/2" />
-    </div>
-  ) : (
+  if (isLoading) {
+    return (
+      <div className="py-4 space-y-2">
+        <ShimmeringLoader />
+        <ShimmeringLoader className="w-3/4" />
+        <ShimmeringLoader className="w-1/2" />
+      </div>
+    )
+  }
+
+  return (
     <div className="flex-grow overflow-y-auto border-t border-scale-400">
       <Editor
         className="monaco-editor"

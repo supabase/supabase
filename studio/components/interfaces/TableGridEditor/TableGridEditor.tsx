@@ -339,7 +339,7 @@ const TableGridEditor = ({
           isViewSelected ? (
             <div>
               <TwoOptionToggle
-                width={80}
+                width={75}
                 options={['definition', 'data']}
                 activeOption={selectedView}
                 borderOverride="border-gray-500"

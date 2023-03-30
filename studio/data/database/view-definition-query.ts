@@ -44,7 +44,7 @@ export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDe
       projectRef,
       connectionString,
       sql: getViewDefinitionQuery({ name }),
-      queryKey: [`view-definition-${name}`],
+      queryKey: ['view-definition', name],
     },
     {
       select(data) {
@@ -64,7 +64,7 @@ export const useViewDefinitionQueryPrefetch = () => {
         projectRef,
         connectionString,
         sql: getViewDefinitionQuery({ name }),
-        queryKey: [`view-definition-${name}`],
+        queryKey: ['view-definition', name],
       }),
     [prefetch]
   )
