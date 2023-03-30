@@ -68,7 +68,7 @@ function CaseStudyPage(props: any) {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.io/blog/${props.blog.slug}`,
+          url: `https://supabase.io/customers/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -78,9 +78,7 @@ function CaseStudyPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.io${basePath}/images/blog/${
-                props.blog.image ? props.blog.image : props.blog.thumb
-              }`,
+              url: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
             },
           ],
         }}
