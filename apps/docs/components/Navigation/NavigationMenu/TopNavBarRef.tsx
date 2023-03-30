@@ -3,12 +3,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
+import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun, SearchButton } from 'ui'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
-
-import SearchButton from '~/components/Search/SearchButton'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
