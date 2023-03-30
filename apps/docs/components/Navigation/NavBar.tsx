@@ -3,12 +3,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Listbox } from 'ui'
+import { IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Listbox, SearchButton } from 'ui'
 import { REFERENCES } from './Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
-
-import SearchButton from '../Search/SearchButton'
 
 const NavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()

@@ -294,6 +294,11 @@ const uiConfig = {
           background:
             'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
         },
+        '.line-loading-bg-light': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(33, 33, 33, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },
