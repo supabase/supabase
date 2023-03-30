@@ -4,7 +4,7 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 
 import { NextPageWithLayout } from 'types'
 import { useParams, useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
@@ -19,7 +19,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
 
-  const { data: accessToken } = useSessionAccessTokenQuery()
+  const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
 
   const apiService = settings?.autoApiService
@@ -54,17 +54,17 @@ const GraphiQLPage: NextPageWithLayout = () => {
     return customFetcher
   }, [graphqlUrl, accessToken])
 
-  if (!accessToken || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
+  if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
   }
 
   if (pgGraphqlExtension?.installed_version === null) {
     return (
-      <div className="flex-1 flex flex-col justify-center items-center px-4">
-        <div className="max-w-md w-full">
+      <div className="flex flex-col items-center justify-center flex-1 px-4">
+        <div className="w-full max-w-md">
           <div className="mb-6">
-            <h1 className="text-2xl mt-8 mb-2">Enable the GraphQL Extension</h1>
-            <h2 className="text-scale-1100 text-sm">
+            <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
+            <h2 className="text-sm text-scale-1100">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
             </h2>

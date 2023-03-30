@@ -17,8 +17,6 @@ import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
 
-// import SearchButton from './../../Search/SearchButton'
-
 const TopNavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)

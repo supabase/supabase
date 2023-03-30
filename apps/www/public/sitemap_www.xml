@@ -67,13 +67,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/contact/mfa</loc>
+    <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/database</loc>
+    <loc>https://supabase.com/contact/mfa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -85,7 +85,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/launch-week/ticket-image</loc>
+    <loc>https://supabase.com/legal/dpa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
