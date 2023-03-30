@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://app.supabase.com',
+    destination: 'https://supabase.com/dashboard',
   },
   {
     permanent: true,
@@ -1458,17 +1458,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://app.supabase.com/sign-in',
+    destination: 'https://supabase.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://app.supabase.com/sign-up',
+    destination: 'https://supabase.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://app.supabase.com/forgot-password',
+    destination: 'https://supabase.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1488,7 +1488,7 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://app.supabase.com/projects',
+    destination: 'https://supabase.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
