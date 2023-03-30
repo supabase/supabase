@@ -41,7 +41,7 @@ export interface TableGridEditorProps {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
@@ -67,6 +67,7 @@ export interface TableGridEditorProps {
     column: any
   }) => void
   onClosePanel: () => void
+  onImportData: () => void
 }
 
 const TableGridEditor = ({
@@ -90,6 +91,7 @@ const TableGridEditor = ({
   onExpandJSONEditor = noop,
   onEditForeignKeyColumnValue = noop,
   onClosePanel = noop,
+  onImportData = noop,
 }: TableGridEditorProps) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
@@ -361,7 +363,7 @@ const TableGridEditor = ({
         onAddRow={onAddRow}
         updateTableRow={updateTableRow}
         onEditRow={onEditRow}
-        onImportData={() => {}}
+        onImportData={onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}

@@ -42,7 +42,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-xs text-scale-900">
+        <p className="text-sm text-scale-1000">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>
@@ -56,8 +56,8 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onDrop={onDrop}
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
-          <p>
-            Drag and drop, or <span className="text-green-1000">browse</span> your files
+          <p className="text-sm">
+            Drag and drop, or <span className="text-brand-900">browse</span> your files
           </p>
         </div>
       ) : (
