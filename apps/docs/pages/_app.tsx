@@ -63,27 +63,20 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const SITE_TITLE = 'Supabase Documentation'
 
+  const AuthContainer = (props) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      props.children
+    )
+  }
+
   return (
     <>
       <Favicons />
-      {IS_PLATFORM || LOCAL_SUPABASE ? (
-        <SessionContextProvider supabaseClient={supabase}>
-          <AuthProvider>
-            <ThemeProvider>
-              <CommandMenuProvider
-                site="docs"
-                MarkdownHandler={({ ...props }) => (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-                )}
-              >
-                <SiteLayout>
-                  <Component {...pageProps} />
-                </SiteLayout>
-              </CommandMenuProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </SessionContextProvider>
-      ) : (
+      <AuthContainer>
         <ThemeProvider>
           <CommandMenuProvider
             site="docs"
@@ -96,7 +89,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             </SiteLayout>
           </CommandMenuProvider>
         </ThemeProvider>
-      )}
+      </AuthContainer>
     </>
   )
 }
