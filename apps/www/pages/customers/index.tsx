@@ -37,10 +37,10 @@ function CustomerStoriesPage(props: any) {
   const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
 
-  const META = {
-    TITLE: 'Customer Stories | Supabase',
-    IMAGE: `${basePath}/images/customers/og/customer-stories.jpg`,
-    DESCRIPTION:
+  const meta = {
+    title: 'Customer Stories | Supabase',
+    image: `${basePath}/images/customers/og/customer-stories.jpg`,
+    description:
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
@@ -68,10 +68,10 @@ function CustomerStoriesPage(props: any) {
   return (
     <>
       <Head>
-        <title>{META['TITLE']}</title>
-        <meta name="description" content={META['DESCRIPTION']} />
-        <meta property="og:image" content={META['IMAGE']} />
-        <meta name="twitter:image" content={META['IMAGE']} />
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <meta property="og:image" content={meta.image} />
+        <meta name="twitter:image" content={meta.image} />
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -80,15 +80,15 @@ function CustomerStoriesPage(props: any) {
         />
       </Head>
       <NextSeo
-        title={META['TITLE']}
-        description={META['DESCRIPTION']}
+        title={meta.title}
+        description={meta.description}
         openGraph={{
-          title: META['TITLE'],
-          description: META['DESCRIPTION'],
+          title: meta.title,
+          description: meta.description,
           url: `${basePath}/customers`,
           images: [
             {
-              url: META['IMAGE'],
+              url: meta.image,
             },
           ],
         }}
