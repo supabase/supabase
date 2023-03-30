@@ -62,7 +62,7 @@ function CaseStudyPage(props: any) {
   const { basePath } = useRouter()
 
   const meta = {
-    title: `${props.blog.name} | Customer Stories`,
+    title: `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.description,
     image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
     url: `https://supabase.io/customers/${props.blog.slug}`,
@@ -74,7 +74,7 @@ function CaseStudyPage(props: any) {
         title={meta.title}
         openGraph={{
           title: meta.title,
-          description: props.blog.description,
+          description: meta.description,
           url: meta.url,
           type: 'article',
           article: {
