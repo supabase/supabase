@@ -11,6 +11,7 @@ interface Props {
   noMargin?: boolean
   title?: JSX.Element | false
   wrapWithLoading?: boolean
+  noHideOverflow?: boolean
 }
 function Panel(props: Props) {
   let headerClasses: string[] = []
@@ -31,7 +32,7 @@ function Panel(props: Props) {
   const content = (
     <div
       className={`
-        overflow-hidden rounded-md border
+        ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md border
         border-panel-border-light shadow-sm
         dark:border-panel-border-dark ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
     >

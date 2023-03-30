@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
@@ -6,7 +7,6 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react'
 import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { API_URL } from 'lib/constants'
-import useSWR from 'swr'
 import { get } from 'lib/common/fetch'
 export interface LogsQueryData {
   params: LogsEndpointParams
@@ -37,20 +37,28 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
+  const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
+
   const queryParams = genQueryParams(params as any)
   const {
     data,
-    error: swrError,
-    isValidating: isLoading,
-    mutate,
-  } = useSWR<Logs>(
-    params.sql
-      ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`
-      : null,
-    get,
-    { revalidateOnFocus: false }
+    error: rqError,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useQuery(
+    ['projects', projectRef, 'logs', queryParams],
+    ({ signal }) =>
+      get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
+        signal,
+      }),
+    {
+      enabled,
+      refetchOnWindowFocus: false,
+    }
   )
-  let error: null | string | object = swrError ? swrError.message : null
+
+  let error: null | string | object = rqError ? (rqError as any).message : null
 
   if (!error && data?.error) {
     error = data?.error
@@ -60,8 +68,13 @@ const useLogsQuery = (
   }
 
   return [
-    { params, isLoading, logData: data?.result ? data?.result : [], error },
-    { changeQuery, runQuery: () => mutate(), setParams },
+    {
+      params,
+      isLoading: (enabled && isLoading) || isRefetching,
+      logData: data?.result ? data?.result : [],
+      error,
+    },
+    { changeQuery, runQuery: () => refetch(), setParams },
   ]
 }
 export default useLogsQuery

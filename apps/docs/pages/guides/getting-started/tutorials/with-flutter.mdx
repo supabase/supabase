@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-flutter',
-  title: 'Quickstart: Flutter',
+  title: 'Build a User Management App with Flutter',
   description: 'Learn how to use Supabase in your Flutter App.',
-  sidebar_label: 'Flutter',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -77,7 +76,7 @@ Add an intent-filter to enable deep linking:
 </manifest>
 ```
 
-For iOS, edit the ios/Runner/Info.plist file. 
+For iOS, edit the ios/Runner/Info.plist file.
 
 Add CFBundleURLTypes to enable deep linking:
 
@@ -797,13 +796,12 @@ class _AccountPageState extends State<AccountPage> {
 
 <StorageManagement />
 
-Congratulations, that is it! You have now built a fully functional user management app using Flutter and Supabase!
+Congratulations, you've built a fully functional user management app using Flutter and Supabase!
 
 ## See also
 
 - [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
 - [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

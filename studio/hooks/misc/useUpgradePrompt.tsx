@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useProjectSubscription } from 'hooks'
-import { useRouter } from 'next/router'
+import { useParams } from 'hooks'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs'
-import { StripeProduct } from 'components/interfaces/Billing'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 
 export const useUpgradePrompt = (from: string) => {
-  const router = useRouter()
-  const { ref } = router.query
-  const { subscription } = useProjectSubscription(ref as string)
+  const { ref: projectRef } = useParams()
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 

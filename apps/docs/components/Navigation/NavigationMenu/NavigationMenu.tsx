@@ -205,7 +205,11 @@ const NavigationMenu = () => {
       <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
       <NavigationMenuGuideList id={'auth'} active={isAuthActive} />
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
-      <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
+      <NavigationMenuGuideList
+        id={'realtime'}
+        active={isRealtimeActive}
+        value={['/guides/realtime/extensions']}
+      />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
       <NavigationMenuGuideList id={'supabase_cli'} active={issupabase_cliActive} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
@@ -298,7 +302,7 @@ const NavigationMenu = () => {
         id={'reference_self_hosting_realtime'}
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
-        lib="self-hosting-auth"
+        lib="self-hosting-realtime"
       />
     </div>
   )

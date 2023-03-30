@@ -244,7 +244,7 @@ functions:
             options: {
               redirectTo: 'https://example.com/welcome'
             }
-          }
+          })
           ```
       - id: sign-in-with-scopes
         name: Sign in with scopes
@@ -4992,7 +4992,7 @@ functions:
     title: 'on().subscribe()'
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.

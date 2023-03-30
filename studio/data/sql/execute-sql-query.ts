@@ -1,4 +1,10 @@
-import { QueryKey, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import {
+  QueryClient,
+  QueryKey,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from '@tanstack/react-query'
 import md5 from 'blueimp-md5'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -13,7 +19,12 @@ export type ExecuteSqlVariables = {
 }
 
 export async function executeSql(
-  { projectRef, connectionString, sql }: ExecuteSqlVariables,
+  {
+    projectRef,
+    connectionString,
+    sql,
+    queryKey,
+  }: Pick<ExecuteSqlVariables, 'projectRef' | 'connectionString' | 'sql' | 'queryKey'>,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -27,7 +38,9 @@ export async function executeSql(
   }
 
   const response = await post(
-    `${API_URL}/pg-meta/${projectRef}/query`,
+    `${API_URL}/pg-meta/${projectRef}/query${
+      queryKey ? `?key=${queryKey.filter((seg) => typeof seg === 'string').join('-')}` : ''
+    }`,
     { query: sql },
     { headers: Object.fromEntries(headers), signal }
   )
@@ -47,23 +60,47 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
 ) =>
   useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
-    ({ signal }) => executeSql({ projectRef, connectionString, sql }, signal),
+    ({ signal }) => executeSql({ projectRef, connectionString, sql, queryKey }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
-export const useExecuteSqlPrefetch = ({
-  projectRef,
-  connectionString,
-  sql,
-  queryKey,
-}: ExecuteSqlVariables) => {
+export const prefetchExecuteSql = (
+  client: QueryClient,
+  { projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables
+) => {
+  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
+    executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+  )
+}
+
+/**
+ * useExecuteSqlPrefetch is used for prefetching a SQL query. For example, starting a query loading before a page is navigated to.
+ *
+ * @example
+ * const prefetch = useExecuteSqlPrefetch()
+ *
+ * return (
+ *   <Link onMouseEnter={() => prefetch({ ...args })}>
+ *     Start loading on hover
+ *   </Link>
+ * )
+ */
+export const useExecuteSqlPrefetch = () => {
   const client = useQueryClient()
 
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
-        executeSql({ projectRef, connectionString, sql }, signal)
-      )
-    }
-  }, [projectRef])
+  return useCallback(
+    ({ projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables) => {
+      if (projectRef) {
+        return prefetchExecuteSql(client, {
+          projectRef,
+          connectionString,
+          sql,
+          queryKey,
+        })
+      }
+
+      return Promise.resolve()
+    },
+    [client]
+  )
 }

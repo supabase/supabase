@@ -178,8 +178,8 @@ export const menuItems: NavMenu = {
           name: 'Serverless APIs',
           url: undefined,
           items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+            { name: 'Overview', url: '/guides/database/api', items: [] },
+            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
           ],
         },
         {
@@ -241,10 +241,62 @@ export const menuItems: NavMenu = {
     {
       label: 'Realtime',
       items: [
-        { name: 'Overview', url: '/guides/realtime', items: [] },
-        { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        {
+          name: 'Overview',
+          url: '/guides/realtime',
+          items: [],
+        },
+        {
+          name: 'Quickstart',
+          url: '/guides/realtime/quickstart',
+          items: [],
+        },
+        {
+          name: 'Features',
+          url: undefined,
+          items: [
+            { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+            {
+              name: 'Extensions',
+              url: '/guides/realtime/extensions',
+              items: [
+                { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+                { name: 'Presence', url: '/guides/realtime/presence', items: [] },
+                { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Guides',
+          url: undefined,
+          items: [
+            {
+              name: 'Subscribing to Database Changes',
+              url: '/guides/realtime/subscribing-to-database-changes',
+              items: [],
+            },
+            {
+              name: 'Bring Your Own Database',
+              url: '/guides/realtime/bring-your-own-database',
+              items: [],
+            },
+            {
+              name: 'Using Realtime with Next.js',
+              url: '/guides/realtime/realtime-with-nextjs',
+              items: [],
+            },
+          ],
+        },
+        {
+          name: 'Deep dive',
+          url: undefined,
+          items: [
+            { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+            { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+            { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
+          ],
+        },
       ],
     },
     {
@@ -276,6 +328,7 @@ export const menuItems: NavMenu = {
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
         { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },
