@@ -361,6 +361,7 @@ const TableGridEditor = ({
         onAddRow={onAddRow}
         updateTableRow={updateTableRow}
         onEditRow={onEditRow}
+        onImportData={() => {}}
         onError={onError}
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}
