@@ -202,6 +202,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         table={table}
         sorts={sorts}
         filters={filters}
+        isRefetching={isRefetching}
         onAddRow={editable ? props.onAddRow : undefined}
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
