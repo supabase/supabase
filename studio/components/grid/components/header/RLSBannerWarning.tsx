@@ -29,7 +29,7 @@ export default function RLSBannerWarning() {
     <>
       {!isAcknowledged && !rlsEnabled && isPublicTable ? (
         <div>
-          <div className="text-center bg-amber-500 text-scale-1200 text-xs py-2.5 flex items-center justify-center relative">
+          <div className="text-center bg-amber-500 text-amber-1100 dark:text-amber-900 text-xs py-2.5 flex items-center justify-center relative">
             <IconAlertCircle size={16} strokeWidth={2} />
             <span className="uppercase font-bold ml-2">Warning</span>: This table is publicly
             readable and writable.{' '}
