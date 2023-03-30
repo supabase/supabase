@@ -1,10 +1,5 @@
 import update from 'immutability-helper'
-import {
-  REFRESH_PAGE_AFTER_DELETED_ROWS,
-  REFRESH_PAGE_IMMEDIATELY,
-  TOTAL_ROWS_INITIAL,
-  TOTAL_ROWS_RESET,
-} from '../../constants'
+import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_INITIAL, TOTAL_ROWS_RESET } from '../../constants'
 import { Dictionary, SupaRow } from '../../types'
 import { INIT_ACTIONTYPE } from './base'
 
