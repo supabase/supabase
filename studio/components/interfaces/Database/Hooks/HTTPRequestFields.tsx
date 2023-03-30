@@ -239,7 +239,7 @@ const HTTPRequestFields = ({
               </div>
             ))}
             <div>
-              <Button type="dashed" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
+              <Button type="default" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
                 Add a new parameter
               </Button>
             </div>
