@@ -122,7 +122,7 @@ export const EMAIL_CHANGE: FormSchema = {
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The original users email address
-- \`{{ .NewEmail }\` : The users new email address
+- \`{{ .NewEmail }}\` : The users new email address
 `,
     },
   },
