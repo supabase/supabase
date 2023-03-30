@@ -8,8 +8,6 @@ import { REFERENCES } from './Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
 
-// import SearchButton from '../Search/SearchButton'
-
 const NavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)

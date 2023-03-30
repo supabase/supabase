@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
 export interface UseThemeProps {
-  isDarkMode?: boolean
+  isDarkMode: boolean
   /**
    * Toggle between dark mode and light mode.
    *

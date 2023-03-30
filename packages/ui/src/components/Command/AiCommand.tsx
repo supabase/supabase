@@ -1,26 +1,14 @@
 import * as React from 'react'
 import type {
   ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
   CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+
 import { SSE } from 'sse.js'
 
-import {
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconCommand,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSearch,
-  IconUser,
-  Input,
-} from 'ui'
+import { Button, IconAlertCircle, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 import { COMMAND_ROUTES } from './CommandMenu'
@@ -48,7 +36,7 @@ function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) {
-    throw new Error('Missing environment variable NEXT_PUBLIC_SUPABASE_URL')
+    return undefined
   }
 
   // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
@@ -111,24 +99,20 @@ const AiCommand = () => {
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
+    useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
 
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
-  const status = isLoading
-    ? 'AI is searching...'
-    : isResponding
-    ? 'AI is responding...'
-    : cantHelp || hasClippyError
-    ? 'AI has failed you'
-    : undefined
 
   const handleConfirm = useCallback(
     async (query: string) => {
+      if (!edgeFunctionUrl) {
+        return console.error('No edge function url')
+      }
+
       setAnswer(undefined)
       setSearch('')
       dispatchPromptData({ index: promptIndex, answer: undefined, query })
@@ -246,8 +230,15 @@ const AiCommand = () => {
             <>
               {prompt.query && (
                 <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                  <div className="w-7 h-7 bg-scale-400 dark:bg-scale-900 rounded-full border border-scale-800 flex items-center justify-center text-scale-800 dark:text-scale-1200">
-                    <IconUser strokeWidth={2} size={16} />
+                  <div
+                    className="
+                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
+                      ring-scale-200
+                      ring-1
+                      shadow-sm
+                  "
+                  >
+                    <IconUser strokeWidth={1.5} size={16} />
                   </div>
                   <div className="prose text-scale-1000">{prompt.query}</div>
                 </div>
@@ -271,12 +262,11 @@ const AiCommand = () => {
                       {isLoading && promptIndex === i ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        // TODO: pull in markdown components from docs for better styling (code blocks, etc)
-                        <ReactMarkdown
+                        // @ts-expect-error
+                        <MarkdownHandler
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
-                          remarkPlugins={[remarkGfm]}
-                          transformLinkUri={(href) => {
+                          transformLinkUri={(href: string) => {
                             const supabaseUrl = new URL('https://supabase.com')
                             const linkUrl = new URL(href, 'https://supabase.com')
 
@@ -288,7 +278,7 @@ const AiCommand = () => {
                           }}
                         >
                           {prompt.answer}
-                        </ReactMarkdown>
+                        </MarkdownHandler>
                       )}
                     </>
                   </div>
