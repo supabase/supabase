@@ -245,8 +245,15 @@ const AiCommand = () => {
             <>
               {prompt.query && (
                 <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                  <div className="w-7 h-7 bg-scale-900 rounded-full border border-scale-800 flex items-center justify-center text-scale-1200">
-                    <IconUser strokeWidth={2} size={16} />
+                  <div
+                    className="
+                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
+                      ring-scale-200
+                      ring-1
+                      shadow-sm
+                  "
+                  >
+                    <IconUser strokeWidth={1.5} size={16} />
                   </div>
                   <div className="prose text-scale-1000">{prompt.query}</div>
                 </div>
