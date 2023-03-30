@@ -6,7 +6,7 @@ export const AiIcon = () => (
     viewBox="0 0 24 24"
     strokeWidth="1.5"
     stroke="currentColor"
-    className="w-6 h-6 text-purple-900"
+    className="w-6 h-6 text-brand-900"
   >
     <path
       strokeLinecap="round"
@@ -19,12 +19,12 @@ export const AiIcon = () => (
 export const AiIconChat = () => (
   <div
     className="w-7 h-7
-    bg-gradient-to-r from-purple-900 to-purple-800
+    bg-gradient-to-r from-brand-900 to-brand-800
 
-    ring-purple-600
+    ring-brand-600
     ring-1
 
-    rounded-md border border-purple-400 flex items-center justify-center
+    rounded-md border border-brand-400 flex items-center justify-center
     shadow-sm
     "
   >
