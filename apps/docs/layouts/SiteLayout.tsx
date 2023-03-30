@@ -7,6 +7,7 @@ import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 import { memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import Head from 'next/head'
 
 const levelsData = {
   home: {
@@ -312,32 +313,37 @@ const SiteLayout = ({ children }) => {
   }, [])
 
   return (
-    <main>
-      <div className="flex flex-row h-screen">
-        <NavContainer />
-        <Container>
-          <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-            <TopNavBarRef />
-          </div>
-          <div
-            className={[
-              'sticky transition-all top-0',
-              'z-10',
-              'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
-            ].join(' ')}
-          >
-            <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
-              <MobileHeader />
+    <>
+      <Head>
+        <title>Supabase Docs</title>
+      </Head>
+      <main>
+        <div className="flex flex-row h-screen">
+          <NavContainer />
+          <Container>
+            <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+              <TopNavBarRef />
             </div>
-          </div>
-          <div className="grow px-5 max-w-7xl mx-auto py-16">
-            {children}
-            <Footer />
-          </div>
-          <MobileMenuBackdrop />
-        </Container>
-      </div>
-    </main>
+            <div
+              className={[
+                'sticky transition-all top-0',
+                'z-10',
+                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+              ].join(' ')}
+            >
+              <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
+                <MobileHeader />
+              </div>
+            </div>
+            <div className="grow px-5 max-w-7xl mx-auto py-16">
+              {children}
+              <Footer />
+            </div>
+            <MobileMenuBackdrop />
+          </Container>
+        </div>
+      </main>
+    </>
   )
 }
 

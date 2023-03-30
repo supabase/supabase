@@ -16,7 +16,8 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
+  const { isLoading } = meta.schemas
+  const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
   const router = useRouter()
