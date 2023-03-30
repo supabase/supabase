@@ -284,7 +284,22 @@ const AiCommand = () => {
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
                         // @ts-expect-error
-                        <MarkdownHandler>{prompt.answer}</MarkdownHandler>
+                        <MarkdownHandler
+                          linkTarget="_blank"
+                          className="prose dark:prose-dark"
+                          transformLinkUri={(href: string) => {
+                            const supabaseUrl = new URL('https://supabase.com')
+                            const linkUrl = new URL(href, 'https://supabase.com')
+
+                            if (linkUrl.origin === supabaseUrl.origin) {
+                              return linkUrl.toString()
+                            }
+
+                            return href
+                          }}
+                        >
+                          {prompt.answer}
+                        </MarkdownHandler>
                       )}
                     </>
                   </div>
