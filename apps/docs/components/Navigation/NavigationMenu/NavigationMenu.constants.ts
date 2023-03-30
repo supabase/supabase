@@ -604,6 +604,11 @@ export const realtime = {
           url: '/guides/realtime/subscribing-to-database-changes',
         },
         {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
+        },
+        {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
         },
