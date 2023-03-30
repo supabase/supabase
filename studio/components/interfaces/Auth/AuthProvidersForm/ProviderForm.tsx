@@ -26,12 +26,23 @@ const ProviderForm: FC<Props> = ({ provider }) => {
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
-      initialValues[key] = isDoubleNegative ? !authConfig.config[key] : authConfig.config[key] ?? ''
+
+      if (provider.title === 'SAML 2.0') {
+        initialValues[key] = authConfig.config[key] ?? false
+      } else {
+        initialValues[key] = isDoubleNegative
+          ? !authConfig.config[key]
+          : authConfig.config[key] ?? ''
+      }
     })
     return initialValues
   }
 
-  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+  // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
+  const isActive =
+    provider.title === 'SAML 2.0'
+      ? authConfig.config['SAML_ENABLED'] || false
+      : authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
@@ -163,7 +174,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         <Button
                           htmlType="submit"
                           loading={isSubmitting}
-                          disabled={!canUpdateConfig || noChanges}
+                          disabled={isSubmitting || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>

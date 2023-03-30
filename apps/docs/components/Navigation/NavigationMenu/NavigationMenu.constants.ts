@@ -48,6 +48,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    { name: 'Local Development', url: '/guides/cli/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -601,6 +602,11 @@ export const realtime = {
         {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
+        },
+        {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
         },
         {
           name: 'Using Realtime with Next.js',
