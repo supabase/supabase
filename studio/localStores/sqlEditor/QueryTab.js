@@ -86,6 +86,40 @@ class QueryTab extends Tab {
     this.splitSizes = sizes
   }
 
+  async generateSqlQuery(naturalLanguageQuery) {
+    const tables = await this.meta.tables.loadBySchema('public')
+
+    const createTableQueries = tables.map((table) => {
+      return `CREATE TABLE "${table.schema}"."${table.name}"
+(
+${table.columns
+  .map(
+    (column) =>
+      `    ${column.name} ${column.data_type} ${!column.is_nullable ? ' NOT NULL' : 'NULL'}`
+  )
+  .join(',\n')}
+);
+`
+    })
+
+    console.log({ tables, createTableQueries })
+
+    const response = await fetch('/api/natural-language', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: naturalLanguageQuery,
+        tables: createTableQueries.join('\n'),
+      }),
+    })
+
+    const result = await response.json()
+
+    return result
+  }
+
   async startExecuting(query) {
     this.isExecuting = true
     this.errorResult = null

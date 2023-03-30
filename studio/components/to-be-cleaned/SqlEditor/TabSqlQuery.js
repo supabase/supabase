@@ -155,6 +155,44 @@ const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
       },
     })
 
+    const isCursorOnComment = editor.createContextKey('isCursorOnComment', false)
+
+    editor.onDidChangeCursorPosition((e) => {
+      const currentLine = editor.getModel().getLineContent(e.position.lineNumber)
+      console.log('cursor moved', { e, currentLine })
+      isCursorOnComment.set(/^--\s*/.test(currentLine))
+    })
+
+    editor.addAction({
+      id: 'supabase-suggest-query',
+      label: 'Suggest Query',
+      keybindings: [monaco.KeyMod.Alt + monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      precondition: 'isCursorOnComment',
+      run: async (editor) => {
+        const currentLineNumber = editor.getPosition().lineNumber
+        const currentLineLength = editor.getModel().getLineMaxColumn(currentLineNumber)
+        const currentLine = editor.getModel().getLineContent(currentLineNumber)
+        const query = currentLine.replace(/^-- */, '')
+
+        const result = await sqlEditorStore.generateSqlQuery(query)
+
+        const op = {
+          identifier: { major: 1, minor: 1 },
+          range: new monaco.Range(
+            currentLineNumber,
+            currentLineLength,
+            currentLineNumber,
+            currentLineLength
+          ),
+          text: `\n${result.text}`,
+          forceMoveMarkers: true,
+        }
+        editor.executeEdits('generate-sql-query', [op])
+      },
+    })
+
     // add margin above first line
     editor.changeViewZones((accessor) => {
       accessor.addZone({

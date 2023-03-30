@@ -371,6 +371,13 @@ class SqlEditorStore {
 
     await tab.startExecuting(query)
   }
+
+  async generateSqlQuery(naturalLanguageQuery) {
+    const tab = this.activeTab
+    if (!tab || tab.type != TAB_TYPES.SQL_QUERY) return
+
+    return tab.generateSqlQuery(naturalLanguageQuery)
+  }
 }
 
 export default SqlEditorStore
