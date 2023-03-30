@@ -35,7 +35,6 @@ const proxyRequest = async (req: NextApiRequest) => {
   const search = '?' + new URLSearchParams(payload as any).toString()
   const apiKey = process.env.LOGFLARE_API_KEY
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/name/${name}${search}`
-  console.log('url', url)
   const result = await get(url, {
     headers: {
       'x-api-key': apiKey,
@@ -43,6 +42,5 @@ const proxyRequest = async (req: NextApiRequest) => {
       Accept: 'application/json',
     },
   })
-  console.log('result', result)
   return result
 }
