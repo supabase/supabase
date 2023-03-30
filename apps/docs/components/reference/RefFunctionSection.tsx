@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 
-import { IconDatabase, Tabs } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { CodeBlock, IconDatabase, Tabs } from 'ui'
 
 import Options from '~/components/Options'
 import Param from '~/components/Params'
