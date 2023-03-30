@@ -37,6 +37,13 @@ function CustomerStoriesPage(props: any) {
   const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
 
+  const META = {
+    TITLE: 'Customer Stories | Supabase',
+    IMAGE: `${basePath}/images/customers/og/customer-stories.jpg`,
+    DESCRIPTION:
+      'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
+  }
+
   useEffect(() => {
     // Update the document title using the browser API
     setBlogs(
@@ -61,6 +68,10 @@ function CustomerStoriesPage(props: any) {
   return (
     <>
       <Head>
+        <title>{META['TITLE']}</title>
+        <meta name="description" content={META['DESCRIPTION']} />
+        <meta property="og:image" content={META['IMAGE']} />
+        <meta name="twitter:image" content={META['IMAGE']} />
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -69,8 +80,18 @@ function CustomerStoriesPage(props: any) {
         />
       </Head>
       <NextSeo
-        title="Customer stories"
-        description="See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work."
+        title={META['TITLE']}
+        description={META['DESCRIPTION']}
+        openGraph={{
+          title: META['TITLE'],
+          description: META['DESCRIPTION'],
+          url: `${basePath}/customers`,
+          images: [
+            {
+              url: META['IMAGE'],
+            },
+          ],
+        }}
       />
       <DefaultLayout>
         <div className="relative z-0 dark:bg-scale-200 bg-scale-200 overflow-hidden">
