@@ -1,25 +1,13 @@
 import type {
   ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
   CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 
-import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
 
-import {
-  Button,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconCommand,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSearch,
-  IconUser,
-  Input,
-} from 'ui'
+import { Button, IconAlertCircle, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 import { COMMAND_ROUTES } from './CommandMenu'
@@ -47,8 +35,7 @@ function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) {
-    // throw new Error('Missing environment variable NEXT_PUBLIC_SUPABASE_URL')
-    return ''
+    return undefined
   }
 
   // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
@@ -117,21 +104,12 @@ const AiCommand = () => {
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
 
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
-  const status = isLoading
-    ? 'AI is searching...'
-    : isResponding
-    ? 'AI is responding...'
-    : cantHelp || hasClippyError
-    ? 'AI has failed you'
-    : undefined
 
   const handleConfirm = useCallback(
     async (query: string) => {
       if (!edgeFunctionUrl) {
-        console.error('No edge function url')
+        return console.error('No edge function url')
       }
 
       setAnswer(undefined)
