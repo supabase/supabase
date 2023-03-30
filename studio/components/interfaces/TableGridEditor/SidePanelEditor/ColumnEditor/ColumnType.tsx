@@ -31,6 +31,7 @@ interface Props {
   disabled?: boolean
   showLabel?: boolean
   description?: ReactNode
+  showRecommendation?: boolean
   onOptionSelect: (value: string) => void
 }
 
@@ -44,6 +45,7 @@ const ColumnType: FC<Props> = ({
   disabled = false,
   showLabel = true,
   description,
+  showRecommendation = false,
   onOptionSelect = () => {},
 }) => {
   // @ts-ignore
@@ -162,7 +164,7 @@ const ColumnType: FC<Props> = ({
           </Listbox.Option>
         ))}
       </Listbox>
-      {recommendation !== undefined && (
+      {showRecommendation && recommendation !== undefined && (
         <Alert
           withIcon
           variant="warning"

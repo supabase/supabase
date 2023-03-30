@@ -12,13 +12,15 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { copyToClipboard, timeout } from 'lib/helpers'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 import UtilityActions from 'components/interfaces/SQLEditor/TabSqlQuery/UtilityActions'
 
 const TabSqlQuery = observer(() => {
   const sqlEditorStore = useSqlStore()
-  const { ui, content: contentStore } = useStore()
+  const { data: profile } = useProfileQuery()
+  const { content: contentStore } = useStore()
   const { height: screenHeight } = useWindowDimensions()
 
   const snapOffset = 50
@@ -27,8 +29,8 @@ const TabSqlQuery = observer(() => {
   const offset = 3
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   useEffect(() => {
@@ -234,14 +236,20 @@ const ResultsDropdown = observer(() => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    Telemetry.sendEvent('sql_editor', 'sql_download_csv', '')
+    Telemetry.sendEvent(
+      { category: 'sql_editor', action: 'sql_download_csv', label: '' },
+      ui.googleAnalyticsProps
+    )
   }
 
   function onCopyAsMarkdown() {
     if (navigator) {
       copyToClipboard(sqlEditorStore.activeTab.markdownData, () => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
-        Telemetry.sendEvent('sql_editor', 'sql_copy_as_markdown', '')
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
+          ui.googleAnalyticsProps
+        )
       })
     }
   }
@@ -377,7 +385,7 @@ const Results = ({ results }) => {
       <div className="group sb-grid-select-cell__formatter overflow-hidden">
         <span className="font-mono text-xs truncate">{JSON.stringify(row[column])}</span>
 
-        {row[column] && (
+        {row[column] != undefined && (
           <Button
             type="outline"
             icon={isCopied ? <IconCheck size="tiny" /> : <IconClipboard size="tiny" />}

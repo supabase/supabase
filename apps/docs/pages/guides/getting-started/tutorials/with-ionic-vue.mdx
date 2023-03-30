@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-ionic-vue',
-  title: 'Quickstart: Ionic Vue',
+  title: 'Build a User Management App with Ionic Vue',
   description: 'Learn how to use Supabase in your Ionic Vue App.',
-  sidebar_label: 'Ionic Vue',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/mhartington/supabase-ionic-vue).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/mhartington/supabase-ionic-vue).
+</Admonition>
 
 <ProjectSetup />
 
@@ -559,12 +558,7 @@ export default defineComponent({
 
 <StorageManagement />
 
-## Next steps
-
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -55,7 +55,7 @@ const ColumnDefaultValue: FC<Props> = ({
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
       placeholder={
         typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
-          ? 'Empty string'
+          ? 'EMPTY'
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}

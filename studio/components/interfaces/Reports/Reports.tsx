@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
@@ -17,10 +16,11 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useParams } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import { useProfileQuery } from 'data/profile/profile-query'
 import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
@@ -31,10 +31,8 @@ const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
-  const { ui } = useStore()
-
-  const router = useRouter()
-  const { id, ref } = router.query
+  const { id, ref } = useParams()
+  const { data: profile } = useProfileQuery()
 
   const [report, setReport] = useState<any>()
 
@@ -53,7 +51,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: ui.profile?.id },
+    subject: { id: profile?.id },
   })
   const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
@@ -61,7 +59,7 @@ const Reports = () => {
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
-    subject: { id: ui.profile?.id },
+    subject: { id: profile?.id },
   })
 
   /*
@@ -277,7 +275,7 @@ const Reports = () => {
                       return (
                         <Dropdown.Checkbox
                           key={metric.key}
-                          checked={config.layout?.find((x: any) => x.attribute === metric.key)}
+                          checked={config.layout?.some((x: any) => x.attribute === metric.key)}
                           onChange={(e) => handleChartSelection({ metric, value: e })}
                         >
                           <div className="flex flex-col space-y-0">
@@ -362,19 +360,21 @@ const Reports = () => {
                   Add / Remove charts
                 </Button>
               </Tooltip.Trigger>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to update this project's report
-                  </span>
-                </div>
-              </Tooltip.Content>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to update this project's report
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
             </Tooltip.Root>
           )}
         </div>

@@ -47,6 +47,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   state = this.STATES.INITIAL
   data: { [key in DataKeys]: T } = {}
   headers: any = {}
+  isInitialized: boolean = false
 
   constructor(
     rootStore: IRootStore,
@@ -68,6 +69,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       count: computed,
       hasError: computed,
       isLoading: computed,
+      isInitialized: observable,
       load: action,
       create: action,
       update: action,
@@ -90,10 +92,6 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
   }
 
-  get isInitialized() {
-    return this.state === this.STATES.LOADED || this.state === this.STATES.ERROR
-  }
-
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
@@ -114,9 +112,12 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       console.error('Load error message', e.message)
       this.setError(e)
       this.setState(ERROR)
+    } finally {
+      if (!this.isInitialized) this.isInitialized = true
     }
   }
 
+  // [Joshen] Only used for tables and views for now
   async loadBySchema(schema: string) {
     let { LOADING, ERROR, LOADED } = this.STATES
     try {
@@ -132,7 +133,14 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const data = response as T[]
       const formattedData = keyBy(data, this.identifier)
 
-      this.data = { ...this.data, ...formattedData }
+      // Purge existing data that belongs to given schema, otherwise
+      // stale data will persist
+      const purgedData = Object.keys(this.data)
+        .map((identifier: any) => this.data[identifier])
+        .filter((item: any) => item.schema !== schema)
+      const formattedPurgedData = keyBy(purgedData, this.identifier)
+
+      this.data = { ...formattedPurgedData, ...formattedData }
       this.setState(LOADED)
 
       return data
@@ -200,10 +208,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
-  async update(id: number | string, updates: any) {
+  async update(id: number | string, payload: any) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      let payload = { ...updates, id }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
       if (response.error) throw response.error

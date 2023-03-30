@@ -83,15 +83,15 @@ const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
     case 'UPDATE_FILTERS': {
       const newState: any = { ...state }
       newState.page = 1
-      newState.refreshPageFlag = Date.now()
-      // newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
+      // newState.refreshPageFlag = Date.now()
+      newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
       newState.totalRows = TOTAL_ROWS_RESET
       return newState
     }
     case 'UPDATE_SORTS': {
       const newState: any = { ...state }
-      newState.refreshPageFlag = Date.now()
-      // newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
+      // newState.refreshPageFlag = Date.now()
+      newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
       return newState
     }
     default:

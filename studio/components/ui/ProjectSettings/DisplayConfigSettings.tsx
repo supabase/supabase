@@ -1,38 +1,43 @@
-import { FC } from 'react'
-import { useRouter } from 'next/router'
-import { Input, IconAlertCircle, IconLoader } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useParams } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { FC } from 'react'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 const DisplayConfigSettings = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
   const {
-    project,
-    services,
+    data: settings,
     isLoading: isProjectSettingsLoading,
     isError: isProjectSettingsError,
-  } = useProjectSettings(ref as string | undefined)
+  } = useProjectSettingsQuery({
+    projectRef,
+  })
+
   const {
+    data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-    jwtSecretUpdateStatus,
-  }: any = useJwtSecretUpdateStatus(ref)
+  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service
-  const jwtSecret = project?.jwt_secret ?? ''
-  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
-  const apiConfig = apiService?.app_config ?? {}
-  const apiUrl = `${apiConfig.protocol ?? 'https'}://${apiConfig.endpoint ?? '-'}`
+  const jwtSecret = settings?.project?.jwt_secret ?? ''
+  const apiService = (settings?.services ?? []).find(
+    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  )
+  const apiConfig = apiService?.app_config
+  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
 
   return (
     <ConfigContentWrapper>
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError
@@ -41,7 +46,7 @@ const DisplayConfigSettings = () => {
           </p>
         </div>
       ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="flex items-center justify-center space-x-2 py-8">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}

@@ -1,8 +1,7 @@
 import ReactMarkdown from 'react-markdown'
-import { IconChevronRight, Tabs } from '~/../../packages/ui'
+import { CodeBlock, IconChevronRight, Tabs } from 'ui'
 // @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
