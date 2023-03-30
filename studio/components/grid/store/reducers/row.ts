@@ -141,18 +141,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         }),
       }
     }
-    case 'REMOVE_ROWS': {
-      const totalRows = state.totalRows - action.payload.rowIdxs.length
-      const maxPages = Math.ceil(totalRows / state.rowsPerPage)
-
-      return {
-        ...state,
-        rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
-        totalRows: totalRows,
-        refreshPageFlag: state.totalRows > state.rowsPerPage ? REFRESH_PAGE_AFTER_DELETED_ROWS : 0,
-        page: Math.min(state.page, maxPages),
-      }
-    }
     case 'REMOVE_ALL_ROWS': {
       return {
         ...state,

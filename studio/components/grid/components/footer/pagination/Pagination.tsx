@@ -6,7 +6,6 @@ import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { REFRESH_PAGE_AFTER_DELETED_ROWS } from 'components/grid/constants'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
@@ -47,20 +46,29 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
       table,
       filters,
     },
-    { keepPreviousData: true }
+    {
+      keepPreviousData: true,
+      onSuccess(data) {
+        dispatch({
+          type: 'SET_ROWS_COUNT',
+          payload: data.count,
+        })
+      },
+    }
   )
 
   const maxPages = Math.ceil((data?.count ?? 0) / state.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
+  useEffect(() => {
+    if (page && page > totalPages) {
+      setPage(totalPages)
+      dispatch({ type: 'SET_PAGE', payload: totalPages })
+    }
+  }, [page, totalPages])
+
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
-
-  useEffect(() => {
-    if (state.refreshPageFlag === REFRESH_PAGE_AFTER_DELETED_ROWS) {
-      setPage(state.page)
-    }
-  }, [state.page, state.refreshPageFlag])
 
   // [Joshen] Note: I've made pagination buttons disabled while rows are being fetched for now
   // at least until we can send an abort signal to cancel requests if users are mashing the
