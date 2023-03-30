@@ -17,4 +17,4 @@ export const DEFAULT_PROJECT = {
   region: 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
 }
-  
+ 
