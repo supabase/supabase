@@ -11,10 +11,11 @@ import { SSE } from 'sse.js'
 import { Button, IconAlertCircle, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
-import { COMMAND_ROUTES } from './CommandMenu'
+
 import { useCommandMenu } from './CommandMenuProvider'
 
 import { cn } from './../../utils/cn'
+import { COMMAND_ROUTES } from './Command.constants'
 
 const questions = [
   'How do I get started with Supabase?',
