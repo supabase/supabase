@@ -15,6 +15,8 @@ import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -67,7 +69,29 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <SessionContextProvider supabaseClient={supabase}>
           <AuthProvider>
             <ThemeProvider>
-              <CommandMenuProvider site="docs">
+              <CommandMenuProvider
+                site="docs"
+                MarkdownHandler={({ children, ...props }: { children: string }) => (
+                  <ReactMarkdown
+                    linkTarget="_blank"
+                    className="prose dark:prose-dark"
+                    remarkPlugins={[remarkGfm]}
+                    transformLinkUri={(href) => {
+                      const supabaseUrl = new URL('https://supabase.com')
+                      const linkUrl = new URL(href, 'https://supabase.com')
+
+                      if (linkUrl.origin === supabaseUrl.origin) {
+                        return linkUrl.toString()
+                      }
+
+                      return href
+                    }}
+                    {...props}
+                  >
+                    {children}
+                  </ReactMarkdown>
+                )}
+              >
                 <SiteLayout>
                   <Component {...pageProps} />
                 </SiteLayout>
@@ -77,11 +101,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         </SessionContextProvider>
       ) : (
         <ThemeProvider>
-          <CommandMenuProvider site="docs">
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
-          </CommandMenuProvider>
+          {/* <CommandMenuProvider site="docs"> */}
+          <SiteLayout>
+            <Component {...pageProps} />
+          </SiteLayout>
+          {/* </CommandMenuProvider> */}
         </ThemeProvider>
       )}
     </>
