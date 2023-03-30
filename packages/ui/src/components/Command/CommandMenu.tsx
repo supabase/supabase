@@ -31,14 +31,7 @@ import DashboardTableEditor from './sections/DashboardTableEditor'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import SearchOnlyItem from './SearchOnlyItem'
 import SearchableStudioItems from './SearchableStudioItems'
-
-export const COMMAND_ROUTES = {
-  AI: 'Supabase AI',
-  DOCS_SEARCH: 'Docs Search',
-  THEME: 'Theme',
-  AI_ASK_ANYTHING: 'Ask anything',
-  AI_RLS_POLICY: 'Help me create a RLS policy',
-}
+import { COMMAND_ROUTES } from './Command.constants'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
