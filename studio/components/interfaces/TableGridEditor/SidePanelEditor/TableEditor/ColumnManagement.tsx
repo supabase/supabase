@@ -1,14 +1,9 @@
 import Link from 'next/link'
-import React, { FC, useState } from 'react'
-import { partition, isEmpty, isUndefined } from 'lodash'
+import { FC, useState } from 'react'
+import { partition, isEmpty } from 'lodash'
 import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
 
-import {
-  PostgresTable,
-  PostgresColumn,
-  PostgresRelationship,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresColumn, PostgresType } from '@supabase/postgres-meta'
 import {
   DragDropContext,
   Droppable,
@@ -23,12 +18,11 @@ import InformationBox from 'components/ui/InformationBox'
 import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
 import { ImportContent } from './TableEditor.types'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
-import { ColumnField } from '../SidePanelEditor.types'
+import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 
 interface Props {
   table?: Partial<PostgresTable>
-  tables: PostgresTable[]
   columns?: ColumnField[]
   enumTypes: PostgresType[]
   importContent?: ImportContent
@@ -40,7 +34,6 @@ interface Props {
 
 const ColumnManagement: FC<Props> = ({
   table,
-  tables = [],
   columns = [],
   enumTypes = [],
   importContent,
@@ -57,24 +50,28 @@ const ColumnManagement: FC<Props> = ({
     (column: ColumnField) => column.isPrimaryKey
   )
 
-  const saveColumnForeignKey = (
-    foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
-  ) => {
-    if (!isUndefined(selectedColumnToEditRelation)) {
+  const saveColumnForeignKey = (foreignKeyConfiguration?: {
+    table: PostgresTable
+    column: PostgresColumn
+    deletionAction: string
+  }) => {
+    if (selectedColumnToEditRelation !== undefined) {
       onUpdateColumn(selectedColumnToEditRelation, {
-        foreignKey: !isUndefined(foreignKeyConfiguration)
-          ? {
-              id: 0,
-              constraint_name: '',
-              source_schema: table?.schema ?? '',
-              source_table_name: table?.name ?? '',
-              source_column_name: selectedColumnToEditRelation?.name,
-              target_table_schema: foreignKeyConfiguration.table.schema,
-              target_table_name: foreignKeyConfiguration.table.name,
-              target_column_name: foreignKeyConfiguration.column.name,
-            }
-          : undefined,
-        ...(!isUndefined(foreignKeyConfiguration) && {
+        foreignKey:
+          foreignKeyConfiguration !== undefined
+            ? {
+                id: 0,
+                constraint_name: '',
+                source_schema: table?.schema ?? '',
+                source_table_name: table?.name ?? '',
+                source_column_name: selectedColumnToEditRelation?.name,
+                target_table_schema: foreignKeyConfiguration.table.schema,
+                target_table_name: foreignKeyConfiguration.table.name,
+                target_column_name: foreignKeyConfiguration.column.name,
+                deletion_action: foreignKeyConfiguration.deletionAction,
+              }
+            : undefined,
+        ...(foreignKeyConfiguration !== undefined && {
           format: foreignKeyConfiguration.column.format,
           defaultValue: null,
         }),
@@ -91,8 +88,8 @@ const ColumnManagement: FC<Props> = ({
           changes.defaultValue = null
         }
 
-        if ('name' in changes && !isUndefined(column.foreignKey)) {
-          const foreignKey: PostgresRelationship = {
+        if ('name' in changes && column.foreignKey !== undefined) {
+          const foreignKey: ExtendedPostgresRelationship = {
             ...column.foreignKey,
             source_column_name: changes?.name ?? '',
           }
@@ -205,20 +202,22 @@ const ColumnManagement: FC<Props> = ({
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      'border border-scale-200 ', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      Recommended to use lowercase and use an underscore to separate words e.g.
-                      column_name
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Recommended to use lowercase and use an underscore to separate words e.g.
+                        column_name
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </div>
             <div className="w-[25%]">
@@ -233,19 +232,21 @@ const ColumnManagement: FC<Props> = ({
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      'border border-scale-200 ', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      Can be either a value or a SQL expression
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Can be either a value or a SQL expression
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
@@ -353,9 +354,8 @@ const ColumnManagement: FC<Props> = ({
         </div>
       </div>
       <ForeignKeySelector
-        tables={tables}
         column={selectedColumnToEditRelation as ColumnField}
-        visible={!isUndefined(selectedColumnToEditRelation)}
+        visible={selectedColumnToEditRelation !== undefined}
         closePanel={() => setSelectedColumnToEditRelation(undefined)}
         saveChanges={saveColumnForeignKey}
       />

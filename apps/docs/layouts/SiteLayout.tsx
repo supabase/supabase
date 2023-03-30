@@ -4,11 +4,10 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import FooterHelpCallout from '~/components/FooterHelpCallout'
-
 import { memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import Head from 'next/head'
 
 const levelsData = {
   home: {
@@ -29,7 +28,7 @@ const levelsData = {
   },
   functions: {
     icon: '/docs/img/icons/menu/functions',
-    name: 'Functions',
+    name: 'Edge Functions',
   },
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
@@ -38,6 +37,10 @@ const levelsData = {
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
+  },
+  supabase_cli: {
+    icon: '/docs/img/icons/menu/reference-cli',
+    name: 'Supabase CLI',
   },
   platform: {
     icon: '/docs/img/icons/menu/platform',
@@ -70,6 +73,14 @@ const levelsData = {
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
     name: 'Dart Reference v0.0',
+  },
+  reference_csharp_v0: {
+    icon: '/docs/img/icons/menu/reference-csharp',
+    name: 'C# Reference v0.0',
+  },
+  reference_python_v2: {
+    icon: '/docs/img/icons/menu/reference-python',
+    name: 'Python Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -302,33 +313,37 @@ const SiteLayout = ({ children }) => {
   }, [])
 
   return (
-    <main>
-      <div className="flex flex-row h-screen">
-        <NavContainer />
-        <Container>
-          <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-            <TopNavBarRef />
-          </div>
-          <div
-            className={[
-              'sticky transition-all top-0',
-              'z-10',
-              'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
-            ].join(' ')}
-          >
-            <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
-              <MobileHeader />
+    <>
+      <Head>
+        <title>Supabase Docs</title>
+      </Head>
+      <main>
+        <div className="flex flex-row h-screen">
+          <NavContainer />
+          <Container>
+            <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+              <TopNavBarRef />
             </div>
-          </div>
-          <div className="grow px-5 max-w-7xl mx-auto py-16">
-            {children}
-            <FooterHelpCallout />
-            <Footer />
-          </div>
-          <MobileMenuBackdrop />
-        </Container>
-      </div>
-    </main>
+            <div
+              className={[
+                'sticky transition-all top-0',
+                'z-10',
+                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+              ].join(' ')}
+            >
+              <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
+                <MobileHeader />
+              </div>
+            </div>
+            <div className="grow px-5 max-w-7xl mx-auto py-16">
+              {children}
+              <Footer />
+            </div>
+            <MobileMenuBackdrop />
+          </Container>
+        </div>
+      </main>
+    </>
   )
 }
 

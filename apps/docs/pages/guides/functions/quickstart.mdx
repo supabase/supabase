@@ -3,8 +3,9 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'functions-quickstart',
   title: 'Edge Functions Quickstart',
-  description: 'Globally distributed TypeScript functions.',
+  description: 'Globally distributed TypeScript Functions.',
   sidebar_label: 'Quickstart',
+  video: 'https://www.youtube.com/v/rzglqRdZUQE',
 }
 
 Learn how to build an Edge Function locally and deploy it to the Supabase Platform in less than 7 minutes.
@@ -28,7 +29,7 @@ Follow the steps to prepare your Supabase project on your local machine.
 - Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
 - Optional: Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
 
-## Create a function
+## Create an Edge Function
 
 Let's create a new Edge Function called `hello-world` inside your project:
 
@@ -55,9 +56,9 @@ If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webho
 
 </Admonition>
 
-## Execute remote functions
+## Invoking remote functions
 
-You can execute Edge Functions using curl. Copy the curl command from the Dashboard. It should look like this:
+You can invoke Edge Functions using curl:
 
 ```bash
 curl --request POST 'https://<project_ref>.functions.supabase.co/hello-world' \
@@ -66,143 +67,69 @@ curl --request POST 'https://<project_ref>.functions.supabase.co/hello-world' \
   --data '{ "name":"Functions" }'
 ```
 
+<Admonition type="note">
+
 If you receive an error `Invalid JWT`, find the `ANON_KEY` of your project in the Dashboard under `Settings > API`.
+
+</Admonition>
+
+or using one of the [client libraries](/docs#reference-documentation), e.g. using [supabase-js](/docs/reference/javascript/functions-invoke):
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+})
+```
 
 After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
 
-## Debug functions
+## Database Functions vs Edge Functions
 
-You can debug your deployed Edge Functions using the "Functions" section of the Dashboard. There are two types debugging tools available:
+For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
+and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
 
-- Invocations: shows the Request and Response for each execution.
-- Logs: shows any platform events, including deployments and errors.
+For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in TypeScript.
 
-![Function invocations.](/docs/img/guides/functions/function-logs.png)
+## Organizing your Edge Functions
 
-## Develop locally
-
-You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
+We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We recommend this folder structure:
 
 ```bash
-supabase start # start the supabase stack
-supabase functions serve hello-world # start the Function watcher
+└── supabase
+    ├── functions
+    │   ├── import_map.json # A top-level import map to use across functions.
+    │   ├── _shared
+    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key.
+    │   │   └── supabaseClient.ts # Supabase client with ANON key.
+    │   │   └── cors.ts # Reusable CORS headers.
+    │   ├── function-one # Use hyphens to name functions.
+    │   │   └── index.ts
+    │   └── function-two
+    │       └── index.ts
+    ├── migrations
+    └── config.toml
 ```
 
-The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
+## Naming Edge Functions
 
-### Invoke functions locally
+We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
 
-While serving your local Function, you can execute it using curl:
+## Using HTTP Methods
 
-```bash
-curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
-  --header 'Content-Type: application/json' \
-  --data '{ "name":"Functions" }'
-```
-
-You should see the response `{ "message":"Hello Functions!" }`.
-
-<details>
-<summary>Implementation details</summary>
-
-- Edge Functions don't serve HTML content (`GET` requests that return `text/html` are rewritten to `text/plain`).
-- The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
-- The Function is proxied through the local API (`http://localhost:54321`)
-
-</details>
-<br />
-
-If you execute Function with a different payload the response will change. <br />
-Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
-
-## Secrets and Environment Variables
-
-It's common that you will need to use sensitive information or environment-specific variables inside your Edge Functions. You can access these using Deno's built-in handler
-
-```js
-Deno.env.get(MY_SECRET_NAME)
-```
-
-### Default secrets
-
-By default, Edge Functions have access to these secrets:
-
-- `SUPABASE_URL`: The API gateway for your Supabase project.
-- `SUPABASE_ANON_KEY`: The `anon` key for your Supabase API. This is safe to use in a browser when you have [Row Level Security](/docs/guides/auth/row-level-security) enabled.
-- `SUPABASE_SERVICE_ROLE_KEY`: The `service_role` key for your Supabase API. This is safe to use in Edge Functions, but it should NEVER be used in a browser. This key will bypass [Row Level Security](/docs/guides/auth/row-level-security).
-- `SUPABASE_DB_URL`: The URL for your [PostgreSQL database](/docs/guides/database). You can use this to connect directly to your database.
-
-### Local secrets
-
-Let's create a local file for storing our secrets, and inside it we can store a secret `MY_NAME`:
-
-```jsx
-echo "MY_NAME=Yoda" >> ./supabase/.env.local
-```
-
-This creates a new file `./supabase/.env.local` for storing your local development secrets.
-
-<Admonition type="caution">
-
-Never check your .env files into Git!
-
-</Admonition>
-
-Now let's access this environment variable `MY_NAME` inside our Function. Anywhere in your function, add this line:
-
-```jsx
-console.log(Deno.env.get('MY_NAME'))
-```
-
-Now we can invoke our function locally, by serving it with our new `.env.local` file:
-
-```bash
-supabase functions serve hello-world --env-file ./supabase/.env.local
-```
-
-When the function starts you should see the name “Yoda” output to the terminal.
-
-### Production secrets
-
-Let's create a `.env` for production. In this case we'll just use the same as our local secrets:
-
-```bash
-cp ./supabase/.env.local ./supabase/.env
-```
-
-This creates a new file `./supabase/.env` for storing your production secrets.
-
-<Admonition type="caution">
-
-Never check your `.env` files into Git!
-
-</Admonition>
-
-Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/usage#supabase-secrets-set):
-
-```bash
-supabase secrets set --env-file ./supabase/.env
-
-# You can also set secrets individually using:
-supabase secrets set MY_NAME=Chewbacca
-```
-
-You don't need to re-deploy after setting your secrets.
-
-To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/usage#supabase-secrets-list):
-
-```bash
-supabase secrets list
-```
+Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your function.
 
 ## Limitations
 
 - Deno Deploy limitations
   - Deno does not support outgoing connections to ports `25`, `465`, and `587`.
-  - Cannot write to File System
+  - Cannot read or write to File System
+  - NPM modules are not supported.
 - Edge Functions
-  - Local development - only one function at a time
   - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

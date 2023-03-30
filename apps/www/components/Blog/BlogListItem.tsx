@@ -58,6 +58,7 @@ const BlogListItem = ({ post }: Props) => {
                       <Image
                         src={author.author_image_url}
                         className="dark:border-dark rounded-full border"
+                        alt={`${author.author} avatar`}
                         width="100%"
                         height="100%"
                         layout="responsive"

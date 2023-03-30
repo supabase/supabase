@@ -29,7 +29,7 @@ export function dart(Prism: any) {
       className,
       {
         // variables and parameters
-        // this to support class names (or generic parameters) which do not contain a lower case letter (also works for methods)
+        // supports class names (or generic parameters) which do not contain a lower case letter (also works for methods)
         pattern: RegExp(packagePrefix + /[A-Z]\w*(?=\s+\w+\s*[;,=()])/.source),
         lookbehind: true,
         inside: className.inside,

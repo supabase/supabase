@@ -149,7 +149,7 @@
     "author": "Tyler Shukert",
     "username": "dshukertjr",
     "position": "DevRel & Flutter",
-    "author_url": "https://github.com/dshukertjr",
+    "author_url": "https://twitter.com/dshukertjr",
     "author_image_url": "https://github.com/dshukertjr.png"
   },
   {
@@ -264,5 +264,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/hf",
     "author_image_url": "https://github.com/hf.png"
+  },
+  {
+    "author_id": "gregnr",
+    "author": "Greg Richardson",
+    "position": "Open Source Contributor",
+    "author_url": "https://github.com/gregnr",
+    "author_image_url": "https://github.com/gregnr.png"
   }
 ]

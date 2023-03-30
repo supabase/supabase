@@ -1,21 +1,28 @@
-import { DefaultSeo } from 'next-seo'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { SearchProvider } from '~/components/DocSearch'
+// import { CommandMenuProvider } from 'ui'
 import Favicons from '~/components/Favicons'
-import { ThemeProvider } from 'common/Providers'
+import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
+import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { post } from '~/lib/fetchWrappers'
 import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
 import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
-import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+
+  const [supabase] = useState(() =>
+    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+  )
 
   function telemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
@@ -53,41 +60,37 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [router.events])
 
   const SITE_TITLE = 'Supabase Documentation'
-  const SITE_DESCRIPTION = 'The open source Firebase alternative.'
-  const { basePath } = useRouter()
 
   return (
     <>
       <Favicons />
-      <DefaultSeo
-        title={SITE_TITLE}
-        description={SITE_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/docs',
-          site_name: SITE_TITLE,
-          images: [
-            {
-              url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
-      <ThemeProvider>
-        <SearchProvider>
-          <SiteLayout>
-            <Component {...pageProps} />
-          </SiteLayout>
-        </SearchProvider>
-      </ThemeProvider>
+      {IS_PLATFORM || LOCAL_SUPABASE ? (
+        <SessionContextProvider supabaseClient={supabase}>
+          <AuthProvider>
+            <ThemeProvider>
+              <SearchProvider>
+                {/* <CommandMenuProvider site="docs"> */}
+                <SiteLayout>
+                  <Component {...pageProps} />
+                </SiteLayout>
+                {/* </CommandMenuProvider> */}
+              </SearchProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </SessionContextProvider>
+      ) : (
+        <AuthProvider>
+          <ThemeProvider>
+            <SearchProvider>
+              {/* <CommandMenuProvider site="docs"> */}
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+              {/* </CommandMenuProvider> */}
+            </SearchProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      )}
     </>
   )
 }

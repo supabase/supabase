@@ -14,9 +14,10 @@ For a complete run-down on how all of our tools work together, see the main DEVE
 [supabase.com/docs](https://supabase.com/docs) is a Next.JS site. You can get setup by following the same steps for all of our other Next.JS projects:
 
 1. Follow the steps outlined in the Local Development section of the main [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md)
-2. Start the local docs site by navigating to `/apps/docs` and running `npm run dev`
-3. Visit http://localhost:3001/docs in your browser - don't forget to append the `/docs` to the end
-4. Your local site should look exactly like [https://supabase.com/docs](https://supabase.com/docs)
+2. If you work at Supabase, run `dev:secrets:pull` to pull down the internal environment variables. If you're a community member, create a `.env` file and add this line to it: `NEXT_PUBLIC_IS_PLATFORM=false`
+3. Start the local docs site by navigating to `/apps/docs` and running `npm run dev`
+4. Visit http://localhost:3001/docs in your browser - don't forget to append the `/docs` to the end
+5. Your local site should look exactly like [https://supabase.com/docs](https://supabase.com/docs)
 
 ## Types of documentation
 

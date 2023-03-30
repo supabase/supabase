@@ -8,9 +8,9 @@ import NoPermission from 'components/ui/NoPermission'
 import { CreateWrapper } from 'components/interfaces/Database'
 
 const DatabaseWrappersNew: NextPageWithLayout = () => {
-  const canReadWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'wrappers')
-  if (!canReadWrappers) {
-    return <NoPermission isFullPage resourceText="view foreign data wrappers" />
+  const canCreateWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  if (!canCreateWrappers) {
+    return <NoPermission isFullPage resourceText="create foreign data wrappers" />
   }
 
   return <CreateWrapper />

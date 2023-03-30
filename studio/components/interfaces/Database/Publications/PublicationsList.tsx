@@ -6,7 +6,7 @@ import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
 import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
@@ -83,7 +83,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
         </div>
       </div>
       {publications.length === 0 ? (
-        <NoSearchResults />
+        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       ) : (
         <div className="overflow-hidden rounded">
           <Table
