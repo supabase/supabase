@@ -1,5 +1,5 @@
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { Dictionary } from './base'
 import { SupaRow, SupaTable } from './table'
 
@@ -81,6 +81,21 @@ export interface SupabaseGridProps {
     row: any
     column: any
   }) => void
+
+  /**
+   * Show custom component passed as children instead of the grid editor
+   */
+  showCustomChildren?: boolean
+
+  /**
+   * Custom header left most actions component
+   */
+  customHeader?: ReactNode
+
+  /**
+   * Custom component passed as children
+   */
+  children?: ReactNode
 }
 
 export interface SupabaseGridRef {

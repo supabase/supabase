@@ -68,7 +68,7 @@ const Developers = () => {
                   <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
                     <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                       <Image
-                        src={`${basePath}/${caseStudy.imgUrl}`}
+                        src={`${basePath}${caseStudy.imgUrl}`}
                         alt="caseStudyThumb"
                         layout="fill"
                         objectFit="cover"

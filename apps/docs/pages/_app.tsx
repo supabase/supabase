@@ -1,6 +1,6 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { ThemeProvider } from 'common/Providers'
+import { AuthProvider, ThemeProvider } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
@@ -66,6 +66,20 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Favicons />
       {IS_PLATFORM || LOCAL_SUPABASE ? (
         <SessionContextProvider supabaseClient={supabase}>
+          <AuthProvider>
+            <ThemeProvider>
+              <SearchProvider>
+                {/* <CommandMenuProvider site="docs"> */}
+                <SiteLayout>
+                  <Component {...pageProps} />
+                </SiteLayout>
+                {/* </CommandMenuProvider> */}
+              </SearchProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </SessionContextProvider>
+      ) : (
+        <AuthProvider>
           <ThemeProvider>
             <SearchProvider>
               {/* <CommandMenuProvider site="docs"> */}
@@ -75,17 +89,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               {/* </CommandMenuProvider> */}
             </SearchProvider>
           </ThemeProvider>
-        </SessionContextProvider>
-      ) : (
-        <ThemeProvider>
-          <SearchProvider>
-            {/* <CommandMenuProvider site="docs"> */}
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
-            {/* </CommandMenuProvider> */}
-          </SearchProvider>
-        </ThemeProvider>
+        </AuthProvider>
       )}
     </>
   )
