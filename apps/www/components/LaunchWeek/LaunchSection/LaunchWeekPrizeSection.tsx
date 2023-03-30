@@ -109,7 +109,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                 animateFrom="down"
                 content={
                   <h3 className="text-sm flex items-center gap-4">
-                    Supabase Sticker Pack <LabelBadge text="25 packs" />
+                    Supabase Sticker Pack <LabelBadge text="200 packs" />
                   </h3>
                 }
               />
