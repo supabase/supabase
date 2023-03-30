@@ -88,7 +88,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          'text-scale-1100 placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
           className
         )}
         {...props}
@@ -258,18 +258,33 @@ export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, Co
 
 CommandItemStale.displayName = 'CommandItemStale'
 
-export const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+interface CommandShortcutProps {
+  className?: string
+  children?: React.ReactNode
+  onClick?: () => void
+  type?: 'default' | 'breadcrumb'
+}
+
+export const CommandShortcut = ({
+  className,
+  children,
+  onClick,
+  type = 'default',
+}: CommandShortcutProps) => {
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        '[&:not(:last-child)]:hover:bg-scale-600 [&:not(:last-child)]:hover:cursor-pointer',
-        'cursor-default bg-scale-500 px-1.5 py-0.5 rounded text-xs text-scale-900',
-        'last:bg-scale-600 last:text-scale-900',
+        'cursor-default px-1.5 py-0.5 rounded text-xs [&:not(:last-child)]:hover:cursor-pointer',
         'justify-end',
+        type === 'breadcrumb'
+          ? 'text-scale-900'
+          : 'bg-scale-500 text-scale-900 [&:not(:last-child)]:hover:bg-scale-600 last:bg-scale-600 last:text-scale-900',
         className
       )}
-      {...props}
-    />
+    >
+      {children}
+    </button>
   )
 }
 
@@ -298,7 +313,10 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
     }
 
     const regex = new RegExp(query, 'gi')
-    return text.replace(regex, (match) => `<span class="font-bold text-scale-1200">${match}</span>`)
+    return text.replace(
+      regex,
+      (match) => `<span class="font-semibold text-scale-1200">${match}</span>`
+    )
   }
 
   return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
