@@ -85,11 +85,16 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         </SessionContextProvider>
       ) : (
         <ThemeProvider>
-          {/* <CommandMenuProvider site="docs"> */}
-          <SiteLayout>
-            <Component {...pageProps} />
-          </SiteLayout>
-          {/* </CommandMenuProvider> */}
+          <CommandMenuProvider
+            site="docs"
+            MarkdownHandler={({ ...props }) => (
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
+            )}
+          >
+            <SiteLayout>
+              <Component {...pageProps} />
+            </SiteLayout>
+          </CommandMenuProvider>
         </ThemeProvider>
       )}
     </>
