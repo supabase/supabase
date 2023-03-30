@@ -40,10 +40,8 @@ import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'component
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
-import CommandMenuProvider from 'ui/src/components/Command/CommandMenuProvider'
+
 import { TooltipProvider } from '@radix-ui/react-tooltip'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -119,33 +117,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>
-                    <AppBannerWrapper>
-                      <CommandMenuProvider
-                        site="studio"
-                        MarkdownHandler={({ children, ...props }: { children: string }) => (
-                          <ReactMarkdown
-                            linkTarget="_blank"
-                            className="prose dark:prose-dark"
-                            remarkPlugins={[remarkGfm]}
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
-                            {...props}
-                          >
-                            {children}
-                          </ReactMarkdown>
-                        )}
-                      >
-                        {getLayout(<Component {...pageProps} />)}
-                      </CommandMenuProvider>
-                    </AppBannerWrapper>
+                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
