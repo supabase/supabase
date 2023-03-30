@@ -5,7 +5,7 @@ import type {
   CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+
 import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
 
@@ -47,7 +47,8 @@ function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) {
-    throw new Error('Missing environment variable NEXT_PUBLIC_SUPABASE_URL')
+    // throw new Error('Missing environment variable NEXT_PUBLIC_SUPABASE_URL')
+    return ''
   }
 
   // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
@@ -110,7 +111,8 @@ const AiCommand = () => {
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
+    useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
@@ -128,6 +130,10 @@ const AiCommand = () => {
 
   const handleConfirm = useCallback(
     async (query: string) => {
+      if (!edgeFunctionUrl) {
+        console.error('No edge function url')
+      }
+
       setAnswer(undefined)
       setSearch('')
       dispatchPromptData({ index: promptIndex, answer: undefined, query })
@@ -277,24 +283,7 @@ const AiCommand = () => {
                       {isLoading && promptIndex === i ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        // TODO: pull in markdown components from docs for better styling (code blocks, etc)
-                        <ReactMarkdown
-                          linkTarget="_blank"
-                          className="prose dark:prose-dark"
-                          remarkPlugins={[remarkGfm]}
-                          transformLinkUri={(href) => {
-                            const supabaseUrl = new URL('https://supabase.com')
-                            const linkUrl = new URL(href, 'https://supabase.com')
-
-                            if (linkUrl.origin === supabaseUrl.origin) {
-                              return linkUrl.toString()
-                            }
-
-                            return href
-                          }}
-                        >
-                          {prompt.answer}
-                        </ReactMarkdown>
+                        <MarkdownHandler>{prompt.answer}</MarkdownHandler>
                       )}
                     </>
                   </div>
