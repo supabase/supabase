@@ -61,14 +61,21 @@ function CaseStudyPage(props: any) {
   const content = props.blog.content
   const { basePath } = useRouter()
 
+  const meta = {
+    title: `${props.blog.name} | Customer Stories`,
+    description: props.blog.description,
+    image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
+    url: `https://supabase.io/customers/${props.blog.slug}`,
+  }
+
   return (
     <>
       <NextSeo
-        title={props.blog.title}
+        title={meta.title}
         openGraph={{
-          title: props.blog.title,
+          title: meta.title,
           description: props.blog.description,
-          url: `https://supabase.io/customers/${props.blog.slug}`,
+          url: meta.url,
           type: 'article',
           article: {
             //
@@ -78,7 +85,7 @@ function CaseStudyPage(props: any) {
           },
           images: [
             {
-              url: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
+              url: meta.image,
             },
           ],
         }}
