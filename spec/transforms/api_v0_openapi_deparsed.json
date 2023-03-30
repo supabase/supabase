@@ -570,9 +570,6 @@
                     },
                     "import_map": {
                       "type": "boolean"
-                    },
-                    "body": {
-                      "type": "string"
                     }
                   },
                   "required": [
@@ -2484,9 +2481,6 @@
           },
           "import_map": {
             "type": "boolean"
-          },
-          "body": {
-            "type": "string"
           }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]

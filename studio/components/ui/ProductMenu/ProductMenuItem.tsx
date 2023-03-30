@@ -16,6 +16,32 @@ interface Props {
   label?: string
 }
 
+const Label = ({ label }: { label: string }) => {
+  const color =
+    label.toLowerCase() === 'new' ? 'text-brand-900 bg-brand-500' : 'text-amber-900 bg-amber-500'
+
+  return (
+    <span
+      className={[
+        `text-mono 
+        h-[18px],
+        flex
+        items-center
+        justify-center
+        px-1.5
+        rounded-full 
+        tracking-widest
+        text-[10px] 
+        font-medium
+        truncate`,
+        color,
+      ].join(' ')}
+    >
+      {label}
+    </span>
+  )
+}
+
 const ProductMenuItem: FC<Props> = ({
   name = '',
   isActive,
@@ -36,9 +62,9 @@ const ProductMenuItem: FC<Props> = ({
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
-          {name}{' '}
+          <span className="truncate">{name}{' '}</span>
           {label !== undefined && (
-            <span className="text-orange-800 text-xs font-normal">{label}</span>
+            <span className="text-orange-800 text-xs font-normal truncate">{label}</span>
           )}
         </div>
         {action}

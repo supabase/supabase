@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import KJUR from 'jsrsasign'
-import CodeBlock from './CodeBlock/CodeBlock'
-import { Button } from 'ui'
+import { Button, Select, Input, CodeBlock } from 'ui'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
 const now = new Date()
@@ -46,9 +45,8 @@ export default function JwtGenerator({}) {
     <div>
       <div className="grid mb-8">
         <label for="secret">JWT Secret:</label>
-        <input
+        <Input
           id="secret"
-          className="border rounded bg-gray-200 w-full"
           type="text"
           placeholder="JWT Secret (at least 32 characters)"
           value={jwtSecret}
@@ -57,19 +55,15 @@ export default function JwtGenerator({}) {
       </div>
       <div className="grid mb-8">
         <label for="service">Preconfigured Payload:</label>
-        <select
-          id="service"
-          onChange={handleKeySelection}
-          className="border rounded bg-gray-200 w-full"
-        >
-          <option value="anon">ANON_KEY</option>
-          <option value="service">SERVICE_KEY</option>
-        </select>
+        <Select id="service" onChange={handleKeySelection}>
+          <Select.Option value="anon">ANON_KEY</Select.Option>
+          <Select.Option value="service">SERVICE_KEY</Select.Option>
+        </Select>
       </div>
 
       <div className="grid mb-8">
         <label for="token">Payload:</label>
-        <textarea
+        <Input.TextArea
           id="token"
           type="text"
           rows="5"

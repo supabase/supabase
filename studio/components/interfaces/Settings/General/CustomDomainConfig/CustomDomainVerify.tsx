@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
+import { Alert, Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
 
 import { useStore } from 'hooks'
-import { ProjectSettingsResponse } from 'data/config/project-settings-query'
+import { ProjectApiResponse } from 'data/config/project-api-query'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
@@ -15,12 +15,11 @@ import InformationBox from 'components/ui/InformationBox'
 export type CustomDomainVerifyProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
-  settings?: ProjectSettingsResponse
+  settings?: ProjectApiResponse
 }
 
 const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
   const { ui } = useStore()
-
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
@@ -29,8 +28,12 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-
   const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+
+  const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
+    (acc, error) => acc || error.message.includes('caa_error'),
+    false
+  )
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) {
@@ -56,11 +59,11 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
       <Panel.Content className="space-y-6">
         <div>
           <h4 className="text-scale-1200 mb-2">
-            Successfully added your custom domain{' '}
+            Configure TXT verification for your custom domain{' '}
             <code className="text-sm">{customDomain.hostname}</code>
           </h4>
           <p className="text-sm text-scale-1100">
-            Set the following record(s) in your DNS provider, then click verify to confirm your
+            Set the following TXT record(s) in your DNS provider, then click verify to confirm your
             control over the domain
           </p>
           <p className="text-sm text-scale-1100">
@@ -111,6 +114,18 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </div>
         </div>
 
+        {hasCAAErrors && (
+          <Alert
+            withIcon
+            variant="warning"
+            title="Certificate Authority Authentication (CAA) error"
+          >
+            Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
+            <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+            <code className="text-xs">0 issue "digicert.com"</code>
+          </Alert>
+        )}
+
         <div className="space-y-2">
           <div className="flex gap-4">
             <div className="w-[50px]">
@@ -134,7 +149,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             <DNSRecord
               type="CNAME"
               name={customDomain.hostname}
-              value={settings?.autoApiService.app_config.endpoint ?? 'Loading...'}
+              value={settings?.autoApiService.endpoint ?? 'Loading...'}
             />
           )}
 
@@ -163,6 +178,16 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             </div>
           )}
         </div>
+        <div className="!mt-4">
+          <p className="text-sm text-scale-1000">
+            One of the records requires you to replace the CNAME record set up in the first step
+            with a TXT record.
+          </p>
+          <p className="text-sm text-scale-1000">
+            You'll be able to restore it back to the CNAME after the verification process has been
+            completed.
+          </p>
+        </div>
       </Panel.Content>
 
       <div className="border-t border-scale-400" />
@@ -181,6 +206,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               type="default"
               onClick={onCancelCustomDomain}
               loading={isDeleting}
+              disabled={isDeleting || isReverifyLoading}
               className="self-end"
             >
               Cancel
@@ -189,6 +215,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
               icon={<IconRefreshCw />}
               onClick={onReverifyCustomDomain}
               loading={isReverifyLoading}
+              disabled={isDeleting || isReverifyLoading}
               className="self-end"
             >
               Verify

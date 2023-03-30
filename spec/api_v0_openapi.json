@@ -1151,8 +1151,7 @@
           "created_at": { "type": "number" },
           "updated_at": { "type": "number" },
           "verify_jwt": { "type": "boolean" },
-          "import_map": { "type": "boolean" },
-          "body": { "type": "string" }
+          "import_map": { "type": "boolean" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },

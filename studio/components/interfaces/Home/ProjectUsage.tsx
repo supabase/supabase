@@ -1,4 +1,3 @@
-import useSWR from 'swr'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useState } from 'react'
@@ -6,9 +5,10 @@ import { useRouter } from 'next/router'
 import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import { get } from 'lib/common/fetch'
-import { API_URL, DATE_FORMAT, METRICS } from 'lib/constants'
+import { DATE_FORMAT, METRICS } from 'lib/constants'
 import { ChartIntervals } from 'types'
+import { useParams } from 'hooks'
+import { useProjectLogStatsQuery } from 'data/logs/project-log-stats-query'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -25,14 +25,11 @@ interface Props {}
 
 const ProjectUsage: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const [interval, setInterval] = useState<string>('hourly')
 
-  const { data, error }: any = useSWR(
-    `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
-    get
-  )
+  const { data, error } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
@@ -51,9 +48,9 @@ const ProjectUsage: FC<Props> = ({}) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/logs/edge-logs?te=${paddedTimestamp}`)
+      router.push(`/project/${projectRef}/logs/edge-logs?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/logs/edge-logs?te=${timestamp}`)
+      router.push(`/project/${projectRef}/logs/edge-logs?te=${timestamp}`)
     }
   }
 
@@ -94,7 +91,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                       </div>
                     }
                     title="Database"
-                    href={`/project/${ref}/editor`}
+                    href={`/project/${projectRef}/editor`}
                   />
                   <ChartHandler
                     startDate={startDate}
@@ -120,7 +117,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                       </div>
                     }
                     title="Auth"
-                    href={`/project/${ref}/auth/users`}
+                    href={`/project/${projectRef}/auth/users`}
                   />
                   <ChartHandler
                     startDate={startDate}
@@ -146,7 +143,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                       </div>
                     }
                     title="Storage"
-                    href={`/project/${ref}/storage/buckets`}
+                    href={`/project/${projectRef}/storage/buckets`}
                   />
                   <ChartHandler
                     startDate={startDate}

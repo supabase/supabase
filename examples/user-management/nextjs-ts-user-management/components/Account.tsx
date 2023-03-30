@@ -14,36 +14,36 @@ export default function Account({ session }: { session: Session }) {
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
 
   useEffect(() => {
-    getProfile()
-  }, [session])
+    async function getProfile() {
+      try {
+        setLoading(true)
+        if (!user) throw new Error('No user')
 
-  async function getProfile() {
-    try {
-      setLoading(true)
-      if (!user) throw new Error('No user')
+        let { data, error, status } = await supabase
+          .from('profiles')
+          .select(`username, website, avatar_url`)
+          .eq('id', user.id)
+          .single()
 
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
-        .single()
+        if (error && status !== 406) {
+          throw error
+        }
 
-      if (error && status !== 406) {
-        throw error
+        if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
+      } catch (error) {
+        alert('Error loading user data!')
+        console.log(error)
+      } finally {
+        setLoading(false)
       }
-
-      if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
-      }
-    } catch (error) {
-      alert('Error loading user data!')
-      console.log(error)
-    } finally {
-      setLoading(false)
     }
-  }
+
+    getProfile()
+  }, [session, user, supabase])
 
   async function updateProfile({
     username,

@@ -89,13 +89,13 @@ const ComputeSizeSelection: FC<Props> = ({
                   </div>
                 }
                 // @ts-ignore
-                description={
-                  <div>
-                    <p>{option.metadata.features}</p>
+                description={option.metadata.features}
+                value={option.id}
+                optionalLabel={
+                  <div className="w-[6rem] flex items-center justify-end">
+                    ${defaultPrice.unit_amount / 100} / month
                   </div>
                 }
-                value={option.id}
-                optionalLabel={<div>${defaultPrice.unit_amount / 100} / month</div>}
                 checked={selectedComputeSize?.id === option.id}
                 onChange={() => onSelectOption(option)}
               />

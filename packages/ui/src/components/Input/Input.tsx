@@ -97,7 +97,7 @@ function Input({
   // }, [errors, touched])
 
   function onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
+    navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
         setCopyLabel('Copied')

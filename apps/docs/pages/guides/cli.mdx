@@ -1,0 +1,120 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Supabase CLI',
+  description:
+    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+}
+
+The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
+You can also use the CLI to manage your Supabase projects, handle database migrations and CI/CD workflows, and generate types directly from your database schema.
+
+## Installation
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
+
+Install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
+
+```sh
+npm install supabase --save-dev
+```
+
+</TabPanel>
+<TabPanel id="macos" label="macOS">
+
+Install the CLI with [Homebrew](https://brew.sh):
+
+```sh
+brew install supabase/tap/supabase
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+Install the CLI with [Scoop](https://scoop.sh):
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+The CLI is available through [Homebrew](https://brew.sh) and Linux packages.
+
+#### Homebrew
+
+```sh
+brew install supabase/tap/supabase
+```
+
+#### Linux packages
+
+Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
+To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager
+and run one of the following:
+
+- `sudo apk add --allow-untrusted <...>.apk`
+- `sudo dpkg -i <...>.deb`
+- `sudo rpm -i <...>.rpm`
+
+</TabPanel>
+</Tabs>
+
+## Updates
+
+When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+>
+<TabPanel id="npm" label="npm">
+
+```sh
+npm update supabase --save-dev
+```
+
+</TabPanel>
+<TabPanel id="macos" label="macOS">
+
+```sh
+brew upgrade supabase
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+```powershell
+scoop update supabase
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+```sh
+brew upgrade supabase
+```
+
+</TabPanel>
+</Tabs>
+
+## See also
+
+- [Supabase CLI Reference](/docs/reference/cli/introduction)
+- [Supabase CLI Configuration](/docs/reference/cli/config)
+- [Local Development](/docs/guides/cli/local-development)
+- [Managing Environments](/docs/guides/cli/managing-environments)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

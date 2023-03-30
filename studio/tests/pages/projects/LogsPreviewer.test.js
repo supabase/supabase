@@ -16,19 +16,24 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscription } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { useParams } from 'hooks'
 
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
   useRouter.mockReset()
-  useRouter.mockReturnValue(defaultRouterMock())
+  const routerReturnValue = defaultRouterMock()
+  useRouter.mockReturnValue(routerReturnValue)
+
+  useParams.mockReset()
+  useParams.mockReturnValue(routerReturnValue.query)
 })
 
 test.each([
@@ -138,8 +143,14 @@ test.each([
     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
     await waitFor(() => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      )
     })
     // reset mock so that we can check for selection call
     get.mockClear()
@@ -151,8 +162,14 @@ test.each([
     fireEvent.click(row)
 
     await waitFor(() => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      )
     })
 
     for (const text of selectionTexts) {
@@ -176,7 +193,7 @@ test('Search will trigger a log refresh', async () => {
 
   await waitFor(
     () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('something'))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('something'), expect.anything())
 
       // updates router query params
       const router = useRouter()
@@ -225,17 +242,18 @@ test('log event chart', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => screen.queryByText(/some-uuid123/) === null)
-  expect(get).toBeCalledWith(expect.stringContaining('trunc'))
+  expect(get).toBeCalledWith(expect.stringContaining('trunc'), expect.anything())
 })
 
 test('s= query param will populate the search bar', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, s: 'someSearch' }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   // should populate search input with the search param
   await screen.findByDisplayValue('someSearch')
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('someSearch'))
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('someSearch'), expect.anything())
 })
 
 test('te= query param will populate the timestamp to input', async () => {
@@ -246,14 +264,15 @@ test('te= query param will populate the timestamp to input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, ite: iso }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`iso_timestamp_end=${encodeURIComponent(iso)}`)
+      expect.stringContaining(`iso_timestamp_end=${encodeURIComponent(iso)}`),
+      expect.anything()
     )
   })
-  userEvent.click(await screen.findByTitle('Custom'))
 })
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
@@ -263,15 +282,15 @@ test('ts= query param will populate the timestamp from input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, its: iso }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`)
+      expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`),
+      expect.anything()
     )
   })
-  userEvent.click(await screen.findByTitle('Custom'))
-  await screen.findByText(new RegExp(newDate.getFullYear()))
 })
 
 test('load older btn will fetch older logs', async () => {
@@ -295,7 +314,7 @@ test('load older btn will fetch older logs', async () => {
   userEvent.click(await screen.findByText('Load older'))
   await screen.findByText('first event')
   await screen.findByText('second event')
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end='))
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end='), expect.anything())
 })
 
 test('bug: load older btn does not error out when previous page is empty', async () => {
@@ -350,6 +369,7 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   const router = defaultRouterMock()
   router.query = { ...router.query, s: 'simple-query' }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   rerender(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await screen.findByDisplayValue('simple-query')
@@ -370,14 +390,17 @@ test('filters alter generated query', async () => {
 
   await waitFor(() => {
     // counts are adjusted
-    expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/))
+    expect(get).toHaveBeenCalledWith(
+      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/),
+      expect.anything()
+    )
 
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('500'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('599'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('200'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('299'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'), expect.anything())
   })
 
   // should be able to clear the filters
@@ -392,18 +415,22 @@ test('filters alter generated query', async () => {
   await waitFor(() => {
     // counts are adjusted
     expect(get).not.toHaveBeenCalledWith(
-      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/)
+      expect.stringMatching(/count.+\*.+as.count.+where.+500.+599/),
+      expect.anything()
     )
-    expect(get).toHaveBeenCalledWith(expect.stringMatching(/count.+\*.+as.count.+where.+400.+499/))
+    expect(get).toHaveBeenCalledWith(
+      expect.stringMatching(/count.+\*.+as.count.+where.+400.+499/),
+      expect.anything()
+    )
 
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'))
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'))
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'))
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('500'), expect.anything())
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('599'), expect.anything())
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('200'), expect.anything())
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('299'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('400'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('499'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'), expect.anything())
   })
 })
 test('filters accept filterOverride', async () => {
@@ -416,15 +443,15 @@ test('filters accept filterOverride', async () => {
   )
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'), expect.anything())
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'), expect.anything())
   })
 })
 
 describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscription.mockReturnValue({
-      subscription: {
+    useProjectSubscriptionQuery.mockReturnValue({
+      data: {
         tier: {
           supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
           key,
@@ -441,6 +468,7 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
       ite: dayjs().toISOString(),
     }
     useRouter.mockReturnValue(router)
+    useParams.mockReturnValue(router.query)
     render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
     await screen.findByText('Log retention') // assert modal title is present
   })

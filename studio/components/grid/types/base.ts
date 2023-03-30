@@ -55,9 +55,17 @@ export type ColumnType =
   | 'time'
   | 'unknown'
 
+export interface GridForeignKey {
+  targetTableSchema?: string | null
+  targetTableName?: string | null
+  targetColumnName?: string | null
+  deletionAction?: string
+}
+
 export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
   columnType: ColumnType
   isPrimaryKey: boolean | undefined
   isEncrypted: boolean | undefined
   format: string
+  foreignKey?: GridForeignKey
 }

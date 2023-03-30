@@ -7,9 +7,9 @@ import {
   LOGS_TABLES,
   QueryType,
 } from 'components/interfaces/Settings/Logs'
-import useSWR from 'swr'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
+import { useQuery } from '@tanstack/react-query'
 
 interface Data {
   logData: LogData | undefined
@@ -20,38 +20,46 @@ interface Handlers {
   refresh: () => void
 }
 function useSingleLog(
-  project: string,
+  projectRef: string,
   queryType?: QueryType,
   paramsToMerge?: Partial<LogsEndpointParams>,
   id?: string | null
 ): [Data, Handlers] {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
-  const params: LogsEndpointParams = { ...paramsToMerge, project, sql }
-  const endpointUrl = `${API_URL}/projects/${project}/analytics/endpoints/logs.all?${genQueryParams(
+  const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
+  const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
     params as any
   )}`
+
+  const enabled = Boolean(id && table)
+
   const {
     data,
-    error: swrError,
-    isValidating,
-    mutate,
-  } = useSWR<Logs>(id && table ? endpointUrl : null, get, {
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 5000,
-  })
+    error: rcError,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useQuery(
+    ['projects', projectRef, 'log', id],
+    ({ signal }) => get(endpointUrl, { signal }) as Promise<Logs>,
+    {
+      enabled,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+    }
+  )
 
-  let error: null | string | object = swrError ? swrError.message : null
+  let error: null | string | object = rcError ? (rcError as any).message : null
   return [
     {
       logData: data?.result ? data.result[0] : undefined,
-      isLoading: isValidating,
+      isLoading: (enabled && isLoading) || isRefetching,
       error,
     },
     {
-      refresh: () => mutate(),
+      refresh: () => refetch(),
     },
   ]
 }

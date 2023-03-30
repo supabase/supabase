@@ -1,5 +1,6 @@
 import LogEventChart from 'components/interfaces/Settings/Logs/LogEventChart'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import { render } from '../../helpers'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'

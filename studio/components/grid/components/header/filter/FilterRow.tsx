@@ -1,24 +1,22 @@
-import { FC, memo } from 'react'
+import { memo } from 'react'
 import { Button, Input, IconChevronDown, IconX } from 'ui'
 
-import { Filter, FilterOperator } from 'components/grid/types'
+import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { DropdownControl } from 'components/grid/components/common'
-import { useTrackedState } from 'components/grid/store'
 import { FilterOperatorOptions } from './Filter.constants'
 
-interface Props {
+export interface FilterRowProps {
+  table: SupaTable
   filterIdx: number
   filter: Filter
   onChange: (index: number, filter: Filter) => void
   onDelete: (index: number) => void
 }
 
-const FilterRow: FC<Props> = ({ filter, filterIdx, onChange, onDelete }) => {
-  const state = useTrackedState()
-
-  const column = state.table?.columns.find((x) => x.name === filter.column)
+const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowProps) => {
+  const column = table.columns.find((x) => x.name === filter.column)
   const columnOptions =
-    state.table?.columns?.map((x) => {
+    table.columns?.map((x) => {
       return { value: x.name, label: x.name, postLabel: x.dataType }
     }) || []
 

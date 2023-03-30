@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input, Alert } from 'ui'
-import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button } from 'ui'
+import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
@@ -17,6 +17,9 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Link from 'next/link'
 
 interface Props {
   table?: PostgresTable
@@ -50,9 +53,9 @@ const TableEditor: FC<Props> = ({
   updateEditorDirty = () => {},
 }) => {
   const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
 
-  const tables = meta.tables.list()
   const enumTypes = meta.types.list(
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
@@ -72,6 +75,13 @@ const TableEditor: FC<Props> = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
 
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: table?.schema,
+  })
+  const foreignKeyMeta = data || []
+
   useEffect(() => {
     if (visible) {
       setErrors({})
@@ -83,6 +93,7 @@ const TableEditor: FC<Props> = ({
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table!,
+          foreignKeyMeta,
           isDuplicating,
           isRealtimeEnabled
         )
@@ -216,21 +227,46 @@ const TableEditor: FC<Props> = ({
                     Restrict access to your table by enabling RLS and writing Postgres policies.
                   </p>
 
-                  <p>
-                    If RLS is not enabled, anyone with the anon key can modify and delete your data.
-                  </p>
-                  {!tableFields.isRLSEnabled && (
+                  {tableFields.isRLSEnabled ? (
                     <Alert
                       withIcon
                       variant="warning"
                       className="!px-4 !py-3 mt-3"
-                      // @ts-ignore
-                      title={
-                        <span className="text-amber-1100 text-sm">
-                          Turning off RLS means that you are allowing anonymous access to your table
-                        </span>
-                      }
-                    />
+                      title="RLS policies are required to query data"
+                    >
+                      <p>
+                        You need to write a policy before you can query data from this table.
+                        Without a policy, querying this table will result in an <u>empty array</u>{' '}
+                        of results.
+                      </p>
+                      <p className="mt-4">
+                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                          <a target="_blank">
+                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                              RLS Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      </p>
+                    </Alert>
+                  ) : (
+                    <Alert
+                      withIcon
+                      variant="danger"
+                      className="!px-4 !py-3 mt-3"
+                      title="Turning off RLS means that you are allowing anonymous access to your table"
+                    >
+                      <p>As such, anyone with the anonymous key can modify or delete your data.</p>
+                      <p className="mt-4">
+                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                          <a target="_blank">
+                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                              RLS Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      </p>
+                    </Alert>
                   )}
                 </>
               }
@@ -255,7 +291,6 @@ const TableEditor: FC<Props> = ({
             {!isDuplicating && (
               <ColumnManagement
                 table={{ name: tableFields.name, schema: selectedSchema }}
-                tables={tables}
                 columns={tableFields?.columns}
                 enumTypes={enumTypes}
                 isNewRecord={isNewRecord}
