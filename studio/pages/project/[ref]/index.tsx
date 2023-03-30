@@ -41,26 +41,30 @@ const Home: NextPageWithLayout = () => {
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
       </div>
 
-      <div className="space-y-8">
-        <div className="mx-6">
-          <h4 className="text-lg">Client libraries</h4>
-        </div>
-        <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
-          {CLIENT_LIBRARIES.map((library) => (
-            <ClientLibrary key={library.language} {...library} />
-          ))}
-        </div>
-      </div>
-      <div className="space-y-8">
-        <div className="mx-6">
-          <h4 className="text-lg">Example projects</h4>
-        </div>
-        <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {EXAMPLE_PROJECTS.sort((a, b) => a.title.localeCompare(b.title)).map((project) => (
-            <ExampleProject key={project.url} {...project} />
-          ))}
-        </div>
-      </div>
+      {project?.status !== PROJECT_STATUS.INACTIVE && (
+        <>
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h4 className="text-lg">Client libraries</h4>
+            </div>
+            <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+              {CLIENT_LIBRARIES.map((library) => (
+                <ClientLibrary key={library.language} {...library} />
+              ))}
+            </div>
+          </div>
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h4 className="text-lg">Example projects</h4>
+            </div>
+            <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {EXAMPLE_PROJECTS.sort((a, b) => a.title.localeCompare(b.title)).map((project) => (
+                <ExampleProject key={project.url} {...project} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

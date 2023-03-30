@@ -99,7 +99,7 @@ const ReportFilterBar: FC<Props> = ({
   ]
   const [showAdder, setShowAdder] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
-    null | typeof PRODUCT_FILTERS[number]
+    null | (typeof PRODUCT_FILTERS)[number]
   >(null)
   const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
     key: filterKeys[0],
@@ -116,7 +116,7 @@ const ReportFilterBar: FC<Props> = ({
   }
 
   const handleProductFilterChange = async (
-    nextProductFilter: null | typeof PRODUCT_FILTERS[number]
+    nextProductFilter: null | (typeof PRODUCT_FILTERS)[number]
   ) => {
     const toRemove = PRODUCT_FILTERS.map(
       (productFilter) =>
@@ -156,6 +156,7 @@ const ReportFilterBar: FC<Props> = ({
                 All Requests
               </Dropdown.Item>
               <Dropdown.Separator />
+
               {PRODUCT_FILTERS.map((productFilter) => {
                 const Icon = productFilter.icon
                 return (
@@ -163,7 +164,6 @@ const ReportFilterBar: FC<Props> = ({
                     key={productFilter.key}
                     disabled={productFilter.key === currentProductFilter?.key}
                     onClick={() => handleProductFilterChange(productFilter)}
-                    className="hover:bg-scale-600"
                     icon={<Icon size={20} className="mr-2" />}
                   >
                     <p
