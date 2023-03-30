@@ -163,7 +163,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         <Button
                           htmlType="submit"
                           loading={isSubmitting}
-                          disabled={!canUpdateConfig || noChanges}
+                          disabled={isSubmitting || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>

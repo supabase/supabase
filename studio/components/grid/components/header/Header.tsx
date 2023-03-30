@@ -28,22 +28,44 @@ export type HeaderProps = {
   table: SupaTable
   sorts: Sort[]
   filters: Filter[]
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
   headerActions?: ReactNode
+  customHeader: ReactNode
 }
 
-const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }: HeaderProps) => {
+const Header = ({
+  table,
+  sorts,
+  filters,
+  onAddColumn,
+  onAddRow,
+  headerActions,
+  customHeader,
+  isRefetching,
+}: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div>
       <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-        {selectedRows.size > 0 ? (
-          <RowHeader table={table} sorts={sorts} filters={filters} />
+        {customHeader ? (
+          <>{customHeader}</>
         ) : (
-          <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
+          <>
+            {selectedRows.size > 0 ? (
+              <RowHeader table={table} sorts={sorts} filters={filters} />
+            ) : (
+              <DefaultHeader
+                table={table}
+                isRefetching={isRefetching}
+                onAddColumn={onAddColumn}
+                onAddRow={onAddRow}
+              />
+            )}
+          </>
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
@@ -56,10 +78,11 @@ export default Header
 
 type DefaultHeaderProps = {
   table: SupaTable
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => {
+const DefaultHeader = ({ table, isRefetching, onAddColumn, onAddRow }: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -72,7 +95,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton table={table} />
+        <RefreshButton table={table} isRefetching={isRefetching} />
         <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
