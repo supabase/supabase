@@ -66,9 +66,8 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           setPageState('ticket')
 
           // Listen to realtime changes
-          const channel =
-            realtimeChannel ??
-            supabase
+          if (!realtimeChannel && !data.golden) {
+            const channel = supabase
               .channel('changes')
               .on(
                 'postgres_changes',
@@ -79,14 +78,19 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
                   filter: `username=eq.${username}`,
                 },
                 (payload) => {
+                  const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
                   setUserData({
                     ...payload.new,
-                    golden: !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn,
+                    golden,
                   })
+                  if (golden) {
+                    channel.unsubscribe()
+                  }
                 }
               )
               .subscribe()
-          setRealtimeChannel(channel)
+            setRealtimeChannel(channel)
+          }
         })
     }
     return () => {
