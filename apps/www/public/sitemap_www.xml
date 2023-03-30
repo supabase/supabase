@@ -31,6 +31,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/case-studies</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/changelog</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -73,13 +79,19 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/contact/mfa</loc>
+    <loc>https://supabase.com/edge-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc>https://supabase.com/legal/dpa</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1059,25 +1071,41 @@
   </url>
 
   <url>
+<<<<<<< HEAD
     <loc>https://supabase.com/blog/case-study-happyteams</loc>
+=======
+    <loc>https://supabase.com/case-studies/epsilon3</loc>
+>>>>>>> c9a03fe27 (update sitemap)
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+<<<<<<< HEAD
     <loc>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</loc>
+=======
+    <loc>https://supabase.com/case-studies/mobbin</loc>
+>>>>>>> c9a03fe27 (update sitemap)
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+<<<<<<< HEAD
     <loc>https://supabase.com/blog/geo-queries-with-postgis-in-ionic-angular</loc>
+=======
+    <loc>https://supabase.com/case-studies/replenysh</loc>
+>>>>>>> c9a03fe27 (update sitemap)
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+<<<<<<< HEAD
     <loc>https://supabase.com/blog/supabase-beta-update-february-2023</loc>
+=======
+    <loc>https://supabase.com/case-studies/xendit</loc>
+>>>>>>> c9a03fe27 (update sitemap)
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
