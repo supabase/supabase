@@ -43,7 +43,7 @@ function ContextMenu({
       </RadixContextMenu.Trigger>
 
       <RadixContextMenu.Content
-        sideOffset={alignOffset}
+        alignOffset={alignOffset}
         // className={classes.join(' ')}
         style={style}
       >
@@ -152,11 +152,7 @@ interface RadioGroupProps {
   onChange?(x: string): void
 }
 
-export function RadioGroup({
-  children,
-  value: propsValue,
-  onChange,
-}: RadioGroupProps) {
+export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
   const handleChange = (e: string) => {

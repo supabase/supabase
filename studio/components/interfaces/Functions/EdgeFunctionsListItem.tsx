@@ -78,19 +78,21 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
               <p className="text-sm text-scale-1000">{dayjs(item.updated_at).fromNow()}</p>
             </div>
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </Table.td>
       <Table.td className="lg:table-cell">

@@ -88,7 +88,9 @@ export function withAuth<T>(
           {IS_PLATFORM && (
             <script
               dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${basePath}/sign-in' + '?' + searchParams.toString())}`,
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${
+                  basePath ?? ''
+                }/sign-in' + '?' + searchParams.toString())}`,
               }}
             />
           )}
