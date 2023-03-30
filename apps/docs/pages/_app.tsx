@@ -17,6 +17,7 @@ import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import components from '~/components'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -71,7 +72,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <ThemeProvider>
               <CommandMenuProvider
                 site="docs"
-                MarkdownHandler={({ children, ...props }: { children: string }) => (
+                MarkdownHandler={({ children }: { children: string }) => (
                   <ReactMarkdown
                     linkTarget="_blank"
                     className="prose dark:prose-dark"
@@ -86,7 +87,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
                       return href
                     }}
-                    {...props}
+                    components={components}
                   >
                     {children}
                   </ReactMarkdown>
