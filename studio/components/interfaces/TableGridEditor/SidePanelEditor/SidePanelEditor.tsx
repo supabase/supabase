@@ -9,7 +9,7 @@ import { useStore } from 'hooks'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { RowEditor, ColumnEditor, TableEditor } from '.'
+import { RowEditor, ColumnEditor, TableEditor, SpreadsheetImport } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import {
   ColumnField,
@@ -38,7 +38,7 @@ export interface SidePanelEditorProps {
     row: any
     column: any
   }
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -448,6 +448,12 @@ const SidePanelEditor = ({
         foreignKey={selectedForeignKeyToEdit?.foreignKey}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
+      />
+      <SpreadsheetImport
+        visible={sidePanelKey === 'csv-import'}
+        selectedTable={selectedTableToEdit}
+        saveContent={() => {}}
+        closePanel={onClosePanel}
       />
       <ConfirmationModal
         visible={isClosingPanel}

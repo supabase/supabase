@@ -3,7 +3,7 @@ import { debounce, includes } from 'lodash'
 import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
 
 import { useStore } from 'hooks'
-import ActionBar from '../../ActionBar'
+import ActionBar from '../ActionBar'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetPreview from './SpreadsheetPreview'
@@ -20,6 +20,7 @@ interface Props {
   headers?: string[]
   rows?: any[]
   visible: boolean
+  selectedTable?: any
   saveContent: (prefillData: any) => void
   closePanel: () => void
 }
@@ -28,6 +29,7 @@ const SpreadsheetImport: FC<Props> = ({
   debounceDuration = 250,
   headers = [],
   rows = [],
+  selectedTable,
   saveContent,
   closePanel,
   visible = false,
@@ -35,10 +37,8 @@ const SpreadsheetImport: FC<Props> = ({
   const { ui } = useStore()
 
   useEffect(() => {
-    if (visible) {
-      if (headers.length === 0) {
-        resetSpreadsheetImport()
-      }
+    if (visible && headers.length === 0) {
+      resetSpreadsheetImport()
     }
   }, [visible])
 
@@ -133,7 +133,18 @@ const SpreadsheetImport: FC<Props> = ({
       size="large"
       visible={visible}
       align="right"
-      header="Add content to new table"
+      header={
+        selectedTable !== undefined ? (
+          <>
+            Add data to{' '}
+            <code className="text-sm">
+              {selectedTable.schema}.{selectedTable.name}
+            </code>
+          </>
+        ) : (
+          'Add content to new table'
+        )
+      }
       onCancel={() => closePanel()}
       customFooter={
         <ActionBar
@@ -150,7 +161,7 @@ const SpreadsheetImport: FC<Props> = ({
       }
     >
       <SidePanel.Content>
-        <div className="flex flex-col">
+        <div className="pt-6">
           <Tabs block type="pills">
             <Tabs.Panel id="fileUpload" label="Upload CSV">
               <SpreadSheetFileUpload
@@ -209,7 +220,9 @@ const SpreadsheetImport: FC<Props> = ({
                               <IconArrowRight size={14} />
                               <p>Extra field(s):</p>
                               {error.data?.__parsed_extra.map((value: any, i: number) => (
-                                <code key={i} className="text-sm">{value}</code>
+                                <code key={i} className="text-sm">
+                                  {value}
+                                </code>
                               ))}
                             </>
                           )}

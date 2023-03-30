@@ -27,6 +27,7 @@ import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import RLSBannerWarning from './RLSBannerWarning'
+import clsx from 'clsx'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -187,20 +188,13 @@ const DefaultHeader = ({
                           className="group"
                           onClick={onImportData}
                           icon={
-                            // <div className="-mt-2 pr-1.5">
-                            //   <div className="border border-scale-1000 w-[15px] h-[4px]" />
-                            //   <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
-                            //   <div
-                            //     className={[
-                            //       'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                            //       'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
-                            //     ].join(' ')}
-                            //   />
-                            // </div>
                             <div className="relative -mt-2">
                               <IconFileText className="-translate-x-[2px]" />
                               <IconArrowUp
-                                className="absolute bottom-0 right-1 translate-y-0.5"
+                                className={clsx(
+                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
+                                  'group-hover:translate-y-0 group-hover:text-brand-900 group-hover:opacity-100'
+                                )}
                                 strokeWidth={3}
                                 size={12}
                               />
