@@ -141,6 +141,29 @@ const AiCommand = () => {
       setHasClippyError(false)
       setIsLoading(true)
 
+      let queryToSend = query
+
+      switch (currentPage) {
+        case COMMAND_ROUTES.AI:
+          queryToSend = query
+          break
+        case COMMAND_ROUTES.AI_ASK_ANYTHING:
+          queryToSend = query
+          break
+
+        case COMMAND_ROUTES.AI_RLS_POLICY:
+          queryToSend = `Given this table schema:
+
+          Schema STRIPE has tables:
+            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
+            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
+
+          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
+          break
+        default:
+          break
+      }
+
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
