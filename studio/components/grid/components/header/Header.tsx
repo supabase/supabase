@@ -1,6 +1,15 @@
 import { saveAs } from 'file-saver'
 import { useState, ReactNode } from 'react'
-import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
+import {
+  Button,
+  IconDownload,
+  IconX,
+  IconTrash,
+  Dropdown,
+  IconChevronDown,
+  IconFileText,
+  IconArrowUp,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useUrlState } from 'hooks'
@@ -31,6 +40,7 @@ export type HeaderProps = {
   isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
   headerActions?: ReactNode
   customHeader: ReactNode
 }
@@ -41,6 +51,7 @@ const Header = ({
   filters,
   onAddColumn,
   onAddRow,
+  onImportData,
   headerActions,
   customHeader,
   isRefetching,
@@ -63,6 +74,7 @@ const Header = ({
                 isRefetching={isRefetching}
                 onAddColumn={onAddColumn}
                 onAddRow={onAddRow}
+                onImportData={onImportData}
               />
             )}
           </>
@@ -81,8 +93,15 @@ type DefaultHeaderProps = {
   isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
 }
-const DefaultHeader = ({ table, isRefetching, onAddColumn, onAddRow }: DefaultHeaderProps) => {
+const DefaultHeader = ({
+  table,
+  isRefetching,
+  onAddColumn,
+  onAddRow,
+  onImportData,
+}: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -115,7 +134,6 @@ const DefaultHeader = ({ table, isRefetching, onAddColumn, onAddRow }: DefaultHe
                           key="add-row"
                           className="group"
                           onClick={onAddRow}
-                          disabled={onAddRow === undefined}
                           icon={
                             <div className="-mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[15px] h-[4px]" />
@@ -142,7 +160,6 @@ const DefaultHeader = ({ table, isRefetching, onAddColumn, onAddRow }: DefaultHe
                           key="add-column"
                           className="group"
                           onClick={onAddColumn}
-                          disabled={onAddColumn === undefined}
                           icon={
                             <div className="flex -mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[4px] h-[15px]" />
@@ -159,6 +176,40 @@ const DefaultHeader = ({ table, isRefetching, onAddColumn, onAddRow }: DefaultHe
                           <div className="">
                             <p>Insert column</p>
                             <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onImportData !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="import-data"
+                          className="group"
+                          onClick={onImportData}
+                          icon={
+                            // <div className="-mt-2 pr-1.5">
+                            //   <div className="border border-scale-1000 w-[15px] h-[4px]" />
+                            //   <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                            //   <div
+                            //     className={[
+                            //       'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                            //       'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
+                            //     ].join(' ')}
+                            //   />
+                            // </div>
+                            <div className="relative -mt-2">
+                              <IconFileText className="-translate-x-[2px]" />
+                              <IconArrowUp
+                                className="absolute bottom-0 right-1 translate-y-0.5"
+                                strokeWidth={3}
+                                size={12}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Import data from CSV</p>
+                            <p className="text-scale-1000">Insert new rows from a CSV</p>
                           </div>
                         </Dropdown.Item>,
                       ]
