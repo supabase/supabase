@@ -22,7 +22,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from './UpgradePrompt'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 
 /**

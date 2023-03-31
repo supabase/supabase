@@ -11,7 +11,8 @@ import {
 } from 'ui'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { HTTPArgument } from './EditHookPanel'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import clsx from 'clsx'
 import { uuidv4 } from 'lib/helpers'
@@ -49,9 +50,9 @@ const HTTPRequestFields = ({
 
   const edgeFunctions = functions ?? []
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : '[YOUR ANON KEY]'
+  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
+    ? apiService.serviceApiKey
+    : '[YOUR API KEY]'
 
   return (
     <>
@@ -170,9 +171,7 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">
-                          Add authorization header with anon key
-                        </p>
+                        <p className="block text-scale-1200">Add auth header with service key</p>
                         <p className="text-scale-1000">
                           Required if your edge function enforces JWT verification
                         </p>
@@ -241,7 +240,7 @@ const HTTPRequestFields = ({
               </div>
             ))}
             <div>
-              <Button type="dashed" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
+              <Button type="default" size="tiny" icon={<IconPlus />} onClick={onAddParameter}>
                 Add a new parameter
               </Button>
             </div>

@@ -12,7 +12,8 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'

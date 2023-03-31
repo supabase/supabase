@@ -1,17 +1,21 @@
+import * as React from 'react'
 import type {
   ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
+  CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertCircle, IconAlertTriangle, IconLoader, IconUser, Input } from 'ui'
+import { Button, IconAlertCircle, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
+
 import { useCommandMenu } from './CommandMenuProvider'
+
+import { cn } from './../../utils/cn'
+import { COMMAND_ROUTES } from './Command.constants'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -33,7 +37,7 @@ function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) {
-    throw new Error('Missing environment variable NEXT_PUBLIC_SUPABASE_URL')
+    return undefined
   }
 
   // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
@@ -96,22 +100,20 @@ const AiCommand = () => {
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
+    useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
-  const status = isLoading
-    ? 'Clippy is searching...'
-    : isResponding
-    ? 'Clippy is responding...'
-    : cantHelp || hasClippyError
-    ? 'Clippy has failed you'
-    : undefined
 
   const handleConfirm = useCallback(
     async (query: string) => {
+      if (!edgeFunctionUrl) {
+        return console.error('No edge function url')
+      }
+
       setAnswer(undefined)
       setSearch('')
       dispatchPromptData({ index: promptIndex, answer: undefined, query })
@@ -119,13 +121,36 @@ const AiCommand = () => {
       setHasClippyError(false)
       setIsLoading(true)
 
+      let queryToSend = query
+
+      switch (currentPage) {
+        case COMMAND_ROUTES.AI:
+          queryToSend = query
+          break
+        case COMMAND_ROUTES.AI_ASK_ANYTHING:
+          queryToSend = query
+          break
+
+        case COMMAND_ROUTES.AI_RLS_POLICY:
+          queryToSend = `Given this table schema:
+
+          Schema STRIPE has tables:
+            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
+            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
+
+          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
+          break
+        default:
+          break
+      }
+
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
-        payload: JSON.stringify({ query }),
+        payload: JSON.stringify({ query, context: promptData }),
       })
 
       function handleError<T>(err: T) {
@@ -151,12 +176,8 @@ const AiCommand = () => {
 
           setIsResponding(true)
 
-          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
-          const [
-            {
-              delta: { content },
-            },
-          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+          const [{ text: content }] = completionResponse.choices
 
           const text = content ?? ''
 
@@ -201,67 +222,71 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="relative mb-[70px] py-4 overflow-y-auto overflow-hidden max-h-[720px]">
-        <div className="flex flex-col gap-6">
-          {promptData.map((prompt, i) => {
-            if (!prompt.query) return <></>
+      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+        {promptData.map((prompt, i) => {
+          if (!prompt.query) return <></>
 
-            return (
-              <>
-                {prompt.query && (
-                  <div className="flex gap-6 mx-4">
-                    <div className="w-7 h-7 bg-brand-900 rounded-full border border-brand-800 flex items-center justify-center text-brand-1200">
-                      <IconUser strokeWidth={2} size={16} />
+          return (
+            <>
+              {prompt.query && (
+                <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                  <div
+                    className="
+                      w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
+                      ring-scale-200
+                      ring-1
+                      shadow-sm
+                  "
+                  >
+                    <IconUser strokeWidth={1.5} size={16} />
+                  </div>
+                  <div className="prose text-scale-1000">{prompt.query}</div>
+                </div>
+              )}
+
+              <div className="px-4 [overflow-anchor:none] mb-6">
+                {cantHelp ? (
+                  <p className="flex flex-col gap-4 items-center p-4">
+                    <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
+                      <IconAlertCircle />
+                      <p>Sorry, I don&apos;t know how to help with that.</p>
                     </div>
-                    <div className="prose text-scale-1000">{prompt.query}</div>
+                    <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+                      Try again?
+                    </Button>
+                  </p>
+                ) : (
+                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <AiIconChat />
+                    <>
+                      {isLoading && promptIndex === i ? (
+                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                      ) : (
+                        // @ts-expect-error
+                        <MarkdownHandler
+                          linkTarget="_blank"
+                          className="prose dark:prose-dark"
+                          transformLinkUri={(href: string) => {
+                            const supabaseUrl = new URL('https://supabase.com')
+                            const linkUrl = new URL(href, 'https://supabase.com')
+
+                            if (linkUrl.origin === supabaseUrl.origin) {
+                              return linkUrl.toString()
+                            }
+
+                            return href
+                          }}
+                        >
+                          {prompt.answer}
+                        </MarkdownHandler>
+                      )}
+                    </>
                   </div>
                 )}
-
-                <div className="px-4">
-                  {cantHelp ? (
-                    <p className="flex flex-col gap-4 items-center p-4">
-                      <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
-                        <IconAlertCircle />
-                        <p>Sorry, I don&apos;t know how to help with that.</p>
-                      </div>
-                      <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-                        Try again?
-                      </Button>
-                    </p>
-                  ) : (
-                    <div className="flex gap-6">
-                      <AiIconChat />
-                      <div className="w-full">
-                        {isLoading && promptIndex === i ? (
-                          <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          // TODO: pull in markdown components from docs for better styling (code blocks, etc)
-                          <ReactMarkdown
-                            linkTarget="_blank"
-                            className="prose dark:prose-dark"
-                            remarkPlugins={[remarkGfm]}
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
-                          >
-                            {prompt.answer}
-                          </ReactMarkdown>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )
-          })}
-        </div>
+              </div>
+            </>
+          )
+        })}
 
         {promptData.length === 0 && !hasClippyError && (
           <CommandGroup heading="Examples" forceMount>
@@ -297,19 +322,45 @@ const AiCommand = () => {
             </Button>
           </div>
         )}
+
+        <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
-      <div className="absolute bottom-0 w-full bg-scale-200">
+      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
-          type="textarea"
-          placeholder="Ask a question"
+          placeholder={
+            isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
+          }
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          actions={
+            <>
+              {!isLoading && !isResponding ? (
+                <div
+                  className={`flex items-center gap-3 mr-3 transition-opacity duration-700 ${
+                    search ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <span className="text-scale-1100">Submit message</span>
+                  <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
+                    <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                  </div>
+                </div>
+              ) : null}
+            </>
+          }
+          onChange={(e) => {
+            if (!isLoading || !isResponding) {
+              setSearch(e.target.value)
+            }
+          }}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
                 if (!search) {
+                  return
+                }
+                if (isLoading || isResponding) {
                   return
                 }
                 handleConfirm(search)
@@ -319,21 +370,6 @@ const AiCommand = () => {
             }
           }}
         />
-        <div className="text-scale-1100 px-3">
-          <div className="flex justify-between items-center text-xs">
-            <div className="flex items-center gap-1 py-2 text-scale-800">
-              <span>Powered by OpenAI.</span>
-            </div>
-            <div className="flex items-center gap-6 py-1">
-              {status && (
-                <span className="bg-scale-400 rounded-lg py-1 px-2 items-center gap-2 hidden md:flex">
-                  {(isLoading || isResponding) && <IconLoader size={14} className="animate-spin" />}
-                  {status}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
