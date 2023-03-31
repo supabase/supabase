@@ -141,7 +141,7 @@ const TopNavBarRef: FC = () => {
               target="_blank"
               rel="noreferrer noopener"
             >
-              <a class="px-2.5 py-1" target="_blank">
+              <a className="px-2.5 py-1" target="_blank">
                 <IconGitHub size={16} />
               </a>
             </Link>
