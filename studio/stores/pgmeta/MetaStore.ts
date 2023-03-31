@@ -14,7 +14,7 @@ import type {
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { timeout } from 'lib/helpers'
-import { ResponseError, SchemaView } from 'types'
+import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
@@ -42,8 +42,8 @@ import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
-import ForeignTableStore from './ForeignTableStore'
-import ViewStore from './ViewStore'
+import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
+import ViewStore, { IViewStore } from './ViewStore'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
 const BATCH_SIZE = 1000
@@ -56,8 +56,8 @@ export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   schemas: IPostgresMetaInterface<PostgresSchema>
-  views: IPostgresMetaInterface<SchemaView>
-  foreignTables: IPostgresMetaInterface<Partial<PostgresTable>>
+  views: IViewStore
+  foreignTables: IForeignTableStore
 
   hooks: IPostgresMetaInterface<any>
   roles: IRolesStore

@@ -85,6 +85,9 @@ const NavigationMenu = () => {
       case url.includes(`/docs/guides/database`) && url:
         menuState.setMenuLevelId('database')
         break
+      case url.includes(`/docs/guides/api`) && url:
+        menuState.setMenuLevelId('api')
+        break
       case url.includes(`/docs/guides/auth`) && url:
         menuState.setMenuLevelId('auth')
         break
@@ -174,6 +177,7 @@ const NavigationMenu = () => {
   const isHomeActive = 'home' === level
   const isGettingStartedActive = 'gettingstarted' === level
   const isDatabaseActive = 'database' === level
+  const isApiActive = 'api' === level
   const isAuthActive = 'auth' === level
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
@@ -203,9 +207,14 @@ const NavigationMenu = () => {
       <NavigationMenuHome active={isHomeActive} />
       <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
       <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'api'} active={isApiActive} />
       <NavigationMenuGuideList id={'auth'} active={isAuthActive} />
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
-      <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
+      <NavigationMenuGuideList
+        id={'realtime'}
+        active={isRealtimeActive}
+        value={['/guides/realtime/extensions']}
+      />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
       <NavigationMenuGuideList id={'supabase_cli'} active={issupabase_cliActive} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />

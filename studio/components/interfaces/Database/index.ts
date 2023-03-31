@@ -2,7 +2,6 @@ import TableList from './Tables/TableList'
 import ColumnList from './Tables/ColumnList'
 
 import RolesList from './Roles/RolesList'
-import RolesSettings from './Roles/RolesSettings'
 
 import Extensions from './Extensions/Extensions'
 
@@ -27,7 +26,6 @@ export {
   TableList,
   ColumnList,
   RolesList,
-  RolesSettings,
   Extensions,
   Wrappers,
   CreateWrapper,

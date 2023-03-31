@@ -80,6 +80,7 @@ export const menuItems: NavMenu = {
       label: 'Auth',
       items: [
         { name: 'Overview', url: '/guides/auth', items: [] },
+        { name: 'Quickstarts', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'Authentication',
           url: undefined,
@@ -175,14 +176,6 @@ export const menuItems: NavMenu = {
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
-          name: 'Serverless APIs',
-          url: undefined,
-          items: [
-            { name: 'Overview', url: '/guides/database/api', items: [] },
-            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
-          ],
-        },
-        {
           name: 'Extensions',
           url: undefined,
           items: [
@@ -229,6 +222,13 @@ export const menuItems: NavMenu = {
       ],
     },
     {
+      label: 'Serverless APIs',
+      items: [
+        { name: 'Overview', url: '/guides/api', items: [] },
+        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+      ],
+    },
+    {
       label: 'Edge Functions',
       items: [
         { name: 'Overview', url: '/guides/functions', items: [] },
@@ -241,12 +241,62 @@ export const menuItems: NavMenu = {
     {
       label: 'Realtime',
       items: [
-        { name: 'Overview', url: '/guides/realtime', items: [] },
-        { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
-        { name: 'Presence', url: '/guides/realtime/presence', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        {
+          name: 'Overview',
+          url: '/guides/realtime',
+          items: [],
+        },
+        {
+          name: 'Quickstart',
+          url: '/guides/realtime/quickstart',
+          items: [],
+        },
+        {
+          name: 'Features',
+          url: undefined,
+          items: [
+            { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+            {
+              name: 'Extensions',
+              url: '/guides/realtime/extensions',
+              items: [
+                { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+                { name: 'Presence', url: '/guides/realtime/presence', items: [] },
+                { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Guides',
+          url: undefined,
+          items: [
+            {
+              name: 'Subscribing to Database Changes',
+              url: '/guides/realtime/subscribing-to-database-changes',
+              items: [],
+            },
+            {
+              name: 'Bring Your Own Database',
+              url: '/guides/realtime/bring-your-own-database',
+              items: [],
+            },
+            {
+              name: 'Using Realtime with Next.js',
+              url: '/guides/realtime/realtime-with-nextjs',
+              items: [],
+            },
+          ],
+        },
+        {
+          name: 'Deep dive',
+          url: undefined,
+          items: [
+            { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+            { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+            { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
+          ],
+        },
       ],
     },
     {
@@ -338,7 +388,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Appsmith', url: '/guides/integrations/appsmith', items: [] },
-            { name: 'Dashibase', url: '/guides/integrations/dashibase', items: [] },
             { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },

@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { isUndefined, partition, isEmpty, noop } from 'lodash'
 import { SidePanel } from 'ui'
 import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
@@ -49,6 +51,21 @@ const RowEditor = ({
   const [requiredFields, optionalFields] = partition(
     rowFields,
     (rowField: any) => !rowField.isNullable
+  )
+
+  const { project } = useProjectContext()
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable.schema,
+  })
+
+  const foreignKey = useMemo(
+    () =>
+      data && referenceRow?.foreignKey?.id
+        ? data.find((key) => key.id === referenceRow.foreignKey?.id)
+        : undefined,
+    [data, referenceRow?.foreignKey?.id]
   )
 
   useEffect(() => {
@@ -201,8 +218,9 @@ const RowEditor = ({
       </form>
 
       <ForeignRowSelector
+        key={`foreign-row-selector-${foreignKey?.id ?? 'null'}`}
         visible={isSelectingForeignKey}
-        foreignKey={referenceRow?.foreignKey}
+        foreignKey={foreignKey}
         onSelect={onSelectForeignRowValue}
         closePanel={() => {
           setIsSelectingForeignKey(false)

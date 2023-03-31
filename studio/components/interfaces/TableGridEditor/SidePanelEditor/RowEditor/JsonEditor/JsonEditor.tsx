@@ -3,7 +3,7 @@ import { SidePanel } from 'ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'
-import TwoOptionToggle from './TwoOptionToggle'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import DrilldownViewer from './DrilldownViewer'
 import ActionBar from '../../ActionBar'
 import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
