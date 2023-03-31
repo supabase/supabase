@@ -3,7 +3,7 @@ import { Button, IconAlertCircle, IconCommand, IconCornerDownLeft } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useKeyboardShortcuts, checkPermissions } from 'hooks'
+import { useKeyboardShortcuts, checkPermissions, useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
@@ -37,6 +37,7 @@ const UtilityActions = ({ updateSqlSnippet }: UtilityActionsProps) => {
   const { data: profile } = useProfileQuery()
   const sqlEditorStore: any = useSqlStore()
   const [showAiPromptModal, setShowAiPromptModal] = useState(false)
+  const enableSQLAI = useFlag('dashboardSqlAi')
 
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -90,13 +91,15 @@ const UtilityActions = ({ updateSqlSnippet }: UtilityActionsProps) => {
           <SizeToggleButton />
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            type="default"
-            icon={<AiIcon className="text-scale-1100 w-4 h-4" />}
-            onClick={() => setShowAiPromptModal(true)}
-          >
-            Ask Supabase AI
-          </Button>
+          {enableSQLAI && (
+            <Button
+              type="default"
+              icon={<AiIcon className="text-scale-1100 w-4 h-4" />}
+              onClick={() => setShowAiPromptModal(true)}
+            >
+              Ask Supabase AI
+            </Button>
+          )}
           <Button
             onClick={executeQuery}
             disabled={sqlEditorStore.isExecuting}

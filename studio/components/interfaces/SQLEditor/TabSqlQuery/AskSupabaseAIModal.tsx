@@ -49,7 +49,14 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
   }
 
   const onSaveOutput = (output: string) => {
-    handleNewQuery({ name: 'Generated query', sql: output })
+    const formattedOutput = `
+-- Note: This query was generated via Supabase AI, please do verify the correctness of the
+-- SQL snippet before running it against your database as we are not able to guarantee the
+-- correctness of the snippet that was generated.
+
+${output}
+`.trim()
+    handleNewQuery({ name: 'Generated query', sql: formattedOutput })
     Telemetry.sendEvent(
       {
         category: 'scripts',
@@ -66,23 +73,27 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
     scrollToBottom()
     setIsSubmitting(true)
 
-    const tables = (await meta.tables.loadBySchema('public')) as any[]
-    const createTableQueries = tables.map((table) => {
-      return stripIndent`
-        CREATE TABLE "${table.schema}"."${table.name}"
-        (
-        ${table.columns
-          .map(
-            (column: any) =>
-              `    ${column.name} ${column.data_type} ${!column.is_nullable ? 'NOT NULL' : 'NULL'}`
-          )
-          .join(',\n')}
-        );
-      `
-    })
+    // [Joshen] We'll need to set up some acceptance policy that users are
+    // okay with us sending over their table data to OpenAI before doing so
+
+    // const tables = (await meta.tables.loadBySchema('public')) as any[]
+    // const createTableQueries = tables.map((table) => {
+    //   return stripIndent`
+    //     CREATE TABLE "${table.schema}"."${table.name}"
+    //     (
+    //     ${table.columns
+    //       .map(
+    //         (column: any) =>
+    //           `    ${column.name} ${column.data_type} ${!column.is_nullable ? 'NOT NULL' : 'NULL'}`
+    //       )
+    //       .join(',\n')}
+    //     );
+    //   `
+    // }).join('\n')
+
     const response = await post('/api/natural-language', {
       query: values.prompt,
-      tables: createTableQueries.join('\n'),
+      tables: '',
     })
     setIsSubmitting(false)
 
@@ -160,16 +171,18 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
                 <p className="text-sm text-scale-1200">
                   Ask us anything, and we will try to generate the relevant SQL statements for you
                 </p>
-                <Button
-                  type="default"
-                  disabled={prompts.length === 0 || outputs.length === 0}
-                  onClick={() => {
-                    setPrompts([])
-                    setOutputs([])
-                  }}
-                >
-                  Clear conversation
-                </Button>
+                {prompts.length > 0 && (
+                  <Button
+                    type="default"
+                    disabled={prompts.length === 0 || outputs.length === 0}
+                    onClick={() => {
+                      setPrompts([])
+                      setOutputs([])
+                    }}
+                  >
+                    Clear conversation
+                  </Button>
+                )}
               </div>
               {prompts.length === 0 && (
                 <div className="space-y-2 mt-4 mb-6">
