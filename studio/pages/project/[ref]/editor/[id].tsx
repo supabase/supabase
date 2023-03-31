@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,7 +7,10 @@ import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { useStore, withAuth, useUrlState } from 'hooks'
+import { useParams } from 'common/hooks'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { Entity } from 'data/entity-types/entity-type-query'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
@@ -20,6 +24,8 @@ const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const queryClient = useQueryClient()
 
   const { meta, ui } = useStore()
   const [selectedSchema, setSelectedSchema] = useState<string>()
@@ -96,21 +102,27 @@ const TableEditorPage: NextPageWithLayout = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onEditTable = (table: PostgresTable) => {
+  const onEditTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(false)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
-  const onDeleteTable = (table: PostgresTable) => {
+  const onDeleteTable = (entity: Entity) => {
     setIsDeleting(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToDelete(table)
     setIsDeleteWithCascade(false)
   }
 
-  const onDuplicateTable = (table: PostgresTable) => {
+  const onDuplicateTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
@@ -194,6 +206,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+
+      await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 
       // For simplicity for now, we just open the first table within the same schema
       if (tables.length > 0) {

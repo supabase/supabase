@@ -188,15 +188,16 @@ function StoragePage() {
                     text="Serve from the edge to reduce latency."
                   />
                   <Link href="/docs/guides/storage/cdn" passHref>
-                    <Button
-                      as="a"
-                      size="small"
-                      type="default"
-                      className="mt-4"
-                      icon={<IconArrowUpRight />}
-                    >
-                      Explore docs
-                    </Button>
+                    <a>
+                      <Button
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        Explore docs
+                      </Button>
+                    </a>
                   </Link>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
@@ -206,15 +207,16 @@ function StoragePage() {
                     text="Resize and compress your media before you serve it."
                   />
                   <Link href="/docs/guides/storage/image-transformations" passHref>
-                    <Button
-                      as="a"
-                      size="small"
-                      type="default"
-                      className="mt-4"
-                      icon={<IconArrowUpRight />}
-                    >
-                      Explore docs
-                    </Button>
+                    <a>
+                      <Button
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        Explore docs
+                      </Button>
+                    </a>
                   </Link>
                 </div>
               </div>,
@@ -252,15 +254,16 @@ function StoragePage() {
                       </p>
 
                       <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <Button
-                          as="a"
-                          size="small"
-                          type="default"
-                          className="mt-4"
-                          icon={<IconArrowUpRight />}
-                        >
-                          Explore documentation
-                        </Button>
+                        <a>
+                          <Button
+                            size="small"
+                            type="default"
+                            className="mt-4"
+                            icon={<IconArrowUpRight />}
+                          >
+                            Explore documentation
+                          </Button>
+                        </a>
                       </Link>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">
