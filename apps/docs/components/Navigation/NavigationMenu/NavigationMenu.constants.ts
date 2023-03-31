@@ -1001,7 +1001,6 @@ export const reference_swift_v1 = {
   parent: '/reference',
 }
 
-
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
