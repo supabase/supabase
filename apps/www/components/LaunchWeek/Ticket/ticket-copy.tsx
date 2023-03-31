@@ -15,7 +15,7 @@ export default function TicketCopy({ username }: Props) {
   const [copied, setCopied] = useState(false)
   const scrollRef = useRef<HTMLParagraphElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const url = `${SITE_URL}/tickets/${username}`
+  const url = `${SITE_URL}/tickets/${username}?lw=7`
   useEffect(() => {
     if (navigator.clipboard) {
       setCopyEnabled(true)

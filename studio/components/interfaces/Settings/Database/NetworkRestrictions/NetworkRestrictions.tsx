@@ -86,7 +86,7 @@ const NetworkRestrictions = ({}) => {
   const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
-  const restrictedIps = data?.config.dbAllowedCidrs ?? []
+  const restrictedIps = data?.config?.dbAllowedCidrs ?? []
   const restrictionStatus = data?.status ?? ''
 
   const hasApplyError = restrictedIps.length === 0 && restrictionStatus === 'stored'

@@ -40,7 +40,7 @@ import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'component
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
-// import CommandMenuProvider from 'ui/src/components/Command/CommandMenuProvider'
+
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 
 dayjs.extend(customParseFormat)
@@ -117,11 +117,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>
-                    <AppBannerWrapper>
-                      {/* <CommandMenuProvider site="studio"> */}
-                      {getLayout(<Component {...pageProps} />)}
-                      {/* </CommandMenuProvider> */}
-                    </AppBannerWrapper>
+                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
