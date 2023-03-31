@@ -189,9 +189,9 @@ const DocsSearch = () => {
                       onSelect={() => {
                         // TODO: replace with Next.js router/Link when cross-project link logic solved
                         window.location.assign(
-                          `/docs/${page.path}${page.type === PageType.Reference ? '/' : '#'}${
-                            section.slug
-                          }`
+                          `https://supabase.com/docs/${page.path}${
+                            page.type === PageType.Reference ? '/' : '#'
+                          }${section.slug}`
                         )
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}

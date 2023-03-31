@@ -4,6 +4,7 @@ import type {
   CreateChatCompletionResponseChoicesInner,
   CreateCompletionResponse,
 } from 'openai'
+import ReactMarkdown from 'react-markdown'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 
 import { SSE } from 'sse.js'
@@ -100,8 +101,7 @@ const AiCommand = () => {
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
   const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
-    useCommandMenu()
+  const { isLoading, setIsLoading, currentPage, search, setSearch } = useCommandMenu()
 
   const [promptIndex, setPromptIndex] = useState(0)
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
@@ -262,8 +262,7 @@ const AiCommand = () => {
                       {isLoading && promptIndex === i ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        // @ts-expect-error
-                        <MarkdownHandler
+                        <ReactMarkdown
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
                           transformLinkUri={(href: string) => {
@@ -278,7 +277,7 @@ const AiCommand = () => {
                           }}
                         >
                           {prompt.answer}
-                        </MarkdownHandler>
+                        </ReactMarkdown>
                       )}
                     </>
                   </div>

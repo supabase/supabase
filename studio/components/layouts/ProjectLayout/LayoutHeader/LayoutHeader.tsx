@@ -12,7 +12,7 @@ import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { Badge } from 'ui'
+import { Badge, IconCommand, IconSearch, SearchButton } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -112,6 +112,23 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
       <div className="flex items-center space-x-2">
+        <SearchButton>
+          <div
+            className="
+              flex items-center justify-between bg-scaleA-200 border transition hover:border-scale-600 hover:bg-scaleA-300 border-scale-500px-2 h-[32px] rounded px-2"
+          >
+            <div className="flex items-center space-x-2">
+              <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
+            </div>
+            <span className="mx-4">/</span>
+            <div className="hidden md:flex items-center space-x-1">
+              <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                <IconCommand size={12} strokeWidth={1.5} />
+                <span className="text-[12px]">K</span>
+              </div>
+            </div>
+          </div>
+        </SearchButton>
         {customHeaderComponents && customHeaderComponents}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}

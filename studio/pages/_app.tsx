@@ -35,13 +35,16 @@ import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
-
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { IS_PLATFORM, LOCAL_SUPABASE } from 'lib/constants'
+import { CommandMenuProvider } from 'ui'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -51,6 +54,25 @@ dayjs.extend(relativeTime)
 dart(Prism)
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  // supabase client required for clippy edge functions in cmdk menu
+  const [supabase] = useState(() =>
+    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+  )
+
+  type AuthContainerProps = {
+    children: React.ReactNode
+  }
+
+  const AuthContainer = ({ children }: AuthContainerProps) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase!}>
+        <AuthProvider>{children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{children}</AuthProvider>
+    )
+  }
+
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
 
@@ -115,11 +137,15 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               </Script>
 
               <PageTelemetry>
+                {/* <AuthContainer> */}
                 <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-                  </RouteValidationWrapper>
+                  <CommandMenuProvider site="docs">
+                    <RouteValidationWrapper>
+                      <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                    </RouteValidationWrapper>
+                  </CommandMenuProvider>
                 </TooltipProvider>
+                {/* </AuthContainer> */}
               </PageTelemetry>
 
               <HCaptchaLoadedStore />

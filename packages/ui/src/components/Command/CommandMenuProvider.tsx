@@ -18,7 +18,7 @@ export interface CommandMenuContextValue {
 
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
+  //MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -38,12 +38,12 @@ export interface CommandMenuActions {
 const CommandMenuProvider = ({
   children,
   site,
-  MarkdownHandler,
-}: PropsWithChildren<{
+}: //MarkdownHandler,
+PropsWithChildren<{
   site: 'studio' | 'docs'
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode
+  //MarkdownHandler: (props: any) => React.ReactNode
 }>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -72,7 +72,7 @@ const CommandMenuProvider = ({
         setPages,
         currentPage,
         site,
-        MarkdownHandler,
+        //MarkdownHandler,
       }}
     >
       {children}
