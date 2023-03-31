@@ -22,6 +22,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/database',
     name: 'Database',
   },
+  api: {
+    icon: '/docs/img/icons/menu/database',
+    name: 'Serverless APIs',
+  },
   auth: {
     icon: '/docs/img/icons/menu/auth',
     name: 'Auth',

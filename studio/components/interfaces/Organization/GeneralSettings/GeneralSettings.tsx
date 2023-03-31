@@ -3,7 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions, useParams } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 

@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import { post } from './../lib/fetchWrapper'
-import { ThemeProvider } from 'common/Providers'
+import { AuthProvider, ThemeProvider } from 'common'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -67,9 +67,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <ThemeProvider>
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </AuthProvider>
     </>
   )
 }
