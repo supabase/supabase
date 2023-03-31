@@ -111,7 +111,9 @@ const BuildingState: FC<Props> = ({ project }) => {
                           support ticket.
                         </p>
                         <Link href="/support/new">
-                          <Button type="default">Contact support team</Button>
+                          <a>
+                            <Button type="default">Contact support team</Button>
+                          </a>
                         </Link>
                       </>
                     }

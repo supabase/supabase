@@ -6,8 +6,7 @@ import { BASE_PATH } from 'lib/constants'
 export const generateDocsMenu = (
   ref: string,
   tables: string[],
-  functions: string[],
-  showGraphiql: boolean
+  functions: string[]
 ): ProductMenuGroup[] => {
   return [
     {
@@ -61,31 +60,25 @@ export const generateDocsMenu = (
         }),
       ],
     },
-    ...(showGraphiql
-      ? [
-          {
-            title: 'GraphQL',
-            items: [
-              {
-                name: 'GraphiQL',
-                key: 'graphiql',
-                url: `/project/${ref}/api/graphiql`,
-                icon: (
-                  <SVG
-                    src={`${BASE_PATH}/img/graphql.svg`}
-                    style={{ width: `${16}px`, height: `${16}px` }}
-                    className="text-scale-1200"
-                    preProcessor={(code) =>
-                      code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                    }
-                  />
-                ),
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
+    {
+      title: 'GraphQL',
+      items: [
+        {
+          name: 'GraphiQL',
+          key: 'graphiql',
+          url: `/project/${ref}/api/graphiql`,
+          icon: (
+            <SVG
+              src={`${BASE_PATH}/img/graphql.svg`}
+              style={{ width: `${16}px`, height: `${16}px` }}
+              className="text-scale-1200"
+              preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
+            />
+          ),
+          items: [],
+        },
+      ],
+    },
     {
       title: 'More Resources',
       items: [
