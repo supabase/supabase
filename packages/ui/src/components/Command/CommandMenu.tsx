@@ -14,7 +14,6 @@ import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
 
 import AiCommand from './AiCommand'
-import navItems from './utils/docs-nav-items.json'
 import sharedItems from './utils/shared-nav-items.json'
 import { AiIcon } from './Command.icons'
 import {
@@ -32,14 +31,7 @@ import DashboardTableEditor from './sections/DashboardTableEditor'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import SearchOnlyItem from './SearchOnlyItem'
 import SearchableStudioItems from './SearchableStudioItems'
-
-export const COMMAND_ROUTES = {
-  AI: 'Supabase AI',
-  DOCS_SEARCH: 'Docs Search',
-  THEME: 'Theme',
-  AI_ASK_ANYTHING: 'Ask anything',
-  AI_RLS_POLICY: 'Help me create a RLS policy',
-}
+import { COMMAND_ROUTES } from './Command.constants'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -67,9 +59,6 @@ const CommandMenu = () => {
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage, site } =
     useCommandMenu()
-
-  console.log('currentPage page', currentPage)
-  console.log('pages page', pages)
 
   const ThemeOptions = ({ isSubItem = false }) => {
     return (
@@ -130,7 +119,7 @@ const CommandMenu = () => {
                   forceMount
                 >
                   <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-1100">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
                     Ask Supabase AI
                     {search ? (
                       <>
@@ -162,6 +151,32 @@ const CommandMenu = () => {
                   </span>
                 </CommandItem>
               </CommandGroup>
+
+              {site === 'docs' && (
+                <CommandGroup heading="Quickstarts">
+                  {sharedItems.quickstarts.map((item) => (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                      <IconArrowRight className="text-scale-900" />
+                      <CommandLabel>
+                        Start with <span className="font-bold"> {item.label}</span>
+                      </CommandLabel>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+
+              {site === 'docs' && (
+                <CommandGroup heading="Projects">
+                  {sharedItems.projectTools.map((item) => (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                      <IconArrowRight className="text-scale-900" />
+                      <CommandLabel>
+                        <span className="font-bold"> {item.label}</span>
+                      </CommandLabel>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
 
               {site === 'docs' && (
                 <CommandGroup heading="Studio tools">
@@ -196,7 +211,7 @@ const CommandMenu = () => {
               {/* <DashboardTableEditor /> */}
 
               <CommandGroup heading="Support">
-                {navItems.docsSupport.map((item) => (
+                {sharedItems.support.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconLifeBuoy className="text-scale-900" />
                     <CommandLabel>
@@ -207,7 +222,7 @@ const CommandMenu = () => {
               </CommandGroup>
 
               <CommandGroup heading="General">
-                {navItems.docsGeneral.map((item) => (
+                {sharedItems.docsGeneral.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     {item?.icon && iconPicker[item.icon]}
                     <CommandLabel>{item.label}</CommandLabel>

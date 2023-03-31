@@ -1,15 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/router'
-// import { scrollTo } from '@lib/smooth-scroll';
 import cn from 'classnames'
-// import GithubIcon from '~/components/LaunchWeek/Ticket/icons/icon-github'
-// import CheckIcon from '~/components/LaunchWeek/Ticket/icons/icon-check'
 import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/Ticket//hooks/use-conf-data'
-import LoadingDots from './loading-dots'
 import formStyles from './form.module.css'
 import ticketFormStyles from './ticket-form.module.css'
-import { Button, IconCheck, IconCheckCircle, IconLoader } from 'ui'
+import { Button, IconCheckCircle, IconLoader } from 'ui'
 
 type FormState = 'default' | 'loading' | 'error'
 type TicketGenerationState = 'default' | 'loading'
@@ -70,9 +66,8 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           setPageState('ticket')
 
           // Listen to realtime changes
-          const channel =
-            realtimeChannel ??
-            supabase
+          if (!realtimeChannel && !data.golden) {
+            const channel = supabase
               .channel('changes')
               .on(
                 'postgres_changes',
@@ -83,14 +78,19 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
                   filter: `username=eq.${username}`,
                 },
                 (payload) => {
+                  const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
                   setUserData({
                     ...payload.new,
-                    golden: !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn,
+                    golden,
                   })
+                  if (golden) {
+                    channel.unsubscribe()
+                  }
                 }
               )
               .subscribe()
-          setRealtimeChannel(channel)
+            setRealtimeChannel(channel)
+          }
         })
     }
     return () => {

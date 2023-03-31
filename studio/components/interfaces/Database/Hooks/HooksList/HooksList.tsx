@@ -68,7 +68,6 @@ const HooksList = ({
             disabled={!canCreateWebhooks}
             disabledMessage="You need additional permissions to create webhooks"
           >
-            <AlphaPreview />
             <p className="text-sm text-scale-1100">
               Database Webhooks can be used to trigger serverless functions or send requests to an
               HTTP endpoint.

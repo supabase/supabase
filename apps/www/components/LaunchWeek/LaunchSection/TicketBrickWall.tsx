@@ -3,7 +3,6 @@ import React from 'react'
 import { Button } from 'ui'
 import { useMobileViewport } from '../../../hooks/useMobileViewport'
 import { UserData } from '../Ticket/hooks/use-conf-data'
-import { TicketBrickWallRow } from './TicketBrickWallRow'
 import { TicketBrickWallSlider } from './TicketBrickWallSlider'
 
 type user = UserData

@@ -147,8 +147,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .order('createdAt', { ascending: false })
     .limit(17)
 
-  // res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=59')
-
   return {
     props: {
       users,

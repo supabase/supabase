@@ -4,6 +4,10 @@ import * as React from 'react'
 
 export * from './src/providers'
 
+// Markdown components
+
+export * from './src/lib/Markdown'
+
 // // GENERAL
 
 export * from './src/components/Button'
@@ -21,6 +25,7 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
+export * from './src/components/CodeBlock'
 // export * from './src/components/Breadcrumb'
 
 // NAV
@@ -56,7 +61,7 @@ export * from './src/components/Upload'
 export * from './src/components/Form'
 
 // CMD+K
-// export * from './src/components/Command'
+export * from './src/components/Command'
 
 // config
 
