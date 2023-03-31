@@ -7,7 +7,7 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { DATE_FORMAT, METRICS } from 'lib/constants'
 import { ChartIntervals } from 'types'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useProjectLogStatsQuery } from 'data/logs/project-log-stats-query'
 
 const CHART_INTERVALS: ChartIntervals[] = [

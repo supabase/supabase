@@ -5,7 +5,8 @@ import { FC } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { Member, Role } from 'types'
 
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
