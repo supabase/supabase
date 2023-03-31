@@ -1,109 +1,248 @@
 api:
-    enabled: true
-    address: "0.0.0.0:9001"
+  enabled: true
+  address: '0.0.0.0:9001'
 
 sources:
-    docker_syslog:
-        type: "syslog"
-        address: "0.0.0.0:9000"
-        mode: "tcp"
-        path: "/tmp/socket"
+  docker_syslog:
+    type: 'syslog'
+    address: '0.0.0.0:9000'
+    mode: 'tcp'
+    path: '/tmp/socket'
 
 transforms:
-    router:
-        type: route
-        inputs:
-            - docker_syslog
-        route:
-            studio: '.appname == "studio"'
-            kong: '.appname == "kong"'
-            auth: '.appname == "auth"'
-            rest: '.appname == "rest"'
-            realtime: '.appname == "realtime"'
-            storage: '.appname == "storage"'
-            meta: '.appname == "meta"'
-            db: '.appname == "db"'
-    auth_logs:
-        type: remap
-        inputs:
-            - router.auth
-        source: |-
-            .message = parse_json!(.message)
-            .event_message = .message.msg
-            .metadata.level = .message.level
-            .metadata.timestamp = .message.time
-            .metadata.app = .appname
-            .metadata.ip = .source_ip
-            del(.message)
-            del(.procid)
-            del(.severity)
-            del(.source_id)
-            del(.source_type)
-            del(.timestamp)
-            del(.facility)
-            del(.host)
-            del(.id)
-            del(.appname)
-
+  router:
+    type: route
+    inputs:
+      - docker_syslog
+    route:
+      auth: '.appname == "auth"'
+      studio: '.appname == "studio"'
+      kong: '.appname == "kong"'
+      rest: '.appname == "rest"'
+      realtime: '.appname == "realtime"'
+      storage: '.appname == "storage"'
+      meta: '.appname == "meta"'
+      db: '.appname == "db"'
+  auth_logs:
+    type: remap
+    inputs:
+      - router.auth
+    source: |-
+      .message = parse_json!(.message)
+      .event_message = .message.msg
+      .metadata.level = .message.level
+      .metadata.timestamp = .message.time
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  studio_logs:
+    type: remap
+    inputs:
+      - router.studio
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  kong_logs:
+    type: remap
+    inputs:
+      - router.kong
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  rest_logs:
+    type: remap
+    inputs:
+      - router.rest
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  realtime_logs:
+    type: remap
+    inputs:
+      - router.realtime
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  storage_logs:
+    type: remap
+    inputs:
+      - router.storage
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  meta_logs:
+    type: remap
+    inputs:
+      - router.meta
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
+  db_logs:
+    type: remap
+    inputs:
+      - router.db
+    source: |-
+      .event_message = .message
+      .metadata.level = .severity
+      .metadata.timestamp = .timestamp
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
 sinks:
-    logflare_auth:
-        type: "http"
-        inputs:
-            - auth_logs
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=gd9tDpgiCVJe"
+  logflare_auth:
+    type: 'http'
+    inputs:
+      - auth_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=gd9tDpgiCVJe'
 
-    logflare_realtime:
-        type: "http"
-        inputs:
-            - router.realtime
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=realtime.logs.prod&api_key=gd9tDpgiCVJe"
-    logflare_rest:
-        type: "http"
-        inputs:
-            - router.rest
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=postgREST.logs.prod&api_key=gd9tDpgiCVJe"
-    logflare_db:
-        type: "http"
-        inputs:
-            - router.db
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=postgres.logs&api_key=gd9tDpgiCVJe"
-    logflare_storage:
-        type: "http"
-        inputs:
-            - router.storage
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=gd9tDpgiCVJe"
-    logflare_kong:
-        type: "http"
-        inputs:
-            - router.kong
-        encoding:
-            codec: "json"
-        method: "post"
-        request:
-            retry_max_duration_secs: 10
-        uri: "http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=gd9tDpgiCVJe"
+  logflare_realtime:
+    type: 'http'
+    inputs:
+      - realtime_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=realtime.logs.prod&api_key=gd9tDpgiCVJe'
+  logflare_rest:
+    type: 'http'
+    inputs:
+      - rest_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=postgREST.logs.prod&api_key=gd9tDpgiCVJe'
+  logflare_db:
+    type: 'http'
+    inputs:
+      - db_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=postgres.logs&api_key=gd9tDpgiCVJe'
+  logflare_storage:
+    type: 'http'
+    inputs:
+      - storage_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=gd9tDpgiCVJe'
+  logflare_kong:
+    type: 'http'
+    inputs:
+      - kong_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=gd9tDpgiCVJe'
