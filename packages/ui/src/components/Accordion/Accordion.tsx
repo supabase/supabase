@@ -44,7 +44,6 @@ function Accordion({
   justified = false,
   chevronAlign = 'left',
 }: AccordionProps) {
-
   const __styles = styleHandler('accordion')
 
   let containerClasses = [__styles.variants[type].base]
@@ -66,6 +65,8 @@ function Accordion({
 
   return (
     <>
+      {/* // 
+      @ts-expect-error */}
       <RadixAccordion.Root
         type={openBehaviour}
         onValueChange={handleOnChange}
@@ -94,11 +95,7 @@ export function Item({ children, className, header, id, disabled }: ItemProps) {
   const __styles = styleHandler('accordion')
   const [open, setOpen] = useState(false)
 
-  const {
-    type,
-    justified,
-    chevronAlign,
-  } = useContext(AccordionContext)
+  const { type, justified, chevronAlign } = useContext(AccordionContext)
 
   let triggerClasses = [__styles.variants[type].trigger]
   if (justified) triggerClasses.push(__styles.justified)
