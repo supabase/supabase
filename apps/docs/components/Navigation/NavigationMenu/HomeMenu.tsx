@@ -29,7 +29,7 @@ const home = [
     },
     {
       label: 'Serverless APIs',
-      icon: '/img/icons/menu/database',
+      icon: '/img/icons/menu/reference',
       href: '/guides/api',
       level: 'api',
     },
