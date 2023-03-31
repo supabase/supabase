@@ -187,19 +187,21 @@ const PaymentMethods: FC<Props> = ({
                                 <Tooltip.Trigger>
                                   <Button disabled as="span" type="outline" icon={<IconX />} />
                                 </Tooltip.Trigger>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                      'w-48 border border-scale-200 text-center', //border
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-scale-1200">
-                                      Your default payment method cannot be deleted
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                        'w-48 border border-scale-200 text-center', //border
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-scale-1200">
+                                        Your default payment method cannot be deleted
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
                               <Dropdown
