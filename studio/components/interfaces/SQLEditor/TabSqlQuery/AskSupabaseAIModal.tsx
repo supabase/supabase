@@ -1,21 +1,15 @@
 import { stripIndent } from 'common-tags'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
 import { useState, useEffect, useRef } from 'react'
-import {
-  Badge,
-  Button,
-  Form,
-  IconChevronDown,
-  IconChevronUp,
-  IconCornerDownLeft,
-  IconUser,
-  Input,
-  Modal,
-} from 'ui'
-import { EXAMPLE_QUERIES } from './AskSupabaseAIModal.constants'
+import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import Telemetry from 'lib/telemetry'
+import { post } from 'lib/common/fetch'
+import PromptOutput from './PromptOutput'
 import { AiIcon } from './UtilityActions'
+import { EXAMPLE_QUERIES } from './AskSupabaseAIModal.constants'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { checkPermissions, useOptimisticSqlSnippetCreate, useStore } from 'hooks'
 
 interface AskSupabaseAIModalProps {
   visible: boolean
@@ -29,6 +23,13 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
   const [prompts, setPrompts] = useState<string[]>([])
   const [outputs, setOutputs] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { data: profile } = useProfileQuery()
+  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
+  const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)
 
   useEffect(() => {
     if (!visible) {
@@ -45,6 +46,19 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
 
   const scrollToBottom = () => {
     setTimeout(() => chatRef.current?.scrollIntoView({ behavior: 'smooth' }), 200)
+  }
+
+  const onSaveOutput = (output: string) => {
+    handleNewQuery({ name: 'Generated query', sql: output })
+    Telemetry.sendEvent(
+      {
+        category: 'scripts',
+        action: 'script_clicked',
+        label: 'Generated query',
+      },
+      ui.googleAnalyticsProps
+    )
+    onClose()
   }
 
   const onSubmit = async (values: any, { resetForm }: any) => {
@@ -124,9 +138,7 @@ const AskSupabaseAIModal = ({ visible, onClose }: AskSupabaseAIModalProps) => {
                       {output == undefined ? (
                         <div className="w-2 h-4 bg-scale-900 mt-1 animate-bounce" />
                       ) : (
-                        <div className="px-4 py-2 bg-scale-400 rounded-md border border-scale-600 flex-grow">
-                          <SimpleCodeBlock language="sql">{output}</SimpleCodeBlock>
-                        </div>
+                        <PromptOutput output={output} onSaveOutput={onSaveOutput} />
                       )}
                     </div>
                   </div>

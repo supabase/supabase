@@ -159,7 +159,6 @@ const MonacoEditor = ({ error, updateSqlSnippet, setUpdatingRequired }) => {
 
     editor.onDidChangeCursorPosition((e) => {
       const currentLine = editor.getModel().getLineContent(e.position.lineNumber)
-      console.log('cursor moved', { e, currentLine })
       isCursorOnComment.set(/^--\s*/.test(currentLine))
     })
 
