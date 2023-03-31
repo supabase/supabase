@@ -1,7 +1,7 @@
 import { createContext, useEffect, useContext, useState, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, Select } from '@supabase/ui'
+import { Button, Input, Select } from 'ui'
 import { runInAction } from 'mobx'
 
 import { API_URL } from 'lib/constants'
@@ -170,7 +170,7 @@ const OrgSelection = observer(({}) => {
 
   return (
     <div className="">
-      <div className="mt-1 mb-8 relative">
+      <div className="relative mt-1 mb-8">
         <Select
           label="Choose an organization"
           value={PageState.selectedOrg?.slug}

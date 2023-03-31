@@ -10,15 +10,15 @@ export const CLIENT_LIBRARIES = [
     language: 'Python',
     officialSupport: false,
     releaseState: 'Alpha',
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/python/introduction',
     gitUrl: 'https://github.com/supabase/supabase-py',
   },
   {
-    language: 'Dart',
-    officialSupport: false,
-    releaseState: 'Beta',
+    language: 'Flutter',
+    officialSupport: true,
+    releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/dart/installing',
-    gitUrl: 'https://github.com/supabase/supabase-dart',
+    gitUrl: 'https://github.com/supabase/supabase-flutter',
   },
 ]
 
@@ -33,7 +33,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NextJS',
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
-    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/slack-clone/nextjs-slack-clone',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
     framework: 'NextJS',
@@ -75,7 +75,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NextJS',
     title: 'Next.js todo list app',
     description: 'NextJS todo list example',
-    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/nextjs-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',
   },
   {
     framework: 'React',
@@ -87,7 +87,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'Svelte',
     title: 'Svelte todo list app',
     description: 'Sveltejs todo with TailwindCSS and Snowpack',
-    url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/sveltejs-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list',
   },
   {
     framework: 'VueJS',

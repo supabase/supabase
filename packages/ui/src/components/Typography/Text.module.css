@@ -1,0 +1,75 @@
+.sbui-typography-text {
+  @apply text-sm;
+  @apply text-typography-body-light dark:text-typography-body-dark;
+}
+
+.sbui-typography-text-small {
+  @apply text-xs;
+}
+
+.sbui-typography-text-secondary {
+  @apply text-typography-body-secondary-light;
+  @apply dark:text-typography-body-secondary-dark;
+}
+
+.sbui-typography-text-success {
+  @apply text-green-500;
+  @apply dark:text-green-500;
+}
+
+.sbui-typography-text-warning {
+  @apply text-yellow-500;
+  @apply dark:text-yellow-500;
+}
+
+.sbui-typography-text-danger {
+  @apply text-red-500;
+  @apply dark:text-red-500;
+}
+
+.sbui-typography-text-disabled {
+  @apply text-gray-300;
+  @apply dark:text-gray-400;
+  /* color: rgba(0,0,0,.25); */
+  cursor: not-allowed;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.sbui-typography-text-underline {
+  @apply underline;
+}
+
+.sbui-typography-text-strikethrough {
+  @apply line-through;
+}
+
+.sbui-typography-text strong {
+  @apply text-sm;
+}
+
+mark.sbui-typography-text {
+  padding: 0;
+  background-color: #ffe58f;
+}
+
+code.sbui-typography-text {
+  /* margin: 0 .2em; */
+  padding: 0.2em 0.4em 0.1em;
+  /* font-size: 85%; */
+  background: hsla(0, 0%, 58.8%, 0.1);
+  border: 1px solid hsla(0, 0%, 39.2%, 0.2);
+  border-radius: 3px;
+}
+
+kbd.sbui-typography-text {
+  /* margin: 0 .2em; */
+  padding: 0.15em 0.4em 0.1em;
+  /* font-size: 90%; */
+  background: hsla(0, 0%, 58.8%, 0.06);
+  border: solid hsla(0, 0%, 39.2%, 0.2);
+  border-width: 1px 1px 2px;
+  border-radius: 3px;
+}

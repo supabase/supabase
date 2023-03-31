@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, Space } from '@supabase/ui'
+import { Button, IconBookOpen, Space } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
@@ -22,7 +22,7 @@ const Hero = () => {
                     <div>
                       <h1
                         className="
-                        text-scale-1200 
+                        text-scale-1200
                         text-2xl sm:text-3xl sm:leading-none lg:text-4xl
                         xl:text-5xl
                         "
@@ -40,14 +40,18 @@ const Hero = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
-                        <Button as="a" size="small" className="text-white">
-                          Start your project
-                        </Button>
+                        <a>
+                          <Button size="small" className="text-white">
+                            Start your project
+                          </Button>
+                        </a>
                       </Link>
                       <Link href="/docs" as="/docs" passHref>
-                        <Button as="a" size="small" type="default" icon={<IconBookOpen />}>
-                          Documentation
-                        </Button>
+                        <a>
+                          <Button size="small" type="default" icon={<IconBookOpen />}>
+                            Documentation
+                          </Button>
+                        </a>
                       </Link>
                     </div>
                     <div className="flex flex-col gap-4">

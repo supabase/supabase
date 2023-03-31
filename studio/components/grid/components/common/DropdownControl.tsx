@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Dropdown } from '@supabase/ui'
+import { Dropdown } from 'ui'
 
 interface DropdownControlProps {
   options: {
@@ -38,7 +38,7 @@ const DropdownItems: FC<DropdownControlProps> = ({ options, onSelect }) => {
         return (
           <Dropdown.Item key={x.value} onClick={() => onSelect(x.value)}>
             <div className="flex items-center gap-2">
-              {x.preLabel && <span className="text-xs text-scale-900 grow">{x.preLabel}</span>}
+              {x.preLabel && <span className="grow text-xs text-scale-900">{x.preLabel}</span>}
               <span>{x.label}</span>
               {x.postLabel && <span className="text-xs text-scale-900">{x.postLabel}</span>}
             </div>

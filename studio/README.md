@@ -19,7 +19,7 @@ As such, the features exposed on Studio for existing deployments are limited to 
 
 ## Managing Project Settings
 
-Project settings are managed outside of the Dashboard. If you use docker-compose, you should manage the settings in your docker-compose file. If you're deploying Supabase to your own cloud, you should store your secrets and env vars in a vault or secrets manager.
+Project settings are managed outside of the Dashboard. If you use docker compose, you should manage the settings in your docker-compose file. If you're deploying Supabase to your own cloud, you should store your secrets and env vars in a vault or secrets manager.
 
 ## How to contribute?
 
@@ -38,6 +38,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 # in /studio
 
 npm i # install dependencies
+npm run dev:secrets:pull # Supabase internal use: if you are working on the platform version of the Studio
 npm run dev # start dev server
 npm run test # run tests
 npm run -- --watch # run tests in watch mode
@@ -50,7 +51,7 @@ Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker)
 ```
 cd ..
 cd docker
-docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
 ```
 
 Once you've got that set up, update `.env` in the studio folder with the corresponding values.

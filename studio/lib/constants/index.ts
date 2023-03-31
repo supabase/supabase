@@ -3,9 +3,11 @@ export * from './metrics'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const API_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_URL : '/api'
+export const API_ADMIN_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_ADMIN_URL : undefined
 export const PG_META_URL = IS_PLATFORM
   ? process.env.PLATFORM_PG_META_URL
   : process.env.STUDIO_PG_META_URL
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
 

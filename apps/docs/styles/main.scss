@@ -1,0 +1,274 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'custom-font';
+  src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'custom-font';
+  src: url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+:root {
+  --sidebar-width: 300px;
+}
+
+body {
+  @apply bg-scale-100 dark:bg-[#1c1c1c] #{!important};
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #6ee7b7;
+  color: #333 !important;
+}
+
+// a {
+//   text-decoration: none !important;
+// }
+
+article h1 {
+  // margin-bottom: 2rem !important;
+  // font-size: 3rem !important;
+  // font-weight: 400 !important;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+}
+
+.sidebar-width {
+  width: var(--sidebar-width);
+}
+
+.docs-width {
+  max-width: calc(100% - var(--sidebar-width));
+
+  @media screen and (max-width: 1024px) {
+    max-width: none;
+  }
+}
+
+.table-of-contents-height {
+  max-height: calc(100vh - 3.75rem - 2rem);
+  top: calc(3.75rem + 1rem);
+}
+
+.width-full {
+  width: 100% !important;
+}
+
+.p:not(.prose *):not(.overwrite) {
+  @apply text-scale-1100;
+  margin-bottom: 16px;
+}
+
+.small:not(.prose *):not(.overwrite) {
+  @apply text-scale-900 text-xs;
+}
+
+code[class*='language-'],
+pre[class*='language-'] {
+  text-shadow: none !important;
+}
+
+// Spec doc specifics ported from docusaurus
+// @TODO these should be converted to Tailwind classes
+
+.method-list-item {
+  @apply border-t border-gray-400;
+  .method-list-item-label {
+    @apply flex items-center gap-1;
+  }
+  .method-list-item-label-name {
+    @apply font-mono font-bold text-sm py-2;
+  }
+  .method-list-item-label-badge {
+    @apply font-mono text-xs px-1;
+    overflow-wrap: anywhere;
+  }
+  .method-list-item-validation {
+    @apply flex flex-wrap gap-2 items-center;
+  }
+  .method-list-item-description {
+    @apply text-sm space-y-2;
+  }
+}
+
+.method-list-title-isChild {
+  font-family: var(--custom-font-size-xs);
+  & h5 {
+    font-weight: 200;
+  }
+}
+
+.method-list-item-validation {
+  code {
+    @apply text-xs bg-scale-300 rounded;
+    padding: 1px 6px;
+  }
+}
+
+.method-list-group {
+  @apply p-0 m-0 list-none border-b;
+}
+
+.method-list-group .method-list-group {
+  @apply border border-scale-400 rounded-md;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+
+.method-list-group .method-list-group li {
+  margin-top: 0;
+  padding: 12px;
+  border-bottom: none;
+}
+.method-list-title {
+  margin: 0;
+  padding: 6px 12px;
+}
+.method-list-group .method-list-group li div,
+.method-list-group .method-list-group li h4,
+.method-list-group .method-list-group li p {
+  padding: 0;
+  margin: 0;
+}
+.method-list-group .method-list-group li h4 {
+  margin-bottom: 4px;
+}
+
+// These should move to their own components
+// wasn't able to get an import path working
+.parent-menu-toggle.active {
+  svg {
+    transform: rotate(90deg);
+  }
+}
+
+// ToC styles
+.toc__menu-item--active {
+  color: var(--colors-brand9) !important;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.admonition-content > p {
+  @apply m-0;
+}
+
+// format <code> inside <p>
+h2 code,
+h3 code,
+h4 code {
+  word-break: keep-all !important;
+  white-space: nowrap !important;
+  padding: 0.1rem 0.35rem !important;
+
+  &:before {
+    display: none;
+  }
+  &::after {
+    display: none;
+  }
+}
+
+// code inside admonitions
+.admonition-content p code {
+  @apply bg-scale-300;
+  word-break: keep-all !important;
+  white-space: nowrap !important;
+}
+
+article p strong {
+  color: inherit !important;
+}
+
+// fix box shadow when <code> is inside <a>
+a:has(code) {
+  box-shadow: none !important;
+}
+
+// fix code line wrapping
+// need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
+article p code {
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+.short-inline-codeblock {
+  @media screen and (min-width: 769px) {
+    white-space: pre !important;
+  }
+}
+
+// fix firefox issue with li wrapping
+.doc-content-container ul li div.relative {
+  display: inline-block;
+}
+
+// fix ToC links when they have <code> inside
+.toc-menu li a code {
+  background: none;
+  border: none;
+}
+
+// prevent horizontal scroll on mobile for tablist tab headers
+div[role='tablist'] {
+  @media screen and (min-width: 320px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 600px) {
+    max-width: 520px;
+  }
+
+  @media screen and (min-width: 769px) {
+    max-width: 620px;
+  }
+}
+
+/*
+* sets the image in @Next/Image components
+* to respect the height of the content
+*
+*/
+.next-image--dynamic-fill {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+.next-image--dynamic-fill > span {
+  position: relative !important;
+}
+.next-image--dynamic-fill img {
+  object-fit: contain;
+  width: 100% !important;
+  position: relative !important;
+  height: unset !important;
+}

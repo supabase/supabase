@@ -3,11 +3,12 @@ import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
 
-import {
+import type {
   PostgresColumn,
   PostgresTable,
   PostgresRelationship,
   PostgresPrimaryKey,
+  PostgresSchema,
 } from '@supabase/postgres-meta'
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
@@ -17,7 +18,7 @@ import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
-import SchemaStore, { ISchemaStore } from './SchemaStore'
+import SchemaStore from './SchemaStore'
 import TableStore, { ITableStore } from './TableStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
@@ -25,6 +26,7 @@ import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import {
   ColumnField,
   CreateColumnPayload,
+  ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
 import {
@@ -35,11 +37,14 @@ import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEd
 import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
-import PublicationStore, { IPublicationStore } from './PublicationStore'
+import PublicationStore from './PublicationStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
+import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
+import ViewStore, { IViewStore } from './ViewStore'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -50,7 +55,9 @@ export interface IMetaStore {
   openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  schemas: ISchemaStore
+  schemas: IPostgresMetaInterface<PostgresSchema>
+  views: IViewStore
+  foreignTables: IForeignTableStore
 
   hooks: IPostgresMetaInterface<any>
   roles: IRolesStore
@@ -58,7 +65,7 @@ export interface IMetaStore {
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
-  publications: IPublicationStore
+  publications: IPostgresMetaInterface<any>
   types: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -76,7 +83,7 @@ export interface IMetaStore {
   ) => Promise<any | { error: ResponseError }>
   removePrimaryKey: (schema: string, table: string) => Promise<any | { error: ResponseError }>
   addForeignKey: (
-    relationship: Partial<PostgresRelationship>
+    relationship: ExtendedPostgresRelationship
   ) => Promise<any | { error: ResponseError }>
   removeForeignKey: (
     relationship: Partial<PostgresRelationship>
@@ -87,14 +94,16 @@ export interface IMetaStore {
   createColumn: (
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: ExtendedPostgresRelationship,
+    securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
   ) => any
   updateColumn: (
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
-    skipPKCreation?: boolean
+    foreignKey?: ExtendedPostgresRelationship,
+    skipPKCreation?: boolean,
+    skipSuccessMessage?: boolean
   ) => any
   duplicateTable: (
     payload: any,
@@ -120,6 +129,8 @@ export interface IMetaStore {
     columns: ColumnField[],
     isRealtimeEnabled: boolean
   ) => any
+
+  setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -127,6 +138,8 @@ export default class MetaStore implements IMetaStore {
   tables: TableStore
   columns: ColumnStore
   schemas: SchemaStore
+  views: ViewStore
+  foreignTables: ForeignTableStore
 
   hooks: HooksStore
   roles: RolesStore
@@ -140,6 +153,7 @@ export default class MetaStore implements IMetaStore {
   projectRef?: string
   connectionString?: string
   baseUrl: string
+  headers: { [prop: string]: any }
 
   // [Joshen] I'm going to treat this as a list of system schemas
   excludedSchemas = [
@@ -147,44 +161,62 @@ export default class MetaStore implements IMetaStore {
     'extensions',
     'information_schema',
     'net',
-    'pg_catalog',
     'pgsodium',
     'pgsodium_masks',
     'pgbouncer',
     'realtime',
     'storage',
     'supabase_functions',
+    'vault',
     'graphql',
     'graphql_public',
   ]
 
-  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
+  constructor(rootStore: IRootStore, options: { projectRef: string; connectionString?: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
     this.projectRef = projectRef
     this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
-    const headers: any = {}
+    this.headers = {}
     if (IS_PLATFORM && connectionString) {
       this.connectionString = connectionString
-      headers['x-connection-encrypted'] = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi = new OpenApiStore(rootStore, `${API_URL}/props/project/${projectRef}/api`)
-    this.tables = new TableStore(rootStore, `${this.baseUrl}/tables`, headers)
-    this.columns = new ColumnStore(rootStore, `${this.baseUrl}/columns`, headers)
-    this.schemas = new SchemaStore(rootStore, `${this.baseUrl}/schemas`, headers)
+    this.openApi = new OpenApiStore(
+      this.rootStore,
+      `${API_URL}/projects/${this.projectRef}/api/rest`
+    )
+    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
+    this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
+    this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
+    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
+    this.foreignTables = new ForeignTableStore(
+      this.rootStore,
+      `${this.baseUrl}/foreign-tables`,
+      this.headers
+    )
 
-    this.roles = new RolesStore(rootStore, `${this.baseUrl}/roles`, headers)
-    this.policies = new PoliciesStore(rootStore, `${this.baseUrl}/policies`, headers)
-    this.hooks = new HooksStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.triggers = new TriggersStore(rootStore, `${this.baseUrl}/triggers`, headers)
-    this.functions = new FunctionsStore(rootStore, `${this.baseUrl}/functions`, headers)
-    this.extensions = new ExtensionsStore(rootStore, `${this.baseUrl}/extensions`, headers, {
-      identifier: 'name',
-    })
-    this.publications = new PublicationStore(rootStore, `${this.baseUrl}/publications`, headers)
-    this.types = new TypesStore(rootStore, `${this.baseUrl}/types`, headers)
+    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
+    this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
+    this.hooks = new HooksStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
+    this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
+    this.extensions = new ExtensionsStore(
+      this.rootStore,
+      `${this.baseUrl}/extensions`,
+      this.headers,
+      {
+        identifier: 'name',
+      }
+    )
+    this.publications = new PublicationStore(
+      this.rootStore,
+      `${this.baseUrl}/publications`,
+      this.headers
+    )
+    this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
     makeObservable(this, {
       excludedSchemas: observable,
@@ -247,12 +279,25 @@ export default class MetaStore implements IMetaStore {
     return await this.query(query)
   }
 
-  async addForeignKey(relationship: Partial<PostgresRelationship>) {
+  // [Joshen TODO] Eventually need to extend this to composite foreign keys
+  async addForeignKey(relationship: ExtendedPostgresRelationship) {
+    const { deletion_action } = relationship
+    const deletionAction =
+      deletion_action === FOREIGN_KEY_DELETION_ACTION.CASCADE
+        ? 'ON DELETE CASCADE'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.RESTRICT
+        ? 'ON DELETE RESTRICT'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT
+        ? 'ON DELETE SET DEFAULT'
+        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_NULL
+        ? 'ON DELETE SET NULL'
+        : ''
+
     const query = `
       ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
       ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
       FOREIGN KEY ("${relationship.source_column_name}")
-      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}");
+      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}") ${deletionAction};
     `
       .replace(/\s+/g, ' ')
       .trim()
@@ -273,15 +318,21 @@ export default class MetaStore implements IMetaStore {
   }
 
   async updateTableRealtime(table: PostgresTable, enable: boolean) {
+    let publicationUpdateError
     const publications = this.publications.list()
     const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
 
-    const realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
+    let realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
     if (realtimePublication === undefined) {
-      return this.rootStore.ui.setNotification({
-        category: 'error',
-        message: `Unable to update realtime for ${table.name}: Missing publication`,
+      const { data: publication, error: publicationCreateError } = await this.publications.create({
+        name: 'supabase_realtime',
+        publish_insert: true,
+        publish_update: true,
+        publish_delete: true,
+        tables: [],
       })
+      if (publicationCreateError) throw publicationCreateError
+      realtimePublication = publication
     }
 
     const { id, tables: publicationTables } = realtimePublication
@@ -294,7 +345,8 @@ export default class MetaStore implements IMetaStore {
         : publicTables
             .filter((t: any) => t.id !== table.id)
             .map((t: any) => `${t.schema}.${t.name}`)
-      await this.publications.recreate(id, realtimeTables)
+      const { error } = await this.publications.update(id, { tables: realtimeTables })
+      publicationUpdateError = error
     } else {
       const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
 
@@ -314,16 +366,23 @@ export default class MetaStore implements IMetaStore {
       if (realtimeTables === null) return
 
       const payload = { id, tables: realtimeTables }
-      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
-      if (publicationsUpdateError) throw publicationsUpdateError
+      const { error } = await this.publications.update(id, payload)
+      publicationUpdateError = error
     }
+
+    if (publicationUpdateError) throw publicationUpdateError
   }
 
   async createColumn(
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>
+    foreignKey?: ExtendedPostgresRelationship,
+    securityConfiguration?: { isEncrypted: boolean; keyId?: string; keyName?: string }
   ) {
+    const toastId = this.rootStore.ui.setNotification({
+      category: 'loading',
+      message: `Creating column "${payload.name}"...`,
+    })
     try {
       // Once pg-meta supports composite keys, we can remove this logic
       const { isPrimaryKey, ...formattedPayload } = payload
@@ -333,6 +392,11 @@ export default class MetaStore implements IMetaStore {
 
       // Firing createColumn in createTable will bypass this block
       if (isPrimaryKey) {
+        this.rootStore.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: 'Assigning primary key to column...',
+        })
         // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
         // @ts-ignore
         const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
@@ -348,10 +412,46 @@ export default class MetaStore implements IMetaStore {
       }
 
       if (!isUndefined(foreignKey)) {
+        this.rootStore.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: 'Adding foreign key to column...',
+        })
         const relation: any = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
       }
+
+      const { isEncrypted, keyId, keyName } = securityConfiguration || {}
+      if (isEncrypted) {
+        this.rootStore.ui.setNotification({
+          id: toastId,
+          category: 'loading',
+          message: 'Encrypting column...',
+        })
+        let encryptionKey = keyId
+        if (keyId === 'create-new') {
+          const addKeyRes = await this.rootStore.vault.addKey(keyName)
+          if (addKeyRes.error) throw addKeyRes.error
+          else encryptionKey = addKeyRes[0].id
+        }
+        if (encryptionKey !== undefined) {
+          const encryptColumnRes = await this.rootStore.vault.encryptColumn(column, encryptionKey)
+          if (encryptColumnRes.error) throw encryptColumnRes.error
+        }
+      }
+      this.rootStore.ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully created column "${column.name}"`,
+      })
     } catch (error: any) {
+      this.rootStore.ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: `An error occurred while creating the column "${payload.name}"`,
+      })
+      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
+      await this.rootStore.meta.query(query)
       return { error }
     }
   }
@@ -360,8 +460,9 @@ export default class MetaStore implements IMetaStore {
     id: string,
     payload: UpdateColumnPayload,
     selectedTable: PostgresTable,
-    foreignKey?: Partial<PostgresRelationship>,
-    skipPKCreation?: boolean
+    foreignKey?: ExtendedPostgresRelationship,
+    skipPKCreation?: boolean,
+    skipSuccessMessage: boolean = false
   ) {
     try {
       const { isPrimaryKey, ...formattedPayload } = payload
@@ -390,14 +491,21 @@ export default class MetaStore implements IMetaStore {
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
-      if (!isUndefined(existingForeignKey)) {
+      if (existingForeignKey !== undefined) {
         const relation: any = await this.removeForeignKey(existingForeignKey)
         if (relation.error) throw relation.error
       }
 
-      if (!isUndefined(foreignKey)) {
+      if (foreignKey !== undefined) {
         const relation: any = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
+      }
+
+      if (!skipSuccessMessage) {
+        this.rootStore.ui.setNotification({
+          category: 'success',
+          message: `Successfully updated column "${column.name}"`,
+        })
       }
     } catch (error: any) {
       return { error }
@@ -414,25 +522,25 @@ export default class MetaStore implements IMetaStore {
     }
   ) {
     const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
-    const sourceTableName = duplicateTable.name
+    const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
     const duplicatedTableName = payload.name
 
     // The following query will copy the structure of the table along with indexes, constraints and
     // triggers. However, foreign key constraints are not duplicated over - has to be done separately
     const table = await this.rootStore.meta.query(
-      `CREATE TABLE "${duplicatedTableName}" (LIKE "${sourceTableName}" INCLUDING ALL);`
+      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`
     )
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
     const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
-      // @ts-ignore, but might need to investigate, sounds bad:
-      // Type instantiation is excessively deep and possibly infinite
+      // @ts-ignore
       relationships.map(async (relationship: PostgresRelationship) => {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
           source_table_name: duplicatedTableName,
+          deletion_action: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
         })
         if (relation.error) throw relation.error
       })
@@ -441,7 +549,7 @@ export default class MetaStore implements IMetaStore {
     // Duplicate rows if needed
     if (isDuplicateRows) {
       const rows = await this.rootStore.meta.query(
-        `INSERT INTO "${duplicatedTableName}" SELECT * FROM ${sourceTableName};`
+        `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`
       )
       if (rows.error) throw rows.error
 
@@ -451,7 +559,7 @@ export default class MetaStore implements IMetaStore {
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
-          `SELECT setval('${duplicatedTableName}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${sourceTableName}"));`
+          `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`
         )
         if (identity.error) throw identity.error
       })
@@ -459,7 +567,7 @@ export default class MetaStore implements IMetaStore {
 
     await this.tables.load()
     const tables = this.tables.list()
-    const duplicatedTable = find(tables, { name: duplicatedTableName })
+    const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
@@ -686,12 +794,14 @@ export default class MetaStore implements IMetaStore {
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
             const skipPKCreation = true
+            const skipSuccessMessage = true
             const res: any = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
               column.foreignKey,
-              skipPKCreation
+              skipPKCreation,
+              skipSuccessMessage
             )
             if (res?.error) {
               hasError = true
@@ -802,5 +912,56 @@ export default class MetaStore implements IMetaStore {
       }
       onProgressUpdate(insertProgress * 100)
     }
+  }
+
+  setProjectDetails({ ref, connectionString }: { ref: string; connectionString?: string }) {
+    this.projectRef = ref
+    this.baseUrl = `${API_URL}/pg-meta/${ref}`
+    if (IS_PLATFORM && connectionString) {
+      this.connectionString = connectionString
+      this.headers['x-connection-encrypted'] = connectionString
+    }
+
+    this.openApi.setUrl(`${API_URL}/projects/${this.projectRef}/api/rest`)
+    this.openApi.setHeaders(this.headers)
+
+    this.tables.setUrl(`${this.baseUrl}/tables`)
+    this.tables.setHeaders(this.headers)
+
+    this.columns.setUrl(`${this.baseUrl}/columns`)
+    this.columns.setHeaders(this.headers)
+
+    this.schemas.setUrl(`${this.baseUrl}/schemas`)
+    this.schemas.setHeaders(this.headers)
+
+    this.views.setUrl(`${this.baseUrl}/views`)
+    this.views.setHeaders(this.headers)
+
+    this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
+    this.foreignTables.setHeaders(this.headers)
+
+    this.roles.setUrl(`${this.baseUrl}/roles`)
+    this.roles.setHeaders(this.headers)
+
+    this.policies.setUrl(`${this.baseUrl}/policies`)
+    this.policies.setHeaders(this.headers)
+
+    this.hooks.setUrl(`${this.baseUrl}/triggers`)
+    this.hooks.setHeaders(this.headers)
+
+    this.triggers.setUrl(`${this.baseUrl}/triggers`)
+    this.triggers.setHeaders(this.headers)
+
+    this.functions.setUrl(`${this.baseUrl}/functions`)
+    this.functions.setHeaders(this.headers)
+
+    this.extensions.setUrl(`${this.baseUrl}/extensions`)
+    this.extensions.setHeaders(this.headers)
+
+    this.publications.setUrl(`${this.baseUrl}/publications`)
+    this.publications.setHeaders(this.headers)
+
+    this.types.setUrl(`${this.baseUrl}/types`)
+    this.types.setHeaders(this.headers)
   }
 }

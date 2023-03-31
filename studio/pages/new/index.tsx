@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input } from '@supabase/ui'
+import { Button, Input, Listbox } from 'ui'
 import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'
@@ -10,6 +10,25 @@ import { WizardLayout } from 'components/layouts'
 import Panel from 'components/ui/Panel'
 import { NextPageWithLayout } from 'types'
 
+const ORG_KIND_TYPES = {
+  PERSONAL: 'Personal',
+  EDUCATIONAL: 'Educational',
+  STARTUP: 'Startup',
+  AGENCY: 'Agency',
+  COMPANY: 'Company',
+  UNDISCLOSED: 'N/A',
+}
+const ORG_KIND_DEFAULT = 'PERSONAL'
+
+const ORG_SIZE_TYPES = {
+  '1': '1 - 10',
+  '10': '10 - 49',
+  '50': '50 - 99',
+  '100': '100 - 299',
+  '300': 'More than 300',
+}
+const ORG_SIZE_DEFAULT = '1'
+
 /**
  * No org selected yet, create a new one
  */
@@ -18,6 +37,8 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
 
   const [orgName, setOrgName] = useState('')
+  const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
+  const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
   function validateOrgName(name: any) {
@@ -27,6 +48,14 @@ const Wizard: NextPageWithLayout = () => {
 
   function onOrgNameChange(e: any) {
     setOrgName(e.target.value)
+  }
+
+  function onOrgKindChange(value: any) {
+    setOrgKind(value)
+  }
+
+  function onOrgSizeChange(value: any) {
+    setOrgSize(value)
   }
 
   async function onClickSubmit(e: any) {
@@ -40,6 +69,8 @@ const Wizard: NextPageWithLayout = () => {
     setNewOrgLoading(true)
     const response = await post(`${API_URL}/organizations`, {
       name: orgName,
+      kind: orgKind,
+      ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
     })
 
     if (response.error) {
@@ -65,11 +96,11 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => router.push('/')}>
+          <Button type="default" onClick={() => router.push('/projects')}>
             Cancel
           </Button>
           <div className="flex items-center space-x-3">
-            <p className="text-scale-900 text-xs">You can rename your organization later</p>
+            <p className="text-xs text-scale-900">You can rename your organization later</p>
             <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
               Create organization
             </Button>
@@ -78,9 +109,9 @@ const Wizard: NextPageWithLayout = () => {
       }
     >
       <Panel.Content className="pt-0">
-        <p className="text-sm">This is your organization's name within Supabase.</p>
-        <p className="text-scale-1100 text-sm">
-          For example, you can use the name of your company or department
+        <p className="text-sm">This is your organization within Supabase.</p>
+        <p className="text-sm text-scale-1100">
+          For example, you can use the name of your company or department.
         </p>
       </Panel.Content>
       <Panel.Content className="Form section-block--body has-inputs-centered">
@@ -95,6 +126,44 @@ const Wizard: NextPageWithLayout = () => {
           onChange={onOrgNameChange}
         />
       </Panel.Content>
+      <Panel.Content className="Form section-block--body has-inputs-centered">
+        <Listbox
+          label="Type of organization"
+          layout="horizontal"
+          value={orgKind}
+          onChange={onOrgKindChange}
+          descriptionText="What would best describe your organization?"
+        >
+          {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
+            return (
+              <Listbox.Option key={k} label={v} value={k}>
+                {v}
+              </Listbox.Option>
+            )
+          })}
+        </Listbox>
+      </Panel.Content>
+      {orgKind == 'COMPANY' ? (
+        <Panel.Content className="Form section-block--body has-inputs-centered">
+          <Listbox
+            label="Company size"
+            layout="horizontal"
+            value={orgSize}
+            onChange={onOrgSizeChange}
+            descriptionText="How many people are in your company?"
+          >
+            {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
+              return (
+                <Listbox.Option key={k} label={v} value={k}>
+                  {v}
+                </Listbox.Option>
+              )
+            })}
+          </Listbox>
+        </Panel.Content>
+      ) : (
+        <></>
+      )}
     </Panel>
   )
 }

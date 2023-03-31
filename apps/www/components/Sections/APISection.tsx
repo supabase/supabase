@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconArrowUpRight, Tabs } from '@supabase/ui'
+import { Button, IconArrowUpRight, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
@@ -36,7 +36,7 @@ function APISection(props: Props) {
     <div className="grid grid-cols-12 lg:gap-16">
       <div className="col-span-12 pb-8 lg:col-span-5 xl:col-span-5">
         <h2 className="h3">{props.title}</h2>
-        <p className="p">{props.text}</p>
+        <div className="p">{props.text}</div>
         {props.documentation_link && (
           <Link href={props.documentation_link} as={props.documentation_link}>
             <a>

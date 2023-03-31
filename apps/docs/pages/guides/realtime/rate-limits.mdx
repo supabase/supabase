@@ -1,0 +1,84 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'rate-limits',
+  title: 'Realtime Rate Limits',
+  description: 'Understanding Realtime rate limiting',
+  sidebar_label: 'Rate Limits',
+}
+
+Supabase Realtime is a global cluster. We've implemented some rate limits to help ensure high availability for all customers.
+
+Rate limits are configurable per project and our cluster supports millions of concurrent connections. [Contact support](https://app.supabase.com/support/new) if these limits are causing issues.
+
+## Limits by Plan
+
+Limits are set on the Free and Pro plans accordingly. See our [pricing page](https://supabase.com/pricing) for more information.
+
+Enterprise plans are billed on a usage basis. We still employ limiting on Enterprise plans. If you're on an Enterprise plan simply contact support and we'll increase your limits as needed.
+
+Enterprise plan limits start at:
+
+- 500 concurrent clients
+- 1,000 messages per second
+- 500 concurrent Channels
+
+## System Limits
+
+The following limits apply to all projects:
+
+- 500 Channel joins per second
+- 100 Channels per connected client
+
+## Client-Side Limiting
+
+Some basic WebSocket message rate limiting is implemented client-side.
+
+For example, the [multiplayer.dev demo](/docs/guides/realtime/quickstart#cursor-positions) instantiates the Supabase client with an `eventsPerSecond` parameter.
+
+## Rate Limiting Errors
+
+Rate limiting errors can appear in backend logs and messages in the WebSocket connection.
+
+<Admonition type="note">
+
+Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error and share those connection details with Supabase support.
+
+</Admonition>
+
+### Backend Logs
+
+If your project is being rate limited, check your [Realtime logs](https://app.supabase.com/project/_/database/realtime-logs).
+
+### WebSocket Errors
+
+- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically when the message rate decreases below your plan limit.
+
+Some limits can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
+
+- `too_many_channels`: Too many channels currently joined for a single client.
+- `too_many_connections`: Too many total concurrent connections for a project.
+- `too_many_joins`: Too many Channel joins per second.
+
+<Admonition type="note">
+
+Use your browser's developer tools to find the WebSocket initiation request and view individual messages.
+
+</Admonition>
+
+## Payload Limits
+
+Realtime has a message byte size limit of 1 megabyte.
+
+## Presence Limits
+
+Realtime Presence is a CRDT backed in-memory key value store based on Phoenix Presence. It's more expensive to update a Presence than Broadcast a message.
+
+The following limits apply to Presence messages:
+
+- 10 keys per object
+- Message rate limit is 10% of your Realtime message rate limit
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

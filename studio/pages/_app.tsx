@@ -10,53 +10,49 @@ import 'styles/contextMenu.scss'
 import 'styles/react-data-grid-logs.scss'
 import 'styles/date-picker.scss'
 import 'styles/grid.scss'
+import 'styles/graphiql-base.scss'
 
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
 
 import Head from 'next/head'
+import Script from 'next/script'
+
 import { AppPropsWithLayout } from 'types'
 
 import { useEffect, useState } from 'react'
+import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
+import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { StoreProvider } from 'hooks'
-import { GOTRUE_ERRORS } from 'lib/constants'
-import { auth } from 'lib/gotrue'
+import { AuthProvider } from 'lib/auth'
 import { dart } from 'lib/constants/prism'
+import { useRootQueryClient } from 'data/query-client'
 
 import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
+import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
+
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 dart(Prism)
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
-
-  useEffect(() => {
-    async function handleEmailVerificationError() {
-      const { error } = await auth.initialize()
-
-      if (error?.message === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
-        rootStore.ui.setNotification({
-          category: 'error',
-          message:
-            'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
-        })
-      }
-    }
-
-    handleEmailVerificationError()
-  }, [])
 
   const getSavingState = () => rootStore.content.savingState
 
@@ -89,24 +85,52 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useAutoAuthRedirect(queryClient)
+
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
-    <StoreProvider rootStore={rootStore}>
-      <FlagProvider>
-        <Head>
-          <title>Supabase</title>
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
-        </Head>
-        <PageTelemetry>
-          <RouteValidationWrapper>
-            <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-          </RouteValidationWrapper>
-        </PageTelemetry>
-        <PortalToast />
-      </FlagProvider>
-    </StoreProvider>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <StoreProvider rootStore={rootStore}>
+          <AuthProvider>
+            <FlagProvider>
+              <Head>
+                <title>Supabase</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              </Head>
+
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="google-analytics" strategy="afterInteractive">
+                {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}', { 'send_page_view': false });
+                `}
+              </Script>
+
+              <PageTelemetry>
+                <TooltipProvider>
+                  <RouteValidationWrapper>
+                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                  </RouteValidationWrapper>
+                </TooltipProvider>
+              </PageTelemetry>
+
+              <HCaptchaLoadedStore />
+              <PortalToast />
+              <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+            </FlagProvider>
+          </AuthProvider>
+        </StoreProvider>
+      </Hydrate>
+    </QueryClientProvider>
   )
 }
-export default MyApp
+
+export default CustomApp

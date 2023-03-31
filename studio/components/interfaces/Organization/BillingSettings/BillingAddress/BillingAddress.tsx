@@ -1,10 +1,10 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Listbox } from '@supabase/ui'
+import { Form, Input, Button, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
@@ -22,11 +22,11 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
 
-  const enablePermissions = useFlag('enablePermissions')
   const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.customer')
-    : ui.selectedOrganization?.is_owner
+  const canUpdateBillingAddress = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.customer'
+  )
 
   const [isDirty, setIsDirty] = useState(false)
   const initialValues = {
@@ -80,9 +80,9 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
       <Panel loading={loading}>
         {loading ? (
           <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-            <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-            <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-            <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+            <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+            <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+            <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
           </div>
         ) : !canReadBillingAddress ? (
           <NoPermission resourceText="view this organization's billing address" />

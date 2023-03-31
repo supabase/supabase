@@ -1,12 +1,7 @@
-import { PostgresSchema } from '@supabase/postgres-meta'
-
-import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
+import type { PostgresSchema } from '@supabase/postgres-meta'
+import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import { ResponseError } from 'types'
 
-export interface ISchemaStore extends IPostgresMetaInterface<PostgresSchema> {
-  getViews: (schema: string) => Promise<any | { error: ResponseError }>
-}
 export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
   constructor(
     rootStore: IRootStore,
@@ -19,12 +14,11 @@ export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
     super(rootStore, dataUrl, headers, options)
   }
 
-  async getViews(schema: string) {
-    const query = `
-      select schemaname as schema, viewname as name from pg_catalog.pg_views
-      where schemaname = '${schema}'
-      order by schemaname, viewname;
-    `
-    return await this.rootStore.meta.query(query)
+  // Dashboard to hide schemas with pg_ prefix
+  list(filter: any) {
+    const schemasFilter = (schema: PostgresSchema) =>
+      !schema.name.startsWith('pg_') && (typeof filter === 'function' ? filter(schema) : true)
+
+    return super.list(schemasFilter)
   }
 }

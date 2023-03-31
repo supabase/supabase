@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -12,9 +12,11 @@ import {
 import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { IS_PLATFORM } from 'lib/constants'
 
-interface Props {
+export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
@@ -29,7 +31,7 @@ interface Props {
   warnings: LogsWarning[]
 }
 
-const LogsQueryPanel: React.FC<Props> = ({
+const LogsQueryPanel = ({
   templates = [],
   onSelectTemplate,
   hasEditorValue,
@@ -42,24 +44,17 @@ const LogsQueryPanel: React.FC<Props> = ({
   defaultTo,
   onDateChange,
   warnings,
-}) => {
-  const { ui } = useStore()
+}: LogsQueryPanelProps) => {
+  const { data: profile } = useProfileQuery()
   const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'log_sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   return (
-    <div
-      className="
-  border
-  border-panel-border-light dark:border-panel-border-dark rounded rounded-bl-none rounded-br-none
-  bg-panel-header-light dark:bg-panel-header-dark
-  
-  "
-    >
-      <div className="px-5 py-2 flex items-center justify-between w-full">
-        <div className="flex flex-row gap-x-4 items-center justify-between w-full">
+    <div className="rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark">
+      <div className="flex w-full items-center justify-between px-5 py-2">
+        <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             <Dropdown
               side="bottom"
@@ -69,7 +64,7 @@ const LogsQueryPanel: React.FC<Props> = ({
                 .map((source) => (
                   <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
                     <div className="flex flex-col gap-1">
-                      <span className="font-mono text-scale-1100 font-bold">{source}</span>
+                      <span className="font-mono font-bold text-scale-1100">{source}</span>
                       <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
                     </div>
                   </Dropdown.Item>
@@ -104,11 +99,10 @@ const LogsQueryPanel: React.FC<Props> = ({
             <div className="overflow-hidden">
               <div
                 className={` transition-all duration-300 ${
-                  warnings.length > 0 ? 'opacity-100' : 'invisible w-0 h-0 opacity-0'
+                  warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
                 }`}
               >
                 <Popover
-                  portalled
                   overlay={
                     <Alert variant="warning" title="">
                       <div className="flex flex-col gap-3">
@@ -137,7 +131,7 @@ const LogsQueryPanel: React.FC<Props> = ({
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>
-                {onSave && (
+                {IS_PLATFORM &&  onSave && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger>
                       <Button
@@ -149,19 +143,21 @@ const LogsQueryPanel: React.FC<Props> = ({
                       </Button>
                     </Tooltip.Trigger>
                     {!canCreateLogQuery && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border',
-                          ].join(' ')}
-                        >
-                          <span className="text-scale-1200 text-xs">
-                            You need additional permissions to save your query
-                          </span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to save your query
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
                     )}
                   </Tooltip.Root>
                 )}

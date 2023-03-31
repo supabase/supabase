@@ -1,7 +1,7 @@
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
 import Link from 'next/link'
-import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from '@supabase/ui'
+import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 // Import Swiper styles if swiper used on page
@@ -122,11 +122,11 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    dark:bg-scale-400 lg:justify-evenly gap-2
-                    flex flex-row rounded rounded-t-none border-b
-                    border-r border-l
-                    border-gray-100 bg-white p-5
-                    pt-14 dark:border-gray-600"
+                    dark:bg-scale-400 flex flex-row
+                    gap-2 rounded rounded-t-none border-b border-r
+                    border-l border-gray-100
+                    bg-white p-5 pt-14
+                    dark:border-gray-600 lg:justify-evenly"
                   >
                     <Link
                       href="https://github.com/supabase/supabase/discussions"
@@ -199,7 +199,7 @@ const Index = ({}: Props) => {
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
                   >
-                    <a href="mailto:support@supabase.io">
+                    <a href="https://app.supabase.com/support/new">
                       <Button size="medium" type="default" iconRight={<IconMail />}>
                         Email Support
                       </Button>

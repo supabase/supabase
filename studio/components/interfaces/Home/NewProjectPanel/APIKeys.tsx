@@ -1,19 +1,18 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { Input, IconLoader, IconAlertCircle } from '@supabase/ui'
-import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
 
-import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { checkPermissions, useParams } from 'hooks'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import Panel from 'components/ui/Panel'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
 const APIKeys = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const availableLanguages = [
     { name: 'Javascript', key: 'js' },
@@ -22,22 +21,24 @@ const APIKeys = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
 
   const {
-    services,
+    data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettings(ref as string | undefined)
+  } = useProjectApiQuery({
+    projectRef,
+  })
 
   const {
-    jwtSecretUpdateStatus,
+    data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  }: any = useJwtSecretUpdateStatus(ref)
+  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
 
   // Get the API service
-  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
-  const apiConfig = apiService?.app_config ?? {}
+  const apiService = settings?.autoApiService
   const apiKeys = apiService?.service_api_keys ?? []
 
   // API keys should not be empty. However it can be populated with a delay on project creation
@@ -45,8 +46,8 @@ const APIKeys = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `https://${apiConfig.endpoint}`
-  const anonKey = apiKeys.find((key: any) => key.tags === 'anon')
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
+  const anonKey = apiKeys.find((key) => key.tags === 'anon')
 
   const clientInitSnippet: any = Snippets.init(apiUrl)
   const selectedLanguageSnippet =
@@ -66,14 +67,14 @@ const APIKeys = () => {
       }
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading || isApiKeysEmpty
@@ -110,7 +111,7 @@ const APIKeys = () => {
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
                   <div className="flex items-center space-x-1 -ml-1">
-                    {anonKey.tags?.split(',').map((x: any, i: number) => (
+                    {anonKey?.tags?.split(',').map((x: any, i: number) => (
                       <code key={`${x}${i}`} className="text-xs">
                         {x}
                       </code>
@@ -120,7 +121,7 @@ const APIKeys = () => {
                 </div>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={anonKey.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+              reveal={anonKey?.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
               value={
                 !canReadAPIKeys
                   ? 'You need additional permissions to view API keys'
@@ -128,7 +129,7 @@ const APIKeys = () => {
                   ? 'JWT secret update failed, new API key may have issues'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                   ? 'Updating JWT secret...'
-                  : anonKey.api_key
+                  : apiService?.defaultApiKey
               }
               onChange={() => {}}
               descriptionText={
@@ -136,8 +137,8 @@ const APIKeys = () => {
                   This key is safe to use in a browser if you have enabled Row Level Security (RLS)
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
-                  <Link href={`/project/${ref}/settings/api`}>
-                    <a className="text-brand-800 hover:text-brand-900 transition">here</a>
+                  <Link href={`/project/${projectRef}/settings/api`}>
+                    <a className="transition text-brand-800 hover:text-brand-900">here</a>
                   </Link>{' '}
                   to bypass RLS.
                 </p>

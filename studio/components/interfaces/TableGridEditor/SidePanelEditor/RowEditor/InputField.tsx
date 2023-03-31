@@ -1,71 +1,96 @@
 import { FC } from 'react'
-import { isUndefined, includes } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from '@supabase/ui'
+import { isUndefined, includes, noop } from 'lodash'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2, Listbox } from 'ui'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
 import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
 
-interface Props {
+export interface InputFieldProps {
   field: RowField
   errors: any
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
-  onViewForeignKey?: () => void
+  onSelectForeignKey?: () => void
 }
 
-const InputField: FC<Props> = ({
+const InputField = ({
   field,
   errors,
   isEditable = true,
-  onUpdateField = () => {},
-  onEditJson = () => {},
-  onViewForeignKey = () => {},
-}) => {
+  onUpdateField = noop,
+  onEditJson = noop,
+  onSelectForeignKey = noop,
+}: InputFieldProps) => {
   if (field.enums.length > 0) {
-    return (
-      <Select
-        size="medium"
-        layout="horizontal"
-        value={field.value}
-        label={field.name}
-        labelOptional={field.format}
-        descriptionText={field.comment}
-        disabled={!isEditable}
-        error={errors[field.name]}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-      >
-        <Select.Option value="">---</Select.Option>
-        {field.enums.map((value: string) => (
-          <Select.Option key={value} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-    )
+    const isArray = field.format[0] === '_'
+    if (isArray) {
+      return (
+        <div className="text-area-text-sm">
+          <Input.TextArea
+            layout="horizontal"
+            label={field.name}
+            className="text-sm"
+            descriptionText={field.comment}
+            labelOptional={field.format}
+            disabled={!isEditable}
+            error={errors[field.name]}
+            rows={5}
+            value={field.value ?? ''}
+            placeholder={
+              field.defaultValue === null
+                ? ''
+                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+                ? 'EMPTY'
+                : `Default: ${field.defaultValue}`
+            }
+            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          />
+        </div>
+      )
+    } else {
+      return (
+        <Select
+          size="medium"
+          layout="horizontal"
+          value={field.value ?? ''}
+          label={field.name}
+          labelOptional={field.format}
+          descriptionText={field.comment}
+          disabled={!isEditable}
+          error={errors[field.name]}
+          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+        >
+          <Select.Option value="">---</Select.Option>
+          {field.enums.map((value: string) => (
+            <Select.Option key={value} value={value}>
+              {value}
+            </Select.Option>
+          ))}
+        </Select>
+      )
+    }
   }
 
-  if (!isUndefined(field.foreignKey)) {
+  if (field.foreignKey !== undefined) {
     return (
       <Input
         layout="horizontal"
         label={field.name}
-        value={field.value}
-        // @ts-ignore This is creating some validateDOMNesting errors
-        // because descriptionText is a <p> element as a parent
+        value={field.value ?? ''}
         descriptionText={
-          <div className="flex items-center space-x-1 opacity-50">
-            {field.comment && <p className="text-sm">{field.comment}</p>}
-            <p className="text-sm">({field.name}</p>
-            <p className="text-sm">
-              <IconArrowRight size={14} strokeWidth={2} />
-            </p>
-            <p className="text-sm">
+          <>
+            {field.comment && <span className="text-sm text-scale-900">{field.comment} </span>}
+            <span className="text-sm text-scale-900">
+              {field.comment && '('}Has a foreign key relation to
+            </span>
+            <span className="text-code font-mono text-xs text-scale-900">
               {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
-              {field.foreignKey.target_column_name})
-            </p>
-          </div>
+              {field.foreignKey.target_column_name}
+            </span>
+            {field.comment && <span className="text-sm text-scale-900">{`)`}</span>}
+          </>
         }
         labelOptional={field.format}
         disabled={!isEditable}
@@ -73,13 +98,13 @@ const InputField: FC<Props> = ({
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
           <Button
-            disabled={field.value.length === 0}
             type="default"
+            className="mr-1"
             htmlType="button"
-            onClick={onViewForeignKey}
+            onClick={onSelectForeignKey}
             icon={<IconLink />}
           >
-            View data
+            Select record
           </Button>
         }
       />
@@ -98,11 +123,28 @@ const InputField: FC<Props> = ({
           disabled={!isEditable}
           error={errors[field.name]}
           rows={5}
-          value={field.value}
+          value={field.value ?? ''}
           placeholder={
-            typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-              ? 'Default: Empty string'
-              : field.defaultValue
+            field.value === null && field.defaultValue === null
+              ? 'NULL'
+              : field.value === ''
+              ? 'EMPTY'
+              : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+              ? 'EMPTY'
+              : `NULL (Default: ${field.defaultValue})`
+          }
+          actions={
+            <div className="mr-1 mt-0.5">
+              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
+                <Button
+                  type="default"
+                  size="tiny"
+                  onClick={() => onUpdateField({ [field.name]: null })}
+                >
+                  Set to NULL
+                </Button>
+              )}
+            </div>
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -114,12 +156,12 @@ const InputField: FC<Props> = ({
     return (
       <Input
         layout="horizontal"
-        value={field.value}
+        value={field.value ?? ''}
         label={field.name}
         descriptionText={field.comment}
         labelOptional={field.format}
         disabled={!isEditable}
-        placeholder={field.defaultValue}
+        placeholder={field?.defaultValue ?? 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -141,10 +183,49 @@ const InputField: FC<Props> = ({
       <DateTimeInput
         name={field.name}
         format={field.format}
-        value={field.value}
-        description={field.comment}
+        value={field.value ?? ''}
+        description={
+          <>
+            {field.defaultValue && <p>Default: {field.defaultValue}</p>}
+            {field.comment && <p>{field.comment}</p>}
+          </>
+        }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
       />
+    )
+  }
+
+  if (field.format === 'bool') {
+    const options = [
+      { value: 'true', label: 'TRUE' },
+      { value: 'false', label: 'FALSE' },
+      ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
+    ]
+    return (
+      <Listbox
+        size="small"
+        layout="horizontal"
+        name={field.name}
+        label={field.name}
+        labelOptional={field.format}
+        descriptionText={field.comment}
+        defaultValue={field.value}
+        onChange={(value: string) => {
+          if (value === 'null') onUpdateField({ [field.name]: null })
+          else onUpdateField({ [field.name]: value })
+        }}
+      >
+        {options.map((option) => (
+          <Listbox.Option
+            id={option.value}
+            key={option.value}
+            label={option.label}
+            value={option.value}
+          >
+            {option.label}
+          </Listbox.Option>
+        ))}
+      </Listbox>
     )
   }
 
@@ -155,8 +236,14 @@ const InputField: FC<Props> = ({
       descriptionText={field.comment}
       labelOptional={field.format}
       error={errors[field.name]}
-      value={field.value}
-      placeholder={field.isIdentity ? 'Automatically generated as identity' : field.defaultValue}
+      value={field.value ?? ''}
+      placeholder={
+        field.isIdentity
+          ? 'Automatically generated as identity'
+          : field.defaultValue !== null
+          ? `Default: ${field.defaultValue}`
+          : 'NULL'
+      }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
     />

@@ -4,6 +4,7 @@ node_modules
 out
 .docz
 tmp
+.swp
 
 coverage
 allure-results
@@ -118,3 +119,5 @@ typings/
 # Supabase
 **/supabase/.branches
 **/supabase/.temp
+
+apps/new-docs/*

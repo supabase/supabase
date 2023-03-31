@@ -1,9 +1,9 @@
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Form, Input } from '@supabase/ui'
+import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useFlag, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useParams } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 
@@ -16,27 +16,14 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-
-const GeneralSettings = observer(() => {
-  const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
+const GeneralSettings = () => {
+  const { app, ui } = useStore()
+  const { slug } = useParams()
 
   const formId = 'org-general-settings'
-  const initialValues = {
-    name: PageState.organization.name,
-    billing_email: PageState.organization?.billing_email ?? '',
-  }
-
-  const enablePermissions = useFlag('enablePermissions')
-
-  const canUpdateOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
-
-  const canDeleteOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
-    : ui.selectedOrganization?.is_owner
+  const initialValues = { name: ui.selectedOrganization?.name ?? '' }
+  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -47,20 +34,25 @@ const GeneralSettings = observer(() => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, values)
+
+    const response = await patch(`${API_URL}/organizations/${slug}`, {
+      ...values,
+      billing_email: ui.selectedOrganization?.billing_email ?? '',
+    })
+
     if (response.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
-      const { name, billing_email } = response
+      const { name } = response
       resetForm({
-        values: { name, billing_email },
-        initialValues: { name, billing_email },
+        values: { name },
+        initialValues: { name },
       })
 
-      PageState.onOrgUpdated(response)
+      app.onOrgUpdated(response)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',
@@ -76,12 +68,9 @@ const GeneralSettings = observer(() => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = {
-              name: PageState.organization.name,
-              billing_email: PageState.organization?.billing_email ?? '',
-            }
+            const values = { name: ui.selectedOrganization?.name ?? '' }
             resetForm({ values, initialValues: values })
-          }, [PageState.organization.slug])
+          }, [ui.selectedOrganization?.slug])
 
           return (
             <FormPanel
@@ -114,6 +103,6 @@ const GeneralSettings = observer(() => {
       {canDeleteOrganization && <OrganizationDeletePanel />}
     </div>
   )
-})
+}
 
-export default GeneralSettings
+export default observer(GeneralSettings)

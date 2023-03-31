@@ -113,7 +113,8 @@
     },
     "EXTERNAL_AZURE_SECRET": {
       "title": "Azure secret",
-      "type": "string"
+      "type": "string",
+      "help": "Enter the data from Value, not the Secret ID."
     },
     "EXTERNAL_AZURE_URL": {
       "title": "Azure tenant URL",
@@ -343,6 +344,14 @@
       "title": "Rate limit",
       "type": "number",
       "help": "Maximum number of emails sent per hour (Default: 30, Max: 32,767)",
+      "minimum": 1,
+      "maximum": 32767,
+      "multipleof": 1
+    },
+    "RATE_LIMIT_SMS_SENT": {
+      "title": "Rate limit",
+      "type": "number",
+      "help": "Maximum number of SMS messages sent per hour (Default: 30, Max: 32,767)",
       "minimum": 1,
       "maximum": 32767,
       "multipleof": 1

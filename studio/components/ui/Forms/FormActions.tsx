@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 interface Props {
   form: React.HTMLProps<HTMLButtonElement>['form']
@@ -7,6 +7,7 @@ interface Props {
   helper?: React.ReactNode // Helper text to show alongside actions
   disabled?: boolean
   isSubmitting?: boolean
+  submitText?: string
 }
 
 const FormActions = ({
@@ -16,18 +17,19 @@ const FormActions = ({
   helper,
   disabled = false,
   isSubmitting,
+  submitText = 'Save',
 }: Props) => {
   const isDisabled = isSubmitting || disabled || (!hasChanges && hasChanges !== undefined)
 
   return (
     <div
       className={[
-        'flex items-center gap-2 w-full',
+        'flex w-full items-center gap-2',
         // justify actions to right if no helper text
         helper ? 'justify-between' : 'justify-end',
       ].join(' ')}
     >
-      {helper && <span className="text-scale-900 text-sm">{helper}</span>}
+      {helper && <span className="text-sm text-scale-900">{helper}</span>}
       <div className="flex items-center gap-2">
         <Button disabled={isDisabled} type="default" htmlType="reset" onClick={() => handleReset()}>
           Cancel
@@ -39,7 +41,7 @@ const FormActions = ({
           disabled={isDisabled}
           loading={isSubmitting}
         >
-          Save
+          {submitText}
         </Button>
       </div>
     </div>

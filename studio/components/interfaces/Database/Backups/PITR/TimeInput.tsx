@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { isNaN } from 'lodash'
 import { ChangeEvent, FC, useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IconClock } from '@supabase/ui'
+import { IconClock } from 'ui'
 
 import { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
@@ -84,7 +84,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[350px]',
+          'rounded-md bg-scaleA-200 border px-3.5 py-2 w-[200px]',
           `${
             isFocused
               ? 'border-scale-900'
@@ -96,7 +96,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
       >
         <IconClock className="text-scale-1100" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -110,21 +110,23 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Hours (HH)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Hours (HH)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -138,21 +140,23 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Minutes (MM)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Minutes (MM)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4">
+          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -166,17 +170,19 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Seconds (SS)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Seconds (SS)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </div>
       {error && <p className="text-sm text-red-900">{error}</p>}

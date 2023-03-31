@@ -19,18 +19,21 @@ import {
   DateTimeEditor,
   DateTimeWithTimezoneEditor,
   JsonEditor,
-  NullableBooleanEditor,
   NumberEditor,
   SelectEditor,
   TextEditor,
   TimeEditor,
   TimeWithTimezoneEditor,
-} from '../components/editor'
-import { AddColumn, ColumnHeader, SelectColumn } from '../components/grid'
-import { COLUMN_MIN_WIDTH } from '../constants'
-import { BooleanFormatter, DefaultFormatter, ForeignKeyFormatter } from '../components/formatter'
+} from 'components/grid/components/editor'
+import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import {
+  BooleanFormatter,
+  DefaultFormatter,
+  ForeignKeyFormatter,
+} from 'components/grid/components/formatter'
 
-const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
+export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
 export function getGridColumns(
   table: SupaTable,
@@ -38,11 +41,11 @@ export function getGridColumns(
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
+    onExpandJSONEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
     const columnType = getColumnType(x)
-
     const columnDefaultWidth = getColumnDefaultWidth(x)
     const columnWidthBasedOnName =
       (x.name.length + x.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
@@ -68,10 +71,14 @@ export function getGridColumns(
           {...props}
           columnType={columnType}
           isPrimaryKey={x.isPrimaryKey}
+          isEncrypted={x.isEncrypted}
           format={x.format}
+          foreignKey={x.foreignKey}
         />
       ),
-      editor: options?.editable ? getColumnEditor(x, columnType) : undefined,
+      editor: options?.editable
+        ? getColumnEditor(x, columnType, options.onExpandJSONEditor)
+        : undefined,
       formatter: getColumnFormatter(x, columnType),
     }
 
@@ -86,14 +93,18 @@ export function getGridColumns(
   return gridColumns
 }
 
-function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
+function getColumnEditor(
+  columnDefinition: SupaColumn,
+  columnType: ColumnType,
+  onExpandJSONEditor: (column: string, row: any) => void
+) {
   if (columnDefinition.isPrimaryKey || !columnDefinition.isUpdatable) {
     return
   }
 
   switch (columnType) {
     case 'boolean': {
-      return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
+      return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
       return DateEditor
@@ -112,13 +123,13 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
     }
     case 'array':
     case 'json': {
-      return JsonEditor
+      return (p: any) => <JsonEditor {...p} onExpandEditor={onExpandJSONEditor} />
     }
     case 'number': {
       return NumberEditor
     }
     case 'text': {
-      return TextEditor
+      return (p: any) => <TextEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     default: {
       return undefined
@@ -168,7 +179,7 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
   } else return 'unknown'
 }
 
-function getColumnDefaultWidth(columnDef: SupaColumn): number {
+export function getColumnDefaultWidth(columnDef: SupaColumn): number {
   if (isNumericalColumn(columnDef.dataType)) {
     return 120
   } else if (

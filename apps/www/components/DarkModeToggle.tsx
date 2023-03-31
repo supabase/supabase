@@ -1,16 +1,8 @@
-import { useTheme } from '~/components/Providers'
-import { IconSun, IconMoon } from '@supabase/ui'
+import { useTheme } from 'common/Providers'
+import { IconSun, IconMoon } from 'ui'
 
 function DarkModeToggle() {
   const { isDarkMode, toggleTheme } = useTheme()
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   return (
     <div className="flex items-center">
@@ -19,12 +11,12 @@ function DarkModeToggle() {
         type="button"
         aria-pressed="false"
         className={`
-                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent 
+                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
                 transition-colors duration-200 ease-in-out focus:outline-none ${
                   isDarkMode ? 'bg-scale-500' : 'bg-scale-900'
                 } mx-5
               `}
-        onClick={() => toggleDarkMode()}
+        onClick={() => toggleTheme()}
       >
         <span className="sr-only">Toggle Themes</span>
         <span

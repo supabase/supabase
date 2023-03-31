@@ -1,5 +1,5 @@
 import { action, makeObservable } from 'mobx'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'

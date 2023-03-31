@@ -2,7 +2,7 @@ import Container from 'components/Container'
 
 import Layout from '~/components/Layouts/Default'
 import CTABanner from 'components/CTABanner/index'
-import { Button, IconDownload } from '@supabase/ui'
+import { Button, IconDownload } from 'ui'
 
 import { useRouter } from 'next/router'
 
@@ -49,7 +49,12 @@ const Index = () => {
           <SectionContainer>
             <div className="shadow-small grid grid-cols-12 rounded-lg border dark:border-gray-600">
               <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5">
-                <Image src={supabaseLogoPreview} layout="fill" objectFit="cover" />
+                <Image
+                  src={supabaseLogoPreview}
+                  alt="Supabase logo Preview"
+                  layout="fill"
+                  objectFit="cover"
+                />
               </div>
               <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">

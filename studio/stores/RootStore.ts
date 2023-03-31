@@ -1,4 +1,4 @@
-import { configure, reaction } from 'mobx'
+import { configure } from 'mobx'
 import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
@@ -9,6 +9,7 @@ import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBack
 import ProjectAuthConfigStore, {
   IProjectAuthConfigStore,
 } from './authConfig/ProjectAuthConfigStore'
+import VaultStore, { IVaultStore } from './project/VaultStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -24,7 +25,11 @@ export interface IRootStore {
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
-  setProjectRef: (value?: string) => void
+  vault: IVaultStore
+
+  selectedProjectRef?: string
+
+  setProjectRef: (value: string) => void
   setOrganizationSlug: (value?: string) => void
 }
 export class RootStore implements IRootStore {
@@ -35,44 +40,20 @@ export class RootStore implements IRootStore {
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
+  vault: IVaultStore
+
+  selectedProjectRef: string | undefined
 
   constructor() {
     this.app = new AppStore(this)
     this.ui = new UiStore(this)
     this.meta = new MetaStore(this, { projectRef: '', connectionString: '' })
 
-    // @ts-ignore
     this.content = new ProjectContentStore(this, { projectRef: '' })
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.backups = new ProjectBackupsStore(this, { projectRef: '' })
     this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
-
-    /**
-     * TODO: meta and content are not observable
-     * meaning that when meta and content object change mobx doesnt trigger new event
-     *
-     * Workaround for now
-     * we need to use ui.selectedProject along with meta and content
-     * cos whenever ui.selectedProject changes, the reaction will create new meta and content stores
-     */
-    reaction(
-      () => this.ui.selectedProject,
-      (selectedProject) => {
-        if (selectedProject) {
-          // @ts-ignore
-          this.meta = new MetaStore(this, {
-            projectRef: selectedProject.ref,
-            connectionString: selectedProject.connectionString ?? '',
-          })
-        } else {
-          // @ts-ignore
-          this.meta = new MetaStore(this, {
-            projectRef: '',
-            connectionString: '',
-          })
-        }
-      }
-    )
+    this.vault = new VaultStore(this)
   }
 
   /**
@@ -80,23 +61,35 @@ export class RootStore implements IRootStore {
    *
    * This method will also trigger project detail loading when it's not available
    */
-  setProjectRef(value?: string) {
-    if (this.ui.selectedProject?.ref === value) return
-    if (value) {
-      // fetch project detail when
-      // - project not found yet. projectStore is loading
-      // - connectionString is not available. projectStore loaded
-      const found = this.app.projects.find((x: Project) => x.ref == value)
-      if (!found || !found.connectionString) {
-        this.app.projects.fetchDetail(value)
-      }
+  setProjectRef(value: string) {
+    if (this.selectedProjectRef === value) return
+    this.selectedProjectRef = value
+
+    // reset ui projectRef in case of switching projects
+    // this will show the loading screen instead of showing the previous project
+    this.ui.setProjectRef(undefined)
+
+    const setProjectRefs = (project: Project) => {
+      this.meta.setProjectDetails(project)
+      this.functions.setProjectRef(project.ref)
+      this.authConfig.setProjectRef(project.ref)
+      this.content.setProjectRef(project.ref)
+      this.backups.setProjectRef(project.ref)
+      // ui set must come last
+      this.ui.setProjectRef(project.ref)
     }
 
-    this.ui.setProjectRef(value)
-    this.functions.setProjectRef(value)
-    this.authConfig.setProjectRef(value)
-    this.content.setProjectRef(value)
-    this.backups.setProjectRef(value)
+    // fetch project detail when
+    // - project not found yet. projectStore is loading
+    // - connectionString is not available. projectStore loaded
+    const found = this.app.projects.find((x: Project) => x.ref === value)
+    if (found?.connectionString === undefined) {
+      this.app.projects.fetchDetail(value, (project) => {
+        setProjectRefs(project)
+      })
+    } else {
+      setProjectRefs(found)
+    }
   }
 
   setOrganizationSlug(value?: string) {

@@ -1,17 +1,37 @@
-import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
-import { PostgresType } from '@supabase/postgres-meta'
-import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
+import React, { FC, ReactNode } from 'react'
+import {
+  IconCalendar,
+  IconType,
+  IconHash,
+  Listbox,
+  IconToggleRight,
+  Input,
+  Alert,
+  IconAlertCircle,
+  Button,
+  IconExternalLink,
+} from 'ui'
+import type { PostgresType } from '@supabase/postgres-meta'
+import {
+  POSTGRES_DATA_TYPES,
+  POSTGRES_DATA_TYPE_OPTIONS,
+  RECOMMENDED_ALTERNATIVE_DATA_TYPE,
+} from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import InformationBox from 'components/ui/InformationBox'
+import Link from 'next/link'
 
 interface Props {
   value: string
   enumTypes: PostgresType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  layout?: 'vertical' | 'horizontal'
   className?: string
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  description?: ReactNode
+  showRecommendation?: boolean
   onOptionSelect: (value: string) => void
 }
 
@@ -20,14 +40,18 @@ const ColumnType: FC<Props> = ({
   enumTypes = [],
   className,
   size = 'medium',
+  layout,
   error,
   disabled = false,
   showLabel = true,
+  description,
+  showRecommendation = false,
   onOptionSelect = () => {},
 }) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
   const isAvailableType = value ? availableTypes.includes(value) : true
+  const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
   if (!isAvailableType) {
     return (
@@ -35,7 +59,9 @@ const ColumnType: FC<Props> = ({
         readOnly
         disabled
         label={showLabel ? 'Type' : ''}
-        layout="horizontal"
+        layout={showLabel ? 'horizontal' : undefined}
+        className="md:gap-x-0"
+        size="small"
         value={value}
         descriptionText={
           showLabel
@@ -68,13 +94,16 @@ const ColumnType: FC<Props> = ({
   }
 
   return (
+    <div className="space-y-2">
       <Listbox
         label={showLabel ? 'Type' : ''}
-        layout={showLabel ? 'horizontal' : 'vertical'}
+        layout={layout || (showLabel ? 'horizontal' : 'vertical')}
         value={value}
         size={size}
         error={error}
         disabled={disabled}
+        // @ts-ignore
+        descriptionText={description}
         className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
         onChange={(value: string) => onOptionSelect(value)}
         optionsWidth={480}
@@ -105,7 +134,7 @@ const ColumnType: FC<Props> = ({
               value={enumType.name}
               label={enumType.name}
               addOnBefore={() => {
-                return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
+                return <div className="mx-1 h-2 w-2 rounded-full bg-scale-1200" />
               }}
             >
               <div className="flex items-center space-x-4">
@@ -135,6 +164,36 @@ const ColumnType: FC<Props> = ({
           </Listbox.Option>
         ))}
       </Listbox>
+      {showRecommendation && recommendation !== undefined && (
+        <Alert
+          withIcon
+          variant="warning"
+          title={
+            <>
+              It is recommended to use <code className="text-xs">{recommendation.alternative}</code>{' '}
+              instead
+            </>
+          }
+        >
+          <p>
+            Postgres recommends against using the data type <code className="text-xs">{value}</code>{' '}
+            unless you have a very specific use case.
+          </p>
+          <div className="flex items-center space-x-2 mt-3">
+            <Link href={recommendation.reference}>
+              <a target="_blank">
+                <Button type="default" icon={<IconExternalLink />}>
+                  Read more
+                </Button>
+              </a>
+            </Link>
+            <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
+              Use {recommendation.alternative}
+            </Button>
+          </div>
+        </Alert>
+      )}
+    </div>
   )
 }
 

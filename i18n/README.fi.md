@@ -12,9 +12,9 @@
 - [x] Isännöity Postgres-tietokanta [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentikointi ja valtuutus [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automaattisesti luodut rajapinnat
-  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funktiot
   - [x] Tietokantatoiminnot [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Katso täydelliset dokumentaatiot osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
+Katso ohjeet osallistumiseen vierailemalla [Aloitus](../DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 
@@ -45,7 +45,7 @@ Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
 
 Olemme tällä hetkellä julkisessa betaversiossa. Katso tämän repon "julkaisut", niin saat ilmoituksen tärkeimmistä päivityksistä.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Katso tämä repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Katso tämä repo"/></kbd>
 
 ---
 
@@ -119,8 +119,8 @@ Lähestymistapamme asiakaskirjastoissa on modulaarinen. Jokainen alikirjasto on 
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

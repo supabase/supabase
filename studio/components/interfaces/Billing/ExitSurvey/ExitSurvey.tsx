@@ -2,16 +2,16 @@ import { FC, useReducer, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, Modal, IconArrowLeft, Alert } from '@supabase/ui'
+import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
-import { generateFeedbackMessage } from './ExitSurvey.utils'
 import { UpdateSuccess } from '../'
 import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 interface Props {
   freeTier: any
@@ -25,6 +25,9 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
 
+  const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+
   const formRef = useRef<any>()
 
   const initialValues = { message: '' }
@@ -34,12 +37,14 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
   // Tracking submitting state separately outside of form component cause of
   // the additional dynamic confirmation modal that we're doing
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmittingDowngradeModal, setIsSubmittingDowngradeModal] = useState(false)
+
   const [isSuccessful, setIsSuccessful] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
 
   // Anything above a micro instance size will involve a change in compute size
-  const willChangeComputeSize = (subscription?.addons ?? []).length > 0
+  // as downgrading back to free will bring the project back to micro
   const currentComputeSize = subscription?.addons.find((option) =>
     option.supabase_prod_id.includes('addon_instance')
   )
@@ -60,7 +65,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     }
   }
 
-  const getDowngradeSuccessMessage = () => {
+  const getDowngradeRefundMessage = () => {
     return `A total of $${returnedAmount} will be refunded as credits on ${billingDate.toLocaleDateString(
       'en-US',
       {
@@ -89,7 +94,20 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
     }
 
-    if (willChangeComputeSize) {
+    setIsSubmitting(true)
+    let token = captchaToken
+
+    try {
+      if (!token) {
+        const captchaResponse = await captchaRef.current?.execute({ async: true })
+        token = captchaResponse?.response ?? null
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      return
+    }
+
+    if (currentComputeSize !== undefined) {
       setMessage(values.message)
       return setShowConfirmModal(true)
     } else {
@@ -97,11 +115,17 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     }
   }
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef.current?.resetCaptcha()
+  }
+
   const downgradeProject = async (values?: any) => {
     const downgradeMessage = values?.message ?? message
 
     try {
       setIsSubmitting(true)
+      setIsSubmittingDowngradeModal(true)
 
       // Trigger subscription downgrade
       const tier = freeTier.prices[0].id
@@ -113,6 +137,8 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         proration_date,
       })
 
+      resetCaptcha()
+
       if (res?.error) {
         return ui.setNotification({
           category: 'error',
@@ -120,11 +146,11 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           error: res.error,
         })
       } else {
-        if (willChangeComputeSize) {
+        if (currentComputeSize !== undefined) {
           app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'info',
-            message: getDowngradeSuccessMessage(),
+            message: getDowngradeRefundMessage(),
             duration: 8000,
           })
           ui.setNotification({
@@ -138,20 +164,21 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           setIsSuccessful(true)
         }
       }
-
-      // Submit feedback to Freshdesk
-      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-        subject: 'Subscription cancellation - Exit survey',
-        tags: ['dashboard-exitsurvey'],
-        category: 'Billing',
-        message: generateFeedbackMessage(selectedReasons, downgradeMessage),
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: downgradeMessage,
+        exitAction: 'downgrade',
       })
       if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to cancel subscription: ${error}` })
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to cancel subscription: ${error.message}`,
+      })
     } finally {
       setIsSubmitting(false)
+      setIsSubmittingDowngradeModal(false)
     }
   }
 
@@ -160,7 +187,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       <UpdateSuccess
         projectRef={projectRef || ''}
         title="Your project has been updated"
-        message={getDowngradeSuccessMessage()}
+        message={getDowngradeRefundMessage()}
       />
     )
   }
@@ -174,7 +201,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
       >
-        <div className="space-y-8 w-4/5">
+        <div className="w-full xl:w-4/5 space-y-8">
           <div ref={formRef} className="relative">
             <div className="absolute top-[2px] -left-24">
               <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
@@ -198,13 +225,13 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                         <label
                           key={option}
                           className={`
-                              text-center rounded-md py-1 pl-2 pr-3 shadow-sm 
-                              transition-all flex items-center space-x-2
-                              duration-100 cursor-pointer text-sm
+                              flex cursor-pointer items-center space-x-2 rounded-md py-1 
+                              pl-2 pr-3 text-center text-sm
+                              shadow-sm transition-all duration-100
                               ${
                                 active
-                                  ? ` opacity-100 bg-scale-1200 text-scale-100 hover:bg-opacity-75`
-                                  : ` bg-scale-700 opacity-25 hover:opacity-50 text-scale-1200`
+                                  ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
+                                  : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
                               }
                           `}
                         >
@@ -246,6 +273,19 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                       credits
                     </p>
                   </div>
+                  <div className="self-center">
+                    <HCaptcha
+                      ref={captchaRef}
+                      sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                      size="invisible"
+                      onVerify={(token) => {
+                        setCaptchaToken(token)
+                      }}
+                      onExpire={() => {
+                        setCaptchaToken(null)
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </Form>
@@ -257,9 +297,12 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         visible={showConfirmModal}
         size="large"
         header="Downgrading project to free"
-        onCancel={() => setShowConfirmModal(false)}
+        onCancel={() => {
+          setShowConfirmModal(false)
+          setIsSubmitting(false)
+        }}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
             <Alert
               withIcon
@@ -275,17 +318,24 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           <Modal.Content>
             <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
+              <Button
+                block
+                type="default"
+                onClick={() => {
+                  setShowConfirmModal(false)
+                  setIsSubmitting(false)
+                }}
+              >
                 Cancel
               </Button>
               <Button
                 block
                 htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
+                loading={isSubmittingDowngradeModal}
+                disabled={isSubmittingDowngradeModal}
                 onClick={() => downgradeProject()}
               >
                 Confirm

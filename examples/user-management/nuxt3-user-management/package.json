@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "^0.2.0",
+    "nuxt": "3.0.0-rc.11"
+  }
+}

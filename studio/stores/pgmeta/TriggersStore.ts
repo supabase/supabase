@@ -20,8 +20,8 @@ export default class TriggersStore extends PostgresMetaInterface<any> {
    */
   list(filter: any) {
     const triggersFilter = (h: any) =>
-      h.function_schema != 'supabase_functions' &&
-      h.schema != 'net' &&
+      h.function_schema !== 'supabase_functions' &&
+      h.schema !== 'net' &&
       (typeof filter === 'function' ? filter(h) : true)
 
     return super.list(triggersFilter)

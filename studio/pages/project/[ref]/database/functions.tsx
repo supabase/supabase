@@ -11,7 +11,6 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
-  const [filterString, setFilterString] = useState<string>('')
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
@@ -19,10 +18,10 @@ const FunctionsPage: NextPageWithLayout = () => {
   const canReadFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       fetchFunctions()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const fetchFunctions = async () => {
     meta.functions.load()
@@ -50,8 +49,6 @@ const FunctionsPage: NextPageWithLayout = () => {
   return (
     <>
       <FunctionsList
-        filterString={filterString}
-        setFilterString={setFilterString}
         createFunction={createFunction}
         editFunction={editFunction}
         deleteFunction={deleteFunction}

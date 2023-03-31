@@ -1,12 +1,14 @@
 import { get } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
-import { LogsExplorerPage } from 'pages/project/[ref]/logs-explorer/index'
+import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { render } from 'tests/helpers'
 import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useParams } from 'hooks'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -20,7 +22,11 @@ beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
   useRouter.mockReset()
-  useRouter.mockReturnValue(defaultRouterMock())
+  const routerReturnValue = defaultRouterMock()
+  useRouter.mockReturnValue(routerReturnValue)
+
+  useParams.mockReset()
+  useParams.mockReturnValue(routerReturnValue.query)
 })
 test('can display log data', async () => {
   get.mockResolvedValue({
@@ -52,10 +58,11 @@ test('q= query param will populate the query input', async () => {
   const router = defaultRouterMock()
   router.query = { ...router.query, type: 'api', q: 'some_query' }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   // should populate editor with the query param
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'), expect.anything())
   })
 })
 
@@ -71,13 +78,18 @@ test('ite= and its= query param will populate the datepicker', async () => {
     ite: end.toISOString(),
   }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   // should populate editor with the query param
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(encodeURIComponent(start.toISOString()))
+      expect.stringContaining(encodeURIComponent(start.toISOString())),
+      expect.anything()
     )
-    expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent(end.toISOString())))
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(encodeURIComponent(end.toISOString())),
+      expect.anything()
+    )
   })
 })
 
@@ -114,14 +126,23 @@ test('custom sql querying', async () => {
   userEvent.type(editor, '\nlimit 123{ctrl}{enter}')
   await waitFor(
     () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end')) // should not have an end date
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      ) // should not have an end date
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'), expect.anything())
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('limit 123')),
+        expect.anything()
+      )
     },
     { timeout: 1000 }
   )
@@ -137,21 +158,6 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-test('datepicker interaction updates query params', async () => {
-  render(<LogsExplorerPage />)
-  clickDropdown(await screen.findByText(/Last day/))
-  userEvent.click(await screen.findByText(/Last 3 days/))
-
-  const router = useRouter()
-  expect(router.push).toBeCalledWith(
-    expect.objectContaining({
-      query: expect.objectContaining({
-        its: expect.any(String),
-      }),
-    })
-  )
-})
-
 test('query warnings', async () => {
   const router = defaultRouterMock()
   router.query = {
@@ -161,6 +167,53 @@ test('query warnings', async () => {
     ite: dayjs().toISOString(),
   }
   useRouter.mockReturnValue(router)
+  useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
+})
+
+test('field reference', async () => {
+  render(<LogsExplorerPage />)
+  userEvent.click(await screen.findByText('Field Reference'))
+  await screen.findByText('metadata.request.cf.asOrganization')
+})
+
+describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+  beforeEach(() => {
+    useProjectSubscriptionQuery.mockReturnValue({
+      data: {
+        tier: {
+          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
+          key,
+        },
+      },
+    })
+  })
+  test('based on query params', async () => {
+    const router = defaultRouterMock()
+    router.query = {
+      ...router.query,
+      q: 'some_query',
+      its: dayjs().subtract(5, 'month').toISOString(),
+      ite: dayjs().toISOString(),
+    }
+    useRouter.mockReturnValue(router)
+    useParams.mockReturnValue(router.query)
+    render(<LogsExplorerPage />)
+    await screen.findByText(/Log retention/) // assert modal title is present
+  })
+
+  test('based on datepicker helpers', async () => {
+    render(<LogsExplorerPage />)
+    // click on the dropdown
+    clickDropdown(await screen.findByText('Last 24 hours'))
+    userEvent.click(await screen.findByText('Last 3 days'))
+
+    // only free tier will show modal
+    if (key === 'FREE') {
+      await screen.findByText('Log retention') // assert modal title is present
+    } else {
+      await expect(screen.findByText('Log retention')).rejects.toThrow()
+    }
+  })
 })

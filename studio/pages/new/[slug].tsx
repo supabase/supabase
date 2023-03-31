@@ -1,10 +1,10 @@
 import Router, { useRouter } from 'next/router'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, PropsWithChildren } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
+import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -19,10 +19,10 @@ import {
   PRICING_TIER_LABELS,
   PRICING_TIER_DEFAULT_KEY,
   PRICING_TIER_FREE_KEY,
-  DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, useSubscriptionStats, checkPermissions } from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -33,18 +33,20 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
+import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useParams()
   const { app, ui } = useStore()
 
-  const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const kpsEnabled = useFlag('initWithKps')
-  const subscriptionStats = useSubscriptionStats()
+  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
+  const [postgresVersion, setPostgresVersion] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
@@ -54,36 +56,32 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
 
+  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
+
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const isOrganizationOwner = ui.selectedOrganization?.is_owner
-  const totalFreeProjects = subscriptionStats.total_active_free_projects
-  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
   const availableRegions = getAvailableRegions()
-
-  const isAdmin = enablePermissions
-    ? checkPermissions(PermissionAction.CREATE, 'projects')
-    : isOrganizationOwner
-
+  const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
+  const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
-  const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
-  const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+
+  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const canCreateProject =
-    isAdmin &&
-    !subscriptionStats.isError &&
-    !subscriptionStats.isLoading &&
-    (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
 
   const canSubmit =
-    projectName != '' &&
+    projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != '' &&
-    dbPricingTierKey != '' &&
+    dbRegion !== '' &&
+    dbPricingTierKey !== '' &&
     (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
 
   const delayedCheckPasswordStrength = useRef(
@@ -157,14 +155,22 @@ const Wizard: NextPageWithLayout = () => {
 
   const onClickNext = async () => {
     setNewProjectLoading(true)
-    const data = {
+
+    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
+
+    const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
-      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
+      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
       kps_enabled: kpsEnabled,
+    }
+    if (postgresVersion) {
+      data['custom_supabase_internal_requests'] = {
+        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+      }
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -202,20 +208,20 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={!app.organizations.isInitialized}
+      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
         </div>
       }
       footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => Router.push('/')}>
+        <div key="panel-footer" className="flex items-center justify-between w-full">
+          <Button type="default" onClick={() => Router.push('/projects')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">
             {!projectCreationDisabled && (
-              <span className="text-scale-900 text-xs">You can rename your project later</span>
+              <span className="text-xs text-scale-900">You can rename your project later</span>
             )}
             <Button
               onClick={onClickNext}
@@ -230,7 +236,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <>
         <Panel.Content className="pt-0 pb-6">
-          <p className="text-scale-900 text-sm">
+          <p className="text-sm text-scale-900">
             Your project will have its own dedicated instance and full postgres database.
             <br />
             An API will be set up so you can easily interact with your new database.
@@ -238,12 +244,17 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
+          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
+            <Panel.Content
+              className={[
+                'space-y-4 border-t border-b',
+                'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+              ].join(' ')}
+            >
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -266,9 +277,15 @@ const Wizard: NextPageWithLayout = () => {
 
               {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
+
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
+                <Panel.Content
+                  className={[
+                    'border-t border-b',
+                    'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                  ].join(' ')}
+                >
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -281,7 +298,33 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                {showCustomVersionInput && (
+                  <Panel.Content
+                    className={[
+                      'border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Input
+                      id="custom-postgres-version"
+                      layout="horizontal"
+                      label="Postgres Version"
+                      descriptionText={
+                        <p>
+                          Specify a custom version of Postgres (Defaults to the latest)
+                          <br />
+                          This is only applicable for local/staging projects
+                        </p>
+                      }
+                      type="text"
+                      placeholder="Postgres Version"
+                      value={postgresVersion}
+                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    />
+                  </Panel.Content>
+                )}
+
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -303,7 +346,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"
@@ -323,7 +366,9 @@ const Wizard: NextPageWithLayout = () => {
                           addOnBefore={({ active, selected }: any) => (
                             <img
                               className="w-5 rounded-sm"
-                              src={`/img/regions/${Object.keys(availableRegions)[i]}.svg`}
+                              src={`${router.basePath}/img/regions/${
+                                Object.keys(availableRegions)[i]
+                              }.svg`}
                             />
                           )}
                         >
@@ -335,8 +380,9 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
               </>
             )}
+
             {isAdmin && (
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Panel.Content>
                 <Listbox
                   label="Pricing Plan"
                   layout="horizontal"
@@ -376,8 +422,8 @@ const Wizard: NextPageWithLayout = () => {
                   })}
                 </Listbox>
 
-                {isSelectFreeTier && isOverFreeProjectLimit && (
-                  <FreeProjectLimitWarning limit={freeProjectsLimit} />
+                {isSelectFreeTier && hasMembersExceedingFreeTierLimit && (
+                  <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
@@ -385,12 +431,45 @@ const Wizard: NextPageWithLayout = () => {
                 )}
               </Panel.Content>
             )}
-            {subscriptionStats.isLoading && (
-              <Panel.Content>
-                <div className="flex items-center justify-center py-10">
-                  <IconLoader size={16} className="animate-spin" />
-                </div>
-              </Panel.Content>
+
+            {!isSelectFreeTier && (
+              <>
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                  <Toggle
+                    id="project-name"
+                    layout="horizontal"
+                    label={
+                      <div className="flex space-x-4">
+                        <span>Spend Cap</span>
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="transition opacity-50 cursor-pointer hover:opacity-100"
+                          onClick={() => setShowSpendCapHelperModal(true)}
+                        />
+                      </div>
+                    }
+                    placeholder="Project name"
+                    checked={isSpendCapEnabled}
+                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                    descriptionText={
+                      <div>
+                        <p>
+                          By default, Pro projects have spend caps to control costs. When enabled,
+                          usage is limited to the plan's quota, with restrictions when limits are
+                          exceeded. To scale beyond Pro limits without restrictions, disable the
+                          spend cap and pay for over-usage beyond the quota.
+                        </p>
+                      </div>
+                    }
+                  />
+                </Panel.Content>
+
+                <SpendCapModal
+                  visible={showSpendCapHelperModal}
+                  onHide={() => setShowSpendCapHelperModal(false)}
+                />
+              </>
             )}
           </>
         )}
@@ -400,7 +479,7 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 const PageLayout = withAuth(
-  observer(({ children }) => {
+  observer<PropsWithChildren<{}>>(({ children }) => {
     const router = useRouter()
     const { slug } = router.query
 

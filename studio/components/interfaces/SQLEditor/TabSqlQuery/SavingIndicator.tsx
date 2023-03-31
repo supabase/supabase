@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from '@supabase/ui'
+import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 
 import { useStore, usePrevious } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
@@ -64,17 +64,19 @@ const SavingIndicator: FC<Props> = ({ updateSqlSnippet }) => {
           <Tooltip.Trigger>
             <IconLoader className="animate-spin" size={14} strokeWidth={2} />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Saving changes...</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">Saving changes...</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       )}
       {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
@@ -85,20 +87,22 @@ const SavingIndicator: FC<Props> = ({ updateSqlSnippet }) => {
           <Tooltip.Trigger>
             <IconCheck className="text-brand-900" size={14} strokeWidth={3} />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border ',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">All changes saved</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200 ',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">All changes saved</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       )}
-      <span className="text-scale-1000 text-sm">
+      <span className="text-sm text-scale-1000">
         {content.savingState === 'CREATING_FAILED' && 'Failed to create'}
         {content.savingState === 'UPDATING_FAILED' && 'Failed to save'}
       </span>

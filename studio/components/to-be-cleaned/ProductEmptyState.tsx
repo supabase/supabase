@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button, IconExternalLink } from 'ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -28,8 +28,8 @@ const ProductEmptyState: FC<Props> = ({
   const hasAction = (ctaButtonLabel && onClickCta) || (infoButtonUrl && infoButtonLabel)
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="flex space-x-4 p-6 rounded border border-panel-border-light dark:border-panel-border-dark bg-panel-body-light dark:bg-panel-body-dark shadow-md">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="flex space-x-4 rounded border border-panel-border-light bg-panel-body-light p-6 shadow-md dark:border-panel-border-dark dark:bg-panel-body-dark">
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>
@@ -45,22 +45,24 @@ const ProductEmptyState: FC<Props> = ({
                       </Button>
                     </Tooltip.Trigger>
                     {disabled && disabledMessage.length > 0 && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border',
-                          ].join(' ')}
-                        >
-                          <span className="text-scale-1200 text-xs">{disabledMessage}</span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">{disabledMessage}</span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
                     )}
                   </Tooltip.Root>
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default">
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
                     <a target="_blank" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

@@ -1,39 +1,53 @@
 import { FC, useState } from 'react'
-import {
-  Listbox,
-  IconLoader,
-  Button,
-  IconPlus,
-  IconAlertCircle,
-  IconCreditCard,
-  Modal,
-  Alert,
-} from '@supabase/ui'
+import Router from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { checkPermissions, useStore } from 'hooks'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
-import { getProductPrice } from '../Billing.utils'
+import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
+import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
+import { getPITRDays } from './PaymentSummaryPanel.utils'
+import ConfirmPaymentModal from './ConfirmPaymentModal'
+import { StripeSubscription } from '../Subscription/Subscription.types'
+
+// [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
 interface Props {
   isRefreshingPreview: boolean
+  currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
+
   currentPlan: any
-  currentComputeSize: any
+  currentAddons: {
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
+    supportPlan?: SubscriptionAddon
+  }
+
   selectedPlan?: any
-  selectedComputeSize: any
+  selectedAddons: {
+    computeSize: SubscriptionAddon
+    pitrDuration: SubscriptionAddon
+    customDomains: SubscriptionAddon
+  }
+
   isSpendCapEnabled: boolean
   paymentMethods?: any
   selectedPaymentMethod: any
   isLoadingPaymentMethods: boolean
   onSelectPaymentMethod: (method: any) => void
   onSelectAddNewPaymentMethod: () => void
+  beforeConfirmPayment: () => Promise<boolean>
   onConfirmPayment: () => void
   isSubmitting: boolean
+
+  captcha: React.ReactNode
 }
 
 // Use case of this panel is actually only for upgrading from Free to Pro
@@ -45,30 +59,55 @@ interface Props {
 
 const PaymentSummaryPanel: FC<Props> = ({
   isRefreshingPreview,
-  subscriptionPreview,
-  currentPlan,
-  selectedPlan,
   isSpendCapEnabled,
-  currentComputeSize,
-  selectedComputeSize,
+  currentSubscription,
+  subscriptionPreview,
+
+  currentPlan,
+  currentAddons,
+
+  selectedPlan,
+  selectedAddons,
+
   paymentMethods,
   selectedPaymentMethod,
   isLoadingPaymentMethods,
   onSelectPaymentMethod,
   onSelectAddNewPaymentMethod,
+  beforeConfirmPayment,
   onConfirmPayment,
   isSubmitting,
+  captcha,
 }) => {
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
-  const isOwner = ui.selectedOrganization?.is_owner
 
-  const enablePermissions = useFlag('enablePermissions')
-  const canUpdatePaymentMethods = enablePermissions
-    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
-    : isOwner
+  const canUpdatePaymentMethods = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const selectedPlanCost =
+    selectedPlan.prices.find(
+      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+    )?.unit_amount ?? 0
+  const totalSelectedAddonCost = Object.keys(selectedAddons)
+    .map((productName) => {
+      const product = (selectedAddons as any)[productName]
+      const price = product.prices.find(
+        (price: AddonPrice) => price.id === product.metadata.default_price_id
+      )
+      return price
+    })
+    .reduce((a, b) => a + b.unit_amount, 0)
+  const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
+
+  const currentPITRDays =
+    currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
+  const selectedPITRDays =
+    selectedAddons.pitrDuration !== undefined ? getPITRDays(selectedAddons.pitrDuration) : 0
 
   const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
@@ -77,11 +116,19 @@ const PaymentSummaryPanel: FC<Props> = ({
       currentPlan.prod_id !== selectedPlan.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
-  const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
+  const isChangingComputeSize = currentAddons.computeSize.id !== selectedAddons.computeSize.id
+  const isChangingPITRDuration = currentAddons.pitrDuration?.id !== selectedAddons.pitrDuration?.id
+  const isChangingCustomDomains =
+    currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
+
+  const togglingOnSpendCap =
+    currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG &&
+    selectedPlan &&
+    selectedPlan.metadata.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
-    ? isChangingComputeSize
+    ? isChangingComputeSize || isChangingPITRDuration
     : subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
@@ -90,17 +137,48 @@ const PaymentSummaryPanel: FC<Props> = ({
     } else return plan.name
   }
 
+  const getAddonPriceFromSubscription = (
+    key: 'computeSize' | 'pitrDuration' | 'customDomains' | 'supportPlan'
+  ) => {
+    return (
+      ((currentSubscription?.addons ?? []).find((addon) => addon.prod_id === currentAddons[key]?.id)
+        ?.unit_amount ?? 0) / 100
+    ).toFixed(2)
+  }
+
+  const validateOrder = async () => {
+    const error = validateSubscriptionUpdatePayload(selectedAddons)
+    if (error) {
+      return ui.setNotification({
+        duration: 4000,
+        category: 'error',
+        message: error,
+      })
+    } else {
+      // [Joshen] We're validating captcha before subsequent actions as there's an issue
+      // with the hcaptcha overlay and the modal component, such that clicking on the hcaptcha closes
+      // both the hcaptcha overlay and the modal. Need to figure that out first, then we can validate
+      // the hcaptcha within onConfirmPayment()
+      const hasValidCaptcha = await beforeConfirmPayment()
+      if (hasValidCaptcha) {
+        isChangingComputeSize || (isChangingPITRDuration && selectedPITRDays === 0)
+          ? setShowConfirmModal(true)
+          : onConfirmPayment()
+      }
+    }
+  }
+
   return (
     <>
       <div
-        className="bg-panel-body-light dark:bg-panel-body-dark w-full space-y-8 border-l px-6 py-10 lg:px-12"
+        className="w-full px-6 py-10 space-y-8 overflow-y-auto border-l bg-panel-body-light dark:bg-panel-body-dark lg:px-12"
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
 
         {/* Subscription details */}
         <div className="space-y-1">
-          <p className="text-scale-1100 text-sm">Selected subscription</p>
+          <p className="text-sm text-scale-1100">Selected subscription</p>
           <div className="flex items-center justify-between">
             <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
               {getPlanName(currentPlan)}
@@ -122,38 +200,120 @@ const PaymentSummaryPanel: FC<Props> = ({
         {/* Add on details */}
         {projectRegion !== 'af-south-1' && (
           <div className="space-y-1">
-            <p className="text-sm">Selected add-ons</p>
-            {currentComputeSize === undefined && selectedComputeSize === undefined && (
-              <p className="text-scale-1100 text-sm">No add-ons selected</p>
-            )}
-            {currentComputeSize !== undefined && (
-              <div className="flex items-center justify-between">
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  {currentComputeSize.name}
-                </p>
-                <p
-                  className={`${
-                    isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                  } text-sm`}
-                >
-                  ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
-                </p>
-              </div>
-            )}
+            <p className="text-sm text-scale-1100">Selected add-ons</p>
+
+            {/* Compute size */}
+            <div className="flex items-center justify-between">
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                {currentAddons.computeSize.name}
+              </p>
+              <p
+                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
+              >
+                ${getAddonPriceFromSubscription('computeSize')}
+              </p>
+            </div>
             {isChangingComputeSize && (
               <div className="flex items-center justify-between">
-                <p className="text-sm">{selectedComputeSize.name}</p>
+                <p className="text-sm">{selectedAddons.computeSize.name}</p>
                 <p className="text-sm">
-                  ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
+                  ${(getProductPrice(selectedAddons.computeSize).unit_amount / 100).toFixed(2)}
                 </p>
               </div>
             )}
-            {isChangingComputeSize && (
-              <div className="!mt-4">
+
+            {/* PITR Duration */}
+            {currentAddons.pitrDuration?.id !== undefined && (
+              <div className="flex items-center justify-between">
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  {currentAddons.pitrDuration?.name}
+                </p>
+                <p
+                  className={`${
+                    isChangingPITRDuration ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  ${getAddonPriceFromSubscription('pitrDuration')}
+                </p>
+              </div>
+            )}
+            {isChangingPITRDuration && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{selectedAddons.pitrDuration?.name}</p>
+                <p className="text-sm">
+                  ${(getProductPrice(selectedAddons.pitrDuration).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            {/* Custom Domains */}
+            {currentAddons.customDomains?.id !== undefined && (
+              <div className="flex items-center justify-between">
+                <p
+                  className={`${
+                    isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  {currentAddons.customDomains?.name}
+                </p>
+                <p
+                  className={`${
+                    isChangingCustomDomains ? 'text-scale-1100 line-through' : ''
+                  } text-sm`}
+                >
+                  ${getAddonPriceFromSubscription('customDomains')}
+                </p>
+              </div>
+            )}
+            {isChangingCustomDomains && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{selectedAddons.customDomains?.name}</p>
+                <p className="text-sm">
+                  ${(getProductPrice(selectedAddons.customDomains).unit_amount / 100).toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            {/* Support Plan */}
+            {currentAddons.supportPlan !== undefined && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm">{currentAddons.supportPlan?.name}</p>
+                <p className="text-sm">${getAddonPriceFromSubscription('supportPlan')}</p>
+              </div>
+            )}
+
+            {/* Show information boxes with regards to change in subscriptions */}
+            <div className="!mt-4 space-y-4">
+              {isChangingPITRDuration && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title={
+                    currentAddons.pitrDuration?.id === undefined
+                      ? 'Enabling PITR'
+                      : selectedAddons.pitrDuration?.id === undefined
+                      ? 'Disabling PITR'
+                      : 'Updating PITR duration'
+                  }
+                  description={
+                    selectedPITRDays >= currentPITRDays
+                      ? `The days for which PITR is available for will only start at the time of enabling the add-on (e.g You will have access to the full ${selectedPITRDays} days of PITR after ${
+                          selectedPITRDays - currentPITRDays
+                        } days from today)`
+                      : selectedPITRDays === 0
+                      ? 'All available PITR back ups for your project will be removed and are non-recoverable'
+                      : `Only the latest ${selectedPITRDays} days of PITR from today will be retained (all backups that are later than ${selectedPITRDays} days will be removed and are non-recoverable)`
+                  }
+                />
+              )}
+              {isChangingComputeSize && (
                 <InformationBox
                   hideCollapse
                   defaultVisibility
@@ -161,14 +321,25 @@ const PaymentSummaryPanel: FC<Props> = ({
                   title="Changing your compute size"
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
-              </div>
-            )}
+              )}
+
+              {togglingOnSpendCap && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Enabling spend cap"
+                  description="Exceeding your plan's quota will result in service restrictions. With the spend cap disabled, you'll be charged for usage beyond the quota."
+                />
+              )}
+            </div>
           </div>
         )}
 
-        <div className="bg-scale-600 h-px w-full" />
+        <div className="w-full h-px bg-scale-600" />
 
         <PaymentTotal
+          totalMonthlyCost={totalMonthlyCost / 100}
           subscriptionPreview={subscriptionPreview}
           isRefreshingPreview={isRefreshingPreview}
           isSpendCapEnabled={isSpendCapEnabled}
@@ -178,13 +349,13 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="space-y-2">
           <p className="text-sm">Select payment method</p>
           {isLoadingPaymentMethods ? (
-            <div className="bg-scale-400 border-scale-700 flex items-center space-x-4 rounded-md border px-4 py-2">
+            <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-scale-700 bg-scale-400">
               <IconLoader className="animate-spin" size={14} />
-              <p className="text-scale-1100 text-sm">Retrieving payment methods</p>
+              <p className="text-sm text-scale-1100">Retrieving payment methods</p>
             </div>
           ) : paymentMethods.length === 0 ? (
-            <div className="bg-scale-100 flex items-center justify-between rounded-md border border-dashed px-4 py-2">
-              <div className="text-scale-1100 flex items-center space-x-4">
+            <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-scale-100">
+              <div className="flex items-center space-x-4 text-scale-1100">
                 <IconAlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm">No saved payment methods</p>
               </div>
@@ -201,21 +372,22 @@ const PaymentSummaryPanel: FC<Props> = ({
                   </Button>
                 </Tooltip.Trigger>
                 {!canUpdatePaymentMethods && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                        'border-scale-200 w-48 border text-center', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-scale-1200 text-xs">
-                        {enablePermissions
-                          ? 'You need additional permissions to add new payment methods to this organization'
-                          : 'Only organization owners can add new payment methods'}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                          'w-48 border border-scale-200 text-center', //border
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to add new payment methods to this
+                          organization
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>
@@ -231,7 +403,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`/img/payment-methods/${method.card.brand
+                          src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"
@@ -244,11 +416,11 @@ const PaymentSummaryPanel: FC<Props> = ({
                 )
               })}
               <div
-                className="hover:bg-scale-500 group flex cursor-pointer items-center space-x-2 py-2 px-3 transition"
+                className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-scale-500"
                 onClick={onSelectAddNewPaymentMethod}
               >
                 <IconPlus size={16} />
-                <p className="text-scale-1000 group-hover:text-scale-1200 transition">
+                <p className="transition text-scale-1000 group-hover:text-scale-1200">
                   Add new payment method
                 </p>
               </div>
@@ -256,60 +428,72 @@ const PaymentSummaryPanel: FC<Props> = ({
           )}
         </div>
 
-        <div className="flex items-center justify-end">
-          <Button
-            block
-            type="primary"
-            size="medium"
-            loading={isSubmitting}
-            disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
-            onClick={() => (isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment())}
-          >
-            Confirm payment
-          </Button>
-        </div>
-      </div>
+        <div className="self-center">{captcha}</div>
 
-      <Modal
-        hideFooter
-        visible={showConfirmModal}
-        size="large"
-        header="Updating project database instance size"
-        onCancel={() => setShowConfirmModal(false)}
-      >
-        <div className="space-y-4 py-4">
-          <Modal.Content>
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted for changes to take place"
-            >
-              Upon confirmation, your project will be restarted to change your instance size. This
-              will take up to 2 minutes in which your project will be unavailable during the time.
-            </Alert>
-          </Modal.Content>
-          <Modal.Content>
-            <p className="text-scale-1200 text-sm">Would you like to update your project now?</p>
-          </Modal.Content>
-          <Modal.Seperator />
-          <Modal.Content>
-            <div className="flex items-center gap-2">
-              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
-                Cancel
-              </Button>
+        <div className="flex items-center justify-end">
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
               <Button
                 block
                 type="primary"
+                size="medium"
                 loading={isSubmitting}
-                disabled={isSubmitting}
-                onClick={() => onConfirmPayment()}
+                disabled={
+                  isSubmitting ||
+                  isLoadingPaymentMethods ||
+                  !hasChangesToPlan ||
+                  !selectedPaymentMethod
+                }
+                onClick={() => validateOrder()}
               >
-                Confirm
+                Confirm payment
               </Button>
-            </div>
-          </Modal.Content>
+            </Tooltip.Trigger>
+            {!hasChangesToPlan ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      No changes made to your subscription
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : !selectedPaymentMethod ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">Please select a payment method</span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : (
+              <></>
+            )}
+          </Tooltip.Root>
         </div>
-      </Modal>
+      </div>
+
+      <ConfirmPaymentModal
+        visible={showConfirmModal}
+        isChangingInstanceSize={isChangingComputeSize}
+        isDisablingPITR={isChangingPITRDuration && selectedPITRDays === 0}
+        isSubmitting={isSubmitting}
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={() => onConfirmPayment()}
+      />
     </>
   )
 }

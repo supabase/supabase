@@ -67,13 +67,13 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function initTable(
+export async function initTable(
   props: SupabaseGridProps,
   state: InitialStateType,
   dispatch: (value: any) => void,
   sort?: string[], // Come directly from URL param
   filter?: string[] // Come directly from URL param
-): { savedState: { sorts?: string[]; filters?: string[] } } {
+): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
   function onInitTable(table: SupaTable, props: SupabaseGridProps) {
     const savedState = props.storageRef
       ? onLoadStorage(props.storageRef, table.name, table.schema)
@@ -99,6 +99,7 @@ export function initTable(
       editable: props.editable,
       defaultWidth: props.gridProps?.defaultColumnWidth,
       onAddColumn: props.editable ? props.onAddColumn : undefined,
+      onExpandJSONEditor: props.editable ? props.onExpandJSONEditor : () => {},
     })
 
     dispatch({
@@ -118,19 +119,15 @@ export function initTable(
   }
 
   if (typeof props.table === 'string') {
-    const fetchMethod = props.editable
-      ? fetchEditableInfo(state.metaService!, props.table, props.schema)
-      : fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
+    const viewData = props.editable
+      ? await fetchEditableInfo(state.metaService!, props.table, props.schema)
+      : await fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
 
-    fetchMethod.then((res) => {
-      if (res) {
-        return onInitTable(res, props)
-      } else {
-        if (props.onError) {
-          props.onError({ message: 'fetch table info failed' })
-        }
-      }
-    })
+    if (viewData) {
+      return onInitTable(viewData, props)
+    } else {
+      if (props.onError) props.onError({ message: 'Failed to fetch data from view' })
+    }
   } else {
     return onInitTable(props.table, props)
   }
@@ -192,12 +189,15 @@ async function fetchReadOnlyInfo(
   return null
 }
 
-export function parseSupaTable(data: {
-  table: Dictionary<any>
-  columns: Dictionary<any>[]
-  primaryKeys: Dictionary<any>[]
-  relationships: Dictionary<any>[]
-}): SupaTable {
+export function parseSupaTable(
+  data: {
+    table: Dictionary<any>
+    columns: Dictionary<any>[]
+    primaryKeys: Dictionary<any>[]
+    relationships: Dictionary<any>[]
+  },
+  encryptedColumns: string[] = []
+): SupaTable {
   const { table, columns, primaryKeys, relationships } = data
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
@@ -212,11 +212,15 @@ export function parseSupaTable(data: {
       isGeneratable: column.identity_generation == 'BY DEFAULT',
       isNullable: column.is_nullable,
       isUpdatable: column.is_updatable,
+      isEncrypted: encryptedColumns.includes(column.name),
       enum: column.enums,
       comment: column.comment,
-      targetTableSchema: null,
-      targetTableName: null,
-      targetColumnName: null,
+      foreignKey: {
+        targetTableSchema: null,
+        targetTableName: null,
+        targetColumnName: null,
+        deletionAction: undefined,
+      },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
@@ -229,9 +233,10 @@ export function parseSupaTable(data: {
       )
     })
     if (relationship) {
-      temp.targetTableSchema = relationship.target_table_schema
-      temp.targetTableName = relationship.target_table_name
-      temp.targetColumnName = relationship.target_column_name
+      temp.foreignKey.targetTableSchema = relationship.target_table_schema
+      temp.foreignKey.targetTableName = relationship.target_table_name
+      temp.foreignKey.targetColumnName = relationship.target_column_name
+      temp.foreignKey.deletionAction = relationship.deletion_action
     }
     return temp
   })

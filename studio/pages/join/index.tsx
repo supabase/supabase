@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckSquare, Loading } from '@supabase/ui'
+import { Button, IconCheckSquare, Loading } from 'ui'
 
-import { useProfile, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -23,7 +24,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { profile } = useProfile()
+  const { data: profile } = useProfileQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(false)
@@ -32,7 +33,7 @@ const JoinOrganizationPage = () => {
   const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
     tokenValidationInfo || {}
 
-  const loginRedirectLink = `/?next=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   useEffect(() => {
     const fetchTokenInfo = async () => {
@@ -132,7 +133,7 @@ const JoinOrganizationPage = () => {
         <p className="text-scale-900">
           To accept this invitation, you will need to{' '}
           <a
-            className="text-brand-900 cursor-pointer"
+            className="cursor-pointer text-brand-900"
             onClick={async () => {
               await auth.signOut()
               router.reload()
@@ -160,27 +161,27 @@ const JoinOrganizationPage = () => {
     <>
       <div className="flex flex-col gap-2 px-6 py-8">
         <>
-          <p className="text-scale-1200 text-sm">You have been invited to join </p>
+          <p className="text-sm text-scale-1200">You have been invited to join </p>
           {organization_name ? (
             <>
-              <p className="text-scale-1200 text-3xl">
+              <p className="text-3xl text-scale-1200">
                 {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
-                <p className="text-scale-900 text-sm">an organization on Supabase</p>
+                <p className="text-sm text-scale-900">an organization on Supabase</p>
               )}
             </>
           ) : (
             <>
-              <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+              <p className="text-3xl text-scale-1200">{'an organization'}</p>
             </>
           )}
-          {slug && <p className="text-scale-900 text-xs">{`organization slug: ${slug}`}</p>}
+          {slug && <p className="text-xs text-scale-900">{`organization slug: ${slug}`}</p>}
         </>
       </div>
 
       <div
-        className={['border-scale-400 border-t', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -206,19 +207,19 @@ const JoinOrganizationPage = () => {
 
           {!profile && (
             <div className="flex flex-col gap-3">
-              <p className="text-scale-900 text-xs">
+              <p className="text-xs text-scale-900">
                 You will need to sign in to accept this invitation
               </p>
               <div className="flex justify-center gap-3">
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Sign in
-                  </Button>
+                  <a>
+                    <Button type="default">Sign in</Button>
+                  </a>
                 </Link>
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Create an account
-                  </Button>
+                  <a>
+                    <Button type="default">Create an account</Button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -231,15 +232,15 @@ const JoinOrganizationPage = () => {
   return (
     <div
       className={[
-        'bg-scale-200 flex h-full min-h-screen',
+        'flex h-full min-h-screen bg-scale-200',
         'w-full flex-col place-items-center',
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
     >
-      <Link href="/">
+      <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
-            src="/img/supabase-logo.svg"
+            src={`${router.basePath}/img/supabase-logo.svg`}
             alt="Supabase"
             className="block h-[24px] cursor-pointer rounded"
           />
@@ -247,8 +248,8 @@ const JoinOrganizationPage = () => {
       </Link>
       <div
         className="
-          bg-scale-100 border-scale-400 mx-auto overflow-hidden
-          rounded-md border text-center shadow
+          mx-auto overflow-hidden rounded-md border
+          border-scale-400 bg-scale-100 text-center shadow
           md:w-[400px]
           "
       >

@@ -1,9 +1,9 @@
 import { FC, useState, useEffect } from 'react'
-import { SidePanel } from '@supabase/ui'
+import { SidePanel } from 'ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'
-import TwoOptionToggle from './TwoOptionToggle'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import DrilldownViewer from './DrilldownViewer'
 import ActionBar from '../../ActionBar'
 import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
@@ -12,21 +12,33 @@ type JsonEditProps = {
   column: string
   jsonString: string
   visible: boolean
+  backButtonLabel?: string
+  applyButtonLabel?: string
   closePanel: () => void
   onSaveJSON: (value: string | number) => void
 }
 
-const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, onSaveJSON }) => {
+const JsonEdit: FC<JsonEditProps> = ({
+  column,
+  jsonString,
+  visible,
+  backButtonLabel,
+  applyButtonLabel,
+  closePanel,
+  onSaveJSON,
+}) => {
   const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
 
   useEffect(() => {
-    const temp = prettifyJSON(jsonString)
-    setJsonStr(temp)
-  }, [jsonString])
+    if (visible) {
+      const temp = prettifyJSON(jsonString)
+      setJsonStr(temp)
+    }
+  }, [visible])
 
-  function validateJSON(resolve: () => void) {
+  const validateJSON = async (resolve: () => void) => {
     try {
       const minifiedJSON = minifyJSON(jsonStr)
       if (onSaveJSON) onSaveJSON(minifiedJSON)
@@ -72,13 +84,20 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
       }
       visible={visible}
       onCancel={closePanel}
-      customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
+      customFooter={
+        <ActionBar
+          closePanel={closePanel}
+          backButtonLabel={backButtonLabel}
+          applyButtonLabel={applyButtonLabel}
+          applyFunction={validateJSON}
+        />
+      }
     >
       <div className="py-4">
         <SidePanel.Content>
           <div className="mt-4 flex flex-auto flex-col space-y-4">
             {view === 'edit' ? (
-              <div className="dark:border-dark h-[500px] w-full flex-grow border">
+              <div className="h-[500px] w-full flex-grow border dark:border-dark">
                 <JsonEditor onInputChange={onInputChange} defaultValue={jsonStr.toString()} />
               </div>
             ) : (

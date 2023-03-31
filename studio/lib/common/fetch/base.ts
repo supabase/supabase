@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
-  const message = e?.message ? `An error has occured: ${e.message}` : 'An error has occured'
+  const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }
   return { error } as unknown as SupaResponse<T>
 }
@@ -12,6 +12,9 @@ export async function handleResponse<T>(
   response: Response,
   requestId: string
 ): Promise<SupaResponse<T>> {
+  const contentType = response.headers.get('Content-Type')
+  if (contentType === 'application/octet-stream') return response as any
+
   try {
     const resTxt = await response.text()
     try {
@@ -77,7 +80,7 @@ export async function handleResponseError<T = unknown>(
   } else if (resJson.error && resJson.error.message) {
     return { error: { code: response.status, ...resJson.error } } as unknown as SupaResponse<T>
   } else {
-    const message = resTxt ?? `An error has occured: ${response.status}`
+    const message = resTxt ?? `An error has occurred: ${response.status}`
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
@@ -106,6 +109,11 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
   if (!hasAuthHeader) {
     const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  if (typeof window !== 'undefined') {
+    const gaClientId = window?.localStorage?.getItem('ga_client_id')
+    if (gaClientId && gaClientId !== 'undefined') headers['X-GA-Client-Id'] = gaClientId
   }
 
   return headers

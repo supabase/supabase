@@ -1,14 +1,15 @@
 import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Alert, Button, IconPauseCircle } from '@supabase/ui'
+import { Modal, Button, IconPauseCircle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Project } from 'types'
-import { checkPermissions, useStore, useSubscriptionStats, useFlag } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { DeleteProjectButton } from 'components/interfaces/Settings/General'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 interface Props {
   project: Project
@@ -16,29 +17,28 @@ interface Props {
 
 const ProjectPausedState: FC<Props> = ({ project }) => {
   const { ui, app } = useStore()
-  const subscriptionStats = useSubscriptionStats()
-  const { total_active_free_projects: totalActiveFreeProjects } = subscriptionStats
-  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+  const orgSlug = ui.selectedOrganization?.slug
 
-  const enablePermissions = useFlag('enablePermissions')
   const kpsEnabled = useFlag('initWithKps')
-  const isOwner = ui.selectedOrganization?.is_owner
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
-  const hasExceedActiveFreeProjectsLimit = totalActiveFreeProjects >= freeProjectsLimit
+  const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const canResumeProject = enablePermissions
-    ? checkPermissions(PermissionAction.INFRA_EXECUTE, 'queue_jobs.projects.initialize_or_resume')
-    : isOwner
+  const canResumeProject = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_jobs.projects.initialize_or_resume'
+  )
 
   const onSelectRestore = () => {
     if (!canResumeProject) {
-      return ui.setNotification({
+      ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restore this project',
       })
-    }
-    setShowConfirmRestore(true)
+    } else if (hasMembersExceedingFreeTierLimit) setShowFreeProjectLimitWarning(true)
+    else setShowConfirmRestore(true)
   }
 
   const onConfirmRestore = async () => {
@@ -50,19 +50,8 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   return (
     <>
       <div className="space-y-4">
-        {hasExceedActiveFreeProjectsLimit && (
-          <div className="mx-6">
-            <Alert
-              withIcon
-              variant="warning"
-              title={`Your account can only have ${freeProjectsLimit} active free projects`}
-            >
-              To restore this project you'll need to pause or delete an existing free project.
-            </Alert>
-          </div>
-        )}
-        <div className="mx-auto mb-16 w-full max-w-7xl">
-          <div className="bg-scale-300 border-scale-400 mx-6 flex h-[500px] items-center justify-center rounded border p-8">
+        <div className="w-full mx-auto mb-16 max-w-7xl">
+          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
             <div className="grid w-[420px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
@@ -76,36 +65,36 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                     <Button
                       size="tiny"
                       type="primary"
-                      disabled={hasExceedActiveFreeProjectsLimit || !canResumeProject}
+                      disabled={!canResumeProject}
                       onClick={onSelectRestore}
                     >
                       Restore project
                     </Button>
                   </Tooltip.Trigger>
                   {!canResumeProject && (
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                          'border-scale-200 border ', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-scale-1200 text-xs">
-                          You need additional permissions to resume this project
-                        </span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                            'border border-scale-200 ', //border
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to resume this project
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   )}
                 </Tooltip.Root>
                 <DeleteProjectButton type="default" />
               </div>
 
-              {!hasExceedActiveFreeProjectsLimit && (
-                <p className="text-scale-1000 mt-4 text-sm">
-                  Restore this project and get back to building the next big thing!
-                </p>
-              )}
+              <p className="mt-4 text-sm text-scale-1000">
+                Restore this project and get back to building the next big thing!
+              </p>
             </div>
           </div>
         </div>
@@ -119,6 +108,49 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
         onSelectCancel={() => setShowConfirmRestore(false)}
         onSelectConfirm={onConfirmRestore}
       />
+      <Modal
+        hideFooter
+        visible={showFreeProjectLimitWarning}
+        size="medium"
+        header="Your organization has members who have exceeded their free project limits"
+        onCancel={() => setShowFreeProjectLimitWarning(false)}
+      >
+        <div className="py-4 space-y-4">
+          <Modal.Content>
+            <div className="space-y-2">
+              <p className="text-sm text-scale-1100">
+                The following members have reached their maximum limits for the number of active
+                free tier projects within organizations where they are an administrator or owner:
+              </p>
+              <ul className="pl-5 text-sm list-disc text-scale-1100">
+                {(membersExceededLimit || []).map((member, idx: number) => (
+                  <li key={`member-${idx}`}>
+                    {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
+                    free projects)
+                  </li>
+                ))}
+              </ul>
+              <p className="text-sm text-scale-1100">
+                These members will need to either delete, pause, or upgrade one or more of these
+                projects before you're able to unpause this project.
+              </p>
+            </div>
+          </Modal.Content>
+          <Modal.Separator />
+          <Modal.Content>
+            <div className="flex items-center gap-2">
+              <Button
+                htmlType="button"
+                type="default"
+                onClick={() => setShowFreeProjectLimitWarning(false)}
+                block
+              >
+                Understood
+              </Button>
+            </div>
+          </Modal.Content>
+        </div>
+      </Modal>
     </>
   )
 }

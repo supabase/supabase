@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { Modal } from '@supabase/ui'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { Modal } from 'ui'
 
 import { useStore } from 'hooks'
 
@@ -27,10 +27,10 @@ const DatabaseTables: NextPageWithLayout = () => {
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
   useEffect(() => {
-    if (ui.selectedProject) {
+    if (ui.selectedProject?.ref) {
       meta.types.load()
     }
-  }, [ui.selectedProject])
+  }, [ui.selectedProject?.ref])
 
   const onAddTable = () => {
     setSidePanelKey('table')
@@ -63,6 +63,8 @@ const DatabaseTables: NextPageWithLayout = () => {
   }
 
   const onColumnUpdated = async () => {
+    if (selectedTable === undefined) return
+
     const updatedTable = await meta.tables.loadById(selectedTable.id)
     setSelectedTable(updatedTable)
   }
@@ -148,7 +150,7 @@ const DatabaseTables: NextPageWithLayout = () => {
         }
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -164,7 +166,7 @@ const DatabaseTables: NextPageWithLayout = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -176,7 +178,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       />
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
-        selectedSchema="public"
+        selectedSchema={selectedSchema}
         selectedTable={selectedTable}
         onColumnSaved={onColumnUpdated}
         closePanel={onClosePanel}

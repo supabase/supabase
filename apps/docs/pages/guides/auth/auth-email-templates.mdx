@@ -1,0 +1,50 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Email Templates',
+  description: 'Learn how to configure the email templates on Supabase.',
+}
+
+You can customize the email messages used for the authentication flows. You can edit the following email templates:
+
+- Confirm signup
+- Invite user
+- Magic Link
+- Change Email Address
+- Reset Password
+
+## Terminology
+
+The templating system provides the following variables for use:
+
+| Name                     | Description                                                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path` . |
+| `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                             |
+| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
+| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://app.supabase.com/project/_/auth/url-configuration).                                                                                                           |
+
+## Limitations
+
+### Email Prefetching
+
+Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails.
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
+To guard against this:
+
+- Use an email OTP instead by including `{{ .Token }}` in the email template.
+- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action.
+  For example, you can include the following in your email template:
+
+  ```html
+  <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
+    >Confirm your signup
+  </a>
+  ```
+
+  The user should be brought to a page on your site where they can confirm the action by clicking a button.
+  The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

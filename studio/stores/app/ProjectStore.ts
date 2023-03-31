@@ -9,7 +9,8 @@ import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/Postgre
 import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
-  fetchDetail: (projectRef: string) => Promise<void>
+  fetchDetail: (projectRef: string, callback?: (project: Project) => void) => Promise<void>
+  fetchSubscriptionTier: (project: Project) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
@@ -44,7 +45,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     this.data = formattedValue
   }
 
-  async fetchDetail(projectRef: string) {
+  async fetchDetail(projectRef: string, callback?: (project: Project) => void) {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
@@ -56,6 +57,8 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       // update project detail by key id
       this.data[project.id] = project
 
+      callback?.(project)
+
       // lazy fetches
       if (IS_PLATFORM) {
         this.fetchSubscriptionTier(project)
@@ -65,9 +68,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
   async pingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
     if (project.status === PROJECT_STATUS.ACTIVE_HEALTHY && project.restUrl) {
-      const success = await pingPostgrest(project.restUrl, project.ref, {
-        kpsVersion: project.kpsVersion,
-      })
+      const success = await pingPostgrest(project.ref, { kpsVersion: project.kpsVersion })
       return success ? 'ONLINE' : 'OFFLINE'
     }
     return undefined
@@ -75,7 +76,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
   async fetchSubscriptionTier(project: Project) {
     const { id: projectId, ref: projectRef, status } = project
-    if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+    if (status !== PROJECT_STATUS.REMOVED) {
       const url = `${this.url}/${projectRef}/subscription`
       const headers = constructHeaders(this.headers)
       const response = await get(url, { headers })

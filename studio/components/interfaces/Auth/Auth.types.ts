@@ -111,6 +111,7 @@ export interface AuthConfig {
   OPERATOR_TOKEN: string | null
   PASSWORD_MIN_LENGTH: number
   RATE_LIMIT_EMAIL_SENT: number
+  RATE_LIMIT_SMS_SENT: number
   RATE_LIMIT_HEADER: string | null
   RATE_LIMIT_TOKEN_REFRESH: number
   RATE_LIMIT_VERIFY: number

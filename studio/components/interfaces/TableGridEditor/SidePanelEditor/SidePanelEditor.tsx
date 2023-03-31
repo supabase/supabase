@@ -1,27 +1,44 @@
-import { FC, useState } from 'react'
-import { find, isEmpty, isUndefined } from 'lodash'
-import { Query, Dictionary } from 'components/grid'
-import { Modal } from '@supabase/ui'
-import {
-  PostgresRelationship,
-  PostgresTable,
-  PostgresColumn,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import { useState } from 'react'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { find, isEmpty, isUndefined, noop } from 'lodash'
+import { Dictionary } from 'components/grid'
+import { Modal } from 'ui'
+import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import {
+  ColumnField,
+  CreateColumnPayload,
+  ExtendedPostgresRelationship,
+  UpdateColumnPayload,
+} from './SidePanelEditor.types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditValue } from './RowEditor/RowEditor.types'
+import { sqlKeys } from 'data/sql/keys'
+import ForeignRowSelector, {
+  ForeignRowSelectorProps,
+} from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 
-interface Props {
+export interface SidePanelEditorProps {
   selectedSchema: string
   selectedTable?: PostgresTable
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
-  sidePanelKey?: 'row' | 'column' | 'table'
+  selectedValueForJsonEdit?: JsonEditValue
+  selectedForeignKeyToEdit?: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -30,32 +47,92 @@ interface Props {
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
   onTableCreated?: (table: PostgresTable) => void
-  onColumnSaved?: () => void
+  onColumnSaved?: (hasEncryptedColumns?: boolean) => void
 }
 
-const SidePanelEditor: FC<Props> = ({
+const SidePanelEditor = ({
   selectedSchema,
   selectedTable,
   selectedRowToEdit,
   selectedColumnToEdit,
   selectedTableToEdit,
+  selectedValueForJsonEdit,
+  selectedForeignKeyToEdit,
   sidePanelKey,
   isDuplicating = false,
   closePanel,
-  onRowCreated = () => {},
-  onRowUpdated = () => {},
-  onTableCreated = () => {},
-  onColumnSaved = () => {},
-}) => {
+  onRowCreated = noop,
+  onRowUpdated = noop,
+  onTableCreated = noop,
+  onColumnSaved = noop,
+}: SidePanelEditorProps) => {
   const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+
+  const { project } = useProjectContext()
+  const { mutateAsync: createTableRow } = useTableRowCreateMutation()
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+    async onMutate({ projectRef, table, configuration, payload }) {
+      closePanel()
+
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
+
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
+
+      await queryClient.cancelQueries(queryKey)
+
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+    },
+  })
 
   const saveRow = async (
     payload: any,
@@ -63,36 +140,53 @@ const SidePanelEditor: FC<Props> = ({
     configuration: { identifiers: any; rowIdx: number },
     onComplete: Function
   ) => {
-    let saveRowError = false
-    if (isNewRecord) {
-      const insertQuery = new Query()
-        .from(selectedTable!.name, selectedTable!.schema)
-        .insert([payload], { returning: true })
-        .toSql()
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
 
-      const res: any = await meta.query(insertQuery)
-      if (res.error) {
+    let saveRowError = false
+    // @ts-ignore
+    const enumArrayColumns = selectedTable.columns
+      .filter((column) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column) => column.name)
+
+    if (isNewRecord) {
+      try {
+        const result = await createTableRow({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          payload,
+          enumArrayColumns,
+        })
+
+        onRowCreated(result[0])
+      } catch (error: any) {
         saveRowError = true
-        ui.setNotification({ category: 'error', message: res.error?.message })
-      } else {
-        onRowCreated(res[0])
+        ui.setNotification({ category: 'error', message: error?.message })
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
-        if (selectedTable!.primary_keys.length > 0) {
-          const updateQuery = new Query()
-            .from(selectedTable!.name, selectedTable!.schema)
-            .update(payload, { returning: true })
-            .match(configuration.identifiers)
-            .toSql()
+        if (selectedTable.primary_keys.length > 0) {
+          if (selectedTable!.primary_keys.length > 0) {
+            try {
+              const result = await updateTableRow({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table: selectedTable as any,
+                configuration,
+                payload,
+                enumArrayColumns,
+              })
 
-          const res: any = await meta.query(updateQuery)
-          if (res.error) {
-            saveRowError = true
-            ui.setNotification({ category: 'error', message: res.error?.message })
-          } else {
-            onRowUpdated(res[0], configuration.rowIdx)
+              onRowUpdated(result[0], configuration.rowIdx)
+            } catch (error: any) {
+              saveRowError = true
+              ui.setNotification({ category: 'error', message: error?.message })
+            }
           }
         } else {
           saveRowError = true
@@ -112,21 +206,55 @@ const SidePanelEditor: FC<Props> = ({
     }
   }
 
+  const onSaveJSON = async (value: string | number) => {
+    if (selectedTable === undefined || selectedValueForJsonEdit === undefined) return
+
+    try {
+      const { row, column } = selectedValueForJsonEdit
+      const payload = { [column]: JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error: any) {}
+  }
+
+  const onSaveForeignRow = async (value: any) => {
+    if (selectedTable === undefined || selectedForeignKeyToEdit === undefined) return
+
+    try {
+      const { row, column } = selectedForeignKeyToEdit
+      const payload = { [column.name]: value }
+      const identifiers = {} as Dictionary<any>
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
+
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error) {}
+  }
+
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: Partial<PostgresRelationship> | undefined,
+    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
     resolve: any
   ) => {
+    const { columnId, ...securityConfig } = configuration
     const response = isNewRecord
       ? await meta.createColumn(
           payload as CreateColumnPayload,
           selectedTable as PostgresTable,
-          foreignKey
+          foreignKey,
+          securityConfig
         )
       : await meta.updateColumn(
-          configuration.columnId as string,
+          columnId as string,
           payload as UpdateColumnPayload,
           selectedTable as PostgresTable,
           foreignKey
@@ -135,10 +263,21 @@ const SidePanelEditor: FC<Props> = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
-      await meta.tables.loadById(selectedTable!.id)
-      onColumnSaved()
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedTable!.id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+      ])
+      onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
       closePanel()
+    }
+
+    if (configuration.isEncrypted && selectedTable?.schema) {
+      await meta.views.loadBySchema(selectedTable.schema)
     }
 
     resolve()
@@ -165,21 +304,27 @@ const SidePanelEditor: FC<Props> = ({
     try {
       if (isDuplicating) {
         const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+
         toastId = ui.setNotification({
           category: 'loading',
           message: `Duplicating table: ${duplicateTable.name}...`,
         })
+
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
           isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
+
+        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${duplicateTable.name} has been successfully duplicated into ${table.name}!`,
         })
+
         onTableCreated(table)
       } else if (isNewRecord) {
         toastId = ui.setNotification({
@@ -195,17 +340,22 @@ const SidePanelEditor: FC<Props> = ({
           isRealtimeEnabled,
           importContent
         )
+
+        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
         ui.setNotification({
           id: toastId,
           category: 'success',
           message: `Table ${table.name} is good to go!`,
         })
+
         onTableCreated(table)
       } else if (selectedTableToEdit) {
         toastId = ui.setNotification({
           category: 'loading',
           message: `Updating table: ${selectedTableToEdit?.name}...`,
         })
+
         const { table, hasError }: any = await meta.updateTable(
           toastId,
           selectedTableToEdit,
@@ -213,6 +363,7 @@ const SidePanelEditor: FC<Props> = ({
           columns,
           isRealtimeEnabled
         )
+
         if (hasError) {
           ui.setNotification({
             id: toastId,
@@ -220,6 +371,8 @@ const SidePanelEditor: FC<Props> = ({
             message: `Table ${table.name} has been updated, but there were some errors`,
           })
         } else {
+          await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+
           ui.setNotification({
             id: toastId,
             category: 'success',
@@ -227,6 +380,8 @@ const SidePanelEditor: FC<Props> = ({
           })
         }
       }
+
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
@@ -262,8 +417,6 @@ const SidePanelEditor: FC<Props> = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          enumTypes={enumTypes}
-          tables={tables}
           column={selectedColumnToEdit}
           selectedTable={selectedTable}
           visible={sidePanelKey === 'column'}
@@ -281,6 +434,22 @@ const SidePanelEditor: FC<Props> = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
+      <JsonEdit
+        visible={sidePanelKey === 'json'}
+        column={selectedValueForJsonEdit?.column ?? ''}
+        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+        backButtonLabel="Cancel"
+        applyButtonLabel="Save changes"
+        closePanel={onClosePanel}
+        onSaveJSON={onSaveJSON}
+      />
+      <ForeignRowSelector
+        key={`foreign-row-selector-${selectedForeignKeyToEdit?.foreignKey?.id ?? 'null'}`}
+        visible={sidePanelKey === 'foreign-row-selector'}
+        foreignKey={selectedForeignKeyToEdit?.foreignKey}
+        closePanel={onClosePanel}
+        onSelect={onSaveForeignRow}
+      />
       <ConfirmationModal
         visible={isClosingPanel}
         header="Confirm to close"
@@ -293,7 +462,7 @@ const SidePanelEditor: FC<Props> = ({
         }}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { object, string } from 'yup'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, Input, Modal } from '@supabase/ui'
+import { Button, Form, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -88,7 +88,7 @@ const RedirectUrls = () => {
       <div className="flex items-center justify-between">
         <FormHeader
           title="Redirect URLs"
-          description="URLs that auth providers are permitted to redirect to post authentication."
+          description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
@@ -97,19 +97,21 @@ const RedirectUrls = () => {
             </Button>
           </Tooltip.Trigger>
           {!canUpdateConfig && (
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                  'border-scale-200 border',
-                ].join(' ')}
-              >
-                <span className="text-scale-1200 text-xs">
-                  You need additional permissions to update redirect URLs
-                </span>
-              </div>
-            </Tooltip.Content>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to update redirect URLs
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
           )}
         </Tooltip.Root>
       </div>
@@ -132,30 +134,14 @@ const RedirectUrls = () => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-sm text-scale-1100">
                     This will add a URL to a list of allowed URLs that can interact with your
-                    Authentication services for this project.
-                  </p>
-                  <p className="text-scale-1100 text-sm mt-2">
-                    Supports{' '}
-                    <a
-                      target="_blank"
-                      className="text-brand-900 hover:text-brand-1200 transition-colors"
-                      href="https://github.com/gobwas/glob"
-                    >
-                      globs
-                    </a>
-                    {' '}where <code>.</code> and <code>/</code> are used as delimiters.
+                    Authenticaton services for this project.
                   </p>
                 </div>
                 <div className="border-overlay-border border-t" />
                 <div className="px-5">
-                  <Input
-                    id="url"
-                    name="url"
-                    label="URL"
-                    placeholder="https://mydomain.com"
-                  />
+                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
                 </div>
                 <div className="border-overlay-border border-t" />
                 <div className="px-5">
@@ -184,7 +170,7 @@ const RedirectUrls = () => {
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
-            <p className="text-scale-1100 mb-2 text-sm">
+            <p className="mb-2 text-sm text-scale-1100">
               Are you sure you want to remove{' '}
               <span className="text-scale-1200">{selectedUrlToDelete}</span>?
             </p>

@@ -1,5 +1,5 @@
 volumes/db/data
-volumes/db/init/data.sql
 volumes/storage
 .env
 test.http
+docker-compose.override.yml

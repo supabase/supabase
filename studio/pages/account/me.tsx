@@ -1,13 +1,14 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Input, Listbox } from '@supabase/ui'
+import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
 
-import { useProfile, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
-import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import Panel from 'components/ui/Panel'
+import { Profile as ProfileType, useProfileQuery } from 'data/profile/profile-query'
+import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useStore } from 'hooks'
+import { useSession } from 'lib/auth'
+import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
@@ -36,14 +37,18 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateProfile } = useProfile()
-  const user = ui.profile
+  const { mutateAsync } = useProfileUpdateMutation()
+
+  const { data: profile } = useProfileQuery()
+  // TODO: ^ handle loading state
 
   const updateUser = async (model: any) => {
     try {
-      const updatedUser = await post(`${API_URL}/profile/update`, model)
-      mutateProfile(updatedUser, false)
-      ui.setProfile(updatedUser)
+      await mutateAsync({
+        firstName: model.first_name,
+        lastName: model.last_name,
+      })
+
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
     } catch (error) {
       ui.setNotification({
@@ -57,9 +62,10 @@ const ProfileCard = observer(() => {
   return (
     <article className="max-w-4xl p-4">
       <section>
-        <GithubProfile />
+        <Profile profile={profile} />
       </section>
-      <section className="">
+
+      <section>
         {/* @ts-ignore */}
         <SchemaFormPanel
           title="Profile"
@@ -72,12 +78,13 @@ const ProfileCard = observer(() => {
             },
           }}
           model={{
-            first_name: user?.first_name ?? '',
-            last_name: user?.last_name ?? '',
+            first_name: profile?.first_name ?? '',
+            last_name: profile?.last_name ?? '',
           }}
           onSubmit={updateUser}
         />
       </section>
+
       <section>
         <ThemeSettings />
       </section>
@@ -85,8 +92,8 @@ const ProfileCard = observer(() => {
   )
 })
 
-const GithubProfile = observer(() => {
-  const { ui } = useStore()
+const Profile = ({ profile }: { profile?: ProfileType }) => {
+  const session = useSession()
 
   return (
     <Panel
@@ -103,20 +110,36 @@ const GithubProfile = observer(() => {
             disabled
             label="Username"
             layout="horizontal"
-            value={ui.profile?.username ?? ''}
+            value={profile?.username ?? ''}
           />
           <Input
             readOnly
             disabled
             label="Email"
             layout="horizontal"
-            value={ui.profile?.primary_email ?? ''}
+            value={profile?.primary_email ?? ''}
           />
+          {session?.user.app_metadata.provider === 'email' && (
+            <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
+              <div className="flex flex-col space-y-2 col-span-4 ">
+                <p className="text-scale-1100 break-all">Password</p>
+              </div>
+              <div className="col-span-8">
+                <Link href="/reset-password">
+                  <a>
+                    <Button type="default" size="medium">
+                      Reset password
+                    </Button>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </Panel.Content>
     </Panel>
   )
-})
+}
 
 const ThemeSettings = observer(() => {
   const { ui } = useStore()

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
-import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from '@supabase/ui'
-import { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
+import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from 'ui'
+import type { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -54,34 +54,38 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    if (values.schema === 'custom') {
-      const { error } = await meta.query(`create schema if not exists ${values.name}`)
-      if (error) {
+
+    const schema =
+      defaultSchema !== undefined && defaultSchema !== null
+        ? defaultSchema
+        : values.schema === 'custom'
+        ? values.name
+        : values.schema
+
+    if (!schema.startsWith('pg_')) {
+      const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
+      if (createSchemaError) {
         return ui.setNotification({
-          error,
+          error: createSchemaError,
           category: 'error',
-          message: `Failed to create schema: ${error.message}`,
+          message: `Failed to create schema: ${createSchemaError.message}`,
         })
       }
     }
 
-    const schema = defaultSchema
-      ? defaultSchema
-      : values.schema === 'custom'
-      ? values.name
-      : values.schema
-
-    const { error } = await meta.extensions.create({
+    const { error: createExtensionError } = await meta.extensions.create({
       schema,
       name: extension.name,
       version: extension.default_version,
       cascade: true,
     })
-    if (error) {
+    if (createExtensionError) {
       ui.setNotification({
-        error,
+        error: createExtensionError,
         category: 'error',
-        message: `Failed to toggle ${extension.name.toUpperCase()}: ${error.message}`,
+        message: `Failed to toggle ${extension.name.toUpperCase()}: ${
+          createExtensionError.message
+        }`,
       })
     } else {
       ui.setNotification({
@@ -102,7 +106,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
       onCancel={onCancel}
       size="small"
       header={
-        <div className="flex gap-2 items-baseline">
+        <div className="flex items-baseline gap-2">
           <h5 className="text-sm text-scale-1200">Confirm to enable</h5>
           <code className="text-xs">{extension.name}</code>
         </div>
@@ -151,7 +155,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
-                    <Modal.Seperator />
+                    <Modal.Separator />
                     {/* @ts-ignore */}
                     {schemas.map((schema: PostgresSchema) => {
                       return (
@@ -176,7 +180,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
                 </Modal.Content>
               )}
 
-              <Modal.Seperator />
+              <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center justify-end space-x-2">
                   <Button type="default" disabled={isSubmitting} onClick={() => onCancel()}>

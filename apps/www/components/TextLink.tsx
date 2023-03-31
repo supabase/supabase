@@ -1,4 +1,4 @@
-import { IconArrowRight, IconChevronRight } from '@supabase/ui'
+import { IconArrowRight, IconChevronRight } from 'ui'
 import Link from 'next/link'
 
 function TextLink({ url, label }: any) {

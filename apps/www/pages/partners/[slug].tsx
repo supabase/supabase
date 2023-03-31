@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
@@ -115,12 +115,12 @@ function Partner({ partner }: { partner: Partner }) {
 
                 {partner.video && (
                   <div
-                    className="bg-scale-1000 relative w-full rounded-b-md shadow-lg"
+                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe
                       title="Demo video showcasing Supabase"
-                      className="absolute h-full w-full rounded-b-md"
+                      className="absolute h-full w-full rounded-md"
                       src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
                       style={{ top: 0, left: 0 }}
                       frameBorder="0"
@@ -201,7 +201,7 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from<Partner>('partners').select('slug')
+  const { data: slugs } = await supabase.from('partners').select('slug')
 
   const paths: {
     params: { slug: string }
@@ -222,8 +222,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // This also gets called at build time
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   let { data: partner } = await supabase
-    .from<Partner>('partners')
+    .from('partners')
     .select('*')
+    .eq('approved', true)
     .eq('slug', params!.slug as string)
     .single()
 

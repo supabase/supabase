@@ -13,14 +13,14 @@
       "flags": {},
       "children": [
         {
-          "id": 381,
+          "id": 403,
           "name": "StorageApiError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 382,
+              "id": 404,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -34,14 +34,14 @@
               ],
               "signatures": [
                 {
-                  "id": 383,
+                  "id": 405,
                   "name": "new StorageApiError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 384,
+                      "id": 406,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -52,7 +52,7 @@
                       }
                     },
                     {
-                      "id": 385,
+                      "id": 407,
                       "name": "status",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -65,24 +65,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 381,
+                    "id": 403,
                     "name": "StorageApiError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 378,
+                    "id": 400,
                     "name": "StorageError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 377,
+                "id": 399,
                 "name": "StorageError.constructor"
               }
             },
             {
-              "id": 386,
+              "id": 408,
               "name": "status",
               "kind": 1024,
               "kindString": "Property",
@@ -100,7 +100,7 @@
               }
             },
             {
-              "id": 387,
+              "id": 409,
               "name": "toJSON",
               "kind": 2048,
               "kindString": "Method",
@@ -114,7 +114,7 @@
               ],
               "signatures": [
                 {
-                  "id": 388,
+                  "id": 410,
                   "name": "toJSON",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -122,14 +122,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 389,
+                      "id": 411,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 391,
+                          "id": 413,
                           "name": "message",
                           "kind": 1024,
                           "kindString": "Property",
@@ -148,7 +148,7 @@
                           "defaultValue": "..."
                         },
                         {
-                          "id": 390,
+                          "id": 412,
                           "name": "name",
                           "kind": 1024,
                           "kindString": "Property",
@@ -167,7 +167,7 @@
                           "defaultValue": "..."
                         },
                         {
-                          "id": 392,
+                          "id": 414,
                           "name": "status",
                           "kind": 1024,
                           "kindString": "Property",
@@ -190,7 +190,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [391, 390, 392]
+                          "children": [413, 412, 414]
                         }
                       ]
                     }
@@ -203,17 +203,17 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [382]
+              "children": [404]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [386]
+              "children": [408]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [387]
+              "children": [409]
             }
           ],
           "sources": [
@@ -226,20 +226,20 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 376,
+              "id": 398,
               "name": "StorageError"
             }
           ]
         },
         {
-          "id": 249,
+          "id": 266,
           "name": "StorageClient",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 250,
+              "id": 267,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -253,14 +253,14 @@
               ],
               "signatures": [
                 {
-                  "id": 251,
+                  "id": 268,
                   "name": "new StorageClient",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 252,
+                      "id": 269,
                       "name": "url",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -271,7 +271,7 @@
                       }
                     },
                     {
-                      "id": 253,
+                      "id": 270,
                       "name": "headers",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -279,20 +279,20 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 254,
+                          "id": 271,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "indexSignature": {
-                            "id": 255,
+                            "id": 272,
                             "name": "__index",
                             "kind": 8192,
                             "kindString": "Index signature",
                             "flags": {},
                             "parameters": [
                               {
-                                "id": 256,
+                                "id": 273,
                                 "name": "key",
                                 "kind": 32768,
                                 "flags": {},
@@ -312,7 +312,7 @@
                       "defaultValue": "{}"
                     },
                     {
-                      "id": 257,
+                      "id": 274,
                       "name": "fetch",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -322,21 +322,21 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 258,
+                          "id": 275,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 259,
+                              "id": 276,
                               "name": "__type",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 260,
+                                  "id": 277,
                                   "name": "input",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -349,7 +349,7 @@
                                   }
                                 },
                                 {
-                                  "id": 261,
+                                  "id": 278,
                                   "name": "init",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -386,7 +386,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 249,
+                    "id": 266,
                     "name": "StorageClient"
                   },
                   "overwrites": {
@@ -403,7 +403,7 @@
               }
             },
             {
-              "id": 292,
+              "id": 309,
               "name": "createBucket",
               "kind": 2048,
               "kindString": "Method",
@@ -417,7 +417,7 @@
               ],
               "signatures": [
                 {
-                  "id": 293,
+                  "id": 310,
                   "name": "createBucket",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -428,7 +428,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 294,
+                      "id": 311,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -442,7 +442,7 @@
                       }
                     },
                     {
-                      "id": 295,
+                      "id": 312,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -450,14 +450,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 296,
+                          "id": 313,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 297,
+                              "id": 314,
                               "name": "public",
                               "kind": 1024,
                               "kindString": "Property",
@@ -482,7 +482,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [297]
+                              "children": [314]
                             }
                           ]
                         }
@@ -499,14 +499,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 298,
+                              "id": 315,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 299,
+                                  "id": 316,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -523,7 +523,7 @@
                                     "typeArguments": [
                                       {
                                         "type": "reference",
-                                        "id": 340,
+                                        "id": 357,
                                         "name": "Bucket"
                                       },
                                       {
@@ -537,7 +537,7 @@
                                   }
                                 },
                                 {
-                                  "id": 300,
+                                  "id": 317,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -559,7 +559,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [299, 300]
+                                  "children": [316, 317]
                                 }
                               ]
                             }
@@ -567,14 +567,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 301,
+                              "id": 318,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 302,
+                                  "id": 319,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -592,7 +592,7 @@
                                   }
                                 },
                                 {
-                                  "id": 303,
+                                  "id": 320,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -606,7 +606,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -615,7 +615,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [302, 303]
+                                  "children": [319, 320]
                                 }
                               ]
                             }
@@ -641,7 +641,7 @@
               }
             },
             {
-              "id": 329,
+              "id": 346,
               "name": "deleteBucket",
               "kind": 2048,
               "kindString": "Method",
@@ -655,7 +655,7 @@
               ],
               "signatures": [
                 {
-                  "id": 330,
+                  "id": 347,
                   "name": "deleteBucket",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -665,7 +665,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 331,
+                      "id": 348,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -688,14 +688,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 332,
+                              "id": 349,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 333,
+                                  "id": 350,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -710,14 +710,14 @@
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 334,
+                                      "id": 351,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 335,
+                                          "id": 352,
                                           "name": "message",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -739,14 +739,14 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [335]
+                                          "children": [352]
                                         }
                                       ]
                                     }
                                   }
                                 },
                                 {
-                                  "id": 336,
+                                  "id": 353,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -768,7 +768,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [333, 336]
+                                  "children": [350, 353]
                                 }
                               ]
                             }
@@ -776,14 +776,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 337,
+                              "id": 354,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 338,
+                                  "id": 355,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -801,7 +801,7 @@
                                   }
                                 },
                                 {
-                                  "id": 339,
+                                  "id": 356,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -815,7 +815,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -824,7 +824,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [338, 339]
+                                  "children": [355, 356]
                                 }
                               ]
                             }
@@ -850,7 +850,7 @@
               }
             },
             {
-              "id": 318,
+              "id": 335,
               "name": "emptyBucket",
               "kind": 2048,
               "kindString": "Method",
@@ -864,7 +864,7 @@
               ],
               "signatures": [
                 {
-                  "id": 319,
+                  "id": 336,
                   "name": "emptyBucket",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -874,7 +874,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 320,
+                      "id": 337,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -897,14 +897,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 321,
+                              "id": 338,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 322,
+                                  "id": 339,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -919,14 +919,14 @@
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 323,
+                                      "id": 340,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 324,
+                                          "id": 341,
                                           "name": "message",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -948,14 +948,14 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [324]
+                                          "children": [341]
                                         }
                                       ]
                                     }
                                   }
                                 },
                                 {
-                                  "id": 325,
+                                  "id": 342,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -977,7 +977,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [322, 325]
+                                  "children": [339, 342]
                                 }
                               ]
                             }
@@ -985,14 +985,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 326,
+                              "id": 343,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 327,
+                                  "id": 344,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1010,7 +1010,7 @@
                                   }
                                 },
                                 {
-                                  "id": 328,
+                                  "id": 345,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1024,7 +1024,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1033,7 +1033,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [327, 328]
+                                  "children": [344, 345]
                                 }
                               ]
                             }
@@ -1059,7 +1059,7 @@
               }
             },
             {
-              "id": 262,
+              "id": 279,
               "name": "from",
               "kind": 2048,
               "kindString": "Method",
@@ -1073,7 +1073,7 @@
               ],
               "signatures": [
                 {
-                  "id": 263,
+                  "id": 280,
                   "name": "from",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1083,7 +1083,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 264,
+                      "id": 281,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1106,7 +1106,7 @@
               ]
             },
             {
-              "id": 283,
+              "id": 300,
               "name": "getBucket",
               "kind": 2048,
               "kindString": "Method",
@@ -1120,7 +1120,7 @@
               ],
               "signatures": [
                 {
-                  "id": 284,
+                  "id": 301,
                   "name": "getBucket",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1130,7 +1130,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 285,
+                      "id": 302,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1153,14 +1153,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 286,
+                              "id": 303,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 287,
+                                  "id": 304,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1174,12 +1174,12 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 340,
+                                    "id": 357,
                                     "name": "Bucket"
                                   }
                                 },
                                 {
-                                  "id": 288,
+                                  "id": 305,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1201,7 +1201,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [287, 288]
+                                  "children": [304, 305]
                                 }
                               ]
                             }
@@ -1209,14 +1209,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 289,
+                              "id": 306,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 290,
+                                  "id": 307,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1234,7 +1234,7 @@
                                   }
                                 },
                                 {
-                                  "id": 291,
+                                  "id": 308,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1248,7 +1248,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1257,7 +1257,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [290, 291]
+                                  "children": [307, 308]
                                 }
                               ]
                             }
@@ -1283,7 +1283,7 @@
               }
             },
             {
-              "id": 275,
+              "id": 292,
               "name": "listBuckets",
               "kind": 2048,
               "kindString": "Method",
@@ -1297,7 +1297,7 @@
               ],
               "signatures": [
                 {
-                  "id": 276,
+                  "id": 293,
                   "name": "listBuckets",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1314,14 +1314,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 277,
+                              "id": 294,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 278,
+                                  "id": 295,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1337,13 +1337,13 @@
                                     "type": "array",
                                     "elementType": {
                                       "type": "reference",
-                                      "id": 340,
+                                      "id": 357,
                                       "name": "Bucket"
                                     }
                                   }
                                 },
                                 {
-                                  "id": 279,
+                                  "id": 296,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1365,7 +1365,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [278, 279]
+                                  "children": [295, 296]
                                 }
                               ]
                             }
@@ -1373,14 +1373,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 280,
+                              "id": 297,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 281,
+                                  "id": 298,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1398,7 +1398,7 @@
                                   }
                                 },
                                 {
-                                  "id": 282,
+                                  "id": 299,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1412,7 +1412,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1421,7 +1421,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [281, 282]
+                                  "children": [298, 299]
                                 }
                               ]
                             }
@@ -1447,7 +1447,7 @@
               }
             },
             {
-              "id": 304,
+              "id": 321,
               "name": "updateBucket",
               "kind": 2048,
               "kindString": "Method",
@@ -1461,7 +1461,7 @@
               ],
               "signatures": [
                 {
-                  "id": 305,
+                  "id": 322,
                   "name": "updateBucket",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1471,7 +1471,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 306,
+                      "id": 323,
                       "name": "id",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1485,7 +1485,7 @@
                       }
                     },
                     {
-                      "id": 307,
+                      "id": 324,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1493,14 +1493,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 308,
+                          "id": 325,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 309,
+                              "id": 326,
                               "name": "public",
                               "kind": 1024,
                               "kindString": "Property",
@@ -1525,7 +1525,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [309]
+                              "children": [326]
                             }
                           ]
                         }
@@ -1541,14 +1541,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 310,
+                              "id": 327,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 311,
+                                  "id": 328,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1563,14 +1563,14 @@
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 312,
+                                      "id": 329,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 313,
+                                          "id": 330,
                                           "name": "message",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -1592,14 +1592,14 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [313]
+                                          "children": [330]
                                         }
                                       ]
                                     }
                                   }
                                 },
                                 {
-                                  "id": 314,
+                                  "id": 331,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1621,7 +1621,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [311, 314]
+                                  "children": [328, 331]
                                 }
                               ]
                             }
@@ -1629,14 +1629,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 315,
+                              "id": 332,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 316,
+                                  "id": 333,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1654,7 +1654,7 @@
                                   }
                                 },
                                 {
-                                  "id": 317,
+                                  "id": 334,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -1668,7 +1668,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -1677,7 +1677,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [316, 317]
+                                  "children": [333, 334]
                                 }
                               ]
                             }
@@ -1707,12 +1707,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [250]
+              "children": [267]
             },
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [292, 329, 318, 262, 283, 275, 304]
+              "children": [309, 346, 335, 279, 300, 292, 321]
             }
           ],
           "sources": [
@@ -1731,14 +1731,14 @@
           ]
         },
         {
-          "id": 376,
+          "id": 398,
           "name": "StorageError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 377,
+              "id": 399,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -1752,14 +1752,14 @@
               ],
               "signatures": [
                 {
-                  "id": 378,
+                  "id": 400,
                   "name": "new StorageError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 379,
+                      "id": 401,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1772,7 +1772,7 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 376,
+                    "id": 398,
                     "name": "StorageError"
                   },
                   "overwrites": {
@@ -1791,7 +1791,7 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [377]
+              "children": [399]
             }
           ],
           "sources": [
@@ -1812,25 +1812,25 @@
           "extendedBy": [
             {
               "type": "reference",
-              "id": 381,
+              "id": 403,
               "name": "StorageApiError"
             },
             {
               "type": "reference",
-              "id": 394,
+              "id": 416,
               "name": "StorageUnknownError"
             }
           ]
         },
         {
-          "id": 394,
+          "id": 416,
           "name": "StorageUnknownError",
           "kind": 128,
           "kindString": "Class",
           "flags": {},
           "children": [
             {
-              "id": 395,
+              "id": 417,
               "name": "constructor",
               "kind": 512,
               "kindString": "Constructor",
@@ -1844,14 +1844,14 @@
               ],
               "signatures": [
                 {
-                  "id": 396,
+                  "id": 418,
                   "name": "new StorageUnknownError",
                   "kind": 16384,
                   "kindString": "Constructor signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 397,
+                      "id": 419,
                       "name": "message",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1862,7 +1862,7 @@
                       }
                     },
                     {
-                      "id": 398,
+                      "id": 420,
                       "name": "originalError",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1875,24 +1875,24 @@
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 394,
+                    "id": 416,
                     "name": "StorageUnknownError"
                   },
                   "overwrites": {
                     "type": "reference",
-                    "id": 378,
+                    "id": 400,
                     "name": "StorageError.constructor"
                   }
                 }
               ],
               "overwrites": {
                 "type": "reference",
-                "id": 377,
+                "id": 399,
                 "name": "StorageError.constructor"
               }
             },
             {
-              "id": 399,
+              "id": 421,
               "name": "originalError",
               "kind": 1024,
               "kindString": "Property",
@@ -1914,12 +1914,12 @@
             {
               "title": "Constructors",
               "kind": 512,
-              "children": [395]
+              "children": [417]
             },
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [399]
+              "children": [421]
             }
           ],
           "sources": [
@@ -1932,20 +1932,20 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "id": 376,
+              "id": 398,
               "name": "StorageError"
             }
           ]
         },
         {
-          "id": 340,
+          "id": 357,
           "name": "Bucket",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 344,
+              "id": 361,
               "name": "created_at",
               "kind": 1024,
               "kindString": "Property",
@@ -1963,7 +1963,7 @@
               }
             },
             {
-              "id": 341,
+              "id": 358,
               "name": "id",
               "kind": 1024,
               "kindString": "Property",
@@ -1981,7 +1981,7 @@
               }
             },
             {
-              "id": 342,
+              "id": 359,
               "name": "name",
               "kind": 1024,
               "kindString": "Property",
@@ -1999,7 +1999,7 @@
               }
             },
             {
-              "id": 343,
+              "id": 360,
               "name": "owner",
               "kind": 1024,
               "kindString": "Property",
@@ -2017,7 +2017,7 @@
               }
             },
             {
-              "id": 346,
+              "id": 363,
               "name": "public",
               "kind": 1024,
               "kindString": "Property",
@@ -2035,7 +2035,7 @@
               }
             },
             {
-              "id": 345,
+              "id": 362,
               "name": "updated_at",
               "kind": 1024,
               "kindString": "Property",
@@ -2057,7 +2057,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [344, 341, 342, 343, 346, 345]
+              "children": [361, 358, 359, 360, 363, 362]
             }
           ],
           "sources": [
@@ -2069,14 +2069,14 @@
           ]
         },
         {
-          "id": 369,
+          "id": 386,
           "name": "FetchParameters",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 370,
+              "id": 387,
               "name": "signal",
               "kind": 1024,
               "kindString": "Property",
@@ -2105,7 +2105,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [370]
+              "children": [387]
             }
           ],
           "sources": [
@@ -2117,14 +2117,14 @@
           ]
         },
         {
-          "id": 347,
+          "id": 364,
           "name": "FileObject",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 349,
+              "id": 366,
               "name": "bucket_id",
               "kind": 1024,
               "kindString": "Property",
@@ -2142,7 +2142,7 @@
               }
             },
             {
-              "id": 356,
+              "id": 373,
               "name": "buckets",
               "kind": 1024,
               "kindString": "Property",
@@ -2156,12 +2156,12 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 340,
+                "id": 357,
                 "name": "Bucket"
               }
             },
             {
-              "id": 353,
+              "id": 370,
               "name": "created_at",
               "kind": 1024,
               "kindString": "Property",
@@ -2179,7 +2179,7 @@
               }
             },
             {
-              "id": 351,
+              "id": 368,
               "name": "id",
               "kind": 1024,
               "kindString": "Property",
@@ -2197,7 +2197,7 @@
               }
             },
             {
-              "id": 354,
+              "id": 371,
               "name": "last_accessed_at",
               "kind": 1024,
               "kindString": "Property",
@@ -2215,7 +2215,7 @@
               }
             },
             {
-              "id": 355,
+              "id": 372,
               "name": "metadata",
               "kind": 1024,
               "kindString": "Property",
@@ -2245,7 +2245,7 @@
               }
             },
             {
-              "id": 348,
+              "id": 365,
               "name": "name",
               "kind": 1024,
               "kindString": "Property",
@@ -2263,7 +2263,7 @@
               }
             },
             {
-              "id": 350,
+              "id": 367,
               "name": "owner",
               "kind": 1024,
               "kindString": "Property",
@@ -2281,7 +2281,7 @@
               }
             },
             {
-              "id": 352,
+              "id": 369,
               "name": "updated_at",
               "kind": 1024,
               "kindString": "Property",
@@ -2303,7 +2303,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [349, 356, 353, 351, 354, 355, 348, 350, 352]
+              "children": [366, 373, 370, 368, 371, 372, 365, 367, 369]
             }
           ],
           "sources": [
@@ -2315,14 +2315,14 @@
           ]
         },
         {
-          "id": 360,
+          "id": 377,
           "name": "FileOptions",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 361,
+              "id": 378,
               "name": "cacheControl",
               "kind": 1024,
               "kindString": "Property",
@@ -2345,7 +2345,7 @@
               }
             },
             {
-              "id": 362,
+              "id": 379,
               "name": "contentType",
               "kind": 1024,
               "kindString": "Property",
@@ -2368,7 +2368,7 @@
               }
             },
             {
-              "id": 363,
+              "id": 380,
               "name": "upsert",
               "kind": 1024,
               "kindString": "Property",
@@ -2395,7 +2395,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [361, 362, 363]
+              "children": [378, 379, 380]
             }
           ],
           "sources": [
@@ -2407,14 +2407,14 @@
           ]
         },
         {
-          "id": 371,
+          "id": 388,
           "name": "Metadata",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 372,
+              "id": 389,
               "name": "name",
               "kind": 1024,
               "kindString": "Property",
@@ -2436,7 +2436,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [372]
+              "children": [389]
             }
           ],
           "sources": [
@@ -2448,14 +2448,14 @@
           ]
         },
         {
-          "id": 364,
+          "id": 381,
           "name": "SearchOptions",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 365,
+              "id": 382,
               "name": "limit",
               "kind": 1024,
               "kindString": "Property",
@@ -2478,7 +2478,7 @@
               }
             },
             {
-              "id": 366,
+              "id": 383,
               "name": "offset",
               "kind": 1024,
               "kindString": "Property",
@@ -2501,7 +2501,7 @@
               }
             },
             {
-              "id": 368,
+              "id": 385,
               "name": "search",
               "kind": 1024,
               "kindString": "Property",
@@ -2524,7 +2524,7 @@
               }
             },
             {
-              "id": 367,
+              "id": 384,
               "name": "sortBy",
               "kind": 1024,
               "kindString": "Property",
@@ -2543,7 +2543,7 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 357,
+                "id": 374,
                 "name": "SortBy"
               }
             }
@@ -2552,7 +2552,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [365, 366, 368, 367]
+              "children": [382, 383, 385, 384]
             }
           ],
           "sources": [
@@ -2564,14 +2564,14 @@
           ]
         },
         {
-          "id": 357,
+          "id": 374,
           "name": "SortBy",
           "kind": 256,
           "kindString": "Interface",
           "flags": {},
           "children": [
             {
-              "id": 358,
+              "id": 375,
               "name": "column",
               "kind": 1024,
               "kindString": "Property",
@@ -2591,7 +2591,7 @@
               }
             },
             {
-              "id": 359,
+              "id": 376,
               "name": "order",
               "kind": 1024,
               "kindString": "Property",
@@ -2615,7 +2615,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [358, 359]
+              "children": [375, 376]
             }
           ],
           "sources": [
@@ -2627,7 +2627,136 @@
           ]
         },
         {
-          "id": 373,
+          "id": 390,
+          "name": "TransformOptions",
+          "kind": 256,
+          "kindString": "Interface",
+          "flags": {},
+          "children": [
+            {
+              "id": 394,
+              "name": "format",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "Specify the format of the image requested.",
+                "text": "When using 'origin' we force the format to be the same as the original image,\nbypassing automatic browser optimisation such as webp conversion\n"
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 98,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "literal",
+                "value": "origin"
+              }
+            },
+            {
+              "id": 392,
+              "name": "height",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The height of the image in pixels."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 84,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            },
+            {
+              "id": 393,
+              "name": "resize",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The resize mode can be cover, contain or fill. Defaults to cover.\nCover resizes the image to maintain it's aspect ratio while filling the entire width and height.\nContain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height.\nFill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 91,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": "cover"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "contain"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "fill"
+                  }
+                ]
+              }
+            },
+            {
+              "id": 391,
+              "name": "width",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The width of the image in pixels."
+              },
+              "sources": [
+                {
+                  "fileName": "src/lib/types.ts",
+                  "line": 80,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "number"
+              }
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [394, 392, 393, 391]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/lib/types.ts",
+              "line": 76,
+              "character": 17
+            }
+          ]
+        },
+        {
+          "id": 395,
           "name": "isStorageError",
           "kind": 64,
           "kindString": "Function",
@@ -2641,14 +2770,14 @@
           ],
           "signatures": [
             {
-              "id": 374,
+              "id": 396,
               "name": "isStorageError",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 375,
+                  "id": 397,
                   "name": "error",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2665,7 +2794,7 @@
                 "asserts": false,
                 "targetType": {
                   "type": "reference",
-                  "id": 376,
+                  "id": 398,
                   "name": "StorageError"
                 }
               }
@@ -2677,17 +2806,17 @@
         {
           "title": "Classes",
           "kind": 128,
-          "children": [381, 249, 376, 394]
+          "children": [403, 266, 398, 416]
         },
         {
           "title": "Interfaces",
           "kind": 256,
-          "children": [340, 369, 347, 360, 371, 364, 357]
+          "children": [357, 386, 364, 377, 388, 381, 374, 390]
         },
         {
           "title": "Functions",
           "kind": 64,
-          "children": [373]
+          "children": [395]
         }
       ],
       "sources": [
@@ -2987,7 +3116,7 @@
                                     "typeArguments": [
                                       {
                                         "type": "reference",
-                                        "id": 340,
+                                        "id": 357,
                                         "name": "Bucket"
                                       },
                                       {
@@ -3070,7 +3199,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3269,7 +3398,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3468,7 +3597,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3561,7 +3690,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 340,
+                                    "id": 357,
                                     "name": "Bucket"
                                   }
                                 },
@@ -3635,7 +3764,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -3714,7 +3843,7 @@
                                     "type": "array",
                                     "elementType": {
                                       "type": "reference",
-                                      "id": 340,
+                                      "id": 357,
                                       "name": "Bucket"
                                     }
                                   }
@@ -3789,7 +3918,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4035,7 +4164,7 @@
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4082,7 +4211,7 @@
           "extendedBy": [
             {
               "type": "reference",
-              "id": 249,
+              "id": 266,
               "name": "StorageClient"
             }
           ]
@@ -4126,7 +4255,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 27,
+                  "line": 33,
                   "character": 2
                 }
               ],
@@ -4293,7 +4422,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 226,
+                  "line": 232,
                   "character": 8
                 }
               ],
@@ -4361,7 +4490,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 231,
+                                      "line": 237,
                                       "character": 8
                                     }
                                   ],
@@ -4376,14 +4505,14 @@
                                       "children": [
                                         {
                                           "id": 176,
-                                          "name": "message",
+                                          "name": "path",
                                           "kind": 1024,
                                           "kindString": "Property",
                                           "flags": {},
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 231,
+                                              "line": 237,
                                               "character": 16
                                             }
                                           ],
@@ -4412,7 +4541,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 232,
+                                      "line": 238,
                                       "character": 8
                                     }
                                   ],
@@ -4449,7 +4578,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 235,
+                                      "line": 241,
                                       "character": 8
                                     }
                                   ],
@@ -4467,13 +4596,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 236,
+                                      "line": 242,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4506,7 +4635,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 262,
+                  "line": 270,
                   "character": 8
                 }
               ],
@@ -4542,11 +4671,95 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.\n"
+                        "shortText": "The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute."
                       },
                       "type": {
                         "type": "intrinsic",
                         "name": "number"
+                      }
+                    },
+                    {
+                      "id": 185,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 186,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 187,
+                              "name": "download",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 273,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 188,
+                              "name": "transform",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Transform the asset before serving it to the client.\n"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 273,
+                                  "character": 45
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 390,
+                                "name": "TransformOptions"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [187, 188]
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -4559,14 +4772,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 185,
+                              "id": 189,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 186,
+                                  "id": 190,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -4574,21 +4787,21 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 267,
+                                      "line": 276,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reflection",
                                     "declaration": {
-                                      "id": 187,
+                                      "id": 191,
                                       "name": "__type",
                                       "kind": 65536,
                                       "kindString": "Type literal",
                                       "flags": {},
                                       "children": [
                                         {
-                                          "id": 188,
+                                          "id": 192,
                                           "name": "signedUrl",
                                           "kind": 1024,
                                           "kindString": "Property",
@@ -4596,7 +4809,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 267,
+                                              "line": 276,
                                               "character": 16
                                             }
                                           ],
@@ -4610,14 +4823,14 @@
                                         {
                                           "title": "Properties",
                                           "kind": 1024,
-                                          "children": [188]
+                                          "children": [192]
                                         }
                                       ]
                                     }
                                   }
                                 },
                                 {
-                                  "id": 189,
+                                  "id": 193,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -4625,7 +4838,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 268,
+                                      "line": 277,
                                       "character": 8
                                     }
                                   ],
@@ -4639,7 +4852,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [186, 189]
+                                  "children": [190, 193]
                                 }
                               ]
                             }
@@ -4647,14 +4860,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 190,
+                              "id": 194,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 191,
+                                  "id": 195,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -4662,7 +4875,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 271,
+                                      "line": 280,
                                       "character": 8
                                     }
                                   ],
@@ -4672,7 +4885,7 @@
                                   }
                                 },
                                 {
-                                  "id": 192,
+                                  "id": 196,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -4680,13 +4893,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 272,
+                                      "line": 281,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4695,7 +4908,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [191, 192]
+                                  "children": [195, 196]
                                 }
                               ]
                             }
@@ -4711,7 +4924,7 @@
               ]
             },
             {
-              "id": 193,
+              "id": 197,
               "name": "createSignedUrls",
               "kind": 2048,
               "kindString": "Method",
@@ -4719,13 +4932,13 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 301,
+                  "line": 315,
                   "character": 8
                 }
               ],
               "signatures": [
                 {
-                  "id": 194,
+                  "id": 198,
                   "name": "createSignedUrls",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -4735,7 +4948,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 195,
+                      "id": 199,
                       "name": "paths",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -4752,17 +4965,75 @@
                       }
                     },
                     {
-                      "id": 196,
+                      "id": 200,
                       "name": "expiresIn",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.\n"
+                        "shortText": "The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute."
                       },
                       "type": {
                         "type": "intrinsic",
                         "name": "number"
+                      }
+                    },
+                    {
+                      "id": 201,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 202,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 203,
+                              "name": "download",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {},
+                              "comment": {
+                                "shortText": "triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.\n"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 318,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [203]
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -4772,151 +5043,6 @@
                       {
                         "type": "union",
                         "types": [
-                          {
-                            "type": "reflection",
-                            "declaration": {
-                              "id": 197,
-                              "name": "__type",
-                              "kind": 65536,
-                              "kindString": "Type literal",
-                              "flags": {},
-                              "children": [
-                                {
-                                  "id": 198,
-                                  "name": "data",
-                                  "kind": 1024,
-                                  "kindString": "Property",
-                                  "flags": {},
-                                  "sources": [
-                                    {
-                                      "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 306,
-                                      "character": 8
-                                    }
-                                  ],
-                                  "type": {
-                                    "type": "array",
-                                    "elementType": {
-                                      "type": "reflection",
-                                      "declaration": {
-                                        "id": 199,
-                                        "name": "__type",
-                                        "kind": 65536,
-                                        "kindString": "Type literal",
-                                        "flags": {},
-                                        "children": [
-                                          {
-                                            "id": 200,
-                                            "name": "error",
-                                            "kind": 1024,
-                                            "kindString": "Property",
-                                            "flags": {},
-                                            "sources": [
-                                              {
-                                                "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 306,
-                                                "character": 16
-                                              }
-                                            ],
-                                            "type": {
-                                              "type": "union",
-                                              "types": [
-                                                {
-                                                  "type": "literal",
-                                                  "value": null
-                                                },
-                                                {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "id": 201,
-                                            "name": "path",
-                                            "kind": 1024,
-                                            "kindString": "Property",
-                                            "flags": {},
-                                            "sources": [
-                                              {
-                                                "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 306,
-                                                "character": 38
-                                              }
-                                            ],
-                                            "type": {
-                                              "type": "union",
-                                              "types": [
-                                                {
-                                                  "type": "literal",
-                                                  "value": null
-                                                },
-                                                {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          {
-                                            "id": 202,
-                                            "name": "signedUrl",
-                                            "kind": 1024,
-                                            "kindString": "Property",
-                                            "flags": {},
-                                            "sources": [
-                                              {
-                                                "fileName": "src/packages/StorageFileApi.ts",
-                                                "line": 306,
-                                                "character": 59
-                                              }
-                                            ],
-                                            "type": {
-                                              "type": "intrinsic",
-                                              "name": "string"
-                                            }
-                                          }
-                                        ],
-                                        "groups": [
-                                          {
-                                            "title": "Properties",
-                                            "kind": 1024,
-                                            "children": [200, 201, 202]
-                                          }
-                                        ]
-                                      }
-                                    }
-                                  }
-                                },
-                                {
-                                  "id": 203,
-                                  "name": "error",
-                                  "kind": 1024,
-                                  "kindString": "Property",
-                                  "flags": {},
-                                  "sources": [
-                                    {
-                                      "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 307,
-                                      "character": 8
-                                    }
-                                  ],
-                                  "type": {
-                                    "type": "literal",
-                                    "value": null
-                                  }
-                                }
-                              ],
-                              "groups": [
-                                {
-                                  "title": "Properties",
-                                  "kind": 1024,
-                                  "children": [198, 203]
-                                }
-                              ]
-                            }
-                          },
                           {
                             "type": "reflection",
                             "declaration": {
@@ -4935,7 +5061,152 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 310,
+                                      "line": 321,
+                                      "character": 8
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "reflection",
+                                      "declaration": {
+                                        "id": 206,
+                                        "name": "__type",
+                                        "kind": 65536,
+                                        "kindString": "Type literal",
+                                        "flags": {},
+                                        "children": [
+                                          {
+                                            "id": 207,
+                                            "name": "error",
+                                            "kind": 1024,
+                                            "kindString": "Property",
+                                            "flags": {},
+                                            "sources": [
+                                              {
+                                                "fileName": "src/packages/StorageFileApi.ts",
+                                                "line": 321,
+                                                "character": 16
+                                              }
+                                            ],
+                                            "type": {
+                                              "type": "union",
+                                              "types": [
+                                                {
+                                                  "type": "literal",
+                                                  "value": null
+                                                },
+                                                {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "id": 208,
+                                            "name": "path",
+                                            "kind": 1024,
+                                            "kindString": "Property",
+                                            "flags": {},
+                                            "sources": [
+                                              {
+                                                "fileName": "src/packages/StorageFileApi.ts",
+                                                "line": 321,
+                                                "character": 38
+                                              }
+                                            ],
+                                            "type": {
+                                              "type": "union",
+                                              "types": [
+                                                {
+                                                  "type": "literal",
+                                                  "value": null
+                                                },
+                                                {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "id": 209,
+                                            "name": "signedUrl",
+                                            "kind": 1024,
+                                            "kindString": "Property",
+                                            "flags": {},
+                                            "sources": [
+                                              {
+                                                "fileName": "src/packages/StorageFileApi.ts",
+                                                "line": 321,
+                                                "character": 59
+                                              }
+                                            ],
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            }
+                                          }
+                                        ],
+                                        "groups": [
+                                          {
+                                            "title": "Properties",
+                                            "kind": 1024,
+                                            "children": [207, 208, 209]
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "id": 210,
+                                  "name": "error",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/packages/StorageFileApi.ts",
+                                      "line": 322,
+                                      "character": 8
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": null
+                                  }
+                                }
+                              ],
+                              "groups": [
+                                {
+                                  "title": "Properties",
+                                  "kind": 1024,
+                                  "children": [205, 210]
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "reflection",
+                            "declaration": {
+                              "id": 211,
+                              "name": "__type",
+                              "kind": 65536,
+                              "kindString": "Type literal",
+                              "flags": {},
+                              "children": [
+                                {
+                                  "id": 212,
+                                  "name": "data",
+                                  "kind": 1024,
+                                  "kindString": "Property",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/packages/StorageFileApi.ts",
+                                      "line": 325,
                                       "character": 8
                                     }
                                   ],
@@ -4945,7 +5216,7 @@
                                   }
                                 },
                                 {
-                                  "id": 206,
+                                  "id": 213,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -4953,13 +5224,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 311,
+                                      "line": 326,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -4968,7 +5239,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [205, 206]
+                                  "children": [212, 213]
                                 }
                               ]
                             }
@@ -4984,7 +5255,7 @@
               ]
             },
             {
-              "id": 207,
+              "id": 214,
               "name": "download",
               "kind": 2048,
               "kindString": "Method",
@@ -4992,33 +5263,85 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 342,
+                  "line": 364,
                   "character": 8
                 }
               ],
               "signatures": [
                 {
-                  "id": 208,
+                  "id": 215,
                   "name": "download",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Downloads a file."
+                    "shortText": "Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `getPublicUrl` instead."
                   },
                   "parameters": [
                     {
-                      "id": 209,
+                      "id": 216,
                       "name": "path",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The full path and file name of the file to be downloaded. For example `folder/image.png`.\n"
+                        "shortText": "The full path and file name of the file to be downloaded. For example `folder/image.png`."
                       },
                       "type": {
                         "type": "intrinsic",
                         "name": "string"
+                      }
+                    },
+                    {
+                      "id": 217,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 218,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 219,
+                              "name": "transform",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Transform the asset before serving it to the client.\n"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 366,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 390,
+                                "name": "TransformOptions"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [219]
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
@@ -5031,14 +5354,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 210,
+                              "id": 220,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 211,
+                                  "id": 221,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5046,7 +5369,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 346,
+                                      "line": 369,
                                       "character": 8
                                     }
                                   ],
@@ -5058,7 +5381,7 @@
                                   }
                                 },
                                 {
-                                  "id": 212,
+                                  "id": 222,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5066,7 +5389,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 347,
+                                      "line": 370,
                                       "character": 8
                                     }
                                   ],
@@ -5080,7 +5403,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [211, 212]
+                                  "children": [221, 222]
                                 }
                               ]
                             }
@@ -5088,14 +5411,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 213,
+                              "id": 223,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 214,
+                                  "id": 224,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5103,7 +5426,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 350,
+                                      "line": 373,
                                       "character": 8
                                     }
                                   ],
@@ -5113,7 +5436,7 @@
                                   }
                                 },
                                 {
-                                  "id": 215,
+                                  "id": 225,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5121,13 +5444,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 351,
+                                      "line": 374,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5136,7 +5459,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [214, 215]
+                                  "children": [224, 225]
                                 }
                               ]
                             }
@@ -5152,7 +5475,7 @@
               ]
             },
             {
-              "id": 216,
+              "id": 226,
               "name": "getPublicUrl",
               "kind": 2048,
               "kindString": "Method",
@@ -5160,47 +5483,131 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 377,
+                  "line": 407,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 217,
+                  "id": 227,
                   "name": "getPublicUrl",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Retrieves the URL for an asset in a public bucket.\nThis function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset."
+                    "shortText": "A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.\nThis function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset."
                   },
                   "parameters": [
                     {
-                      "id": 218,
+                      "id": 228,
                       "name": "path",
                       "kind": 32768,
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The path and name of the file to generate the public URL for. For example `folder/image.png`.\n"
+                        "shortText": "The path and name of the file to generate the public URL for. For example `folder/image.png`."
                       },
                       "type": {
                         "type": "intrinsic",
                         "name": "string"
+                      }
+                    },
+                    {
+                      "id": 229,
+                      "name": "options",
+                      "kind": 32768,
+                      "kindString": "Parameter",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "type": {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 230,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "children": [
+                            {
+                              "id": 231,
+                              "name": "download",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 409,
+                                  "character": 16
+                                }
+                              ],
+                              "type": {
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "id": 232,
+                              "name": "transform",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "Transform the asset before serving it to the client.\n"
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/packages/StorageFileApi.ts",
+                                  "line": 409,
+                                  "character": 45
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 390,
+                                "name": "TransformOptions"
+                              }
+                            }
+                          ],
+                          "groups": [
+                            {
+                              "title": "Properties",
+                              "kind": 1024,
+                              "children": [231, 232]
+                            }
+                          ]
+                        }
                       }
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 219,
+                      "id": 233,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 220,
+                          "id": 234,
                           "name": "data",
                           "kind": 1024,
                           "kindString": "Property",
@@ -5208,21 +5615,21 @@
                           "sources": [
                             {
                               "fileName": "src/packages/StorageFileApi.ts",
-                              "line": 377,
-                              "character": 32
+                              "line": 410,
+                              "character": 7
                             }
                           ],
                           "type": {
                             "type": "reflection",
                             "declaration": {
-                              "id": 221,
+                              "id": 235,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 222,
+                                  "id": 236,
                                   "name": "publicUrl",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5230,8 +5637,8 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 377,
-                                      "character": 40
+                                      "line": 410,
+                                      "character": 15
                                     }
                                   ],
                                   "type": {
@@ -5244,7 +5651,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [222]
+                                  "children": [236]
                                 }
                               ]
                             }
@@ -5255,7 +5662,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [220]
+                          "children": [234]
                         }
                       ]
                     }
@@ -5264,7 +5671,7 @@
               ]
             },
             {
-              "id": 232,
+              "id": 246,
               "name": "list",
               "kind": 2048,
               "kindString": "Method",
@@ -5272,13 +5679,13 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 483,
+                  "line": 541,
                   "character": 8
                 }
               ],
               "signatures": [
                 {
-                  "id": 233,
+                  "id": 247,
                   "name": "list",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -5288,7 +5695,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 234,
+                      "id": 248,
                       "name": "path",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -5304,7 +5711,7 @@
                       }
                     },
                     {
-                      "id": 235,
+                      "id": 249,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -5313,12 +5720,12 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 364,
+                        "id": 381,
                         "name": "SearchOptions"
                       }
                     },
                     {
-                      "id": 236,
+                      "id": 250,
                       "name": "parameters",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -5327,7 +5734,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 369,
+                        "id": 386,
                         "name": "FetchParameters"
                       }
                     }
@@ -5341,14 +5748,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 237,
+                              "id": 251,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 238,
+                                  "id": 252,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5356,7 +5763,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 489,
+                                      "line": 547,
                                       "character": 8
                                     }
                                   ],
@@ -5364,13 +5771,13 @@
                                     "type": "array",
                                     "elementType": {
                                       "type": "reference",
-                                      "id": 347,
+                                      "id": 364,
                                       "name": "FileObject"
                                     }
                                   }
                                 },
                                 {
-                                  "id": 239,
+                                  "id": 253,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5378,7 +5785,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 490,
+                                      "line": 548,
                                       "character": 8
                                     }
                                   ],
@@ -5392,7 +5799,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [238, 239]
+                                  "children": [252, 253]
                                 }
                               ]
                             }
@@ -5400,14 +5807,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 240,
+                              "id": 254,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 241,
+                                  "id": 255,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5415,7 +5822,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 493,
+                                      "line": 551,
                                       "character": 8
                                     }
                                   ],
@@ -5425,7 +5832,7 @@
                                   }
                                 },
                                 {
-                                  "id": 242,
+                                  "id": 256,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5433,13 +5840,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 494,
+                                      "line": 552,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5448,7 +5855,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [241, 242]
+                                  "children": [255, 256]
                                 }
                               ]
                             }
@@ -5472,7 +5879,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 190,
+                  "line": 196,
                   "character": 8
                 }
               ],
@@ -5540,7 +5947,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 195,
+                                      "line": 201,
                                       "character": 8
                                     }
                                   ],
@@ -5562,7 +5969,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 195,
+                                              "line": 201,
                                               "character": 16
                                             }
                                           ],
@@ -5591,7 +5998,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 196,
+                                      "line": 202,
                                       "character": 8
                                     }
                                   ],
@@ -5628,7 +6035,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 199,
+                                      "line": 205,
                                       "character": 8
                                     }
                                   ],
@@ -5646,13 +6053,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 200,
+                                      "line": 206,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5677,7 +6084,7 @@
               ]
             },
             {
-              "id": 223,
+              "id": 237,
               "name": "remove",
               "kind": 2048,
               "kindString": "Method",
@@ -5685,13 +6092,13 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 387,
+                  "line": 445,
                   "character": 8
                 }
               ],
               "signatures": [
                 {
-                  "id": 224,
+                  "id": 238,
                   "name": "remove",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -5701,7 +6108,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 225,
+                      "id": 239,
                       "name": "paths",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -5727,14 +6134,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 226,
+                              "id": 240,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 227,
+                                  "id": 241,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5742,7 +6149,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 391,
+                                      "line": 449,
                                       "character": 8
                                     }
                                   ],
@@ -5750,13 +6157,13 @@
                                     "type": "array",
                                     "elementType": {
                                       "type": "reference",
-                                      "id": 347,
+                                      "id": 364,
                                       "name": "FileObject"
                                     }
                                   }
                                 },
                                 {
-                                  "id": 228,
+                                  "id": 242,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5764,7 +6171,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 392,
+                                      "line": 450,
                                       "character": 8
                                     }
                                   ],
@@ -5778,7 +6185,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [227, 228]
+                                  "children": [241, 242]
                                 }
                               ]
                             }
@@ -5786,14 +6193,14 @@
                           {
                             "type": "reflection",
                             "declaration": {
-                              "id": 229,
+                              "id": 243,
                               "name": "__type",
                               "kind": 65536,
                               "kindString": "Type literal",
                               "flags": {},
                               "children": [
                                 {
-                                  "id": 230,
+                                  "id": 244,
                                   "name": "data",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5801,7 +6208,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 395,
+                                      "line": 453,
                                       "character": 8
                                     }
                                   ],
@@ -5811,7 +6218,7 @@
                                   }
                                 },
                                 {
-                                  "id": 231,
+                                  "id": 245,
                                   "name": "error",
                                   "kind": 1024,
                                   "kindString": "Property",
@@ -5819,13 +6226,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 396,
+                                      "line": 454,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -5834,7 +6241,7 @@
                                 {
                                   "title": "Properties",
                                   "kind": 1024,
-                                  "children": [230, 231]
+                                  "children": [244, 245]
                                 }
                               ]
                             }
@@ -5858,7 +6265,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 157,
+                  "line": 163,
                   "character": 8
                 }
               ],
@@ -5978,7 +6385,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 360,
+                        "id": 377,
                         "name": "FileOptions"
                       }
                     }
@@ -6007,7 +6414,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 173,
+                                      "line": 179,
                                       "character": 8
                                     }
                                   ],
@@ -6029,7 +6436,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 173,
+                                              "line": 179,
                                               "character": 16
                                             }
                                           ],
@@ -6058,7 +6465,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 174,
+                                      "line": 180,
                                       "character": 8
                                     }
                                   ],
@@ -6095,7 +6502,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 177,
+                                      "line": 183,
                                       "character": 8
                                     }
                                   ],
@@ -6113,13 +6520,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 178,
+                                      "line": 184,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -6152,7 +6559,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageFileApi.ts",
-                  "line": 124,
+                  "line": 130,
                   "character": 8
                 }
               ],
@@ -6272,7 +6679,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 360,
+                        "id": 377,
                         "name": "FileOptions"
                       }
                     }
@@ -6301,7 +6708,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 140,
+                                      "line": 146,
                                       "character": 8
                                     }
                                   ],
@@ -6323,7 +6730,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageFileApi.ts",
-                                              "line": 140,
+                                              "line": 146,
                                               "character": 16
                                             }
                                           ],
@@ -6352,7 +6759,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 141,
+                                      "line": 147,
                                       "character": 8
                                     }
                                   ],
@@ -6389,7 +6796,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 144,
+                                      "line": 150,
                                       "character": 8
                                     }
                                   ],
@@ -6407,13 +6814,13 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageFileApi.ts",
-                                      "line": 145,
+                                      "line": 151,
                                       "character": 8
                                     }
                                   ],
                                   "type": {
                                     "type": "reference",
-                                    "id": 376,
+                                    "id": 398,
                                     "name": "StorageError"
                                   }
                                 }
@@ -6447,13 +6854,13 @@
             {
               "title": "Methods",
               "kind": 2048,
-              "children": [169, 181, 193, 207, 216, 232, 157, 223, 144, 131]
+              "children": [169, 181, 197, 214, 226, 246, 157, 237, 144, 131]
             }
           ],
           "sources": [
             {
               "fileName": "src/packages/StorageFileApi.ts",
-              "line": 21,
+              "line": 27,
               "character": 21
             }
           ]

@@ -1,9 +1,0 @@
-{
-  "include": ["node_modules/cypress", "./cypress/**/*.js"],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./*"]
-    }
-  }
-}
