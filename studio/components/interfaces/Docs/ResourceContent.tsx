@@ -231,49 +231,51 @@ const ResourceContent = ({
           </div>
         </>
       )}
-      <>
-        <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
-        <div className="doc-section">
-          <article className="text ">
-            <p>
-              Supabase provides realtime functionality and broadcasts database changes to authorized
-              users depending on Row Level Security (RLS) policies.
-            </p>
-            <p>
-              <a href="https://supabase.com/docs/reference/javascript/subscribe" target="_blank">
-                Learn more
-              </a>
-            </p>
-          </article>
-          <article className="code">
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeEq(
-                resourceMeta.camelCase,
-                resourceId,
-                'column_name',
-                'someValue'
-              )}
-            />
-          </article>
-        </div>
-      </>
+      {(methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
+        <>
+          <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
+          <div className="doc-section">
+            <article className="text ">
+              <p>
+                Supabase provides realtime functionality and broadcasts database changes to
+                authorized users depending on Row Level Security (RLS) policies.
+              </p>
+              <p>
+                <a href="https://supabase.com/docs/reference/javascript/subscribe" target="_blank">
+                  Learn more
+                </a>
+              </p>
+            </article>
+            <article className="code">
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeEq(
+                  resourceMeta.camelCase,
+                  resourceId,
+                  'column_name',
+                  'someValue'
+                )}
+              />
+            </article>
+          </div>
+        </>
+      )}
     </>
   )
 }
