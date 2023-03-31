@@ -240,7 +240,7 @@ const ColumnManagement: FC<Props> = ({
                   >
                     <span className="text-xs text-scale-1200">
                       Can either be a literal or an expression. When using an expression wrap your
-                      expression in brackets e.g (e.g uuid_generate_v4())
+                      expression in brackets (e.g uuid_generate_v4())
                     </span>
                   </div>
                 </Tooltip.Content>
