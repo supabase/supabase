@@ -30,7 +30,7 @@ const home = [
     {
       label: 'Auth',
       icon: '/img/icons/menu/auth',
-      href: '/guides/auth/overview',
+      href: '/guides/auth',
       level: 'auth',
     },
     {

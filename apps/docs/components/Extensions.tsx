@@ -94,8 +94,15 @@ export default function Extensions() {
                 filters.length === 0 ? x : x.tags.some((item) => filters.includes(item))
               )
               .map((extension) => (
-                <Link passHref href={`/guides/database/extensions/${extension.name}`}>
-                  <a target="_blank" className="no-underline">
+                <Link
+                  passHref
+                  href={`${
+                    extension.link
+                      ? `/guides/database/extensions/${extension.name}`
+                      : '/guides/database/extensions#full-list-of-extensions'
+                  }`}
+                >
+                  <a target={`${extension.link ? '_blank' : '_self'}`} className="no-underline">
                     <GlassPanel title={extension.name} background={false} key={extension.name}>
                       <p className="mt-4">
                         {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}

@@ -2,8 +2,8 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
+import { serve } from 'std/server'
+import { Redis } from 'upstash_redis'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 

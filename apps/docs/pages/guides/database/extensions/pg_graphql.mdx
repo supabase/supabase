@@ -54,8 +54,8 @@ Given a table
 ```sql
 create table "Blog"(
   id serial primary key,
-  name varchar(255) not null,
-  description varchar(255),
+  name text not null,
+  description text,
 );
 
 insert into "Blog"(name)

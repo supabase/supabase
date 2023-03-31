@@ -42,7 +42,7 @@ const NavigationBar: FC<Props> = ({}) => {
         <Link href="/projects">
           <a className="block">
             <img
-              src="/img/supabase-logo.svg"
+              src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
               className="mx-auto h-[40px] w-6 cursor-pointer rounded"
             />

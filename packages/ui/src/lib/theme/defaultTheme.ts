@@ -123,7 +123,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -187,7 +187,11 @@ export default {
     chevron: {
       base: `
         text-scale-900
-        rotate-0 group-state-open:rotate-180
+        rotate-0
+        group-state-open:rotate-180
+        group-data-[state=open]:rotate-180
+        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        transition-transform duration-300
         duration-200
       `,
       align: {
@@ -968,6 +972,7 @@ export default {
 
   sidepanel: {
     base: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
@@ -998,6 +1003,7 @@ export default {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
       xlarge: `w-screen max-w-3xl h-full`,
+      xxlarge: `w-screen max-w-4xl h-full`,
     },
     align: {
       left: `
@@ -1018,6 +1024,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1205,12 +1212,12 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1292,6 +1299,7 @@ export default {
 
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1464,6 +1472,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1475,13 +1484,13 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-40
       fixed
       inset-0
       grid
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
     `,
     separator: `
       w-full

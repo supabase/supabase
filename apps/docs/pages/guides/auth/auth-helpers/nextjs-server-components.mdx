@@ -10,6 +10,15 @@ export const meta = {
 
 This submodule provides experimental convenience helpers for implementing user authentication in Next.js Server Components - the `app` directory. For examples using the `pages` directory check out [Auth Helpers in Next.js](/docs/guides/auth/auth-helpers/nextjs).
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Bh1TOpOcGJQ"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 > For a complete implementation example, check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components).
 
 > To learn more about fetching and caching Supabase data with Next.js 13 Server Components, check out our [blog](/blog/fetching-and-caching-supabase-data-in-next-js-server-components) or [live stream](https://www.youtube.com/watch?v=QH0P5xZt5wY).
@@ -149,7 +158,7 @@ import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
 import type { NextRequest } from 'next/server'
-import type { Database } from '../lib/database.types'
+import type { Database } from './lib/database.types'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -246,7 +255,9 @@ export default function SupabaseProvider({ children }) {
   const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.access_token !== accessToken) {
         router.refresh()
       }
@@ -297,11 +308,11 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
 }
 
 export const useSupabase = () => {
-  let context = useContext(Context);
+  let context = useContext(Context)
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider')
   } else {
-    return context;
+    return context
   }
 }
 ```
@@ -506,7 +517,7 @@ import { useSupabase } from './supabase-provider'
 
 // Supabase auth needs to be triggered client-side
 export default function Login() {
-  const { supabase, session } = useSupabase()
+  const { supabase } = useSupabase()
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
@@ -546,7 +557,7 @@ import { useSupabase } from './supabase-provider'
 
 // Supabase auth needs to be triggered client-side
 export default function Login() {
-  const { supabase, session } = useSupabase()
+  const { supabase } = useSupabase()
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
