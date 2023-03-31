@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 
 import { Project } from 'types'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 

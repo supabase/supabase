@@ -3,7 +3,8 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'

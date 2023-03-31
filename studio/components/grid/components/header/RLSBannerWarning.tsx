@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, Modal } from 'ui'
 import Link from 'next/link'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
@@ -29,7 +30,7 @@ export default function RLSBannerWarning() {
     <>
       {!isAcknowledged && !rlsEnabled && isPublicTable ? (
         <div>
-          <div className="text-center bg-amber-500 text-amber-900 text-xs py-2.5 flex items-center justify-center relative">
+          <div className="text-center bg-amber-500 text-amber-1100 dark:text-amber-900 text-xs py-2.5 flex items-center justify-center relative">
             <IconAlertCircle size={16} strokeWidth={2} />
             <span className="uppercase font-bold ml-2">Warning</span>: This table is publicly
             readable and writable.{' '}
@@ -41,7 +42,7 @@ export default function RLSBannerWarning() {
             <div className="ml-20 absolute right-2">
               <Button
                 type="outline"
-                className="text-white hover:text-scale-1200"
+                className="hover:text-scale-1200 text-amber-900 dark:text-amber-900 border border-amber-800"
                 onClick={() => setIsOpen(true)}
               >
                 Dismiss

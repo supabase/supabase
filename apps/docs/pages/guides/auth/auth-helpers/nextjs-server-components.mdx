@@ -255,7 +255,9 @@ export default function SupabaseProvider({ children }) {
   const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.access_token !== accessToken) {
         router.refresh()
       }
@@ -306,11 +308,11 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
 }
 
 export const useSupabase = () => {
-  let context = useContext(Context);
+  let context = useContext(Context)
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider')
   } else {
-    return context;
+    return context
   }
 }
 ```
@@ -515,7 +517,7 @@ import { useSupabase } from './supabase-provider'
 
 // Supabase auth needs to be triggered client-side
 export default function Login() {
-  const { supabase, session } = useSupabase()
+  const { supabase } = useSupabase()
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
@@ -555,7 +557,7 @@ import { useSupabase } from './supabase-provider'
 
 // Supabase auth needs to be triggered client-side
 export default function Login() {
-  const { supabase, session } = useSupabase()
+  const { supabase } = useSupabase()
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
