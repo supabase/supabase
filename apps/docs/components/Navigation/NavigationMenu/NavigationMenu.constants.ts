@@ -144,7 +144,7 @@ export const gettingstarted = {
 }
 
 export const cli = {
-  label: 'CLI',
+  title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli', items: [] },
     { name: 'Local Development', url: '/guides/cli/local-development', items: [] },
@@ -286,7 +286,7 @@ export const PhoneLoginsItems = [
 
 export const auth = {
   icon: 'auth',
-  label: 'Auth',
+  title: 'Auth',
   items: [
     {
       name: 'Overview',
@@ -377,7 +377,7 @@ export const auth = {
 
 export const database = {
   icon: 'database',
-  label: 'Database',
+  title: 'Database',
   url: '/guides/database',
   items: [
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres', items: [] },
@@ -551,8 +551,8 @@ export const database = {
 }
 
 export const api = {
-  icon: 'database',
-  label: 'Serverless APIs',
+  icon: 'reference',
+  title: 'Serverless APIs',
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
@@ -590,7 +590,7 @@ export const api = {
 
 export const functions = {
   icon: 'functions',
-  label: 'Edge Functions',
+  title: 'Edge Functions',
   url: '/guides/functions',
   items: [
     { name: 'Quickstart', url: '/guides/functions/quickstart', items: [] },
@@ -631,7 +631,7 @@ export const functions = {
 
 export const realtime = {
   icon: 'realtime',
-  label: 'Realtime',
+  title: 'Realtime',
   url: '/guides/realtime',
   items: [
     {
@@ -692,7 +692,7 @@ export const realtime = {
 
 export const storage = {
   icon: 'storage',
-  label: 'Storage',
+  title: 'Storage',
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage', items: [] },
@@ -724,7 +724,7 @@ export const supabase_cli = {
 
 export const platform = {
   icon: 'platform',
-  label: 'Platform',
+  title: 'Platform',
   url: '/guides/platform',
   items: [
     {
@@ -800,7 +800,7 @@ export const platform = {
 
 export const resources = {
   icon: 'resources',
-  label: 'Resources',
+  title: 'Resources',
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples', items: [] },
@@ -871,7 +871,7 @@ export const self_hosting = {
 }
 
 export const migrate = {
-  label: 'Migrate to Supabase',
+  title: 'Migrate to Supabase',
   url: '/guides/migrate',
   items: [
     { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth', items: [] },
@@ -884,7 +884,7 @@ export const migrate = {
 
 export const integrations = {
   icon: 'integrations',
-  label: 'Integrations',
+  title: 'Integrations',
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations', items: [] },
