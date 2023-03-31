@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore, useFlag, useParams } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

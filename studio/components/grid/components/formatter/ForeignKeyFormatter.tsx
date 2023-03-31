@@ -5,7 +5,8 @@ import { SupaRow } from '../../types'
 import { NullValue } from '../common'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconArrowRight } from 'ui'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 
 export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<SupaRow, unknown>>) => {
   const { ref, id } = useParams()

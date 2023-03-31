@@ -1,7 +1,8 @@
 import { FC, useState } from 'react'
 import { Alert, Button, Form, Input, Modal } from 'ui'
 
-import { useStore, useParams } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
 interface Props {

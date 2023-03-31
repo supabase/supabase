@@ -5,7 +5,8 @@ import { observer } from 'mobx-react-lite'
 import { IconCheck, IconClipboard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import Table from 'components/to-be-cleaned/Table'
 import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 
