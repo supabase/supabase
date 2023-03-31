@@ -19,6 +19,9 @@ export interface CommandMenuContextValue {
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
+
+  // Optional callback to save a generated SQL output
+  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -41,6 +44,7 @@ export interface CommandMenuProviderProps {
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: any) => React.ReactNode
+  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
 }
 
 const CommandMenuProvider = ({
@@ -48,6 +52,7 @@ const CommandMenuProvider = ({
   site,
   projectRef,
   MarkdownHandler,
+  onSaveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -77,6 +82,7 @@ const CommandMenuProvider = ({
         currentPage,
         site,
         MarkdownHandler,
+        onSaveGeneratedSQL,
       }}
     >
       {children}

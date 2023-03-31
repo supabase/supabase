@@ -32,11 +32,13 @@ import CommandMenuShortcuts from './CommandMenuShortcuts'
 import SearchOnlyItem from './SearchOnlyItem'
 import SearchableStudioItems from './SearchableStudioItems'
 import { COMMAND_ROUTES } from './Command.constants'
+import GenerateSQL from './GenerateSQL'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
   COMMAND_ROUTES.AI_ASK_ANYTHING,
   COMMAND_ROUTES.AI_RLS_POLICY,
+  COMMAND_ROUTES.GENERATE_SQL,
 ]
 
 const iconPicker: { [key: string]: React.ReactNode } = {
@@ -193,10 +195,22 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandGroup>
               )}
 
-              {site === 'studio' && (
+              {site === 'studio' && [
+                <CommandGroup heading="Experimental">
+                  <CommandItem
+                    forceMount
+                    type="command"
+                    onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
+                  >
+                    <AiIcon className="text-scale-1100" />
+                    <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
+                  </CommandItem>
+                </CommandGroup>,
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
-                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
+                    const itemUrl = (
+                      projectRef ? item.url.replace('_', projectRef) : item.url
+                    ).split('https://app.supabase.com')[1]
 
                     return (
                       <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
@@ -207,8 +221,8 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                       </CommandItem>
                     )
                   })}
-                </CommandGroup>
-              )}
+                </CommandGroup>,
+              ]}
 
               {/* <DashboardTableEditor /> */}
 
@@ -244,6 +258,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
           {currentPage === COMMAND_ROUTES.DOCS_SEARCH && <DocsSearch />}
+          {currentPage === COMMAND_ROUTES.GENERATE_SQL && <GenerateSQL />}
           {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
         </CommandList>
       </CommandDialog>
