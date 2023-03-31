@@ -215,7 +215,7 @@ final result = await client
 
 ### Search multiple columns
 
-To find all `books` where `description` or `title` contain the word `little` (there is no JavaScript and Dart frontend api for multiple columns search at this moment):
+To find all `books` where `description` or `title` contain the word `little` (you can used [computed columns](https://postgrest.org/en/stable/api.html#computed-virtual-columns) to concatenate multiple columns):
 
 <Tabs
   scrollable
