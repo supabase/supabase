@@ -5,7 +5,8 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 
 const DisplayApiSettings = () => {
