@@ -31,25 +31,25 @@ import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { StoreProvider, useParams } from 'hooks'
+import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
 
-import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
+import {
+  PortalToast,
+  RouteValidationWrapper,
+  AppBannerWrapper,
+  CommandMenuWrapper,
+} from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { CommandMenuProvider } from 'ui'
-
-import remarkGfm from 'remark-gfm'
-import ReactMarkdown from 'react-markdown'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -59,7 +59,6 @@ dayjs.extend(relativeTime)
 dart(Prism)
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const { ref } = useParams()
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
 
@@ -146,15 +145,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>
-                    <CommandMenuProvider
-                      site="studio"
-                      projectRef={ref}
-                      MarkdownHandler={({ ...props }) => (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={null} {...props} />
-                      )}
-                    >
+                    <CommandMenuWrapper>
                       <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-                    </CommandMenuProvider>
+                    </CommandMenuWrapper>
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
