@@ -3,7 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
 import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   PRICING_TIER_PRODUCT_IDS,
   TIME_PERIODS_INFRA,

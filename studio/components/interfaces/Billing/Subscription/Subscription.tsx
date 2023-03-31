@@ -5,7 +5,8 @@ import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, useParams } from 'hooks'
+import { checkPermissions, useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 

@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconLoader, IconAlertCircle } from 'ui'
 
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { ProjectUsage, NewProjectPanel } from 'components/interfaces/Home'
 import InformationBox from 'components/ui/InformationBox'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { SidePanel, IconBookOpen } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { GeneralContent, ResourceContent } from '../Docs'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
