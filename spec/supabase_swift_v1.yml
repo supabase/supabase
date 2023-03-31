@@ -364,7 +364,7 @@ functions:
 
       Filters can be used on `select()`, `update()`, and `delete()` queries.
 
-      If a Database function returns a table response, you can also apply filters.
+      If a database function returns a table response, you can also apply filters.
     examples:
       - id: applying-filters
         name: Applying Filters
@@ -1108,6 +1108,8 @@ functions:
 
   - id: range-lt
     title: rangeLt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is less than any element in range.
     examples:
       - id: with-select
         name: With `select()`
@@ -1120,9 +1122,49 @@ functions:
                   .rangeLt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-gt
     title: rangeGt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
+
+
     examples:
       - id: with-select
         name: With `select()`
@@ -1135,9 +1177,47 @@ functions:
                   .rangeGt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-gte
     title: rangeGte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is either contained in range or greater than any element in range.
     examples:
       - id: with-select
         name: With `select()`
@@ -1150,9 +1230,49 @@ functions:
                   .rangeGte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
+
 
   - id: range-lte
     title: rangeLte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.
+
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
@@ -1166,6 +1286,42 @@ functions:
                 .rangeLte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                 .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-adjacent
     title: rangeAdjacent()
@@ -1181,6 +1337,38 @@ functions:
                 .rangeAdjacent(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                 .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+
+        hideCodeBlock: true
 
   - id: overlaps
     title: overlaps()
@@ -1456,7 +1644,7 @@ functions:
       Filters work on the row level—they allows you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
-      change the format of the response (e.g., returning a CSV string).
+      change the format of the response (e.g. returning a CSV string).
 
       Modifiers must be specified after filters. Some modifiers only apply for
       queries that return rows (e.g., `select()` or `rpc()` on a function that
@@ -2005,7 +2193,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
@@ -2245,7 +2433,8 @@ functions:
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'removeChannel()'
     notes: |
-      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
+      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: removes-a-channel
         name: Remove a channel
