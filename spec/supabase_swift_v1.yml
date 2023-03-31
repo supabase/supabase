@@ -137,7 +137,7 @@ functions:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
+      This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - id: create-a-record
@@ -190,7 +190,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          let toUpdate = CountryModel(name: "Austrailia")
+          let toUpdate = CountryModel(name: "Australia")
           try await client.database
                           .from("countries")
                           .update(toUpdate)
@@ -201,7 +201,7 @@ functions:
         name: Update a record and return it
         code: |
           ```js
-          let toUpdate = CountryModel(name: "Austrailia")
+          let toUpdate = CountryModel(name: "Australia")
           try await client.database
                           .from("countries")
                           .update(toUpdate, returning: .representation)
@@ -1859,7 +1859,7 @@ functions:
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
