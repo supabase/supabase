@@ -10,7 +10,8 @@ import type {
   PostgresType,
 } from '@supabase/postgres-meta'
 
-import { useFlag, useParams, useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'

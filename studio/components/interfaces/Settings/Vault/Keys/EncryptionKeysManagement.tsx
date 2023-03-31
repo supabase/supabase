@@ -18,7 +18,8 @@ import {
   IconExternalLink,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Divider from 'components/ui/Divider'
 
 const DEFAULT_KEY_NAME = 'No description provided'

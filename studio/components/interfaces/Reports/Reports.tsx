@@ -16,7 +16,8 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
