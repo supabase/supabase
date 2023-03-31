@@ -18,7 +18,6 @@ import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml
 // @ts-expect-error
 import spec_swift_v1 from '~/../../spec/supabase_swift_v1.yml' assert { type: 'yml' }
 
-
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
 import cliCommonSections from '~/../../spec/common-cli-sections.json'
@@ -271,7 +270,7 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="swift"
         spec={spec_swift_v1}
-       />
+      />
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}
         id={'reference_python_v2'}
