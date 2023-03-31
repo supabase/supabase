@@ -223,7 +223,7 @@ const DocsSearch = () => {
             </CommandGroup>
           )
         })}
-      {!results && !hasSearchError && (
+      {!results && !hasSearchError && !isLoading && (
         <CommandGroup forceMount>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
@@ -253,7 +253,7 @@ const DocsSearch = () => {
         </div>
       )}
       {results && results.length === 0 && (
-        <div className="p-6 flex flex-col items-center gap-6 mt-4">
+        <div className="p-6 flex flex-col items-center gap-6 mt-4 text-scale-1100">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">No results found.</p>
           <Button size="tiny" type="secondary" onClick={handleResetPrompt}>

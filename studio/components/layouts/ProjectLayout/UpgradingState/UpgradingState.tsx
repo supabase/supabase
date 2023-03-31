@@ -15,7 +15,8 @@ import {
 } from 'ui'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'

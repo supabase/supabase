@@ -260,6 +260,10 @@ export const auth = {
       url: '/guides/auth',
     },
     {
+      name: 'Quickstarts',
+      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+    },
+    {
       name: 'Authentication',
       url: undefined,
       items: [
@@ -604,6 +608,11 @@ export const realtime = {
           url: '/guides/realtime/subscribing-to-database-changes',
         },
         {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
+        },
+        {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
         },
@@ -851,7 +860,6 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'Dashibase', url: '/guides/integrations/dashibase' },
         { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },

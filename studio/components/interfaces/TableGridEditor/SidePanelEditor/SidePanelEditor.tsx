@@ -269,6 +269,7 @@ const SidePanelEditor = ({
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),
+        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)

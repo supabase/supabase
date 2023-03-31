@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, Modal } from 'ui'
 import Link from 'next/link'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
 

@@ -1,18 +1,18 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { ThemeProvider } from 'common/Providers'
+import { AuthProvider, ThemeProvider } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { AppPropsWithLayout } from 'types'
-// import { CommandMenuProvider } from 'ui'
+import { CommandMenuProvider } from 'ui'
+import components from '~/components'
 import Favicons from '~/components/Favicons'
-import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
-import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
@@ -61,32 +61,33 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const SITE_TITLE = 'Supabase Documentation'
 
+  const AuthContainer = (props) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
+
   return (
     <>
       <Favicons />
-      {IS_PLATFORM || LOCAL_SUPABASE ? (
-        <SessionContextProvider supabaseClient={supabase}>
-          <ThemeProvider>
-            <SearchProvider>
-              {/* <CommandMenuProvider site="docs"> */}
-              <SiteLayout>
-                <Component {...pageProps} />
-              </SiteLayout>
-              {/* </CommandMenuProvider> */}
-            </SearchProvider>
-          </ThemeProvider>
-        </SessionContextProvider>
-      ) : (
+      <AuthContainer>
         <ThemeProvider>
-          <SearchProvider>
-            {/* <CommandMenuProvider site="docs"> */}
+          <CommandMenuProvider
+            site="docs"
+            MarkdownHandler={({ ...props }) => (
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
+            )}
+          >
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
-            {/* </CommandMenuProvider> */}
-          </SearchProvider>
+          </CommandMenuProvider>
         </ThemeProvider>
-      )}
+      </AuthContainer>
     </>
   )
 }

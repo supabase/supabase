@@ -4,7 +4,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { FormPanel, FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -86,7 +87,7 @@ const NetworkRestrictions = ({}) => {
   const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
-  const restrictedIps = data?.config.dbAllowedCidrs ?? []
+  const restrictedIps = data?.config?.dbAllowedCidrs ?? []
   const restrictionStatus = data?.status ?? ''
 
   const hasApplyError = restrictedIps.length === 0 && restrictionStatus === 'stored'
