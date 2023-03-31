@@ -131,9 +131,7 @@ if (refreshToken && accessToken) {
     refresh_token: refreshToken,
     access_token: accessToken,
     {
-      auth: {
-        persistSession: false,
-      },
+      auth: { persistSession: false },
     }
   })
 } else {
