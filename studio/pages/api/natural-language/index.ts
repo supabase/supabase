@@ -31,10 +31,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
         : ''
     }
 
-    Generate a SQL query based on the following natural language prompt:
+    Generate a Postgres SQL query based on the following natural language prompt:
     ${query}
 
-    SQL query:
+    Postgres SQL query:
   `
 
   const completionOptions = {
