@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal, Toggle } from 'ui'
+import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import Telemetry from 'lib/telemetry'
