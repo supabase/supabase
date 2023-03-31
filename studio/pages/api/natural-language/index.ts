@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handlePost(req, res)
     default:
       res.setHeader('Allow', ['POST'])
-      res.status(405).json({ error: { message: `Method ${method} Not Allowed` } })
+      return res.status(405).json({ error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
@@ -51,14 +51,14 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     },
   })
 
-  const {
-    id,
-    choices: [{ text }],
-  } = response
-
   if (response.error) {
+    console.log('ERROR', response)
     return res.status(400).json({ error: response.error })
   } else {
+    const {
+      id,
+      choices: [{ text }],
+    } = response
     return res.status(200).json({ id, text })
   }
 }

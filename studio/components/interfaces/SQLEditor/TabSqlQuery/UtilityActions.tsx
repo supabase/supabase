@@ -91,7 +91,7 @@ const UtilityActions = ({ updateSqlSnippet }: UtilityActionsProps) => {
           <SizeToggleButton />
         </div>
         <div className="flex items-center space-x-2">
-          {enableSQLAI && (
+          {IS_PLATFORM && enableSQLAI && (
             <Button
               type="default"
               icon={<AiIcon className="text-scale-1100 w-4 h-4" />}

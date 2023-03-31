@@ -1,6 +1,6 @@
 import { stripIndent } from 'common-tags'
 import { useState, useEffect, useRef } from 'react'
-import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal } from 'ui'
+import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import Telemetry from 'lib/telemetry'
@@ -99,6 +99,7 @@ ${output}
 
     if (response.error) {
       ui.setNotification({ category: 'error', message: 'Failed to generate SQL' })
+      setOutputs(outputs.concat('Failed to generate SQL'))
     } else {
       setOutputs(outputs.concat(response.text))
 
@@ -183,6 +184,12 @@ ${output}
                     Clear conversation
                   </Button>
                 )}
+              </div>
+              <div className="px-5 pt-2">
+                <Toggle
+                  label="Allow us to send your database structure to OpenAI when sending prompt"
+                  descriptionText="This will allow us to generate queries which are more accurate and relevant to your project"
+                />
               </div>
               {prompts.length === 0 && (
                 <div className="space-y-2 mt-4 mb-6">
