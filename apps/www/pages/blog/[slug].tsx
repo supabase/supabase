@@ -320,7 +320,7 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  <div className="space-y-8 lg:sticky lg:top-16 lg:mb-16">
+                  <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">

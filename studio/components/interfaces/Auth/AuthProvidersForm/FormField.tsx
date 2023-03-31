@@ -103,7 +103,17 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
           name={name}
           disabled={disabled}
           label={properties.title}
-          descriptionText={properties.description}
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown
+                unwrapDisallowed
+                disallowedElements={['p']}
+                className="form-field-markdown"
+              >
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
         />
       )
 
@@ -114,7 +124,17 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
           name={name}
           disabled={disabled}
           label={properties.title}
-          descriptionText={properties.description}
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown
+                unwrapDisallowed
+                disallowedElements={['p']}
+                className="form-field-markdown"
+              >
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
           defaultValue={properties.enum[0]}
         >
           {properties.enum.map((option: Enum) => {

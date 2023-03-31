@@ -80,6 +80,7 @@ export const menuItems: NavMenu = {
       label: 'Auth',
       items: [
         { name: 'Overview', url: '/guides/auth', items: [] },
+        { name: 'Quickstarts', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'Authentication',
           url: undefined,
@@ -276,6 +277,11 @@ export const menuItems: NavMenu = {
               items: [],
             },
             {
+              name: 'Bring Your Own Database',
+              url: '/guides/realtime/bring-your-own-database',
+              items: [],
+            },
+            {
               name: 'Using Realtime with Next.js',
               url: '/guides/realtime/realtime-with-nextjs',
               items: [],
@@ -382,7 +388,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Appsmith', url: '/guides/integrations/appsmith', items: [] },
-            { name: 'Dashibase', url: '/guides/integrations/dashibase', items: [] },
             { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },

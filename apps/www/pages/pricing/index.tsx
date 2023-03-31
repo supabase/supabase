@@ -178,9 +178,11 @@ export default function IndexPage() {
         </div>
         <p className="p">{description}</p>
         <Link href="https://app.supabase.com" passHref>
-          <Button as="a" size="medium" block>
-            Get started
-          </Button>
+          <a>
+            <Button size="medium" block>
+              Get started
+            </Button>
+          </a>
         </Link>
       </div>
     )

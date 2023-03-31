@@ -12,7 +12,8 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'
@@ -79,6 +80,10 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
           {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+            const selectedVersion = (data?.target_upgrade_versions ?? []).find(
+              (x) => x.postgres_version === values.version
+            )
+
             return (
               <>
                 <div className="py-6">
@@ -130,7 +135,10 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                         id="version"
                         name="version"
                         label="Select the version of Postgres to upgrade to"
-                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${values.version}`}
+                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${
+                          selectedVersion?.app_version?.split('supabase-postgres-')[1] ??
+                          values.version
+                        }`}
                       >
                         {data?.target_upgrade_versions.map((version) => (
                           <Listbox.Option
