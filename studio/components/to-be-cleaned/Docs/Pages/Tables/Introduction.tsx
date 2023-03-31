@@ -1,10 +1,8 @@
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import Link from 'next/link'
-import { Button, IconDownload, IconExternalLink } from 'ui'
-import { useParams, useStore } from 'hooks'
-import { API_ADMIN_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { useParams } from 'hooks'
 import CodeSnippet from '../../CodeSnippet'
+import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
 
 interface Props {
   selectedLang: string
@@ -12,35 +10,6 @@ interface Props {
 
 const Introduction: FC<Props> = ({ selectedLang }) => {
   const { ref } = useParams()
-  const { ui } = useStore()
-  const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
-
-  const generateTypes = async () => {
-    setIsGeneratingTypes(true)
-    const res = await get(`${API_ADMIN_URL}/projects/${ref}/types/typescript`)
-
-    if (!res.error) {
-      let element = document.createElement('a')
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
-      element.setAttribute('download', 'supabase.ts')
-      element.style.display = 'none'
-      document.body.appendChild(element)
-      element.click()
-      document.body.removeChild(element)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully generated types! File is being downloaded`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to generate types: ${res.error.message}`,
-        error: res.error,
-      })
-    }
-
-    setIsGeneratingTypes(false)
-  }
 
   return (
     <>
@@ -65,48 +34,7 @@ const Introduction: FC<Props> = ({ selectedLang }) => {
         <article className="code"></article>
       </div>
 
-      <h2 className="doc-heading flex items-center justify-between">
-        <span>Generating types</span>
-        <Link href="https://supabase.com/docs/guides/database/api/generating-types">
-          <a target="_blank">
-            <Button type="default" icon={<IconExternalLink />}>
-              Documentation
-            </Button>
-          </a>
-        </Link>
-      </h2>
-      <div className="doc-section">
-        <article className="text ">
-          <p>
-            Supabase APIs are generated from your database, which means that we can use database
-            introspection to generate type-safe API definitions.
-          </p>
-          <p>
-            You can generate types from your database either through the{' '}
-            <Link href="https://supabase.com/docs/guides/database/api/generating-types">Supabase CLI</Link>,
-            or by downloading the types file via the button on the right and importing it in your
-            application within <code>src/index.ts</code>.
-          </p>
-        </article>
-        <article className={`code ${selectedLang === 'js' ? 'flex items-center' : ''}`}>
-          {selectedLang === 'js' && (
-            <Button
-              type="default"
-              disabled={isGeneratingTypes}
-              loading={isGeneratingTypes}
-              icon={<IconDownload strokeWidth={1.5} />}
-              onClick={generateTypes}
-            >
-              Generate and download types
-            </Button>
-          )}
-          <CodeSnippet selectedLang={selectedLang} snippet={localSnippets.cliLogin()} />
-          <CodeSnippet
-            selectedLang={selectedLang}
-            snippet={localSnippets.generateTypes(ref ?? '')}
-          />
-        </article>
-      </div>
+      <GeneratingTypes selectedLang={selectedLang} />
 
       <h2 className="doc-heading">
         GraphQL <span className="lowercase">vs</span> Supabase
@@ -141,22 +69,6 @@ const Introduction: FC<Props> = ({ selectedLang }) => {
 }
 
 const localSnippets = {
-  cliLogin: () => ({
-    title: 'Login via the CLI with your Personal Access Token',
-    bash: {
-      code: `
-npx supabase login
-`,
-    },
-  }),
-  generateTypes: (ref: string) => ({
-    title: 'Generate types',
-    bash: {
-      code: `
-npx supabase gen types typescript --project-id "${ref}" --schema public > types/supabase.ts
-`,
-    },
-  }),
   withApollo: () => ({
     title: 'With Apollo GraphQL',
     bash: {

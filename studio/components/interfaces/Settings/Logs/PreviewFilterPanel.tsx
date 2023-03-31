@@ -183,7 +183,7 @@ const PreviewFilterPanel: FC<Props> = ({
         <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
       </div>
 
-      <Button type="secondary" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
+      <Button type="default" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
         Explore via query
       </Button>
     </div>

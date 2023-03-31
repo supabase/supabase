@@ -9,7 +9,7 @@ Create a Redis database using the [Upstash Console](https://console.upstash.com/
 Select the `Global` type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file. You'll find them under **Details > REST API > .env**.
 
 ```bash
-cp supabase/functions/upstash-redis-counter/.env.example supabase/functions/upstash-redis-counter/.env
+cp supabase/.env.local.example supabase/.env.local
 ```
 
 ## Run locally
@@ -18,7 +18,7 @@ Make sure you have the latest version of the [Supabase CLI installed](https://su
 
 ```bash
 supabase start
-supabase functions serve upstash-redis-counter --no-verify-jwt --env-file supabase/functions/upstash-redis-counter/.env
+supabase functions serve --no-verify-jwt --env-file supabase/.env.local
 ```
 
 Navigate to http://localhost:54321/functions/v1/upstash-redis-counter.
@@ -27,5 +27,5 @@ Navigate to http://localhost:54321/functions/v1/upstash-redis-counter.
 
 ```bash
 supabase functions deploy upstash-redis-counter --no-verify-jwt
-supabase secrets set --env-file supabase/functions/upstash-redis-counter/.env
+supabase secrets set --env-file supabase/.env.local
 ```

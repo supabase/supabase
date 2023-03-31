@@ -52,7 +52,7 @@ export default [
     img: 'multiplayer-game.svg',
     title: 'Multiplayer games',
     description:
-      "Keep track of how long a player has been playing, who's turn it is and even share to other clients what the pllayer is doing.",
+      "Keep track of how long a player has been playing, who's turn it is and even share to other clients what the player is doing.",
   },
   {
     img: 'form-presence.svg',

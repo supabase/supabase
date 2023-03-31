@@ -23,22 +23,25 @@ import {
   LogTemplate,
   maybeShowUpgradePrompt,
   TEMPLATES,
+  useEditorHints,
 } from 'components/interfaces/Settings/Logs'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
+const PLACEHOLDER_QUERY =
+  'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 export const LogsExplorerPage: NextPageWithLayout = () => {
+  useEditorHints()
   const { ui, content } = useStore()
   const router = useRouter()
   const { ref: projectRef, q, ite, its } = useParams()
   const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [editorValue, setEditorValue] = useState<string>('')
+  const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
-
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(projectRef as string, {
       iso_timestamp_start: its ? (its as string) : undefined,

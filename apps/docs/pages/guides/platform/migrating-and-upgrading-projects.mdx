@@ -21,42 +21,41 @@ When you pause and restore a project, the restored database includes the latest 
 
 ## Migrate your project
 
-Migrating projects can be achieved using standard PostgreSQL tooling. This is particularly useful for older projects (e.g. to use a newer Postgres version).
+Migrating projects can be achieved using the Supabase CLI. This is particularly useful for older projects (e.g. to use a newer Postgres version).
 
 ### Before you begin
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
+- Install [Supabase CLI](https://supabase.com/docs/guides/cli#installation).
 - Create a new [Supabase project](https://app.supabase.com).
 - Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
 
-### Migrate the database
+### Backup your old database
 
-1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) in your new project if you enabled them in your old project.
-2. In your new project, enable all extensions that were enabled in your old project.
-3. Run the following command from your terminal:
+1. Run the following command from your terminal:
 
-```sh
-set -euo pipefail
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
+supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
+supabase db dump --db-url "$OLD_DB_URL" -f data.sql --data-only
+```
 
-pg_dump \
-  --clean \
-  --if-exists \
-  --quote-all-identifiers \
-  --exclude-table-data 'storage.objects' \
-  --exclude-schema 'extensions|graphql|graphql_public|net|pgbouncer|pgsodium|pgsodium_masks|realtime|supabase_functions|pg_toast|pg_catalog|information_schema' \
-  --schema '*' \
-  --dbname "$OLD_DB_URL" \
-| sed 's/^DROP SCHEMA IF EXISTS "auth";$/-- DROP SCHEMA IF EXISTS "auth";/' \
-| sed 's/^DROP SCHEMA IF EXISTS "storage";$/-- DROP SCHEMA IF EXISTS "storage";/' \
-| sed 's/^CREATE SCHEMA "auth";$/-- CREATE SCHEMA "auth";/' \
-| sed 's/^CREATE SCHEMA "storage";$/-- CREATE SCHEMA "storage";/' \
-| sed 's/^ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/-- ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/' \
-> dump.sql
+### Restore to your new project
 
+In your new project:
+
+1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) if you enabled them in your old project.
+2. Enable any [extensions](https://app.supabase.com/project/_/database/extensions) that were enabled in your old project.
+3. Create any [custom roles](https://app.supabase.com/project/_/database/roles) that were created in your old project.
+
+Then run the following command from your terminal:
+
+```bash
 psql \
   --single-transaction \
   --variable ON_ERROR_STOP=1 \
-  --file dump.sql \
+  --file schema.sql \
+  --file data.sql \
   --dbname "$NEW_DB_URL"
 ```
 
@@ -66,7 +65,7 @@ Replication for Realtime is disabled for all tables in your new project. On the 
 
 ### Migrate Storage objects
 
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.com](mailto:support@supabase.com).
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
 
 ```js
 // npm install @supabase/supabase-js@1

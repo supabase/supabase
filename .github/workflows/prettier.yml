@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
-      # disable this check while we migrate to monorepo
+        uses: actions/checkout@v3
       - name: Run prettier
-        uses: EPMatt/reviewdog-action-prettier@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          level: warning
-          command: npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
+        run: |-
+          npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
+        # [Joshen] Temp disable the following due to an issue
+        # https://github.com/EPMatt/reviewdog-action-prettier/issues/34
+        # uses: EPMatt/reviewdog-action-prettier@v1
+        # with:
+        #   github_token: ${{ secrets.github_token }}
+        #   reporter: github-pr-review
+        #   level: warning
+        #   command: npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
 
         # run: |-
         #   function run_check() {
@@ -38,11 +41,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run prettier
-        uses: EPMatt/reviewdog-action-prettier@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          level: warning
-          command: npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+        run: |-
+          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+        # uses: EPMatt/reviewdog-action-prettier@v1
+        # with:
+        #   github_token: ${{ secrets.github_token }}
+        #   reporter: github-pr-review
+        #   level: warning
+        #   command: npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+
+  format-sql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Install plugin
+        run: npm ci
+      - name: Run prettier
+        run: |-
+          # Check mdx files which contain sql code blocks
+          grep -lr '```sql' apps/docs/pages/**/*.mdx | xargs npx prettier -c
