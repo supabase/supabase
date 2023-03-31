@@ -11,6 +11,11 @@ module.exports = {
     '../src/components/Accordion/Accordion.stories.tsx',
     '../src/components/Alert/Alert.stories.tsx',
     '../src/components/Avatar/Avatar.stories.tsx',
+    '../src/components/Button/Button.stories.tsx',
+    '../src/components/Checkbox/Checkbox.stories.tsx',
+    '../src/components/Collapsible/Collapsible.stories.tsx',
+    '../src/components/ContextMenu/ContextMenu.stories.tsx',
+    '../src/components/Dropdown/Dropdown.stories.tsx',
   ],
   addons: [
     '@storybook/addon-links',
