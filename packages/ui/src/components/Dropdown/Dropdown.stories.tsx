@@ -236,88 +236,88 @@ export const SearchList = (args: any) => (
 
 SearchList.args = {}
 
-// export const Checkbox = (args: any) => {
-//   const [checked, setChecked] = useState(false)
+export const Checkbox = (args: any) => {
+  const [checked, setChecked] = useState(false)
 
-//   return (
-//     <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
-//       <Dropdown
-//         {...args}
-//         overlay={[
-//           <Dropdown.Item icon={<IconSettings size="small" />}>Account</Dropdown.Item>,
-//           <Dropdown.Item>Settings</Dropdown.Item>,
-//           <Dropdown.Separator />,
-//           <Dropdown.Checkbox checked={checked} onChange={setChecked}>
-//             Show subtitles
-//           </Dropdown.Checkbox>,
-//         ]}
-//       >
-//         <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-//           Click for dropdown
-//         </Button>
-//       </Dropdown>
-//     </div>
-//   )
-// }
+  return (
+    <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
+      <Dropdown
+        {...args}
+        overlay={[
+          <Dropdown.Item icon={<IconSettings size="small" />}>Account</Dropdown.Item>,
+          <Dropdown.Item>Settings</Dropdown.Item>,
+          <Dropdown.Separator />,
+          <Dropdown.Checkbox checked={checked} onChange={setChecked}>
+            Show subtitles
+          </Dropdown.Checkbox>,
+        ]}
+      >
+        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
+          Click for dropdown
+        </Button>
+      </Dropdown>
+    </div>
+  )
+}
 
-// export const Radio = (args: any) => {
-//   const [value, setValue] = useState('red')
+export const Radio = (args: any) => {
+  const [value, setValue] = useState('red')
 
-//   return (
-//     <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
-//       <Dropdown
-//         {...args}
-//         overlay={[
-//           <Dropdown.RadioGroup value={value} onChange={setValue}>
-//             <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
-//             <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
-//             <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
-//           </Dropdown.RadioGroup>,
-//         ]}
-//       >
-//         <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-//           Click for dropdown
-//         </Button>
-//       </Dropdown>
-//     </div>
-//   )
-// }
+  return (
+    <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
+      <Dropdown
+        {...args}
+        overlay={[
+          <Dropdown.RadioGroup value={value} onChange={setValue}>
+            <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
+            <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
+            <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
+          </Dropdown.RadioGroup>,
+        ]}
+      >
+        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
+          Click for dropdown
+        </Button>
+      </Dropdown>
+    </div>
+  )
+}
 
-// export const Nested = (args: any) => {
-//   const [value, setValue] = useState('red')
+export const Nested = (args: any) => {
+  const [value, setValue] = useState('red')
 
-//   return (
-//     <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
-//       <Dropdown
-//         {...args}
-//         overlay={
-//           <>
-//             <Dropdown.RadioGroup value={value} onChange={setValue}>
-//               <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
-//               <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
-//               <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
-//             </Dropdown.RadioGroup>
+  return (
+    <div style={{ margin: '0 auto', minHeight: '420px', marginTop: '220px' }}>
+      <Dropdown
+        {...args}
+        overlay={
+          <>
+            <Dropdown.RadioGroup value={value} onChange={setValue}>
+              <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
+              <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
+              <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
+            </Dropdown.RadioGroup>
 
-//             <Dropdown
-//               isNested
-//               overlay={[
-//                 <Dropdown.RadioGroup value={value} onChange={setValue}>
-//                   <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
-//                   <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
-//                   <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
-//                 </Dropdown.RadioGroup>,
-//               ]}
-//             >
-//               <Dropdown.TriggerItem>Open sub menu</Dropdown.TriggerItem>
-//             </Dropdown>
-//             <Dropdown.Item>hello</Dropdown.Item>
-//           </>
-//         }
-//       >
-//         <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-//           Click for dropdown
-//         </Button>
-//       </Dropdown>
-//     </div>
-//   )
-// }
+            <Dropdown
+              isNested
+              overlay={[
+                <Dropdown.RadioGroup value={value} onChange={setValue}>
+                  <Dropdown.Radio value={'red'}>Red</Dropdown.Radio>
+                  <Dropdown.Radio value={'blue'}>Blue</Dropdown.Radio>
+                  <Dropdown.Radio value={'green'}>Green</Dropdown.Radio>
+                </Dropdown.RadioGroup>,
+              ]}
+            >
+              <Dropdown.TriggerItem>Open sub menu</Dropdown.TriggerItem>
+            </Dropdown>
+            <Dropdown.Item>hello</Dropdown.Item>
+          </>
+        }
+      >
+        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
+          Click for dropdown
+        </Button>
+      </Dropdown>
+    </div>
+  )
+}
