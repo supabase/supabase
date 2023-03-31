@@ -143,7 +143,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
               href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
-                <Button as="a" type="default" iconRight={<IconCode />}>
+                <Button type="default" iconRight={<IconCode />}>
                   Examples
                 </Button>
               </a>

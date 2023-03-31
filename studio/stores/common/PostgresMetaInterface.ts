@@ -47,6 +47,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   state = this.STATES.INITIAL
   data: { [key in DataKeys]: T } = {}
   headers: any = {}
+  isInitialized: boolean = false
 
   constructor(
     rootStore: IRootStore,
@@ -68,6 +69,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       count: computed,
       hasError: computed,
       isLoading: computed,
+      isInitialized: observable,
       load: action,
       create: action,
       update: action,
@@ -90,10 +92,6 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
   }
 
-  get isInitialized() {
-    return this.state === this.STATES.LOADED || this.state === this.STATES.ERROR
-  }
-
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
@@ -114,6 +112,8 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       console.error('Load error message', e.message)
       this.setError(e)
       this.setState(ERROR)
+    } finally {
+      if (!this.isInitialized) this.isInitialized = true
     }
   }
 

@@ -102,39 +102,42 @@ const Column: FC<Props> = ({
               <IconLink size={14} strokeWidth={column.foreignKey !== undefined ? 2 : 1} />
             </Button>
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              {column.foreignKey === undefined ? (
-                <span className="text-xs text-scale-1200">Edit foreign key relation</span>
-              ) : (
-                <div>
-                  <p className="text-xs text-scale-1100">Foreign key relation:</p>
-                  <div className="flex items-center space-x-1">
-                    <p className="text-xs text-scale-1200">
-                      {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
-                      {column.foreignKey.source_column_name}
-                    </p>
-                    <IconArrowRight size="tiny" strokeWidth={1.5} />
-                    <p className="text-xs text-scale-1200">
-                      {column.foreignKey.target_table_schema}.{column.foreignKey.target_table_name}.
-                      {column.foreignKey.target_column_name}
-                    </p>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                {column.foreignKey === undefined ? (
+                  <span className="text-xs text-scale-1200">Edit foreign key relation</span>
+                ) : (
+                  <div>
+                    <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                    <div className="flex items-center space-x-1">
+                      <p className="text-xs text-scale-1200">
+                        {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
+                        {column.foreignKey.source_column_name}
+                      </p>
+                      <IconArrowRight size="tiny" strokeWidth={1.5} />
+                      <p className="text-xs text-scale-1200">
+                        {column.foreignKey.target_table_schema}.
+                        {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
+                      </p>
+                    </div>
+                    {column.foreignKey.deletion_action !==
+                      FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                      <p className="text-xs text-scale-1200 mt-1">
+                        On delete: {getForeignKeyDeletionAction(column.foreignKey.deletion_action)}
+                      </p>
+                    )}
                   </div>
-                  {column.foreignKey.deletion_action !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
-                    <p className="text-xs text-scale-1200 mt-1">
-                      On delete: {getForeignKeyDeletionAction(column.foreignKey.deletion_action)}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </Tooltip.Content>
+                )}
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </div>
       <div className="w-[25%]">
@@ -190,6 +193,7 @@ const Column: FC<Props> = ({
             <Popover
               size="xlarge"
               className="pointer-events-auto"
+              align="end"
               header={
                 <div className="flex items-center justify-center">
                   <h5 className="text-sm text-scale-1200">Extra options</h5>
