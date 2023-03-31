@@ -1,14 +1,7 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { includes } from 'lodash'
-import {
-  Button,
-  Dropdown,
-  IconEdit3,
-  IconFileText,
-  IconMoreVertical,
-  IconTrash,
-} from '@supabase/ui'
+import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -96,19 +89,21 @@ const FunctionList: FC<Props> = ({
                   <Tooltip.Trigger>
                     <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
                   </Tooltip.Trigger>
-                  <Tooltip.Content side="left">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                        'border-scale-200 border',
-                      ].join(' ')}
-                    >
-                      <span className="text-scale-1200 text-xs">
-                        You need additional permissions to update functions
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="left">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to update functions
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 </Tooltip.Root>
               )}
             </div>

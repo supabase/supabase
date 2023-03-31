@@ -110,7 +110,7 @@ export const filterSensitiveProjectProps = (project: any) => {
 }
 
 /**
- * Returns undefine if the string isn't parse-able
+ * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
@@ -120,7 +120,7 @@ export const tryParseInt = (str: string) => {
   }
 }
 
-// Used as checker for memoised components
+// Used as checker for memoized components
 export const propsAreEqual = (prevProps: any, nextProps: any) => {
   try {
     Object.keys(prevProps).forEach((key) => {
@@ -168,31 +168,33 @@ export async function passwordStrength(value: string) {
   let strength = 0
 
   if (value && value !== '') {
-    if(value.length > 99){
+    if (value.length > 99) {
       message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
       warning = `Password should be less than 100 characters`
     } else {
-    const response = await post(`${API_URL}/profile/password-check`, { password: value })
-    if (!response.error) {
-      const { result } = response
-      const score = (PASSWORD_STRENGTH as any)[result.score]
-      const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
+      const response = await post(`${API_URL}/profile/password-check`, { password: value })
+      if (!response.error) {
+        const { result } = response
+        const score = (PASSWORD_STRENGTH as any)[result.score]
+        const suggestions = result.feedback?.suggestions
+          ? result.feedback.suggestions.join(' ')
+          : ''
 
-      // set message :string
-      message = `${score} ${suggestions}`
+        // set message :string
+        message = `${score} ${suggestions}`
 
-      // set strength :number
-      strength = result.score
+        // set strength :number
+        strength = result.score
 
-      // warning message for anything below 4 strength :string
-      if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-        warning = `${
-          result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-        } You need a stronger password.`
+        // warning message for anything below 4 strength :string
+        if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+          warning = `${
+            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
+          } You need a stronger password.`
+        }
       }
     }
   }
-}
 
   return {
     message,

@@ -5,8 +5,10 @@ const supabaseUrl = 'https://project.supabase.co'
 const supabaseAnonKey = 'your-anon-key'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  localStorage: AsyncStorage as any,
-  autoRefreshToken: true,
-  persistSession: true,
-  detectSessionInUrl: false,
+  auth: {
+    storage: AsyncStorage as any,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
 })

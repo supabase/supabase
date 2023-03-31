@@ -1,4 +1,6 @@
+import InformationBox from 'components/ui/InformationBox'
 import { FC } from 'react'
+import { IconAlertCircle } from 'ui'
 
 interface Props {
   id: string | number
@@ -7,7 +9,12 @@ interface Props {
 const NotFoundState: FC<Props> = ({ id }) => {
   return (
     <div className="flex items-center justify-center h-full">
-      <p>Oops! Unable to find your table with the ID {id}</p>
+      <div className="w-[400px]">
+        <InformationBox
+          icon={<IconAlertCircle strokeWidth={2} />}
+          title={`Unable to find your table with ID ${id}`}
+        />
+      </div>
     </div>
   )
 }

@@ -12,9 +12,9 @@
 - [x] ホスティングされた Postgres データベース [Docs](https://supabase.com/docs/guides/database)
 - [x] 認証・認可 [Docs](https://supabase.com/docs/guides/auth)
 - [x] API を自動生成
-  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] 関数
   - [x] データベース関数 [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 詳しいドキュメントは[supabase.com/docs](https://supabase.com/docs)をご覧ください。
 
-コントリビュート方法は[Getting Started](./DEVELOPERS.md)をご覧ください。
+コントリビュート方法は[Getting Started](../DEVELOPERS.md)をご覧ください。
 
 ## コミュニティとサポート
 
@@ -119,8 +119,8 @@ Supabase クライアントライブラリはモジュール化されていま�
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

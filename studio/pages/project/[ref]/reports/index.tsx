@@ -4,28 +4,30 @@ import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { checkPermissions, useFlag, useParams, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import { useProfileQuery } from 'data/profile/profile-query'
 import Loading from 'components/ui/Loading'
-import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
+import { ReportsLayout } from 'components/layouts'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
+  const { data: profile } = useProfileQuery()
   const { ui } = useStore()
   const project = ui.selectedProject
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   const kpsEnabled = useFlag('initWithKps')
@@ -52,7 +54,7 @@ export const UserReportPage: NextPageWithLayout = () => {
   }, [ref])
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl flex-grow space-y-16">
+    <div className="mx-auto my-32 w-full max-w-7xl flex-grow space-y-16">
       {loading ? (
         <Loading />
       ) : (
@@ -83,6 +85,6 @@ export const UserReportPage: NextPageWithLayout = () => {
   )
 }
 
-UserReportPage.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+UserReportPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
 export default observer(UserReportPage)

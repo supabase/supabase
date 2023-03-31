@@ -7,15 +7,19 @@ import {
   IconList,
   IconSettings,
   IconUsers,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 
 import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { SHOW_O11Y } from 'components/interfaces/Settings/Logs'
 
-export const generateProductRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
   const buildingUrl = `/project/${ref}/building`
 
   return [
@@ -24,46 +28,74 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       label: 'Table Editor',
       icon: (
         <SVG
-          src="/img/table-editor.svg"
+          src={`${BASE_PATH}/img/table-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/editor`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
     },
-    {
-      key: 'auth',
-      label: 'Authentication',
-      icon: <IconUsers size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`,
-    },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'storage',
-            label: 'Storage',
-            icon: <IconArchive size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
-          },
-        ]
-      : []),
     {
       key: 'sql',
       label: 'SQL Editor',
       icon: (
         <SVG
-          src="/img/sql-editor.svg"
+          src={`${BASE_PATH}/img/sql-editor.svg`}
           style={{ width: `${18}px`, height: `${18}px` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/sql`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
+  ]
+}
+export const generateProductRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
+  const buildingUrl = `/project/${ref}/building`
+
+  return [
     {
       key: 'database',
       label: 'Database',
       icon: <IconDatabase size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/database/tables`),
+    },
+    {
+      key: 'auth',
+      label: 'Authentication',
+      icon: <IconUsers size={18} strokeWidth={2} />,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/auth/users`),
+    },
+    {
+      key: 'storage',
+      label: 'Storage',
+      icon: <IconArchive size={18} strokeWidth={2} />,
+      link:
+        ref &&
+        (isProjectPaused
+          ? homeUrl
+          : isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/storage/buckets`),
     },
     ...(IS_PLATFORM
       ? [
@@ -71,51 +103,74 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
             key: 'functions',
             label: 'Edge Functions',
             icon: <IconCode size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/functions`),
           },
         ]
       : []),
   ]
 }
 
-export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
+  const isProjectPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const homeUrl = `/project/${ref}`
   const buildingUrl = `/project/${ref}/building`
 
   return [
     ...(IS_PLATFORM
       ? [
           {
-            key: 'logs-explorer',
-            label: 'Logs Explorer',
-            icon: <IconList size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`,
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
             key: 'reports',
             label: 'Reports',
             icon: <IconBarChart size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/reports`,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/reports`),
+          },
+        ]
+      : []),
+    ...(SHOW_O11Y
+      ? [
+          {
+            key: 'logs',
+            label: 'Logs',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link:
+              ref &&
+              (isProjectPaused
+                ? homeUrl
+                : isProjectBuilding
+                ? buildingUrl
+                : `/project/${ref}/logs/explorer`),
           },
         ]
       : []),
     {
       key: 'api',
-      label: 'API',
+      label: 'API Docs',
       icon: <IconFileText size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/api`,
+      link:
+        ref &&
+        (isProjectPaused ? homeUrl : isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
     ...(IS_PLATFORM
       ? [
           {
             key: 'settings',
-            label: 'Settings',
+            label: 'Project Settings',
             icon: <IconSettings size={18} strokeWidth={2} />,
-            link: `/project/${ref}/settings/general`,
+            link: ref && `/project/${ref}/settings/general`,
           },
         ]
       : []),

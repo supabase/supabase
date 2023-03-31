@@ -1,4 +1,4 @@
-import { Modal, IconChevronLeft } from '@supabase/ui'
+import { Modal, IconChevronLeft } from 'ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 
@@ -181,7 +181,7 @@ const StoragePoliciesEditPolicyModal = ({
           <div className="flex items-center space-x-3">
             <span
               onClick={onSelectBackFromTemplates}
-              className="text-scale-900 hover:text-scale-1200 cursor-pointer transition-colors"
+              className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>
@@ -192,7 +192,7 @@ const StoragePoliciesEditPolicyModal = ({
     }
     return (
       <div className="flex items-center space-x-3">
-        <h4 className="text-lg m-0">{getTitle()}</h4>
+        <h4 className="m-0 text-lg">{getTitle()}</h4>
       </div>
     )
   }

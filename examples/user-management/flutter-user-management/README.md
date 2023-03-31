@@ -1,62 +1,34 @@
 # Supabase Flutter User Management
 
-This example will set you up for a very common situation: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter  guide](https://supabase.io/docs/guides/with-flutter). 
 
-## Technologies used
+This repo will demonstrate how to:
+- sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
+- store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
+- store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
 
-- Frontend:
-  - [Flutter SDK](https://flutter.dev/) - Google's UI toolkit for crafting beautiful, natively compiled applications for mobile, web, and desktop from a single codebase.
-  - [supabase_flutter](https://pub.dev/packages/supabase_flutter) for user management and image storage uploading.
-- Backend:
-  - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with supabase_flutter.
+<img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
-## Build from scratch
+## Getting Started
 
-### 1. Create new project
+Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `main.dart`. 
 
-Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
+You can run this app on iOS, Android or the Web. 
 
-### 2. Run "User Management" Quickstart
+To run this application, simply run the following for iOS or Android
+```bash
+flutter run
+```
 
-Once your database has started, run the "User Management Starter" quickstart. Inside of your project, enter the `SQL editor` tab and scroll down until you see `User Management Starter: Set up a Public Profiles table which you can access with your API`.
+Or for web, run the following command to launch it on `localhost:3000`
+```bash
+flutter run -d web-server --web-hostname localhost --web-port 3000
+```
 
-### 3. Get the URL and Key
-
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
-
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
-
-![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
-
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
-
-### 4. Setup deeplink redirect urls
-
-Go to the Authentication Settings page (the user icon). Enter the flutter app redirect url below into `Additional Redirect URLs` field. Then click Save.
-
-> io.supabase.flutterdemo://login-callback
-
-![authentication settings page](https://user-images.githubusercontent.com/689843/124574731-f735c180-de74-11eb-8f50-2d34161261dd.png)
-
-### 5. Run the flutter application
-
-- Go to `lib/utils/constants.dart` file
-- Update `SUPABASE_URL` and `SUPABASE_ANNON_KEY` with your URL and Key
-- Run the application: `flutter run`
-
-## Supabase details
-
-### Postgres Row level security
-
-This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
-When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
-We can use these details to provide fine-grained control over what each user can and cannot do.
-
-This is a trimmed-down schema, with the policies:
+## Database Schema
 
 ```sql
--- Create a table for Public Profiles
+-- Create a table for public "profiles"
 create table profiles (
   id uuid references auth.users not null,
   updated_at timestamp with time zone,
@@ -101,14 +73,4 @@ create policy "Avatar images are publicly accessible."
 create policy "Anyone can upload an avatar."
   on storage.objects for insert
   with check ( bucket_id = 'avatars' );
-
-create policy "Anyone can update an avatar."
-  on storage.objects for update
-  with check ( bucket_id = 'avatars' );
 ```
-
-## Authors
-
-- [Supabase](https://supabase.com)
-
-Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
+import { IconRewind, Button } from 'ui'
 
 import {
   LogTable,
@@ -12,6 +12,7 @@ import {
   LogEventChart,
   Filters,
   ensureNoTimestampConflict,
+  maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
@@ -19,7 +20,10 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import { LOGS_TABLES } from './Logs.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from './UpgradePrompt'
+import { useParams } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 
 /**
  * Acts as a container component for the entire log display
@@ -46,15 +50,21 @@ export const LogsPreviewer: React.FC<Props> = ({
   tableName,
 }) => {
   const router = useRouter()
-  const { s, ite, its } = router.query
+  const { s, ite, its } = useParams()
   const [showChart, setShowChart] = useState(true)
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
+  const tier = subscription?.tier
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
-    { error, logData, params, newCount, filters, isLoading, eventChartData },
+    { error, logData, params, newCount, filters, isLoading, eventChartData, isLoadingOlder },
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
+
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+    params.iso_timestamp_start as string
+  )
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
@@ -66,6 +76,16 @@ export const LogsPreviewer: React.FC<Props> = ({
       }))
     }
   }, [s, ite, its])
+
+  // Show the prompt on page load based on query params
+  useEffect(() => {
+    if (its) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+    }
+  }, [its, tier])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -109,24 +129,30 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          its: from || '',
-          ite: to || '',
-        },
-      })
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      } else {
+        setParams((prev) => ({
+          ...prev,
+          iso_timestamp_start: from || '',
+          iso_timestamp_end: to || '',
+        }))
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            its: from || '',
+            ite: to || '',
+          },
+        })
+      }
     }
   }
 
   return (
-    <div className="h-full flex flex-col flex-grow">
+    <div className="flex flex-col flex-grow h-full">
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -141,7 +167,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         defaultFromValue={params.iso_timestamp_start}
         onExploreClick={() => {
           router.push(
-            `/project/${projectRef}/logs-explorer?q=${encodeURIComponent(
+            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
               params.sql || ''
             )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
               params.iso_timestamp_end || ''
@@ -160,8 +186,8 @@ export const LogsPreviewer: React.FC<Props> = ({
         className={
           'transition-all duration-500 ' +
           (showChart && !isLoading && logData.length > 0
-            ? 'opacity-100 h-24 pt-4 mb-4'
-            : 'opacity-0 h-0')
+            ? 'mb-4 h-24 pt-4 opacity-100'
+            : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
@@ -179,7 +205,7 @@ export const LogsPreviewer: React.FC<Props> = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col flex-grow relative pt-4">
+      <div className="relative flex flex-col flex-grow pt-4">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -194,11 +220,19 @@ export const LogsPreviewer: React.FC<Props> = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="p-2 flex flex-row justify-between">
-            <Button onClick={loadOlder} icon={<IconRewind />} type="default">
+          <div className="flex flex-row justify-between p-2">
+            <Button
+              onClick={loadOlder}
+              icon={<IconRewind />}
+              type="default"
+              loading={isLoadingOlder}
+              disabled={isLoadingOlder}
+            >
               Load older
             </Button>
-            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''} />
+            <div className="flex flex-row justify-end mt-2">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </div>
         )}
       </div>

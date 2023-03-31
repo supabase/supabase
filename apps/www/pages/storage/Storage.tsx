@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -155,7 +155,7 @@ function StoragePage() {
                   author_img={'https://avatars.githubusercontent.com/u/54469796'}
                   repo_name={'nextjs-ts-user-management'}
                   repo_url={
-                    'https://github.com/supabase/examples/tree/main/supabase-js-v1/user-management/nextjs-ts-user-management'
+                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management'
                   }
                   vercel_deploy_url={
                     'https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-mangement%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management'
@@ -187,6 +187,18 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from the edge to reduce latency."
                   />
+                  <Link href="/docs/guides/storage/cdn" passHref>
+                    <a>
+                      <Button
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        Explore docs
+                      </Button>
+                    </a>
+                  </Link>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
@@ -194,7 +206,18 @@ function StoragePage() {
                     title="Transformations"
                     text="Resize and compress your media before you serve it."
                   />
-                  <Badge>Coming soon</Badge>
+                  <Link href="/docs/guides/storage/image-transformations" passHref>
+                    <a>
+                      <Button
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        Explore docs
+                      </Button>
+                    </a>
+                  </Link>
                 </div>
               </div>,
             ]}
@@ -231,15 +254,16 @@ function StoragePage() {
                       </p>
 
                       <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <Button
-                          as="a"
-                          size="small"
-                          type="default"
-                          className="mt-4"
-                          icon={<IconArrowUpRight />}
-                        >
-                          Explore documentation
-                        </Button>
+                        <a>
+                          <Button
+                            size="small"
+                            type="default"
+                            className="mt-4"
+                            icon={<IconArrowUpRight />}
+                          >
+                            Explore documentation
+                          </Button>
+                        </a>
                       </Link>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">

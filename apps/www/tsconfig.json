@@ -4,6 +4,7 @@
     "paths": {
       "~/*": ["./*"]
     },
+    "downlevelIteration": true,
     "target": "es5",
     "module": "esnext",
     "jsx": "preserve",

@@ -1,4 +1,4 @@
-import { Dictionary } from './base'
+import { Dictionary, GridForeignKey } from './base'
 
 export interface SupaColumn {
   readonly dataType: string
@@ -12,9 +12,8 @@ export interface SupaColumn {
   readonly isGeneratable?: boolean
   readonly isNullable?: boolean
   readonly isUpdatable?: boolean
-  readonly targetTableSchema?: string | null
-  readonly targetTableName?: string | null
-  readonly targetColumnName?: string | null
+  readonly isEncrypted?: boolean
+  readonly foreignKey?: GridForeignKey
   position: number
 }
 

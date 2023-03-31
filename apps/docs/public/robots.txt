@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://supabase.com/docs/sitemap.xml

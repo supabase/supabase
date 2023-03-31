@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
-import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from '@supabase/ui'
+import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from 'ui'
 
 import Examples from '../../data/tweets/Tweets.json'
 import TweetCard from '../TweetCard'
@@ -37,28 +37,18 @@ function TwitterSocialProof() {
           </p>
           <div className="my-8 flex justify-center gap-2">
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
-              <Button
-                as="a"
-                // @ts-ignore
-                target="_blank"
-                size="small"
-                iconRight={<IconMessageCircle size={14} />}
-                type="default"
-              >
-                GitHub discussions
-              </Button>
+              <a target="_blank">
+                <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
+                  GitHub discussions
+                </Button>
+              </a>
             </Link>
             <Link href={'https://discord.supabase.com/'} passHref>
-              <Button
-                as="a"
-                type="default"
-                // @ts-ignore
-                target="_blank"
-                size="small"
-                iconRight={<IconMessageCircle size={14} />}
-              >
-                Discord
-              </Button>
+              <a target="_blank">
+                <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
+                  Discord
+                </Button>
+              </a>
             </Link>
           </div>
         </div>

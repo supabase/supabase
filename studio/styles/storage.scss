@@ -40,7 +40,9 @@
 // scroll-behavior: smooth;
 // }
 
-.storage-row:hover {
+.storage-row:hover,
+button[aria-haspopup='menu'][data-state='open'],
+button[aria-haspopup='menu']:focus-visible {
   .storage-row-menu {
     @apply opacity-100;
   }

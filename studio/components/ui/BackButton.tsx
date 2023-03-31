@@ -1,8 +1,8 @@
-import { Button, IconArrowLeft } from '@supabase/ui'
+import { Button, IconArrowLeft } from 'ui'
 
 export function BackButton({ onClick }: { onClick: () => void }) {
   return (
-    <div className="2xl:absolute 2xl:top-[2px] -ml-2 2xl:-left-24">
+    <div className="-ml-2 2xl:absolute 2xl:top-[2px] 2xl:left-0">
       <Button type="text" icon={<IconArrowLeft />} onClick={onClick}>
         Back
       </Button>

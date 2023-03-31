@@ -1,0 +1,265 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'quickstart',
+  title: 'Realtime Quickstart',
+  description: "Getting started with Realtime's Features",
+  sidebar_label: 'Quickstart',
+  video: 'https://www.youtube.com/v/BelYEMJ2N00',
+}
+
+Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres Changes using [Realtime](/docs/guides/realtime).
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/BelYEMJ2N00"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+## Install `supabase-js` Client
+
+```bash
+npm install @supabase/supabase-js
+```
+
+## Cursor Positions
+
+[Broadcast](/docs/guides/realtime/broadcast) allows a client to send messages and multiple clients to receive the messages. The broadcasted messages are ephemeral. They are not persisted to the database and are directly relayed through the Realtime servers. This is ideal for sending information like cursor positions where minimal latency is important, but persisting them is not.
+
+In [multiplayer.dev](https://multiplayer.dev), client's cursor positions are sent to other clients in the room. However, cursor positions will be randomly generated for this example.
+
+You need to get the public `anon` access token from your project's [API settings](https://app.supabase.com/project/_/settings/api). Then you can set up the Supabase client and start sending a client's cursor positions to other clients in channel `room1`:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient('https://your-project-ref.supabase.co', 'anon-key', {
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+})
+
+// Channel name can be any string.
+// Create channels with the same name for both the broadcasting and receiving clients.
+const channel = supabase.channel('room1')
+
+// Subscribe registers your client with the server
+channel.subscribe((status) => {
+  if (status === 'SUBSCRIBED') {
+    // now you can start broadcasting cursor positions
+    setInterval(() => {
+      channel.send({
+        type: 'broadcast',
+        event: 'cursor-pos',
+        payload: { x: Math.random(), y: Math.random() },
+      })
+      console.log(status)
+    }, 100)
+  }
+})
+```
+
+<Admonition type="info">
+
+JavaScript client has a default rate limit of 1 Realtime event every 100 milliseconds that's configured by `eventsPerSecond`.
+
+</Admonition>
+
+Another client can subscribe to channel `room1` and receive cursor positions:
+
+```js
+// Supabase client setup
+
+// Listen to broadcast messages.
+supabase
+  .channel('room1')
+  .on('broadcast', { event: 'cursor-pos' }, (payload) => console.log(payload))
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      // your callback function will now be called with the messages broadcast by the other client
+    }
+  })
+```
+
+<Admonition type="info">
+
+`type` must be `broadcast` and the `event` must match for clients subscribed to the channel.
+
+</Admonition>
+
+## Roundtrip Latency
+
+You can also configure the channel so that the server must return an acknowledgement that it received the `broadcast` message. This is useful if you want to measure the roundtrip latency:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('calc-latency', {
+  config: {
+    broadcast: { ack: true },
+  },
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const begin = performance.now()
+
+    await channel.send({
+      type: 'broadcast',
+      event: 'latency',
+      payload: {},
+    })
+
+    const end = performance.now()
+
+    console.log(`Latency is ${end - begin} milliseconds`)
+  }
+})
+```
+
+## Track and Display Which Users Are Online
+
+[Presence](/docs/guides/realtime/presence) stores and synchronize shared state across clients. The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when new clients join the channel and `leave` event is triggered when clients leave.
+
+Each client can use the channel's `track` method to store an object in shared state. Each client can only track one object, and if `track` is called again by the same client, then the new object overwrites the previously tracked object in the shared state. You can use one client to track and display users who are online:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('online-users', {
+  config: {
+    presence: {
+      key: 'user1',
+    },
+  },
+})
+
+channel.on('presence', { event: 'sync' }, () => {
+  console.log('Online users: ', channel.presenceState())
+})
+
+channel.on('presence', { event: 'join' }, ({ newPresences }) => {
+  console.log('New users have joined: ', newPresences)
+})
+
+channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
+  console.log('Users have left: ', leftPresences)
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const status = await channel.track({ online_at: new Date().toISOString() })
+    console.log(status)
+  }
+})
+```
+
+Then you can use another client to add another user to the channel's Presence state:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('online-users', {
+  config: {
+    presence: {
+      key: 'user2',
+    },
+  },
+})
+
+// Presence event handlers setup
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const status = await channel.track({ online_at: new Date().toISOString() })
+    console.log(status)
+  }
+})
+```
+
+If a channel is set up without a presence key, the server generates a random UUID. `type` must be `presence` and `event` must be either `sync`, `join`, or `leave`.
+
+## Insert and Receive Persisted Messages
+
+[Postgres Changes](/docs/guides/realtime#postgres-changes) enables your client to insert, update, or delete database records and send the changes to clients. Create a `messages` table to keep track of messages created by users in specific rooms:
+
+```sql
+create table messages (
+  id serial primary key,
+  message text,
+  user_id text,
+  room_id text,
+  created_at timestamptz default now()
+)
+
+alter table messages enable row level security;
+
+create policy "anon_ins_policy"
+ON messages
+for insert
+to anon
+with check (true);
+
+create policy "anon_sel_policy"
+ON messages
+for select
+to anon
+using (true);
+```
+
+If it doesn't already exist, create a `supabase_realtime` publication and add `messages` table to the publication:
+
+```sql
+begin;
+  -- remove the supabase_realtime publication
+  drop publication if exists supabase_realtime;
+
+  -- re-create the supabase_realtime publication with no tables and only for insert
+  create publication supabase_realtime with (publish = 'insert');
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table messages;
+```
+
+You can then have a client listen for changes on the `messages` table for a specific room and send and receive persisted messages:
+
+```js
+// Supabase client setup
+
+const channel = supabase.channel('db-messages')
+
+const roomId = 'room1'
+const userId = 'user1'
+
+channel.on(
+  'postgres_changes',
+  {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'messages',
+    filter: `room_id=eq.${roomId}`,
+  },
+  (payload) => console.log(payload)
+)
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const res = await supabase.from('messages').insert({
+      room_id: roomId,
+      user_id: userId,
+      message: 'Welcome to Realtime!',
+    })
+    console.log(res)
+  }
+})
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

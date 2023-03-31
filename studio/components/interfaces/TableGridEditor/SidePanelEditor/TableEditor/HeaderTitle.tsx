@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   schema: string

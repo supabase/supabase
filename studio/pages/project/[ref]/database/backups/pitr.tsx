@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconInfo, Tabs } from '@supabase/ui'
+import { Tabs } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -9,8 +8,10 @@ import { useStore, checkPermissions } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -19,10 +20,11 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-5 pt-12 pb-20">
-      <h3 className="text-scale-1200 text-xl">Backups</h3>
+      <h3 className="text-xl text-scale-1200">Backups</h3>
 
       <Tabs
         type="underlined"
+        size="small"
         activeId="pitr"
         onChange={(id: any) => {
           if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
@@ -48,6 +50,7 @@ const PITR = () => {
   const { configuration, error, isLoading } = backups
 
   const ref = ui.selectedProject?.ref ?? 'default'
+  const tier = ui.selectedProject?.subscription_tier
   const isEnabled = configuration.walg_enabled
 
   const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
@@ -55,21 +58,19 @@ const PITR = () => {
 
   if (isLoading) return <Loading />
   if (error) return <BackupsError />
-  if (!isEnabled)
+  if (!isEnabled) {
     return (
-      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
-        <div className="flex space-x-3">
-          <IconInfo size={20} strokeWidth={1.5} />
-          <p className="text-sm">
-            Point in time backups is an Enterprise feature. Reach out to us{' '}
-            <Link href={`/support/new?ref=${ref}&category=sales`}>
-              <a className="text-brand-900">here</a>
-            </Link>{' '}
-            if you're interested!
-          </p>
-        </div>
-      </div>
+      <UpgradeToPro
+        projectRef={ref}
+        primaryText="Point in time recovery is a Pro plan add-on."
+        secondaryText={
+          tier === PRICING_TIER_PRODUCT_IDS.FREE
+            ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+            : 'Please enable the add-on to enable point in time recovery for your project.'
+        }
+      />
     )
+  }
 
   return (
     <>

@@ -1,0 +1,4477 @@
+{
+  "produces": ["application/json"],
+  "schemes": ["http", "https"],
+  "swagger": "2.0",
+  "info": {
+    "description": "Documentation of the gotrue API.",
+    "title": "gotrue",
+    "version": "1.0.0"
+  },
+  "host": "localhost:9999",
+  "basePath": "/",
+  "paths": {
+    "/admin/generate_link": {
+      "post": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "Generates an email action link.",
+        "operationId": "admin-generate-link",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "Data"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "NewEmail"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "redirect_to": {
+                  "type": "string",
+                  "x-go-name": "RedirectTo"
+                },
+                "type": {
+                  "type": "string",
+                  "x-go-name": "Type"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The response object for generate link.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action_link": {
+                  "type": "string",
+                  "x-go-name": "ActionLink"
+                },
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "email_otp": {
+                  "type": "string",
+                  "x-go-name": "EmailOtp"
+                },
+                "hashed_token": {
+                  "type": "string",
+                  "x-go-name": "HashedToken"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "redirect_to": {
+                  "type": "string",
+                  "x-go-name": "RedirectTo"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "verification_type": {
+                  "type": "string",
+                  "x-go-name": "VerificationType"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      }
+    },
+    "/admin/user/{user_id}": {
+      "get": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "Get a user.",
+        "operationId": "admin-get-user",
+        "parameters": [
+          {
+            "description": "The user's id",
+            "name": "user_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "Update a user.",
+        "operationId": "admin-update-user",
+        "parameters": [
+          {
+            "description": "The user's id",
+            "name": "user_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "Deletes a user.",
+        "operationId": "admin-delete-user",
+        "parameters": [
+          {
+            "description": "The user's id",
+            "name": "user_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated user."
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "List all users.",
+        "operationId": "admin-list-users",
+        "responses": {
+          "200": {
+            "description": "The list of users.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "description": "User respresents a registered user with email/password authentication",
+                    "type": "object",
+                    "properties": {
+                      "app_metadata": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "aud": {
+                        "type": "string",
+                        "x-go-name": "Aud"
+                      },
+                      "banned_until": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "BannedUntil"
+                      },
+                      "confirmation_sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "ConfirmationSentAt"
+                      },
+                      "confirmed_at": {
+                        "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "ConfirmedAt"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "email": {
+                        "type": "string",
+                        "x-go-package": "github.com/netlify/gotrue/storage"
+                      },
+                      "email_change_sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "EmailChangeSentAt"
+                      },
+                      "email_confirmed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "EmailConfirmedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "ID"
+                      },
+                      "identities": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "created_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "x-go-name": "CreatedAt"
+                            },
+                            "id": {
+                              "type": "string",
+                              "x-go-name": "ID"
+                            },
+                            "identity_data": {
+                              "type": "object",
+                              "additionalProperties": {},
+                              "x-go-package": "github.com/netlify/gotrue/models"
+                            },
+                            "last_sign_in_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "x-go-name": "LastSignInAt"
+                            },
+                            "provider": {
+                              "type": "string",
+                              "x-go-name": "Provider"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "x-go-name": "UpdatedAt"
+                            },
+                            "user_id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "x-go-name": "UserID"
+                            }
+                          },
+                          "x-go-package": "github.com/netlify/gotrue/models"
+                        },
+                        "x-go-name": "Identities"
+                      },
+                      "invited_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "InvitedAt"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "new_email": {
+                        "type": "string",
+                        "x-go-name": "EmailChange"
+                      },
+                      "new_phone": {
+                        "type": "string",
+                        "x-go-name": "PhoneChange"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "x-go-package": "github.com/netlify/gotrue/storage"
+                      },
+                      "phone_change_sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "PhoneChangeSentAt"
+                      },
+                      "phone_confirmed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "PhoneConfirmedAt"
+                      },
+                      "reauthentication_sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "ReauthenticationSentAt"
+                      },
+                      "recovery_sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "RecoverySentAt"
+                      },
+                      "role": {
+                        "type": "string",
+                        "x-go-name": "Role"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_metadata": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Users"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["admin"],
+        "summary": "Returns the created user.",
+        "operationId": "admin-create-user",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "AppMetaData"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "ban_duration": {
+                  "type": "string",
+                  "x-go-name": "BanDuration"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "email_confirm": {
+                  "type": "boolean",
+                  "x-go-name": "EmailConfirm"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                },
+                "phone_confirm": {
+                  "type": "boolean",
+                  "x-go-name": "PhoneConfirm"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "UserMetaData"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      }
+    },
+    "/authorize": {
+      "get": {
+        "tags": ["oauth"],
+        "summary": "Redirects the user to the 3rd-party OAuth provider to start the OAuth1.0 or OAuth2.0 authentication process.",
+        "operationId": "authorize",
+        "parameters": [
+          {
+            "description": "The redirect url to return the user to after the `/callback` endpoint has completed.",
+            "name": "redirect_to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects user to the 3rd-party OAuth provider"
+          }
+        }
+      }
+    },
+    "/callback": {
+      "get": {
+        "tags": ["oauth"],
+        "summary": "Receives the redirect from an external provider during the OAuth authentication process. Starts the process of creating an access and refresh token.",
+        "operationId": "callback",
+        "responses": {
+          "302": {
+            "description": "Redirects user to the redirect url specified in `/authorize`. If no `redirect_url` is provided, the user will be redirected to the `SITE_URL`."
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "The healthcheck endpoint for gotrue. Returns the current gotrue version.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "x-go-name": "Description"
+                },
+                "name": {
+                  "type": "string",
+                  "x-go-name": "Name"
+                },
+                "version": {
+                  "type": "string",
+                  "x-go-name": "Version"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": ["invite"],
+        "summary": "Sends an invite link to the user.",
+        "operationId": "invite",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "InviteParams are the parameters the Signup endpoint accepts",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "Data"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["logout"],
+        "summary": "Logs out the user.",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/otp": {
+      "post": {
+        "tags": ["otp"],
+        "summary": "Passwordless sign-in method for email or phone.",
+        "operationId": "otp",
+        "parameters": [
+          {
+            "description": "Only an email or phone should be provided.",
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "OtpParams contains the request body params for the otp endpoint",
+              "type": "object",
+              "properties": {
+                "create_user": {
+                  "type": "boolean",
+                  "x-go-name": "CreateUser"
+                },
+                "data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "Data"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/recover": {
+      "post": {
+        "tags": ["recovery"],
+        "summary": "Sends a password recovery email link to the user's email.",
+        "operationId": "recovery",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "RecoverParams holds the parameters for a password recovery request",
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "tags": ["settings"],
+        "summary": "Returns the configuration settings for the gotrue server.",
+        "operationId": "settings",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "disable_signup": {
+                  "type": "boolean",
+                  "x-go-name": "DisableSignup"
+                },
+                "external": {
+                  "type": "object",
+                  "properties": {
+                    "apple": {
+                      "type": "boolean",
+                      "x-go-name": "Apple"
+                    },
+                    "azure": {
+                      "type": "boolean",
+                      "x-go-name": "Azure"
+                    },
+                    "bitbucket": {
+                      "type": "boolean",
+                      "x-go-name": "Bitbucket"
+                    },
+                    "discord": {
+                      "type": "boolean",
+                      "x-go-name": "Discord"
+                    },
+                    "email": {
+                      "type": "boolean",
+                      "x-go-name": "Email"
+                    },
+                    "facebook": {
+                      "type": "boolean",
+                      "x-go-name": "Facebook"
+                    },
+                    "github": {
+                      "type": "boolean",
+                      "x-go-name": "GitHub"
+                    },
+                    "gitlab": {
+                      "type": "boolean",
+                      "x-go-name": "GitLab"
+                    },
+                    "google": {
+                      "type": "boolean",
+                      "x-go-name": "Google"
+                    },
+                    "keycloak": {
+                      "type": "boolean",
+                      "x-go-name": "Keycloak"
+                    },
+                    "linkedin": {
+                      "type": "boolean",
+                      "x-go-name": "Linkedin"
+                    },
+                    "notion": {
+                      "type": "boolean",
+                      "x-go-name": "Notion"
+                    },
+                    "phone": {
+                      "type": "boolean",
+                      "x-go-name": "Phone"
+                    },
+                    "saml": {
+                      "type": "boolean",
+                      "x-go-name": "SAML"
+                    },
+                    "slack": {
+                      "type": "boolean",
+                      "x-go-name": "Slack"
+                    },
+                    "spotify": {
+                      "type": "boolean",
+                      "x-go-name": "Spotify"
+                    },
+                    "twitch": {
+                      "type": "boolean",
+                      "x-go-name": "Twitch"
+                    },
+                    "twitter": {
+                      "type": "boolean",
+                      "x-go-name": "Twitter"
+                    },
+                    "workos": {
+                      "type": "boolean",
+                      "x-go-name": "WorkOS"
+                    },
+                    "zoom": {
+                      "type": "boolean",
+                      "x-go-name": "Zoom"
+                    }
+                  },
+                  "x-go-package": "github.com/netlify/gotrue/api"
+                },
+                "mailer_autoconfirm": {
+                  "type": "boolean",
+                  "x-go-name": "MailerAutoconfirm"
+                },
+                "phone_autoconfirm": {
+                  "type": "boolean",
+                  "x-go-name": "PhoneAutoconfirm"
+                },
+                "sms_provider": {
+                  "type": "string",
+                  "x-go-name": "SmsProvider"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "tags": ["signup"],
+        "summary": "Password-based signup with either email or phone.",
+        "operationId": "signup",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "SignupParams are the parameters the Signup endpoint accepts",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "Data"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          }
+        }
+      }
+    },
+    "/token?grant_type=password": {
+      "post": {
+        "tags": ["token"],
+        "summary": "Signs in a user with a password.",
+        "operationId": "token-password",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "PasswordGrantParams are the parameters the ResourceOwnerPasswordGrant method accepts",
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "description": "AccessTokenResponse represents an OAuth2 success response",
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "x-go-name": "Token"
+                },
+                "expires_in": {
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "ExpiresIn"
+                },
+                "refresh_token": {
+                  "type": "string",
+                  "x-go-name": "RefreshToken"
+                },
+                "token_type": {
+                  "type": "string",
+                  "x-go-name": "TokenType"
+                },
+                "user": {
+                  "description": "User respresents a registered user with email/password authentication",
+                  "type": "object",
+                  "properties": {
+                    "app_metadata": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    },
+                    "aud": {
+                      "type": "string",
+                      "x-go-name": "Aud"
+                    },
+                    "banned_until": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "BannedUntil"
+                    },
+                    "confirmation_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ConfirmationSentAt"
+                    },
+                    "confirmed_at": {
+                      "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ConfirmedAt"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "CreatedAt"
+                    },
+                    "email": {
+                      "type": "string",
+                      "x-go-package": "github.com/netlify/gotrue/storage"
+                    },
+                    "email_change_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "EmailChangeSentAt"
+                    },
+                    "email_confirmed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "EmailConfirmedAt"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "x-go-name": "ID"
+                    },
+                    "identities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "CreatedAt"
+                          },
+                          "id": {
+                            "type": "string",
+                            "x-go-name": "ID"
+                          },
+                          "identity_data": {
+                            "type": "object",
+                            "additionalProperties": {},
+                            "x-go-package": "github.com/netlify/gotrue/models"
+                          },
+                          "last_sign_in_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "LastSignInAt"
+                          },
+                          "provider": {
+                            "type": "string",
+                            "x-go-name": "Provider"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "UpdatedAt"
+                          },
+                          "user_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "x-go-name": "UserID"
+                          }
+                        },
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "x-go-name": "Identities"
+                    },
+                    "invited_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "InvitedAt"
+                    },
+                    "last_sign_in_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "LastSignInAt"
+                    },
+                    "new_email": {
+                      "type": "string",
+                      "x-go-name": "EmailChange"
+                    },
+                    "new_phone": {
+                      "type": "string",
+                      "x-go-name": "PhoneChange"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "x-go-package": "github.com/netlify/gotrue/storage"
+                    },
+                    "phone_change_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "PhoneChangeSentAt"
+                    },
+                    "phone_confirmed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "PhoneConfirmedAt"
+                    },
+                    "reauthentication_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ReauthenticationSentAt"
+                    },
+                    "recovery_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "RecoverySentAt"
+                    },
+                    "role": {
+                      "type": "string",
+                      "x-go-name": "Role"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "UpdatedAt"
+                    },
+                    "user_metadata": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    }
+                  },
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        }
+      }
+    },
+    "/token?grant_type=refresh_token": {
+      "post": {
+        "tags": ["token"],
+        "summary": "Refreshes a user's refresh token.",
+        "operationId": "token-refresh",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "RefreshTokenGrantParams are the parameters the RefreshTokenGrant method accepts",
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "type": "string",
+                  "x-go-name": "RefreshToken"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "description": "AccessTokenResponse represents an OAuth2 success response",
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "x-go-name": "Token"
+                },
+                "expires_in": {
+                  "type": "integer",
+                  "format": "int64",
+                  "x-go-name": "ExpiresIn"
+                },
+                "refresh_token": {
+                  "type": "string",
+                  "x-go-name": "RefreshToken"
+                },
+                "token_type": {
+                  "type": "string",
+                  "x-go-name": "TokenType"
+                },
+                "user": {
+                  "description": "User respresents a registered user with email/password authentication",
+                  "type": "object",
+                  "properties": {
+                    "app_metadata": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    },
+                    "aud": {
+                      "type": "string",
+                      "x-go-name": "Aud"
+                    },
+                    "banned_until": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "BannedUntil"
+                    },
+                    "confirmation_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ConfirmationSentAt"
+                    },
+                    "confirmed_at": {
+                      "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ConfirmedAt"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "CreatedAt"
+                    },
+                    "email": {
+                      "type": "string",
+                      "x-go-package": "github.com/netlify/gotrue/storage"
+                    },
+                    "email_change_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "EmailChangeSentAt"
+                    },
+                    "email_confirmed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "EmailConfirmedAt"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "x-go-name": "ID"
+                    },
+                    "identities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "CreatedAt"
+                          },
+                          "id": {
+                            "type": "string",
+                            "x-go-name": "ID"
+                          },
+                          "identity_data": {
+                            "type": "object",
+                            "additionalProperties": {},
+                            "x-go-package": "github.com/netlify/gotrue/models"
+                          },
+                          "last_sign_in_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "LastSignInAt"
+                          },
+                          "provider": {
+                            "type": "string",
+                            "x-go-name": "Provider"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-go-name": "UpdatedAt"
+                          },
+                          "user_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "x-go-name": "UserID"
+                          }
+                        },
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "x-go-name": "Identities"
+                    },
+                    "invited_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "InvitedAt"
+                    },
+                    "last_sign_in_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "LastSignInAt"
+                    },
+                    "new_email": {
+                      "type": "string",
+                      "x-go-name": "EmailChange"
+                    },
+                    "new_phone": {
+                      "type": "string",
+                      "x-go-name": "PhoneChange"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "x-go-package": "github.com/netlify/gotrue/storage"
+                    },
+                    "phone_change_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "PhoneChangeSentAt"
+                    },
+                    "phone_confirmed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "PhoneConfirmedAt"
+                    },
+                    "reauthentication_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "ReauthenticationSentAt"
+                    },
+                    "recovery_sent_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "RecoverySentAt"
+                    },
+                    "role": {
+                      "type": "string",
+                      "x-go-name": "Role"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "UpdatedAt"
+                    },
+                    "user_metadata": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    }
+                  },
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["user"],
+        "summary": "Get information for the logged-in user.",
+        "operationId": "user-get",
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["user"],
+        "summary": "Returns the updated user.",
+        "operationId": "user-put",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "UserUpdateParams parameters for updating a user",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "AppData"
+                },
+                "data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-name": "Data"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "nonce": {
+                  "type": "string",
+                  "x-go-name": "Nonce"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "schema": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "401": {
+            "description": "This endpoint requires a bearer token."
+          }
+        }
+      }
+    },
+    "/verify": {
+      "get": {
+        "tags": ["verify"],
+        "summary": "Verifies a sign up.",
+        "operationId": "verify-get",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Token",
+            "name": "token",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Email",
+            "name": "email",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Phone",
+            "name": "phone",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "RedirectTo",
+            "name": "redirect_to",
+            "in": "query"
+          }
+        ]
+      },
+      "post": {
+        "tags": ["verify"],
+        "summary": "Verifies a sign up.",
+        "operationId": "verify-post",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "description": "VerifyParams are the parameters the Verify endpoint accepts",
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-name": "Phone"
+                },
+                "redirect_to": {
+                  "type": "string",
+                  "x-go-name": "RedirectTo"
+                },
+                "token": {
+                  "type": "string",
+                  "x-go-name": "Token"
+                },
+                "type": {
+                  "type": "string",
+                  "x-go-name": "Type"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/api"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AccessTokenResponse": {
+      "description": "AccessTokenResponse represents an OAuth2 success response",
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string",
+          "x-go-name": "Token"
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpiresIn"
+        },
+        "refresh_token": {
+          "type": "string",
+          "x-go-name": "RefreshToken"
+        },
+        "token_type": {
+          "type": "string",
+          "x-go-name": "TokenType"
+        },
+        "user": {
+          "description": "User respresents a registered user with email/password authentication",
+          "type": "object",
+          "properties": {
+            "app_metadata": {
+              "type": "object",
+              "additionalProperties": {},
+              "x-go-package": "github.com/netlify/gotrue/models"
+            },
+            "aud": {
+              "type": "string",
+              "x-go-name": "Aud"
+            },
+            "banned_until": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "BannedUntil"
+            },
+            "confirmation_sent_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "ConfirmationSentAt"
+            },
+            "confirmed_at": {
+              "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "ConfirmedAt"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "CreatedAt"
+            },
+            "email": {
+              "type": "string",
+              "x-go-package": "github.com/netlify/gotrue/storage"
+            },
+            "email_change_sent_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "EmailChangeSentAt"
+            },
+            "email_confirmed_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "EmailConfirmedAt"
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "x-go-name": "ID"
+            },
+            "identities": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-go-name": "CreatedAt"
+                  },
+                  "id": {
+                    "type": "string",
+                    "x-go-name": "ID"
+                  },
+                  "identity_data": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "last_sign_in_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-go-name": "LastSignInAt"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "x-go-name": "Provider"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-go-name": "UpdatedAt"
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "x-go-name": "UserID"
+                  }
+                },
+                "x-go-package": "github.com/netlify/gotrue/models"
+              },
+              "x-go-name": "Identities"
+            },
+            "invited_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "InvitedAt"
+            },
+            "last_sign_in_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "LastSignInAt"
+            },
+            "new_email": {
+              "type": "string",
+              "x-go-name": "EmailChange"
+            },
+            "new_phone": {
+              "type": "string",
+              "x-go-name": "PhoneChange"
+            },
+            "phone": {
+              "type": "string",
+              "x-go-package": "github.com/netlify/gotrue/storage"
+            },
+            "phone_change_sent_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "PhoneChangeSentAt"
+            },
+            "phone_confirmed_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "PhoneConfirmedAt"
+            },
+            "reauthentication_sent_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "ReauthenticationSentAt"
+            },
+            "recovery_sent_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "RecoverySentAt"
+            },
+            "role": {
+              "type": "string",
+              "x-go-name": "Role"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date-time",
+              "x-go-name": "UpdatedAt"
+            },
+            "user_metadata": {
+              "type": "object",
+              "additionalProperties": {},
+              "x-go-package": "github.com/netlify/gotrue/models"
+            }
+          },
+          "x-go-package": "github.com/netlify/gotrue/models"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "AdminListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "aud": {
+          "type": "string",
+          "x-go-name": "Aud"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "description": "User respresents a registered user with email/password authentication",
+            "type": "object",
+            "properties": {
+              "app_metadata": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              },
+              "aud": {
+                "type": "string",
+                "x-go-name": "Aud"
+              },
+              "banned_until": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "BannedUntil"
+              },
+              "confirmation_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ConfirmationSentAt"
+              },
+              "confirmed_at": {
+                "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ConfirmedAt"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "CreatedAt"
+              },
+              "email": {
+                "type": "string",
+                "x-go-package": "github.com/netlify/gotrue/storage"
+              },
+              "email_change_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "EmailChangeSentAt"
+              },
+              "email_confirmed_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "EmailConfirmedAt"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "x-go-name": "ID"
+              },
+              "identities": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "CreatedAt"
+                    },
+                    "id": {
+                      "type": "string",
+                      "x-go-name": "ID"
+                    },
+                    "identity_data": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    },
+                    "last_sign_in_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "LastSignInAt"
+                    },
+                    "provider": {
+                      "type": "string",
+                      "x-go-name": "Provider"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "UpdatedAt"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "x-go-name": "UserID"
+                    }
+                  },
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "x-go-name": "Identities"
+              },
+              "invited_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "InvitedAt"
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "LastSignInAt"
+              },
+              "new_email": {
+                "type": "string",
+                "x-go-name": "EmailChange"
+              },
+              "new_phone": {
+                "type": "string",
+                "x-go-name": "PhoneChange"
+              },
+              "phone": {
+                "type": "string",
+                "x-go-package": "github.com/netlify/gotrue/storage"
+              },
+              "phone_change_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "PhoneChangeSentAt"
+              },
+              "phone_confirmed_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "PhoneConfirmedAt"
+              },
+              "reauthentication_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ReauthenticationSentAt"
+              },
+              "recovery_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "RecoverySentAt"
+              },
+              "role": {
+                "type": "string",
+                "x-go-name": "Role"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "UpdatedAt"
+              },
+              "user_metadata": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              }
+            },
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "x-go-name": "Users"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "AdminUserParams": {
+      "type": "object",
+      "properties": {
+        "app_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "AppMetaData"
+        },
+        "aud": {
+          "type": "string",
+          "x-go-name": "Aud"
+        },
+        "ban_duration": {
+          "type": "string",
+          "x-go-name": "BanDuration"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "email_confirm": {
+          "type": "boolean",
+          "x-go-name": "EmailConfirm"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        },
+        "phone_confirm": {
+          "type": "boolean",
+          "x-go-name": "PhoneConfirm"
+        },
+        "role": {
+          "type": "string",
+          "x-go-name": "Role"
+        },
+        "user_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "UserMetaData"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "GenerateLinkParams": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "Data"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "new_email": {
+          "type": "string",
+          "x-go-name": "NewEmail"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "redirect_to": {
+          "type": "string",
+          "x-go-name": "RedirectTo"
+        },
+        "type": {
+          "type": "string",
+          "x-go-name": "Type"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "GenerateLinkResponse": {
+      "type": "object",
+      "properties": {
+        "action_link": {
+          "type": "string",
+          "x-go-name": "ActionLink"
+        },
+        "app_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-package": "github.com/netlify/gotrue/models"
+        },
+        "aud": {
+          "type": "string",
+          "x-go-name": "Aud"
+        },
+        "banned_until": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "BannedUntil"
+        },
+        "confirmation_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ConfirmationSentAt"
+        },
+        "confirmed_at": {
+          "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ConfirmedAt"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "email": {
+          "type": "string",
+          "x-go-package": "github.com/netlify/gotrue/storage"
+        },
+        "email_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "EmailChangeSentAt"
+        },
+        "email_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "EmailConfirmedAt"
+        },
+        "email_otp": {
+          "type": "string",
+          "x-go-name": "EmailOtp"
+        },
+        "hashed_token": {
+          "type": "string",
+          "x-go-name": "HashedToken"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "CreatedAt"
+              },
+              "id": {
+                "type": "string",
+                "x-go-name": "ID"
+              },
+              "identity_data": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "LastSignInAt"
+              },
+              "provider": {
+                "type": "string",
+                "x-go-name": "Provider"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "UpdatedAt"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid",
+                "x-go-name": "UserID"
+              }
+            },
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "x-go-name": "Identities"
+        },
+        "invited_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "InvitedAt"
+        },
+        "last_sign_in_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastSignInAt"
+        },
+        "new_email": {
+          "type": "string",
+          "x-go-name": "EmailChange"
+        },
+        "new_phone": {
+          "type": "string",
+          "x-go-name": "PhoneChange"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-package": "github.com/netlify/gotrue/storage"
+        },
+        "phone_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "PhoneChangeSentAt"
+        },
+        "phone_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "PhoneConfirmedAt"
+        },
+        "reauthentication_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ReauthenticationSentAt"
+        },
+        "recovery_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "RecoverySentAt"
+        },
+        "redirect_to": {
+          "type": "string",
+          "x-go-name": "RedirectTo"
+        },
+        "role": {
+          "type": "string",
+          "x-go-name": "Role"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "user_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-package": "github.com/netlify/gotrue/models"
+        },
+        "verification_type": {
+          "type": "string",
+          "x-go-name": "VerificationType"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "HealthCheckResponse": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "version": {
+          "type": "string",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "identity_data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-package": "github.com/netlify/gotrue/models"
+        },
+        "last_sign_in_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastSignInAt"
+        },
+        "provider": {
+          "type": "string",
+          "x-go-name": "Provider"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/models"
+    },
+    "InviteParams": {
+      "description": "InviteParams are the parameters the Signup endpoint accepts",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "Data"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "JSONMap": {
+      "type": "object",
+      "additionalProperties": {},
+      "x-go-package": "github.com/netlify/gotrue/models"
+    },
+    "NullString": {
+      "type": "string",
+      "x-go-package": "github.com/netlify/gotrue/storage"
+    },
+    "OtpParams": {
+      "description": "OtpParams contains the request body params for the otp endpoint",
+      "type": "object",
+      "properties": {
+        "create_user": {
+          "type": "boolean",
+          "x-go-name": "CreateUser"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "Data"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "PasswordGrantParams": {
+      "description": "PasswordGrantParams are the parameters the ResourceOwnerPasswordGrant method accepts",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "ProviderSettings": {
+      "type": "object",
+      "properties": {
+        "apple": {
+          "type": "boolean",
+          "x-go-name": "Apple"
+        },
+        "azure": {
+          "type": "boolean",
+          "x-go-name": "Azure"
+        },
+        "bitbucket": {
+          "type": "boolean",
+          "x-go-name": "Bitbucket"
+        },
+        "discord": {
+          "type": "boolean",
+          "x-go-name": "Discord"
+        },
+        "email": {
+          "type": "boolean",
+          "x-go-name": "Email"
+        },
+        "facebook": {
+          "type": "boolean",
+          "x-go-name": "Facebook"
+        },
+        "github": {
+          "type": "boolean",
+          "x-go-name": "GitHub"
+        },
+        "gitlab": {
+          "type": "boolean",
+          "x-go-name": "GitLab"
+        },
+        "google": {
+          "type": "boolean",
+          "x-go-name": "Google"
+        },
+        "keycloak": {
+          "type": "boolean",
+          "x-go-name": "Keycloak"
+        },
+        "linkedin": {
+          "type": "boolean",
+          "x-go-name": "Linkedin"
+        },
+        "notion": {
+          "type": "boolean",
+          "x-go-name": "Notion"
+        },
+        "phone": {
+          "type": "boolean",
+          "x-go-name": "Phone"
+        },
+        "saml": {
+          "type": "boolean",
+          "x-go-name": "SAML"
+        },
+        "slack": {
+          "type": "boolean",
+          "x-go-name": "Slack"
+        },
+        "spotify": {
+          "type": "boolean",
+          "x-go-name": "Spotify"
+        },
+        "twitch": {
+          "type": "boolean",
+          "x-go-name": "Twitch"
+        },
+        "twitter": {
+          "type": "boolean",
+          "x-go-name": "Twitter"
+        },
+        "workos": {
+          "type": "boolean",
+          "x-go-name": "WorkOS"
+        },
+        "zoom": {
+          "type": "boolean",
+          "x-go-name": "Zoom"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "RecoverParams": {
+      "description": "RecoverParams holds the parameters for a password recovery request",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "RefreshTokenGrantParams": {
+      "description": "RefreshTokenGrantParams are the parameters the RefreshTokenGrant method accepts",
+      "type": "object",
+      "properties": {
+        "refresh_token": {
+          "type": "string",
+          "x-go-name": "RefreshToken"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "Settings": {
+      "type": "object",
+      "properties": {
+        "disable_signup": {
+          "type": "boolean",
+          "x-go-name": "DisableSignup"
+        },
+        "external": {
+          "type": "object",
+          "properties": {
+            "apple": {
+              "type": "boolean",
+              "x-go-name": "Apple"
+            },
+            "azure": {
+              "type": "boolean",
+              "x-go-name": "Azure"
+            },
+            "bitbucket": {
+              "type": "boolean",
+              "x-go-name": "Bitbucket"
+            },
+            "discord": {
+              "type": "boolean",
+              "x-go-name": "Discord"
+            },
+            "email": {
+              "type": "boolean",
+              "x-go-name": "Email"
+            },
+            "facebook": {
+              "type": "boolean",
+              "x-go-name": "Facebook"
+            },
+            "github": {
+              "type": "boolean",
+              "x-go-name": "GitHub"
+            },
+            "gitlab": {
+              "type": "boolean",
+              "x-go-name": "GitLab"
+            },
+            "google": {
+              "type": "boolean",
+              "x-go-name": "Google"
+            },
+            "keycloak": {
+              "type": "boolean",
+              "x-go-name": "Keycloak"
+            },
+            "linkedin": {
+              "type": "boolean",
+              "x-go-name": "Linkedin"
+            },
+            "notion": {
+              "type": "boolean",
+              "x-go-name": "Notion"
+            },
+            "phone": {
+              "type": "boolean",
+              "x-go-name": "Phone"
+            },
+            "saml": {
+              "type": "boolean",
+              "x-go-name": "SAML"
+            },
+            "slack": {
+              "type": "boolean",
+              "x-go-name": "Slack"
+            },
+            "spotify": {
+              "type": "boolean",
+              "x-go-name": "Spotify"
+            },
+            "twitch": {
+              "type": "boolean",
+              "x-go-name": "Twitch"
+            },
+            "twitter": {
+              "type": "boolean",
+              "x-go-name": "Twitter"
+            },
+            "workos": {
+              "type": "boolean",
+              "x-go-name": "WorkOS"
+            },
+            "zoom": {
+              "type": "boolean",
+              "x-go-name": "Zoom"
+            }
+          },
+          "x-go-package": "github.com/netlify/gotrue/api"
+        },
+        "mailer_autoconfirm": {
+          "type": "boolean",
+          "x-go-name": "MailerAutoconfirm"
+        },
+        "phone_autoconfirm": {
+          "type": "boolean",
+          "x-go-name": "PhoneAutoconfirm"
+        },
+        "sms_provider": {
+          "type": "string",
+          "x-go-name": "SmsProvider"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "SignupParams": {
+      "description": "SignupParams are the parameters the Signup endpoint accepts",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "Data"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "User": {
+      "description": "User respresents a registered user with email/password authentication",
+      "type": "object",
+      "properties": {
+        "app_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-package": "github.com/netlify/gotrue/models"
+        },
+        "aud": {
+          "type": "string",
+          "x-go-name": "Aud"
+        },
+        "banned_until": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "BannedUntil"
+        },
+        "confirmation_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ConfirmationSentAt"
+        },
+        "confirmed_at": {
+          "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ConfirmedAt"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "email": {
+          "type": "string",
+          "x-go-package": "github.com/netlify/gotrue/storage"
+        },
+        "email_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "EmailChangeSentAt"
+        },
+        "email_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "EmailConfirmedAt"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "CreatedAt"
+              },
+              "id": {
+                "type": "string",
+                "x-go-name": "ID"
+              },
+              "identity_data": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "LastSignInAt"
+              },
+              "provider": {
+                "type": "string",
+                "x-go-name": "Provider"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "UpdatedAt"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid",
+                "x-go-name": "UserID"
+              }
+            },
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "x-go-name": "Identities"
+        },
+        "invited_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "InvitedAt"
+        },
+        "last_sign_in_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastSignInAt"
+        },
+        "new_email": {
+          "type": "string",
+          "x-go-name": "EmailChange"
+        },
+        "new_phone": {
+          "type": "string",
+          "x-go-name": "PhoneChange"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-package": "github.com/netlify/gotrue/storage"
+        },
+        "phone_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "PhoneChangeSentAt"
+        },
+        "phone_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "PhoneConfirmedAt"
+        },
+        "reauthentication_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "ReauthenticationSentAt"
+        },
+        "recovery_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "RecoverySentAt"
+        },
+        "role": {
+          "type": "string",
+          "x-go-name": "Role"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "user_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-package": "github.com/netlify/gotrue/models"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/models"
+    },
+    "UserUpdateParams": {
+      "description": "UserUpdateParams parameters for updating a user",
+      "type": "object",
+      "properties": {
+        "app_metadata": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "AppData"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {},
+          "x-go-name": "Data"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "nonce": {
+          "type": "string",
+          "x-go-name": "Nonce"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    },
+    "VerifyParams": {
+      "description": "VerifyParams are the parameters the Verify endpoint accepts",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        },
+        "redirect_to": {
+          "type": "string",
+          "x-go-name": "RedirectTo"
+        },
+        "token": {
+          "type": "string",
+          "x-go-name": "Token"
+        },
+        "type": {
+          "type": "string",
+          "x-go-name": "Type"
+        }
+      },
+      "x-go-package": "github.com/netlify/gotrue/api"
+    }
+  },
+  "responses": {
+    "adminListUserResponse": {
+      "description": "The list of users.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "aud": {
+            "type": "string",
+            "x-go-name": "Aud"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "description": "User respresents a registered user with email/password authentication",
+              "type": "object",
+              "properties": {
+                "app_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "aud": {
+                  "type": "string",
+                  "x-go-name": "Aud"
+                },
+                "banned_until": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "BannedUntil"
+                },
+                "confirmation_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmationSentAt"
+                },
+                "confirmed_at": {
+                  "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ConfirmedAt"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "email": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "email_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailChangeSentAt"
+                },
+                "email_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "EmailConfirmedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "ID"
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "CreatedAt"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-go-name": "ID"
+                      },
+                      "identity_data": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "x-go-package": "github.com/netlify/gotrue/models"
+                      },
+                      "last_sign_in_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "LastSignInAt"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "x-go-name": "Provider"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-go-name": "UpdatedAt"
+                      },
+                      "user_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "x-go-name": "UserID"
+                      }
+                    },
+                    "x-go-package": "github.com/netlify/gotrue/models"
+                  },
+                  "x-go-name": "Identities"
+                },
+                "invited_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "InvitedAt"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "new_email": {
+                  "type": "string",
+                  "x-go-name": "EmailChange"
+                },
+                "new_phone": {
+                  "type": "string",
+                  "x-go-name": "PhoneChange"
+                },
+                "phone": {
+                  "type": "string",
+                  "x-go-package": "github.com/netlify/gotrue/storage"
+                },
+                "phone_change_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneChangeSentAt"
+                },
+                "phone_confirmed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "PhoneConfirmedAt"
+                },
+                "reauthentication_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "ReauthenticationSentAt"
+                },
+                "recovery_sent_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "RecoverySentAt"
+                },
+                "role": {
+                  "type": "string",
+                  "x-go-name": "Role"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_metadata": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            },
+            "x-go-name": "Users"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/api"
+      }
+    },
+    "authorizeResponse": {
+      "description": "Redirects user to the 3rd-party OAuth provider"
+    },
+    "callbackResponse": {
+      "description": "Redirects user to the redirect url specified in `/authorize`. If no `redirect_url` is provided, the user will be redirected to the `SITE_URL`."
+    },
+    "deleteUserResponse": {
+      "description": "The updated user."
+    },
+    "generateLinkResponse": {
+      "description": "The response object for generate link.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "action_link": {
+            "type": "string",
+            "x-go-name": "ActionLink"
+          },
+          "app_metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "aud": {
+            "type": "string",
+            "x-go-name": "Aud"
+          },
+          "banned_until": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "BannedUntil"
+          },
+          "confirmation_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ConfirmationSentAt"
+          },
+          "confirmed_at": {
+            "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ConfirmedAt"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "CreatedAt"
+          },
+          "email": {
+            "type": "string",
+            "x-go-package": "github.com/netlify/gotrue/storage"
+          },
+          "email_change_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "EmailChangeSentAt"
+          },
+          "email_confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "EmailConfirmedAt"
+          },
+          "email_otp": {
+            "type": "string",
+            "x-go-name": "EmailOtp"
+          },
+          "hashed_token": {
+            "type": "string",
+            "x-go-name": "HashedToken"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "x-go-name": "ID"
+          },
+          "identities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "x-go-name": "ID"
+                },
+                "identity_data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "provider": {
+                  "type": "string",
+                  "x-go-name": "Provider"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "UserID"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            },
+            "x-go-name": "Identities"
+          },
+          "invited_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "InvitedAt"
+          },
+          "last_sign_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "LastSignInAt"
+          },
+          "new_email": {
+            "type": "string",
+            "x-go-name": "EmailChange"
+          },
+          "new_phone": {
+            "type": "string",
+            "x-go-name": "PhoneChange"
+          },
+          "phone": {
+            "type": "string",
+            "x-go-package": "github.com/netlify/gotrue/storage"
+          },
+          "phone_change_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "PhoneChangeSentAt"
+          },
+          "phone_confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "PhoneConfirmedAt"
+          },
+          "reauthentication_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ReauthenticationSentAt"
+          },
+          "recovery_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "RecoverySentAt"
+          },
+          "redirect_to": {
+            "type": "string",
+            "x-go-name": "RedirectTo"
+          },
+          "role": {
+            "type": "string",
+            "x-go-name": "Role"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "UpdatedAt"
+          },
+          "user_metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "verification_type": {
+            "type": "string",
+            "x-go-name": "VerificationType"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/api"
+      }
+    },
+    "healthCheckResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "x-go-name": "Description"
+          },
+          "name": {
+            "type": "string",
+            "x-go-name": "Name"
+          },
+          "version": {
+            "type": "string",
+            "x-go-name": "Version"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/api"
+      }
+    },
+    "inviteResponse": {
+      "description": ""
+    },
+    "logoutResponse": {
+      "description": ""
+    },
+    "otpResponse": {
+      "description": ""
+    },
+    "recoveryResponse": {
+      "description": ""
+    },
+    "settingsResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "disable_signup": {
+            "type": "boolean",
+            "x-go-name": "DisableSignup"
+          },
+          "external": {
+            "type": "object",
+            "properties": {
+              "apple": {
+                "type": "boolean",
+                "x-go-name": "Apple"
+              },
+              "azure": {
+                "type": "boolean",
+                "x-go-name": "Azure"
+              },
+              "bitbucket": {
+                "type": "boolean",
+                "x-go-name": "Bitbucket"
+              },
+              "discord": {
+                "type": "boolean",
+                "x-go-name": "Discord"
+              },
+              "email": {
+                "type": "boolean",
+                "x-go-name": "Email"
+              },
+              "facebook": {
+                "type": "boolean",
+                "x-go-name": "Facebook"
+              },
+              "github": {
+                "type": "boolean",
+                "x-go-name": "GitHub"
+              },
+              "gitlab": {
+                "type": "boolean",
+                "x-go-name": "GitLab"
+              },
+              "google": {
+                "type": "boolean",
+                "x-go-name": "Google"
+              },
+              "keycloak": {
+                "type": "boolean",
+                "x-go-name": "Keycloak"
+              },
+              "linkedin": {
+                "type": "boolean",
+                "x-go-name": "Linkedin"
+              },
+              "notion": {
+                "type": "boolean",
+                "x-go-name": "Notion"
+              },
+              "phone": {
+                "type": "boolean",
+                "x-go-name": "Phone"
+              },
+              "saml": {
+                "type": "boolean",
+                "x-go-name": "SAML"
+              },
+              "slack": {
+                "type": "boolean",
+                "x-go-name": "Slack"
+              },
+              "spotify": {
+                "type": "boolean",
+                "x-go-name": "Spotify"
+              },
+              "twitch": {
+                "type": "boolean",
+                "x-go-name": "Twitch"
+              },
+              "twitter": {
+                "type": "boolean",
+                "x-go-name": "Twitter"
+              },
+              "workos": {
+                "type": "boolean",
+                "x-go-name": "WorkOS"
+              },
+              "zoom": {
+                "type": "boolean",
+                "x-go-name": "Zoom"
+              }
+            },
+            "x-go-package": "github.com/netlify/gotrue/api"
+          },
+          "mailer_autoconfirm": {
+            "type": "boolean",
+            "x-go-name": "MailerAutoconfirm"
+          },
+          "phone_autoconfirm": {
+            "type": "boolean",
+            "x-go-name": "PhoneAutoconfirm"
+          },
+          "sms_provider": {
+            "type": "string",
+            "x-go-name": "SmsProvider"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/api"
+      }
+    },
+    "tokenResponse": {
+      "description": "",
+      "schema": {
+        "description": "AccessTokenResponse represents an OAuth2 success response",
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "expires_in": {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ExpiresIn"
+          },
+          "refresh_token": {
+            "type": "string",
+            "x-go-name": "RefreshToken"
+          },
+          "token_type": {
+            "type": "string",
+            "x-go-name": "TokenType"
+          },
+          "user": {
+            "description": "User respresents a registered user with email/password authentication",
+            "type": "object",
+            "properties": {
+              "app_metadata": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              },
+              "aud": {
+                "type": "string",
+                "x-go-name": "Aud"
+              },
+              "banned_until": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "BannedUntil"
+              },
+              "confirmation_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ConfirmationSentAt"
+              },
+              "confirmed_at": {
+                "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ConfirmedAt"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "CreatedAt"
+              },
+              "email": {
+                "type": "string",
+                "x-go-package": "github.com/netlify/gotrue/storage"
+              },
+              "email_change_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "EmailChangeSentAt"
+              },
+              "email_confirmed_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "EmailConfirmedAt"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "x-go-name": "ID"
+              },
+              "identities": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "CreatedAt"
+                    },
+                    "id": {
+                      "type": "string",
+                      "x-go-name": "ID"
+                    },
+                    "identity_data": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "x-go-package": "github.com/netlify/gotrue/models"
+                    },
+                    "last_sign_in_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "LastSignInAt"
+                    },
+                    "provider": {
+                      "type": "string",
+                      "x-go-name": "Provider"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "x-go-name": "UpdatedAt"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "x-go-name": "UserID"
+                    }
+                  },
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "x-go-name": "Identities"
+              },
+              "invited_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "InvitedAt"
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "LastSignInAt"
+              },
+              "new_email": {
+                "type": "string",
+                "x-go-name": "EmailChange"
+              },
+              "new_phone": {
+                "type": "string",
+                "x-go-name": "PhoneChange"
+              },
+              "phone": {
+                "type": "string",
+                "x-go-package": "github.com/netlify/gotrue/storage"
+              },
+              "phone_change_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "PhoneChangeSentAt"
+              },
+              "phone_confirmed_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "PhoneConfirmedAt"
+              },
+              "reauthentication_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "ReauthenticationSentAt"
+              },
+              "recovery_sent_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "RecoverySentAt"
+              },
+              "role": {
+                "type": "string",
+                "x-go-name": "Role"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-go-name": "UpdatedAt"
+              },
+              "user_metadata": {
+                "type": "object",
+                "additionalProperties": {},
+                "x-go-package": "github.com/netlify/gotrue/models"
+              }
+            },
+            "x-go-package": "github.com/netlify/gotrue/models"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/api"
+      }
+    },
+    "unauthorizedError": {
+      "description": "This endpoint requires a bearer token."
+    },
+    "userResponse": {
+      "description": "The current user.",
+      "schema": {
+        "description": "User respresents a registered user with email/password authentication",
+        "type": "object",
+        "properties": {
+          "app_metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "x-go-package": "github.com/netlify/gotrue/models"
+          },
+          "aud": {
+            "type": "string",
+            "x-go-name": "Aud"
+          },
+          "banned_until": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "BannedUntil"
+          },
+          "confirmation_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ConfirmationSentAt"
+          },
+          "confirmed_at": {
+            "description": "For backward compatibility only. Use EmailConfirmedAt or PhoneConfirmedAt instead.",
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ConfirmedAt"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "CreatedAt"
+          },
+          "email": {
+            "type": "string",
+            "x-go-package": "github.com/netlify/gotrue/storage"
+          },
+          "email_change_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "EmailChangeSentAt"
+          },
+          "email_confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "EmailConfirmedAt"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "x-go-name": "ID"
+          },
+          "identities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "CreatedAt"
+                },
+                "id": {
+                  "type": "string",
+                  "x-go-name": "ID"
+                },
+                "identity_data": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "x-go-package": "github.com/netlify/gotrue/models"
+                },
+                "last_sign_in_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "LastSignInAt"
+                },
+                "provider": {
+                  "type": "string",
+                  "x-go-name": "Provider"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "x-go-name": "UpdatedAt"
+                },
+                "user_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "UserID"
+                }
+              },
+              "x-go-package": "github.com/netlify/gotrue/models"
+            },
+            "x-go-name": "Identities"
+          },
+          "invited_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "InvitedAt"
+          },
+          "last_sign_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "LastSignInAt"
+          },
+          "new_email": {
+            "type": "string",
+            "x-go-name": "EmailChange"
+          },
+          "new_phone": {
+            "type": "string",
+            "x-go-name": "PhoneChange"
+          },
+          "phone": {
+            "type": "string",
+            "x-go-package": "github.com/netlify/gotrue/storage"
+          },
+          "phone_change_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "PhoneChangeSentAt"
+          },
+          "phone_confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "PhoneConfirmedAt"
+          },
+          "reauthentication_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "ReauthenticationSentAt"
+          },
+          "recovery_sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "RecoverySentAt"
+          },
+          "role": {
+            "type": "string",
+            "x-go-name": "Role"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "UpdatedAt"
+          },
+          "user_metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "x-go-package": "github.com/netlify/gotrue/models"
+          }
+        },
+        "x-go-package": "github.com/netlify/gotrue/models"
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "name": "Authentication",
+      "in": "header"
+    }
+  }
+}

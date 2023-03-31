@@ -39,7 +39,7 @@ Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/do
 
 Şu anda Herkese Açık Beta sürümündeyiz. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -51,7 +51,7 @@ Supabase, açık kaynaklı araçların bir kombinasyonudur. Firebase'in özellik
 
 Supabase [barındırılan bir platformdur](https://app.supabase.com). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
 
-![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne kavuşan 30 yılı aşkın aktif geliştirmeye sahip bir nesne ilişkisel veritabanı sistemidir.
 - [Realtime](https://github.com/supabase/realtime) Web soketleri kullanarak PostgreSQL eklerini, güncellemelerini ve silmelerini dinlemenizi sağlayan bir Elixir sunucusudur. Supabase, Postgres'in yerleşik çoğaltma işlevini dinler, çoğaltma bayt akışını JSON'a dönüştürür ve ardından JSON'yi web yuvaları üzerinden yayınlar.
@@ -109,8 +109,8 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

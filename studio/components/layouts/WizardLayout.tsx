@@ -1,8 +1,9 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { IconChevronRight } from '@supabase/ui'
+import { IconChevronRight } from 'ui'
 import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
+import { BASE_PATH } from 'lib/constants'
 
 const WizardLayout: FC<any> = ({ organization, project, children }) => {
   const ongoingIncident = useFlag('ongoingIncident')
@@ -27,17 +28,17 @@ export const WizardLayoutWithoutAuth = observer(WizardLayout)
 const Header: FC<any> = ({ organization, project }) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
-    <div className="dark:border-dark border-b p-3">
+    <div className="border-b p-3 dark:border-dark">
       <div className="PageHeader">
         <div className="Breadcrumbs flex justify-between">
           <div className="flex items-center text-sm">
             <div className="flex items-center space-x-2">
-              <Link href="/">
+              <Link href="/projects">
                 <a>
                   <img
-                    src="/img/supabase-logo.svg"
+                    src={`${BASE_PATH}/img/supabase-logo.svg`}
                     alt="Supabase"
-                    className="dark:border-dark rounded border p-1 hover:border-white"
+                    className="rounded border p-1 hover:border-white dark:border-dark"
                     style={{ height: 24 }}
                   />
                 </a>

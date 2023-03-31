@@ -57,7 +57,7 @@ const GetStartedHero = () => {
       <div
         className={[
           'w-[260px] lg:w-[320px] h-[160px] lg:h-[220px] bg-scale-300 border border-scale-500',
-          'absolute right-0 top-[50px] lg:-top-[40px] z-10 rounded-t overflow-y-hidden',
+          'absolute right-0 top-[50px] lg:-top-[40px] rounded-t overflow-y-hidden',
         ].join(' ')}
       >
         <div className="h-[24px] flex items-center border-b border-scale-500">

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { Route } from 'components/ui/ui.types'
+import ConditionalWrap from 'components/ui/ConditionalWrap'
 
 interface Props {
   route: Route
@@ -13,7 +14,10 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
-        <Link href={route.link}>
+        <ConditionalWrap
+          condition={route.link !== undefined}
+          wrap={(children) => <Link href={route.link!}>{children}</Link>}
+        >
           <a
             className={[
               'transition-colors duration-200',
@@ -25,19 +29,21 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
           >
             {route.icon}
           </a>
-        </Link>
+        </ConditionalWrap>
       </Tooltip.Trigger>
-      <Tooltip.Content side="right">
-        <Tooltip.Arrow className="radix-tooltip-arrow" />
-        <div
-          className={[
-            'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
-            'border border-scale-200 ', //border
-          ].join(' ')}
-        >
-          <span className="text-scale-1200 text-xs">{route.label}</span>
-        </div>
-      </Tooltip.Content>
+      <Tooltip.Portal>
+        <Tooltip.Content side="right">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
+              'border border-scale-200 ', //border
+            ].join(' ')}
+          >
+            <span className="text-scale-1200 text-xs">{route.label}</span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
     </Tooltip.Root>
   )
 }

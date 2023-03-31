@@ -26,7 +26,13 @@ export async function fetchPage(
   sorts: Sort[],
   filters: Filter[]
 ) {
-  if (!state.rowService) return
+  if (!state.rowService) {
+    return dispatch({
+      type: 'SET_ROWS',
+      payload: { rows: state?.rows ?? [] },
+    })
+  }
+
   dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: true } })
 
   const { data, error } = await state.rowService.fetchPage(

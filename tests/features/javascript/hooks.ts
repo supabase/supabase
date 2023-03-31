@@ -2,12 +2,13 @@ import postgres from 'postgres'
 import crossFetch from 'cross-fetch'
 import { faker } from '@faker-js/faker'
 import {
-  ApiError,
+  AuthResponse,
   createClient,
-  Session,
   SupabaseClient,
   SupabaseClientOptions,
   User,
+  UserAttributes,
+  UserResponse,
 } from '@supabase/supabase-js'
 
 import { JasmineAllureReporter, step } from '../../.jest/jest-custom-reporter'
@@ -32,7 +33,14 @@ export abstract class Hooks {
   }
 
   @step('Create Supabase client')
-  createSupaClient(url: string, key: string, options: SupabaseClientOptions = {}): SupabaseClient {
+  createSupaClient(
+    url: string,
+    key: string,
+    options: SupabaseClientOptions<'public'> = {}
+  ): SupabaseClient {
+    options.auth = options.auth || {}
+    options.auth.persistSession = false
+
     return createClient(url, key, options)
   }
 
@@ -41,6 +49,7 @@ export abstract class Hooks {
     email: string
     password: string
     username: string
+    id: string
   }> {
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
 
@@ -48,11 +57,17 @@ export abstract class Hooks {
       email: faker.internet.exampleEmail(),
       password: faker.internet.password(),
       username: faker.internet.userName(),
+      id: '',
     }
-    const { user, error: signUpError } = await this.signUp(supabase, fakeUser, {
+    const {
+      error: signUpError,
+      data: { user },
+    } = await this.signUp(supabase, fakeUser, {
       data: data,
     })
     expect(signUpError).toBeNull()
+    expect(user).not.toBeNull()
+    fakeUser.id = user.id
 
     return fakeUser
   }
@@ -92,19 +107,14 @@ export abstract class Hooks {
     options: {
       redirectTo?: string
       data?: object
+      captchaToken?: string
     } = {}
-  ): Promise<{
-    user: User
-    session: Session
-    error: ApiError
-  }> {
-    return supabase.auth.signUp(
-      {
-        email: email,
-        password: password,
-      },
-      options
-    )
+  ): Promise<AuthResponse> {
+    return supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: options,
+    })
   }
 
   @step('Check if I am being able to log out')
@@ -114,7 +124,7 @@ export abstract class Hooks {
 
   @step('Get user data, if there is a logged in user')
   getUser(supabase: SupabaseClient) {
-    return supabase.auth.user()
+    return supabase.auth.getUser()
   }
 
   @step((user: User) => `Get user by ID (${user.id}) from Supabase auth schema`)
@@ -126,5 +136,76 @@ export abstract class Hooks {
       where
         id = ${user.id}
     `
+  }
+
+  @step('I sign up with a valid email and password')
+  async signUpByPhone(
+    supabase: SupabaseClient,
+    {
+      phone = faker.phone.phoneNumber(),
+      password = faker.internet.password(),
+    }: {
+      phone?: string
+      password?: string
+    } = {},
+    options: {
+      redirectTo?: string
+      data?: object
+    } = {}
+  ): Promise<AuthResponse> {
+    return supabase.auth.signUp({
+      phone: phone,
+      password: password,
+      options: options,
+    })
+  }
+
+  @step('User inserts profile')
+  async insertProfile(
+    supabase: SupabaseClient,
+    user: {
+      id: string
+    },
+    fakeUser: {
+      username: string
+    }
+  ): Promise<{ data: any; error: any }> {
+    return await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        username: fakeUser.username,
+      })
+      .select()
+  }
+
+  @step('I can get my profile via postgREST')
+  async getUserProfile(supabase: SupabaseClient): Promise<{ data: any; error: any }> {
+    return supabase.from('profiles').select().maybeSingle()
+  }
+
+  @step('Update user info')
+  async updateUser(supabase: SupabaseClient, attr: UserAttributes): Promise<UserResponse> {
+    return supabase.auth.updateUser(attr)
+  }
+
+  @step('Create signed in supabase client')
+  async createSignedInSupaClient() {
+    // create user
+    const fakeUser = await this.createUser()
+
+    // sign in as user
+    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const {
+      data: { user },
+      error: signInError,
+    } = await supabase.auth.signInWithPassword({
+      email: fakeUser.email,
+      password: fakeUser.password,
+    })
+    expect(signInError).toBeNull()
+    fakeUser.id = user.id
+
+    return { supabase, user: fakeUser }
   }
 }

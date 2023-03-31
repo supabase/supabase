@@ -1,0 +1,397 @@
+.sbui-space {
+  /* @apply flex; */
+}
+
+.sbui-space-row {
+  /* @apply flex flex-row items-center; */
+}
+
+.sbui-space-col {
+  /* @apply flex flex-col; */
+}
+
+.sbui-space-y-0 {
+  /* @apply space-y-0; */
+}
+.sbui-space-y-0.5 {
+  /* @apply space-y-0.5; */
+}
+.sbui-space-y-1 {
+  /* @apply space-y-1; */
+}
+.sbui-space-y-1.5 {
+  /* @apply space-y-1.5; */
+}
+.sbui-space-y-2 {
+  /* @apply space-y-2; */
+}
+.sbui-space-y-2.5 {
+  /* @apply space-y-2.5; */
+}
+.sbui-space-y-3 {
+  /* @apply space-y-3; */
+}
+.sbui-space-y-3.5 {
+  /* @apply space-y-3.5; */
+}
+.sbui-space-y-4 {
+  /* @apply space-y-4; */
+}
+.sbui-space-y-5 {
+  /* @apply space-y-5; */
+}
+.sbui-space-y-6 {
+  /* @apply space-y-6; */
+}
+.sbui-space-y-7 {
+  /* @apply space-y-7; */
+}
+.sbui-space-y-8 {
+  /* @apply space-y-8; */
+}
+.sbui-space-y-9 {
+  /* @apply space-y-9; */
+}
+.sbui-space-y-10 {
+  /* @apply space-y-10; */
+}
+.sbui-space-y-11 {
+  /* @apply space-y-11; */
+}
+.sbui-space-y-12 {
+  /* @apply space-y-12; */
+}
+.sbui-space-y-14 {
+  /* @apply space-y-14; */
+}
+.sbui-space-y-16 {
+  /* @apply space-y-16; */
+}
+.sbui-space-y-20 {
+  /* @apply space-y-20; */
+}
+.sbui-space-y-24 {
+  /* @apply space-y-24; */
+}
+.sbui-space-y-28 {
+  /* @apply space-y-28; */
+}
+.sbui-space-y-32 {
+  /* @apply space-y-32; */
+}
+.sbui-space-y-36 {
+  /* @apply space-y-36; */
+}
+.sbui-space-y-40 {
+  /* @apply space-y-40; */
+}
+.sbui-space-y-44 {
+  /* @apply space-y-44; */
+}
+.sbui-space-y-48 {
+  /* @apply space-y-48; */
+}
+.sbui-space-y-52 {
+  /* @apply space-y-52; */
+}
+.sbui-space-y-56 {
+  /* @apply space-y-56; */
+}
+.sbui-space-y-60 {
+  /* @apply space-y-60; */
+}
+.sbui-space-y-64 {
+  /* @apply space-y-64; */
+}
+.sbui-space-y-72 {
+  /* @apply space-y-72; */
+}
+.sbui-space-y-80 {
+  /* @apply space-y-80; */
+}
+.sbui-space-y-96 {
+  /* @apply space-y-96; */
+}
+.sbui-space-y-px {
+  /* @apply space-y-px; */
+}
+.sbui-space-x-0 {
+  /* @apply space-x-0; */
+}
+.sbui-space-x-1 {
+  /* @apply space-x-1; */
+}
+.sbui-space-x-2 {
+  /* @apply space-x-2; */
+}
+.sbui-space-x-3 {
+  /* @apply space-x-3; */
+}
+.sbui-space-x-4 {
+  /* @apply space-x-4; */
+}
+.sbui-space-x-5 {
+  /* @apply space-x-5; */
+}
+.sbui-space-x-6 {
+  /* @apply space-x-6; */
+}
+.sbui-space-x-7 {
+  /* @apply space-x-7; */
+}
+.sbui-space-x-8 {
+  /* @apply space-x-8; */
+}
+.sbui-space-x-9 {
+  /* @apply space-x-9; */
+}
+.sbui-space-x-10 {
+  /* @apply space-x-10; */
+}
+.sbui-space-x-11 {
+  /* @apply space-x-11; */
+}
+.sbui-space-x-12 {
+  /* @apply space-x-12; */
+}
+.sbui-space-x-14 {
+  /* @apply space-x-14; */
+}
+.sbui-space-x-16 {
+  /* @apply space-x-16; */
+}
+.sbui-space-x-20 {
+  /* @apply space-x-20; */
+}
+.sbui-space-x-24 {
+  /* @apply space-x-24; */
+}
+.sbui-space-x-28 {
+  /* @apply space-x-28; */
+}
+.sbui-space-x-32 {
+  /* @apply space-x-32; */
+}
+.sbui-space-x-36 {
+  /* @apply space-x-36; */
+}
+.sbui-space-x-40 {
+  /* @apply space-x-40; */
+}
+.sbui-space-x-44 {
+  /* @apply space-x-44; */
+}
+.sbui-space-x-48 {
+  /* @apply space-x-48; */
+}
+.sbui-space-x-52 {
+  /* @apply space-x-52; */
+}
+.sbui-space-x-56 {
+  /* @apply space-x-56; */
+}
+.sbui-space-x-60 {
+  /* @apply space-x-60; */
+}
+.sbui-space-x-64 {
+  /* @apply space-x-64; */
+}
+.sbui-space-x-72 {
+  /* @apply space-x-72; */
+}
+.sbui-space-x-80 {
+  /* @apply space-x-80; */
+}
+.sbui-space-x-96 {
+  /* @apply space-x-96; */
+}
+.sbui-space-x-px {
+  /* @apply space-x-px; */
+}
+.sbui-minus-space-y-0 {
+  /* @apply -space-y-0; */
+}
+.sbui-minus-space-y-1 {
+  /* @apply -space-y-1; */
+}
+.sbui-minus-space-y-2 {
+  /* @apply -space-y-2; */
+}
+.sbui-minus-space-y-3 {
+  /* @apply -space-y-3; */
+}
+.sbui-minus-space-y-4 {
+  /* @apply -space-y-4; */
+}
+.sbui-minus-space-y-5 {
+  /* @apply -space-y-5; */
+}
+.sbui-minus-space-y-6 {
+  /* @apply -space-y-6; */
+}
+.sbui-minus-space-y-7 {
+  /* @apply -space-y-7; */
+}
+.sbui-minus-space-y-8 {
+  /* @apply -space-y-8; */
+}
+.sbui-minus-space-y-9 {
+  /* @apply -space-y-9; */
+}
+.sbui-minus-space-y-10 {
+  /* @apply -space-y-10; */
+}
+.sbui-minus-space-y-11 {
+  /* @apply -space-y-11; */
+}
+.sbui-minus-space-y-12 {
+  /* @apply -space-y-12; */
+}
+.sbui-minus-space-y-14 {
+  /* @apply -space-y-14; */
+}
+.sbui-minus-space-y-16 {
+  /* @apply -space-y-16; */
+}
+.sbui-minus-space-y-20 {
+  /* @apply -space-y-20; */
+}
+.sbui-minus-space-y-24 {
+  /* @apply -space-y-24; */
+}
+.sbui-minus-space-y-28 {
+  /* @apply -space-y-28; */
+}
+.sbui-minus-space-y-32 {
+  /* @apply -space-y-32; */
+}
+.sbui-minus-space-y-36 {
+  /* @apply -space-y-36; */
+}
+.sbui-minus-space-y-40 {
+  /* @apply -space-y-40; */
+}
+.sbui-minus-space-y-44 {
+  /* @apply -space-y-44; */
+}
+.sbui-minus-space-y-48 {
+  /* @apply -space-y-48; */
+}
+.sbui-minus-space-y-52 {
+  /* @apply -space-y-52; */
+}
+.sbui-minus-space-y-56 {
+  /* @apply -space-y-56; */
+}
+.sbui-minus-space-y-60 {
+  /* @apply -space-y-60; */
+}
+.sbui-minus-space-y-64 {
+  /* @apply -space-y-64; */
+}
+.sbui-minus-space-y-72 {
+  /* @apply -space-y-72; */
+}
+.sbui-minus-space-y-80 {
+  /* @apply -space-y-80; */
+}
+.sbui-minus-space-y-96 {
+  /* @apply -space-y-96; */
+}
+.sbui-minus-space-y-px {
+  /* @apply -space-y-px; */
+}
+
+.sbui-minus-space-x-0 {
+  /* @apply -space-x-0; */
+}
+.sbui-minus-space-x-1 {
+  /* @apply -space-x-1; */
+}
+.sbui-minus-space-x-2 {
+  /* @apply -space-x-2; */
+}
+.sbui-minus-space-x-3 {
+  /* @apply -space-x-3; */
+}
+.sbui-minus-space-x-4 {
+  /* @apply -space-x-4; */
+}
+.sbui-minus-space-x-5 {
+  /* @apply -space-x-5; */
+}
+.sbui-minus-space-x-6 {
+  /* @apply -space-x-6; */
+}
+.sbui-minus-space-x-7 {
+  /* @apply -space-x-7; */
+}
+.sbui-minus-space-x-8 {
+  /* @apply -space-x-8; */
+}
+.sbui-minus-space-x-9 {
+  /* @apply -space-x-9; */
+}
+.sbui-minus-space-x-10 {
+  /* @apply -space-x-10; */
+}
+.sbui-minus-space-x-11 {
+  /* @apply -space-x-11; */
+}
+.sbui-minus-space-x-12 {
+  /* @apply -space-x-12; */
+}
+.sbui-minus-space-x-14 {
+  /* @apply -space-x-14; */
+}
+.sbui-minus-space-x-16 {
+  /* @apply -space-x-16; */
+}
+.sbui-minus-space-x-20 {
+  /* @apply -space-x-20; */
+}
+.sbui-minus-space-x-24 {
+  /* @apply -space-x-24; */
+}
+.sbui-minus-space-x-28 {
+  /* @apply -space-x-28; */
+}
+.sbui-minus-space-x-32 {
+  /* @apply -space-x-32; */
+}
+.sbui-minus-space-x-36 {
+  /* @apply -space-x-36; */
+}
+.sbui-minus-space-x-40 {
+  /* @apply -space-x-40; */
+}
+.sbui-minus-space-x-44 {
+  /* @apply -space-x-44; */
+}
+.sbui-minus-space-x-48 {
+  /* @apply -space-x-48; */
+}
+.sbui-minus-space-x-52 {
+  /* @apply -space-x-52; */
+}
+.sbui-minus-space-x-56 {
+  /* @apply -space-x-56; */
+}
+.sbui-minus-space-x-60 {
+  /* @apply -space-x-60; */
+}
+.sbui-minus-space-x-64 {
+  /* @apply -space-x-64; */
+}
+.sbui-minus-space-x-72 {
+  /* @apply -space-x-72; */
+}
+.sbui-minus-space-x-80 {
+  /* @apply -space-x-80; */
+}
+.sbui-minus-space-x-96 {
+  /* @apply -space-x-96; */
+}
+/* .sbui-minus-space-x-px {
+  /* @apply -space-x-; */
+} */

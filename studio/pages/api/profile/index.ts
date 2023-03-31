@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { IS_PLATFORM } from 'lib/constants'
 import apiWrapper from 'lib/api/apiWrapper'
-import { createEncryptedDbConnectionString } from 'lib/api/apiHelpers'
+import { DEFAULT_PROJECT } from '../constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -32,28 +31,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
         name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
-        projects: [
-          {
-            id: 1,
-            ref: 'default',
-            name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
-            organization_id: 1,
-            cloud_provider: 'localhost',
-            status: 'ACTIVE_HEALTHY',
-            region: 'local',
-            connectionString: IS_PLATFORM
-              ? createEncryptedDbConnectionString({
-                  db_user_supabase: 'postgres',
-                  db_dns_name: undefined,
-                  db_host: 'localhost',
-                  db_pass_supabase: String(process.env.POSTGRES_PASSWORD),
-                  db_port: 5432,
-                  db_name: 'postgres',
-                  db_ssl: false,
-                })
-              : '',
-          },
-        ],
+        projects: [{ ...DEFAULT_PROJECT, connectionString: '' }],
       },
     ],
   }

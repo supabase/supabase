@@ -1,20 +1,25 @@
-import useSWR from 'swr'
-import { FC, useState } from 'react'
-import { Button, Form, Input, Listbox } from '@supabase/ui'
+import { useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { useStore } from 'hooks'
-import { patch, get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { checkPermissions, useStore } from 'hooks'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-const StorageSettings: FC<any> = ({ projectRef }) => {
-  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config/storage`, get)
+export type StorageSettingsProps = {
+  projectRef: string | undefined
+}
+
+const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
+  const { data, error } = useProjectStorageConfigQuery({ projectRef })
 
   if (error || data?.error) {
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-sm">Error loading storage settings</p>
       </div>
     )
@@ -22,7 +27,7 @@ const StorageSettings: FC<any> = ({ projectRef }) => {
 
   if (!data) {
     return (
-      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-sm">Loading...</p>
       </div>
     )
@@ -38,6 +43,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const { ui } = useStore()
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
+
+  const canUpdateStorageSettings = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
@@ -58,6 +65,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
     return errors
   }
 
+  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
+
   const onSubmit = async (values: any) => {
     const errors = onValidate(values)
 
@@ -67,20 +76,23 @@ const StorageConfig = ({ config, projectRef }: any) => {
         message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
       })
     } else {
-      const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
-      const res = await patch(`${API_URL}/projects/${projectRef}/config/storage`, payload)
-      if (res?.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update storage settings: ${res.error.message}`,
+      try {
+        const res = await updateStorageConfig({
+          projectRef,
+          fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
         })
-      } else {
+
         const updatedValue = convertFromBytes(res.fileSizeLimit)
         initialValues = {
           fileSizeLimit: updatedValue.value,
           unformattedFileSizeLimit: res.fileSizeLimit,
         }
-        ui.setNotification({ category: 'success', message: 'Sucessfully updated settings' })
+        ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+      } catch (error: any) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to update storage settings: ${error?.message}`,
+        })
       }
     }
   }
@@ -105,8 +117,8 @@ const StorageConfig = ({ config, projectRef }: any) => {
           return (
             <>
               <div className="mb-6">
-                <h3 className="text-scale-1200 mb-2 text-xl">Storage settings</h3>
-                <div className="text-scale-900 text-sm">
+                <h3 className="mb-2 text-xl text-scale-1200">Storage settings</h3>
+                <div className="text-sm text-scale-900">
                   Configure your project's storage settings
                 </div>
               </div>
@@ -114,23 +126,23 @@ const StorageConfig = ({ config, projectRef }: any) => {
                 <div
                   className={[
                     'bg-scale-100 dark:bg-scale-300',
-                    'border-scale-400 overflow-hidden',
+                    'overflow-hidden border-scale-400',
                     'rounded-md border shadow',
                   ].join(' ')}
                 >
-                  <div className="divide-scale-400 flex flex-col gap-0 divide-y">
-                    <div className="block grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
-                      <div className="relative col-span-12 flex flex-col gap-6 lg:col-span-4">
+                  <div className="flex flex-col gap-0 divide-y divide-scale-400">
+                    <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
+                      <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                         <p className="text-sm">Upload file size limit</p>
                       </div>
-                      <div className="relative col-span-12 flex flex-col gap-x-6 gap-y-2 lg:col-span-8">
-                        <div className="col-span-12 grid grid-cols-12 gap-2">
+                      <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
+                        <div className="grid grid-cols-12 col-span-12 gap-2">
                           <div className="col-span-8">
                             <Input
                               id="fileSizeLimit"
                               name="fileSizeLimit"
                               type="number"
-                              disabled={isFreeTier}
+                              disabled={isFreeTier || !canUpdateStorageSettings}
                               step={1}
                               onKeyPress={(event) => {
                                 if (event.charCode < 48 || event.charCode > 57) {
@@ -158,7 +170,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                             </Listbox>
                           </div>
                         </div>
-                        <p className="text-scale-1100 text-sm">
+                        <p className="text-sm text-scale-1100">
                           {selectedUnit !== StorageSizeUnits.BYTES &&
                             `Equivalent to ${convertToBytes(
                               values.fileSizeLimit,
@@ -173,15 +185,23 @@ const StorageConfig = ({ config, projectRef }: any) => {
                   {isFreeTier && (
                     <div className="px-6 pb-6">
                       <UpgradeToPro
+                        icon={<IconClock size="large" />}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                         projectRef={projectRef}
-                        secondaryText="Please upgrade to Pro plan for a configurable upload file size limit of up to 5 GB."
+                        secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                       />
                     </div>
                   )}
-                  <div className="border-scale-400 border-t" />
-                  <div className="flex justify-between py-4 px-8">
-                    <div className="flex w-full items-center justify-end gap-2">
+                  <div className="border-t border-scale-400" />
+                  <div className="flex justify-between px-8 py-4">
+                    <div className="flex items-center justify-between w-full gap-2">
+                      {!canUpdateStorageSettings ? (
+                        <p className="text-sm text-scale-1000">
+                          You need additional permissions to update storage settings
+                        </p>
+                      ) : (
+                        <div />
+                      )}
                       <div className="flex gap-2">
                         <Button
                           type="default"
@@ -195,7 +215,9 @@ const StorageConfig = ({ config, projectRef }: any) => {
                           type="primary"
                           htmlType="submit"
                           loading={isSubmitting}
-                          disabled={!hasChanges && hasChanges !== undefined}
+                          disabled={
+                            !canUpdateStorageSettings || (!hasChanges && hasChanges !== undefined)
+                          }
                         >
                           Save
                         </Button>

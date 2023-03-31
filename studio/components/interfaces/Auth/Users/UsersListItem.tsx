@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
@@ -11,9 +11,10 @@ import { User } from './Users.types'
 interface Props {
   user: User
   canRemoveUser: boolean
+  canRemoveMFAFactors: boolean
 }
 
-const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
+const UserListItem: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = getDateFromIsoString(user.created_at)
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
@@ -54,7 +55,11 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
         </div>
       </Table.td>
       <Table.td className="text-right">
-        <UserDropdown user={user} canRemoveUser={canRemoveUser} />
+        <UserDropdown
+          user={user}
+          canRemoveUser={canRemoveUser}
+          canRemoveMFAFactors={canRemoveMFAFactors}
+        />
       </Table.td>
     </Table.tr>
   )

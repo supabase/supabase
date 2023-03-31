@@ -1,4 +1,4 @@
-import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from '@supabase/ui'
+import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from 'ui'
 import { useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -62,19 +62,19 @@ function CodeBlock(props: CodeBlockProps) {
           className="
             bg-scale-200
             text-scale-900
-            flex 
-            h-8 w-full 
+            flex
+            h-8 w-full
             items-center
-            
-            gap-1
-            rounded-tr  
-            rounded-tl 
-            
-            border-t 
 
-            border-r 
-            border-l 
-            px-4 
+            gap-1
+            rounded-tr
+            rounded-tl
+
+            border-t
+
+            border-r
+            border-l
+            px-4
             font-sans
             "
         >

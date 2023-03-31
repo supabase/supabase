@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Toggle } from '@supabase/ui'
-import { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
+import { Badge, Toggle } from 'ui'
+import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

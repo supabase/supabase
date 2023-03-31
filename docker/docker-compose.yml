@@ -1,33 +1,38 @@
 # Usage
-#   Start:          docker-compose up
-#   With helpers:   docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
-#   Stop:           docker-compose down
-#   Destroy:        docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
+#   Start:          docker compose up
+#   With helpers:   docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+#   Stop:           docker compose down
+#   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
 version: "3.8"
 
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:latest
+    image: supabase/studio:20230216-e731b77
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-      DEFAULT_ORGANIZATION: ${STUDIO_DEFAULT_ORGANIZATION}
-      DEFAULT_PROJECT: ${STUDIO_DEFAULT_PROJECT}
+      DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
+      DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
 
       SUPABASE_URL: http://kong:8000
-      SUPABASE_REST_URL: ${PUBLIC_REST_URL}
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
   kong:
     container_name: supabase-kong
-    image: kong:2.1
+    image: kong:2.8.1
     restart: unless-stopped
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
@@ -38,14 +43,23 @@ services:
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
-      - ./volumes/api:/var/lib/kong
+      # https://github.com/supabase/supabase/issues/12661
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.10.0
+    image: supabase/gotrue:v2.47.0
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
@@ -53,7 +67,7 @@ services:
       API_EXTERNAL_URL: ${API_EXTERNAL_URL}
 
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
@@ -67,6 +81,8 @@ services:
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+      # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
+      # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
       GOTRUE_SMTP_HOST: ${SMTP_HOST}
       GOTRUE_SMTP_PORT: ${SMTP_PORT}
@@ -80,58 +96,75 @@ services:
 
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+      MFA_ENABLED: ${MFA_ENABLED}
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v9.0.1
+    image: postgrest/postgrest:v10.1.2
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
   realtime:
-    container_name: supabase-realtime
-    image: supabase/realtime:v0.22.4
+    container_name: realtime-dev.supabase-realtime
+    image: supabase/realtime:v2.5.1
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
+      PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
+      DB_USER: supabase_admin
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_SSL: "false"
-      PORT: 4000
-      JWT_SECRET: ${JWT_SECRET}
-      REPLICATION_MODE: RLS
-      REPLICATION_POLL_INTERVAL: 100
-      SECURE_CHANNELS: "true"
-      SLOT_NAME: supabase_realtime_rls
-      TEMPORARY_SLOT: "true"
+      DB_NAME: ${POSTGRES_DB}
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
     command: >
-      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
-      && ./prod/rel/realtime/bin/realtime start"
+      sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.10.0
+    image: supabase/storage-api:v0.28.2
     depends_on:
-      - db # Disable this if you are using an external Postgres database
-      - rest
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
+      rest:
+        condition: service_started
+      imgproxy:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
     restart: unless-stopped
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-      PGOPTIONS: -c search_path=storage,public
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
@@ -139,33 +172,74 @@ services:
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: stub
       GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - ./volumes/storage:/var/lib/storage:z
+
+  imgproxy:
+    container_name: supabase-imgproxy
+    image: darthsim/imgproxy:v3.13
+    healthcheck:
+      test: [ "CMD", "imgproxy", "health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+    volumes:
+      - ./volumes/storage:/var/lib/storage:z
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.29.0
+    image: supabase/postgres-meta:v0.60.7
     depends_on:
-      - db # Disable this if you are using an external Postgres database
+      db: # Disable this if you are using an external Postgres database
+        condition: service_healthy
     restart: unless-stopped
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
       PG_META_DB_PORT: ${POSTGRES_PORT}
       PG_META_DB_NAME: ${POSTGRES_DB}
-      PG_META_DB_USER: ${POSTGRES_USER}
+      PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.21
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    image: supabase/postgres:15.1.0.54-rc0
+    healthcheck:
+      test: pg_isready -U postgres -h localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+      - -c
+      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:5432
+      # Pass down internal port because it's set dynamically by other services
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      # - ./volumes/db/data:/var/lib/postgresql/data
-      - ./volumes/db/init:/docker-entrypoint-initdb.d
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      # Must be superuser to create event trigger
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      # Must be superuser to alter reserved role
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      # PGDATA directory is persisted between restarts
+      - ./volumes/db/data:/var/lib/postgresql/data:Z

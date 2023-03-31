@@ -33,7 +33,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       chartSize="tiny"
       data={transformedData}
       attribute="count"
-      label="Events"
+      label="Logs / Time"
       onBarClick={(v?: { activePayload?: { payload: any }[] }) => {
         if (!v || !v?.activePayload?.[0]?.payload) return
         const unixOrIsoTimestamp = v.activePayload[0].payload.timestamp

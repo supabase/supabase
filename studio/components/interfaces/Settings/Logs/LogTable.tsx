@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
-import DataGrid from '@supabase/react-data-grid'
+import { Alert, Button, IconEye, IconEyeOff } from 'ui'
+import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
@@ -14,7 +14,7 @@ import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceed
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
-import Divider from 'components/ui/Divider'
+import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -70,20 +70,27 @@ const LogTable = ({
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
-  const DEFAULT_COLUMNS = columnNames.map((v) => {
+  const DEFAULT_COLUMNS = columnNames.map((v, idx: number) => {
     let formatter = undefined
 
     formatter = (received: FormatterArg) => {
       const value = received.row?.[v]
       if (value && typeof value === 'object') {
-        return `[Object]`
+        return JSON.stringify(value)
       } else if (value === null) {
         return 'NULL'
       } else {
         return String(value)
       }
     }
-    return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
+    return {
+      key: `logs-column-${idx}`,
+      name: v,
+      resizable: true,
+      formatter,
+      header: v,
+      minWidth: 128,
+    }
   })
 
   let columns
@@ -104,6 +111,10 @@ const LogTable = ({
         break
       case 'functions':
         columns = FunctionsLogsColumnRender
+        break
+
+      case 'auth':
+        columns = AuthColumnRenderer
         break
 
       default:
@@ -152,6 +163,15 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const RowRenderer = (props: RowRendererProps<any>) => {
+    return (
+      <Row
+        {...props}
+        className="font-mono tracking-tight cursor-pointer !bg-scale-200 hover:!bg-scale-300"
+      />
+    )
+  }
+
   const LogsExplorerTableHeader = () => (
     <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
       <div className="flex items-center gap-2">
@@ -195,7 +215,7 @@ const LogTable = ({
 
     return (
       <div className="flex w-1/2 justify-center px-5">
-        <Alert variant="danger" title="Sorry! An error occured when fetching data." withIcon>
+        <Alert variant="danger" title="Sorry! An error occurred when fetching data." withIcon>
           <Renderer {...childProps} />
         </Alert>
       </div>
@@ -271,6 +291,7 @@ const LogTable = ({
               return row.id
             }}
             onRowClick={(r) => setFocusedLog(r)}
+            rowRenderer={RowRenderer}
           />
           {logDataRows.length > 0 ? (
             <div

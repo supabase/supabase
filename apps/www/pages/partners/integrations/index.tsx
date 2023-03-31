@@ -1,4 +1,4 @@
-import { IconLoader, IconSearch, Input } from '@supabase/ui'
+import { IconLoader, IconSearch, Input } from 'ui'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -13,7 +13,7 @@ import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
-    .from<Partner>('partners')
+    .from('partners')
     .select('*')
     .eq('approved', true)
     .eq('type', 'technology')
@@ -57,19 +57,17 @@ function IntegrationPartnersPage(props: Props) {
       setIsSearching(true)
 
       let query = supabase
-        .from<Partner>('partners')
+        .from('partners')
         .select('*')
         .eq('approved', true)
         .order('category')
         .order('title')
 
       if (search.trim()) {
-        query = query
-          // @ts-ignore
-          .textSearch('tsv', `${search.trim()}`, {
-            type: 'websearch',
-            config: 'english',
-          })
+        query = query.textSearch('tsv', `${search.trim()}`, {
+          type: 'websearch',
+          config: 'english',
+        })
       }
 
       const { data: partners } = await query

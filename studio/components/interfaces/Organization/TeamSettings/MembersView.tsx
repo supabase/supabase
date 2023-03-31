@@ -1,43 +1,75 @@
 import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState, useContext, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
+import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
 
-import { Member, Role } from 'types'
-import { useStore, useFlag, useOrganizationDetail } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
+import { Member } from 'types'
+import { useStore, useParams } from 'hooks'
 
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
-import { PageContext } from 'pages/org/[slug]/settings'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 
 interface SelectedMember extends Member {
   oldRoleId: number
   newRoleId: number
 }
 
-const MembersView = () => {
-  const PageState: any = useContext(PageContext)
-  const { roles }: { roles: Role[] } = PageState
+export interface MembersViewProps {
+  searchString: string
+}
+
+const MembersView = ({ searchString }: MembersViewProps) => {
+  const { ui } = useStore()
+  const { slug } = useParams()
+
+  const { data: profile } = useProfileQuery()
+  const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
+  const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })
+  const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
+    onSuccess() {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
+      })
+    },
+    onError() {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
+      })
+    },
+  })
+
+  const roles = rolesData?.roles ?? []
+  const members = detailData?.members ?? []
   const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
-  const { ui } = useStore()
-  const slug = ui.selectedOrganization?.slug || ''
-  const isOwner = ui.selectedOrganization?.is_owner
-
-  const enablePermissions = useFlag('enablePermissions')
-  const { mutateOrgMembers } = useOrganizationDetail(slug)
-
-  const [loading, setLoading] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
-  const hasAccessToMemberActions = enablePermissions ? true : isOwner
+  const filteredMembers = (
+    !searchString
+      ? members
+      : members.filter((x: any) => {
+          if (x.invited_at) {
+            return x.primary_email.includes(searchString)
+          }
+          if (x.id || x.gotrue_id) {
+            return x.username.includes(searchString) || x.primary_email.includes(searchString)
+          }
+        })
+  )
+    .slice()
+    .sort((a: any, b: any) => a.username.localeCompare(b.username))
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -47,58 +79,52 @@ const MembersView = () => {
   const handleRoleChange = async () => {
     if (!selectedMember) return
 
-    setLoading(true)
     const { gotrue_id, newRoleId } = selectedMember
-    const response = await patch(`${API_URL}/organizations/${slug}/members/${gotrue_id}`, {
-      role_id: newRoleId,
-    })
 
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
-      })
-    } else {
-      const updatedMembers = PageState.members.map((member: Member) => {
-        if (member.gotrue_id === selectedMember.gotrue_id) {
-          return { ...member, role_ids: [newRoleId] }
-        } else {
-          return member
-        }
-      })
-      mutateOrgMembers(updatedMembers)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
-      })
+    if (!slug) {
+      throw new Error('slug is required')
+    }
+    if (!gotrue_id) {
+      throw new Error('gotrue_id is required')
     }
 
-    setLoading(false)
+    updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
     setUserRoleChangeModalVisible(false)
+  }
+
+  if (isLoadingOrgDetails) {
+    return (
+      <div className="py-4 space-y-2">
+        <ShimmeringLoader />
+        <ShimmeringLoader className="w-3/4" />
+        <ShimmeringLoader className="w-1/2" />
+      </div>
+    )
   }
 
   return (
     <>
       <div className="rounded">
-        <Loading active={!PageState.filteredMembers}>
+        <Loading active={!filteredMembers}>
           <Table
             head={[
               <Table.th key="header-user">User</Table.th>,
               <Table.th key="header-status"></Table.th>,
               <Table.th key="header-role" className="flex items-center space-x-2">
                 <span>Role</span>
-                {enablePermissions && <RolesHelperModal />}
+                <RolesHelperModal />
               </Table.th>,
               <Table.th key="header-action"></Table.th>,
             ]}
             body={[
-              PageState.filteredMembers.map((x: Member, i: number) => {
+              ...filteredMembers.map((x: Member, i: number) => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
-                const memberIsUser = x.primary_email == PageState.user.primary_email
+                const memberIsUser = x.primary_email == profile?.primary_email
                 const memberIsPendingInvite = !!x.invited_id
                 const canRemoveRole = rolesRemovable.includes(memberRoleId)
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
+                const isEmailUser = x.username === x.primary_email
 
                 const validateSelectedRoleToChange = (roleId: any) => {
                   if (!role || role.id === roleId) return
@@ -127,15 +153,19 @@ const MembersView = () => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2">
+                              <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
+                            ) : isEmailUser ? (
+                              <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <IconUser strokeWidth={1.5} />
+                              </div>
                             ) : (
                               <Image
                                 src={`https://github.com/${x.username}.png?size=80`}
                                 width="40"
                                 height="40"
-                                className="rounded-full border"
+                                className="border rounded-full"
                               />
                             )}
                           </div>
@@ -157,87 +187,128 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
-                        {!role && !enablePermissions && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
-                        {role && (
-                          <>
-                            {!enablePermissions ? (
-                              <p>{role?.name ?? 'Developer'}</p>
-                            ) : (
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <Listbox
-                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                        {isLoadingRoles ? (
+                          <div className="w-[140px]">
+                            <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+                          </div>
+                        ) : role !== undefined ? (
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger className="w-[140px]">
+                              <Listbox
+                                className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                disabled={disableRoleEdit}
+                                value={role.id}
+                                onChange={validateSelectedRoleToChange}
+                              >
+                                {roles.map((r: any) => (
+                                  <Listbox.Option
+                                    key={r.id}
+                                    value={r.id}
+                                    label={r.name}
                                     disabled={disableRoleEdit}
-                                    value={role.id}
-                                    onChange={validateSelectedRoleToChange}
+                                    className="w-36"
                                   >
-                                    {roles.map((r: any) => (
-                                      <Listbox.Option
-                                        key={r.id}
-                                        value={r.id}
-                                        label={r.name}
-                                        disabled={disableRoleEdit}
-                                      >
-                                        {r.name}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox>
-                                </Tooltip.Trigger>
-                                {memberIsPendingInvite ? (
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                                        'border-scale-200 border ', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-scale-1200 text-xs">
-                                        Role can only be changed after the user has accepted the
-                                        invite
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                ) : !memberIsUser && !canRemoveRole ? (
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                                        'border-scale-200 border ', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-scale-1200 text-xs">
-                                        You need additional permissions to manage this team member
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                ) : (
-                                  <></>
-                                )}
-                              </Tooltip.Root>
+                                    {r.name}
+                                  </Listbox.Option>
+                                ))}
+                              </Listbox>
+                            </Tooltip.Trigger>
+                            {memberIsPendingInvite ? (
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      Role can only be changed after the user has accepted the
+                                      invite
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            ) : !memberIsUser && !canRemoveRole ? (
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      You need additional permissions to manage this team member
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            ) : (
+                              <></>
                             )}
-                          </>
+                          </Tooltip.Root>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm text-scale-1100">Invalid role</p>
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <IconAlertCircle size={16} strokeWidth={1.5} />
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      This user has an invalid role, please reach out to us via
+                                      support
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          </div>
                         )}
                       </Table.td>
                       <Table.td>
-                        {hasAccessToMemberActions && !memberIsUser && (
-                          <MemberActions members={PageState.members} member={x} roles={roles} />
-                        )}
+                        {!memberIsUser && <MemberActions member={x} roles={roles} />}
                       </Table.td>
                     </Table.tr>
                   </Fragment>
                 )
               }),
+              ...(searchString.length > 0 && filteredMembers.length === 0
+                ? [
+                    <Table.tr
+                      key="no-results"
+                      className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
+                    >
+                      <Table.td colSpan={12}>
+                        <div className="flex items-center space-x-3 opacity-75">
+                          <IconAlertCircle size={16} strokeWidth={2} />
+                          <p className="text-scale-1100">
+                            No users matched the search query "{searchString}"
+                          </p>
+                        </div>
+                      </Table.td>
+                    </Table.tr>,
+                  ]
+                : []),
               <Table.tr
                 key="footer"
                 className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
               >
                 <Table.td colSpan={4}>
                   <p className="text-scale-1100">
-                    {PageState.membersFilterString ? `${PageState.filteredMembers.length} of ` : ''}
-                    {PageState.members.length || '0'}{' '}
-                    {PageState.members.length == 1 ? 'user' : 'users'}
+                    {searchString ? `${filteredMembers.length} of ` : ''}
+                    {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
                   </p>
                 </Table.td>
               </Table.tr>,
@@ -262,11 +333,11 @@ const MembersView = () => {
               to{' '}
               <span className="text-scale-1200">{getRoleNameById(selectedMember?.newRoleId)}</span>
             </p>
-            <p className="text-sm text-scale-1200 mt-3">
+            <p className="mt-3 text-sm text-scale-1200">
               By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>
-          <Modal.Seperator />
+          <Modal.Separator />
           <Modal.Content>
             <div className="flex gap-3">
               <Button
@@ -281,8 +352,8 @@ const MembersView = () => {
                 block
                 type="warning"
                 size="medium"
-                disabled={loading}
-                loading={loading}
+                disabled={isLoading}
+                loading={isLoading}
                 onClick={() => handleRoleChange()}
               >
                 Confirm

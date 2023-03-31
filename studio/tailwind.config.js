@@ -1,3 +1,4 @@
+const { repeat } = require('lodash')
 const ui = require('./../packages/config/ui.config.js')
 
 const blueGray = {
@@ -35,8 +36,10 @@ module.exports = ui({
     './internals/**/*.{js,ts,jsx,tsx}',
     './lib/**/*.{js,ts,jsx,tsx}',
     './lib/**/**/*.{js,ts,jsx,tsx}',
+    './../packages/ui/src/lib/theme/defaultTheme.ts',
+    './../packages/ui/src/components/**/*.{ts,tsx}',
     // purge styles from supabase ui theme
-    './../node_modules/@supabase/ui/dist/config/default-theme.js',
+    // './../node_modules/ui/dist/config/default-theme.js',
     // purge styles from grid library
     './../node_modules/@supabase/grid/src/components/**/*.{js,ts,jsx,tsx}',
     './../node_modules/@supabase/grid/src/components/**/**/*.{js,ts,jsx,tsx}',
@@ -70,6 +73,125 @@ module.exports = ui({
             },
             'code::after': {
               content: '""',
+            },
+            '--tw-prose-body': theme('colors.scale[1100]'),
+            '--tw-prose-headings': theme('colors.scale[1200]'),
+            '--tw-prose-lead': theme('colors.scale[1100]'),
+            '--tw-prose-links': theme('colors.scale[1100]'),
+            '--tw-prose-bold': theme('colors.scale[1100]'),
+            '--tw-prose-counters': theme('colors.scale[1100]'),
+            '--tw-prose-bullets': theme('colors.scale[900]'),
+            '--tw-prose-hr': theme('colors.scale[500]'),
+            '--tw-prose-quotes': theme('colors.scale[1100]'),
+            '--tw-prose-quote-borders': theme('colors.scale[500]'),
+            '--tw-prose-captions': theme('colors.scale[700]'),
+            '--tw-prose-code': theme('colors.scale[1200]'),
+            '--tw-prose-pre-code': theme('colors.scale[900]'),
+            '--tw-prose-pre-bg': theme('colors.scale[400]'),
+            '--tw-prose-th-borders': theme('colors.scale[500]'),
+            '--tw-prose-td-borders': theme('colors.scale[200]'),
+            '--tw-prose-invert-body': theme('colors.scale[200]'),
+            '--tw-prose-invert-headings': theme('colors.white'),
+            '--tw-prose-invert-lead': theme('colors.scale[500]'),
+            '--tw-prose-invert-links': theme('colors.white'),
+            '--tw-prose-invert-bold': theme('colors.white'),
+            '--tw-prose-invert-counters': theme('colors.scale[400]'),
+            '--tw-prose-invert-bullets': theme('colors.scale[600]'),
+            '--tw-prose-invert-hr': theme('colors.scale[700]'),
+            '--tw-prose-invert-quotes': theme('colors.scale[100]'),
+            '--tw-prose-invert-quote-borders': theme('colors.scale[700]'),
+            '--tw-prose-invert-captions': theme('colors.scale[400]'),
+            // the following are typography overrides
+            // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
+            // reset all header font weights
+            'h1, h2, h3, h4, h5': {
+              fontWeight: '400',
+            },
+            h2: {
+              fontWeight: '400',
+            },
+            p: {
+              fontWeight: '400',
+            },
+            pre: {
+              background: 'none',
+              padding: 0,
+              marginBottom: '32px',
+            },
+            ul: {
+              listStyleType: 'none',
+              paddingLeft: '1rem',
+            },
+            'ul li': {
+              position: 'relative',
+            },
+            'ul li::before': {
+              position: 'absolute',
+              top: '0.75rem',
+              left: '-1rem',
+              height: '0.125rem',
+              width: '0.5rem',
+              borderRadius: '0.25rem',
+              backgroundColor: 'var(--colors-scale7)',
+              content: '""',
+            },
+            ol: {
+              paddingLeft: '1rem',
+              counterReset: 'item',
+              listStyleType: 'none',
+            },
+            'ol li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol li::before': {
+              position: 'absolute',
+              top: '0.25rem',
+              left: '-1rem',
+              height: '1.2rem',
+              width: '1.2rem',
+              borderRadius: '0.25rem',
+              backgroundColor: 'var(--colors-scale3)',
+              border: '1px solid var(--colors-scale5)',
+              content: 'counter(item) "  "',
+              counterIncrement: 'item',
+              fontSize: '12px',
+              color: 'var(--colors-scale9)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+
+            'p img': {
+              border: '1px solid var(--colors-scale4)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            },
+            iframe: {
+              border: '1px solid ' + theme('borderColor.DEFAULT'),
+              borderRadius: theme('borderRadius.lg'),
+            },
+            td: {
+              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+            },
+            code: {
+              fontWeight: '400',
+              padding: '0.2rem 0.4rem',
+              backgroundColor: theme('colors.scale[400]'),
+              border: '1px solid ' + theme('colors.scale[500]'),
+              borderRadius: theme('borderRadius.lg'),
+              wordBreak: 'break-all',
+            },
+            a: {
+              position: 'relative',
+              transition: 'color 0.3s ease-in-out',
+              paddingBottom: '2px',
+              fontWeight: '400',
+              color: 'var(--colors-scale12)',
+              textDecorationLine: 'underline',
+              textDecorationColor: 'var(--colors-brand7)',
+              textDecorationThickness: '1px',
+              textUnderlineOffset: '4px',
+            },
+            'a:hover': {
+              textDecorationColor: 'var(--colors-brand9)',
             },
           },
         },
@@ -118,6 +240,9 @@ module.exports = ui({
       }),
       fontSize: {
         grid: '13px',
+      },
+      gridTemplateColumns: {
+        billingWithTeam: 'repeat(3, minmax(0, 1fr)) 0.9fr',
       },
       colors: {
         // gray: { ...gray },
@@ -234,7 +359,7 @@ module.exports = ui({
           dark: 'var(--colors-scale4)',
         },
 
-        /* 
+        /*
           Forms
         */
         // form: {

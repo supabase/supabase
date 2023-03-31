@@ -108,10 +108,21 @@
                                       "kindString": "Parameter",
                                       "flags": {},
                                       "type": {
-                                        "type": "reference",
-                                        "qualifiedName": "RequestInfo",
-                                        "package": "typescript",
-                                        "name": "RequestInfo"
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "RequestInfo",
+                                            "package": "typescript",
+                                            "name": "RequestInfo"
+                                          },
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "URL",
+                                            "package": "typescript",
+                                            "name": "URL"
+                                          }
+                                        ]
                                       }
                                     },
                                     {
@@ -295,10 +306,21 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "type": {
-                        "type": "reference",
-                        "qualifiedName": "RequestInfo",
-                        "package": "typescript",
-                        "name": "RequestInfo"
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "reference",
+                            "qualifiedName": "RequestInfo",
+                            "package": "typescript",
+                            "name": "RequestInfo"
+                          },
+                          {
+                            "type": "reference",
+                            "qualifiedName": "URL",
+                            "package": "typescript",
+                            "name": "URL"
+                          }
+                        ]
                       }
                     },
                     {
@@ -1000,15 +1022,15 @@
                       },
                       {
                         "type": "literal",
+                        "value": "invite"
+                      },
+                      {
+                        "type": "literal",
                         "value": "magiclink"
                       },
                       {
                         "type": "literal",
                         "value": "recovery"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "invite"
                       },
                       {
                         "type": "literal",
@@ -5037,10 +5059,21 @@
                                       "kindString": "Parameter",
                                       "flags": {},
                                       "type": {
-                                        "type": "reference",
-                                        "qualifiedName": "RequestInfo",
-                                        "package": "typescript",
-                                        "name": "RequestInfo"
+                                        "type": "union",
+                                        "types": [
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "RequestInfo",
+                                            "package": "typescript",
+                                            "name": "RequestInfo"
+                                          },
+                                          {
+                                            "type": "reference",
+                                            "qualifiedName": "URL",
+                                            "package": "typescript",
+                                            "name": "URL"
+                                          }
+                                        ]
                                       }
                                     },
                                     {
@@ -5169,11 +5202,11 @@
                                       },
                                       {
                                         "type": "literal",
-                                        "value": "setItem"
+                                        "value": "removeItem"
                                       },
                                       {
                                         "type": "literal",
-                                        "value": "removeItem"
+                                        "value": "setItem"
                                       }
                                     ]
                                   }
@@ -5419,11 +5452,11 @@
                       },
                       {
                         "type": "literal",
-                        "value": "setItem"
+                        "value": "removeItem"
                       },
                       {
                         "type": "literal",
-                        "value": "removeItem"
+                        "value": "setItem"
                       }
                     ]
                   }
@@ -5632,6 +5665,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 708,
+                                  "character": 21
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5663,6 +5703,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 710,
+                                  "character": 15
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5675,6 +5722,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 710,
+                                  "character": 27
+                                }
+                              ],
                               "type": {
                                 "type": "reference",
                                 "id": 483,
@@ -5836,6 +5890,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 533,
+                                  "character": 35
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5869,6 +5930,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 533,
+                                  "character": 59
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5881,6 +5949,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 533,
+                                  "character": 47
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5924,6 +5999,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 540,
+                                  "character": 53
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -5936,6 +6018,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 540,
+                                  "character": 38
+                                }
+                              ],
                               "type": {
                                 "type": "reference",
                                 "id": 486,
@@ -5949,6 +6038,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 540,
+                                  "character": 21
+                                }
+                              ],
                               "type": {
                                 "type": "union",
                                 "types": [
@@ -6249,6 +6345,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 555,
+                                  "character": 35
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -6282,6 +6385,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 555,
+                                  "character": 59
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -6294,6 +6404,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 555,
+                                  "character": 47
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -6337,6 +6454,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 562,
+                                  "character": 53
+                                }
+                              ],
                               "type": {
                                 "type": "literal",
                                 "value": null
@@ -6349,6 +6473,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 562,
+                                  "character": 38
+                                }
+                              ],
                               "type": {
                                 "type": "reference",
                                 "id": 486,
@@ -6362,6 +6493,13 @@
                               "kind": 1024,
                               "kindString": "Property",
                               "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/GoTrueClient.ts",
+                                  "line": 562,
+                                  "character": 21
+                                }
+                              ],
                               "type": {
                                 "type": "union",
                                 "types": [
@@ -6568,6 +6706,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 587,
+                              "character": 30
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6580,6 +6725,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 587,
+                              "character": 69
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6604,6 +6756,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 587,
+                              "character": 42
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6627,6 +6786,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 587,
+                              "character": 57
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6658,6 +6824,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 591,
+                              "character": 15
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6670,6 +6843,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 591,
+                              "character": 54
+                            }
+                          ],
                           "type": {
                             "type": "reference",
                             "id": 483,
@@ -6694,6 +6874,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 591,
+                              "character": 39
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -6717,6 +6904,13 @@
                           "kind": 1024,
                           "kindString": "Property",
                           "flags": {},
+                          "sources": [
+                            {
+                              "fileName": "src/GoTrueClient.ts",
+                              "line": 591,
+                              "character": 27
+                            }
+                          ],
                           "type": {
                             "type": "literal",
                             "value": null
@@ -11254,7 +11448,7 @@
       "children": [539, 483, 557, 583, 486, 549, 505, 533, 563, 494, 576, 571]
     },
     {
-      "title": "Type aliases",
+      "title": "Type Aliases",
       "kind": 4194304,
       "children": [482, 582, 581, 481, 589, 570]
     }

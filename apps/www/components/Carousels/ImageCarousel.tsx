@@ -1,4 +1,4 @@
-import { Button, IconCornerRightUp, Tabs } from '@supabase/ui'
+import { Button, IconCornerRightUp, Tabs } from 'ui'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -110,6 +110,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                     {content.img_url && (
                       <Image
                         src={`${basePath}${content.img_url}`}
+                        alt={content.title}
                         layout="responsive"
                         width="1460"
                         height="960"

@@ -1,11 +1,13 @@
-# Supabase Next.js User Management
+# Supabase Next.js Auth & User Management Starter
 
-This example will set you up for a very common situation: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This example will set you up for a very common situation: users can sign up or sign in and then update their account with public profile information, including a profile image.
 
 This demonstrates how to use:
 
 - User signups using Supabase [Auth](https://supabase.com/auth).
-- User avatar images using Supabase [Storage](https://supabase.com/storage).
+  - Supabase [Auth Helpers for Next.js](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
+  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui).
+- User avatar images using Supabase [Storage](https://supabase.com/storage)
 - Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
 - Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
 
@@ -14,6 +16,8 @@ This demonstrates how to use:
 - Frontend:
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - Supabase [Auth Helpers for Next.js](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
+  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui).
 - Backend:
   - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with Supabase.js.
 
@@ -21,9 +25,15 @@ This demonstrates how to use:
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2user-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
-## Build from scratch
+## Build locally
+
+Or create a new projec locally with `create-next-app`:
+
+```bash
+npx create-next-app -e with-supabase
+```
 
 ### 1. Create new project
 
@@ -31,7 +41,7 @@ Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and c
 
 ### 2. Run "User Management" Quickstart
 
-Once your database has started, run the "User Management Starter" quickstart. Inside of your project, enter the `SQL editor` tab and scroll down until you see `User Management Starter: Set up a Public Profiles table which you can access with your API`.
+Once your database has started, head over to your project's `SQL Editor` and run the "User Management Starter" quickstart. On the `SQL editor` page, scroll down until you see `User Management Starter: Sets up a public Profiles table which you can access with your API`. Click that, then click `RUN` to execute that query and create a new `profiles` table. When that's finished, head over to the `Table Editor` and see your new `profiles` table.
 
 ### 3. Get the URL and Key
 
@@ -70,52 +80,77 @@ We can use these details to provide fine-grained control over what each user can
 This is a trimmed-down schema, with the policies:
 
 ```sql
--- Create a table for Public Profiles
+-- Create a table for public profiles
 create table profiles (
-  id uuid references auth.users not null,
+  id uuid references auth.users not null primary key,
   updated_at timestamp with time zone,
   username text unique,
+  full_name text,
   avatar_url text,
   website text,
 
-  primary key (id),
-  unique(username),
   constraint username_length check (char_length(username) >= 3)
 );
+-- Set up Row Level Security (RLS)
+-- See https://supabase.com/docs/guides/auth/row-level-security for more details.
+alter table profiles
+  enable row level security;
 
-alter table profiles enable row level security;
+create policy "Public profiles are viewable by everyone." on profiles
+  for select using (true);
 
-create policy "Public profiles are viewable by everyone."
-  on profiles for select
-  using ( true );
+create policy "Users can insert their own profile." on profiles
+  for insert with check (auth.uid() = id);
 
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
+create policy "Users can update own profile." on profiles
+  for update using (auth.uid() = id);
 
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Set up Realtime!
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
-alter publication supabase_realtime add table profiles;
+-- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
+-- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
+create function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  return new;
+end;
+$$ language plpgsql security definer;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 -- Set up Storage!
 insert into storage.buckets (id, name)
-values ('avatars', 'avatars');
+  values ('avatars', 'avatars');
 
-create policy "Avatar images are publicly accessible."
-  on storage.objects for select
-  using ( bucket_id = 'avatars' );
+-- Set up access controls for storage.
+-- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+create policy "Avatar images are publicly accessible." on storage.objects
+  for select using (bucket_id = 'avatars');
 
-create policy "Anyone can upload an avatar."
-  on storage.objects for insert
-  with check ( bucket_id = 'avatars' );
+create policy "Anyone can upload an avatar." on storage.objects
+  for insert with check (bucket_id = 'avatars');
+
+create policy "Anyone can update their own avatar." on storage.objects
+  for update using ( auth.uid() = owner ) with check (bucket_id = 'avatars');
 ```
+
+## More Supabase Examples & Resources
+
+## Examples
+
+These official examples are maintained by the Supabase team:
+
+- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
+- [Next.js Slack Clone](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone)
+- [Next.js 13 Data Fetching](https://github.com/supabase/supabase/tree/master/examples/caching/with-nextjs-13)
+- [And more...](https://github.com/supabase/supabase/tree/master/examples)
+
+## Other resources
+
+- [[Docs] Next.js User Management Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
+- [[Egghead.io] Build a SaaS product with Next.js, Supabase and Stripe](https://egghead.io/courses/build-a-saas-product-with-next-js-supabase-and-stripe-61f2bc20)
+- [[Blog] Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components)
 
 ## Authors
 

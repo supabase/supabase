@@ -84,6 +84,8 @@ export type QueryType =
   | 'auth'
   | 'realtime'
   | 'storage'
+  | 'pgbouncer'
+  | 'postgrest'
 
 export type Mode = 'simple' | 'custom'
 
@@ -132,4 +134,5 @@ export interface DatetimeHelper {
   calcTo: () => string
   calcFrom: () => string
   default?: boolean
+  disabled?: boolean
 }

@@ -1,22 +1,22 @@
 import { FC } from 'react'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'ui'
 
 interface Props {
   item: string
   amount: number | string
   unitPrice: number | string
   price: number | string
-  freeQuota?: number
+  note?: string
 }
 
-const CostBreakdownRow: FC<Props> = ({ item, amount, unitPrice, price, freeQuota }) => {
+const CostBreakdownRow: FC<Props> = ({ item, amount, unitPrice, price, note }) => {
   return (
-    <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
+    <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
       <div className="flex w-[40%] items-center gap-3">
         <span className="text-sm">{item}</span>
-        {freeQuota && (
+        {note && (
           <Badge color="scale">
-            <span className="text-scale-900 text-xs">{`${freeQuota / 1000000000}GB included`}</span>
+            <span className="text-xs text-scale-900">{note}</span>
           </Badge>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { CalculatedColumn } from '@supabase/react-data-grid'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   Button,
   Dropdown,
@@ -8,15 +9,15 @@ import {
   IconTrash,
   IconLock,
   IconUnlock,
-} from '@supabase/ui'
-import * as React from 'react'
+} from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 
 type ColumnMenuProps = {
   column: CalculatedColumn<any, unknown>
+  isEncrypted?: boolean
 }
 
-const ColumnMenu: React.FC<ColumnMenuProps> = ({ column }) => {
+const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
@@ -43,9 +44,34 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column }) => {
     return (
       <>
         {state.editable && onEditColumn !== undefined && (
-          <Dropdown.Item onClick={onEditColumn} icon={<IconEdit size="tiny" />}>
-            Edit column
-          </Dropdown.Item>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
+              <Dropdown.Item
+                onClick={onEditColumn}
+                disabled={isEncrypted}
+                icon={<IconEdit size="tiny" />}
+              >
+                Edit column
+              </Dropdown.Item>
+            </Tooltip.Trigger>
+            {isEncrypted && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      Encrypted columns cannot be edited
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
         )}
         <Dropdown.Item
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}

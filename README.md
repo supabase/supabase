@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -41,7 +41,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 - [x] Alpha: We are testing Supabase with a closed set of customers
 - [x] Public Alpha: Anyone can sign up over at [app.supabase.com](https://app.supabase.com). But go easy on us, there are a few kinks
 - [x] Public Beta: Stable enough for most non-enterprise use-cases
-- [ ] Public: Production-ready
+- [ ] Public: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
 
@@ -58,7 +58,7 @@ Supabase is a combination of open source tools. We’re building the features of
 Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
@@ -108,6 +108,15 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
+    <tr>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
+    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
+    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
+    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
+  </tr>
   <th colspan="7">💚 Community 💚</th>
   <tr>
     <td>C#</td>
@@ -119,22 +128,13 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Dart (Flutter)</td>
-    <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
-    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-    <td><a href="https://github.com/supabase-community/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
-  </tr>
-  <tr>
     <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
     <td>Java</td>
@@ -142,17 +142,17 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
     <td>-</td>
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>
@@ -188,7 +188,16 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
+  </tr>
+  <tr>
+    <td>Godot Engine (GDScript)</td>
+    <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
 </table>
 

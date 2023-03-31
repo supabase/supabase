@@ -1,11 +1,11 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 const CTABanner = (props: any) => {
   const { darkerBg } = props
   return (
     <div
       className={`
-        bg-dark-800 grid grid-cols-12 items-center gap-4 border-t py-32 text-center dark:border-gray-600
+        bg-scale-200 grid grid-cols-12 items-center gap-4 border-t py-32 text-center
         ${darkerBg ? 'dark:bg-dark-900' : ''} px-16
       `}
     >

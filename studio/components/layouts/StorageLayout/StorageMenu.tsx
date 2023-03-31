@@ -2,38 +2,27 @@ import { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  Menu,
-  IconLoader,
-  IconMoreVertical,
-  Alert,
-  IconEdit,
-  IconTrash,
-} from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
+import { checkPermissions, useParams } from 'hooks'
+import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import Flag from 'components/ui/Flag/Flag'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
-  const { ref, bucketId } = router.query
+  const { ref, bucketId } = useParams()
+  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
   const page = router.pathname.split('/')[4] as
     | undefined
     | 'policies'
     | 'settings'
     | 'usage'
     | 'logs'
-
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
 
   const storageExplorerStore = useStorageStore()
   const {
@@ -45,28 +34,50 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <Menu type="pills" className="my-6 flex flex-col flex-grow px-5">
-      <div className="px-2 mb-6">
-        <Button
-          block
-          type="default"
-          icon={
-            <div className="text-scale-900">
-              <IconEdit size={14} />
-            </div>
-          }
-          style={{ justifyContent: 'start' }}
-          onClick={openCreateBucketModal}
-        >
-          New bucket
-        </Button>
+    <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
+      <div className="mb-6 px-2">
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger className="w-full">
+            <Button
+              block
+              type="default"
+              icon={
+                <div className="text-scale-900">
+                  <IconEdit size={14} />
+                </div>
+              }
+              disabled={!canCreateBuckets}
+              style={{ justifyContent: 'start' }}
+              onClick={openCreateBucketModal}
+            >
+              New bucket
+            </Button>
+          </Tooltip.Trigger>
+          {!canCreateBuckets && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    You need additional permissions to create buckets
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
       </div>
       <div className="space-y-6">
         <div className="">
           <div>
             <Menu.Group title="All buckets" />
             {!loaded ? (
-              <div className="py-2 px-2 flex items-center space-x-2">
+              <div className="flex items-center space-x-2 py-2 px-2">
                 <IconLoader className="animate-spin" size={14} strokeWidth={2} />
                 <span className="text-sm">Loading buckets</span>
               </div>
@@ -96,26 +107,14 @@ const StorageMenu: FC<Props> = () => {
             )}
           </div>
         </div>
-
+        <div className="h-px w-full bg-scale-500"></div>
         <div className="">
           <Menu.Group title="Configuration" />
-          <Link href={`/project/${projectRef}/storage/settings`}>
-            <Menu.Item rounded active={page === 'settings'}>
-              <p className="truncate">Settings</p>
-            </Menu.Item>
-          </Link>
-          <Link href={`/project/${projectRef}/storage/policies`}>
+          <Link href={`/project/${ref}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
-          <Flag name="logsStorage">
-            <Link href={`/project/${projectRef}/storage/logs`}>
-              <Menu.Item rounded active={page === 'logs'}>
-                <p className="truncate">Logs</p>
-              </Menu.Item>
-            </Link>
-          </Flag>
         </div>
       </div>
     </Menu>
@@ -123,59 +122,3 @@ const StorageMenu: FC<Props> = () => {
 }
 
 export default observer(StorageMenu)
-
-const BucketRow = ({
-  bucket = {},
-  projectRef = '',
-  isSelected = false,
-  onSelectDeleteBucket = () => {},
-  onSelectToggleBucketPublic = () => {},
-}: any) => {
-  return (
-    <ProductMenuItem
-      key={bucket.id}
-      name={
-        <div className="flex items-center space-x-2">
-          <p>{bucket.name}</p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
-        </div>
-      }
-      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
-      isActive={isSelected}
-      action={
-        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
-          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="toggle-private"
-                onClick={() => onSelectToggleBucketPublic(bucket)}
-              >
-                {bucket.public ? 'Make private' : 'Make public'}
-              </Dropdown.Item>,
-              <Dropdown.Seperator key="bucket-separator" />,
-              <Dropdown.Item
-                icon={<IconTrash size="tiny" />}
-                key="delete-bucket"
-                onClick={() => onSelectDeleteBucket(bucket)}
-              >
-                Delete bucket
-              </Dropdown.Item>,
-            ]}
-          >
-            <IconMoreVertical
-              className="opacity-0 group-hover:opacity-100"
-              size="tiny"
-              strokeWidth={2}
-            />
-          </Dropdown>
-        ) : (
-          <div />
-        )
-      }
-    />
-  )
-}

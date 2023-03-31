@@ -1,22 +1,14 @@
-import useSWR from 'swr'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-  Button,
-  Dropdown,
-  IconArchive,
-  IconChevronDown,
-  IconDatabase,
-  IconKey,
-  IconZap,
-} from '@supabase/ui'
+import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import { get } from 'lib/common/fetch'
-import { API_URL, DATE_FORMAT, METRICS } from 'lib/constants'
+import { DATE_FORMAT, METRICS } from 'lib/constants'
 import { ChartIntervals } from 'types'
+import { useParams } from 'hooks'
+import { useProjectLogStatsQuery } from 'data/logs/project-log-stats-query'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -33,14 +25,11 @@ interface Props {}
 
 const ProjectUsage: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
 
   const [interval, setInterval] = useState<string>('hourly')
 
-  const { data, error }: any = useSWR(
-    `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
-    get
-  )
+  const { data, error } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
@@ -59,9 +48,9 @@ const ProjectUsage: FC<Props> = ({}) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/database/api-logs?te=${paddedTimestamp}`)
+      router.push(`/project/${projectRef}/logs/edge-logs?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/database/api-logs?te=${timestamp}`)
+      router.push(`/project/${projectRef}/logs/edge-logs?te=${timestamp}`)
     }
   }
 
@@ -85,7 +74,7 @@ const ProjectUsage: FC<Props> = ({}) => {
             {selectedInterval.label}
           </Button>
         </Dropdown>
-        <span className="text-scale-1000 text-xs">
+        <span className="text-xs text-scale-1000">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -97,12 +86,12 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconDatabase strokeWidth={2} size={16} />
                       </div>
                     }
                     title="Database"
-                    href={`/project/${ref}/editor`}
+                    href={`/project/${projectRef}/editor`}
                   />
                   <ChartHandler
                     startDate={startDate}
@@ -123,12 +112,12 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconKey strokeWidth={2} size={16} />
                       </div>
                     }
                     title="Auth"
-                    href={`/project/${ref}/auth/users`}
+                    href={`/project/${projectRef}/auth/users`}
                   />
                   <ChartHandler
                     startDate={startDate}
@@ -149,12 +138,12 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconArchive strokeWidth={2} size={16} />
                       </div>
                     }
                     title="Storage"
-                    href={`/project/${ref}/storage/buckets`}
+                    href={`/project/${projectRef}/storage/buckets`}
                   />
                   <ChartHandler
                     startDate={startDate}
@@ -175,7 +164,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconZap strokeWidth={2} size={16} />
                       </div>
                     }
@@ -214,7 +203,7 @@ const PanelHeader = (props: any) => {
       <div
         className={
           'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'hover:text-gray-1200 cursor-pointer hover:opacity-100' : '')
+          (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
         }
       >
         <p>{props.icon}</p>

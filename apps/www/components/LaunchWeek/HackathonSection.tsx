@@ -1,5 +1,5 @@
 import { TruckIcon } from '@heroicons/react/outline'
-import { Button, Badge } from '@supabase/ui'
+import { Button, Badge } from 'ui'
 import Link from 'next/link'
 import Controller from './launch-controller.json'
 

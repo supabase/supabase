@@ -1,8 +1,9 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { uniqBy, map as lodashMap, includes } from 'lodash'
-import { Button, IconSearch, IconLoader, Input } from '@supabase/ui'
+import { Button, IconSearch, IconLoader, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -10,17 +11,25 @@ import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import SchemaTable from './SchemaTable'
 
-const FunctionsList: FC<any> = ({
-  filterString,
-  setFilterString = () => {},
+interface Props {
+  createFunction: () => void
+  editFunction: (fn: PostgresFunction) => void
+  deleteFunction: (fn: PostgresFunction) => void
+}
+
+const FunctionsList: FC<Props> = ({
   createFunction = () => {},
   editFunction = () => {},
   deleteFunction = () => {},
 }) => {
   const { meta } = useStore()
-  const functions = meta.functions.list((fn: any) => !meta.excludedSchemas.includes(fn.schema))
-  const filteredFunctions = functions.filter((x: any) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const [filterString, setFilterString] = useState<string>('')
+
+  const functions = meta.functions.list(
+    (fn: PostgresFunction) => !meta.excludedSchemas.includes(fn.schema)
+  )
+  const filteredFunctions = functions.filter((x: PostgresFunction) =>
+    includes(x.name?.toLowerCase(), filterString.toLowerCase())
   )
   const filteredFunctionSchemas = lodashMap(uniqBy(filteredFunctions, 'schema'), 'schema')
   const canCreateFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'functions')
@@ -51,13 +60,15 @@ const FunctionsList: FC<any> = ({
             title="Functions"
             ctaButtonLabel="Create a new function"
             onClickCta={() => createFunction()}
+            disabled={!canCreateFunctions}
+            disabledMessage="You need additional permissions to create functions"
           >
             <AlphaPreview />
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
               commands such as declarations, assignments, loops, flow-of-control, etc.
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               It's stored on the database server and can be invoked using the SQL interface.
             </p>
           </ProductEmptyState>
@@ -79,24 +90,28 @@ const FunctionsList: FC<any> = ({
                 </Button>
               </Tooltip.Trigger>
               {!canCreateFunctions && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
-                    ].join(' ')}
-                  >
-                    <span className="text-scale-1200 text-xs">
-                      You need additional permissions to create functions
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to create functions
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>
           {filteredFunctions.length <= 0 && (
-            <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
+            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
               <p>No results match your filter query</p>
               <Button type="outline" onClick={() => setFilterString('')}>
                 Reset filter

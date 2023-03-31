@@ -1,0 +1,3 @@
+.sbui-input-error-icon {
+  @apply inset-y-0 right-3 pr-2 pl-2 flex items-center pointer-events-none;
+}

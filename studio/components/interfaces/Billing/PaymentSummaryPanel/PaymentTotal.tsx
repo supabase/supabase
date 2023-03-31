@@ -1,22 +1,24 @@
 import { FC, useState } from 'react'
-import { Loading, IconHelpCircle, Button } from '@supabase/ui'
+import { Loading, IconHelpCircle, Button } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { SubscriptionPreview } from '../Billing.types'
 import CostBreakdownModal from './CostBreakdownModal'
 
 interface Props {
+  totalMonthlyCost: number
   subscriptionPreview?: SubscriptionPreview
   isRefreshingPreview: boolean
   isSpendCapEnabled: boolean
 }
 
 const PaymentTotal: FC<Props> = ({
+  totalMonthlyCost,
   subscriptionPreview,
   isRefreshingPreview,
   isSpendCapEnabled,
 }) => {
   const hasChanges = subscriptionPreview?.has_changes ?? false
-  const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
+  // const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
   const amountDueImmediately = (subscriptionPreview?.amount_due_immediately ?? 0) / 100
   const billingDate = new Date((subscriptionPreview?.bill_on ?? 0) * 1000)
   const isBillingToday =
@@ -48,21 +50,23 @@ const PaymentTotal: FC<Props> = ({
                       <IconHelpCircle
                         size={16}
                         strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 hover:opacity-100 transition"
+                        className="cursor-pointer opacity-50 transition hover:opacity-100"
                         onClick={() => setShowCostBreakdown(true)}
                       />
                     </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
-                          'border border-scale-200 ', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-scale-1200 text-xs">How is this calculated?</span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                            'border border-scale-200 ', //border
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">How is this calculated?</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   </Tooltip.Root>
                 )}
               </div>
@@ -106,8 +110,8 @@ const PaymentTotal: FC<Props> = ({
                 <p className="text-sm text-scale-1100">No changes to current subscription</p>
               )}
             </div>
-            <div className="flex justify-end items-end relative -top-[8px]">
-              <p className="text-scale-1100 relative -top-[1px]">$</p>
+            <div className="relative -top-[8px] flex items-end justify-end">
+              <p className="relative -top-[1px] text-scale-1100">$</p>
               <p className="text-2xl">
                 {!hasChanges
                   ? '0.00'

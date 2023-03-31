@@ -2,14 +2,17 @@ import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
-import { useTheme } from '../Providers'
-import { Badge } from '@supabase/ui'
+import { useTheme } from 'common/Providers'
+import { Badge } from 'ui'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { useRouter } from 'next/router'
 
 const Footer = () => {
   const { isDarkMode } = useTheme()
+  const { pathname } = useRouter()
+  const isLaunchWeekPage = pathname.includes('launch-week')
 
   return (
     <footer
@@ -25,7 +28,13 @@ const Footer = () => {
             <Link href="#" as="/">
               <a className="w-40">
                 <Image
-                  src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                  src={
+                    isLaunchWeekPage
+                      ? supabaseLogoWordmarkDark
+                      : isDarkMode
+                      ? supabaseLogoWordmarkDark
+                      : supabaseLogoWordmarkLight
+                  }
                   width={160}
                   height={30}
                   alt="Supabase"

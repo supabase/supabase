@@ -1,11 +1,11 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 import DefaultLayout from '../components/Layouts/Default'
 
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -61,9 +61,11 @@ const Error404 = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
-              <Button as="a" size="small" className="text-white">
-                Head back
-              </Button>
+              <a>
+                <Button size="small" className="text-white">
+                  Head back
+                </Button>
+              </a>
             </Link>
           </div>
         </div>
