@@ -83,9 +83,9 @@ async function fetchUser(req: NextApiRequest, res: NextApiResponse): Promise<any
       id, auth0_id, primary_email, username, first_name, last_name, mobile, is_alpha_user
     `
   )
-  console.log({ gotrue_id })
 
   const { data } = await query.eq('gotrue_id', gotrue_id).single()
+  console.log({ gotrue_id, data })
   return data
 }
 

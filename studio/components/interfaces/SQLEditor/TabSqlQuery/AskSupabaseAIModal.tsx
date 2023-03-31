@@ -144,8 +144,10 @@ ${output}
                       <p className="text-sm mt-1 text-scale-1100">{p}</p>
                     </div>
                     <div className="flex space-x-4">
-                      <div className="flex items-center justify-center w-7 h-7 rounded-md border border-brand-400 bg-gradient-to-r from-brand-900 to-brand-800 ring-brand-600 ring-1">
-                        <AiIcon className="w-4 h-4" />
+                      <div>
+                        <div className="flex items-center justify-center w-7 h-7 rounded-md border border-brand-400 bg-gradient-to-r from-brand-900 to-brand-800 ring-brand-600 ring-1">
+                          <AiIcon className="w-4 h-4" />
+                        </div>
                       </div>
                       {output == undefined ? (
                         <div className="w-2 h-4 bg-scale-900 mt-1 animate-bounce" />
