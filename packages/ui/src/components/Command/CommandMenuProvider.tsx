@@ -35,16 +35,20 @@ export interface CommandMenuActions {
   toggleTheme: UseThemeProps['toggleTheme']
 }
 
-const CommandMenuProvider = ({
-  children,
-  site,
-  MarkdownHandler,
-}: PropsWithChildren<{
+export interface CommandMenuProviderProps {
   site: 'studio' | 'docs'
+  projectRef?: string
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: any) => React.ReactNode
-}>) => {
+}
+
+const CommandMenuProvider = ({
+  children,
+  site,
+  projectRef,
+  MarkdownHandler,
+}: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = React.useState('')
@@ -76,7 +80,7 @@ const CommandMenuProvider = ({
       }}
     >
       {children}
-      <CommandMenu />
+      <CommandMenu projectRef={projectRef} />
     </CommandMenuContext.Provider>
   )
 }

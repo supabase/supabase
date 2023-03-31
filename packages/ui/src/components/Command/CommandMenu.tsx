@@ -51,9 +51,11 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-const projectRef = ''
+interface CommandMenuProps {
+  projectRef?: string
+}
 
-const CommandMenu = () => {
+const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
