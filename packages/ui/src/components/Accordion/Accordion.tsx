@@ -4,6 +4,7 @@ import styleHandler from '../../lib/theme/styleHandler'
 
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import { IconChevronDown } from '../Icon/icons/IconChevronDown'
+import { IconChevronUp } from '../Icon/icons/IconChevronUp'
 
 type Type = 'default' | 'bordered'
 type Size = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -25,10 +26,13 @@ const AccordionContext = createContext<ContextValue>({
 export interface AccordionProps {
   children?: React.ReactNode
   className?: string
+  defaultActiveId?: (string | number)[]
+  icon?: React.ReactNode
+  iconPosition?: Align
   onChange?: (item: string | string[]) => void
   openBehaviour: 'single' | 'multiple'
   type?: Type
-  // TODO: size?: Size
+  size?: Size
   defaultValue?: string | string[] | undefined
   justified?: Boolean
   chevronAlign?: Align
