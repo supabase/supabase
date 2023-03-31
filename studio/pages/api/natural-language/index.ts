@@ -19,11 +19,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { query, tables } = req.body
+  const { query, tables }: { query: string; tables: string } = req.body
 
   const prompt = stripIndent`
+    ${
+      tables !== undefined && tables.length > 0
+        ? `
     Given the following PostgreSQL tables:
     ${tables}
+    `
+        : ''
+    }
 
     Generate a SQL query based on the following natural language prompt:
     ${query}
