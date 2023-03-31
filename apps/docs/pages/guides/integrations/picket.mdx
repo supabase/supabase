@@ -70,6 +70,7 @@ Click `Save` to create the new table.
 ### Setup Row Level Security (RLS)
 
 Now we want to make sure that only the `todos` owner, the user's `wallet_address`, can access their todos. The key component of the this RLS policy is the expression
+
 ```sql
 ((auth.jwt() ->> 'walletAddress'::text) = wallet_address)
 ```
