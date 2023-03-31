@@ -31,7 +31,7 @@ import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { StoreProvider } from 'hooks'
+import { StoreProvider, useParams } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
@@ -42,6 +42,14 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { IS_PLATFORM } from 'lib/constants'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { createClient } from '@supabase/supabase-js'
+import { CommandMenuProvider } from 'ui'
+
+import remarkGfm from 'remark-gfm'
+import ReactMarkdown from 'react-markdown'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -51,8 +59,19 @@ dayjs.extend(relativeTime)
 dart(Prism)
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const { ref } = useParams()
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
+
+  // [Joshen] Some issues with using createBrowserSupabaseClient
+  const [supabase] = useState(() =>
+    IS_PLATFORM
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+        )
+      : undefined
+  )
 
   const getSavingState = () => rootStore.content.savingState
 
@@ -89,11 +108,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
+  const AuthContainer = (props: any) => {
+    return IS_PLATFORM ? (
+      <SessionContextProvider supabaseClient={supabase as any}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <StoreProvider rootStore={rootStore}>
-          <AuthProvider>
+          <AuthContainer>
             <FlagProvider>
               <Head>
                 <title>Supabase</title>
@@ -117,7 +146,15 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>
-                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                    <CommandMenuProvider
+                      site="studio"
+                      projectRef={ref}
+                      MarkdownHandler={({ ...props }) => (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={null} {...props} />
+                      )}
+                    >
+                      <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                    </CommandMenuProvider>
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
@@ -126,7 +163,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PortalToast />
               <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
             </FlagProvider>
-          </AuthProvider>
+          </AuthContainer>
         </StoreProvider>
       </Hydrate>
     </QueryClientProvider>
