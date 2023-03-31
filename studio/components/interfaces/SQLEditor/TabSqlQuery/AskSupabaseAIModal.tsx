@@ -185,12 +185,12 @@ ${output}
                   </Button>
                 )}
               </div>
-              <div className="px-5 pt-2">
+              {/* <div className="px-5 pt-2">
                 <Toggle
                   label="Allow us to send your database structure to OpenAI when sending prompt"
                   descriptionText="This will allow us to generate queries which are more accurate and relevant to your project"
                 />
-              </div>
+              </div> */}
               {prompts.length === 0 && (
                 <div className="space-y-2 mt-4 mb-6">
                   <div className="flex items-center justify-between px-5">
