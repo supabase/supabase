@@ -1,0 +1,40 @@
+---
+title: Auth Day
+tags:
+  - launch-week
+  - auth
+  - saml
+  - sso
+date: '2023-04-13'
+to_depth: 3
+---
+
+Today we're super excited to announce a few new features for Auth:
+
+1. Easily add SSO support to your projects
+2. Better support for server-side rendering and mobile apps
+
+## SSO Support for Projects
+
+Last launch week we hinted that we're dogfooding SSO for our Dashboard, but this launch week we're releasing SSO support for your projects. We are once again delivering on our promise to build in a weekend and scale to millions.
+
+Every start-up goes through the same process once larger companies notice you. They demand your product add support for SSO, otherwise you can't sign a contract. So you scramble to find a solution to this problem amid the infinite jargon, acronyms and software complicating the whole ordeal. We went through this ourselves, but instead of solving it only for us we decided to solve this problem for all developers.
+
+Today we're super exited to announce [Single Sign-On Support in Supabase Auth
+using the SAML 2.0 protocol](https://supabase.com/docs/guides/auth/sso/auth-sso-saml). We provide you with client APIs and simple CLI commands that will let you build SSO into your project in no time. You can take advantage of Row Level Security policies to quickly build multi-tenant, B2B applications using Supabase.
+
+You can enable SAML 2.0 support for your project in the [Auth
+Providers](https://app.supabase.com/project/_/auth/providers) dashboard. Support is available only on Pro plans and above. You pay get 50 free MAUs, and it's $0.015 above.
+
+_Video here._
+
+## Improved Server-Side Rendering and Mobile Support
+
+One of the biggest struggles we've seen with developers lately has been around Server-Side Rendering and Authentication. Our current implementation uses what's known as _Implicit Grant Flow_, where the user session credentials (JWT and refresh token) are made available to the client before they're made available to the underlying server.
+
+This flow allows the greatest level of flexibility when building different styles of apps. Unfortunately it has some drawbacks. For example, when rendering pages immediately after the user signs in. Our Auth Helpers library took care of the common use cases, but we felt the struggle you had when venturing out on your own or using a framework not supported by the helpers.
+
+Furthermore, there are some security concerns when the Implicit Grant Flow is used on mobile applications.
+
+We spent a few months switching over both the JavaScript client library and our Auth Helpers libraries to use the PKCE (Proof Key for Code Exchange) method. This means that you can now build mobile apps securely, while allowing you to retrieve the session credentials on the server first.
+
