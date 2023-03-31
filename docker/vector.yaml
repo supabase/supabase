@@ -15,55 +15,12 @@ transforms:
     inputs:
       - docker_syslog
     route:
-      auth: '.appname == "auth"'
-      studio: '.appname == "studio"'
       kong: '.appname == "kong"'
+      auth: '.appname == "auth"'
       rest: '.appname == "rest"'
       realtime: '.appname == "realtime"'
       storage: '.appname == "storage"'
-      meta: '.appname == "meta"'
       db: '.appname == "db"'
-  auth_logs:
-    type: remap
-    inputs:
-      - router.auth
-    source: |-
-      .message = parse_json!(.message)
-      .event_message = .message.msg
-      .metadata.level = .message.level
-      .metadata.timestamp = .message.time
-      .metadata.app = .appname
-      .metadata.ip = .source_ip
-      del(.message)
-      del(.procid)
-      del(.severity)
-      del(.source_id)
-      del(.source_type)
-      del(.timestamp)
-      del(.facility)
-      del(.host)
-      del(.id)
-      del(.appname)
-  studio_logs:
-    type: remap
-    inputs:
-      - router.studio
-    source: |-
-      .event_message = .message
-      .metadata.level = .severity
-      .metadata.timestamp = .timestamp
-      .metadata.app = .appname
-      .metadata.ip = .source_ip
-      del(.message)
-      del(.procid)
-      del(.severity)
-      del(.source_id)
-      del(.source_type)
-      del(.timestamp)
-      del(.facility)
-      del(.host)
-      del(.id)
-      del(.appname)
   kong_logs:
     type: remap
     inputs:
@@ -84,6 +41,28 @@ transforms:
       del(.host)
       del(.id)
       del(.appname)
+  auth_logs:
+    type: remap
+    inputs:
+      - router.auth
+    source: |-
+      .message = parse_json!(.message)
+      .event_message = .message.msg
+      .metadata.level = .message.level
+      .metadata.timestamp = .message.time
+      .metadata.app = .appname
+      .metadata.ip = .source_ip
+      .metadata.project = "default"
+      del(.message)
+      del(.procid)
+      del(.severity)
+      del(.source_id)
+      del(.source_type)
+      del(.timestamp)
+      del(.facility)
+      del(.host)
+      del(.id)
+      del(.appname)
   rest_logs:
     type: remap
     inputs:
@@ -94,6 +73,7 @@ transforms:
       .metadata.timestamp = .timestamp
       .metadata.app = .appname
       .metadata.ip = .source_ip
+      .metadata.project = "default"
       del(.message)
       del(.procid)
       del(.severity)
@@ -114,6 +94,7 @@ transforms:
       .metadata.timestamp = .timestamp
       .metadata.app = .appname
       .metadata.ip = .source_ip
+      .metadata.project = "default"
       del(.message)
       del(.procid)
       del(.severity)
@@ -134,26 +115,7 @@ transforms:
       .metadata.timestamp = .timestamp
       .metadata.app = .appname
       .metadata.ip = .source_ip
-      del(.message)
-      del(.procid)
-      del(.severity)
-      del(.source_id)
-      del(.source_type)
-      del(.timestamp)
-      del(.facility)
-      del(.host)
-      del(.id)
-      del(.appname)
-  meta_logs:
-    type: remap
-    inputs:
-      - router.meta
-    source: |-
-      .event_message = .message
-      .metadata.level = .severity
-      .metadata.timestamp = .timestamp
-      .metadata.app = .appname
-      .metadata.ip = .source_ip
+      .metadata.project = "default"
       del(.message)
       del(.procid)
       del(.severity)
@@ -174,6 +136,7 @@ transforms:
       .metadata.timestamp = .timestamp
       .metadata.app = .appname
       .metadata.ip = .source_ip
+      .metadata.project = "default"
       del(.message)
       del(.procid)
       del(.severity)
@@ -185,6 +148,16 @@ transforms:
       del(.id)
       del(.appname)
 sinks:
+  logflare_kong:
+    type: 'http'
+    inputs:
+      - kong_logs
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=gd9tDpgiCVJe'
   logflare_auth:
     type: 'http'
     inputs:
@@ -195,7 +168,6 @@ sinks:
     request:
       retry_max_duration_secs: 10
     uri: 'http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=gd9tDpgiCVJe'
-
   logflare_realtime:
     type: 'http'
     inputs:
@@ -236,13 +208,3 @@ sinks:
     request:
       retry_max_duration_secs: 10
     uri: 'http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=gd9tDpgiCVJe'
-  logflare_kong:
-    type: 'http'
-    inputs:
-      - kong_logs
-    encoding:
-      codec: 'json'
-    method: 'post'
-    request:
-      retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=gd9tDpgiCVJe'
