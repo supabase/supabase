@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'std/server'
 
 const msg = new TextEncoder().encode('data: hello\r\n\r\n')
 

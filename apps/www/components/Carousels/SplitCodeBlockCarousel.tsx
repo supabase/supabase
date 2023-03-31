@@ -126,9 +126,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                   {extension.url && (
                     <Link href={extension.url} as={extension.url}>
                       <a className="ml-px">
-                        <Button as="a" type="default">
-                          View documentation
-                        </Button>
+                        <Button type="default">View documentation</Button>
                       </a>
                     </Link>
                   )}

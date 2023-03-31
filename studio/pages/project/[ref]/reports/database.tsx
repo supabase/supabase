@@ -1,10 +1,14 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { FC, useEffect, useState } from 'react'
-import { IconArrowRight } from 'ui'
+import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
 import { useParams, useStore } from 'hooks'
-import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import {
+  PRICING_TIER_PRODUCT_IDS,
+  TIME_PERIODS_INFRA,
+  USAGE_APPROACHING_THRESHOLD,
+} from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 
@@ -71,6 +75,10 @@ const DatabaseUsage: FC<any> = () => {
   const egressIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
   const egressIsExceeded = databaseSizeUsageRatio >= 1
 
+  const subscriptionTier = ui.selectedProject?.subscription_tier
+
+  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+
   return (
     <>
       <div>
@@ -94,6 +102,26 @@ const DatabaseUsage: FC<any> = () => {
                   labelTop={databaseSizeLimit > 0 ? formatBytes(databaseSizeLimit) : ''}
                 />
               </div>
+
+              {isPaidTier && (
+                <div className="flex justify-between items-center mt-3">
+                  <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    {usage?.disk_volume_size_gb && (
+                      <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
+                    )}
+                    <Badge>Auto-Scaling</Badge>
+                  </div>
+
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                    <a
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/platform/database-usage"
+                    >
+                      What is disk size?
+                    </a>
+                  </Button>
+                </div>
+              )}
             </Panel.Content>
             <Panel.Content>
               <div className="space-y-1">

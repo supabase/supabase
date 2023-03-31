@@ -3,7 +3,7 @@
 ## Run locally
 
 ```bash
-supabase functions serve --no-verify-jwt streams
+supabase functions serve --no-verify-jwt
 ```
 
 Use cURL or Postman to make a GET request to http://localhost:54321/functions/v1/streams.

@@ -15,12 +15,11 @@ import { isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
-  members: Member[]
   member: Member
   roles: Role[]
 }
 
-const MemberActions: FC<Props> = ({ members, member, roles }) => {
+const MemberActions: FC<Props> = ({ member, roles }) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const { rolesRemovable } = getRolesManagementPermissions(roles)
@@ -134,19 +133,21 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
           <Tooltip.Trigger>
             <Button as="span" type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to manage this team member
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to manage this team member
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </div>
     )

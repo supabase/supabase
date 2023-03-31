@@ -234,6 +234,7 @@ export default {
   IconSunrise: 'src/components/Icon/icons/IconSunrise/index.tsx',
   IconSunset: 'src/components/Icon/icons/IconSunset/index.tsx',
   IconTablet: 'src/components/Icon/icons/IconTablet/index.tsx',
+  IconTable: 'src/components/Icon/icons/IconTable/index.tsx',
   IconTag: 'src/components/Icon/icons/IconTag/index.tsx',
   IconTarget: 'src/components/Icon/icons/IconTarget/index.tsx',
   IconTerminal: 'src/components/Icon/icons/IconTerminal/index.tsx',
@@ -284,5 +285,5 @@ export default {
   IconZapOff: 'src/components/Icon/icons/IconZapOff/index.tsx',
   IconZap: 'src/components/Icon/icons/IconZap/index.tsx',
   IconZoomIn: 'src/components/Icon/icons/IconZoomIn/index.tsx',
-  IconZoomOut: 'src/components/Icon/icons/IconZoomOut/index.tsx'
+  IconZoomOut: 'src/components/Icon/icons/IconZoomOut/index.tsx',
 }

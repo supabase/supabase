@@ -21,10 +21,9 @@ export async function getPermissions(signal?: AbortSignal) {
 export type PermissionsData = Awaited<ReturnType<typeof getPermissions>>
 export type PermissionsError = unknown
 
-export const usePermissionsQuery = <TData = PermissionsData>({
-  enabled = true,
-  ...options
-}: UseQueryOptions<PermissionsData, PermissionsError, TData> = {}) =>
+export const usePermissionsQuery = <TData = PermissionsData>(
+  options: UseQueryOptions<PermissionsData, PermissionsError, TData> = {}
+) =>
   useQuery<PermissionsData, PermissionsError, TData>(
     permissionKeys.list(),
     ({ signal }) => getPermissions(signal),

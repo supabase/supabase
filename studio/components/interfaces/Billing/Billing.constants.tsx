@@ -1,4 +1,4 @@
-import { Badge, IconArchive, IconCode, IconDatabase, IconKey } from 'ui'
+import { IconArchive, IconCode, IconDatabase, IconKey, IconZap } from 'ui'
 
 export const CANCELLATION_REASONS = [
   'Pricing',
@@ -149,6 +149,38 @@ export const USAGE_BASED_PRODUCTS = [
           <span>
             Every single serverless function invocation independent of response status is counted.
             Billing is based on the sum of all invocations throughout your billing period.
+          </span>
+        ),
+      },
+    ],
+  },
+  {
+    title: 'Realtime',
+    icon: <IconZap className="dark:text-scale-100" size={16} strokeWidth={2} />,
+    features: [
+      {
+        key: 'realtime_message_count',
+        attribute: 'total_realtime_message_count',
+        title: 'Realtime Messages',
+        units: 'absolute',
+        costPerUnit: 0.0000025,
+        tooltip: (
+          <span>
+            Billing is based on the total amount of messages throughout your billing period.
+          </span>
+        ),
+      },
+
+      {
+        key: 'realtime_peak_connection',
+        attribute: 'total_realtime_peak_connection',
+        title: 'Realtime Concurrent Peak Connections',
+        units: 'absolute',
+        costPerUnit: 0.01,
+        tooltip: (
+          <span>
+            Billing is based on the maximum amount of concurrent peak connections throughout your
+            billing period.
           </span>
         ),
       },

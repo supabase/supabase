@@ -1,0 +1,76 @@
+.appear {
+  opacity: 0;
+  animation: appear 0.8s cubic-bezier(0.1, 0, 0.175, 1) forwards;
+}
+
+.appear-first {
+  animation-delay: 0.4s;
+}
+
+.appear-second {
+  animation-delay: 0.8s;
+}
+
+.appear-third {
+  animation-delay: 1.2s;
+}
+
+.appear-fourth {
+  animation-delay: 1.6s;
+}
+
+.appear-fifth {
+  animation-delay: 2s;
+}
+
+.appear-sixth {
+  animation-delay: 2.4s;
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hide-on-desktop {
+    display: none;
+  }
+}
+
+.show-on-mobile {
+  display: block;
+}
+
+.hide-on-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .show-on-mobile {
+    display: none;
+  }
+
+  .hide-on-mobile {
+    display: block;
+  }
+}
+
+.hide-on-tablet {
+  display: block;
+}
+
+.show-on-tablet {
+  display: none;
+}
+
+@media (max-width: 1199px) and (min-width: 768px) {
+  .show-on-tablet {
+    display: block;
+  }
+
+  .hide-on-tablet {
+    display: none;
+  }
+}
