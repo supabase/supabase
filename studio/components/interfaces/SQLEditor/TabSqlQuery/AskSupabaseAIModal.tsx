@@ -1,4 +1,3 @@
-import { stripIndent } from 'common-tags'
 import { useState, useEffect, useRef } from 'react'
 import { Badge, Button, Form, IconCornerDownLeft, IconUser, Input, Modal, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
