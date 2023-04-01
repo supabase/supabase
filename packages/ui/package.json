@@ -5,7 +5,8 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "build:icons": "node --experimental-modules internals/populate-icons.js"
+    "build:icons": "node --experimental-modules internals/populate-icons.js",
+    "lint": "eslint '**/*.{js,ts,tsx}'"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
