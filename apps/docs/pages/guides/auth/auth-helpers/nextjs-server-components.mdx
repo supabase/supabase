@@ -419,8 +419,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 </TabPanel>
 </Tabs>
 
-And now create our Supabase listener component that uses the singleton Supabase instance to listen for auth changes.
-
 <Tabs
   scrollable
   size="small"
@@ -428,6 +426,8 @@ And now create our Supabase listener component that uses the singleton Supabase 
   defaultActiveId="js"
 >
 <TabPanel id="js" label="JavaScript">
+  
+And now create our Supabase listener component at `/components/supabase-listener.jsx` that uses the singleton Supabase instance to listen for auth changes.
 
 ```jsx title="/components/supabase-listener.jsx"
 'use client'
@@ -461,6 +461,8 @@ export default function SupabaseListener({ serverAccessToken }) {
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+  
+And now create our Supabase listener component at `/components/supabase-listener.tsx` that uses the singleton Supabase instance to listen for auth changes.
 
 ```tsx title="/components/supabase-listener.tsx"
 'use client'
