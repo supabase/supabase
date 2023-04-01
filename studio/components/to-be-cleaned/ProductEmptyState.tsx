@@ -63,7 +63,7 @@ const ProductEmptyState: FC<Props> = ({
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
                   <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-                    <a target="_blank" href={infoButtonUrl}>
+                    <a target="_blank" href={infoButtonUrl} rel="noreferrer">
                       {infoButtonLabel}
                     </a>
                   </Button>

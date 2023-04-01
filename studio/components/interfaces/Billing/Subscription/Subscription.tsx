@@ -140,7 +140,7 @@ const Subscription: FC<Props> = ({
           <div className="px-6 pb-4 mt-2">
             <p className="text-sm text-scale-1100">
               See our{' '}
-              <a href="https://supabase.com/pricing" target="_blank" className="underline">
+              <a href="https://supabase.com/pricing" target="_blank" className="underline" rel="noreferrer">
                 pricing
               </a>{' '}
               for a more detailed analysis of what Supabase has on offer.

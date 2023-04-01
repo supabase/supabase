@@ -6,6 +6,7 @@
     "dev": "next dev -p 8082",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node internals/getSecrets.js",
     "build": "next build",
+    "lint": "next lint",
     "start": "next start",
     "test": "jest",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",

@@ -81,7 +81,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
-                  className="dark block cursor-pointer"
+                  className="dark block cursor-pointer" rel="noreferrer"
                 >
                   <Image
                     className="absolute left-0 top-0 opacity-50"
@@ -106,7 +106,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"
-                  className="block cursor-pointer"
+                  className="block cursor-pointer" rel="noreferrer"
                 >
                   <Image
                     className="absolute left-0 top-0 opacity-50"

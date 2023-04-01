@@ -40,7 +40,7 @@ function IntegrationComplete() {
             <a
               href={`/project/${PageState.supabaseProjectRef}`}
               target="_blank"
-              className="hover:text-green-1000"
+              className="hover:text-green-1000" rel="noreferrer"
             >
               Open Supabase Dashboard →
             </a>

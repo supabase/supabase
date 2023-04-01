@@ -212,7 +212,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                     <a
                       className="text-green-900"
                       target="_blank"
-                      href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                      href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool" rel="noreferrer"
                     >
                       click here
                     </a>
