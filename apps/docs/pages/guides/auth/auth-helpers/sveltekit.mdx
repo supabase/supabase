@@ -149,8 +149,8 @@ We need to create an event listener in the root `+layout.svelte` file in order c
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, _session) => {
       if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-			}
+        invalidate('supabase:auth');
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -551,8 +551,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, _session) => {
       if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-			}
+        invalidate('supabase:auth')
+      }
     });
 
     return () => subscription.unsubscribe();
