@@ -427,12 +427,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/dashibase</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/docs/guides/integrations/dhiwise</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>

@@ -80,6 +80,7 @@ export const menuItems: NavMenu = {
       label: 'Auth',
       items: [
         { name: 'Overview', url: '/guides/auth', items: [] },
+        { name: 'Quickstarts', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'Authentication',
           url: undefined,
@@ -129,9 +130,9 @@ export const menuItems: NavMenu = {
           items: [
             { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
-            { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+            { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs', items: [] },
             {
-              name: 'Next.js Server Components',
+              name: 'Next.js (app)',
               url: '/guides/auth/auth-helpers/nextjs-server-components',
               items: [],
             },
@@ -174,14 +175,6 @@ export const menuItems: NavMenu = {
         { name: 'Database Webhooks', url: '/guides/database/webhooks', items: [] },
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
-        {
-          name: 'Serverless APIs',
-          url: undefined,
-          items: [
-            { name: 'Overview', url: '/guides/database/api', items: [] },
-            { name: 'Generating Types', url: '/guides/database/api/generating-types', items: [] },
-          ],
-        },
         {
           name: 'Extensions',
           url: undefined,
@@ -226,6 +219,13 @@ export const menuItems: NavMenu = {
             { name: 'Timezones', url: '/guides/database/managing-timezones', items: [] },
           ],
         },
+      ],
+    },
+    {
+      label: 'Serverless APIs',
+      items: [
+        { name: 'Overview', url: '/guides/api', items: [] },
+        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
       ],
     },
     {
@@ -388,7 +388,6 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Appsmith', url: '/guides/integrations/appsmith', items: [] },
-            { name: 'Dashibase', url: '/guides/integrations/dashibase', items: [] },
             { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },

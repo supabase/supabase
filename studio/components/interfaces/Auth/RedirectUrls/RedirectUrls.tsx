@@ -7,10 +7,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
-import { domainRegex } from '../Auth.constants'
-import DomainList from './DomainList'
+import { urlRegex } from '../Auth.constants'
+import RedirectUrlList from './RedirectUrlList'
 
-const RedirectDomains = () => {
+const RedirectUrls = () => {
   const { authConfig, ui } = useStore()
 
   const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
@@ -19,24 +19,24 @@ const RedirectDomains = () => {
 
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [selectedDomainToDelete, setSelectedDomainToDelete] = useState<string>()
+  const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
 
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const newDomainSchema = object({
-    domain: string().matches(domainRegex, 'URL is not valid').required(),
+  const newUrlSchema = object({
+    url: string().matches(urlRegex, 'URL is not valid').required(),
   })
 
-  const onAddNewDomain = async (values: any, { setSubmitting }: any) => {
+  const onAddNewUrl = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
     const payload = URI_ALLOW_LIST_ARRAY
-    payload.push(values.domain)
+    payload.push(values.url)
 
     const payloadString = payload.toString()
 
     if (payloadString.length > 2 * 1024) {
       ui.setNotification({
-        message: 'Too many redirect domains, please remove some or try to use wildcards',
+        message: 'Too many redirect URLs, please remove some or try to use wildcards',
         category: 'error',
       })
 
@@ -47,36 +47,36 @@ const RedirectDomains = () => {
     const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
     if (!error) {
       setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully added domain' })
+      ui.setNotification({ category: 'success', message: 'Successfully added URL' })
     } else {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Failed to update domain: ${error?.message}`,
+        message: `Failed to update URL: ${error?.message}`,
       })
     }
 
     setSubmitting(false)
   }
 
-  const onConfirmDeleteDomain = async (domain?: string) => {
-    if (!domain) return
+  const onConfirmDeleteUrl = async (url?: string) => {
+    if (!url) return
 
     setIsDeleting(true)
 
-    // Remove selectedDomain from array and update
-    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== domain)
+    // Remove selectedUrl from array and update
+    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
 
     const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
 
     if (!error) {
-      setSelectedDomainToDelete(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully removed domain' })
+      setSelectedUrlToDelete(undefined)
+      ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
     } else {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Failed to remove domain: ${error?.message}`,
+        message: `Failed to remove URL: ${error?.message}`,
       })
     }
 
@@ -115,50 +115,45 @@ const RedirectDomains = () => {
           )}
         </Tooltip.Root>
       </div>
-      <DomainList canUpdate={canUpdateConfig} onSelectDomainToDelete={setSelectedDomainToDelete} />
+      <RedirectUrlList canUpdate={canUpdateConfig} onSelectUrlToDelete={setSelectedUrlToDelete} />
       <Modal
         hideFooter
         size="small"
         visible={open}
         onCancel={() => setOpen(!open)}
-        header={<h3 className="text-sm">Add a new domain</h3>}
+        header={<h3 className="text-sm">Add a new URL</h3>}
       >
         <Form
           validateOnBlur
-          id="new-domain-form"
-          initialValues={{ domain: '' }}
-          validationSchema={newDomainSchema}
-          onSubmit={onAddNewDomain}
+          id="new-redirect-url-form"
+          initialValues={{ url: '' }}
+          validationSchema={newUrlSchema}
+          onSubmit={onAddNewUrl}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => {
             return (
               <div className="mb-4 space-y-4 pt-4">
                 <div className="px-5">
                   <p className="text-sm text-scale-1100">
-                    This will add a domain to a list of allowed domains that can interact with your
+                    This will add a URL to a list of allowed URLs that can interact with your
                     Authenticaton services for this project.
                   </p>
                 </div>
                 <div className="border-overlay-border border-t" />
                 <div className="px-5">
-                  <Input
-                    id="domain"
-                    name="domain"
-                    label="Domain"
-                    placeholder="https://mydomain.com"
-                  />
+                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
                 </div>
                 <div className="border-overlay-border border-t" />
                 <div className="px-5">
                   <Button
                     block
-                    form="new-domain-form"
+                    form="new-redirect-url-form"
                     htmlType="submit"
                     size="medium"
                     disabled={isSubmitting}
                     loading={isSubmitting}
                   >
-                    Add domain
+                    Add URL
                   </Button>
                 </div>
               </div>
@@ -169,18 +164,18 @@ const RedirectDomains = () => {
       <Modal
         hideFooter
         size="small"
-        visible={selectedDomainToDelete !== undefined}
-        header={<h3 className="text-sm">Remove domain</h3>}
-        onCancel={() => setSelectedDomainToDelete(undefined)}
+        visible={selectedUrlToDelete !== undefined}
+        header={<h3 className="text-sm">Remove URL</h3>}
+        onCancel={() => setSelectedUrlToDelete(undefined)}
       >
         <div className="mb-4 space-y-4 pt-4">
           <div className="px-5">
             <p className="mb-2 text-sm text-scale-1100">
               Are you sure you want to remove{' '}
-              <span className="text-scale-1200">{selectedDomainToDelete}</span>?
+              <span className="text-scale-1200">{selectedUrlToDelete}</span>?
             </p>
-            <p className="text-sm text-scale-1100">
-              This domain will no longer work with your authentication configuration.
+            <p className="text-scale-1100 text-sm">
+              This URL will no longer work with your authentication configuration.
             </p>
           </div>
           <div className="border-overlay-border border-t"></div>
@@ -189,7 +184,7 @@ const RedirectDomains = () => {
               block
               type="default"
               size="medium"
-              onClick={() => setSelectedDomainToDelete(undefined)}
+              onClick={() => setSelectedUrlToDelete(undefined)}
             >
               Cancel
             </Button>
@@ -198,9 +193,9 @@ const RedirectDomains = () => {
               size="medium"
               type="warning"
               loading={isDeleting}
-              onClick={() => onConfirmDeleteDomain(selectedDomainToDelete)}
+              onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
             >
-              {isDeleting ? 'Removing...' : 'Remove domain'}
+              {isDeleting ? 'Removing...' : 'Remove URL'}
             </Button>
           </div>
         </div>
@@ -209,4 +204,4 @@ const RedirectDomains = () => {
   )
 }
 
-export default observer(RedirectDomains)
+export default observer(RedirectUrls)

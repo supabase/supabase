@@ -6,7 +6,8 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   FormPanel,
   FormActions,
