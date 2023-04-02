@@ -5,6 +5,7 @@ import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
+import { Badge } from 'ui'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -14,6 +15,7 @@ const ignoreClass = 'ignore-on-export'
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    Badge,
     Quote,
     Avatar,
     PGChart: (props: any) => {
@@ -30,20 +32,13 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <div
-            className={[
-              'next-image--dynamic-fill',
-              type === 'blog' && 'to-scale-400 from-scale-500 rounded-lg border bg-gradient-to-r',
-            ].join(' ')}
-          >
+          <span className={['next-image--dynamic-fill'].join(' ')}>
             <Image
               {...props}
-              className={['next-image--dynamic-fill', type === 'blog' && 'rounded-md border'].join(
-                ' '
-              )}
+              className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
               layout="fill"
             />
-          </div>
+          </span>
         )
       }
       return <img {...props} />

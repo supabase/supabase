@@ -1,20 +1,13 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectBase } from 'types'
-import { checkPermissions } from '../../../hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'lib/constants'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
+  const isVaultEnabled = useFlag('vaultExtension')
+
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
-
-  const canReadStorage = checkPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const canReadInvoices = checkPermissions(PermissionAction.BILLING_READ, 'stripe.invoices')
-  const canReadSubscriptions = checkPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
 
   return [
     {
@@ -55,6 +48,17 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
                 key: 'storage',
                 url: `/project/${ref}/settings/storage`,
                 items: [],
+              },
+            ]
+          : []),
+        ...(isVaultEnabled
+          ? [
+              {
+                name: 'Vault',
+                key: 'vault',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+                items: [],
+                label: 'BETA',
               },
             ]
           : []),

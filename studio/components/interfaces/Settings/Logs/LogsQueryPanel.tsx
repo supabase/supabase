@@ -12,9 +12,11 @@ import {
 import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { IS_PLATFORM } from 'lib/constants'
 
-interface Props {
+export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
@@ -29,7 +31,7 @@ interface Props {
   warnings: LogsWarning[]
 }
 
-const LogsQueryPanel: React.FC<Props> = ({
+const LogsQueryPanel = ({
   templates = [],
   onSelectTemplate,
   hasEditorValue,
@@ -42,18 +44,15 @@ const LogsQueryPanel: React.FC<Props> = ({
   defaultTo,
   onDateChange,
   warnings,
-}) => {
-  const { ui } = useStore()
+}: LogsQueryPanelProps) => {
+  const { data: profile } = useProfileQuery()
   const canCreateLogQuery = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'log_sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
 
   return (
-    <div
-      className=" rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark
-  "
-    >
+    <div className="rounded rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light dark:border-panel-border-dark dark:bg-panel-header-dark">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
@@ -104,7 +103,6 @@ const LogsQueryPanel: React.FC<Props> = ({
                 }`}
               >
                 <Popover
-                  portalled
                   overlay={
                     <Alert variant="warning" title="">
                       <div className="flex flex-col gap-3">
@@ -133,7 +131,7 @@ const LogsQueryPanel: React.FC<Props> = ({
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>
-                {onSave && (
+                {IS_PLATFORM &&  onSave && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger>
                       <Button
@@ -145,19 +143,21 @@ const LogsQueryPanel: React.FC<Props> = ({
                       </Button>
                     </Tooltip.Trigger>
                     {!canCreateLogQuery && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-scale-1200">
-                            You need additional permissions to save your query
-                          </span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                              'border border-scale-200',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to save your query
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
                     )}
                   </Tooltip.Root>
                 )}

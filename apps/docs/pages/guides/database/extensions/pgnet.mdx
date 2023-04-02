@@ -8,7 +8,7 @@ export const meta = {
 
 <Admonition type="caution">
 
-The pg_net API is in beta. Functions signatures may change.
+The pg_net API is in alpha. Functions signatures may change.
 
 </Admonition>
 
@@ -16,9 +16,7 @@ The pg_net API is in beta. Functions signatures may change.
 
 It differs from the `http` extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -36,11 +34,11 @@ It differs from the `http` extension in that it is asynchronous by default. This
 <TabPanel id="sql" label="SQL">
 
 ```sql
--- Example: enable the "pg_net" extension
-create schema if not exists net;
-create extension pg_net with schema net;
+-- Example: enable the "pg_net" extension.
+create extension pg_net;
+-- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts.
 
--- Example: disable the "plv8" extension
+-- Example: disable the "pg_net" extension
 drop extension if exists pg_net;
 drop schema net;
 ```
@@ -53,11 +51,11 @@ Procedural languages are automatically installed within `pg_catalog`, so you don
 </TabPanel>
 </Tabs>
 
-## `http_get` [#http_get]
+## `http_get`
 
 Creates an HTTP GET request returning the request's ID. HTTP requests are not started until the transaction is committed.
 
-### Signature
+### Signature [#get-signature]
 
 <Admonition type="caution">
 
@@ -86,7 +84,7 @@ net.http_get(
     language plpgsql
 ```
 
-### Usage
+### Usage [#get-usage]
 
 ```sql
 select net.http_get('https://news.ycombinator.com') as request_id;
@@ -98,13 +96,13 @@ request_id
 
 After triggering `http_get`, use [`http_get_result`](#http_get_result) to get the result of the request.
 
-## `http_post` [#http_post]
+## `http_post`
 
 Creates an HTTP POST request with a JSON body, returning the request's ID. HTTP requests are not started until the transaction is committed.
 
 The body's character set encoding matches the database's `server_encoding` setting.
 
-### Signature
+### Signature [#post-signature]
 
 <Admonition type="caution">
 
@@ -134,7 +132,7 @@ net.http_post(
     language plpgsql
 ```
 
-### Usage
+### Usage [#post-usage]
 
 ```sql
 select
@@ -149,6 +147,21 @@ request_id
 ```
 
 After triggering `http_post`, use [`http_get_result`](#http_get_result) to get the result of the request.
+
+## Examples
+
+### Invoke a Supabase Edge Function
+
+Make a POST request to a Supabase Edge Function with auth header and JSON body payload:
+
+```sql
+select
+    net.http_post(
+        url:='https://project-ref.functions.supabase.co/function-name',
+        headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
+        body:='{"name": "pg_net"}'::jsonb
+    ) as request_id;
+```
 
 ## Resources
 

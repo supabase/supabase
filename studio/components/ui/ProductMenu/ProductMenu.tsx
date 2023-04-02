@@ -37,7 +37,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                       isActive={page === item.key}
                       isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
-                      isPreview={item.isPreview}
+                      label={item.label}
                     />
                   ))}
                 </div>

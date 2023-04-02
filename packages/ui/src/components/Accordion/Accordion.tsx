@@ -37,14 +37,13 @@ interface AccordionProps {
   defaultActiveId?: (string | number)[]
   icon?: React.ReactNode
   iconPosition?: Align
-  bordered: boolean
   onChange?: (item: string | string[]) => void
   openBehaviour: 'single' | 'multiple'
-  type: Type
-  size: Size
+  type?: Type
+  size?: Size
   defaultValue?: string | string[] | undefined
-  justified: Boolean
-  chevronAlign: Align
+  justified?: Boolean
+  chevronAlign?: Align
 }
 
 function Accordion({
@@ -58,8 +57,8 @@ function Accordion({
   type = 'default',
   // size, // TO DO
   defaultValue = undefined,
-  justified = true,
-  chevronAlign,
+  justified = false,
+  chevronAlign = 'left',
 }: AccordionProps) {
   // const [currentItems, setCurrentItems] = useState(defaultValue || [])
 
@@ -99,7 +98,7 @@ function Accordion({
         className={containerClasses.join(' ')}
         children={
           <AccordionContext.Provider value={{ ...contextValue }}>
-            <div className={containerClasses.join(' ')}>{children}</div>
+            <div>{children}</div>
           </AccordionContext.Provider>
         }
       ></RadixAccordion.Root>
@@ -113,11 +112,12 @@ interface ItemProps {
   header: React.ReactNode
   id: string
   icon?: React.ReactNode
+  disabled?: boolean
 }
 
-export function Item({ children, className, header, id, icon }: ItemProps) {
+export function Item({ children, className, header, id, icon, disabled }: ItemProps) {
   const __styles = styleHandler('accordion')
-  // const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const {
     type,
@@ -134,12 +134,24 @@ export function Item({ children, className, header, id, icon }: ItemProps) {
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   // console.log('currentItems', currentItems)
+  if (open && !disabled) {
+    chevronClasses.unshift('!rotate-180')
+  }
 
   return (
-    <RadixAccordion.Item value={id} className={__styles.variants[type].container}>
+    <RadixAccordion.Item
+      value={id}
+      className={__styles.variants[type].container}
+      disabled={disabled}
+      onClick={() => {
+        setOpen(!open)
+      }}
+    >
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
         {header}
-        <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+        {!disabled && (
+          <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+        )}
       </RadixAccordion.Trigger>
       <RadixAccordion.Content className={__styles.variants[type].content}>
         <div className={__styles.variants[type].panel}>{children}</div>

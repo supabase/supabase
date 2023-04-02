@@ -97,7 +97,7 @@ function Input({
   // }, [errors, touched])
 
   function onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
+    navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
         setCopyLabel('Copied')
@@ -182,7 +182,7 @@ export interface TextAreaProps
   descriptionText?: string
   error?: string
   icon?: any
-  label?: string
+  label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
   labelOptional?: string

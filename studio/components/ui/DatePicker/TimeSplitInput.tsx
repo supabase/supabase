@@ -38,13 +38,10 @@ const TimeSplitInput = ({
     // Only run time conflicts if
     // startDate and endDate are the same date
 
-    // console.log(startDate)
-    // console.log(endDate)
     if (format(new Date(startDate), 'dd/mm/yyyy') == format(new Date(endDate), 'dd/mm/yyyy')) {
       // checks if start time is ahead of end time
 
       if (type === 'start') {
-        // console.log('HH in start switch')
         if (_time.HH && Number(_time.HH) > Number(endTime.HH)) {
           endTimePayload.HH = _time.HH
           endTimeChanges = true
@@ -79,8 +76,6 @@ const TimeSplitInput = ({
       }
 
       if (type === 'end') {
-        // console.log('HH in start switch')
-
         if (_time.HH && Number(_time.HH) < Number(startTime.HH)) {
           startTimePayload.HH = _time.HH
           startTimeChanges = true
@@ -128,8 +123,6 @@ const TimeSplitInput = ({
   }
 
   function handleOnChange(value: string, valueType: TimeType) {
-    // console.log('handleOnChange')
-
     const payload = {
       HH: time.HH,
       mm: time.mm,
@@ -151,14 +144,8 @@ const TimeSplitInput = ({
         break
     }
 
-    // console.log('got here')
-
     payload[valueType] = value
     setTime({ ...payload })
-
-    // if (endTimeChanges) {
-    //   setEndTime(endTimePayload)
-    // }
   }
 
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {

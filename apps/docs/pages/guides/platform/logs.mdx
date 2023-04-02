@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { logConstants } from 'shared-data'
 
 export const meta = {
   id: 'logs',
@@ -19,9 +20,7 @@ This is on the roadmap and you can follow the progress in the [Logflare reposito
 
 Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
-<!--
-To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example.
--->
+{/* <!-- To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
 
 <Tabs
   scrollable
@@ -31,7 +30,7 @@ To update the screenshots, ensure that at least one log line is selected to disp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://app.supabase.com/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/api).
+[API logs](https://app.supabase.com/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
 
 ![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
@@ -60,6 +59,12 @@ To update the screenshots, ensure that at least one log line is selected to disp
 <TabPanel id="realtime" label="Realtime">
 
 [Realtime logs](https://app.supabase.com/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+
+<Admonition type="note">
+
+Realtime connections are not logged by default. Turn on [Realtime connection logs per client](#logging-realtime-connections) with the `log_level` parameter.
+
+</Admonition>
 
 ![Realtime Logs](/docs/img/guides/platform/logs/logs-realtime.png)
 
@@ -127,6 +132,21 @@ If any permission errors are encountered when executing `alter role postgres ...
 
 </Admonition>
 
+## Logging Realtime Connections
+
+Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const options = {
+  realtime: {
+    log_level: 'info',
+  },
+}
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+```
+
 ## Logs Explorer
 
 The [Logs Explorer](https://app.supabase.com/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
@@ -170,12 +190,12 @@ Each log event stores metadata an array of objects with multiple levels, and can
 For example, to query the edge logs without any joins:
 
 ```sql
-select timestamp, metadata from edge_logs t
+select timestamp, metadata from edge_logs as t;
 ```
 
 The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
 
-<!--  Scene is here https://app.excalidraw.com/s/8gj16loJfGZ/3HzccK9MyLx -->
+{/* <!-- Scene is here https://app.excalidraw.com/s/8gj16loJfGZ/3HzccK9MyLx --> */}
 
 ![Without Unnesting](/docs/img/unnesting-none.png)
 
@@ -185,10 +205,11 @@ To query for a nested value, add a join for each array level:
 
 ```sql
 select timestamp, request.method, header.cf_ipcountry
-from edge_logs t
-cross join unnest(t.metadata) as metadata
-cross join unnest(metadata.request) as request
-cross join unnest(request.headers) as header
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as metadata
+  cross join unnest(metadata.request) as request
+  cross join unnest(request.headers) as header;
 ```
 
 This surfaces the following columns available for selection:
@@ -219,17 +240,19 @@ Instead, select only the values required.
 -- ❌ Avoid doing this
 select
   datetime(timestamp),
-  m as metadata  -- <- metadata contains many nested keys
-from edge_logs t
-cross join unnest(t.metadata) as m;
+  m as metadata -- <- metadata contains many nested keys
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as m;
 
 -- ✅ Do this
 select
-datetime(timestamp),
-r.method   -- <- select only the required values
-from edge_logs t
-cross join unnest(t.metadata) as m
-cross join unnest(m.request) as r
+  datetime(timestamp),
+  r.method -- <- select only the required values
+from
+  edge_logs as t
+  cross join unnest(t.metadata) as m
+  cross join unnest(m.request) as r;
 ```
 
 ### Examples and Templates
@@ -240,12 +263,40 @@ For example, you can enter the following query in the SQL Editor to retrieve eac
 
 ```sql
 select datetime(timestamp), h.x_real_ip
-from edge_logs
+from
+  edge_logs
   cross join unnest(metadata) as m
-  cross join unnest(m.request) AS r
-  cross join unnest(r.headers) AS h
-where h.x_real_ip is not null and r.method = "GET"
+  cross join unnest(m.request) as r
+  cross join unnest(r.headers) as h
+where h.x_real_ip is not null and r.method = "GET";
 ```
+
+### Log Source Reference
+
+Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs">
+  {logConstants.schemas.map((schema) => (
+    <TabPanel id={schema.reference} label={schema.name}>
+      <table>
+        <thead>
+          <td className="font-bold">Path</td>
+          <td className="font-bold">Type</td>
+        </thead>
+        <tbody>
+          {schema.fields
+            .sort((a, b) => a.path - b.path)
+            .map((field) => (
+              <tr>
+                <td className="font-mono">{field.path}</td>
+                <td className="font-mono">{field.type}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </TabPanel>
+  ))}
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -13,7 +13,7 @@ import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
 interface Props {
   variant?: 'success' | 'danger' | 'warning' | 'info' | 'neutral'
   className?: string
-  title: string
+  title: string | React.ReactNode
   withIcon?: boolean
   closable?: boolean
   children?: React.ReactNode
@@ -21,10 +21,7 @@ interface Props {
   actions?: React.ReactNode
 }
 
-const icons: Record<
-  'success' | 'danger' | 'warning' | 'info' | 'neutral',
-  React.ReactElement
-> = {
+const icons: Record<'success' | 'danger' | 'warning' | 'info' | 'neutral', React.ReactElement> = {
   danger: <IconAlertOctagon strokeWidth={1.5} size={18} />,
   success: <IconCheckCircle strokeWidth={1.5} size={18} />,
   warning: <IconAlertTriangle strokeWidth={1.5} size={18} />,
@@ -51,10 +48,7 @@ function Alert({
 
   if (className) containerClasses.push(className)
 
-  let descriptionClasses = [
-    __styles.description,
-    __styles.variant[variant].description,
-  ]
+  let descriptionClasses = [__styles.description, __styles.variant[variant].description]
   let closeButtonClasses = [__styles.close]
 
   return (
@@ -62,19 +56,12 @@ function Alert({
       {visible && (
         <div className={containerClasses.join(' ')}>
           {withIcon ? (
-            <div className={__styles.variant[variant].icon}>
-              {withIcon && icons[variant]}
-            </div>
+            <div className={__styles.variant[variant].icon}>{withIcon && icons[variant]}</div>
           ) : null}
           {icon && icon}
           <div className="flex flex-1 items-center justify-between">
             <div>
-              <h3
-                className={[
-                  __styles.variant[variant].header,
-                  __styles.header,
-                ].join(' ')}
-              >
+              <h3 className={[__styles.variant[variant].header, __styles.header].join(' ')}>
                 {title}
               </h3>
               <div className={descriptionClasses.join(' ')}>{children}</div>

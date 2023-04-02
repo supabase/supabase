@@ -37,11 +37,7 @@ export class SqlRowService implements IRowService {
     }
   }
 
-  async create(row: SupaRow) {
-    return { error: { message: 'not implemented' } }
-  }
-
-  delete(rows: SupaRow[]) {
+  async delete(rows: SupaRow[]) {
     const { primaryKeys, error } = this.getPrimaryKeys()
     if (error) return { error }
 
@@ -53,14 +49,7 @@ export class SqlRowService implements IRowService {
     })
 
     const query = queryChains.toSql()
-    SupabaseGridQueue.add(async () => {
-      const { error } = await this.onSqlQuery(query)
-      if (error) throw error
-    }).catch((error) => {
-      this.onError(error)
-    })
-
-    return {}
+    return await this.onSqlQuery(query)
   }
 
   // For deleting all rows based on a given filter
@@ -174,12 +163,21 @@ export class SqlRowService implements IRowService {
     return rows
   }
 
-  update(row: SupaRow, changedColumn?: string, onRowUpdate?: (value: any) => void) {
+  update(
+    row: SupaRow,
+    originalRow: SupaRow,
+    changedColumn?: string,
+    onRowUpdate?: (value: any) => void
+  ) {
     const { primaryKeys, error } = this.getPrimaryKeys()
     if (error) {
       return { error }
     }
     const { idx, ...value } = row
+
+    // Optimistic rendering
+    if (onRowUpdate) onRowUpdate({ row: value, idx })
+
     const matchValues: any = {}
     primaryKeys!.forEach((key) => {
       matchValues[key] = row[key]
@@ -210,6 +208,9 @@ export class SqlRowService implements IRowService {
       if (error) throw error
       if (onRowUpdate) onRowUpdate({ row: data[0], idx })
     }).catch((error) => {
+      const { idx, ...originalRowData } = originalRow
+      // Revert optimistic rendering if any errors
+      if (onRowUpdate) onRowUpdate({ row: originalRowData, idx })
       this.onError(error)
     })
 

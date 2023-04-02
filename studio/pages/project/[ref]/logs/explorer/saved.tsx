@@ -27,8 +27,8 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
       <LogsExplorerHeader subtitle="Saved Queries" />
-      <div className="flex flex-col gap-3 py-6">
-        {saved.length > 0 && (
+      {saved.length > 0 && (
+        <div className="flex flex-col gap-3 py-6">
           <Table
             headTrClasses="expandable-tr"
             head={
@@ -44,8 +44,8 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               <LogsSavedQueriesItem key={item.id} item={item} />
             ))}
           />
-        )}
-      </div>
+        </div>
+      )}
       {saved.length === 0 && (
         <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
           <IconSave className="animate-bounce" />

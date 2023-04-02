@@ -4,6 +4,7 @@ export const meta = {
   id: 'tables',
   title: 'Tables and Data',
   description: 'Creating and using Postgres tables.',
+  video: 'https://www.youtube.com/v/TKwF3IGij5c',
 }
 
 Tables are where you store your data.
@@ -41,7 +42,12 @@ and run the SQL queries yourself.
 <TabPanel id="dashboard" label="Dashboard">
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
@@ -77,7 +83,7 @@ You must define the "data type" when you create a column.
 ### Data types
 
 Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions)
-if the default types don't fit your needs.
+if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -166,7 +172,7 @@ create table movies (
 
 ## Loading data
 
-There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](../../guides/api).
+There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](../../guides/database/api).
 Use the "Bulk Loading" instructions if you are loading large data sets.
 
 ### Basic data loading
@@ -183,8 +189,14 @@ Use the "Bulk Loading" instructions if you are loading large data sets.
 insert into movies
   (name, description)
 values
-  ('The Empire Strikes Back', 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'),
-  ('Return of the Jedi', 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.');
+  (
+    'The Empire Strikes Back',
+    'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'
+  ),
+  (
+    'Return of the Jedi',
+    'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
+  );
 ```
 
 </TabPanel>
@@ -206,7 +218,7 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```sql
-final res = await supabase
+await supabase
   .from('movies')
   .insert([{
     name: 'The Empire Strikes Back',
@@ -214,7 +226,7 @@ final res = await supabase
   }, {
     name: 'Return of the Jedi',
     description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
-  }]).execute();
+  }]);
 ```
 
 </TabPanel>
@@ -236,8 +248,17 @@ You would [connect](../../guides/database/connecting-to-postgres#direct-connecti
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
-  -c "COPY movies FROM './movies.csv';"
+  -c "\COPY movies FROM './movies.csv';"
 ```
+
+Additionally use the `DELIMITER`, `HEADER` and `FORMAT` options as defined in the PostgreSQL [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
+
+```bash
+psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
+  -c "\COPY movies FROM './movies.csv' WITH DELIMITER ',' CSV HEADER"
+```
+
+If you receive an error `FATAL:  password authentication failed for user "postgres"`, reset your database password in the Database Settings and try again.
 
 ## Joining tables with Foreign Keys
 
@@ -265,7 +286,7 @@ For example if you had the following situations:
 
 - You have a list of `movies`.
 - A movie can have several `actors`.
-- An `actor` can perfom in several movies.
+- An `actor` can perform in several movies.
 
 <Tabs
   scrollable
@@ -410,14 +431,15 @@ As a query becomes complex it becomes a hassle to call it. Especially when we ru
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-left join students on grades.student_id = students.id
-left join courses on grades.course_id = courses.id;
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id;
 ```
 
 We can run this instead:
@@ -434,14 +456,15 @@ Views ensure that the likelihood of mistakes decreases when repeatedly executing
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-    left join students on grades.student_id = students.id
-    left join courses on grades.course_id = courses.id
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id
 where courses.code != 'PG101';
 ```
 
@@ -463,13 +486,14 @@ Using our example above, a materialized view can be created like this:
 
 ```sql
 create materialized view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```

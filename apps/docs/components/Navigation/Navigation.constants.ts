@@ -17,13 +17,13 @@ export const REFERENCES: References = {
     name: 'supabase-js',
     library: 'supabase-js',
     versions: ['v2', 'v1'],
-    icon: '/docs/img/libraries/javascript-icon.svg',
+    icon: '/docs/img/icons/javascript-icon.svg',
   },
   dart: {
     name: 'Flutter',
     library: 'supabase-dart',
     versions: ['v1', 'v0'],
-    icon: '/docs/img/libraries/flutter-icon.svg',
+    icon: '/docs/img/icons/flutter-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -80,6 +80,7 @@ export const menuItems: NavMenu = {
       label: 'Auth',
       items: [
         { name: 'Overview', url: '/guides/auth', items: [] },
+        { name: 'Quickstarts', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'Authentication',
           url: undefined,
@@ -102,6 +103,7 @@ export const menuItems: NavMenu = {
             { name: 'Login with Twitch', url: '/guides/auth/auth-twitch', items: [] },
             { name: 'Login with Twitter', url: '/guides/auth/auth-twitter', items: [] },
             { name: 'Login with WorkOS', url: '/guides/auth/auth-workos', items: [] },
+            { name: 'Login with Zoom', url: '/guides/auth/auth-zoom', items: [] },
             { name: 'Phone Auth with Twilio', url: '/guides/auth/auth-twilio', items: [] },
             { name: 'Phone Auth with Vonage', url: '/guides/auth/auth-vonage', items: [] },
             {
@@ -128,9 +130,9 @@ export const menuItems: NavMenu = {
           items: [
             { name: 'Overview', url: '/guides/auth/auth-helpers', items: [] },
             { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui', items: [] },
-            { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs', items: [] },
+            { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs', items: [] },
             {
-              name: 'Next.js Server Components',
+              name: 'Next.js (app)',
               url: '/guides/auth/auth-helpers/nextjs-server-components',
               items: [],
             },
@@ -174,14 +176,6 @@ export const menuItems: NavMenu = {
         { name: 'Full Text Search', url: '/guides/database/full-text-search', items: [] },
         { name: 'Database Testing', url: '/guides/database/testing', items: [] },
         {
-          name: 'Serverless APIs',
-          url: undefined,
-          items: [
-            { name: 'Overview', url: '/guides/api', items: [] },
-            { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
-          ],
-        },
-        {
           name: 'Extensions',
           url: undefined,
           items: [
@@ -204,6 +198,11 @@ export const menuItems: NavMenu = {
               items: [],
             },
             {
+              name: 'PostGIS: Geo queries',
+              url: '/guides/database/extensions/postgis',
+              items: [],
+            },
+            {
               name: 'uuid-ossp: Unique Identifiers',
               url: '/guides/database/extensions/uuid-ossp',
               items: [],
@@ -223,6 +222,13 @@ export const menuItems: NavMenu = {
       ],
     },
     {
+      label: 'Serverless APIs',
+      items: [
+        { name: 'Overview', url: '/guides/api', items: [] },
+        { name: 'Generating Types', url: '/guides/api/generating-types', items: [] },
+      ],
+    },
+    {
       label: 'Edge Functions',
       items: [
         { name: 'Overview', url: '/guides/functions', items: [] },
@@ -235,26 +241,82 @@ export const menuItems: NavMenu = {
     {
       label: 'Realtime',
       items: [
-        { name: 'Overview', url: '/guides/realtime', items: [] },
-        { name: 'Quickstart', url: '/guides/realtime/quickstart', items: [] },
-        { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+        {
+          name: 'Overview',
+          url: '/guides/realtime',
+          items: [],
+        },
+        {
+          name: 'Quickstart',
+          url: '/guides/realtime/quickstart',
+          items: [],
+        },
+        {
+          name: 'Features',
+          url: undefined,
+          items: [
+            { name: 'Channels', url: '/guides/realtime/channels', items: [] },
+            {
+              name: 'Extensions',
+              url: '/guides/realtime/extensions',
+              items: [
+                { name: 'Broadcast', url: '/guides/realtime/broadcast', items: [] },
+                { name: 'Presence', url: '/guides/realtime/presence', items: [] },
+                { name: 'Postgres Changes', url: '/guides/realtime/postgres-changes', items: [] },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Guides',
+          url: undefined,
+          items: [
+            {
+              name: 'Subscribing to Database Changes',
+              url: '/guides/realtime/subscribing-to-database-changes',
+              items: [],
+            },
+            {
+              name: 'Bring Your Own Database',
+              url: '/guides/realtime/bring-your-own-database',
+              items: [],
+            },
+            {
+              name: 'Using Realtime with Next.js',
+              url: '/guides/realtime/realtime-with-nextjs',
+              items: [],
+            },
+          ],
+        },
+        {
+          name: 'Deep dive',
+          url: undefined,
+          items: [
+            { name: 'Rate Limits', url: '/guides/realtime/rate-limits', items: [] },
+            { name: 'Architecture', url: '/guides/realtime/architecture', items: [] },
+            { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
+          ],
+        },
       ],
     },
     {
       label: 'Storage',
       items: [
         { name: 'Overview', url: '/guides/storage', items: [] },
-        { name: 'CDN', url: '/guides/storage-cdn', items: [] },
+        { name: 'Quickstart', url: '/guides/storage/quickstart', items: [] },
+        { name: 'Access Control', url: '/guides/storage/access-control', items: [] },
+        { name: 'CDN', url: '/guides/storage/cdn', items: [] },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations', items: [] },
       ],
     },
     {
       label: 'Platform',
       items: [
-        { name: 'Overview', url: '/guides/hosting/platform', items: [] },
+        { name: 'Overview', url: '/guides/platform', items: [] },
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons', items: [] },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains', items: [] },
         { name: 'Database Usage', url: '/guides/platform/database-usage', items: [] },
+        { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes', items: [] },
         { name: 'Logging', url: '/guides/platform/logs', items: [] },
         { name: 'Metrics', url: '/guides/platform/metrics', items: [] },
         {
@@ -262,9 +324,12 @@ export const menuItems: NavMenu = {
           url: '/guides/platform/migrating-and-upgrading-projects',
           items: [],
         },
+        { name: 'Network Restrictions', url: '/guides/platform/network-restrictions', items: [] },
         { name: 'Performance Tuning', url: '/guides/platform/performance', items: [] },
         { name: 'Permissions', url: '/guides/platform/permissions', items: [] },
         { name: 'Production Readiness', url: '/guides/platform/going-into-prod', items: [] },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement', items: [] },
+        { name: 'Troubleshooting', url: '/guides/platform/troubleshooting', items: [] },
       ],
     },
     {
@@ -295,6 +360,7 @@ export const menuItems: NavMenu = {
             { name: 'Authsignal', url: '/guides/integrations/authsignal', items: [] },
             { name: 'Clerk', url: '/guides/integrations/clerk', items: [] },
             { name: 'keyri', url: '/guides/integrations/keyri', items: [] },
+            { name: 'Picket', url: '/guides/integrations/picket', items: [] },
             { name: 'Stytch', url: '/guides/integrations/stytch', items: [] },
             { name: 'SuperTokens', url: '/guides/integrations/supertokens', items: [] },
           ],
@@ -322,12 +388,12 @@ export const menuItems: NavMenu = {
           url: undefined,
           items: [
             { name: 'Appsmith', url: '/guides/integrations/appsmith', items: [] },
-            { name: 'Dashibase', url: '/guides/integrations/dashibase', items: [] },
             { name: 'DhiWise', url: '/guides/integrations/dhiwise', items: [] },
             { name: 'Directus', url: '/guides/integrations/directus', items: [] },
             { name: 'Draftbit', url: '/guides/integrations/draftbit', items: [] },
             { name: 'Plasmic', url: '/guides/integrations/plasmic', items: [] },
             { name: 'WeWeb', url: '/guides/integrations/weweb', items: [] },
+            { name: 'ILLA', url: '/guides/integrations/illa', items: [] },
           ],
         },
       ],

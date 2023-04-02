@@ -4,6 +4,14 @@ module.exports = [
     destination: `/:path*`,
   },
   {
+    source: '/dashboard',
+    destination: `${process.env.NEXT_PUBLIC_STUDIO_URL}`,
+  },
+  {
+    source: '/dashboard/:path*',
+    destination: `${process.env.NEXT_PUBLIC_STUDIO_URL}/:path*`,
+  },
+  {
     source: '/docs',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
   },
@@ -43,10 +51,6 @@ module.exports = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
-  },
-  {
-    source: '/oss',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/oss`,
   },
   {
     source: '/feed.xml',

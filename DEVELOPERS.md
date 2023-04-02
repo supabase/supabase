@@ -8,6 +8,7 @@
    - [Running turborepo](#running-turborepo)
      - [Shared components](#shared-components)
      - [Installing packages](#installing-packages)
+   - [New Supabase docs](#new-supabase-docs)
 3. [Create a pull request](#create-a-pull-request)
 
 - [Common tasks](#common-tasks)
@@ -35,8 +36,6 @@ We are in the process of migrating this repository to monorepo, using [Turborepo
 
 Eventually, all the apps will be run using [Turborepo](https://turborepo.org/docs), which will significantly improve the developer workflow.
 
-If you are working on the ([docs site](https://supabase.com/docs)), please refer to this [developers guide](https://github.com/supabase/supabase/tree/master/apps/reference/DEVELOPERS.md).
-
 ### Fork the repository
 
 To contribute code to [Supabase](https://supabase.com), you must fork the [Supabase Repository](https://github.com/supabase/supabase).
@@ -58,7 +57,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 [Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
-1. Install the dependences in the root of the repo.
+1. Install the dependencies in the root of the repo.
 
    ```sh
    npm install # install dependencies
@@ -71,11 +70,11 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 Then visit, and edit, any of the following sites:
 
-| Site                                           | Directory      | Scope name | Description                          | Local development server |
-| ---------------------------------------------- | -------------- | ---------- | ------------------------------------ | ------------------------ |
-| [supabase.com](https://supabase.com)           | `/apps/www`    | www        | The main website                     | http://localhost:3000    |
-| [app.supabase.com](https://app.supabase.com)   | `/studio`      | studio     | Studio dashboard                     | http://localhost:8082    |
-| [supabase.com/docs](https://supabase.com/docs) | `/apps/docs`   | docs       | Guides and Reference (Next.js based) | http://localhost:3001    |
+| Site                                           | Directory    | Scope name | Description                          | Local development server   |
+| ---------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
+| [supabase.com](https://supabase.com)           | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
+| [app.supabase.com](https://app.supabase.com)   | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs) | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
 
 #### Running sites individually
 
@@ -108,6 +107,14 @@ For example:
 
 You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
+#### New Supabase docs
+
+Following the changes to the [Supabase docs](https://supabase.com/blog/new-supabase-docs-built-with-nextjs) the following is needed to run the new docs locally:
+
+- Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
+
+Now when you run a local development docs server you will see the new docs site.
+
 ---
 
 ## Create a pull request
@@ -129,3 +136,9 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 ## Community channels
 
 Stuck somewhere? Have any questions? Join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+
+## Contributors
+
+<a href="https://github.com/supabase/supabase/graphs/contributors">
+   <img src="https://contributors.deno.dev/supabase/supabase?height=1200&width=1200&count=90" width="1200" height="1200" alt="contributors">
+</a>

@@ -99,6 +99,7 @@ export async function initTable(
       editable: props.editable,
       defaultWidth: props.gridProps?.defaultColumnWidth,
       onAddColumn: props.editable ? props.onAddColumn : undefined,
+      onExpandJSONEditor: props.editable ? props.onExpandJSONEditor : () => {},
     })
 
     dispatch({
@@ -188,12 +189,15 @@ async function fetchReadOnlyInfo(
   return null
 }
 
-export function parseSupaTable(data: {
-  table: Dictionary<any>
-  columns: Dictionary<any>[]
-  primaryKeys: Dictionary<any>[]
-  relationships: Dictionary<any>[]
-}): SupaTable {
+export function parseSupaTable(
+  data: {
+    table: Dictionary<any>
+    columns: Dictionary<any>[]
+    primaryKeys: Dictionary<any>[]
+    relationships: Dictionary<any>[]
+  },
+  encryptedColumns: string[] = []
+): SupaTable {
   const { table, columns, primaryKeys, relationships } = data
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
@@ -208,11 +212,15 @@ export function parseSupaTable(data: {
       isGeneratable: column.identity_generation == 'BY DEFAULT',
       isNullable: column.is_nullable,
       isUpdatable: column.is_updatable,
+      isEncrypted: encryptedColumns.includes(column.name),
       enum: column.enums,
       comment: column.comment,
-      targetTableSchema: null,
-      targetTableName: null,
-      targetColumnName: null,
+      foreignKey: {
+        targetTableSchema: null,
+        targetTableName: null,
+        targetColumnName: null,
+        deletionAction: undefined,
+      },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
@@ -225,9 +233,10 @@ export function parseSupaTable(data: {
       )
     })
     if (relationship) {
-      temp.targetTableSchema = relationship.target_table_schema
-      temp.targetTableName = relationship.target_table_name
-      temp.targetColumnName = relationship.target_column_name
+      temp.foreignKey.targetTableSchema = relationship.target_table_schema
+      temp.foreignKey.targetTableName = relationship.target_table_name
+      temp.foreignKey.targetColumnName = relationship.target_column_name
+      temp.foreignKey.deletionAction = relationship.deletion_action
     }
     return temp
   })

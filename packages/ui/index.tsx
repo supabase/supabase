@@ -1,10 +1,20 @@
 import * as React from 'react'
 
+// Providers
+
+export * from './src/providers'
+
+// Markdown components
+
+export * from './src/lib/Markdown'
+
 // // GENERAL
 
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
+export * from './src/components/GlassPanel'
+export * from './src/components/IconPanel'
 // export * from './src/components/Image'
 
 // DISPLAYS
@@ -15,6 +25,7 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
+export * from './src/components/CodeBlock'
 // export * from './src/components/Breadcrumb'
 
 // NAV
@@ -35,7 +46,7 @@ export * from './src/components/Popover'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-export * from './src/components/ThemeProvider'
+// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
 
@@ -48,6 +59,9 @@ export * from './src/components/Radio'
 export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
+
+// CMD+K
+export * from './src/components/Command'
 
 // config
 
@@ -299,6 +313,7 @@ export * from './src/components/Icon/icons/IconSun'
 export * from './src/components/Icon/icons/IconSunrise'
 export * from './src/components/Icon/icons/IconSunset'
 export * from './src/components/Icon/icons/IconTablet'
+export * from './src/components/Icon/icons/IconTable'
 export * from './src/components/Icon/icons/IconTag'
 export * from './src/components/Icon/icons/IconTarget'
 export * from './src/components/Icon/icons/IconTerminal'

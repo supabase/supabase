@@ -4,6 +4,7 @@ export const meta = {
   id: 'functions',
   title: 'Database Functions',
   description: 'Creating and using Postgres functions.',
+  video: 'https://www.youtube.com/v/MJZCCpCYEqk',
 }
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
@@ -88,9 +89,8 @@ Reference: [rpc()](../../reference/javascript/rpc)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
-  .rpc('hello_world')
-  .execute();
+final data = await supabase
+  .rpc('hello_world');
 ```
 
 Reference: [rpc()](../../reference/dart/rpc)
@@ -138,7 +138,8 @@ create table planets (
   name text
 );
 
-insert into planets (id, name)
+insert into planets
+  (id, name)
 values
   (1, 'Tattoine'),
   (2, 'Alderaan'),
@@ -150,7 +151,8 @@ create table people (
   planet_id bigint references planets
 );
 
-insert into people (id, name, planet_id)
+insert into people
+  (id, name, planet_id)
 values
   (1, 'Anakin Skywalker', 1),
   (2, 'Luke Skywalker', 1),
@@ -199,10 +201,9 @@ const { data, error } = supabase.rpc('get_planets').eq('id', 1)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
+final data = await supabase
   .rpc('get_planets')
-  .eq('id', 1)
-  .execute();
+  .eq('id', 1);
 ```
 
 </TabPanel>
@@ -254,9 +255,8 @@ const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase
-  .rpc('add_planet', params: { 'name': 'Jakku' })
-  .execute();
+final data = await supabase
+  .rpc('add_planet', params: { 'name': 'Jakku' });
 ```
 
 </TabPanel>

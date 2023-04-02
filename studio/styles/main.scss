@@ -184,10 +184,6 @@ div[data-radix-portal]:not(.portal--toast) {
   }
 }
 
-div.fixed.inset-0 {
-  z-index: 11 !important;
-}
-
 .recharts-tooltip-cursor {
   @apply fill-transparent;
 }
@@ -216,6 +212,29 @@ div.fixed.inset-0 {
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.text-area-resize-none {
+  textarea {
+    @apply resize-none;
+  }
+}
+
 .capitalize-sentence:first-letter {
   text-transform: capitalize;
+}
+
+.input-clear {
+  input {
+    @apply pr-7;
+  }
+}
+
+// to do: remove this CSS and do the same thing in a reusable tooltip component
+[data-radix-popper-content-wrapper] {
+  @apply z-50 #{!important};
 }

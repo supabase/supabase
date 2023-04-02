@@ -2,6 +2,12 @@ import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLAT
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import { StripeSubscription } from 'components/interfaces/Billing'
+import { useMonaco } from '@monaco-editor/react'
+import logConstants from 'shared-data/logConstants'
+import BackwardIterator from 'components/to-be-cleaned/SqlEditor/BackwardIterator'
+import { uniqBy } from 'lodash'
+import { useEffect } from 'react'
+
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -173,16 +179,22 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  */
 export const maybeShowUpgradePrompt = (
   from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']["key"]
+  tierKey?: StripeSubscription['tier']['key']
 ) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
-  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
+  return (
+    (day > 1 && tierKey === 'FREE') ||
+    (day > 7 && tierKey === 'PRO') ||
+    (day > 28 && tierKey === 'TEAM') ||
+    (day > 90 && tierKey === 'ENTERPRISE')
+  )
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
   const where = _genWhereStatement(table, filters)
-  return `SELECT count(*) as count FROM ${table} ${where}`}
+  return `SELECT count(*) as count FROM ${table} ${where}`
+}
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
@@ -224,10 +236,11 @@ SELECT
 FROM
   ${table} t
   cross join unnest(t.metadata) as metadata
-  ${where
+  ${
+    where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
       : `where t.timestamp > '${startOffset.toISOString()}'`
-    }
+  }
 GROUP BY
 timestamp
 ORDER BY
@@ -256,4 +269,85 @@ export const ensureNoTimestampConflict = (
   } else {
     return [nextStart, nextEnd]
   }
+}
+
+
+/**
+ * Adds SQL code hints to logs explorer code editor
+ */
+export const useEditorHints = ()=>{
+  const monaco = useMonaco()
+
+  useEffect(() => {
+    if (monaco) {
+      const competionProvider = {
+        triggerCharacters: ['`', ' ', '.'],
+        provideCompletionItems: function (model: any, position: any, context: any) {
+          let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
+          if (iterator.isNextDQuote()) return { suggestions: [] }
+          let suggestions: { label: string; kind: any; insertText: string }[] = []
+
+          let schemasInUse = logConstants.schemas.filter((schema) =>
+            iterator._text.includes(schema.reference)
+          )
+          if (schemasInUse.length === 0) {
+            schemasInUse = logConstants.schemas
+          }
+
+          if (iterator.isNextPeriod()) {
+            // should be nested key reference, suggest all tail endings of available fields
+            const fields = schemasInUse.flatMap((schema) => schema.fields)
+            const trailingKeys = fields.flatMap((field) => {
+              const [_head, ...rest] = field.path.split('.')
+              return rest
+            })
+
+            const trailingToAdd = trailingKeys.map((key) => ({
+              label: key,
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: key,
+            }))
+            suggestions = suggestions.concat(trailingToAdd)
+          }
+
+          if (context.triggerCharacter === '`' || context.triggerCharacter === ' ') {
+            // should be reference or start of key
+            const referencesToAdd = logConstants.schemas.map((schema) => ({
+              label: schema.reference,
+              kind: monaco.languages.CompletionItemKind.Class,
+              insertText: schema.reference,
+            }))
+
+            const fields = schemasInUse.flatMap((schema) => schema.fields)
+            const leadingKeys = fields.flatMap((field) => {
+              const splitPath = field.path.split('.')
+
+              return splitPath.slice(0, -1)
+            })
+
+            const leadingToAdd = leadingKeys.map((key) => ({
+              label: key,
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: key,
+            }))
+            suggestions = suggestions.concat(leadingToAdd)
+            suggestions = suggestions.concat(referencesToAdd)
+          }
+          return {
+            suggestions: uniqBy(suggestions, 'label'),
+          }
+        },
+      }
+
+      // register completion item provider for pgsql
+      const completeProvider = monaco.languages.registerCompletionItemProvider(
+        'pgsql',
+        competionProvider
+      )
+
+      return () => {
+        completeProvider.dispose()
+      }
+    }
+  }, [monaco])
 }

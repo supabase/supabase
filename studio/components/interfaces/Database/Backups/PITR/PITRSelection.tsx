@@ -86,8 +86,8 @@ const PITRSelection = ({}) => {
 
   // Start: Variables specifically for date picker component
   // Required as it only works with vanilla Date object which is not timezone localized
-  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('DD-MMM-YYYY'))
-  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('DD-MMM-YYYY'))
+  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('YYYY-MM-DD'))
+  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('YYYY-MM-DD'))
   const isSelectedOnEarliest = checkMatchingDates(selectedDate, earliestAvailableBackupFormatted)
   const isSelectedOnLatest = checkMatchingDates(selectedDate, latestAvailableBackupFormatted)
   const availableDates = getDatesBetweenRange(
@@ -185,26 +185,28 @@ const PITRSelection = ({}) => {
                       <Button
                         as="span"
                         type="warning"
-                        disabled={isSelectedOutOfRange}
+                        disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}
                       >
                         Review restore details
                       </Button>
                     </Tooltip.Trigger>
                     {isSelectedOutOfRange && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border w-48 text-center',
-                          ].join(' ')}
-                        >
-                          <span className="text-scale-1200 text-xs">
-                            Selected date is out of range where backups are available
-                          </span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                              'border-scale-200 border w-48 text-center',
+                            ].join(' ')}
+                          >
+                            <span className="text-scale-1200 text-xs">
+                              Selected date is out of range where backups are available
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
                     )}
                   </Tooltip.Root>
                 </div>

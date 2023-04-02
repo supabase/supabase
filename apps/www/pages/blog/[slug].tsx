@@ -134,7 +134,15 @@ function BlogPostPage(props: any) {
           description: props.blog.description,
           url: `https://supabase.com/blog/${props.blog.slug}`,
           type: 'article',
-
+          videos: props.blog.video && [
+            {
+              // youtube based video meta
+              url: props.blog.video,
+              type: 'application/x-shockwave-flash',
+              width: 640,
+              height: 385,
+            },
+          ],
           article: {
             //
             // to do: add expiration and modified dates
@@ -201,6 +209,7 @@ function BlogPostPage(props: any) {
                                     <Image
                                       src={author.author_image_url}
                                       className="dark:border-dark rounded-full border"
+                                      alt={`${author.author} avatar`}
                                       width="100%"
                                       height="100%"
                                       layout="responsive"
@@ -227,17 +236,33 @@ function BlogPostPage(props: any) {
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
-                  {props.blog.thumb && (
-                    <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
-                      <Image
-                        src={'/images/blog/' + props.blog.thumb}
-                        layout="fill"
-                        objectFit="cover"
-                      />
+                  <article>
+                    <div className={['prose prose-docs'].join(' ')}>
+                      {props.blog.youtubeHero ? (
+                        <iframe
+                          className="w-full"
+                          width="700"
+                          height="350"
+                          src={props.blog.youtubeHero}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          // @ts-expect-error
+                          allowfullscreen={true}
+                        ></iframe>
+                      ) : (
+                        props.blog.thumb && (
+                          <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                            <Image
+                              src={'/images/blog/' + props.blog.thumb}
+                              alt={props.blog.title}
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                      )}
+                      <MDXRemote {...content} components={mdxComponents()} />
                     </div>
-                  )}
-                  <article className={['prose prose-docs'].join(' ')}>
-                    <MDXRemote {...content} components={mdxComponents()} />
                   </article>
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
@@ -295,7 +320,7 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  <div className="space-y-8 lg:sticky lg:top-16 lg:mb-16">
+                  <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">

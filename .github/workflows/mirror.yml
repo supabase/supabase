@@ -1,10 +1,15 @@
 name: Mirror Image
 
 on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       version:
-        description: "Image tag"
+        description: 'Image tag'
         required: true
         type: string
 
@@ -14,12 +19,16 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
       - uses: docker/login-action@v2
         with:
           registry: public.ecr.aws
-          username: ${{ secrets.PROD_ACCESS_KEY_ID }}
-          password: ${{ secrets.PROD_SECRET_ACCESS_KEY }}
       - uses: docker/login-action@v2
         with:
           registry: ghcr.io

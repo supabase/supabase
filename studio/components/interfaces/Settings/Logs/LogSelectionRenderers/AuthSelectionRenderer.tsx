@@ -1,6 +1,5 @@
-import { parse } from 'crypto-js/enc-utf8'
 import { tryParseJson } from 'lib/helpers'
-import { isUnixMicro, PreviewLogData, unixMicroToIsoTimestamp } from '..'
+import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import {
   jsonSyntaxHighlight,

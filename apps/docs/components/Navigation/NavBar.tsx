@@ -1,17 +1,14 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, useEffect, FC } from 'react'
-import { IconMenu, IconMoon, IconSearch, IconSun, IconCommand, Listbox } from 'ui'
-import { useTheme } from '../Providers'
+import { FC, useEffect, useState } from 'react'
+import { IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Listbox, SearchButton } from 'ui'
 import { REFERENCES } from './Navigation.constants'
-import { SearchButton } from '../DocSearch'
 
-interface Props {
-  currentPage: string
-}
+import { getPageType } from '~/lib/helpers'
 
-const NavBar: FC<Props> = ({ currentPage }) => {
+const NavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -27,6 +24,8 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     ? pathSegments[pathSegments.indexOf(library) + 1]
     : versions[0]
 
+  const pageType = getPageType(asPath)
+
   useEffect(() => {
     setMounted(true)
   }, [isDarkMode])
@@ -35,14 +34,6 @@ const NavBar: FC<Props> = ({ currentPage }) => {
     { text: 'Guides', key: 'docs', link: '/' },
     { text: 'Reference', key: 'reference', link: '/reference' },
   ]
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -96,7 +87,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
                 <Link href={p.link}>
                   <a
                     className={`text-sm ${
-                      currentPage.includes(p.key) ? 'text-brand-900' : 'text-scale-1100'
+                      pageType.includes(p.key) ? 'text-brand-900' : 'text-scale-1100'
                     }`}
                   >
                     {p.text}
@@ -183,7 +174,7 @@ const NavBar: FC<Props> = ({ currentPage }) => {
               </a>
             </li>
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon size={18} strokeWidth={2} className="text-scale-1200" />
                 ) : (

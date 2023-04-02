@@ -40,7 +40,7 @@ const OrgDropdown = () => {
                     }
 
                     router.push({
-                      pathname: `/org/[slug]/settings`,
+                      pathname: `/org/[slug]/general`,
                       query: { slug },
                       hash: router.asPath.split('#')[1]?.toLowerCase(),
                     })

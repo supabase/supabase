@@ -5,7 +5,7 @@ import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
@@ -39,9 +39,9 @@ const SignUpForm = () => {
       hcaptchaToken: token ?? null,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
           : process.env.NEXT_PUBLIC_SITE_URL
-      }/sign-in`,
+      }${BASE_PATH}/sign-in`,
     })
     const error = response.error
 
@@ -72,9 +72,9 @@ const SignUpForm = () => {
           isSubmitted ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <Alert className="w-full" withIcon variant="success" title="Successfully signed up">
-          Please check your email to confirm your account before signing in to the Supabase
-          dashboard
+        <Alert className="w-full" withIcon variant="success" title="Check your email to confirm">
+          You've successfully signed up. Please check your email to confirm your account before
+          signing in to the Supabase dashboard
         </Alert>
       </div>
       <Form

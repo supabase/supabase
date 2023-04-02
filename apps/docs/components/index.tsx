@@ -1,36 +1,54 @@
-import { Button, Tabs, Alert } from 'ui'
+import Link from 'next/link'
+import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 // Common components
 import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
-import CodeBlock from './CodeBlock/CodeBlock'
-import { parseNumericRange } from './CodeBlock/CodeBlock.utils'
 import JwtGenerator from './JwtGenerator'
 
 // Page specific components
-import Frameworks from './Frameworks'
 import AuthProviders from './AuthProviders'
-import FunctionsExamples from './FunctionsExamples'
 import Extensions from './Extensions'
+import Frameworks from './Frameworks'
+import FunctionsExamples from './FunctionsExamples'
 
 // Other components
-import { Heading } from './CustomHTMLElements'
-import QuickstartIntro from './MDX/quickstart_intro.mdx'
-import ProjectSetup from './MDX/project_setup.mdx'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
-import InlineCodeTag from './CustomHTMLElements/InlineCode'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { Heading } from './CustomHTMLElements'
+import ProjectSetup from './MDX/project_setup.mdx'
+import QuickstartIntro from './MDX/quickstart_intro.mdx'
+import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
+import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import StorageManagement from './MDX/storage_management.mdx'
+// import { CH } from '@code-hike/mdx/components'
+import RefHeaderSection from './reference/RefHeaderSection'
+
+// Ref version specific
+import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
+
+import Options from '~/components/Options'
+import Param from '~/components/Params'
 
 const components = {
+  ...markdownComponents,
   Admonition,
   Button,
   ButtonCard,
   CodeBlock,
+  GlassPanel,
+  Link,
   Frameworks,
   AuthProviders,
   FunctionsExamples,
   JwtGenerator,
   QuickstartIntro,
   ProjectSetup,
+  SocialProviderSetup,
+  SocialProviderSettingsSupabase,
+  StepHikeCompact,
+  StorageManagement,
   Mermaid,
   Extensions,
   Alert: (props: any) => (
@@ -40,7 +58,6 @@ const components = {
   ),
   Tabs,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
@@ -51,12 +68,11 @@ const components = {
       {props.children}
     </Heading>
   ),
-  code: (props: any) => {
-    const linesToHighlight = parseNumericRange(props.lines ?? '')
-    return <CodeBlock {...props} linesToHighlight={linesToHighlight} />
-  },
-  mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  inlineCode: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+  RefSubLayout,
+  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
+  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  Options,
+  Param,
 }
 
 export default components

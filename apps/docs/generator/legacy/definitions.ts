@@ -28,6 +28,7 @@ export namespace OpenRef {
     title?: string
     description?: string
     notes?: string
+    id: string
     // $ref?: string // reference to a TSDoc node
   }
 }

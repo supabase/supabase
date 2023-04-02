@@ -4,21 +4,22 @@ import { FC, useEffect, useState } from 'react'
 import { IconArrowRight, Loading } from 'ui'
 
 import { Project, NextPageWithLayout } from 'types'
-import { useProjectSubscription, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PAYGUsage } from 'components/interfaces/Billing'
-import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
   return (
-    <div className="content h-full w-full overflow-y-auto">
-      <div className="mx-auto w-full">
+    <div className="w-full h-full overflow-y-auto content">
+      <div className="w-full mx-auto">
         <Settings project={project} />
       </div>
     </div>
@@ -39,10 +40,10 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
 
   const {
-    subscription,
+    data: subscription,
     isLoading: loading,
     error,
-  } = useProjectSubscription(ui.selectedProject?.ref)
+  } = useProjectSubscriptionQuery({ projectRef: ui.selectedProject?.ref })
 
   const [dateRange, setDateRange] = useState<any>()
   const isPayg = subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG
@@ -51,7 +52,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
@@ -61,18 +62,18 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   }
 
   return (
-    <div className="container max-w-4xl space-y-8 p-4">
+    <div className="container max-w-4xl p-4 space-y-8">
       {loading ? (
         <Loading active={loading}>
-          <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
-            <div className="flex items-center justify-center bg-panel-body-light px-6 py-6 dark:bg-panel-body-dark">
+          <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
+            <div className="flex items-center justify-center px-6 py-6 bg-panel-body-light dark:bg-panel-body-dark">
               <p>Loading usage breakdown</p>
             </div>
           </div>
         </Loading>
       ) : isPayg ? (
         <div>
-          <div className="mb-4 flex items-center space-x-3">
+          <div className="flex items-center mb-4 space-x-3">
             <DateRangePicker
               onChange={setDateRange}
               value={TIME_PERIODS_BILLING[0].key}
@@ -97,7 +98,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {dateRange && <PAYGUsage dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} />
+        <ProjectUsageBars projectRef={project?.ref} />
       )}
     </div>
   )

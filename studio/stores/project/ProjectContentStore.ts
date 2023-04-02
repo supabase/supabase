@@ -178,9 +178,9 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   loadRecentLogSqlSnippets() {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !window.localStorage) return
     this.recentLogSqlSnippets = JSON.parse(
-      (window as any).localStorage.getItem(this.recentLogSqlKey) || '[]'
+      window.localStorage.getItem(this.recentLogSqlKey) || '[]'
     )
   }
 

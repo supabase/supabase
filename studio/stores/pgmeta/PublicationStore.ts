@@ -12,4 +12,9 @@ export default class PublicationStore extends PostgresMetaInterface<any> {
   ) {
     super(rootStore, dataUrl, headers, options)
   }
+
+  // loadBySchema is not supported in this store
+  async loadBySchema(schema: string) {
+    return []
+  }
 }

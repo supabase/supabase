@@ -9,6 +9,21 @@ export const CHART_COLORS = {
   GREEN_2: 'var(--colors-brand6)',
 }
 
+// refer to packages/ui/radix-colors.js for full list of colors
+export const STACK_COLORS = [
+  ['brand', 9],
+  ['mint', 9],
+  ['blue', 9],
+  ['sky', 9],
+  ['lime', 9],
+  ['yellow', 9],
+  ['orange', 9],
+].map(([color, n]) => ({
+  lighter: `var(--colors-${color}${(n as number) - 1})`,
+  base: `var(--colors-${color}${n})`,
+  darker: `var(--colors-${color}${(n as number) + 1})`,
+}))
+
 export const USAGE_COLORS = {
   200: 'var(--colors-brand9)',
   201: 'var(--colors-brand8)',

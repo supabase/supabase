@@ -11,7 +11,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const UsersList = ({}) => {
   const PageState: any = useContext(PageContext)
+
+  // Check once on the top level, rather than checking for every row
   const canRemoveUser = checkPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
+  const canRemoveMFAFactors = checkPermissions(
+    PermissionAction.TENANT_SQL_DELETE,
+    'auth.mfa_factors'
+  )
 
   return (
     <Loading active={PageState.usersLoading}>
@@ -49,7 +55,12 @@ const UsersList = ({}) => {
             )}
             {PageState.users.length > 0 &&
               PageState.users.map((x: any) => (
-                <UserListItem key={x.id} user={x} canRemoveUser={canRemoveUser} />
+                <UserListItem
+                  key={x.id}
+                  user={x}
+                  canRemoveUser={canRemoveUser}
+                  canRemoveMFAFactors={canRemoveMFAFactors}
+                />
               ))}
             <Table.tr>
               <Table.td colSpan={7}>

@@ -283,7 +283,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Automatically refreshes the token for logged in users."
+                                            "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -306,7 +306,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -329,7 +329,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Whether to persist a logged in session to storage."
+                                            "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                           },
                                           "sources": [
                                             {
@@ -352,7 +352,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "A storage provider. Used to store the logged in session."
+                                            "shortText": "A storage provider. Used to store the logged-in session."
                                           },
                                           "sources": [
                                             {
@@ -383,7 +383,7 @@
                                             "isOptional": true
                                           },
                                           "comment": {
-                                            "shortText": "Optional key name used for storing tokens in local storage"
+                                            "shortText": "Optional key name used for storing tokens in local storage."
                                           },
                                           "sources": [
                                             {
@@ -424,7 +424,7 @@
                                     "isOptional": true
                                   },
                                   "comment": {
-                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                                   },
                                   "sources": [
                                     {
@@ -460,7 +460,8 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 78,
-                                            "name": "SchemaName"
+                                            "name": "SchemaName",
+                                            "dereferenced": {}
                                           }
                                         }
                                       ],
@@ -526,7 +527,31 @@
                                           "type": {
                                             "type": "reference",
                                             "id": 60,
-                                            "name": "Fetch"
+                                            "name": "Fetch",
+                                            "dereferenced": {
+                                              "id": 60,
+                                              "name": "Fetch",
+                                              "kind": 4194304,
+                                              "kindString": "Type alias",
+                                              "flags": {},
+                                              "sources": [
+                                                {
+                                                  "fileName": "src/lib/types.ts",
+                                                  "line": 8,
+                                                  "character": 12
+                                                }
+                                              ],
+                                              "type": {
+                                                "type": "query",
+                                                "queryType": {
+                                                  "type": "reference",
+                                                  "id": 18,
+                                                  "qualifiedName": "fetch",
+                                                  "package": "typescript",
+                                                  "name": "fetch"
+                                                }
+                                              }
+                                            }
                                           }
                                         },
                                         {
@@ -2573,7 +2598,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2596,7 +2621,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2619,7 +2644,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -2642,7 +2667,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -2673,7 +2698,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -2714,7 +2739,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -2750,7 +2775,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -2816,7 +2842,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -3652,7 +3702,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3675,7 +3725,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3698,7 +3748,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -3721,7 +3771,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -3752,7 +3802,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -3793,7 +3843,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -3829,7 +3879,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -3895,7 +3946,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -4076,7 +4151,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Automatically refreshes the token for logged in users."
+                                        "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4099,7 +4174,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                                        "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4122,7 +4197,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Whether to persist a logged in session to storage."
+                                        "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                                       },
                                       "sources": [
                                         {
@@ -4145,7 +4220,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "A storage provider. Used to store the logged in session."
+                                        "shortText": "A storage provider. Used to store the logged-in session."
                                       },
                                       "sources": [
                                         {
@@ -4176,7 +4251,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "Optional key name used for storing tokens in local storage"
+                                        "shortText": "Optional key name used for storing tokens in local storage."
                                       },
                                       "sources": [
                                         {
@@ -4217,7 +4292,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                               },
                               "sources": [
                                 {
@@ -4253,7 +4328,8 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 78,
-                                        "name": "SchemaName"
+                                        "name": "SchemaName",
+                                        "dereferenced": {}
                                       }
                                     }
                                   ],
@@ -4319,7 +4395,31 @@
                                       "type": {
                                         "type": "reference",
                                         "id": 60,
-                                        "name": "Fetch"
+                                        "name": "Fetch",
+                                        "dereferenced": {
+                                          "id": 60,
+                                          "name": "Fetch",
+                                          "kind": 4194304,
+                                          "kindString": "Type alias",
+                                          "flags": {},
+                                          "sources": [
+                                            {
+                                              "fileName": "src/lib/types.ts",
+                                              "line": 8,
+                                              "character": 12
+                                            }
+                                          ],
+                                          "type": {
+                                            "type": "query",
+                                            "queryType": {
+                                              "type": "reference",
+                                              "id": 18,
+                                              "qualifiedName": "fetch",
+                                              "package": "typescript",
+                                              "name": "fetch"
+                                            }
+                                          }
+                                        }
                                       }
                                     },
                                     {
@@ -5165,14 +5265,204 @@
             "type": "union",
             "types": [
               {
-                "type": "reference",
                 "id": 84,
-                "name": "GenericUpdatableView"
+                "name": "GenericUpdatableView",
+                "kind": 4194304,
+                "kindString": "Type alias",
+                "flags": {},
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 62,
+                    "character": 12
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 85,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 87,
+                        "name": "Insert",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 64,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      },
+                      {
+                        "id": 86,
+                        "name": "Row",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 63,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      },
+                      {
+                        "id": 88,
+                        "name": "Update",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 65,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [87, 86, 88]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 62,
+                        "character": 35
+                      }
+                    ]
+                  }
+                }
               },
               {
-                "type": "reference",
                 "id": 89,
-                "name": "GenericNonUpdatableView"
+                "name": "GenericNonUpdatableView",
+                "kind": 4194304,
+                "kindString": "Type alias",
+                "flags": {},
+                "sources": [
+                  {
+                    "fileName": "src/lib/types.ts",
+                    "line": 68,
+                    "character": 12
+                  }
+                ],
+                "type": {
+                  "type": "reflection",
+                  "declaration": {
+                    "id": 90,
+                    "name": "__type",
+                    "kind": 65536,
+                    "kindString": "Type literal",
+                    "flags": {},
+                    "children": [
+                      {
+                        "id": 91,
+                        "name": "Row",
+                        "kind": 1024,
+                        "kindString": "Property",
+                        "flags": {},
+                        "sources": [
+                          {
+                            "fileName": "src/lib/types.ts",
+                            "line": 69,
+                            "character": 2
+                          }
+                        ],
+                        "type": {
+                          "type": "reference",
+                          "typeArguments": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "intrinsic",
+                              "name": "unknown"
+                            }
+                          ],
+                          "qualifiedName": "Record",
+                          "package": "typescript",
+                          "name": "Record"
+                        }
+                      }
+                    ],
+                    "groups": [
+                      {
+                        "title": "Properties",
+                        "kind": 1024,
+                        "children": [91]
+                      }
+                    ],
+                    "sources": [
+                      {
+                        "fileName": "src/lib/types.ts",
+                        "line": 68,
+                        "character": 38
+                      }
+                    ]
+                  }
+                }
               }
             ]
           }
@@ -5241,7 +5531,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Automatically refreshes the token for logged in users."
+                            "shortText": "Automatically refreshes the token for logged-in users. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5264,7 +5554,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks."
+                            "shortText": "Detect a session from the URL. Used for OAuth login callbacks. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5287,7 +5577,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Whether to persist a logged in session to storage."
+                            "shortText": "Whether to persist a logged-in session to storage. Defaults to true."
                           },
                           "sources": [
                             {
@@ -5310,7 +5600,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "A storage provider. Used to store the logged in session."
+                            "shortText": "A storage provider. Used to store the logged-in session."
                           },
                           "sources": [
                             {
@@ -5341,7 +5631,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Optional key name used for storing tokens in local storage"
+                            "shortText": "Optional key name used for storing tokens in local storage."
                           },
                           "sources": [
                             {
@@ -5382,7 +5672,7 @@
                     "isOptional": true
                   },
                   "comment": {
-                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`."
                   },
                   "sources": [
                     {
@@ -5418,7 +5708,8 @@
                           "type": {
                             "type": "reference",
                             "id": 78,
-                            "name": "SchemaName"
+                            "name": "SchemaName",
+                            "dereferenced": {}
                           }
                         }
                       ],
@@ -5484,7 +5775,31 @@
                           "type": {
                             "type": "reference",
                             "id": 60,
-                            "name": "Fetch"
+                            "name": "Fetch",
+                            "dereferenced": {
+                              "id": 60,
+                              "name": "Fetch",
+                              "kind": 4194304,
+                              "kindString": "Type alias",
+                              "flags": {},
+                              "sources": [
+                                {
+                                  "fileName": "src/lib/types.ts",
+                                  "line": 8,
+                                  "character": 12
+                                }
+                              ],
+                              "type": {
+                                "type": "query",
+                                "queryType": {
+                                  "type": "reference",
+                                  "id": 18,
+                                  "qualifiedName": "fetch",
+                                  "package": "typescript",
+                                  "name": "fetch"
+                                }
+                              }
+                            }
                           }
                         },
                         {

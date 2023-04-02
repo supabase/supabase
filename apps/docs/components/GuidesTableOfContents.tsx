@@ -41,7 +41,7 @@ interface Props {
 
 const GuidesTableOfContents: FC<Props> = ({ list }) => {
   return (
-    <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">
+    <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
       {list.map((item, i) => (
         <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
           <a
@@ -52,22 +52,6 @@ const GuidesTableOfContents: FC<Props> = ({ list }) => {
         </li>
       ))}
     </ul>
-
-    // <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">
-    //   {(toc.json as TOCHeader[])
-    //     .filter((item) => item.lvl !== 1 && item.lvl <= 3)
-    //     .map((item: any, i: number) => {
-    //       return (
-    //         <li key={i} id={item.lvl} style={{ marginLeft: `${(item.lvl - 2) * 1}rem` }}>
-    //           <a
-    //             href={`#${formatSlug(item.slug)}`}
-    //             className="text-scale-1000 hover:text-brand-900 transition-colors"
-    //             dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
-    //           />
-    //         </li>
-    //       )
-    //     })}
-    // </ul>
   )
 }
 

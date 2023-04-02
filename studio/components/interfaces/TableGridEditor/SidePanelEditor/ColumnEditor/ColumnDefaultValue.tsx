@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { isNil } from 'lodash'
 import { Select } from 'ui'
-import { PostgresType } from '@supabase/postgres-meta'
+import type { PostgresType } from '@supabase/postgres-meta'
 
 import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
@@ -51,11 +51,11 @@ const ColumnDefaultValue: FC<Props> = ({
   return (
     <InputWithSuggestions
       label="Default Value"
-      layout="horizontal"
+      layout="vertical"
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
       placeholder={
         typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
-          ? 'Empty string'
+          ? 'EMPTY'
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}

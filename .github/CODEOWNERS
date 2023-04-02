@@ -2,3 +2,4 @@
 /apps/www/ @supabase/frontend
 /apps/docs/ @supabase/docs
 /spec/ @supabase/docs
+/docker/ @supabase/cli

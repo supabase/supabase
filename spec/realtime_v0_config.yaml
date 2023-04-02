@@ -2,9 +2,9 @@ configspec: '001'
 
 # This section outlines the general information for the tool.
 info:
-  id: 'storage' # {string} A unique ID for this tool.
+  id: 'realtime' # {string} A unique ID for this tool.
   version: 'next' # {string} The current version number of the tool.
-  title: 'Storage' # {string} A readable name.
+  title: 'Realtime' # {string} A readable name.
   source: 'https://github.com/supabase/realtime' # {string} Where developers can find the source code.
   bugs: 'https://github.com/supabase/realtime/issues' # {string} Where developers can file bugs.
   spec: 'https://github.com/supabase/supabase/blob/master/spec/realtime_v0_config.yml' # {string} Where developers can find this spec (to link directly in the docs).

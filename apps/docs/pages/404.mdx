@@ -1,6 +1,13 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
 export const meta = {
-  title: '404',
-  description: 'Page not found',
+  id: '404',
+  title: '404 not found',
+  description: '404 not found',
 }
 
-# Page not found
+404 not found
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

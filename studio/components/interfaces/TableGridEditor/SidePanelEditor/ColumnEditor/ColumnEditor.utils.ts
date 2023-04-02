@@ -1,6 +1,6 @@
 import { find, isUndefined, isEqual, isNull } from 'lodash'
 import { Dictionary } from 'components/grid'
-import {
+import type {
   PostgresColumn,
   PostgresRelationship,
   PostgresTable,
@@ -8,7 +8,14 @@ import {
 } from '@supabase/postgres-meta'
 
 import { uuidv4 } from 'lib/helpers'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
+import {
+  ColumnField,
+  CreateColumnPayload,
+  ExtendedPostgresRelationship,
+  UpdateColumnPayload,
+} from '../SidePanelEditor.types'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -43,17 +50,19 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     isPrimaryKey: false,
     isIdentity: false,
     isNewColumn: true,
+    isEncrypted: false,
   }
 }
 
 export const generateColumnFieldFromPostgresColumn = (
   column: PostgresColumn,
-  table: PostgresTable
+  table: PostgresTable,
+  foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
   const { primary_keys } = table
   // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
-  const foreignKey = getColumnForeignKey(column, table)
+  const foreignKey = getColumnForeignKey(column, table, foreignKeys)
   const isArray = column?.data_type === 'ARRAY'
 
   return {
@@ -69,6 +78,7 @@ export const generateColumnFieldFromPostgresColumn = (
     isUnique: column.is_unique,
 
     isNewColumn: false,
+    isEncrypted: false,
     isPrimaryKey: primaryKeyColumns.includes(column.name),
   }
 }
@@ -163,12 +173,18 @@ export const validateFields = (field: ColumnField) => {
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
   }
+  if (field.isEncrypted && field.keyId === 'create-new' && (field?.keyName ?? '').length === 0) {
+    errors['keyName'] = 'Please provide a name for your new key'
+  }
+  if (field.isEncrypted && field.format !== 'text') {
+    errors['isEncrypted'] = 'Only columns of type text can be encrypted'
+  }
   return errors
 }
 
 export const getForeignKeyUIState = (
-  originalConfig: PostgresRelationship | undefined,
-  updatedConfig: PostgresRelationship | undefined
+  originalConfig: ExtendedPostgresRelationship | undefined,
+  updatedConfig: ExtendedPostgresRelationship | undefined
 ): 'Info' | 'Add' | 'Remove' | 'Update' => {
   if (isUndefined(originalConfig) && !isUndefined(updatedConfig)) {
     return 'Add'
@@ -181,7 +197,8 @@ export const getForeignKeyUIState = (
   if (
     !isEqual(originalConfig?.target_table_schema, updatedConfig?.target_table_schema) ||
     !isEqual(originalConfig?.target_table_name, updatedConfig?.target_table_name) ||
-    !isEqual(originalConfig?.target_column_name, updatedConfig?.target_column_name)
+    !isEqual(originalConfig?.target_column_name, updatedConfig?.target_column_name) ||
+    originalConfig?.deletion_action !== updatedConfig?.deletion_action
   ) {
     return 'Update'
   }
@@ -189,19 +206,46 @@ export const getForeignKeyUIState = (
   return 'Info'
 }
 
-export const getColumnForeignKey = (column: PostgresColumn, table: PostgresTable) => {
+export const getColumnForeignKey = (
+  column: PostgresColumn,
+  table: PostgresTable,
+  foreignKeys: ForeignKeyConstraint[]
+) => {
   const { relationships } = table
-  return find(relationships, (relationship) => {
+  const foreignKey = find(relationships, (relationship) => {
     return (
       relationship.source_schema === column.schema &&
       relationship.source_table_name === column.table &&
       relationship.source_column_name === column.name
     )
   })
+  if (foreignKey === undefined) return foreignKey
+  else {
+    const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)
+    return {
+      ...foreignKey,
+      deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+    }
+  }
 }
 
 // Assumes arrayString is a stringified array (e.g "[1, 2, 3]")
 const formatArrayToPostgresArray = (arrayString: string) => {
   if (!arrayString) return null
   return arrayString.replaceAll('[', '{').replaceAll(']', '}')
+}
+
+export const getForeignKeyDeletionAction = (deletionAction?: string) => {
+  switch (deletionAction) {
+    case FOREIGN_KEY_DELETION_ACTION.CASCADE:
+      return 'Cascade'
+    case FOREIGN_KEY_DELETION_ACTION.RESTRICT:
+      return 'Restrict'
+    case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
+      return 'Set default'
+    case FOREIGN_KEY_DELETION_ACTION.SET_NULL:
+      return 'Set NULL'
+    default:
+      return undefined
+  }
 }

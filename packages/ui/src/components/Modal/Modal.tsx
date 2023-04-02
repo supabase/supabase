@@ -115,16 +115,22 @@ const Modal = ({
     customFooter
   ) : (
     <Space
+      className="flex w-full space-x-2"
       style={{
         width: '100%',
         justifyContent:
           layout === 'vertical' ? 'center' : alignFooter === 'right' ? 'flex-end' : 'flex-start',
       }}
     >
-      <Button type="secondary" onClick={onCancel} disabled={loading}>
+      <Button type="default" onClick={onCancel} disabled={loading}>
         {cancelText}
       </Button>
-      <Button onClick={onConfirm} loading={loading} danger={variant === 'danger'}>
+      <Button
+        onClick={onConfirm}
+        disabled={loading}
+        loading={loading}
+        danger={variant === 'danger'}
+      >
         {confirmText}
       </Button>
     </Space>
@@ -153,8 +159,9 @@ const Modal = ({
         <Dialog.Overlay className={__styles.overlay} />
         <Dialog.Overlay className={__styles.scroll_overlay}>
           <Dialog.Content
-            className={[__styles.base, __styles.size[size]].join(' ')}
+            className={[__styles.base, __styles.size[size], className].join(' ')}
             onInteractOutside={props.onInteractOutside}
+            onEscapeKeyDown={props.onEscapeKeyDown}
           >
             {header && <div className={__styles.header}>{header}</div>}
             {/* <div
