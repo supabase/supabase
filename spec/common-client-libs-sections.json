@@ -858,10 +858,7 @@
   },
   {
     "title": "Misc",
-    "excludes": [
-      "reference_dart_v1",
-      "reference_dart_v0"
-    ],
+    "excludes": ["reference_dart_v1", "reference_dart_v0"],
     "items": [
       {
         "title": "Release Notes",
