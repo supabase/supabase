@@ -1164,7 +1164,6 @@ functions:
     description: |
       Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
 
-
     examples:
       - id: with-select
         name: With `select()`
@@ -1266,7 +1265,6 @@ functions:
           can filter on range columns using the string representation of range
           values.
         hideCodeBlock: true
-
 
   - id: range-lte
     title: rangeLte()
@@ -2084,7 +2082,7 @@ functions:
         description: |
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance. 
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs. 
-          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation). 
+          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
@@ -2101,7 +2099,7 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance. 
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs. 
-          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation). 
+          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
@@ -2687,5 +2685,3 @@ functions:
                   .from(id: "avatars")
                   .list()
           ```
-
-
