@@ -31,7 +31,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install deps
-        run: npm ci --no-optional
+        run: npm ci
         working-directory: ./
       - name: Run tests
         run: npm run test:studio
