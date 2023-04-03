@@ -236,15 +236,16 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 ))}
               </CommandGroup>
 
-              <CommandGroup heading="General">
-                {sharedItems.docsGeneral.map((item) => (
-                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                    {item?.icon && iconPicker[item.icon]}
-                    <CommandLabel>{item.label}</CommandLabel>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-
+              {site === 'docs' && (
+                <CommandGroup heading="General">
+                  {sharedItems.docsGeneral.map((item) => (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                      {item?.icon && iconPicker[item.icon]}
+                      <CommandLabel>{item.label}</CommandLabel>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
                   <IconMonitor className="mr-2" />
@@ -252,7 +253,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
               </CommandGroup>
               <ThemeOptions isSubItem />
-              {site === 'studio' && <SearchableStudioItems />}
+              {site === 'studio' && search && <SearchableStudioItems />}
             </>
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
