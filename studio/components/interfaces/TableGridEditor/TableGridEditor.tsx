@@ -357,15 +357,20 @@ const TableGridEditor = ({
                 />
               )}
               {(isTableSelected || isViewSelected) && (
-                <div>
-                  <TwoOptionToggle
-                    width={75}
-                    options={['definition', 'data']}
-                    activeOption={selectedView}
-                    borderOverride="border-gray-500"
-                    onClickOption={setSelectedView}
-                  />
-                </div>
+                <>
+                  {canEditViaTableEditor && (
+                    <div className="h-[20px] w-px border-r border-scale-600"></div>
+                  )}
+                  <div>
+                    <TwoOptionToggle
+                      width={75}
+                      options={['definition', 'data']}
+                      activeOption={selectedView}
+                      borderOverride="border-gray-500"
+                      onClickOption={setSelectedView}
+                    />
+                  </div>
+                </>
               )}
             </>
           ) : null
