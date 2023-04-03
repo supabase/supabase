@@ -42,7 +42,7 @@
     "prettier-plugin-sql-cst": "^0.5.0",
     "supabase": "^1.45.2",
     "ts-jest": "^27.0.7",
-    "turbo": "^1.4.7"
+    "turbo": "1.4.6"
   },
   "repository": {
     "type": "git",
