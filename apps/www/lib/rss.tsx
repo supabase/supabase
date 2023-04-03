@@ -13,7 +13,7 @@ const generateRssItem = (post: any): string => {
   <title>${post.title}</title>
   <link>https://supabase.com${post.path}</link>
   <description>${post.description}</description>
-  <pubDate>${dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:hh:mm ZZ')}</pubDate>
+  <pubDate>${dayjs(post.date).utcOffset(0).format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</pubDate>
 </item>
 `
 }
