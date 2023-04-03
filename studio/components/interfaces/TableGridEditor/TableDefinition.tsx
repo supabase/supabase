@@ -103,7 +103,7 @@ const ViewDefinition = ({ id }: ViewDefinitionProps) => {
         theme={isDarkTheme ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
-        defaultValue={formattedDefinition}
+        value={formattedDefinition}
         path={''}
         options={{
           domReadOnly: true,
