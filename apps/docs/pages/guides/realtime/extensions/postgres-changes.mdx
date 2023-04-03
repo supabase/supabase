@@ -335,7 +335,8 @@ const channel = supabase
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
 In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
 
-The `apikey` in `headers` must be either the `anon` or `service_role` token that Supabase signed.
+The `apikey` in `headers` must be either the `anon` or `service_role` token that Supabase provides for every project.
+You can find these tokens under [Project API keys](https://app.supabase.com/project/_/settings/api) in your project's dashboard.
 This will authenticate your request in the API gateway.
 
 <Admonition type="caution">
