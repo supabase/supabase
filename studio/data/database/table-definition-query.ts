@@ -33,15 +33,15 @@ export type TableDefinitionData = string
 export type TableDefinitionError = unknown
 
 export const useTableDefinitionQuery = <TData extends TableDefinitionData = TableDefinitionData>(
-  { projectRef, connectionString, name }: TableDefinitionVariables,
+  { projectRef, connectionString, schema, name }: TableDefinitionVariables,
   options: UseQueryOptions<ExecuteSqlData, TableDefinitionError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableDefinitionQuery({ name }),
-      queryKey: ['table-definition', name],
+      sql: getTableDefinitionQuery({ schema, name }),
+      queryKey: ['table-definition', schema, name],
     },
     {
       select(data) {
@@ -56,12 +56,12 @@ export const useTableDefinitionQueryPrefetch = () => {
   const prefetch = useExecuteSqlPrefetch()
 
   return useCallback(
-    ({ projectRef, connectionString, name }: TableDefinitionVariables) =>
+    ({ projectRef, connectionString, schema, name }: TableDefinitionVariables) =>
       prefetch({
         projectRef,
         connectionString,
-        sql: getTableDefinitionQuery({ name }),
-        queryKey: ['table-definition', name],
+        sql: getTableDefinitionQuery({ schema, name }),
+        queryKey: ['table-definition', schema, name],
       }),
     [prefetch]
   )

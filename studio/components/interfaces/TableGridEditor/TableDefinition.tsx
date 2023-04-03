@@ -27,6 +27,7 @@ const ViewDefinition = ({ id }: ViewDefinitionProps) => {
   const { project } = useProjectContext()
   const viewResult = useViewDefinitionQuery(
     {
+      schema: entityType?.schema,
       name: entityType?.name,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
