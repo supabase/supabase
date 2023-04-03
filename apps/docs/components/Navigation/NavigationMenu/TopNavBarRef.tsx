@@ -126,16 +126,15 @@ const TopNavBarRef: FC = () => {
             Dashboard
           </Button>
           <ul className="flex items-center">
-            <Button
-              type="text"
-              as="a"
-              // @ts-ignore
+            <Link
               href="https://github.com/supabase/supabase"
               target="_blank"
               rel="noreferrer noopener"
             >
-              <IconGitHub size={16} />
-            </Button>
+              <a className="px-2.5 py-1" target="_blank">
+                <IconGitHub size={16} />
+              </a>
+            </Link>
           </ul>
           <ul className="flex items-center">
             <li className="px-4">
