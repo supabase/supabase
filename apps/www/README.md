@@ -1,4 +1,4 @@
-# supabase.io - test
+# supabase.io
 
 ## Overview
 
