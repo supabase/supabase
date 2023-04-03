@@ -140,8 +140,8 @@ services:
       - ${VECTOR_PORT}:${VECTOR_PORT}
       - ${VECTOR_API_PORT}:${VECTOR_API_PORT}
     volumes:
-      - $PWD/vector.yaml:/etc/vector/vector.yaml:ro
-    command: [ "--config", "etc/vector/vector.yaml" ]
+      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
+    command: [ "--config", "etc/vector/vector.yml" ]
   # Comment out everything below this point if you are using an external Postgres database
   db:
     logging:
