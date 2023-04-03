@@ -27,7 +27,6 @@ import {
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import DocsSearch from './DocsSearch'
-import DashboardTableEditor from './sections/DashboardTableEditor'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import SearchOnlyItem from './SearchOnlyItem'
 import SearchableStudioItems from './SearchableStudioItems'
