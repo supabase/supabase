@@ -132,6 +132,7 @@ export interface IMetaStore {
   insertRowsViaSpreadsheet: (
     file: any,
     table: PostgresTable,
+    selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) => void
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
@@ -656,6 +657,7 @@ export default class MetaStore implements IMetaStore {
           const { error }: any = await this.insertRowsViaSpreadsheet(
             importContent.file,
             table,
+            importContent.selectedHeaders,
             (progress: number) => {
               this.rootStore.ui.setNotification({
                 id: toastId,
@@ -838,6 +840,7 @@ export default class MetaStore implements IMetaStore {
   async insertRowsViaSpreadsheet(
     file: any,
     table: PostgresTable,
+    selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) {
     let chunkNumber = 0
@@ -853,9 +856,15 @@ export default class MetaStore implements IMetaStore {
         chunk: async (results: any, parser: any) => {
           parser.pause()
 
+          const formattedData = results.data.map((row: any) => {
+            const formattedRow: any = {}
+            selectedHeaders.forEach((header) => (formattedRow[header] = row[header]))
+            return formattedRow
+          })
+
           const insertQuery = new Query()
             .from(table.name, table.schema)
-            .insert(results.data)
+            .insert(formattedData)
             .toSql()
           const res = await this.query(insertQuery)
 

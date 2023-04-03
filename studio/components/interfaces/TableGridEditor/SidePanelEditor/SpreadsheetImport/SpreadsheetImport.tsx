@@ -1,12 +1,11 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
+import { SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
-import SpreadsheetPreview from './SpreadsheetPreview'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 import {
   acceptedFileExtension,
@@ -15,6 +14,8 @@ import {
 } from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 import { ImportContent } from '../TableEditor/TableEditor.types'
+import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
+import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 
 interface Props {
   debounceDuration?: number
@@ -27,13 +28,13 @@ interface Props {
 }
 
 const SpreadsheetImport: FC<Props> = ({
+  visible = false,
   debounceDuration = 250,
   headers = [],
   rows = [],
   selectedTable,
   saveContent,
   closePanel,
-  visible = false,
 }) => {
   const { ui } = useStore()
 
@@ -53,7 +54,7 @@ const SpreadsheetImport: FC<Props> = ({
     columnTypeMap: {},
   })
   const [errors, setErrors] = useState<any>([])
-  const [expandedErrors, setExpandedErrors] = useState<string[]>([])
+  const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -84,6 +85,7 @@ const SpreadsheetImport: FC<Props> = ({
       }
 
       setErrors(errors)
+      setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
@@ -94,7 +96,6 @@ const SpreadsheetImport: FC<Props> = ({
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
     setErrors([])
-    setExpandedErrors([])
   }
 
   const readSpreadsheetText = async (text: string) => {
@@ -121,11 +122,21 @@ const SpreadsheetImport: FC<Props> = ({
     handler(event.target.value)
   }
 
-  const onSelectExpandError = (key: string) => {
-    if (expandedErrors.includes(key)) {
-      setExpandedErrors(expandedErrors.filter((error) => error !== key))
+  const onToggleHeader = (header: string) => {
+    const updatedSelectedHeaders = selectedHeaders.includes(header)
+      ? selectedHeaders.filter((h) => h !== header)
+      : selectedHeaders.concat([header])
+    setSelectedHeaders(updatedSelectedHeaders)
+  }
+
+  const onConfirm = (resolve: () => void) => {
+    if (selectedHeaders.length === 0) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'Please select at least one header from your CSV',
+      })
     } else {
-      setExpandedErrors(expandedErrors.concat([key]))
+      saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
     }
   }
 
@@ -152,13 +163,7 @@ const SpreadsheetImport: FC<Props> = ({
           backButtonLabel="Cancel"
           applyButtonLabel={selectedTable === undefined ? 'Save' : 'Import data'}
           closePanel={closePanel}
-          applyFunction={(resolve: () => void) => {
-            saveContent({
-              file: uploadedFile,
-              ...spreadsheetData,
-              resolve,
-            })
-          }}
+          applyFunction={onConfirm}
         />
       }
     >
@@ -184,79 +189,19 @@ const SpreadsheetImport: FC<Props> = ({
           <div className="pt-4">
             <SidePanel.Separator />
           </div>
-          <SidePanel.Content>
-            <div className="space-y-5 py-5">
-              <div className="space-y-4">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm">Preview data to be imported</p>
-                  <div>
-                    <p className="text-sm text-scale-1000">
-                      {selectedTable === undefined
-                        ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
-                      following ${spreadsheetData.headers.length} columns.`
-                        : `A total of ${spreadsheetData.rowCount.toLocaleString()} rows will be added to the table "${
-                            selectedTable.name
-                          }"`}
-                    </p>
-                    <p className="text-sm text-scale-1000">
-                      Here is a preview of the data that will be added (up to the first 20 columns
-                      and first 20 rows).
-                    </p>
-                  </div>
-                </div>
-                <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
-              </div>
-              {errors.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex flex-col space-y-1">
-                    <p>Issues found in spreadsheet</p>
-                    <p className="text-scale-1000">
-                      Your table can still be created nonetheless despite issues in the following
-                      rows.
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    {errors.map((error: any, idx: number) => {
-                      const key = `import-error-${idx}`
-                      const isExpanded = expandedErrors.includes(key)
-                      return (
-                        <div key={key} className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <IconChevronRight
-                              className={`transform cursor-pointer ${
-                                isExpanded ? 'rotate-90' : ''
-                              }`}
-                              size={14}
-                              onClick={() => onSelectExpandError(key)}
-                            />
-                            <p className="w-14">Row: {error.row}</p>
-                            <p>{error.message}</p>
-                            {error.data?.__parsed_extra && (
-                              <>
-                                <IconArrowRight size={14} />
-                                <p>Extra field(s):</p>
-                                {error.data?.__parsed_extra.map((value: any, i: number) => (
-                                  <code key={i} className="text-sm">
-                                    {value}
-                                  </code>
-                                ))}
-                              </>
-                            )}
-                          </div>
-                          {isExpanded && (
-                            <SpreadsheetPreview
-                              headers={spreadsheetData.headers}
-                              rows={[error.data]}
-                            />
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </SidePanel.Content>
+          <SpreadsheetImportConfiguration
+            spreadsheetData={spreadsheetData}
+            selectedHeaders={selectedHeaders}
+            onToggleHeader={onToggleHeader}
+          />
+          <SidePanel.Separator />
+          <SpreadsheetImportPreview
+            selectedTable={selectedTable}
+            selectedHeaders={selectedHeaders}
+            spreadsheetData={spreadsheetData}
+            errors={errors}
+          />
+          <SidePanel.Separator />
         </>
       )}
     </SidePanel>
