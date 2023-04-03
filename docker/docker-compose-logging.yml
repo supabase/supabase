@@ -16,13 +16,12 @@ services:
     depends_on:
       logs:
         condition: service_healthy
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
+      LOGFLARE_URL: http://logs:4000
+      NEXT_PUBLIC_ENABLE_LOGS: true
 
   kong:
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: kong
     depends_on:
       logs:
         condition: service_healthy
@@ -114,11 +113,12 @@ services:
       DB_PORT: ${POSTGRES_PORT}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
-      LOGFLARE_SINGLE_TENANT: true
-      LOGFLARE_MIN_CLUSTER_SIZE: 1
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-      GOOGLE_PROJECT_ID: logflare-dev-238720
-      GOOGLE_PROJECT_NUMBER: 1023172132421
+      GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
+      GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+      LOGFLARE_SINGLE_TENANT: true
+      LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_MIN_CLUSTER_SIZE: 1
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
