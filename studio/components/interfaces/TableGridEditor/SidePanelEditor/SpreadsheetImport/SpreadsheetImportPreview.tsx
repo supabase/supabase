@@ -18,17 +18,19 @@ const MAX_ROWS = 20
 const MAX_HEADERS = 20
 
 interface SpreadsheetImportPreviewProps {
-  selectedTable: PostgresTable
-  selectedHeaders: string[]
+  selectedTable?: PostgresTable
   spreadsheetData: SpreadsheetData
   errors?: any[]
+  selectedHeaders: string[]
+  incompatibleHeaders: string[]
 }
 
 const SpreadsheetImportPreview = ({
   selectedTable,
-  selectedHeaders,
   spreadsheetData,
   errors = [],
+  selectedHeaders,
+  incompatibleHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -38,6 +40,8 @@ const SpreadsheetImportPreview = ({
     .filter((header) => selectedHeaders.includes(header))
     .slice(0, MAX_HEADERS)
   const previewRows = rows.slice(0, MAX_ROWS)
+
+  const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
 
   useEffect(() => {
     setExpandPreview(true)
@@ -57,6 +61,7 @@ const SpreadsheetImportPreview = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <p className="text-sm">Preview data to be imported</p>
+            {!isCompatible && <Badge color="red">Data incompatible</Badge>}
             {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
           </div>
           <Button
@@ -107,27 +112,53 @@ const SpreadsheetImportPreview = ({
             </div>
           )}
         </div>
-        {errors.length > 0 && (
+        {(!isCompatible || errors.length > 0) && (
           <div className="space-y-2 my-4">
             <div className="flex flex-col space-y-1">
               <p className="text-sm">Issues found in spreadsheet</p>
-              <p className="text-sm text-scale-1000">
-                Your table can still be created nonetheless despite issues in the following rows.
-              </p>
+              {isCompatible && (
+                <p className="text-sm text-scale-1000">
+                  {selectedTable !== undefined
+                    ? 'This CSV can still be imported into your table despite issues in the following rows.'
+                    : 'Your table can still be created nonetheless despite issues in the following rows.'}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
+              {!isCompatible && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 ">
+                    <div className="w-[14px] h-[14px] flex items-center justify-center">
+                      <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                    </div>
+                    <p className="text-sm">
+                      This CSV <span className="text-red-900">cannot</span> be imported into your
+                      table due to incompatible headers: {incompatibleHeaders.join(', ')}
+                    </p>
+                  </div>
+                </div>
+              )}
               {errors.map((error: any, idx: number) => {
                 const key = `import-error-${idx}`
                 const isExpanded = expandedErrors.includes(key)
+
                 return (
                   <div key={key} className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <IconChevronRight
-                        className={`transform cursor-pointer ${isExpanded ? 'rotate-90' : ''}`}
-                        size={14}
-                        onClick={() => onSelectExpandError(key)}
-                      />
-                      <p className="text-sm w-14">Row: {error.row}</p>
+                    <div
+                      className="flex items-center space-x-2 cursor-pointer"
+                      onClick={() => onSelectExpandError(key)}
+                    >
+                      {error.data !== undefined ? (
+                        <IconChevronRight
+                          size={14}
+                          className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                        />
+                      ) : (
+                        <div className="w-[14px] h-[14px] flex items-center justify-center">
+                          <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                        </div>
+                      )}
+                      {error.data !== undefined && <p className="text-sm w-14">Row: {error.row}</p>}
                       <p className="text-sm">{error.message}</p>
                       {error.data?.__parsed_extra && (
                         <>
@@ -141,7 +172,7 @@ const SpreadsheetImportPreview = ({
                         </>
                       )}
                     </div>
-                    {isExpanded && (
+                    {error.data !== undefined && isExpanded && (
                       <SpreadsheetPreviewGrid
                         headers={spreadsheetData.headers}
                         rows={[error.data]}

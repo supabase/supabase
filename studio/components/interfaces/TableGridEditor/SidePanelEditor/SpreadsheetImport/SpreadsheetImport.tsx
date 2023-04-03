@@ -1,6 +1,7 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes, noop } from 'lodash'
 import { SidePanel, Tabs } from 'ui'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
@@ -22,7 +23,7 @@ interface Props {
   headers?: string[]
   rows?: any[]
   visible: boolean
-  selectedTable?: any
+  selectedTable?: PostgresTable
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void
@@ -57,6 +58,12 @@ const SpreadsheetImport: FC<Props> = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+
+  const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
+  const incompatibleHeaders = selectedHeaders.filter(
+    (header) => !selectedTableColumns.includes(header)
+  )
+  const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -135,10 +142,17 @@ const SpreadsheetImport: FC<Props> = ({
 
   const onConfirm = (resolve: () => void) => {
     if (selectedHeaders.length === 0) {
-      return ui.setNotification({
+      ui.setNotification({
         category: 'error',
         message: 'Please select at least one header from your CSV',
       })
+      resolve()
+    } else if (!isCompatible) {
+      ui.setNotification({
+        category: 'error',
+        message: 'The data that you are trying to import is incompatible with your table structure',
+      })
+      resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
     }
@@ -170,6 +184,10 @@ const SpreadsheetImport: FC<Props> = ({
           applyFunction={onConfirm}
         />
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) event.preventDefault()
+      }}
     >
       <SidePanel.Content>
         <div className="pt-6">
@@ -201,9 +219,10 @@ const SpreadsheetImport: FC<Props> = ({
           <SidePanel.Separator />
           <SpreadsheetImportPreview
             selectedTable={selectedTable}
-            selectedHeaders={selectedHeaders}
             spreadsheetData={spreadsheetData}
             errors={errors}
+            selectedHeaders={selectedHeaders}
+            incompatibleHeaders={incompatibleHeaders}
           />
           <SidePanel.Separator />
         </>
