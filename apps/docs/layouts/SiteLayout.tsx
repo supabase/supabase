@@ -108,7 +108,7 @@ const levelsData = {
   },
   reference_self_hosting_analytics: {
     icon: '/docs/img/icons/menu/reference-analytics',
-    name: 'analytics Server Reference',
+    name: 'Analytics Server Reference',
   },
 }
 
