@@ -28,6 +28,15 @@ export const SAMPLE_QUERIES: SampleQueries = [
       'Create a view that shows the total revenue for each customer',
       'Create a view that shows all orders that were placed in the last week',
       'Create a view that shows all products that are currently out of stock',
+      'Create a materialized view that shows the customer_orders table the total value of orders in a month',
+    ],
+  },
+  {
+    category: 'Create indexes',
+    queries: [
+      'Create an index on the primary key column of my orders table',
+      'Create a partial index on the orders table:',
+      'Create an index on the customer_id column of the customer_orders table',
     ],
   },
   {
@@ -38,7 +47,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Triggers',
+    category: 'Create triggers',
     queries: [
       'Create a trigger that updates the updated_at column on the orders table with the current time when the row of the orders table is updated',
     ],
@@ -49,6 +58,14 @@ export const SAMPLE_QUERIES: SampleQueries = [
       'Create an RLS policy that grants only authenticated access to the profiles table',
       'Create an RLS policy that grants SELECT access to the sales_rep role for the customers table, but denies access to all other roles',
       "Create an RLS policy that grants INSERT access access to the manager role for the employees table, but only for rows where the employee's department_id matches a list of departments that the manager is responsible for",
+    ],
+  },
+  {
+    category: 'Postgres functions',
+    queries: [
+      "Create a function to add a new entry to a user's table when a new user signs up",
+      'Create an a function to calculate the average price of a product in a given category',
+      'Create a function to insert a new order and update the inventory for the ordered products',
     ],
   },
 ]
