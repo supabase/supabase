@@ -52,10 +52,15 @@ const ViewDefinition = ({ id }: ViewDefinitionProps) => {
   const { data: definition, isLoading } =
     entityType?.type === ENTITY_TYPE.VIEW ? viewResult : tableResult
 
+  const prepend =
+    entityType?.type === ENTITY_TYPE.VIEW
+      ? `create view ${entityType.schema}.${entityType.name} as\n`
+      : ''
+
   const formattedDefinition = useMemo(
     () =>
       definition
-        ? format(definition, {
+        ? format(prepend + definition, {
             language: 'postgresql',
             keywordCase: 'lower',
           })
