@@ -113,6 +113,7 @@ services:
       DB_PORT: ${POSTGRES_PORT}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
+      DB_SCHEMA: _logs
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
@@ -153,3 +154,5 @@ services:
       vector:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+    volumes:
+      - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
