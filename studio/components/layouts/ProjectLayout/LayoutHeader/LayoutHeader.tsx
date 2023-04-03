@@ -13,7 +13,7 @@ import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { Badge } from 'ui'
+import { Badge, IconSearch, SearchButton } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -114,6 +114,16 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
+        {IS_PLATFORM && (
+          <SearchButton>
+            <span
+              className="
+                 cursor-pointer text-center ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600  shadow-sm text-xs px-2.5 py-1"
+            >
+              <IconSearch className="text-scale-1100" size={16} strokeWidth={2} />
+            </span>
+          </SearchButton>
+        )}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}
