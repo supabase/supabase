@@ -76,9 +76,9 @@ const SpreadSheetFileUpload: FC<Props> = ({
               <SparkBar
                 value={parseProgress}
                 max={100}
-                type={'horizontal'}
-                barClass={'bg-green-500'}
-                labelBottom="Parsing file..."
+                type="horizontal"
+                barClass="bg-green-900"
+                labelBottom="Checking file..."
                 labelTop={`${parseProgress}%`}
               />
             </div>

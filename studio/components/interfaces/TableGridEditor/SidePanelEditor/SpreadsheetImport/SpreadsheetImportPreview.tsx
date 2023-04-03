@@ -57,7 +57,7 @@ const SpreadsheetImportPreview = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <p className="text-sm">Preview data to be imported</p>
-            {errors.length > 0 && <Badge color="red">{errors.length} errors present</Badge>}
+            {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
           </div>
           <Button
             type="text"
@@ -108,10 +108,10 @@ const SpreadsheetImportPreview = ({
           )}
         </div>
         {errors.length > 0 && (
-          <div className="space-y-2 mt-4">
+          <div className="space-y-2 my-4">
             <div className="flex flex-col space-y-1">
-              <p>Issues found in spreadsheet</p>
-              <p className="text-scale-1000">
+              <p className="text-sm">Issues found in spreadsheet</p>
+              <p className="text-sm text-scale-1000">
                 Your table can still be created nonetheless despite issues in the following rows.
               </p>
             </div>
@@ -127,14 +127,14 @@ const SpreadsheetImportPreview = ({
                         size={14}
                         onClick={() => onSelectExpandError(key)}
                       />
-                      <p className="w-14">Row: {error.row}</p>
-                      <p>{error.message}</p>
+                      <p className="text-sm w-14">Row: {error.row}</p>
+                      <p className="text-sm">{error.message}</p>
                       {error.data?.__parsed_extra && (
                         <>
                           <IconArrowRight size={14} />
-                          <p>Extra field(s):</p>
+                          <p className="text-sm">Extra field(s):</p>
                           {error.data?.__parsed_extra.map((value: any, i: number) => (
-                            <code key={i} className="text-sm">
+                            <code key={i} className="text-xs">
                               {value}
                             </code>
                           ))}

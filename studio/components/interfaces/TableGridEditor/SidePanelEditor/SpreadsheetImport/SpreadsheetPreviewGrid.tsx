@@ -21,7 +21,7 @@ const SpreadsheetPreviewGrid = ({
   return (
     <DataGrid
       columns={previewHeaders.map((header) => {
-        const columnValues = previewRows.map((row) => row[header].toString())
+        const columnValues = previewRows.map((row) => row[header]?.toString() ?? '')
         const maxLength = Math.max(...columnValues.map((el) => el.length))
         const maxWidth = maxLength > 20 ? 200 : maxLength * 10
 

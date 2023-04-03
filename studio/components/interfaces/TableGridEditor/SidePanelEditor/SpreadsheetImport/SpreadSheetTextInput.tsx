@@ -15,7 +15,7 @@ const SpreadSheetTextInput: FC<Props> = ({ input, onInputChange }) => (
         include any special characters other than hyphens (<code>-</code>) or underscores (
         <code>_</code>).
       </p>
-      <p className="text-xs text-scale-900">
+      <p className="text-sm text-scale-900">
         Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
       </p>
     </div>
