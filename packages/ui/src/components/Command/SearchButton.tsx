@@ -9,10 +9,20 @@ const SearchButton = ({
   DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
 >) => {
   const searchButtonRef = useRef<HTMLButtonElement>(null)
-  const { setIsOpen } = useCommandMenu()
+  const { setIsOpen, site } = useCommandMenu()
 
   return (
-    <button type="button" ref={searchButtonRef} onClick={() => setIsOpen(true)} {...props}>
+    <button
+      type="button"
+      ref={searchButtonRef}
+      onClick={() => setIsOpen(true)}
+      {...props}
+      className={
+        site === 'studio'
+          ? 'flex border-none rounded bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4 focus:outline-scale-600'
+          : ''
+      }
+    >
       {children}
     </button>
   )
