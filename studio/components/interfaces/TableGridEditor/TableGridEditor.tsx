@@ -211,7 +211,7 @@ const TableGridEditor = ({
   const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
   const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
+  const canEditViaTableEditor = isTableSelected && !isLocked
 
   // [Joshen] We can tweak below to eventually support composite keys as the data
   // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
