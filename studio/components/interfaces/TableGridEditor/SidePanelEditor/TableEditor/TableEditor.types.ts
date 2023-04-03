@@ -16,4 +16,5 @@ export interface ImportContent {
   rowCount: number
   rows: object[]
   columnTypeMap: Dictionary<any>
+  resolve: () => void
 }

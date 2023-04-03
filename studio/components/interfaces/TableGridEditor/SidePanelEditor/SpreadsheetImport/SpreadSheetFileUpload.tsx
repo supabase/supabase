@@ -34,7 +34,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-4">
       <div>
         <p className="mb-2 text-sm text-scale-1100">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
@@ -48,7 +48,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
       </div>
       {!uploadedFile ? (
         <div
-          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed dark:border-gray-500 ${
+          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed dark:border-gray-700 ${
             isDraggedOver ? 'bg-gray-500' : ''
           }`}
           onDragOver={onDragOver}
@@ -61,10 +61,10 @@ const SpreadSheetFileUpload: FC<Props> = ({
           </p>
         </div>
       ) : (
-        <div className="flex h-32 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-500">
+        <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
-            <h3 className="text-base text-scale-1200">{uploadedFile.name}</h3>
+            <p className="text-sm text-scale-1200">{uploadedFile.name}</p>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>

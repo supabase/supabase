@@ -7,10 +7,7 @@ export const UPLOAD_FILE_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
-export const UPLOAD_FILE_EXTENSIONS = [
-  'csv',
-  'tsv',
-]
+export const UPLOAD_FILE_EXTENSIONS = ['csv', 'tsv']
 
 export const EMPTY_SPREADSHEET_DATA: SpreadsheetData = {
   headers: [],

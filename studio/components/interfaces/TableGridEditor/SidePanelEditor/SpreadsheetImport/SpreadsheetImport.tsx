@@ -14,6 +14,7 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
+import { ImportContent } from '../TableEditor/TableEditor.types'
 
 interface Props {
   debounceDuration?: number
@@ -21,7 +22,7 @@ interface Props {
   rows?: any[]
   visible: boolean
   selectedTable?: any
-  saveContent: (prefillData: any) => void
+  saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
 }
 
@@ -149,12 +150,13 @@ const SpreadsheetImport: FC<Props> = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
-          applyButtonLabel="Save"
+          applyButtonLabel={selectedTable === undefined ? 'Save' : 'Import data'}
           closePanel={closePanel}
-          applyFunction={() => {
+          applyFunction={(resolve: () => void) => {
             saveContent({
               file: uploadedFile,
               ...spreadsheetData,
+              resolve,
             })
           }}
         />
@@ -176,72 +178,87 @@ const SpreadsheetImport: FC<Props> = ({
             </Tabs.Panel>
           </Tabs>
         </div>
-
-        {spreadsheetData.headers.length > 0 && (
-          <div className="space-y-5 py-5">
-            <div className="space-y-2">
-              <div className="flex flex-col space-y-1">
-                <p>Content Preview</p>
-                <p className="text-scale-1000">
-                  Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
-                  following {spreadsheetData.headers.length} columns.
-                </p>
-                <p className="text-scale-1000">
-                  Here is a preview of your table (up to the first 20 columns and first 20 rows).
-                </p>
-              </div>
-              <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
-            </div>
-            {errors.length > 0 && (
-              <div className="space-y-2">
+      </SidePanel.Content>
+      {spreadsheetData.headers.length > 0 && (
+        <>
+          <div className="pt-4">
+            <SidePanel.Separator />
+          </div>
+          <SidePanel.Content>
+            <div className="space-y-5 py-5">
+              <div className="space-y-4">
                 <div className="flex flex-col space-y-1">
-                  <p>Issues found in spreadsheet</p>
-                  <p className="text-scale-1000">
-                    Your table can still be created nonetheless despite issues in the following
-                    rows.
-                  </p>
+                  <p className="text-sm">Preview data to be imported</p>
+                  <div>
+                    <p className="text-sm text-scale-1000">
+                      {selectedTable === undefined
+                        ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
+                      following ${spreadsheetData.headers.length} columns.`
+                        : `A total of ${spreadsheetData.rowCount.toLocaleString()} rows will be added to the table "${
+                            selectedTable.name
+                          }"`}
+                    </p>
+                    <p className="text-sm text-scale-1000">
+                      Here is a preview of the data that will be added (up to the first 20 columns
+                      and first 20 rows).
+                    </p>
+                  </div>
                 </div>
+                <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
+              </div>
+              {errors.length > 0 && (
                 <div className="space-y-2">
-                  {errors.map((error: any, idx: number) => {
-                    const key = `import-error-${idx}`
-                    const isExpanded = expandedErrors.includes(key)
-                    return (
-                      <div key={key} className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <IconChevronRight
-                            className={`transform cursor-pointer ${isExpanded ? 'rotate-90' : ''}`}
-                            size={14}
-                            onClick={() => onSelectExpandError(key)}
-                          />
-                          <p className="w-14">Row: {error.row}</p>
-                          <p>{error.message}</p>
-                          {error.data?.__parsed_extra && (
-                            <>
-                              <IconArrowRight size={14} />
-                              <p>Extra field(s):</p>
-                              {error.data?.__parsed_extra.map((value: any, i: number) => (
-                                <code key={i} className="text-sm">
-                                  {value}
-                                </code>
-                              ))}
-                            </>
+                  <div className="flex flex-col space-y-1">
+                    <p>Issues found in spreadsheet</p>
+                    <p className="text-scale-1000">
+                      Your table can still be created nonetheless despite issues in the following
+                      rows.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {errors.map((error: any, idx: number) => {
+                      const key = `import-error-${idx}`
+                      const isExpanded = expandedErrors.includes(key)
+                      return (
+                        <div key={key} className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <IconChevronRight
+                              className={`transform cursor-pointer ${
+                                isExpanded ? 'rotate-90' : ''
+                              }`}
+                              size={14}
+                              onClick={() => onSelectExpandError(key)}
+                            />
+                            <p className="w-14">Row: {error.row}</p>
+                            <p>{error.message}</p>
+                            {error.data?.__parsed_extra && (
+                              <>
+                                <IconArrowRight size={14} />
+                                <p>Extra field(s):</p>
+                                {error.data?.__parsed_extra.map((value: any, i: number) => (
+                                  <code key={i} className="text-sm">
+                                    {value}
+                                  </code>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                          {isExpanded && (
+                            <SpreadsheetPreview
+                              headers={spreadsheetData.headers}
+                              rows={[error.data]}
+                            />
                           )}
                         </div>
-                        {isExpanded && (
-                          <SpreadsheetPreview
-                            headers={spreadsheetData.headers}
-                            rows={[error.data]}
-                          />
-                        )}
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </SidePanel.Content>
+              )}
+            </div>
+          </SidePanel.Content>
+        </>
+      )}
     </SidePanel>
   )
 }
