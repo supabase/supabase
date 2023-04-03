@@ -397,7 +397,7 @@ const SidePanelEditor = ({
       return console.error('no project or table selected')
     }
 
-    const { file, rowCount, resolve } = importContent
+    const { file, rowCount, selectedHeaders, resolve } = importContent
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
@@ -405,6 +405,7 @@ const SidePanelEditor = ({
     const { error }: any = await meta.insertRowsViaSpreadsheet(
       file,
       selectedTable,
+      selectedHeaders,
       (progress: number) => {
         ui.setNotification({
           id: toastId,
