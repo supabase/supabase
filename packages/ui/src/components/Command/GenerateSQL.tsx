@@ -20,12 +20,7 @@ import { CommandGroup, CommandItem } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { noop } from 'lodash'
-
-const SAMPLE_QUERIES = [
-  'Create a table that stores a list of cities, and insert 10 rows of sample data into it',
-  'Generate tables (with id bigserial & FK relationships) for blog posts and comments',
-  'Create a trigger that updates the updated_at column on the orders table with the current time when the row of the orders table is updated',
-]
+import { SAMPLE_QUERIES } from './Command.constants'
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -163,6 +158,7 @@ const GenerateSQL = () => {
   const [answer, setAnswer] = useState<string | undefined>('')
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
   const eventSourceRef = useRef<SSE>()
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
@@ -322,31 +318,52 @@ Postgres SQL query:
             </>
           )
         })}
-
         {promptData.length === 0 && !hasClippyError && (
-          <CommandGroup heading="Examples" forceMount>
-            {SAMPLE_QUERIES.map((question) => {
-              const key = question.replace(/\s+/g, '_')
-              return (
-                <CommandItem
-                  type="command"
-                  onSelect={() => {
-                    if (!search) {
-                      handleConfirm(question)
-                    }
-                  }}
-                  forceMount
-                  key={key}
-                >
-                  <div>
-                    <AiIcon />
-                  </div>
-                  <p>{question}</p>
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
+          <div className="flex">
+            <div className="w-1/3 py-4 px-6">
+              <ul className="space-y-2 mr-8">
+                {SAMPLE_QUERIES.map((item, index) => (
+                  <li
+                    key={index}
+                    onClick={() => setSelectedCategory(item.category)}
+                    className={cn(
+                      'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md',
+                      selectedCategory === item.category && 'bg-slate-400 '
+                    )}
+                  >
+                    {item.category}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="w-2/3 py-4 px-6">
+              <ul>
+                {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
+                  (query, index) => (
+                    <CommandItem
+                      type="command"
+                      onSelect={() => {
+                        if (!search) {
+                          handleConfirm(query)
+                        }
+                      }}
+                      forceMount
+                      key={query.replace(/\s+/g, '_')}
+                    >
+                      <div className="flex">
+                        <div>
+                          <AiIcon />
+                        </div>
+                        <p>{query}</p>
+                      </div>
+                    </CommandItem>
+                  )
+                )}
+              </ul>
+            </div>
+          </div>
         )}
+
         {hasClippyError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
@@ -369,7 +386,7 @@ Postgres SQL query:
           placeholder={
             isLoading || isResponding
               ? 'Waiting on an answer...'
-              : 'Describe what you need to Supabase AI, and it will try to generate the relevant SQL statements...'
+              : 'Describe what you need and Supabase AI will try to generate the relevant SQL statements'
           }
           value={search}
           actions={
