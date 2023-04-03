@@ -500,6 +500,7 @@ const SidePanelEditor = ({
         selectedTable={selectedTableToEdit}
         saveContent={onImportData}
         closePanel={onClosePanel}
+        updateEditorDirty={setIsEdited}
       />
       <ConfirmationModal
         visible={isClosingPanel}

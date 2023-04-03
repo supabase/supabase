@@ -1,5 +1,5 @@
 import { useCallback, useState, FC, useEffect } from 'react'
-import { debounce, includes } from 'lodash'
+import { debounce, includes, noop } from 'lodash'
 import { SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
@@ -25,6 +25,7 @@ interface Props {
   selectedTable?: any
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
+  updateEditorDirty?: (value: boolean) => void
 }
 
 const SpreadsheetImport: FC<Props> = ({
@@ -35,6 +36,7 @@ const SpreadsheetImport: FC<Props> = ({
   selectedTable,
   saveContent,
   closePanel,
+  updateEditorDirty = noop,
 }) => {
   const { ui } = useStore()
 
@@ -70,6 +72,7 @@ const SpreadsheetImport: FC<Props> = ({
         message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
       })
     } else {
+      updateEditorDirty(true)
       setUploadedFile(file)
       const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
@@ -96,6 +99,7 @@ const SpreadsheetImport: FC<Props> = ({
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
     setErrors([])
+    updateEditorDirty(false)
   }
 
   const readSpreadsheetText = async (text: string) => {
