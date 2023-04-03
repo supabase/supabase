@@ -305,7 +305,15 @@ const EXTERNAL_PROVIDER_APPLE = {
       title: 'Services ID',
       description: `
 Client identifier when authenticating or validating users.
-[learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      type: 'string',
+    },
+    EXTERNAL_IOS_BUNDLE_ID: {
+      /**
+       * to do: change docs
+       */
+      title: 'IOS Bundle ID',
+      description: `The iOS app's unique identifier. [Learn more](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
@@ -320,19 +328,38 @@ The secret key is a JWT token that must be generated.
       isSecret: true,
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_CLIENT_ID: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Services ID is required'),
-      otherwise: (schema) => schema,
-    }),
-    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Secret key is required'),
-      otherwise: (schema) => schema,
-    }),
-  }),
+  validationSchema: object().shape(
+    {
+      EXTERNAL_APPLE_ENABLED: boolean().required(),
+      EXTERNAL_APPLE_SECRET: string().when(['EXTERNAL_APPLE_ENABLED'], {
+        is: true,
+        then: (schema) => schema.required('Secret key is required'),
+        otherwise: (schema) => schema,
+      }),
+      EXTERNAL_APPLE_CLIENT_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_IOS_BUNDLE_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_IOS_BUNDLE_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_IOS_BUNDLE_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+      EXTERNAL_IOS_BUNDLE_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+    },
+    // this is necessary for the "either or" validation on EXTERNAL_APPLE_CLIENT_ID and EXTERNAL_IOS_BUNDLE_ID
+    [['EXTERNAL_APPLE_CLIENT_ID', 'EXTERNAL_IOS_BUNDLE_ID']]
+  ),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
