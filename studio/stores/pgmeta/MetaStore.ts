@@ -129,7 +129,11 @@ export interface IMetaStore {
     columns: ColumnField[],
     isRealtimeEnabled: boolean
   ) => any
-
+  insertRowsViaSpreadsheet: (
+    file: any,
+    table: PostgresTable,
+    onProgressUpdate: (progress: number) => void
+  ) => void
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {

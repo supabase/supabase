@@ -73,9 +73,14 @@ const SidePanelEditor = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
+  const enumArrayColumns = (selectedTable?.columns ?? [])
+    .filter((column) => {
+      return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+    })
+    .map((column) => column.name)
 
   const { project } = useProjectContext()
-  const { mutateAsync: createTableRow } = useTableRowCreateMutation()
+  const { mutateAsync: createTableRows } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
     async onMutate({ projectRef, table, configuration, payload }) {
       closePanel()
@@ -145,16 +150,9 @@ const SidePanelEditor = ({
     }
 
     let saveRowError = false
-    // @ts-ignore
-    const enumArrayColumns = selectedTable.columns
-      .filter((column) => {
-        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-      })
-      .map((column) => column.name)
-
     if (isNewRecord) {
       try {
-        const result = await createTableRow({
+        const result = await createTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
@@ -394,6 +392,53 @@ const SidePanelEditor = ({
     resolve()
   }
 
+  const onImportData = async (importContent: ImportContent) => {
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
+
+    const { file, rowCount, resolve } = importContent
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+    })
+    const { error }: any = await meta.insertRowsViaSpreadsheet(
+      file,
+      selectedTable,
+      (progress: number) => {
+        ui.setNotification({
+          id: toastId,
+          progress,
+          category: 'loading',
+          message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+        })
+      }
+    )
+
+    if (error) {
+      ui.setNotification({
+        error,
+        id: toastId,
+        category: 'error',
+        message: `Failed to import data: ${error.message}`,
+      })
+      resolve()
+    } else {
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
+      })
+      await Promise.all([
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+      ])
+      resolve()
+      closePanel()
+    }
+  }
+
   const onClosePanel = () => {
     if (isEdited) {
       setIsClosingPanel(true)
@@ -452,7 +497,7 @@ const SidePanelEditor = ({
       <SpreadsheetImport
         visible={sidePanelKey === 'csv-import'}
         selectedTable={selectedTableToEdit}
-        saveContent={() => {}}
+        saveContent={onImportData}
         closePanel={onClosePanel}
       />
       <ConfirmationModal
