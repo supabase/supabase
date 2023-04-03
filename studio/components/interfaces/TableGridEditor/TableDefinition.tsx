@@ -11,11 +11,11 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
 
-export interface ViewDefinitionProps {
+export interface TableDefinitionProps {
   id?: number
 }
 
-const ViewDefinition = ({ id }: ViewDefinitionProps) => {
+const TableDefinition = ({ id }: TableDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
 
@@ -119,4 +119,4 @@ const ViewDefinition = ({ id }: ViewDefinitionProps) => {
   )
 }
 
-export default observer(ViewDefinition)
+export default observer(TableDefinition)
