@@ -1,28 +1,66 @@
-import { useRef } from 'react'
 import Editor from '@monaco-editor/react'
-import { timeout } from 'lib/helpers'
-import { useStore } from 'hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useTableDefinitionQuery } from 'data/database/table-definition-query'
+import { useViewDefinitionQuery } from 'data/database/view-definition-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useStore } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import { timeout } from 'lib/helpers'
+import { observer } from 'mobx-react-lite'
+import { useMemo, useRef } from 'react'
+import { format } from 'sql-formatter'
 
 export interface ViewDefinitionProps {
-  name: string
+  id?: number
 }
 
-const ViewDefinition = ({ name }: ViewDefinitionProps) => {
+const ViewDefinition = ({ id }: ViewDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
 
   const { ui } = useStore()
   const { isDarkTheme } = ui
 
+  const entityType = useEntityType(id)
+
   const { project } = useProjectContext()
-  const { data: definition, isLoading } = useViewDefinitionQuery({
-    name,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const viewResult = useViewDefinitionQuery(
+    {
+      name: entityType?.name,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: entityType?.type === ENTITY_TYPE.VIEW,
+    }
+  )
+
+  const tableResult = useTableDefinitionQuery(
+    {
+      schema: entityType?.schema,
+      name: entityType?.name,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: entityType?.type === ENTITY_TYPE.TABLE,
+    }
+  )
+
+  const { data: definition, isLoading } =
+    entityType?.type === ENTITY_TYPE.VIEW ? viewResult : tableResult
+
+  const formattedDefinition = useMemo(
+    () =>
+      definition
+        ? format(definition, {
+            language: 'postgresql',
+            keywordCase: 'lower',
+          })
+        : undefined,
+    [definition]
+  )
 
   const handleEditorOnMount = async (editor: any, monaco: any) => {
     editorRef.current = editor
@@ -59,7 +97,7 @@ const ViewDefinition = ({ name }: ViewDefinitionProps) => {
         theme={isDarkTheme ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
-        defaultValue={definition}
+        defaultValue={formattedDefinition}
         path={''}
         options={{
           domReadOnly: true,
@@ -75,4 +113,4 @@ const ViewDefinition = ({ name }: ViewDefinitionProps) => {
   )
 }
 
-export default ViewDefinition
+export default observer(ViewDefinition)

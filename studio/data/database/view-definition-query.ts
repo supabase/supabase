@@ -2,7 +2,7 @@ import { UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
-type getViewDefinition = {
+type GetViewDefinition = {
   name?: string
 }
 
@@ -20,19 +20,20 @@ type ViewDefinition = {
   target_columns: string
 }
 
-export const getViewDefinitionQuery = ({ name }: getViewDefinition) => {
+export const getViewDefinitionQuery = ({ name }: GetViewDefinition) => {
   const sql = /* SQL */ `
-select pg_get_viewdef('${name}', true) as definition
-`.trim()
+    select pg_get_viewdef('${name}', true) as definition
+  `.trim()
+
   return sql
 }
 
-export type ViewDefinitionVariables = getViewDefinition & {
+export type ViewDefinitionVariables = GetViewDefinition & {
   projectRef?: string
   connectionString?: string
 }
 
-export type ViewDefinitionData = any
+export type ViewDefinitionData = string
 export type ViewDefinitionError = unknown
 
 export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDefinitionData>(
