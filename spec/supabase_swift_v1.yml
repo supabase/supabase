@@ -1473,8 +1473,8 @@ functions:
           try await client.database
                 .from("quotes")
                 .select("catchphrase")
-                .textSearch(column: "catchphrase", 
-                            query: "'fat' & 'cat'", 
+                .textSearch(column: "catchphrase",
+                            query: "'fat' & 'cat'",
                             config: "english")
                 .execute()
           ```
@@ -1486,9 +1486,9 @@ functions:
           try await client.database
                 .from("quotes")
                 .select("catchphrase")
-                .textSearch(column: "catchphrase", 
-                            query: "'fat' & 'cat'", 
-                            config: "english", 
+                .textSearch(column: "catchphrase",
+                            query: "'fat' & 'cat'",
+                            config: "english",
                             type: .plain)
                 .execute()
           ```
@@ -1500,9 +1500,9 @@ functions:
           try await client.database
                 .from("quotes")
                 .select("catchphrase")
-                .textSearch(column: "catchphrase", 
-                            query: "'fat' & 'cat'", 
-                            config: "english", 
+                .textSearch(column: "catchphrase",
+                            query: "'fat' & 'cat'",
+                            config: "english",
                             type: .phrase)
                 .execute()
           ```
@@ -1523,9 +1523,9 @@ functions:
           try await client.database
                 .from("quotes")
                 .select("catchphrase")
-                .textSearch(column: "catchphrase", 
-                            query: "'fat' & 'cat'", 
-                            config: "english", 
+                .textSearch(column: "catchphrase",
+                            query: "'fat' & 'cat'",
+                            config: "english",
                             type: .websearch)
                 .execute()
           ```
@@ -1639,7 +1639,7 @@ functions:
   - id: using-modifiers
     title: Using Modifiers
     description: |
-      Filters work on the row level—they allows you to return rows that
+      Filters work on the row level—they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g. returning a CSV string).
@@ -1985,7 +1985,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          try await supabase.auth.signUp( email: "example@email.com", 
+          try await supabase.auth.signUp( email: "example@email.com",
                                 password: "example-password")
           ```
       - id: sign-up-with-additional-user-metadata
@@ -1993,10 +1993,10 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          try await supabase.auth.signUp( email: "example@email.com", 
+          try await supabase.auth.signUp( email: "example@email.com",
                                 password: "example-password",
                                 data: [
-                                        "first_name": AnyJSON.string("John"), 
+                                        "first_name": AnyJSON.string("John"),
                                         "age": AnyJSON.number(24)
                                       ]
                                 )
@@ -2007,8 +2007,8 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
-          try await supabase.auth.signUp( 
-                                email:  "example@email.com", 
+          try await supabase.auth.signUp(
+                                email:  "example@email.com",
                                 password: "example-password",
                                 redirectTo: URL(string: "https://example.com/welcome")!
                                )
@@ -2024,7 +2024,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          try await supabase.auth.signIn( email: "example@email.com", 
+          try await supabase.auth.signIn( email: "example@email.com",
                                 password: "example-password" )
           ```
       - id: sign-in-with-phone-and-password
@@ -2032,11 +2032,11 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          try await supabase.auth.signIn( phone: "+13334445555", 
+          try await supabase.auth.signIn( phone: "+13334445555",
                                 password: "same-password" )
 
-          try await supabase.auth.verifyOTP(phone: "+13334445555", 
-                                            token: "123456", 
+          try await supabase.auth.verifyOTP(phone: "+13334445555",
+                                            token: "123456",
                                             type: .sms)
           ```
   - id: sign-in-with-otp
@@ -2058,7 +2058,7 @@ functions:
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```js
-          try await supabase.auth.signInWithOTP(email: "example@email.com", 
+          try await supabase.auth.signInWithOTP(email: "example@email.com",
                                       redirectTo: URL(string: "https://example.com/welcome")!)
           ```
       - id: sign-in-with-sms-otp
@@ -2080,8 +2080,8 @@ functions:
         name: Sign in using a third-party provider
         isSpotlight: true
         description: |
-          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance. 
-          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs. 
+          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
+          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
           - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
@@ -2097,14 +2097,14 @@ functions:
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance. 
-          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs. 
+          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
+          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
           - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
                   .getOAuthSignInURL(
-                      provider: .google, 
+                      provider: .google,
                       redirectTo: URL(string: "https://example.com/welcome")!
                     )
           ```
@@ -2118,7 +2118,7 @@ functions:
           ```js
           let url = try await supabase.auth
                     .getOAuthSignInURL(
-                      provider: .github, 
+                      provider: .github,
                       scopes: "repo gist notifications"
                     )
           ```
@@ -2147,8 +2147,8 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          try await supabase.auth.verifyOTP(phone: "+13334445555", 
-                                  token: "123456", 
+          try await supabase.auth.verifyOTP(phone: "+13334445555",
+                                  token: "123456",
                                   type: .sms)
           ```
       - id: verify-signup-one-time-password(otp)
@@ -2156,8 +2156,8 @@ functions:
         isSpotlight: false
         code: |
           ```js
-             try await supabase.auth.verifyOTP(email: "example@example-email.com", 
-                                  token: "123456", 
+             try await supabase.auth.verifyOTP(email: "example@example-email.com",
+                                  token: "123456",
                                   type: .signup)
           ```
   - id: get-session
@@ -2214,7 +2214,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          try await supabase.auth.update(user: 
+          try await supabase.auth.update(user:
                                  UserAttributes(data: [
                                       "hello": AnyJSON.string("world")
                                   ]
@@ -2297,7 +2297,7 @@ functions:
             functionName: "hello",
             invokeOptions: body: FooModel(foo: "baa"))
             { data, response in
-            
+
             }
           ```
       - id: parsing-custom-headers
@@ -2312,7 +2312,7 @@ functions:
             invokeOptions:.init(headers:["Authorization": "Bearer ${supabase.auth.currentSession?.accessToken}"],
                                 body: FooModel(foo: "baa"))
             { data, response in
-            
+
             }
           ```
   - id: subscribe
@@ -2551,9 +2551,9 @@ functions:
           ```js
           import SupabaseStorage
 
-          let file = File(name: "avatar1", 
-                          data: fileData, 
-                          fileName: "avatar1.png", 
+          let file = File(name: "avatar1",
+                          data: fileData,
+                          fileName: "avatar1.png",
                           contentType: "png")
 
           try await supabase.storage.from(id: "avatars").upload(
@@ -2580,9 +2580,9 @@ functions:
           ```js
           import SupabaseStorage
 
-          let file = File(name: "avatar2", 
-                          data: fileData, 
-                          fileName: "avatar2.png", 
+          let file = File(name: "avatar2",
+                          data: fileData,
+                          fileName: "avatar2.png",
                           contentType: "png")
 
           try await supabase.storage.from(id: "avatars").update(
@@ -2608,7 +2608,7 @@ functions:
           ```js
           try await supabase.storage.
                   .from(id: "avatars")
-                  .move(fromPath: "public/avatar1.png", 
+                  .move(fromPath: "public/avatar1.png",
                         toPath: "public/avatar2.png")
           ```
 
