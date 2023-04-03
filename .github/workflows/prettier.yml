@@ -58,7 +58,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
       - name: Install plugin
-        run: npm ci
+        run: npm ci --no-optional
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
