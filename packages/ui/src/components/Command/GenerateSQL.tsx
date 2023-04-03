@@ -188,7 +188,7 @@ const GenerateSQL = () => {
 
       // [Joshen] Eventually we need to pass the table data in here as well
       const queryToSend = `
-Generate a Postgres SQL query based on the following natural language prompt:
+Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity":
 ${query}
 
 Postgres SQL query:
