@@ -1,8 +1,9 @@
+import { NextPage } from 'next'
 import DefaultLayout from '../components/Layouts/Default'
 import { useTheme } from 'common/Providers'
 import { ErrorPage } from 'ui'
 
-const Error404 = () => {
+const Error404: NextPage = () => {
   const { isDarkMode } = useTheme()
 
   return <ErrorPage isDarkMode={isDarkMode} />
