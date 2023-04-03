@@ -14,10 +14,10 @@ hideTitle: true
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-The Supabase Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytical events.
+The Supabase Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytics events.
 
 When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
-However, do note that due the platform's infrastructure gives rise to certain [differences](#differences).
+However, it's important to note that certain [differences](#differences) may arise due to the platform's infrastructure.
 
 <Admonition type="info" label="Logflare Technical Docs">
   All logflare technical docs are available at
@@ -57,7 +57,8 @@ Make sure to set the `GOOGLE_DATASET_ID_APPEND`, `GOOGLE_PROJECT_ID` and `GOOGLE
 Download your Google Cloud API JWT and store it under gcloud.json in your working directory.
 
 <Admonition>
-You must also enable billing on your Google Cloud project, as the streaming inserts feature is required.
+  You must also enable billing on your Google Cloud project, as the streaming inserts feature is
+  required.
 </Admonition>
 
 ## Production Recommendations
