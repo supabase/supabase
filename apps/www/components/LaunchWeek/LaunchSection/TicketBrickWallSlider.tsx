@@ -28,7 +28,7 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
     }/${BUCKET_FOLDER_VERSION}/${username}.png`
 
   useEffect(() => {
-    // trigger autplay if viewport resize
+    // trigger autoplay if viewport resize
     if (swiperInstance) swiperInstance?.autoplay?.run()
   }, [width])
 
