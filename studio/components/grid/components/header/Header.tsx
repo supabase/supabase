@@ -349,8 +349,18 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
+    const formattedRows = rows.map((row) => {
+      const formattedRow = row
+      Object.keys(row).map((column) => {
+        if (typeof row[column] === 'object' && row[column] !== null)
+          formattedRow[column] = JSON.stringify(formattedRow[column])
+      })
+      return formattedRow
+    })
 
-    const csv = Papa.unparse(rows, { columns: state.table!.columns.map((column) => column.name) })
+    const csv = Papa.unparse(formattedRows, {
+      columns: state.table!.columns.map((column) => column.name),
+    })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
