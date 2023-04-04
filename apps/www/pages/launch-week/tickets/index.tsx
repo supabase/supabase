@@ -52,21 +52,12 @@ export default function TicketsPage({ users }: Props) {
     loadMoreUsers(offset)
   }, [hasLoaded])
 
-  const getPagination = (page: number = 1, size: number) => {
-    const limit = size ? +size : 3
-    const from = page ? page * limit : 0
-    const to = page ? from + size : size
-
-    return { from, to }
-  }
-
-  const loadUsers = async (offset = 0, pageCount: number) => {
-    const { from, to } = getPagination(offset, pageCount)
-
+  const loadUsers = async (offset: number) => {
+    const from = offset * PAGE_COUNT
     return await supabaseAdmin!
       .from('lw7_tickets_golden')
       .select('*')
-      .range(from, to - 1)
+      .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
   }
 
@@ -74,7 +65,7 @@ export default function TicketsPage({ users }: Props) {
     if (isLast) return
     setIsLoading(true)
     setOffset((prev) => prev + 1)
-    const { data: users } = await loadUsers(offset, PAGE_COUNT)
+    const { data: users } = await loadUsers(offset)
     setLoadedUsers((prevUsers) => [...prevUsers, ...(users as any[])])
     if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
     setIsLoading(false)
@@ -84,8 +75,8 @@ export default function TicketsPage({ users }: Props) {
     document.body.className = 'dark bg-[#1C1C1C]'
   }, [])
 
-  const isBottomInView = () => {
-    if (ref.current && window) {
+  const handleScroll = () => {
+    if (ref.current && typeof window !== 'undefined') {
       const rect = (ref.current as HTMLDivElement)?.getBoundingClientRect()
       const isInView = rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
       setHasLoaded((prev) => !prev && isInView)
@@ -93,13 +84,12 @@ export default function TicketsPage({ users }: Props) {
   }
 
   useEffect(() => {
-    window.addEventListener(
-      'scroll',
-      debounce(() => !isLast && isBottomInView(), 200)
-    )
+    const handleDebouncedScroll = debounce(() => !isLast && handleScroll(), 200)
+
+    window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      window.removeEventListener('scroll', isBottomInView)
+      window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])
 

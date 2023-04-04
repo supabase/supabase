@@ -271,5 +271,12 @@
     "position": "Open Source Contributor",
     "author_url": "https://github.com/gregnr",
     "author_image_url": "https://github.com/gregnr.png"
+  },
+  {
+    "author_id": "fsansalvadore",
+    "author": "Francesco Sansalvadore",
+    "position": "Engineering",
+    "author_url": "https://github.com/fsansalvadore",
+    "author_image_url": "https://github.com/fsansalvadore.png"
   }
 ]
