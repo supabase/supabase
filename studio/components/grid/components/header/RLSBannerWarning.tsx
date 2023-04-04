@@ -82,7 +82,7 @@ export default function RLSBannerWarning() {
                       <Alert
                         variant="warning"
                         className="!px-4 !py-3 mt-3"
-                        title=" You are allowing anonymous access to your table"
+                        title=" You are making this table public"
                       >
                         <p>
                           Anyone with the anon key can modify or delete data. <br />
@@ -96,7 +96,7 @@ export default function RLSBannerWarning() {
                         <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                           <a target="_blank">
                             <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              Learn more about RLS
+                              RLS Documentation
                             </Button>
                           </a>
                         </Link>
