@@ -85,15 +85,15 @@ serve(async (req) => {
 
     const [{ embedding }] = embeddingResponse.data.data
 
-    const { error: matchError, data: pageSections } = await supabaseClient.rpc(
-      'match_page_sections',
-      {
+    const { error: matchError, data: pageSections } = await supabaseClient
+      .rpc('match_page_sections', {
         embedding,
         match_threshold: 0.78,
-        match_count: 10,
         min_content_length: 50,
-      }
-    )
+      })
+      .not('page.path', 'like', '/guides/integrations/%')
+      .select('content,page!inner(path)')
+      .limit(10)
 
     if (matchError) {
       throw new ApplicationError('Failed to match page sections', matchError)
@@ -115,26 +115,6 @@ serve(async (req) => {
 
       contextText += `${content.trim()}\n---\n`
     }
-
-    const prompt = codeBlock`
-      ${oneLine`
-        You are a very enthusiastic Supabase representative who loves
-        to help people! Given the following sections from the Supabase
-        documentation, answer the question using only that information,
-        outputted in markdown format. If you are unsure and the answer
-        is not explicitly written in the documentation, say
-        "Sorry, I don't know how to help with that."
-      `}
-
-      Context sections:
-      ${contextText}
-
-      Question: """
-      ${sanitizedQuery}
-      """
-
-      Answer as markdown (including related code snippets if available):
-    `
 
     const messages: ChatCompletionRequestMessage[] = [
       {
