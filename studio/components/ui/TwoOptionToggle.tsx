@@ -26,7 +26,7 @@ const TwoOptionToggle: FC<Props> = ({
 
   return (
     <div
-      className={`relative border ${borderOverride} rounded-md h-8`}
+      className={`relative border ${borderOverride} rounded-md h-7`}
       style={{ padding: 1, width: (width + 1) * 2 }}
     >
       <span

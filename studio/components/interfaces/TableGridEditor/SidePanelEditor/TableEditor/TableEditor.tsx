@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import {
@@ -18,7 +19,7 @@ import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnManagement from './ColumnManagement'
-import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from '../'
 import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import { TableField, ImportContent } from './TableEditor.types'
@@ -30,7 +31,6 @@ import {
 } from './TableEditor.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Link from 'next/link'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 interface Props {
@@ -381,12 +381,11 @@ const TableEditor: FC<Props> = ({
                       </div>
 
                       <div className="mt-3">
-                        <p>Learn more about RLS:</p>
                         <p className="mt-2">
                           <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                             <a target="_blank">
                               <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                                RLS Documentation
+                                Learn more about RLS
                               </Button>
                             </a>
                           </Link>

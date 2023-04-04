@@ -13,7 +13,7 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useParams } from 'hooks/misc/useParams'
+import { useParams } from 'common/hooks'
 
 interface Props {}
 

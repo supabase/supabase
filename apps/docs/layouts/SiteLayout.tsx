@@ -22,6 +22,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/database',
     name: 'Database',
   },
+  api: {
+    icon: '/docs/img/icons/menu/database',
+    name: 'Serverless APIs',
+  },
   auth: {
     icon: '/docs/img/icons/menu/auth',
     name: 'Auth',
@@ -33,6 +37,10 @@ const levelsData = {
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
+  },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
   },
   storage: {
     icon: '/docs/img/icons/menu/storage',
@@ -101,6 +109,10 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
   },
 }
 

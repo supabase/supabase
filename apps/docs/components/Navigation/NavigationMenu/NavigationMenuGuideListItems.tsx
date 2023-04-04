@@ -21,7 +21,11 @@ const HeaderImage = React.memo(function HeaderImage(props: any) {
   )
 })
 
-const HeaderLink = React.memo(function HeaderLink(props: any) {
+const HeaderLink = React.memo(function HeaderLink(props: {
+  title: string
+  id: string
+  url: string
+}) {
   const router = useRouter()
 
   return (
