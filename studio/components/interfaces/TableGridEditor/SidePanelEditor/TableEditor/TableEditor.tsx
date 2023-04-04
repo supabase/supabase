@@ -10,8 +10,11 @@ import {
   IconBookOpen,
   Button,
   Modal,
-  IconLock,
   IconUnlock,
+  IconInfo,
+  IconAlertTriangle,
+  IconShieldOff,
+  IconLock,
 } from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
@@ -280,7 +283,6 @@ const TableEditor: FC<Props> = ({
                 className="!px-4 !py-3 mt-3"
                 title="You are allowing anonymous access to your table"
               >
-                <p>Anyone with the anon key will be able to modify or delete your data.</p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                     <a target="_blank">
@@ -346,7 +348,7 @@ const TableEditor: FC<Props> = ({
 
             <ConfirmationModal
               visible={rlsConfirmVisible}
-              header="Confirm"
+              header="Turn off Row Level Security"
               buttonLabel="Confirm"
               size="medium"
               onSelectCancel={() => setRlsConfirmVisible(false)}
@@ -364,13 +366,9 @@ const TableEditor: FC<Props> = ({
                     </div>
                     <div className="text-sm text-scale-1100 grid gap-4">
                       <div className="grid gap-1">
-                        <p>
-                          Row Level Security will be turned <u>off</u> for this table.
-                        </p>
-
                         <Alert
                           variant="warning"
-                          className="!px-4 !py-3 mt-3"
+                          className="!px-4 !py-3"
                           title=" You are allowing anonymous access to your table"
                         >
                           <p>
@@ -378,6 +376,33 @@ const TableEditor: FC<Props> = ({
                             We recommend using RLS policies to control access to your data.
                           </p>
                         </Alert>
+                        <ul className="mt-4 space-y-4">
+                          <li className="flex gap-3">
+                            <IconAlertTriangle />
+                            <span>All requests by anyone with the anon key will be accepted</span>
+                          </li>
+
+                          <li className="flex gap-3">
+                            <IconShieldOff />
+                            <span>Auth policies will not be enforced</span>
+                          </li>
+
+                          <li className="flex gap-3">
+                            <IconLock w={14} className="flex-shrink-0" />
+                            <div>
+                              <strong>Before you make public, consider:</strong>
+                              <ul className="space-y-2">
+                                <li className="list-disc ml-4">
+                                  Any personal information in this table will be publicly accessible
+                                </li>
+                                <li className="list-disc ml-4">
+                                  Anyone with the anon key will be able to copy, modify, add and
+                                  delete any row in this table
+                                </li>
+                              </ul>
+                            </div>
+                          </li>
+                        </ul>
                       </div>
 
                       <div className="mt-3">
@@ -385,7 +410,7 @@ const TableEditor: FC<Props> = ({
                           <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                             <a target="_blank">
                               <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                                Learn more about RLS
+                                RLS Documentation
                               </Button>
                             </a>
                           </Link>
