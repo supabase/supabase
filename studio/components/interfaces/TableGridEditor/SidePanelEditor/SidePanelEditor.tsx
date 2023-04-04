@@ -278,6 +278,13 @@ const SidePanelEditor = ({
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
+        ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
       onColumnSaved(configuration.isEncrypted)
@@ -402,7 +409,20 @@ const SidePanelEditor = ({
             message: `Table ${table.name} has been updated, but there were some errors`,
           })
         } else {
-          await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+          queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+          await Promise.all([
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+            ),
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [
+                'table-definition',
+                selectedTable!.schema,
+                selectedTable!.name,
+              ])
+            ),
+            queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          ])
 
           ui.setNotification({
             id: toastId,
@@ -411,8 +431,6 @@ const SidePanelEditor = ({
           })
         }
       }
-
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
