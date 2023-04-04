@@ -53,8 +53,8 @@ to run automatically when starting the database container.
 We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
 
-<!-- prettier-ignore -->
 ```sql
+{/* prettier-ignore */}
 create schema if not exists extensions;
 create extension if not exists "uuid-ossp" with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
