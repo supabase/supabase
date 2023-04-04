@@ -318,6 +318,11 @@ functions:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
+  - id: auth-signinwithsso
+    title: 'signInWithSSO()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
+    notes: |
+      - Test
   - id: verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'

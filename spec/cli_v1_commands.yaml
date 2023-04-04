@@ -418,6 +418,19 @@ commands:
     usage: supabase secrets list
     subcommands: []
     flags: []
+  - id: supabase-sso
+    title: supabase sso
+    summary: Manage your project's SSO configuration
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-sso-add
+      - supabase-sso-show
+      - supabase-sso-update
+      - supabase-sso-remove
+      - supabase-sso-list
+    flags: []
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
