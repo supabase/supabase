@@ -225,6 +225,26 @@ const uiConfig = {
           '0%': { transform: 'translate-x-0', opacity: 1 },
           '100%': { transform: 'translateX(100%)', opacity: 0 },
         },
+        lineLoading: {
+          '0%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+          '25%': {
+            width: ' 240px',
+          },
+          '50%': {
+            marginLeft: '100%',
+            width: '80px',
+          },
+          '75%': {
+            width: '240px',
+          },
+          '100%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+        },
       },
       animation: {
         'fade-in': 'fadeIn 300ms',
@@ -250,6 +270,8 @@ const uiConfig = {
         'panel-slide-right-out': 'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
+        'line-loading': 'lineLoading 1.8s infinite',
+
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
         // tailwind class for this is `animate-dropdownFadeOut`
@@ -267,13 +289,22 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
+        '.line-loading-bg': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
+        '.line-loading-bg-light': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(33, 33, 33, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-
         "[data-state='open'] .accordion-content-animation": {
           animation: 'slideDown 200ms ease-out',
         },

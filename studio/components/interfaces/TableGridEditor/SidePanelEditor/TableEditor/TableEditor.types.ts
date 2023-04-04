@@ -16,4 +16,6 @@ export interface ImportContent {
   rowCount: number
   rows: object[]
   columnTypeMap: Dictionary<any>
+  selectedHeaders: string[]
+  resolve: () => void
 }

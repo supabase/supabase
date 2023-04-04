@@ -3,7 +3,8 @@ import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
 
-import { checkPermissions, useParams, withAuth } from 'hooks'
+import { checkPermissions, withAuth } from 'hooks'
+import { useParams } from 'common/hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import BaseLayout from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
@@ -44,11 +45,11 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">
             <div
-              className="item-center 
-            flex 
+              className="item-center
+            flex
             flex-col
-            justify-between 
-            gap-y-4 
+            justify-between
+            gap-y-4
             xl:flex-row"
             >
               <div className="flex items-center gap-3">

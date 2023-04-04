@@ -12,7 +12,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {app.organizations.isLoading ? (
+      {!app.organizations.isInitialized ? (
         <div className="flex h-full items-center justify-center space-x-2">
           <Connecting />
         </div>

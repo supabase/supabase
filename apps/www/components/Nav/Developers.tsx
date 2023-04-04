@@ -62,23 +62,23 @@ const Developers = () => {
         <div className="m-3 mx-6">
           <p className="p">Latest announcements</p>
           <ul className="mt-6 space-y-3 pb-6">
-            {AnnouncementsData.map((caseStudy: any, idx: number) => (
+            {AnnouncementsData.map((announcement: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
-                <Link href={caseStudy.url}>
+                <Link href={announcement.url}>
                   <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
                     <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                       <Image
-                        src={`${basePath}/${caseStudy.imgUrl}`}
-                        alt="caseStudyThumb"
+                        src={`${basePath}${announcement.imgUrl}`}
+                        alt={announcement.title}
                         layout="fill"
                         objectFit="cover"
                       />
                     </div>
                     <div className="min-w-0 flex-1 sm:ml-4">
                       <h4 className="text-scale-1200 text-normal mb-0 text-base">
-                        {caseStudy.title}
+                        {announcement.title}
                       </h4>
-                      <p className="p text-sm">{caseStudy.description}</p>
+                      <p className="p text-sm">{announcement.description}</p>
                     </div>
                   </a>
                 </Link>
