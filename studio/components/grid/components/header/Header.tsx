@@ -1,4 +1,5 @@
-import { saveAs } from 'file-saver'
+import saveAs from 'file-saver'
+import Papa from 'papaparse'
 import { useState, ReactNode } from 'react'
 import {
   Button,
@@ -18,7 +19,6 @@ import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { Sort, Filter, SupaTable } from 'components/grid/types'
-import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
@@ -350,7 +350,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
 
-    const csv = exportRowsToCsv(state.table!.columns, rows)
+    const csv = Papa.unparse(rows, { columns: state.table!.columns.map((column) => column.name) })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
