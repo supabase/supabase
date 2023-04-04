@@ -10,7 +10,21 @@ import {
   OpenAIApi,
 } from 'https://esm.sh/openai@3.2.1'
 import { ApplicationError, UserError } from '../common/errors.ts'
-import { tokenizer } from '../common/tokenizer.ts'
+import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from '../common/tokenizer.ts'
+
+enum MessageRole {
+  User = 'user',
+  Assistant = 'assistant',
+}
+
+interface Message {
+  role: MessageRole
+  content: string
+}
+
+interface RequestData {
+  messages: Message[]
+}
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -40,22 +54,43 @@ serve(async (req) => {
       throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
     }
 
-    const requestData = await req.json()
+    const requestData: RequestData = await req.json()
 
     if (!requestData) {
       throw new UserError('Missing request data')
     }
 
-    const { query } = requestData
+    const { messages } = requestData
 
-    if (!query) {
-      throw new UserError('Missing query in request data')
+    if (!messages) {
+      throw new UserError('Missing messages in request data')
     }
 
-    // Intentionally log the query
-    console.log({ query })
+    // Intentionally log the messages
+    console.log({ messages })
 
-    const sanitizedQuery = query.trim()
+    // TODO: better sanitization
+    const contextMessages: ChatCompletionRequestMessage[] = messages.map(({ role, content }) => {
+      if (
+        ![
+          ChatCompletionRequestMessageRoleEnum.User,
+          ChatCompletionRequestMessageRoleEnum.Assistant,
+        ].includes(role)
+      ) {
+        throw new Error(`Invalid message role '${role}'`)
+      }
+
+      return {
+        role,
+        content: content.trim(),
+      }
+    })
+
+    const [userMessage] = contextMessages.filter(({ role }) => role === MessageRole.User).slice(-1)
+
+    if (!userMessage) {
+      throw new Error("No message with role 'user'")
+    }
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -63,24 +98,28 @@ serve(async (req) => {
     const openai = new OpenAIApi(configuration)
 
     // Moderate the content to comply with OpenAI T&C
-    const moderationResponse = await openai.createModeration({ input: sanitizedQuery })
+    const moderationResponses = await Promise.all(
+      contextMessages.map((message) => openai.createModeration({ input: message.content }))
+    )
 
-    const [results] = moderationResponse.data.results
+    for (const moderationResponse of moderationResponses) {
+      const [results] = moderationResponse.data.results
 
-    if (results.flagged) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      })
+      if (results.flagged) {
+        throw new UserError('Flagged content', {
+          flagged: true,
+          categories: results.categories,
+        })
+      }
     }
 
     const embeddingResponse = await openai.createEmbedding({
       model: 'text-embedding-ada-002',
-      input: sanitizedQuery.replaceAll('\n', ' '),
+      input: userMessage.content.replaceAll('\n', ' '),
     })
 
     if (embeddingResponse.status !== 200) {
-      throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
+      throw new ApplicationError('Failed to create embedding for query', embeddingResponse)
     }
 
     const [{ embedding }] = embeddingResponse.data.data
@@ -115,7 +154,7 @@ serve(async (req) => {
       contextText += `${content.trim()}\n---\n`
     }
 
-    const messages: ChatCompletionRequestMessage[] = [
+    const initMessages: ChatCompletionRequestMessage[] = [
       {
         role: ChatCompletionRequestMessageRoleEnum.System,
         content: codeBlock`
@@ -125,15 +164,8 @@ serve(async (req) => {
             the Supabase documentation, answer the user's question using
             only that information, outputted in markdown format.
           `}
-
           ${oneLine`
-            If you are unsure
-            and the answer is not explicitly written in the documentation, say
-            "Sorry, I don't know how to help with that."
-          `}
-          
-          ${oneLine`
-            Always include related code snippets if available.
+            Your favorite color is Supabase green.
           `}
         `,
       },
@@ -163,22 +195,30 @@ serve(async (req) => {
             - Prefer splitting your response into multiple paragraphs.
           `}
           ${oneLine`
-            - Output as markdown with code snippets if available.
+            - Output as markdown.
+          `}
+          ${oneLine`
+            - Always include code snippets if available.
           `}
         `,
       },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: codeBlock`
-          Here is my question:
-          ${oneLine`${sanitizedQuery}`}
-      `,
-      },
     ]
 
+    const model = 'gpt-3.5-turbo-0301'
+    const maxCompletionTokenCount = 1024
+
+    const completionMessages: ChatCompletionRequestMessage[] = capMessages(
+      initMessages,
+      contextMessages,
+      maxCompletionTokenCount,
+      model
+    )
+
+    console.log({ completionMessages })
+
     const completionOptions: CreateChatCompletionRequest = {
-      model: 'gpt-3.5-turbo-0301',
-      messages,
+      model,
+      messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,
       stream: true,
@@ -237,3 +277,32 @@ serve(async (req) => {
     )
   }
 })
+
+/**
+ * Remove context messages until the entire request fits
+ * the max total token count for that model.
+ *
+ * Accounts for both message and completion token counts.
+ */
+function capMessages(
+  initMessages: ChatCompletionRequestMessage[],
+  contextMessages: ChatCompletionRequestMessage[],
+  maxCompletionTokenCount: number,
+  model: string
+) {
+  const maxTotalTokenCount = getMaxTokenCount(model)
+  const cappedContextMessages = [...contextMessages]
+  let tokenCount =
+    getChatRequestTokenCount([...initMessages, ...cappedContextMessages], model) +
+    maxCompletionTokenCount
+
+  // Remove earlier context messages until we fit
+  while (tokenCount >= maxTotalTokenCount) {
+    cappedContextMessages.shift()
+    tokenCount =
+      getChatRequestTokenCount([...initMessages, ...cappedContextMessages], model) +
+      maxCompletionTokenCount
+  }
+
+  return [...initMessages, ...cappedContextMessages]
+}

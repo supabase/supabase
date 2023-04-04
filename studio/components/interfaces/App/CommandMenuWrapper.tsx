@@ -46,9 +46,7 @@ ${answer}
     <CommandMenuProvider
       site="studio"
       projectRef={ref}
-      MarkdownHandler={({ ...props }) => (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={null} {...props} />
-      )}
+      MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
       onSaveGeneratedSQL={onSaveGeneratedSQL}
     >
       {children}
