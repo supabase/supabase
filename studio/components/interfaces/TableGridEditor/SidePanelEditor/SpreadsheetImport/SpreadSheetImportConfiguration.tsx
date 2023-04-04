@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { useState } from 'react'
-import { SidePanel, Button, IconChevronDown } from 'ui'
+import { SidePanel, Button, IconChevronDown, Collapsible } from 'ui'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
@@ -17,30 +17,29 @@ const SpreadsheetImportConfiguration = ({
   const [expandConfiguration, setExpandConfiguration] = useState(false)
 
   return (
-    <SidePanel.Content>
-      <div className="py-1">
-        <div className="flex items-center justify-between">
-          <p className="text-sm">Configure import data</p>
-          <Button
-            type="text"
-            icon={
-              <IconChevronDown
-                size={18}
-                strokeWidth={2}
-                className={clsx('text-scale-1100', expandConfiguration && 'rotate-180')}
-              />
-            }
-            className="px-1"
-            onClick={() => setExpandConfiguration(!expandConfiguration)}
-          />
-        </div>
-      </div>
-      <div
-        style={{ maxHeight: expandConfiguration ? '1000px' : '0px' }}
-        className="transition-all overflow-y-hidden"
-      >
-        <div className="py-2">
-          <div className="space-y-3">
+    <Collapsible open={expandConfiguration} onOpenChange={setExpandConfiguration} className={''}>
+      <Collapsible.Trigger asChild>
+        <SidePanel.Content>
+          <div className="py-1 flex items-center justify-between">
+            <p className="text-sm">Configure import data</p>
+            <Button
+              type="text"
+              icon={
+                <IconChevronDown
+                  size={18}
+                  strokeWidth={2}
+                  className={clsx('text-scale-1100', expandConfiguration && 'rotate-180')}
+                />
+              }
+              className="px-1"
+              onClick={() => setExpandConfiguration(!expandConfiguration)}
+            />
+          </div>
+        </SidePanel.Content>
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <SidePanel.Content>
+          <div className="py-2 space-y-3">
             <div>
               <p className="text-sm text-scale-1100">Select which columns to import</p>
               <p className="text-sm text-scale-1000">
@@ -63,10 +62,9 @@ const SpreadsheetImportConfiguration = ({
               })}
             </div>
           </div>
-          {/* Setting null perhaps idk */}
-        </div>
-      </div>
-    </SidePanel.Content>
+        </SidePanel.Content>
+      </Collapsible.Content>
+    </Collapsible>
   )
 }
 
