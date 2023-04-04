@@ -8,7 +8,6 @@ import BackwardIterator from 'components/to-be-cleaned/SqlEditor/BackwardIterato
 import { uniqBy } from 'lodash'
 import { useEffect } from 'react'
 
-
 /**
  * Convert a micro timestamp from number/string to iso timestamp
  */
@@ -271,11 +270,10 @@ export const ensureNoTimestampConflict = (
   }
 }
 
-
 /**
  * Adds SQL code hints to logs explorer code editor
  */
-export const useEditorHints = ()=>{
+export const useEditorHints = () => {
   const monaco = useMonaco()
 
   useEffect(() => {
@@ -337,7 +335,7 @@ export const useEditorHints = ()=>{
             suggestions: uniqBy(suggestions, 'label'),
           }
         },
-      }
+      } as any
 
       // register completion item provider for pgsql
       const completeProvider = monaco.languages.registerCompletionItemProvider(

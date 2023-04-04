@@ -65,6 +65,7 @@
     "mdast-util-to-markdown": "^1.5.0",
     "mdast-util-to-string": "^3.1.1",
     "mdx-mermaid": "2.0.0-rc3",
+    "mermaid": "^10.0.2",
     "micromark-extension-mdxjs": "^1.0.0",
     "next": "12.3.2",
     "next-compose-plugins": "^2.2.1",
