@@ -82,6 +82,9 @@ const PaymentSummaryPanel: FC<Props> = ({
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
 
+  // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
+  // Reduce one unnecessary prop
+
   const canUpdatePaymentMethods = checkPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
@@ -90,9 +93,12 @@ const PaymentSummaryPanel: FC<Props> = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const selectedPlanCost =
-    selectedPlan.prices.find(
-      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
-    )?.unit_amount ?? 0
+    selectedPlan !== undefined
+      ? selectedPlan.prices.find(
+          (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+        )?.unit_amount ?? 0
+      : currentSubscription?.tier.unit_amount ?? 0
+
   const totalSelectedAddonCost = Object.keys(selectedAddons)
     .map((productName) => {
       const product = (selectedAddons as any)[productName]
