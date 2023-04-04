@@ -237,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     try {
       await supabase.auth.signInWithOtp(
-        email: _emailController.text,
+        email: _emailController.text.trim(),
         emailRedirectTo:
             kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );
@@ -358,8 +358,8 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {
       _loading = true;
     });
-    final userName = _usernameController.text;
-    final website = _websiteController.text;
+    final userName = _usernameController.text.trim();
+    final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
     final updates = {
       'id': user!.id,
@@ -682,8 +682,8 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {
       _loading = true;
     });
-    final userName = _usernameController.text;
-    final website = _websiteController.text;
+    final userName = _usernameController.text.trim();
+    final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
     final updates = {
       'id': user!.id,
