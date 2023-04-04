@@ -22,6 +22,11 @@ services:
       NEXT_PUBLIC_ENABLE_LOGS: true
 
   kong:
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: kong
     depends_on:
       logs:
         condition: service_healthy
@@ -132,7 +137,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:9001/health"
+          "http://localhost:${VECTOR_API_PORT}/health"
         ]
       timeout: 5s
       interval: 5s
