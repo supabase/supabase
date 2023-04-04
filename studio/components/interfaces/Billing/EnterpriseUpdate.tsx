@@ -5,7 +5,7 @@ import { Transition } from '@headlessui/react'
 import { useStore } from 'hooks'
 import { getURL } from 'lib/helpers'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { API_URL, PROJECT_STATUS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 import Divider from 'components/ui/Divider'
