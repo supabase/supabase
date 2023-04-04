@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
+import CountdownBanner from '../LaunchWeek/Banners/CountdownBanner'
 
 type Props = {
   hideHeader?: boolean
@@ -23,6 +24,7 @@ const DefaultLayout = (props: Props) => {
 
   return (
     <>
+      {/* <CountdownBanner /> */}
       {!hideHeader && <Nav />}
       <div className="min-h-screen">
         <main>{children}</main>

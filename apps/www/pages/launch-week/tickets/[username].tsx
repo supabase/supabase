@@ -64,7 +64,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-20">
+        <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto xl:h-[calc(90vh-65px)] min-h-[600px] md:min-h-[auto] lg:min-h-[650px]">
