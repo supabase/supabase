@@ -1,8 +1,7 @@
-import * as React from 'react'
 import type {
   ChatCompletionResponseMessage,
+  CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
-  CreateCompletionResponse,
 } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 
@@ -176,8 +175,12 @@ const AiCommand = () => {
 
           setIsResponding(true)
 
-          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-          const [{ text: content }] = completionResponse.choices
+          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+          const [
+            {
+              delta: { content },
+            },
+          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
 
           const text = content ?? ''
 
