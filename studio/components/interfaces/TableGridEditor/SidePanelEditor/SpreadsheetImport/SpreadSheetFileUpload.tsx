@@ -34,7 +34,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-4">
       <div>
         <p className="mb-2 text-sm text-scale-1100">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
@@ -42,13 +42,13 @@ const SpreadSheetFileUpload: FC<Props> = ({
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-xs text-scale-900">
+        <p className="text-sm text-scale-1000">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>
       {!uploadedFile ? (
         <div
-          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed dark:border-gray-500 ${
+          className={`flex h-48 cursor-pointer items-center justify-center rounded-md border border-dashed dark:border-gray-700 ${
             isDraggedOver ? 'bg-gray-500' : ''
           }`}
           onDragOver={onDragOver}
@@ -56,15 +56,15 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onDrop={onDrop}
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
-          <p>
-            Drag and drop, or <span className="text-green-1000">browse</span> your files
+          <p className="text-sm">
+            Drag and drop, or <span className="text-brand-900">browse</span> your files
           </p>
         </div>
       ) : (
-        <div className="flex h-32 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-500">
+        <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
-            <h3 className="text-base text-scale-1200">{uploadedFile.name}</h3>
+            <p className="text-sm text-scale-1200">{uploadedFile.name}</p>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>
@@ -76,9 +76,9 @@ const SpreadSheetFileUpload: FC<Props> = ({
               <SparkBar
                 value={parseProgress}
                 max={100}
-                type={'horizontal'}
-                barClass={'bg-green-500'}
-                labelBottom="Parsing file..."
+                type="horizontal"
+                barClass="bg-green-900"
+                labelBottom="Checking file..."
                 labelTop={`${parseProgress}%`}
               />
             </div>

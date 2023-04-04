@@ -96,6 +96,11 @@ export interface SupabaseGridProps {
    * Custom component passed as children
    */
   children?: ReactNode
+
+  /**
+   * show import csv data button if available
+   */
+  onImportData?: () => void
 }
 
 export interface SupabaseGridRef {
