@@ -28,9 +28,15 @@ const home = [
       level: 'database',
     },
     {
+      label: 'Serverless APIs',
+      icon: '/img/icons/menu/reference',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
       label: 'Auth',
       icon: '/img/icons/menu/auth',
-      href: '/guides/auth/overview',
+      href: '/guides/auth',
       level: 'auth',
     },
     {

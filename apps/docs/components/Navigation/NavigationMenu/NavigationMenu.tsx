@@ -22,6 +22,7 @@ import cliCommonSections from '~/../../spec/common-cli-sections.json'
 import libCommonSections from '~/../../spec/common-client-libs-sections.json'
 import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
 import realtimeServerCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
+import analyticsServerCommonSections from '~/../../spec/common-self-hosting-analytics-sections.json'
 import storageServerCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
 import { flattenSections } from '~/lib/helpers'
 import NavigationMenuHome from './HomeMenu'
@@ -59,6 +60,7 @@ export type RefIdOptions =
   | 'reference_self_hosting_auth'
   | 'reference_self_hosting_storage'
   | 'reference_self_hosting_realtime'
+  | 'reference_self_hosting_analytics'
 
 export type RefKeyOptions =
   | 'javascript'
@@ -70,6 +72,7 @@ export type RefKeyOptions =
   | 'self-hosting-auth'
   | 'self-hosting-storage'
   | 'self-hosting-realtime'
+  | 'self-hosting-analytics'
 
 const NavigationMenu = () => {
   const router = useRouter()
@@ -84,6 +87,9 @@ const NavigationMenu = () => {
         break
       case url.includes(`/docs/guides/database`) && url:
         menuState.setMenuLevelId('database')
+        break
+      case url.includes(`/docs/guides/api`) && url:
+        menuState.setMenuLevelId('api')
         break
       case url.includes(`/docs/guides/auth`) && url:
         menuState.setMenuLevelId('auth')
@@ -154,6 +160,9 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/self-hosting-realtime`) && url:
         menuState.setMenuLevelId('reference_self_hosting_realtime')
         break
+      case url.includes(`/docs/reference/self-hosting-analytics`) && url:
+        menuState.setMenuLevelId('reference_self_hosting_analytics')
+        break
 
       default:
         break
@@ -174,6 +183,7 @@ const NavigationMenu = () => {
   const isHomeActive = 'home' === level
   const isGettingStartedActive = 'gettingstarted' === level
   const isDatabaseActive = 'database' === level
+  const isApiActive = 'api' === level
   const isAuthActive = 'auth' === level
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
@@ -196,6 +206,7 @@ const NavigationMenu = () => {
   const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
   const isReference_Self_Hosting_Storage = 'reference_self_hosting_storage' === level
   const isReference_Self_Hosting_Realtime = 'reference_self_hosting_realtime' === level
+  const isReference_Self_Hosting_Analytics = 'reference_self_hosting_analytics' === level
 
   return (
     <div className={['flex relative', 'justify-center lg:justify-start'].join(' ')}>
@@ -203,6 +214,7 @@ const NavigationMenu = () => {
       <NavigationMenuHome active={isHomeActive} />
       <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
       <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'api'} active={isApiActive} />
       <NavigationMenuGuideList id={'auth'} active={isAuthActive} />
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
       <NavigationMenuGuideList
@@ -303,6 +315,13 @@ const NavigationMenu = () => {
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-realtime"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-analytics-menu'}
+        id={'reference_self_hosting_analytics'}
+        active={isReference_Self_Hosting_Analytics}
+        commonSections={analyticsServerCommonSections}
+        lib="self-hosting-analytics"
       />
     </div>
   )

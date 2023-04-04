@@ -318,6 +318,8 @@ export default function Account({ session }) {
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
 
+First, [generate type definitions from your database using the Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types) to `../utils/database.types`.
+
 ```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
 import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'

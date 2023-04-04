@@ -80,7 +80,9 @@ const SignInLayout = ({
         <Head>
           <script
             dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
+              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace('${
+                BASE_PATH ?? ''
+              }' + window._getReturnToPath())}`,
             }}
           />
         </Head>

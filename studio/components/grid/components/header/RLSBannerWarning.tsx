@@ -9,7 +9,8 @@ import {
   Modal,
 } from 'ui'
 import Link from 'next/link'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
@@ -49,7 +50,7 @@ export default function RLSBannerWarning() {
             <div className="ml-20 absolute right-2">
               <Button
                 type="outline"
-                className="text-amber-1100 dark:text-white hover:text-scale-1200"
+                className="hover:text-scale-1200 text-amber-900 dark:text-amber-900 border border-amber-800"
                 onClick={() => setIsOpen(true)}
               >
                 Dismiss
@@ -91,12 +92,11 @@ export default function RLSBannerWarning() {
                     </div>
 
                     <div className="mt-3">
-                      <p>Learn more about RLS:</p>
                       <p className="mt-2">
                         <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                           <a target="_blank">
                             <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
+                              Learn more about RLS
                             </Button>
                           </a>
                         </Link>

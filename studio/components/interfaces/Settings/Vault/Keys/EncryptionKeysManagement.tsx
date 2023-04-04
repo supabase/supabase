@@ -18,7 +18,8 @@ import {
   IconExternalLink,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Divider from 'components/ui/Divider'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -157,19 +158,21 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 </Button>
               </Tooltip.Trigger>
               {!canManageKeys && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to add keys
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to add keys
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>
@@ -215,19 +218,21 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                             />
                           </Tooltip.Trigger>
                           {!canManageKeys && (
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-scale-1200">
-                                  You need additional permissions to delete keys
-                                </span>
-                              </div>
-                            </Tooltip.Content>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    You need additional permissions to delete keys
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
                           )}
                         </Tooltip.Root>
                       </div>
