@@ -163,12 +163,10 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         {hasImportContent && (
-          <div className="my-2 opacity-75">
-            <p>
-              Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and
-              the following {columns.length} columns.
-            </p>
-          </div>
+          <p className="text-sm text-scale-1000 my-2">
+            Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
+            following {columns.length} columns.
+          </p>
         )}
 
         {primaryKeyColumns.length === 0 && (
