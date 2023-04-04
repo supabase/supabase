@@ -6,7 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -105,19 +106,21 @@ const HookList: FC<Props> = ({
                     <Tooltip.Trigger>
                       <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
                     </Tooltip.Trigger>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to update webhooks
-                        </span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="left">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to update webhooks
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   </Tooltip.Root>
                 )}
               </div>

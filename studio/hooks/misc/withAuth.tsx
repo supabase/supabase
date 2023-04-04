@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -88,7 +89,9 @@ export function withAuth<T>(
           {IS_PLATFORM && (
             <script
               dangerouslySetInnerHTML={{
-                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${basePath}/sign-in' + '?' + searchParams.toString())}`,
+                __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (!localStorage.getItem('${STORAGE_KEY}') && !location.hash) {const searchParams = new URLSearchParams(location.search);searchParams.set('returnTo', location.pathname);location.replace('${
+                  basePath ?? ''
+                }/sign-in' + '?' + searchParams.toString())}`,
               }}
             />
           )}

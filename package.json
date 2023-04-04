@@ -40,6 +40,7 @@
     "json-stringify-safe": "^5.0.1",
     "prettier": "^2.8.4",
     "prettier-plugin-sql-cst": "^0.5.0",
+    "supabase": "^1.45.2",
     "ts-jest": "^27.0.7",
     "turbo": "^1.4.7"
   },

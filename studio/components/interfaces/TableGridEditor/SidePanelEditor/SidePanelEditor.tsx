@@ -5,7 +5,7 @@ import { Dictionary } from 'components/grid'
 import { Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { useStore, useUrlState } from 'hooks'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
@@ -66,6 +66,7 @@ const SidePanelEditor = ({
   onTableCreated = noop,
   onColumnSaved = noop,
 }: SidePanelEditorProps) => {
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const { meta, ui } = useStore()
   const queryClient = useQueryClient()
 
@@ -263,12 +264,21 @@ const SidePanelEditor = ({
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
     } else {
+      if (
+        !isNewRecord &&
+        payload.name &&
+        selectedColumnToEdit &&
+        selectedColumnToEdit.name !== payload.name
+      ) {
+        reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
+      }
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
       await Promise.all([
         meta.tables.loadById(selectedTable!.id),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),
+        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
@@ -280,6 +290,28 @@ const SidePanelEditor = ({
     }
 
     resolve()
+  }
+
+  /**
+   * Adds the renamed column's filter and/or sort rules.
+   */
+  const reAddRenamedColumnSortAndFilter = (oldColumnName: string, newColumnName: string) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+
+      return {
+        ...prevParams,
+        filter: existingFilters.map((filter: string) => {
+          const [column] = filter.split(':')
+          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
+        }),
+        sort: existingSorts.map((sort: string) => {
+          const [column] = sort.split(':')
+          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
+        }),
+      }
+    })
   }
 
   const saveTable = async (

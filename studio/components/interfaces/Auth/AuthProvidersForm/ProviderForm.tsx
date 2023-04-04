@@ -26,12 +26,23 @@ const ProviderForm: FC<Props> = ({ provider }) => {
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
-      initialValues[key] = isDoubleNegative ? !authConfig.config[key] : authConfig.config[key] ?? ''
+
+      if (provider.title === 'SAML 2.0') {
+        initialValues[key] = authConfig.config[key] ?? false
+      } else {
+        initialValues[key] = isDoubleNegative
+          ? !authConfig.config[key]
+          : authConfig.config[key] ?? ''
+      }
     })
     return initialValues
   }
 
-  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+  // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
+  const isActive =
+    provider.title === 'SAML 2.0'
+      ? authConfig.config['SAML_ENABLED'] || false
+      : authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
@@ -163,25 +174,27 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         <Button
                           htmlType="submit"
                           loading={isSubmitting}
-                          disabled={!canUpdateConfig || noChanges}
+                          disabled={isSubmitting || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>
                       </Tooltip.Trigger>
                       {!canUpdateConfig && (
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                              'border border-scale-200',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-scale-1200">
-                              You need additional permissions to update provider settings
-                            </span>
-                          </div>
-                        </Tooltip.Content>
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-scale-1200">
+                                You need additional permissions to update provider settings
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
                       )}
                     </Tooltip.Root>
                   </div>

@@ -21,7 +21,8 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
