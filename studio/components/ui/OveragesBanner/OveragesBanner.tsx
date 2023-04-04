@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Alert, Button } from 'ui'
 
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { getResourcesApproachingLimits, getResourcesExceededLimits } from './OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'

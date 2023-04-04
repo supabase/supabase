@@ -16,7 +16,8 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
-import { useParams, useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 
 interface Props {
   secret: VaultSecret

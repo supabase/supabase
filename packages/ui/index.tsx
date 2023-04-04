@@ -61,7 +61,7 @@ export * from './src/components/Upload'
 export * from './src/components/Form'
 
 // CMD+K
-// export * from './src/components/Command'
+export * from './src/components/Command'
 
 // config
 

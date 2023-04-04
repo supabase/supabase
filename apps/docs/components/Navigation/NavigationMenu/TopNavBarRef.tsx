@@ -3,12 +3,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun } from 'ui'
+import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun, SearchButton } from 'ui'
 import { REFERENCES } from '~/components/Navigation/Navigation.constants'
 
 import { getPageType } from '~/lib/helpers'
-
-import SearchButton from '~/components/Search/SearchButton'
 
 const TopNavBarRef: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -128,16 +126,15 @@ const TopNavBarRef: FC = () => {
             Dashboard
           </Button>
           <ul className="flex items-center">
-            <Button
-              type="text"
-              as="a"
-              // @ts-ignore
+            <Link
               href="https://github.com/supabase/supabase"
               target="_blank"
               rel="noreferrer noopener"
             >
-              <IconGitHub size={16} />
-            </Button>
+              <a className="px-2.5 py-1" target="_blank">
+                <IconGitHub size={16} />
+              </a>
+            </Link>
           </ul>
           <ul className="flex items-center">
             <li className="px-4">

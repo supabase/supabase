@@ -25,8 +25,9 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
+import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
-import { checkPermissions, useStore, useParams, useLocalStorage } from 'hooks'
+import { checkPermissions, useStore, useLocalStorage } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -464,7 +465,10 @@ const EntityListItem = ({
               <Dropdown.Item
                 key="edit-table"
                 icon={<IconEdit size="tiny" />}
-                onClick={() => onEditTable(entity)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEditTable(entity)
+                }}
                 disabled={isLoadingTableMetadata}
               >
                 Edit Table
@@ -472,7 +476,10 @@ const EntityListItem = ({
               <Dropdown.Item
                 key="duplicate-table"
                 icon={<IconCopy size="tiny" />}
-                onClick={() => onDuplicateTable(entity)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDuplicateTable(entity)
+                }}
                 disabled={isLoadingTableMetadata}
               >
                 Duplicate Table
@@ -488,7 +495,10 @@ const EntityListItem = ({
               <Dropdown.Item
                 key="delete-table"
                 icon={<IconTrash size="tiny" />}
-                onClick={() => onDeleteTable(entity)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteTable(entity)
+                }}
                 disabled={isLoadingTableMetadata}
               >
                 Delete Table
