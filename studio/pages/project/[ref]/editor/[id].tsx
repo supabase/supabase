@@ -44,7 +44,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
   const [sidePanelKey, setSidePanelKey] = useState<
-    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   >()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
@@ -135,6 +135,16 @@ const TableEditorPage: NextPageWithLayout = () => {
   const onExpandJSONEditor = (column: string, row: any) => {
     setSidePanelKey('json')
     setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+  }
+
+  const onImportData = () => {
+    if (id) {
+      setSidePanelKey('csv-import')
+      const table = meta.tables.byId(id)
+      setSelectedTableToEdit(table)
+    } else {
+      console.error('Table ID not found')
+    }
   }
 
   const onEditForeignKeyColumnValue = ({
@@ -280,6 +290,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
         theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
+        onImportData={onImportData}
       />
       <ConfirmationModal
         danger
