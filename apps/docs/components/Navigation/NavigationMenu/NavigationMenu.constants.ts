@@ -48,6 +48,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    { name: 'Local Development', url: '/guides/cli/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -130,7 +131,7 @@ export const gettingstarted = {
 }
 
 export const cli = {
-  label: 'CLI',
+  title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Local Development', url: '/guides/cli/local-development' },
@@ -252,11 +253,15 @@ export const PhoneLoginsItems = [
 
 export const auth = {
   icon: 'auth',
-  label: 'Auth',
+  title: 'Auth',
   items: [
     {
       name: 'Overview',
       url: '/guides/auth',
+    },
+    {
+      name: 'Quickstarts',
+      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
     },
     {
       name: 'Authentication',
@@ -304,9 +309,9 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Next.js', url: '/guides/auth/auth-helpers/nextjs' },
+        { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs' },
         {
-          name: 'Next.js Server Components',
+          name: 'Next.js (app)',
           url: '/guides/auth/auth-helpers/nextjs-server-components',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
@@ -338,7 +343,7 @@ export const auth = {
 
 export const database = {
   icon: 'database',
-  label: 'Database',
+  title: 'Database',
   url: '/guides/database',
   items: [
     { name: 'Database Connections', url: '/guides/database/connecting-to-postgres' },
@@ -347,14 +352,6 @@ export const database = {
     { name: 'Database Webhooks', url: '/guides/database/webhooks' },
     { name: 'Full Text Search', url: '/guides/database/full-text-search' },
     { name: 'Database Testing', url: '/guides/database/testing' },
-    {
-      name: 'Serverless APIs',
-      url: undefined,
-      items: [
-        { name: 'Overview', url: '/guides/database/api' },
-        { name: 'Generating Types', url: '/guides/database/api/generating-types' },
-      ],
-    },
     {
       name: 'Extensions',
       url: undefined,
@@ -495,9 +492,47 @@ export const database = {
   ],
 }
 
+export const api = {
+  icon: 'reference',
+  title: 'Serverless APIs',
+  url: '/guides/api',
+  items: [
+    { name: 'Overview', url: '/guides/api', items: [] },
+    { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
+    {
+      name: 'Guides',
+      url: '/guides/api',
+      items: [
+        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
+        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/api/joins-and-nesting',
+          items: [],
+        },
+      ],
+    },
+    {
+      name: 'REST & REALTIME',
+      url: undefined,
+      items: [
+        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
+        { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
+        { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+      ],
+    },
+    {
+      name: 'GRAPHQL',
+      url: undefined,
+      items: [{ name: 'GraphiQL Documentation', url: '/guides/api/graphql/graphiql', items: [] }],
+    },
+  ],
+}
+
 export const functions = {
   icon: 'functions',
-  label: 'Edge Functions',
+  title: 'Edge Functions',
   url: '/guides/functions',
   items: [
     {
@@ -564,7 +599,7 @@ export const functions = {
 
 export const realtime = {
   icon: 'realtime',
-  label: 'Realtime',
+  title: 'Realtime',
   url: '/guides/realtime',
   items: [
     {
@@ -603,6 +638,11 @@ export const realtime = {
           url: '/guides/realtime/subscribing-to-database-changes',
         },
         {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
+        },
+        {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
         },
@@ -622,7 +662,7 @@ export const realtime = {
 
 export const storage = {
   icon: 'storage',
-  label: 'Storage',
+  title: 'Storage',
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage' },
@@ -654,7 +694,7 @@ export const supabase_cli = {
 
 export const platform = {
   icon: 'platform',
-  label: 'Platform',
+  title: 'Platform',
   url: '/guides/platform',
   items: [
     {
@@ -726,7 +766,7 @@ export const platform = {
 
 export const resources = {
   icon: 'resources',
-  label: 'Resources',
+  title: 'Resources',
   url: '/guides/resources',
   items: [
     { name: 'Examples', url: '/guides/resources/examples' },
@@ -792,7 +832,7 @@ export const self_hosting = {
 }
 
 export const migrate = {
-  label: 'Migrate to Supabase',
+  title: 'Migrate to Supabase',
   url: '/guides/migrate',
   items: [
     { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth' },
@@ -805,7 +845,7 @@ export const migrate = {
 
 export const integrations = {
   icon: 'integrations',
-  label: 'Integrations',
+  title: 'Integrations',
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
@@ -850,7 +890,6 @@ export const integrations = {
       url: undefined,
       items: [
         { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'Dashibase', url: '/guides/integrations/dashibase' },
         { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },

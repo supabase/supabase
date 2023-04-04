@@ -1,5 +1,6 @@
 import { useTheme } from 'common/Providers'
 import * as React from 'react'
+import Image from 'next/image'
 
 interface Props {
   title: string
@@ -8,11 +9,10 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
-  img?: string
+  logo?: string
+  logoInverse?: string
   hasLightIcon?: boolean
-
   showLink?: boolean
-
   showIconBg?: boolean
 }
 
@@ -23,12 +23,15 @@ const GlassPanel = ({
   children,
   header,
   background = true,
-  img,
+  logo,
+  logoInverse,
   hasLightIcon,
   showLink = false,
   showIconBg = false,
 }: Props) => {
   const { isDarkMode } = useTheme()
+  const showLogoInverse = logoInverse && isDarkMode
+  const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC = (props) => (
     <div
@@ -38,6 +41,20 @@ const GlassPanel = ({
       ].join(' ')}
     >
       {props.children}
+    </div>
+  )
+
+  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
+    <div className="relative box-content p-8 pb-0">
+      <div className="relative h-[33px] w-auto max-w-[145px]">
+        <Image
+          src={logoImage}
+          layout="fill"
+          objectFit="contain"
+          objectPosition="left"
+          className={className}
+        />
+      </div>
     </div>
   )
 
@@ -57,6 +74,9 @@ const GlassPanel = ({
         'transition',
       ].join(' ')}
     >
+      {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
+      {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
+
       {header && (
         <img
           src={`${header}`}

@@ -45,6 +45,9 @@ serve(async (req) => {
       throw new UserError('Missing query in request data')
     }
 
+    // Intentionally log the query
+    console.log({ query })
+
     const sanitizedQuery = query.trim()
 
     const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)

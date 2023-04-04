@@ -38,3 +38,11 @@ supabase functions serve og-images
 ```
 
 Now we can visit [localhost:54321/functions/v1/og-images/?site=docs&title=Title&description=Description&type=Auth](http://localhost:54321/functions/v1/og-images/?site=docs&title=Title&description=Description&type=Auth) to see your changes localy.
+
+## Deploy
+
+To deploy this function, you currently need to depoy it locally. To do this follow the steps below.
+
+```bash
+supabase functions deploy og-images --no-verify-jwt
+```
