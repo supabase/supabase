@@ -1,5 +1,5 @@
 ---
-title: Infinite scroll with NextJs, Supabase and Framer Motion
+title: Infinite scroll with Next.js, Supabase and Framer Motion
 description: Lazy load and paginate data on scroll with supabase-js and a sprinkle of Framer Motion magic ✨
 author: fsansalvadore
 image: infinite-scroll-thumb.jpg
@@ -8,7 +8,7 @@ tags:
   - tutorial
   - launch-week
   - Next.js
-date: '2023-04-07'
+date: '2023-04-04'
 toc_depth: 6
 ---
 
@@ -18,7 +18,7 @@ Our goal was to feature all the amazing people who generated tickets on a [singl
 
 With infinite scrolling, users can effortlessly scroll through content while only loading the necessary data as they go. This not only enhances performance but also creates a seamless and enjoyable user experience.
 
-In this post, we'll detail our process of implementing infinite scrolling using NextJs, Framer Motion, and Supabase.
+In this post, we'll detail our process of implementing infinite scrolling using Next.js, Framer Motion, and Supabase.
 
 ## Step 0. Load the first batch
 
@@ -68,7 +68,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
 To detect if the user is scrolling we can listen to the window `scroll` event.
 
-If you try to console.log the event returned in the listener callback, you'll notice that it fires on every single pixel scrolled. We want to avoid triggering like crazy, so we'll use a [lodash debounce function](https://www.geeksforgeeks.org/lodash-_-debounce-method/) to limit how often we call this event to once every 200 milliseconds.
+If you try to `console.log()` the event returned in the listener callback, you'll notice that it fires on every single pixel scrolled. We want to avoid triggering like crazy, so we'll use a [lodash debounce function](https://www.geeksforgeeks.org/lodash-_-debounce-method/) to limit how often we call this event to once every 200 milliseconds.
 
 Here's what it looks like:
 
@@ -211,7 +211,7 @@ if (newTickets.length < PAGE_COUNT) {
 }
 ```
 
-We'll use this state variable to conditionally remove the event listener:
+We'll use this code to conditionally remove the event listener:
 
 ```jsx
 useEffect(() => {
