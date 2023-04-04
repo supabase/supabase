@@ -3,7 +3,7 @@
 #   With helpers:   docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml up
 #   Stop:           docker compose down
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml down -v --remove-orphans
-
+# Please refer to https://supabase.com/docs/reference/self-hosting-analytics/introduction
 version: "3.8"
 
 services:
@@ -14,11 +14,11 @@ services:
         syslog-address: "tcp://localhost:${VECTOR_PORT}"
         tag: studio
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-      LOGFLARE_URL: http://logs:4000
+      LOGFLARE_URL: http://analytics:4000
       NEXT_PUBLIC_ENABLE_LOGS: true
 
   kong:
@@ -28,12 +28,12 @@ services:
         syslog-address: "tcp://localhost:${VECTOR_PORT}"
         tag: kong
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
 
   auth:
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     logging:
       driver: syslog
@@ -43,7 +43,7 @@ services:
 
   rest:
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     logging:
       driver: syslog
@@ -53,7 +53,7 @@ services:
 
   realtime:
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     logging:
       driver: syslog
@@ -63,7 +63,7 @@ services:
 
   storage:
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     logging:
       driver: syslog
@@ -73,7 +73,7 @@ services:
 
   meta:
     depends_on:
-      logs:
+      analytics:
         condition: service_healthy
     logging:
       driver: syslog
@@ -81,22 +81,14 @@ services:
         syslog-address: "tcp://localhost:${VECTOR_PORT}"
         tag: meta
 
-  logs:
-    container_name: supabase-logs
+  analytics:
+    container_name: supabase-analytics
     image: supabase/logflare:1.0.0
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:4000/health"
-        ]
+      test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
       interval: 5s
-      retries: 3
+      retries: 10
     restart: unless-stopped
     depends_on:
       db:
@@ -110,14 +102,12 @@ services:
         target: /opt/app/rel/logflare/bin/gcloud.json
         read_only: true
     environment:
-      PHX_STATIC: PATH=/opt/app/rel/logflare/bin/priv/static
       MY_POD_IP: 127.0.0.1
       DB_USERNAME: supabase_admin
       DB_DATABASE: ${POSTGRES_DB}
       DB_HOSTNAME: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
       DB_SCHEMA: _analytics
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
