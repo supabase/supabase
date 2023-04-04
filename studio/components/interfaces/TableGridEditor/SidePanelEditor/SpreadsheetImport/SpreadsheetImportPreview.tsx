@@ -4,6 +4,7 @@ import {
   SidePanel,
   Badge,
   Button,
+  Collapsible,
   IconChevronDown,
   IconChevronRight,
   IconArrowRight,
@@ -56,136 +57,139 @@ const SpreadsheetImportPreview = ({
   }
 
   return (
-    <SidePanel.Content>
-      <div className="py-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Preview data to be imported</p>
-            {!isCompatible && <Badge color="red">Data incompatible</Badge>}
-            {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
+    <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
+      <Collapsible.Trigger asChild>
+        <SidePanel.Content>
+          <div className="py-1 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <p className="text-sm">Preview data to be imported</p>
+              {!isCompatible && <Badge color="red">Data incompatible</Badge>}
+              {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
+            </div>
+            <Button
+              type="text"
+              icon={
+                <IconChevronDown
+                  size={18}
+                  strokeWidth={2}
+                  className={clsx('text-scale-1100', expandPreview && 'rotate-180')}
+                />
+              }
+              className="px-1"
+              onClick={() => setExpandPreview(!expandPreview)}
+            />
           </div>
-          <Button
-            type="text"
-            icon={
-              <IconChevronDown
-                size={18}
-                strokeWidth={2}
-                className={clsx('text-scale-1100', expandPreview && 'rotate-180')}
-              />
-            }
-            className="px-1"
-            onClick={() => setExpandPreview(!expandPreview)}
-          />
-        </div>
-      </div>
-      <div
-        style={{ maxHeight: expandPreview ? '1000px' : '0px' }}
-        className="transition-all overflow-y-hidden"
-      >
-        <div className="mb-4">
-          <p className="text-sm text-scale-1000">
-            {selectedTable === undefined
-              ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
+        </SidePanel.Content>
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <SidePanel.Content>
+          <div className="mb-4">
+            <p className="text-sm text-scale-1000">
+              {selectedTable === undefined
+                ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
                         following ${spreadsheetData.headers.length} columns.`
-              : `A total of ${spreadsheetData.rowCount.toLocaleString()} rows will be added to the table "${
-                  selectedTable.name
-                }"`}
-          </p>
-          <p className="text-sm text-scale-1000">
-            Here is a preview of the data that will be added (up to the first 20 columns and first
-            20 rows).
-          </p>
-        </div>
-        <div className="mb-4">
-          {previewHeaders.length > 0 && previewRows.length > 0 ? (
-            <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
-          ) : (
-            <div className="flex items-center justify-center py-4 border border-scale-600 rounded-md space-x-2">
-              <IconAlertCircle size={16} strokeWidth={1.5} className="text-scale-1000" />
-              <p className="text-sm text-scale-1000">
-                {previewHeaders.length === 0
-                  ? 'No headers have been selected'
-                  : previewRows.length === 0
-                  ? 'Your CSV contains no data'
-                  : ''}
-              </p>
+                : `A total of ${spreadsheetData.rowCount.toLocaleString()} rows will be added to the table "${
+                    selectedTable.name
+                  }"`}
+            </p>
+            <p className="text-sm text-scale-1000">
+              Here is a preview of the data that will be added (up to the first 20 columns and first
+              20 rows).
+            </p>
+          </div>
+          <div className="mb-4">
+            {previewHeaders.length > 0 && previewRows.length > 0 ? (
+              <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
+            ) : (
+              <div className="flex items-center justify-center py-4 border border-scale-600 rounded-md space-x-2">
+                <IconAlertCircle size={16} strokeWidth={1.5} className="text-scale-1000" />
+                <p className="text-sm text-scale-1000">
+                  {previewHeaders.length === 0
+                    ? 'No headers have been selected'
+                    : previewRows.length === 0
+                    ? 'Your CSV contains no data'
+                    : ''}
+                </p>
+              </div>
+            )}
+          </div>
+          {(!isCompatible || errors.length > 0) && (
+            <div className="space-y-2 my-4">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm">Issues found in spreadsheet</p>
+                {isCompatible && (
+                  <p className="text-sm text-scale-1000">
+                    {selectedTable !== undefined
+                      ? 'This CSV can still be imported into your table despite issues in the following rows.'
+                      : 'Your table can still be created nonetheless despite issues in the following rows.'}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                {!isCompatible && (
+                  <div className="space-y-2">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
+                        <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                      </div>
+                      <p className="text-sm">
+                        This CSV <span className="text-red-900">cannot</span> be imported into your
+                        table due to incompatible headers: {incompatibleHeaders.join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {errors.map((error: any, idx: number) => {
+                  const key = `import-error-${idx}`
+                  const isExpanded = expandedErrors.includes(key)
+
+                  return (
+                    <div key={key} className="space-y-2">
+                      <div
+                        className="flex items-center space-x-2 cursor-pointer"
+                        onClick={() => onSelectExpandError(key)}
+                      >
+                        {error.data !== undefined ? (
+                          <IconChevronRight
+                            size={14}
+                            className={`transform ${isExpanded ? 'rotate-90' : ''}`}
+                          />
+                        ) : (
+                          <div className="w-[14px] h-[14px] flex items-center justify-center">
+                            <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
+                          </div>
+                        )}
+                        {error.data !== undefined && (
+                          <p className="text-sm w-14">Row: {error.row}</p>
+                        )}
+                        <p className="text-sm">{error.message}</p>
+                        {error.data?.__parsed_extra && (
+                          <>
+                            <IconArrowRight size={14} />
+                            <p className="text-sm">Extra field(s):</p>
+                            {error.data?.__parsed_extra.map((value: any, i: number) => (
+                              <code key={i} className="text-xs">
+                                {value}
+                              </code>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                      {error.data !== undefined && isExpanded && (
+                        <SpreadsheetPreviewGrid
+                          headers={spreadsheetData.headers}
+                          rows={[error.data]}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
-        </div>
-        {(!isCompatible || errors.length > 0) && (
-          <div className="space-y-2 my-4">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm">Issues found in spreadsheet</p>
-              {isCompatible && (
-                <p className="text-sm text-scale-1000">
-                  {selectedTable !== undefined
-                    ? 'This CSV can still be imported into your table despite issues in the following rows.'
-                    : 'Your table can still be created nonetheless despite issues in the following rows.'}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              {!isCompatible && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 ">
-                    <div className="w-[14px] h-[14px] flex items-center justify-center">
-                      <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
-                    </div>
-                    <p className="text-sm">
-                      This CSV <span className="text-red-900">cannot</span> be imported into your
-                      table due to incompatible headers: {incompatibleHeaders.join(', ')}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {errors.map((error: any, idx: number) => {
-                const key = `import-error-${idx}`
-                const isExpanded = expandedErrors.includes(key)
-
-                return (
-                  <div key={key} className="space-y-2">
-                    <div
-                      className="flex items-center space-x-2 cursor-pointer"
-                      onClick={() => onSelectExpandError(key)}
-                    >
-                      {error.data !== undefined ? (
-                        <IconChevronRight
-                          size={14}
-                          className={`transform ${isExpanded ? 'rotate-90' : ''}`}
-                        />
-                      ) : (
-                        <div className="w-[14px] h-[14px] flex items-center justify-center">
-                          <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
-                        </div>
-                      )}
-                      {error.data !== undefined && <p className="text-sm w-14">Row: {error.row}</p>}
-                      <p className="text-sm">{error.message}</p>
-                      {error.data?.__parsed_extra && (
-                        <>
-                          <IconArrowRight size={14} />
-                          <p className="text-sm">Extra field(s):</p>
-                          {error.data?.__parsed_extra.map((value: any, i: number) => (
-                            <code key={i} className="text-xs">
-                              {value}
-                            </code>
-                          ))}
-                        </>
-                      )}
-                    </div>
-                    {error.data !== undefined && isExpanded && (
-                      <SpreadsheetPreviewGrid
-                        headers={spreadsheetData.headers}
-                        rows={[error.data]}
-                      />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-    </SidePanel.Content>
+        </SidePanel.Content>
+      </Collapsible.Content>
+    </Collapsible>
   )
 }
 
