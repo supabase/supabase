@@ -2,7 +2,6 @@ import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
-import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import {
   ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum,
@@ -11,6 +10,7 @@ import {
   OpenAIApi,
 } from 'https://esm.sh/openai@3.2.1'
 import { ApplicationError, UserError } from '../common/errors.ts'
+import { tokenizer } from '../common/tokenizer.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -99,7 +99,6 @@ serve(async (req) => {
       throw new ApplicationError('Failed to match page sections', matchError)
     }
 
-    const tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
     let tokenCount = 0
     let contextText = ''
 
@@ -107,7 +106,7 @@ serve(async (req) => {
       const pageSection = pageSections[i]
       const content = pageSection.content
       const encoded = tokenizer.encode(content)
-      tokenCount += encoded.text.length
+      tokenCount += encoded.length
 
       if (tokenCount >= 1500) {
         break
@@ -178,7 +177,7 @@ serve(async (req) => {
     ]
 
     const completionOptions: CreateChatCompletionRequest = {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0301',
       messages,
       max_tokens: 1024,
       temperature: 0,
