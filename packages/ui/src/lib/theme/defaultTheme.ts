@@ -123,7 +123,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -369,6 +369,7 @@ export default {
         transition
         shadow-sm
         rounded
+        border
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -376,13 +377,13 @@ export default {
         `,
       inactive: `
         bg-scale-200
-        border border-scale-700 hover:border-scale-900
+        border-scale-700 hover:border-scale-900
         text-scale-900 hover:text-scale-1200
       `,
       active: `
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
+        bg-scale-600
+        text-scale-1200
+        border-scale-800
       `,
     },
     'rounded-pills': {
@@ -972,11 +973,11 @@ export default {
 
   sidepanel: {
     base: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
       inset-y-0
-      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
@@ -1023,6 +1024,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1210,12 +1212,12 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1297,6 +1299,7 @@ export default {
 
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1469,6 +1472,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1480,13 +1484,13 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-40
       fixed
       inset-0
       grid
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
     `,
     separator: `
       w-full

@@ -26,7 +26,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           name: 'Functions',
           key: 'functions',
           url: `/project/${ref}/database/functions`,
-          label: 'ALPHA',
           items: [],
         },
         {
@@ -49,7 +48,6 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
                 key: 'hooks',
                 url: `/project/${ref}/database/hooks`,
                 items: [],
-                label: 'ALPHA',
               },
             ]
           : []),

@@ -37,9 +37,11 @@ const HelpPopover: FC<Props> = () => {
             </p>
             <div className="space-x-1">
               <Link passHref href={supportUrl}>
-                <Button type="default" icon={<IconMail />} as="a">
-                  Contact Support
-                </Button>
+                <a>
+                  <Button type="default" icon={<IconMail />}>
+                    Contact Support
+                  </Button>
+                </a>
               </Link>
               <Link passHref href="https://supabase.com/docs/">
                 <a target="_blank" rel="noreferrer">
