@@ -148,9 +148,11 @@ export default function TicketsPage({ users }: Props) {
                 </p>
                 <div className="mt-1">
                   <Link href="/launch-week">
-                    <Button as="a" type="outline" size="medium">
-                      Get your ticket now
-                    </Button>
+                    <a>
+                      <Button type="outline" size="medium">
+                        Get your ticket now
+                      </Button>
+                    </a>
                   </Link>
                 </div>
               </motion.div>

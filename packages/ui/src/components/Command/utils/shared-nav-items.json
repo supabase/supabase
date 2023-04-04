@@ -170,5 +170,67 @@
         }
       ]
     }
+  ],
+  "projectTools": [
+    {
+      "label": "Your Projects",
+      "url": "https://app.supabase.com/projects"
+    },
+    {
+      "label": "Project API Keys",
+      "url": "https://app.supabase.com/project/_/settings/api"
+    }
+  ],
+  "support": [
+    {
+      "label": "Support",
+      "url": "https://supabase.com/support"
+    },
+    {
+      "label": "System Status",
+      "url": "https://status.supabase.com/"
+    },
+    {
+      "label": "Github Discussions",
+      "url": "https://github.com/supabase/supabase/discussions"
+    }
+  ],
+  "quickstarts": [
+    {
+      "label": "React",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/reactjs"
+    },
+    {
+      "label": "Next.js",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nextjs"
+    },
+    {
+      "label": "Flutter",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
+    },
+    {
+      "label": "SvelteKit",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit"
+    },
+    {
+      "label": "SolidJS",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/solidjs"
+    },
+    {
+      "label": "Vue",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/vue"
+    }
+  ],
+  "docsGeneral": [
+    {
+      "icon": "arrowRight",
+      "label": "Go to the Dashboard",
+      "url": "https://app.supabase.io"
+    },
+    {
+      "icon": "inbox",
+      "label": "Read the Changelog",
+      "url": "https://supabase.com/changelog"
+    }
   ]
 }

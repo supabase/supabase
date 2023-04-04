@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'

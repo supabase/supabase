@@ -1829,16 +1829,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/api',
-    destination: '/docs/guides/database/api',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/api/generating-types',
-    destination: '/docs/guides/database/api/generating-types',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1891,5 +1881,26 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/realtime/postgres-changes',
     destination: '/docs/guides/realtime/extensions/postgres-changes',
+  },
+  // Serverless APIs
+  {
+    permanent: true,
+    source: '/docs/guides/database/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
   },
 ]

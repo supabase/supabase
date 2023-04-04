@@ -16,7 +16,8 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useParams, useStore } from 'hooks'
+import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 

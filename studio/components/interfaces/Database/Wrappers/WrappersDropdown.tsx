@@ -6,7 +6,8 @@ import { Button, Dropdown, IconPlus } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useParams, checkPermissions } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { WRAPPERS } from './Wrappers.constants'
 
 interface Props {

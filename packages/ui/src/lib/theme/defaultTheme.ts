@@ -123,7 +123,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -972,7 +972,7 @@ export default {
 
   sidepanel: {
     base: `
-      z-50
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
@@ -1024,7 +1024,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
-      z-50
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1212,7 +1212,7 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
-      z-50
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1299,7 +1299,7 @@ export default {
 
     `,
     content: `
-      z-50
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1472,7 +1472,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
-      z-50
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1484,7 +1484,7 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
-      z-50
+      z-40
       fixed
       inset-0
       grid

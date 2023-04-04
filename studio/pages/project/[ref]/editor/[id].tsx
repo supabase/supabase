@@ -7,22 +7,29 @@ import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { useStore, withAuth, useUrlState } from 'hooks'
+import { useParams } from 'common/hooks'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { Entity } from 'data/entity-types/entity-type-query'
+import { sqlKeys } from 'data/sql/keys'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const { project } = useProjectContext()
 
   const queryClient = useQueryClient()
 
@@ -184,7 +191,21 @@ const TableEditorPage: NextPageWithLayout = () => {
         message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
       })
 
-      await meta.tables.loadById(selectedColumnToDelete!.table_id)
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedColumnToDelete!.table_id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
+        ),
+      ])
+
       if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
