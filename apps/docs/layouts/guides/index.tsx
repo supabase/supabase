@@ -65,7 +65,7 @@ const Layout: FC<Props> = (props) => {
   const hasTableOfContents = tocList.length > 0
 
   // page type, ie, Auth, Database, Storage etc
-  const ogPageType = asPath.split('/')[2]
+  const ogPageType = asPath.split('/')[1]
   // open graph image url constructor
   const ogImageUrl = encodeURI(
     `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
