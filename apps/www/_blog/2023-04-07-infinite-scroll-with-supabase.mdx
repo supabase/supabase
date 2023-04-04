@@ -12,11 +12,13 @@ date: '2023-04-07'
 toc_depth: 6
 ---
 
-Imagine you generated a bunch of tickets for the Supabase [Launch Week](https://www.supabase.com/launch-week) and you wanted to display them all on [one page](https://supabase.com/launch-week/tickets). It might take a while to load them all in one go, so a great solution to this would be to lazy load smaller subsets while the user scrolls, with a technique called infinite scrolling.
+Every Launch Week, we strive to approach things differently as part of our Kaizen mindset. For [Launch Week 7](https://www.supabase.com/launch-week), we decided to add some twists to our popular ticket system. While we made several changes, this post will focus on one specific modification (we'll share more about the rest in a future post!).
 
-An infinite scroll allows you to scroll through your content endlessly while only loading the data you need as you need it. This improves performance while also creating a smooth and delightful user experience.
+Our goal was to feature all the amazing people who generated tickets on a [single page](https://supabase.com/launch-week/tickets). However, displaying them all at once could take a toll on the loading time and negatively affect the user experience. That's where lazy loading smaller subsets via infinite scrolling came in as the solution.
 
-In this post, we'll go through the steps of how to create an infinite scroll using NextJs, Supabase, and Framer Motion.
+With infinite scrolling, users can effortlessly scroll through content while only loading the necessary data as they go. This not only enhances performance but also creates a seamless and enjoyable user experience.
+
+In this post, we'll detail our process of implementing infinite scrolling using NextJs, Framer Motion, and Supabase.
 
 ## Step 0. Load the first batch
 
@@ -201,7 +203,7 @@ With this code, each ticket will start with an opacity of 0 and a y position of 
 
 ## Step 5. Stop listening when finished
 
-Once all the tickets have been loaded, we want to stop listening to the scroll event to avoid unnecessary requests. We can do this by setting a state variable called `isLast` to true whenever the length of the response will be less than PAGE_COUNT:
+Once all the tickets have been loaded, we want to stop listening to the scroll event to avoid unnecessary requests. We can do this by setting a state variable called `isLast` to true whenever the length of the response will be less than `PAGE_COUNT`:
 
 ```jsx
 if (newTickets.length < PAGE_COUNT) {
@@ -221,7 +223,7 @@ useEffect(() => {
 }, [])
 ```
 
-Now, when the isLast state variable is true, the event listener will be removed and the component will stop listening to the scroll event.
+Now, when the `isLast` state variable is true, the event listener will be removed and the component will stop listening to the scroll event.
 
 ## Wrap up
 
@@ -329,3 +331,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   }
 }
 ```
+
+If you also want to feature in the endless tickets page and have a chance to win cool swag, you're invited to [generate your unique ticket](https://www.supabase.com/launch-week) until April 16th.
+
+See you at Launch Week! 👋
