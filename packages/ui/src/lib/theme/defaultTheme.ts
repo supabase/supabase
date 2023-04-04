@@ -978,7 +978,6 @@ export default {
       flex flex-col
       fixed
       inset-y-0
-      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
