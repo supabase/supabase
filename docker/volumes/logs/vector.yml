@@ -145,7 +145,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=gotrue.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=gotrue.logs.prod&api_key=your-super-secret-and-long-logflare-key'
   logflare_realtime:
     type: 'http'
     inputs:
@@ -155,7 +155,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=realtime.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=realtime.logs.prod&api_key=your-super-secret-and-long-logflare-key'
   logflare_rest:
     type: 'http'
     inputs:
@@ -165,7 +165,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=postgREST.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=postgREST.logs.prod&api_key=your-super-secret-and-long-logflare-key'
   logflare_db:
     type: 'http'
     inputs:
@@ -188,7 +188,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=storage.logs.prod.2&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=storage.logs.prod.2&api_key=your-super-secret-and-long-logflare-key'
   logflare_kong:
     type: 'http'
     inputs:
@@ -198,4 +198,4 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://logs:4000/api/logs?source_name=cloudflare.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=cloudflare.logs.prod&api_key=your-super-secret-and-long-logflare-key'
