@@ -828,6 +828,13 @@ export const self_hosting = {
         { name: 'Configuration', url: '/guides/self-hosting/realtime/config' },
       ],
     },
+    {
+      name: 'Analytics Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-analytics/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/analytics/config', items: [] },
+      ],
+    },
   ],
 }
 
@@ -1034,9 +1041,16 @@ export const reference_self_hosting_storage = {
 }
 
 export const reference_self_hosting_realtime = {
-  icon: 'reference-auth',
+  icon: 'reference-realtime',
   title: 'Self-Hosting Realtime',
   url: '/guides/reference/self-hosting/realtime',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_analytics = {
+  icon: 'reference-analytics',
+  title: 'Self-Hosting Analytics',
+  url: '/guides/reference/self-hosting/analytics',
   parent: '/reference',
 }
 
