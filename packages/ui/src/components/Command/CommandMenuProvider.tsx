@@ -2,6 +2,7 @@ import { useTheme, UseThemeProps } from 'common'
 import * as React from 'react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import CommandMenu from './CommandMenu'
+import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
 
 export interface CommandMenuContextValue {
   isOpen: boolean
@@ -18,7 +19,7 @@ export interface CommandMenuContextValue {
 
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element // to do: remove this. although it breaks our jest tests
 
   // Optional callback to save a generated SQL output
   onSaveGeneratedSQL?: (answer: string, resolve: any) => void
@@ -43,7 +44,7 @@ export interface CommandMenuProviderProps {
   projectRef?: string
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
   onSaveGeneratedSQL?: (answer: string, resolve: any) => void
 }
 
