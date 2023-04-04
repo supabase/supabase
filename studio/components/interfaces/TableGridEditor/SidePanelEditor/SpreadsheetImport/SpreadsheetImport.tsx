@@ -121,6 +121,7 @@ const SpreadsheetImport: FC<Props> = ({
         })
       }
       setErrors(errors)
+      setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
       setSpreadsheetData(EMPTY_SPREADSHEET_DATA)

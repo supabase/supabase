@@ -425,16 +425,16 @@ const SidePanelEditor = ({
       })
       resolve()
     } else {
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
-      })
       await Promise.all([
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),
       ])
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
+      })
       resolve()
       closePanel()
     }

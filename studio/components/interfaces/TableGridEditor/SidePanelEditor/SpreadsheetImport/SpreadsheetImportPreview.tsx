@@ -134,7 +134,11 @@ const SpreadsheetImportPreview = ({
                       </div>
                       <p className="text-sm">
                         This CSV <span className="text-red-900">cannot</span> be imported into your
-                        table due to incompatible headers: {incompatibleHeaders.join(', ')}
+                        table due to incompatible headers:
+                        <br />
+                        The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
+                        {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
+                        {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
                       </p>
                     </div>
                   </div>
