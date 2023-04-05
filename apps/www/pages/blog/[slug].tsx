@@ -13,6 +13,7 @@ import { generateReadingTime } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import BlogLinks from '~/components/LaunchWeek/BlogLinks'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -64,6 +65,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
+  const isLaunchWeek7 = props.blog.launchWeek7
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
@@ -307,6 +309,7 @@ function BlogPostPage(props: any) {
                       </Link>
                     </div>
                   </div>
+                  {isLaunchWeek7 && <BlogLinks />}
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
                     <div>
                       {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
