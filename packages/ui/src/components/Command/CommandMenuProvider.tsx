@@ -18,7 +18,7 @@ export interface CommandMenuContextValue {
   site: 'studio' | 'docs'
 
   // Project metadata for easy retrieval
-  project: { apiKeys: { anon?: string; service?: string } }
+  project: { ref?: string; apiKeys: { anon?: string; service?: string } }
 
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
@@ -85,7 +85,7 @@ const CommandMenuProvider = ({
         setPages,
         currentPage,
         site,
-        project: { apiKeys },
+        project: { ref: projectRef, apiKeys },
         MarkdownHandler,
         onSaveGeneratedSQL,
       }}
