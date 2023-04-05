@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import { AutoApiService } from 'data/config/project-api-query'
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
+import { useTheme } from 'common'
 
 const libs = [
   {
@@ -26,8 +26,7 @@ interface Props {
 }
 
 export default function Introduction({ autoApiService, selectedLang }: Props) {
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
+  const { isDarkMode } = useTheme()
 
   return (
     <>
@@ -66,7 +65,7 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
                 >
                   <Image
                     src={`${BASE_PATH}/img/icons/reference-${
-                      isDarkTheme ? lib.icon : `${lib.icon}-light`
+                      isDarkMode ? lib.icon : `${lib.icon}-light`
                     }.svg`}
                     width={16}
                     height={16}
