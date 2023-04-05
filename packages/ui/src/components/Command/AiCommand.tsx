@@ -58,6 +58,7 @@ enum MessageRole {
 }
 
 enum MessageStatus {
+  Pending = 'pending',
   InProgress = 'in-progress',
   Complete = 'complete',
 }
@@ -125,8 +126,6 @@ const AiCommand = () => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
 
-  console.log({ messages })
-
   const handleConfirm = useCallback(
     async (query: string) => {
       if (!edgeFunctionUrl) {
@@ -145,7 +144,7 @@ const AiCommand = () => {
       dispatchMessage({
         type: 'new',
         message: {
-          status: MessageStatus.InProgress,
+          status: MessageStatus.Pending,
           role: MessageRole.Assistant,
           content: '',
         },
@@ -176,8 +175,6 @@ const AiCommand = () => {
         default:
           break
       }
-
-      console.log(messages)
 
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
@@ -218,6 +215,14 @@ const AiCommand = () => {
             return
           }
 
+          dispatchMessage({
+            type: 'update',
+            index: currentMessageIndex,
+            message: {
+              status: MessageStatus.InProgress,
+            },
+          })
+
           setIsResponding(true)
 
           const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
@@ -228,8 +233,6 @@ const AiCommand = () => {
           ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
 
           const text = content ?? ''
-
-          console.log({ text })
 
           dispatchMessage({
             type: 'append-content',
@@ -287,14 +290,11 @@ const AiCommand = () => {
               )
             case MessageRole.Assistant:
               return (
-                <div
-                  key={`${index}-${message.content}`}
-                  className="px-4 [overflow-anchor:none] mb-6"
-                >
+                <div key={index} className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
                     <AiIconChat />
                     <>
-                      {message.status === MessageStatus.InProgress ? (
+                      {message.status === MessageStatus.Pending ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
                         <MarkdownHandler
