@@ -4,12 +4,10 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import FooterHelpCallout from '~/components/FooterHelpCallout'
-
 import { memo, useEffect } from 'react'
-import Clippy from '~/components/Clippy/Clippy'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import Head from 'next/head'
 
 const levelsData = {
   home: {
@@ -24,6 +22,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/database',
     name: 'Database',
   },
+  api: {
+    icon: '/docs/img/icons/menu/database',
+    name: 'Serverless APIs',
+  },
   auth: {
     icon: '/docs/img/icons/menu/auth',
     name: 'Auth',
@@ -35,6 +37,10 @@ const levelsData = {
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
+  },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
   },
   storage: {
     icon: '/docs/img/icons/menu/storage',
@@ -84,6 +90,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
+  reference_swift_v1: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v1.0',
+  },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
     name: 'CLI Reference',
@@ -103,6 +113,10 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
   },
 }
 
@@ -315,35 +329,37 @@ const SiteLayout = ({ children }) => {
   }, [])
 
   return (
-    <main>
-      <div className="flex flex-row h-screen">
-        <NavContainer />
-        <Container>
-          <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-            <TopNavBarRef />
-          </div>
-          <div
-            className={[
-              'sticky transition-all top-0',
-              'z-10',
-              'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
-            ].join(' ')}
-          >
-            <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
-              <MobileHeader />
+    <>
+      <Head>
+        <title>Supabase Docs</title>
+      </Head>
+      <main>
+        <div className="flex flex-row h-screen">
+          <NavContainer />
+          <Container>
+            <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+              <TopNavBarRef />
             </div>
-          </div>
-          <div className="grow px-5 max-w-7xl mx-auto py-16">
-            {children}
-            <Footer />
-          </div>
-          <MobileMenuBackdrop />
-        </Container>
-        <div className=" absolute right-4 md:right-12 bottom-8 z-[300]">
-          <Clippy />
+            <div
+              className={[
+                'sticky transition-all top-0',
+                'z-10',
+                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+              ].join(' ')}
+            >
+              <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
+                <MobileHeader />
+              </div>
+            </div>
+            <div className="grow px-5 max-w-7xl mx-auto py-16">
+              {children}
+              <Footer />
+            </div>
+            <MobileMenuBackdrop />
+          </Container>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 

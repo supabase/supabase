@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useParams, useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
@@ -11,23 +12,35 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
+import { Badge } from 'ui'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
 
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
+
+  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
+
   const projectHasNoLimits =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+
   const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0
+    resourcesExceededLimits.length > 0 &&
+    useFlag('overusageBadge')
 
   return (
     <div
@@ -63,16 +76,27 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 {/* Project Dropdown */}
                 <ProjectDropdown />
 
-                {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
-                {/* {showOverUsageBadge && (
+                {/* [Terry] Temporary until we figure out how we want to display this permanently */}
+                {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
+                {isReadOnlyMode && (
                   <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
+                      <a>
+                        <Badge color="red">Project is in read-only mode</Badge>
+                      </a>
+                    </Link>
+                  </div>
+                )}
+
+                {showOverUsageBadge && (
+                  <div className="ml-2">
+                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
                         <Badge color="red">Project has exceeded usage limits </Badge>
                       </a>
                     </Link>
                   </div>
-                )} */}
+                )}
               </>
             )}
           </>

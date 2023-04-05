@@ -5,7 +5,9 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
+import { BASE_PATH } from 'lib/constants'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
@@ -65,8 +67,8 @@ const WrappersDisabledState = () => {
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
           backgroundImage: ui.isDarkTheme
-            ? 'url("/img/wrappers-dark.png")'
-            : 'url("/img/wrappers-light.png")',
+            ? `url("${BASE_PATH}/img/wrappers-dark.png")`
+            : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
@@ -130,19 +132,21 @@ const WrappersDisabledState = () => {
                   </Button>
                 </Tooltip.Trigger>
                 {!canToggleWrappers && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to enable Wrappers for this project
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to enable Wrappers for this project
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>

@@ -1,6 +1,8 @@
 import { FC } from 'react'
 import { Badge, Dropdown, IconLoader, IconMoreVertical, IconTrash } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { checkPermissions } from 'hooks'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 
@@ -19,6 +21,8 @@ const BucketRow: FC<Props> = ({
   onSelectDeleteBucket = () => {},
   onSelectToggleBucketPublic = () => {},
 }) => {
+  const canUpdateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
   return (
     <ProductMenuItem
       key={bucket.id}
@@ -35,7 +39,7 @@ const BucketRow: FC<Props> = ({
       action={
         bucket.status === STORAGE_ROW_STATUS.LOADING ? (
           <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
+        ) : canUpdateBuckets && bucket.status === STORAGE_ROW_STATUS.READY ? (
           <Dropdown
             side="bottom"
             align="start"

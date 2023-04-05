@@ -21,7 +21,11 @@ const HeaderImage = React.memo(function HeaderImage(props: any) {
   )
 })
 
-const HeaderLink = React.memo(function HeaderLink(props: any) {
+const HeaderLink = React.memo(function HeaderLink(props: {
+  title: string
+  id: string
+  url: string
+}) {
   const router = useRouter()
 
   return (
@@ -143,9 +147,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 })
 
 const Content = (props) => {
-  const { id } = props
-
-  const menu = NavItems[id]
+  const { menu, id } = props
 
   return (
     <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>

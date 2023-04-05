@@ -7,7 +7,7 @@ import { useStore, checkPermissions } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 
 import NoPermission from 'components/ui/NoPermission'
-import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
+import RedirectUrls from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
 import { FormsContainer } from 'components/ui/Forms'
 import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
 
@@ -26,7 +26,7 @@ const URLConfiguration: NextPageWithLayout = () => {
     return (
       <FormsContainer>
         <SiteUrl />
-        <RedirectDomains />
+        <RedirectUrls />
       </FormsContainer>
     )
   } else {
