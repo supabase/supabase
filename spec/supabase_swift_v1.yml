@@ -1770,7 +1770,7 @@ functions:
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the Supabase GoTrue Auth client.
+      - The auth methods can be accessed via the supabase.auth namespace.
     examples:
       - id: create-auth-client
         name: Create auth client
@@ -2356,7 +2356,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
-      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: upload-file
         name: Upload file
@@ -2385,7 +2384,6 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
-      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: update-file
         name: Update file
