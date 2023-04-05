@@ -17,6 +17,9 @@ export interface CommandMenuContextValue {
   currentPage?: string
   site: 'studio' | 'docs'
 
+  // Project metadata for easy retrieval
+  project: { ref?: string; apiKeys: { anon?: string; service?: string } }
+
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element // to do: remove this. although it breaks our jest tests
@@ -42,6 +45,7 @@ export interface CommandMenuActions {
 export interface CommandMenuProviderProps {
   site: 'studio' | 'docs'
   projectRef?: string
+  apiKeys: { anon?: string; service?: string }
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
@@ -52,6 +56,7 @@ const CommandMenuProvider = ({
   children,
   site,
   projectRef,
+  apiKeys,
   MarkdownHandler,
   onSaveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
@@ -62,9 +67,7 @@ const CommandMenuProvider = ({
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
-  const actions: CommandMenuActions = {
-    toggleTheme,
-  }
+  const actions: CommandMenuActions = { toggleTheme }
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
 
@@ -82,6 +85,7 @@ const CommandMenuProvider = ({
         setPages,
         currentPage,
         site,
+        project: { ref: projectRef, apiKeys },
         MarkdownHandler,
         onSaveGeneratedSQL,
       }}
