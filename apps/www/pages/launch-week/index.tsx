@@ -129,7 +129,7 @@ export default function TicketHome({ users }: Props) {
             />
           </div>
 
-          <LaunchWeekPrizeSection className="-mt-[65px] md:-mt-60" />
+          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
 
           {users && <TicketBrickWall users={users} />}
         </div>
