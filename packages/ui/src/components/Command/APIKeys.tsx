@@ -7,7 +7,7 @@ import { IconAlertCircle } from './../Icon/icons/IconAlertCircle'
 
 const APIKeys = ({ isSubItem = false }) => {
   const { setIsOpen, project } = useCommandMenu()
-  const { apiKeys } = project
+  const { apiKeys } = project ?? {}
 
   const copyToClipboard = (str: string, callback = () => {}) => {
     const focused = window.document.hasFocus()
