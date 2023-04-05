@@ -1,20 +1,12 @@
 import { useState } from 'react'
-import {
-  Alert,
-  Button,
-  IconAlertCircle,
-  IconBookOpen,
-  IconExternalLink,
-  IconUnlock,
-  Modal,
-} from 'ui'
+import { Button, IconAlertCircle, Modal } from 'ui'
 import Link from 'next/link'
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
-
-const RLS_ACKNOWLEDGED_KEY = 'supabase-acknowledge-rls-warning'
+import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+import RLSDisableModalContent from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSDisableModal'
 
 export default function RLSBannerWarning() {
   const { meta } = useStore()
@@ -60,50 +52,14 @@ export default function RLSBannerWarning() {
 
           <ConfirmationModal
             visible={isOpen}
-            header="Confirm"
+            header="Turn off Row Level Security"
             buttonLabel="Confirm"
             size="medium"
             onSelectCancel={() => setIsOpen(false)}
             onSelectConfirm={handleDismissWarning}
             children={
               <Modal.Content>
-                <div className="flex gap-4 my-6">
-                  <div>
-                    <div className="w-16 h-16 bg-scale-300 flex flex-col justify-center text-center items-center rounded-full">
-                      <IconUnlock strokeWidth={2} size={24} />
-                    </div>
-                  </div>
-                  <div className="text-sm text-scale-1100 grid gap-4">
-                    <div className="grid gap-1">
-                      <p>
-                        Row Level Security will be turned <u>off</u> for this table.
-                      </p>
-
-                      <Alert
-                        variant="warning"
-                        className="!px-4 !py-3 mt-3"
-                        title=" You are making this table public"
-                      >
-                        <p>
-                          Anyone with the anon key can modify or delete data. <br />
-                          We recommend using RLS policies to control access to your data.
-                        </p>
-                      </Alert>
-                    </div>
-
-                    <div className="mt-3">
-                      <p className="mt-2">
-                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                          <a target="_blank">
-                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <RLSDisableModalContent />
               </Modal.Content>
             }
           />
