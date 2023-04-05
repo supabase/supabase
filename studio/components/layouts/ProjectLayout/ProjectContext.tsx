@@ -1,4 +1,5 @@
 import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { observer } from 'mobx-react-lite'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 import { Project } from 'types'
@@ -44,3 +45,9 @@ export const ProjectContextProvider = observer(
     return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
   }
 )
+
+export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren<{}>) => {
+  const { ref: projectRef } = useParams()
+
+  return <ProjectContextProvider projectRef={projectRef}>{children}</ProjectContextProvider>
+}

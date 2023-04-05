@@ -5,6 +5,10 @@
 - https://deno.com/deploy/docs/tutorial-discord-slash
 - https://discord.com/developers/docs/interactions/application-commands#slash-commands
 
+## Watch the Video Tutorial
+
+[![video tutorial](https://img.youtube.com/vi/J24Bvo_m7DM/0.jpg)](https://www.youtube.com/watch?v=J24Bvo_m7DM)
+
 ## Create an application on Discord Developer Portal
 
 1. Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) (login using your discord account if required).
@@ -59,6 +63,6 @@ Open Discord, type `/Promise` and press **Enter**.
 ## Run locally
 
 ```bash
-supabase functions serve discord-bot --no-verify-jwt --env-file ./supabase/functions/discord-bot/.env
+supabase functions serve discord-bot --no-verify-jwt --env-file ./supabase/.env.local
 ngrok http 54321
 ```

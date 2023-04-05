@@ -15,8 +15,10 @@ Good luck trying to GET a T-Shirt!
 ### Serve this function locally
 
 ```bash
-supabase functions serve --no-verify-jwt get-tshirt-competition
+supabase functions serve --no-verify-jwt
 ```
+
+Navigate to http://localhost:54321/functions/v1/get-tshirt-competition?email=testr@test.de&twitter=thorwebdev&size=2XL&answer=20
 
 ### Deploy this function
 

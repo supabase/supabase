@@ -15,7 +15,6 @@ export interface IUiStore {
   selectedProjectBaseInfo?: ProjectBase
   selectedOrganization?: Organization
   notification?: Notification
-  profile?: User
   permissions?: Permission[]
 
   googleAnalyticsProps?: GoogleAnalyticsProps
@@ -26,7 +25,7 @@ export interface IUiStore {
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
-  setProfile: (value?: User) => void
+  setProfile: (value: User) => void
   setPermissions: (permissions?: Permission[]) => void
   setGaClientId: (clientId?: string) => void
 }
@@ -39,7 +38,6 @@ export default class UiStore implements IUiStore {
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
   notification?: Notification
-  profile?: User
   permissions?: Permission[] = []
 
   constructor(rootStore: IRootStore) {
@@ -128,8 +126,8 @@ export default class UiStore implements IUiStore {
   }
 
   setTheme(theme: 'dark' | 'light') {
+    document.body.classList.replace(this.theme, theme)
     this.theme = theme
-    document.body.className = theme
   }
 
   onThemeOptionChange(themeOption: 'dark' | 'light' | 'system') {
@@ -158,12 +156,8 @@ export default class UiStore implements IUiStore {
     return id
   }
 
-  setProfile(value?: User) {
-    if (value && value?.id !== this.profile?.id) {
-      Telemetry.sendIdentify(value, this.googleAnalyticsProps)
-    }
-
-    this.profile = value
+  setProfile(value: User) {
+    Telemetry.sendIdentify(value, this.googleAnalyticsProps)
   }
 
   setPermissions(permissions?: any) {

@@ -5,15 +5,17 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import Telemetry from 'lib/telemetry'
 import { useOptimisticSqlSnippetCreate, checkPermissions, useStore } from 'hooks'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import CardButton from 'components/ui/CardButton'
 
 const TabWelcome = observer(() => {
   const { ui } = useStore()
+  const { data: profile } = useProfileQuery()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: ui.profile?.id },
-    subject: { id: ui.profile?.id },
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
   })
   const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)
 
