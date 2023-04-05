@@ -61,7 +61,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage, site } =
+  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site } =
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
