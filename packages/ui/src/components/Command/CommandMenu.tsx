@@ -1,4 +1,3 @@
-import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { ElementRef, useRef } from 'react'
@@ -12,6 +11,7 @@ import { IconLifeBuoy } from './../Icon/icons/IconLifeBuoy'
 import { IconMonitor } from './../Icon/icons/IconMonitor'
 import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
+import { IconKey } from './../Icon/icons/IconKey'
 
 import AiCommand from './AiCommand'
 import sharedItems from './utils/shared-nav-items.json'
@@ -23,15 +23,16 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
-  CommandShortcut,
 } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
-import DocsSearch from './DocsSearch'
-import CommandMenuShortcuts from './CommandMenuShortcuts'
-import SearchOnlyItem from './SearchOnlyItem'
-import SearchableStudioItems from './SearchableStudioItems'
 import { COMMAND_ROUTES } from './Command.constants'
+import { useCommandMenu } from './CommandMenuProvider'
+
+import DocsSearch from './DocsSearch'
 import GenerateSQL from './GenerateSQL'
+import ThemeOptions from './ThemeOptions'
+import APIKeys from './APIKeys'
+import SearchableStudioItems from './SearchableStudioItems'
+import CommandMenuShortcuts from './CommandMenuShortcuts'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -62,32 +63,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage, site } =
     useCommandMenu()
-
-  const ThemeOptions = ({ isSubItem = false }) => {
-    return (
-      <CommandGroup>
-        <SearchOnlyItem
-          isSubItem={isSubItem}
-          onSelect={() => {
-            actions.toggleTheme(true)
-            setIsOpen(false)
-          }}
-        >
-          Change Theme to dark
-        </SearchOnlyItem>
-        <SearchOnlyItem
-          isSubItem={isSubItem}
-          onSelect={() => {
-            actions.toggleTheme(false)
-            setIsOpen(false)
-          }}
-        >
-          Change Theme to light
-        </SearchOnlyItem>
-      </CommandGroup>
-    )
-  }
-
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
@@ -194,7 +169,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandGroup>
               )}
 
-              {site === 'studio' && [
+              {site === 'studio' && (
                 <CommandGroup heading="Experimental">
                   <CommandItem
                     forceMount
@@ -204,7 +179,23 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     <AiIcon className="text-scale-1100" />
                     <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
                   </CommandItem>
-                </CommandGroup>,
+                </CommandGroup>
+              )}
+
+              {site === 'studio' && projectRef !== undefined && (
+                <CommandGroup heading="Project tools">
+                  <CommandItem
+                    forceMount
+                    type="command"
+                    onSelect={() => setPages([...pages, COMMAND_ROUTES.API_KEYS])}
+                  >
+                    <IconKey className="text-scale-1100" />
+                    <CommandLabel>Get API keys</CommandLabel>
+                  </CommandItem>
+                </CommandGroup>
+              )}
+
+              {site === 'studio' && (
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
                     const itemUrl = (
@@ -220,8 +211,8 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                       </CommandItem>
                     )
                   })}
-                </CommandGroup>,
-              ]}
+                </CommandGroup>
+              )}
 
               {/* <DashboardTableEditor /> */}
 
@@ -246,12 +237,14 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   ))}
                 </CommandGroup>
               )}
+
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
                   <IconMonitor className="mr-2" />
                   Change theme
                 </CommandItem>
               </CommandGroup>
+
               <ThemeOptions isSubItem />
               {site === 'studio' && search && <SearchableStudioItems />}
             </>
@@ -260,6 +253,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
           {currentPage === COMMAND_ROUTES.DOCS_SEARCH && <DocsSearch />}
           {currentPage === COMMAND_ROUTES.GENERATE_SQL && <GenerateSQL />}
           {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
+          {currentPage === COMMAND_ROUTES.API_KEYS && <APIKeys />}
         </CommandList>
       </CommandDialog>
     </>
