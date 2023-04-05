@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/csharp
-  title: Getting started
+  title: Supabase C# Client
   description: |
 
     Supabase C#.
@@ -16,6 +16,104 @@ info:
       version: '0.8.0'
 
 functions:
+  - id: initializing
+    title: Initializing
+    description: |
+      Initializing a new client is pretty straightforward. Find your project url and public key from the
+      admin panel and pass it into your client initialization function.
+
+      `supabase-csharp` is heavily dependent on Models deriving from `BaseModel`. To interact with the API, one must have the associated model (see example) specified.
+
+      Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
+
+    examples:
+      - id: csharp-init-standard
+        name: Standard
+        code: |
+          ```c#
+          var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+          var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+
+          var options = new Supabase.SupabaseOptions
+          {
+              AutoConnectRealtime = true
+          };
+
+          var supabase = new Supabase.Client(url, key, options);
+          await supabase.InitializeAsync();
+          ```
+      - id: csharp-init-maui
+        name: Dependency Injection (Maui-like)
+        code: |
+          ```c#
+          public static MauiApp CreateMauiApp()
+          {
+                // ...
+                var builder = MauiApp.CreateBuilder();
+
+                var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
+                var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+                var options = new SupabaseOptions
+                {
+                  AutoRefreshToken = true,
+                  AutoConnectRealtime = true,
+                  SessionHandler = new SupabaseSessionHandler()
+                };
+
+                // Note the creation as a singleton.
+                builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+          }
+          ```
+      - id: csharp-init-showing-models
+        name: With Models Example
+        code: |
+          ```c#
+          // Given the following Model representing the Supabase Database (Message.cs)
+          [Table("messages")]
+          public class Message : BaseModel
+          {
+              [PrimaryKey("id")]
+              public int Id { get; set; }
+
+              [Column("username")]
+              public string UserName { get; set; }
+
+              [Column("channel_id")]
+              public int ChannelId { get; set; }
+
+              public override bool Equals(object obj)
+              {
+                  return obj is Message message &&
+                          Id == message.Id;
+              }
+
+              public override int GetHashCode()
+              {
+                  return HashCode.Combine(Id);
+              }
+          }
+
+          void Initialize()
+          {
+              // Get All Messages
+              var response = await client.Table<Message>().Get();
+              List<Message> models = response.Models;
+
+              // Insert
+              var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+              await client.Table<Message>().Insert();
+
+              // Update
+              var model = response.Models.First();
+              model.UserName = "elrhomariyounes";
+              await model.Update();
+
+              // Delete
+              await response.Models.Last().Delete();
+
+              // etc.
+          }
+          ```
   - id: sign-up
     title: 'SignUp()'
     description: |
@@ -195,9 +293,9 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var attrs = new UserAttributes 
-          { 
-            Data = new Dictionary<string, string> { {"example", "data" } } 
+          var attrs = new UserAttributes
+          {
+            Data = new Dictionary<string, string> { {"example", "data" } }
           };
           var response = await supabase.Auth.Update(attrs);
           ```
@@ -418,10 +516,10 @@ functions:
               public int CountryId { get; set; }
           }
 
-          var model = new City 
-          { 
-            Name = "The Shire", 
-            CountryId = 554 
+          var model = new City
+          {
+            Name = "The Shire",
+            CountryId = 554
           };
 
           await supabase.From<City>().Insert(model);
@@ -505,10 +603,10 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase.From<City>().Upsert(model);
@@ -522,10 +620,10 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase
@@ -539,10 +637,10 @@ functions:
           Allowed values for count option are `exact`, `planned` and `estimated`.
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase
@@ -604,7 +702,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          class CursorBroadcast : BaseBroadcast 
+          class CursorBroadcast : BaseBroadcast
           {
               [JsonProperty("cursorX")]
               public int CursorX {get; set;}
@@ -616,7 +714,7 @@ functions:
           var channel = supabase.Realtime.Channel("any");
           var broadcast = channel.Register<CursorBroadcast>();
 
-          broadcast.OnBroadcast += (sender, _) => 
+          broadcast.OnBroadcast += (sender, _) =>
           {
             var data = broadcast.Current();
           };
@@ -631,7 +729,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-            class UserPresence : BasePresence 
+            class UserPresence : BasePresence
             {
                 [JsonProperty("cursorX")]
                 public bool IsTyping {get; set;}
@@ -644,7 +742,7 @@ functions:
             var presenceKey = Guid.NewGuid().ToString();
             var presence = channel.Register<UserPresence>(presenceKey);
 
-            presence.OnSync += (sender, _) => 
+            presence.OnSync += (sender, _) =>
             {
               var state = presence.CurrentState;
             };

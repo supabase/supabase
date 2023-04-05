@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 
 import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
@@ -6,7 +6,6 @@ import ItemContextMenu from './ItemContextMenu'
 import FolderContextMenu from './FolderContextMenu'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const FileExplorer = ({
   view = STORAGE_VIEWS.COLUMNS,
@@ -17,16 +16,9 @@ const FileExplorer = ({
   onFilesUpload = () => {},
   onSelectAllItemsInColumn = () => {},
   onSelectColumnEmptySpace = () => {},
-  onSelectCreateFolder = () => {},
-  onChangeView = () => {},
-  onChangeSortBy = () => {},
-  onChangeSortByOrder = () => {},
   onColumnLoadMore = () => {},
 }) => {
   const fileExplorerRef = useRef(null)
-  const storageExplorerStore = useStorageStore()
-
-  const { setSelectedItemToRename, setSelectedItemsToDelete } = storageExplorerStore
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -42,20 +34,9 @@ const FileExplorer = ({
       ref={fileExplorerRef}
       className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
     >
-      <ColumnContextMenu
-        id={CONTEXT_MENU_KEYS.STORAGE_COLUMN}
-        onCreateNewFolder={onSelectCreateFolder}
-        onSelectAllItems={onSelectAllItemsInColumn}
-        onSelectView={onChangeView}
-        onSelectSort={onChangeSortBy}
-        onSelectSortByOrder={onChangeSortByOrder}
-      />
+      <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
-      <FolderContextMenu
-        id={CONTEXT_MENU_KEYS.STORAGE_FOLDER}
-        onRenameFolder={(folder) => setSelectedItemToRename(folder)}
-        onDeleteFolder={(folder) => setSelectedItemsToDelete([folder])}
-      />
+      <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
       {view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (

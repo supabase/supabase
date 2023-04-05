@@ -700,7 +700,7 @@
               }
             },
             {
-              "id": 115,
+              "id": 116,
               "name": "authUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -710,7 +710,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 57,
+                  "line": 58,
                   "character": 12
                 }
               ],
@@ -787,10 +787,21 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "type": {
-                            "type": "reference",
-                            "qualifiedName": "RequestInfo",
-                            "package": "typescript",
-                            "name": "RequestInfo"
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "reference",
+                                "qualifiedName": "RequestInfo",
+                                "package": "typescript",
+                                "name": "RequestInfo"
+                              },
+                              {
+                                "type": "reference",
+                                "qualifiedName": "URL",
+                                "package": "typescript",
+                                "name": "URL"
+                              }
+                            ]
                           }
                         },
                         {
@@ -829,7 +840,7 @@
               }
             },
             {
-              "id": 117,
+              "id": 118,
               "name": "functionsUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -839,7 +850,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 59,
+                  "line": 60,
                   "character": 12
                 }
               ],
@@ -898,18 +909,16 @@
               }
             },
             {
-              "id": 118,
+              "id": 114,
               "name": "realtime",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {
-                "isProtected": true
-              },
+              "flags": {},
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 60,
-                  "character": 12
+                  "line": 55,
+                  "character": 2
                 }
               ],
               "type": {
@@ -920,7 +929,7 @@
               }
             },
             {
-              "id": 114,
+              "id": 115,
               "name": "realtimeUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -930,7 +939,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 56,
+                  "line": 57,
                   "character": 12
                 }
               ],
@@ -1031,7 +1040,7 @@
               }
             },
             {
-              "id": 116,
+              "id": 117,
               "name": "storageUrl",
               "kind": 1024,
               "kindString": "Property",
@@ -1041,7 +1050,7 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 58,
+                  "line": 59,
                   "character": 12
                 }
               ],
@@ -1427,10 +1436,21 @@
                                   "kindString": "Parameter",
                                   "flags": {},
                                   "type": {
-                                    "type": "reference",
-                                    "qualifiedName": "RequestInfo",
-                                    "package": "typescript",
-                                    "name": "RequestInfo"
+                                    "type": "union",
+                                    "types": [
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "RequestInfo",
+                                        "package": "typescript",
+                                        "name": "RequestInfo"
+                                      },
+                                      {
+                                        "type": "reference",
+                                        "qualifiedName": "URL",
+                                        "package": "typescript",
+                                        "name": "URL"
+                                      }
+                                    ]
                                   }
                                 },
                                 {
@@ -1830,15 +1850,15 @@
                           "types": [
                             {
                               "type": "literal",
+                              "value": "error"
+                            },
+                            {
+                              "type": "literal",
                               "value": "ok"
                             },
                             {
                               "type": "literal",
                               "value": "timed out"
-                            },
-                            {
-                              "type": "literal",
-                              "value": "error"
                             }
                           ]
                         }
@@ -1900,15 +1920,15 @@
                         "types": [
                           {
                             "type": "literal",
+                            "value": "error"
+                          },
+                          {
+                            "type": "literal",
                             "value": "ok"
                           },
                           {
                             "type": "literal",
                             "value": "timed out"
-                          },
-                          {
-                            "type": "literal",
-                            "value": "error"
                           }
                         ]
                       }
@@ -2212,7 +2232,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [113, 115, 126, 121, 117, 127, 118, 114, 119, 120, 116, 132, 131]
+              "children": [113, 116, 126, 121, 118, 127, 114, 115, 119, 120, 117, 132, 131]
             },
             {
               "title": "Accessors",
@@ -3214,10 +3234,21 @@
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
-                                "type": "reference",
-                                "qualifiedName": "RequestInfo",
-                                "package": "typescript",
-                                "name": "RequestInfo"
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "RequestInfo",
+                                    "package": "typescript",
+                                    "name": "RequestInfo"
+                                  },
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "URL",
+                                    "package": "typescript",
+                                    "name": "URL"
+                                  }
+                                ]
                               }
                             },
                             {
@@ -3279,10 +3310,21 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "type": {
-                            "type": "reference",
-                            "qualifiedName": "RequestInfo",
-                            "package": "typescript",
-                            "name": "RequestInfo"
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "reference",
+                                "qualifiedName": "RequestInfo",
+                                "package": "typescript",
+                                "name": "RequestInfo"
+                              },
+                              {
+                                "type": "reference",
+                                "qualifiedName": "URL",
+                                "package": "typescript",
+                                "name": "URL"
+                              }
+                            ]
                           }
                         },
                         {
@@ -3374,10 +3416,21 @@
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
-                                "type": "reference",
-                                "qualifiedName": "RequestInfo",
-                                "package": "typescript",
-                                "name": "RequestInfo"
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "RequestInfo",
+                                    "package": "typescript",
+                                    "name": "RequestInfo"
+                                  },
+                                  {
+                                    "type": "reference",
+                                    "qualifiedName": "URL",
+                                    "package": "typescript",
+                                    "name": "URL"
+                                  }
+                                ]
                               }
                             },
                             {
@@ -3439,10 +3492,21 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "type": {
-                            "type": "reference",
-                            "qualifiedName": "RequestInfo",
-                            "package": "typescript",
-                            "name": "RequestInfo"
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "reference",
+                                "qualifiedName": "RequestInfo",
+                                "package": "typescript",
+                                "name": "RequestInfo"
+                              },
+                              {
+                                "type": "reference",
+                                "qualifiedName": "URL",
+                                "package": "typescript",
+                                "name": "URL"
+                              }
+                            ]
                           }
                         },
                         {

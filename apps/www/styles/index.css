@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url(../pages/launch-week/launchWeek.css);
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
@@ -658,4 +660,75 @@ launch week
   ); */
 
   -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 1), transparent);
+}
+
+/* Text with a gradient background */
+[class*='gradient-text-'] {
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[class*='gradient-text-']::selection {
+  background-color: var(--colors-brand9);
+  background-clip: unset;
+  -webkit-text-fill-color: white;
+}
+
+@layer utilities {
+  .gradient-text-brand-100 {
+    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+  }
+  .gradient-text-brand-500 {
+    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+  }
+
+  .gradient-text-scale-100 {
+    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
+  }
+
+  .gradient-text-scale-500 {
+    background-image: -webkit-linear-gradient(
+      45deg,
+      var(--colors-scale10) 0%,
+      var(--colors-scale12) 100%
+    );
+  }
+
+  .gradient-text-pink-500 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#c867ee] to-[#f6a4f3];
+  }
+
+  .gradient-text-purple-500 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#902DFB] to-[#D87BF5];
+  }
+
+  .gradient-text-purple-800 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#5900EA] to-[#A242E5];
+  }
+
+  .gradient-text-gold-500 {
+    background-image: -webkit-linear-gradient(45deg, #e4b641 100%, #f5bf0069 41%);
+  }
+
+  .radial-gradient-text-scale-500 {
+    background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.35) 100%);
+  }
+  .radial-gradient-text-scale-600 {
+    background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.6) 100%);
+  }
+}
+
+/* LW7 Tickets Slider */
+.ticket-brick-swiper .swiper-slide {
+  width: 230px;
+}
+
+@media (min-width: 768px) {
+  .ticket-brick-swiper .swiper-slide {
+    width: 450px;
+  }
+}
+
+.ticket-brick-swiper .swiper-wrapper {
+  transition-timing-function: linear;
 }
