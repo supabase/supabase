@@ -67,6 +67,7 @@ export interface ColumnField {
   format: string
   defaultValue: string | null
   foreignKey: ExtendedPostgresRelationship | undefined
+  check: string | null
   isNullable: boolean
   isUnique: boolean
   isArray: boolean
