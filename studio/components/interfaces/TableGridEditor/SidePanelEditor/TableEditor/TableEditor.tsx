@@ -10,11 +10,9 @@ import {
   IconBookOpen,
   Button,
   Modal,
-  IconUnlock,
-  IconInfo,
-  IconAlertTriangle,
   IconShieldOff,
   IconLock,
+  IconAlertOctagon,
 } from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
@@ -266,6 +264,9 @@ const TableEditor: FC<Props> = ({
                   Without a policy, querying this table will result in an <u>empty array</u> of
                   results.
                 </p>
+                {isNewRecord && (
+                  <p className="mt-3">You can create policies after you create this table.</p>
+                )}
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                     <a target="_blank">
@@ -283,6 +284,7 @@ const TableEditor: FC<Props> = ({
                 className="!px-4 !py-3 mt-3"
                 title="You are allowing anonymous access to your table"
               >
+                <p>The table foo will be publicly writable and readable</p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
                     <a target="_blank">
@@ -358,46 +360,40 @@ const TableEditor: FC<Props> = ({
               }}
               children={
                 <Modal.Content>
-                  <div className="flex gap-4 my-6">
-                    <div>
-                      <div className="w-16 h-16 bg-scale-300 flex flex-col justify-center text-center items-center rounded-full">
-                        <IconUnlock strokeWidth={2} size={24} />
-                      </div>
-                    </div>
+                  <div className="my-6">
                     <div className="text-sm text-scale-1100 grid gap-4">
                       <div className="grid gap-1">
                         <Alert
                           variant="warning"
                           className="!px-4 !py-3"
-                          title=" You are allowing anonymous access to your table"
+                          title="This table will be publicly readable and writable"
+                          withIcon
                         >
-                          <p>
-                            Anyone with the anon key can modify or delete data. <br />
-                            We recommend using RLS policies to control access to your data.
-                          </p>
+                          <p>Anyone can edit or delete data in this table.</p>
                         </Alert>
-                        <ul className="mt-4 space-y-4">
+                        <ul className="mt-4 space-y-5">
                           <li className="flex gap-3">
-                            <IconAlertTriangle />
-                            <span>All requests by anyone with the anon key will be accepted</span>
+                            <IconAlertOctagon />
+                            <span>All requests to this table will be accepted.</span>
                           </li>
 
                           <li className="flex gap-3">
                             <IconShieldOff />
-                            <span>Auth policies will not be enforced</span>
+                            <span>Auth policies will not be enforced.</span>
                           </li>
 
                           <li className="flex gap-3">
                             <IconLock w={14} className="flex-shrink-0" />
                             <div>
-                              <strong>Before you make public, consider:</strong>
-                              <ul className="space-y-2">
+                              <strong>Before you turn off Row Level Security, consider:</strong>
+                              <ul className="space-y-2 mt-2">
                                 <li className="list-disc ml-4">
-                                  Any personal information in this table will be publicly accessible
+                                  Any personal information in this table will be publicly
+                                  accessible.
                                 </li>
                                 <li className="list-disc ml-4">
-                                  Anyone with the anon key will be able to copy, modify, add and
-                                  delete any row in this table
+                                  Anyone will be able to modify, add or delete any row in this
+                                  table.
                                 </li>
                               </ul>
                             </div>
