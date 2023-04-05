@@ -1,8 +1,28 @@
 [
   {
-    "title": "Docs Updated",
+    "title": "AI generated OG images",
     "shipped": true,
-    "date": "12 Dec 2022",
+    "date": "",
+    "description": "AI generated OG images",
+    "d": 0,
+    "dd": "Pre-release",
+    "youtube_id": "OpPOaJI_Z28",
+    "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
+    "docs": "https://supabase.com/docs",
+    "steps": [
+      {
+        "title": "Supabase Docs",
+        "blog": "/blog/new-supabase-docs-built-with-nextjs",
+        "docs": "/docs",
+        "isNew": true,
+        "description": ""
+      }
+    ]
+  },
+  {
+    "title": "Self-hosted Logs & observability",
+    "shipped": true,
+    "date": "10 Apr 2023",
     "description": "Supabase Docs",
     "d": 1,
     "dd": "Monday",
@@ -20,9 +40,9 @@
     ]
   },
   {
-    "title": "Image Processing: Resize V2 + CDN",
+    "title": "Self-hosted Edge Functions",
     "shipped": true,
-    "date": "13 Dec 2022",
+    "date": "11 Apr 2023",
     "description": "Image Transformations",
     "d": 2,
     "dd": "Tuesday",
@@ -47,10 +67,10 @@
     ]
   },
   {
-    "title": "Multi-factor Authentication",
+    "title": "Storage v3  Multipart upload",
     "shipped": true,
-    "date": "14 Dec 2022",
-    "description": "Multi-factor Authentication",
+    "date": "12 Apr 2023",
+    "description": "Storage v3  Multipart upload",
     "d": 3,
     "dd": "Wednesday",
     "youtube_id": "CGZr5tybW18",
@@ -58,7 +78,7 @@
     "docs": "https://supabase.com/docs",
     "steps": [
       {
-        "title": "Multi-factor Authentication",
+        "title": "Storage v3  Multipart upload",
         "blog": "/blog/mfa-auth-via-rls",
         "docs": "/docs/guides/auth/auth-mfa",
         "isNew": false,
@@ -67,9 +87,9 @@
     ]
   },
   {
-    "title": "Supabase Wrappers - FDW Framework",
+    "title": "SSO Support for Projects",
     "shipped": true,
-    "date": "15 Dec 2022",
+    "date": "13 Apr 2023",
     "description": "Supabase Wrappers",
     "d": 4,
     "dd": "Thursday",
@@ -87,9 +107,9 @@
     ]
   },
   {
-    "title": "Supabase Vault Release",
+    "title": "Community Highlight",
     "shipped": true,
-    "date": "16 Dec 2022",
+    "date": "14 Apr 2023",
     "description": "Vault Release",
     "d": 5,
     "dd": "Friday",

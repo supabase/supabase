@@ -15,6 +15,7 @@ import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
 import LW7BgGraphic from '../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../components/CTABanner'
+import LW7Releases from '../../components/LaunchWeek/Releases/LW7'
 
 interface Props {
   users: UserData[]
@@ -98,29 +99,8 @@ export default function TicketHome({ users }: Props) {
         <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto lg:h-[calc(80vh-65px)] min-h-[600px] lg:min-h-[650px]">
+              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
                 <LaunchWeekLogoHeader />
-
-                {supabase && (
-                  <TicketContainer
-                    supabase={supabase}
-                    session={session}
-                    defaultUserData={defaultUserData}
-                    defaultPageState="ticket"
-                  />
-                )}
-
-                <div className="my-4">
-                  <a
-                    href="#lw-7-prizes"
-                    className="flex items-center text-white text-sm my-4 gap-4"
-                  >
-                    More about the prizes{' '}
-                    <span className="bounce-loop">
-                      <IconArrowDown w={10} h={12} />
-                    </span>
-                  </a>
-                </div>
               </SectionContainer>
               <LW7BgGraphic />
             </div>
@@ -129,9 +109,30 @@ export default function TicketHome({ users }: Props) {
             />
           </div>
 
-          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
+          <SectionContainer className="relative w-full -mt-40 md:-mt-96 z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+            <div className="mb-8">
+              <a href="#lw-7-prizes" className="flex items-center text-white text-sm my-4 gap-4">
+                Join Hackathon{' '}
+                <span className="bounce-loop">
+                  <IconArrowDown w={10} h={12} />
+                </span>
+              </a>
+            </div>
+            <LW7Releases />
+            <div className="w-full flex justify-center py-8 md:py-14 !px-2">
+              {supabase && (
+                <TicketContainer
+                  supabase={supabase}
+                  session={session}
+                  defaultUserData={defaultUserData}
+                  defaultPageState="ticket"
+                />
+              )}
+            </div>
+            <LaunchWeekPrizeSection className="pt-10 md:pt-20" />
 
-          {users && <TicketBrickWall users={users} />}
+            {users && <TicketBrickWall users={users} />}
+          </SectionContainer>
         </div>
         <CTABanner />
       </DefaultLayout>
