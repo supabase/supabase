@@ -44,7 +44,7 @@ function CountdownBanner() {
         </div>
       )
     } else {
-      // Render a countdown
+      // Render countdown
       return (
         <div
           className={[
