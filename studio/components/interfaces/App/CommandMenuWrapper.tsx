@@ -8,16 +8,23 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { uuidv4 } from 'lib/helpers'
 import { createSqlSnippetSkeleton } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { content } = useStore()
 
   const { data: profile } = useProfileQuery()
+  const { data: settings } = useProjectApiQuery({ projectRef: ref })
   // const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
   //   resource: { type: 'sql', owner_id: profile?.id },
   //   subject: { id: profile?.id },
   // })
+
+  const apiKeys = {
+    anon: settings?.autoApiService?.defaultApiKey ?? undefined,
+    service: settings?.autoApiService?.serviceApiKey ?? undefined,
+  }
 
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     // remove backticks from returned answer
@@ -46,6 +53,7 @@ ${answer}
     <CommandMenuProvider
       site="studio"
       projectRef={ref}
+      apiKeys={apiKeys}
       MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
       onSaveGeneratedSQL={onSaveGeneratedSQL}
     >
