@@ -249,12 +249,6 @@ export const PhoneLoginsItems = [
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
   },
-  {
-    name: 'Twilio WhatsApp Login',
-    icon: '/docs/img/icons/twilio-icon',
-    url: '/guides/auth/phone-login/twilio-whatsapp',
-    linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
-  },
 ]
 
 export const auth = {

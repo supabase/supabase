@@ -111,11 +111,6 @@ export const menuItems: NavMenu = {
               url: '/guides/auth/auth-messagebird',
               items: [],
             },
-            {
-              name: 'WhatsApp Auth with Twilio',
-              url: '/guides/auth/auth-twilio-whatsapp',
-              items: [],
-            },
           ],
         },
         {
