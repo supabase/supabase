@@ -3,16 +3,23 @@
     "title": "AI generated OG images",
     "shipped": true,
     "date": "",
+    "publishedAt": "2023-04-04T07:00:00.000-07:00",
     "description": "AI generated OG images",
     "d": 0,
     "dd": "Pre-release",
-    "youtube_id": "OpPOaJI_Z28",
+    "youtube_id": "",
     "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
     "docs": "https://supabase.com/docs",
     "steps": [
       {
-        "title": "Supabase Docs",
-        "blog": "/blog/new-supabase-docs-built-with-nextjs",
+        "title": "AI generated OG images",
+        "blog": "/blog/",
+        "isNew": false,
+        "description": ""
+      },
+      {
+        "title": "Supavisor",
+        "blog": "/blog/",
         "docs": "/docs",
         "isNew": true,
         "description": ""
@@ -21,8 +28,9 @@
   },
   {
     "title": "Self-hosted Logs & observability",
-    "shipped": true,
+    "shipped": false,
     "date": "10 Apr 2023",
+    "publishedAt": "2023-04-10T07:00:00.000-07:00",
     "description": "Supabase Docs",
     "d": 1,
     "dd": "Monday",
@@ -41,8 +49,9 @@
   },
   {
     "title": "Self-hosted Edge Functions",
-    "shipped": true,
+    "shipped": false,
     "date": "11 Apr 2023",
+    "publishedAt": "2023-04-11T07:00:00.000-07:00",
     "description": "Image Transformations",
     "d": 2,
     "dd": "Tuesday",
@@ -52,8 +61,8 @@
     "steps": [
       {
         "title": "Image Transformations",
-        "blog": "/blog/storage-image-resizing-smart-cdn",
-        "docs": "/docs/guides/storage/image-transformations",
+        "blog": "",
+        "docs": "",
         "isNew": true,
         "description": ""
       },
@@ -68,8 +77,9 @@
   },
   {
     "title": "Storage v3  Multipart upload",
-    "shipped": true,
+    "shipped": false,
     "date": "12 Apr 2023",
+    "publishedAt": "2023-04-12T07:00:00.000-07:00",
     "description": "Storage v3  Multipart upload",
     "d": 3,
     "dd": "Wednesday",
@@ -88,8 +98,9 @@
   },
   {
     "title": "SSO Support for Projects",
-    "shipped": true,
+    "shipped": false,
     "date": "13 Apr 2023",
+    "publishedAt": "2023-04-13T07:00:00.000-07:00",
     "description": "Supabase Wrappers",
     "d": 4,
     "dd": "Thursday",
@@ -108,8 +119,9 @@
   },
   {
     "title": "Community Highlight",
-    "shipped": true,
+    "shipped": false,
     "date": "14 Apr 2023",
+    "publishedAt": "2023-04-14T07:00:00.000-07:00",
     "description": "Vault Release",
     "d": 5,
     "dd": "Friday",

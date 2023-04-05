@@ -25,5 +25,5 @@
 }
 
 .lw7-article-card-gradient {
-  background: linear-gradient(90deg, #1c1c1c -20%, #20113d 149.46%);
+  background: linear-gradient(90deg, #1c1c1c -20%, #20113d50 150%);
 }
