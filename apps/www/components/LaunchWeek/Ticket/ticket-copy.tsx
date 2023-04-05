@@ -6,16 +6,17 @@ import { IconCopy, IconCheck } from 'ui'
 
 type Props = {
   username: string
+  isGolden?: boolean
 }
 
-export default function TicketCopy({ username }: Props) {
+export default function TicketCopy({ username, isGolden }: Props) {
   const [fadeOpacity, setFadeOpacity] = useState(1)
   const [scrolling, setScrolling] = useState(false)
   const [copyEnabled, setCopyEnabled] = useState(false)
   const [copied, setCopied] = useState(false)
   const scrollRef = useRef<HTMLParagraphElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const url = `${SITE_URL}/tickets/${username}?lw=7`
+  const url = `${SITE_URL}/tickets/${username}?lw=7${isGolden ? `&golden=true` : ''}`
   useEffect(() => {
     if (navigator.clipboard) {
       setCopyEnabled(true)
