@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button } from 'ui'
@@ -7,7 +8,7 @@ import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnManagement from './ColumnManagement'
-import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from '../'
 import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import { TableField, ImportContent } from './TableEditor.types'
@@ -19,7 +20,6 @@ import {
 } from './TableEditor.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Link from 'next/link'
 
 interface Props {
   table?: PostgresTable

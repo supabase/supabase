@@ -1,12 +1,12 @@
 import { useCallback, useState, FC, useEffect } from 'react'
-import { debounce, includes } from 'lodash'
-import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from 'ui'
+import { debounce, includes, noop } from 'lodash'
+import { SidePanel, Tabs } from 'ui'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
-import ActionBar from '../../ActionBar'
+import ActionBar from '../ActionBar'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
-import SpreadsheetPreview from './SpreadsheetPreview'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 import {
   acceptedFileExtension,
@@ -14,31 +14,36 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
+import { ImportContent } from '../TableEditor/TableEditor.types'
+import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
+import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 
 interface Props {
   debounceDuration?: number
   headers?: string[]
   rows?: any[]
   visible: boolean
-  saveContent: (prefillData: any) => void
+  selectedTable?: PostgresTable
+  saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
+  updateEditorDirty?: (value: boolean) => void
 }
 
 const SpreadsheetImport: FC<Props> = ({
+  visible = false,
   debounceDuration = 250,
   headers = [],
   rows = [],
+  selectedTable,
   saveContent,
   closePanel,
-  visible = false,
+  updateEditorDirty = noop,
 }) => {
   const { ui } = useStore()
 
   useEffect(() => {
-    if (visible) {
-      if (headers.length === 0) {
-        resetSpreadsheetImport()
-      }
+    if (visible && headers.length === 0) {
+      resetSpreadsheetImport()
     }
   }, [visible])
 
@@ -52,7 +57,13 @@ const SpreadsheetImport: FC<Props> = ({
     columnTypeMap: {},
   })
   const [errors, setErrors] = useState<any>([])
-  const [expandedErrors, setExpandedErrors] = useState<string[]>([])
+  const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+
+  const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
+  const incompatibleHeaders = selectedHeaders.filter(
+    (header) => !selectedTableColumns.includes(header)
+  )
+  const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -68,6 +79,7 @@ const SpreadsheetImport: FC<Props> = ({
         message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
       })
     } else {
+      updateEditorDirty(true)
       setUploadedFile(file)
       const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
@@ -83,6 +95,7 @@ const SpreadsheetImport: FC<Props> = ({
       }
 
       setErrors(errors)
+      setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
@@ -93,7 +106,7 @@ const SpreadsheetImport: FC<Props> = ({
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(null)
     setErrors([])
-    setExpandedErrors([])
+    updateEditorDirty(false)
   }
 
   const readSpreadsheetText = async (text: string) => {
@@ -108,6 +121,7 @@ const SpreadsheetImport: FC<Props> = ({
         })
       }
       setErrors(errors)
+      setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
       setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
@@ -120,11 +134,28 @@ const SpreadsheetImport: FC<Props> = ({
     handler(event.target.value)
   }
 
-  const onSelectExpandError = (key: string) => {
-    if (expandedErrors.includes(key)) {
-      setExpandedErrors(expandedErrors.filter((error) => error !== key))
+  const onToggleHeader = (header: string) => {
+    const updatedSelectedHeaders = selectedHeaders.includes(header)
+      ? selectedHeaders.filter((h) => h !== header)
+      : selectedHeaders.concat([header])
+    setSelectedHeaders(updatedSelectedHeaders)
+  }
+
+  const onConfirm = (resolve: () => void) => {
+    if (selectedHeaders.length === 0) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Please select at least one header from your CSV',
+      })
+      resolve()
+    } else if (!isCompatible) {
+      ui.setNotification({
+        category: 'error',
+        message: 'The data that you are trying to import is incompatible with your table structure',
+      })
+      resolve()
     } else {
-      setExpandedErrors(expandedErrors.concat([key]))
+      saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
     }
   }
 
@@ -133,24 +164,34 @@ const SpreadsheetImport: FC<Props> = ({
       size="large"
       visible={visible}
       align="right"
-      header="Add content to new table"
+      header={
+        selectedTable !== undefined ? (
+          <>
+            Add data to{' '}
+            <code className="text-sm">
+              {selectedTable.schema}.{selectedTable.name}
+            </code>
+          </>
+        ) : (
+          'Add content to new table'
+        )
+      }
       onCancel={() => closePanel()}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
-          applyButtonLabel="Save"
+          applyButtonLabel={selectedTable === undefined ? 'Save' : 'Import data'}
           closePanel={closePanel}
-          applyFunction={() => {
-            saveContent({
-              file: uploadedFile,
-              ...spreadsheetData,
-            })
-          }}
+          applyFunction={onConfirm}
         />
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) event.preventDefault()
+      }}
     >
       <SidePanel.Content>
-        <div className="flex flex-col">
+        <div className="pt-6">
           <Tabs block type="pills">
             <Tabs.Panel id="fileUpload" label="Upload CSV">
               <SpreadSheetFileUpload
@@ -165,70 +206,28 @@ const SpreadsheetImport: FC<Props> = ({
             </Tabs.Panel>
           </Tabs>
         </div>
-
-        {spreadsheetData.headers.length > 0 && (
-          <div className="space-y-5 py-5">
-            <div className="space-y-2">
-              <div className="flex flex-col space-y-1">
-                <p>Content Preview</p>
-                <p className="text-scale-1000">
-                  Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
-                  following {spreadsheetData.headers.length} columns.
-                </p>
-                <p className="text-scale-1000">
-                  Here is a preview of your table (up to the first 20 columns and first 20 rows).
-                </p>
-              </div>
-              <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
-            </div>
-            {errors.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex flex-col space-y-1">
-                  <p>Issues found in spreadsheet</p>
-                  <p className="text-scale-1000">
-                    Your table can still be created nonetheless despite issues in the following
-                    rows.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {errors.map((error: any, idx: number) => {
-                    const key = `import-error-${idx}`
-                    const isExpanded = expandedErrors.includes(key)
-                    return (
-                      <div key={key} className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <IconChevronRight
-                            className={`transform cursor-pointer ${isExpanded ? 'rotate-90' : ''}`}
-                            size={14}
-                            onClick={() => onSelectExpandError(key)}
-                          />
-                          <p className="w-14">Row: {error.row}</p>
-                          <p>{error.message}</p>
-                          {error.data?.__parsed_extra && (
-                            <>
-                              <IconArrowRight size={14} />
-                              <p>Extra field(s):</p>
-                              {error.data?.__parsed_extra.map((value: any, i: number) => (
-                                <code key={i} className="text-sm">{value}</code>
-                              ))}
-                            </>
-                          )}
-                        </div>
-                        {isExpanded && (
-                          <SpreadsheetPreview
-                            headers={spreadsheetData.headers}
-                            rows={[error.data]}
-                          />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </SidePanel.Content>
+      {spreadsheetData.headers.length > 0 && (
+        <>
+          <div className="pt-4">
+            <SidePanel.Separator />
+          </div>
+          <SpreadsheetImportConfiguration
+            spreadsheetData={spreadsheetData}
+            selectedHeaders={selectedHeaders}
+            onToggleHeader={onToggleHeader}
+          />
+          <SidePanel.Separator />
+          <SpreadsheetImportPreview
+            selectedTable={selectedTable}
+            spreadsheetData={spreadsheetData}
+            errors={errors}
+            selectedHeaders={selectedHeaders}
+            incompatibleHeaders={incompatibleHeaders}
+          />
+          <SidePanel.Separator />
+        </>
+      )}
     </SidePanel>
   )
 }

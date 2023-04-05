@@ -11,19 +11,25 @@ import { useStore, withAuth, useUrlState } from 'hooks'
 import { useParams } from 'common/hooks'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { Entity } from 'data/entity-types/entity-type-query'
+import { sqlKeys } from 'data/sql/keys'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const { project } = useProjectContext()
 
   const queryClient = useQueryClient()
 
@@ -38,7 +44,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
   const [sidePanelKey, setSidePanelKey] = useState<
-    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   >()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
@@ -131,6 +137,16 @@ const TableEditorPage: NextPageWithLayout = () => {
     setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
   }
 
+  const onImportData = () => {
+    if (id) {
+      setSidePanelKey('csv-import')
+      const table = meta.tables.byId(id)
+      setSelectedTableToEdit(table)
+    } else {
+      console.error('Table ID not found')
+    }
+  }
+
   const onEditForeignKeyColumnValue = ({
     foreignKey,
     row,
@@ -185,7 +201,21 @@ const TableEditorPage: NextPageWithLayout = () => {
         message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
       })
 
-      await meta.tables.loadById(selectedColumnToDelete!.table_id)
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedColumnToDelete!.table_id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
+        ),
+      ])
+
       if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
@@ -260,6 +290,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
         theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
+        onImportData={onImportData}
       />
       <ConfirmationModal
         danger

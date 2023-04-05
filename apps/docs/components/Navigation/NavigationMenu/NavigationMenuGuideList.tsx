@@ -36,7 +36,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active, value }) => {
       type={value ? 'multiple' : 'single'}
       value={value ?? firstLevelRoute}
       className={[
-        'transition-all ml-8 duration-150 ease-out',
+        'transition-all duration-150 ease-out',
         // enabled
         active && 'opacity-100 ml-0 delay-150',
         // level === 'home' && 'ml-12',

@@ -38,6 +38,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
   },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
+  },
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
@@ -105,6 +109,10 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
   },
 }
 

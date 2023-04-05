@@ -2,28 +2,35 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'auth-sso-saml',
-  title: 'Single Sign-On with SAML 2.0',
-  description: 'Use Single Sign-On (SSO) authentication with SAML 2.0',
+  title: 'Single Sign-On with SAML 2.0 for Projects',
+  description: 'Use Single Sign-On (SSO) authentication on your project with SAML 2.0',
   video: 'https://www.youtube.com/v/em1cpOAXknM',
 }
 
-Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the using the SAML 2.0 protocol.
+Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the using the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
 
-<Admonition type="info">
-This is an early beta release of these APIs. CLI and Dashboard support for SSO is under development.
+- Google Workspaces (formerly known as GSuite)
+- Okta, Auth0
+- Microsoft Active Directory, Azure Active Directory, Microsoft Entra
+- PingIdentity
+- OneLogin
 
-If you are comfortable using these APIs and would like to try out SSO with SAML 2.0 for your project, please [open a support ticket](https://app.supabase.com/support/new).
+If you're having issues with identity provider software not on this list, please [open a support ticket](https://app.supabase.com/support/new).
 
-These APIs are not expected to change before the feature is generally available, but we do reserve the right to modify them. Projects in the Beta will be notified of any changes.
+## Prerequisites
 
-</Admonition>
+This guide requires the use of the [Supabase CLI](/docs/guides/cli). Please make sure you're using version v1.46.4 or higher. You can use `supabase -v` to see the currently installed version.
+
+SAML 2.0 support is disabled by default on Supabase projects. You can configure this on the [Auth Providers](https://app.supabase.com/project/_/auth/providers) page on your project.
+
+Please note that SAML 2.0 support is offered on tiers Pro and above. Check the [Pricing](https://supabase.com/pricing) page for more information.
 
 ## Terminology
 
-The number of SAML and SSO acronyms can often overwhelming. Here's a glossary which you can refer back to at any time:
+The number of SAML and SSO acronyms can often be overwhelming. Here's a glossary which you can refer back to at any time:
 
 - **Identity Provider**, **IdP**, or **IDP**  
-  This is software that manages user accounts at a company or organization. It can verify the identity of a user and exchange that information with your Supabase project. Commonly used identity providers are: Microsoft Active Directory (Azure AD, Microsoft Entra), Okta, Google Workspaces (GSuite), PingIdentity, OneLogin, and many others.
+  An identity provider is a service that manages user accounts at a company or organization. It can verify the identity of a user and exchange that information with your Supabase project and other applications. It acts as a single source of truth for user identities and access rights. Commonly used identity providers are: Microsoft Active Directory (Azure AD, Microsoft Entra), Okta, Google Workspaces (GSuite), PingIdentity, OneLogin, and many others. There are also self-hosted and on-prem versions of identity providers, and sometimes they are accessible only by having access to a company VPN or being in a specific building.
 - **Service Provider**, **SP**  
   This is the software that is asking for user information from an identity provider. In Supabase, this is your project's Auth server.
 - **Assertion**  
@@ -47,17 +54,20 @@ The number of SAML and SSO acronyms can often overwhelming. Here's a glossary wh
 
 Below is information about your project's SAML 2.0 configuration which you can share with the company or organization that you're trying to on-board.
 
-| Name         | Value                                                     |
-| ------------ | --------------------------------------------------------- |
-| EntityID     | `https://<project>.supabase.co/auth/v1/sso/saml/metadata` |
-| Metadata URL | `https://<project>.supabase.co/auth/v1/sso/saml/metadata` |
-| ACS URL      | `https://<project>.supabase.co/auth/v1/sso/saml/acs`      |
-| SLO URL      | `https://<project>.supabase.co/auth/v1/sso/slo`           |
-| NameID       | Required `emailAddress` or `persistent`                   |
+| Name                        | Value                                                                   |
+| --------------------------- | ----------------------------------------------------------------------- |
+| EntityID                    | `https://<project>.supabase.co/auth/v1/sso/saml/metadata`               |
+| Metadata URL                | `https://<project>.supabase.co/auth/v1/sso/saml/metadata`               |
+| Metadata URL<br/>(download) | `https://<project>.supabase.co/auth/v1/sso/saml/metadata?download=true` |
+| ACS URL                     | `https://<project>.supabase.co/auth/v1/sso/saml/acs`                    |
+| SLO URL                     | `https://<project>.supabase.co/auth/v1/sso/slo`                         |
+| NameID                      | Required `emailAddress` or `persistent`                                 |
 
 Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available.
 
-Append `?download=true` to the Metadata URL to get a downloadable Metadata XML file.
+Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
+
+Alternatively, you can use the `supabase sso info --project-ref <your-project>` command to get setup information for your project.
 
 ### User accounts and identities
 
@@ -119,18 +129,7 @@ CREATE POLICY "View organization settings."
 
 ## Managing SAML 2.0 connections
 
-### Prerequisites
-
-SSO support with SAML 2.0 is in an early beta release. This guide uses the following software which you need to install on your machine to configure your project:
-
-- [**cURL**](https://curl.se)  
-  It is typically pre-installed in macOS and GNU/Linux distributions.
-- [**jq**](https://stedolan.github.io/jq/)  
-  You can install it with `brew install jq` on macOS or using your distribution's package manager.
-
-You would need access to two keys -- the `anon` and `service_role` key. You can obtain these on the [Project API Keys](https://app.supabase.com/project/_/settings/api) page in the dashboard.
-
-We publish an [OpenAPI specification](https://github.com/supabase/gotrue/blob/master/openapi.yaml) which you can refer to at any time.
+Once you've enabled SAML 2.0 support on your project via the [Auth Providers](https://app.supabase.com/project/_/auth/providers) page in the dashboard, you can use the [Supabase CLI](/docs/guides/cli) to add, update, remove and view information about identity providers.
 
 ### Add a connection
 
@@ -151,40 +150,34 @@ Commonly used SAML 2.0 Identity Providers that support Metadata URLs:
 Commonly used SAML 2.0 Identity Providers that only support Metadata XML files:
 
 - Google Workspaces (GSuite)
+- Any self-hosted or on-prem identity provider behind a VPN
 
-Once you've obtained the SAML 2.0 Metadata XML file or URL you can establish a connection with your project's Supabase Auth server by invoking this API:
-
-```bash
-curl -X POST \
-  -H 'Content-Type: application/json' \
-  -H 'apikey: <anon-jwt>' \
-  -H 'Authorization: Bearer <service_role-jwt>' \
-  --data-binary '@/tmp/body.json' \
-    'https://<project>.supabase.co/auth/v1/admin/sso/providers'
-```
-
-To create the `/tmp/body.json` file you can use this:
+Once you've obtained the SAML 2.0 Metadata XML file or URL you can establish a connection with your project's Supabase Auth server by using the [Supabase CLI](/docs/guides/cli):
 
 ```bash
-jq --null-input \
-  --arg metadata_url "https://..." \
-  '{ "type": "saml", "metadata_url": $metadata_url, "domains": ["company.com"] }' \
-  > /tmp/body.json
+supabase sso add --type saml --project-ref <your-project> \
+  --metadata-url 'https://company.com/idp/saml/metadata' \
+  --domains company.com
 ```
 
 If you wish to use a Metadata XML file instead, you can use:
 
 ```bash
-jq --null-input \
-  -M \
-  --rawfile metadata_file /path/to/metadata.xml \
-  '{ "type": "saml", "metadata_xml": $metadata_file, "domains":  ["company.com"] }' \
-  > /tmp/body.json
+supabase sso add --type saml --project-ref <your-project> \
+  --metadata-file /path/to/saml/metadata.xml \
+  --domains company.com
 ```
 
-Once you've executed the cURL command with the correct body, you should see details about the registered SAML 2.0 Identity Provider.
+This command will register a new identity provider with your project's Auth server. When successful, you will see the details of the provider such as it's SAML information and registered domains.
 
-To initiate a sign-in request from your front-end application you can use:
+Please note that only persons with write access to the project can register, update or remove identity providers.
+
+Once you've added an identity provider, users who have access to it can sign in to your application. With SAML 2.0 there are two ways that users can sign in to your project:
+
+- By signing-in from your application's user interface, commonly known as **SP (Service Provider) Initiated Flow**
+- By clicking on an icon in the application menu on the company intranet or identity provider page, commonly known as **Identity Provider Initiated (IdP) Flow**
+
+To initiate a sign-in request from your application's user interface (i.e. the SP Initiated Flow), you can use:
 
 ```typescript
 supabase.auth.signInWithSSO({
@@ -192,11 +185,11 @@ supabase.auth.signInWithSSO({
 })
 ```
 
-Which will start the sign-in process using the SSO Identity Provider registered for the `company.com` domain name. If the SSO Identity Provider does not have an associated domain name, you can use `providerId` instead.
+Calling this method starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 ### Understanding attribute mappings
 
-When a user signs in using the SAML 2.0 Single Sign-On protocol, an XML document called the SAML Assertion is exchanged between the Identity Provider and Supabase Auth.
+When a user signs in using the SAML 2.0 Single Sign-On protocol, an XML document called the SAML Assertion is exchanged between the identity provider and Supabase Auth.
 
 This assertion contains information about the user's identity and other authentication information, such as:
 
@@ -206,9 +199,9 @@ This assertion contains information about the user's identity and other authenti
 - Department or organization
 - Other attributes present in the users directory managed by the identity provider
 
-Other than the unique ID of the user, SAML does not make it mandatory that any other attributes appear in the assertion. Identity Providers are configured about what user information is shared with your project.
+With exception of the unique user ID, SAML does not require any other attributes in the assertion. Identity providers can be configured so that only select user information is shared with your project.
 
-Your project can be configured to recognize these attributes and map them into your project's database using a JSON structure. This process is called attribute mapping, and varies according to the configuration of the Identity Provider.
+Your project can be configured to recognize these attributes and map them into your project's database using a JSON structure. This process is called attribute mapping, and varies according to the configuration of the identity provider.
 
 For example, the following JSON structure configures attribute mapping for the `email` and `first_name` user identity properties.
 
@@ -225,7 +218,14 @@ For example, the following JSON structure configures attribute mapping for the `
 }
 ```
 
-You can include this structure in the `POST /auth/v1/admin/sso/providers` call under the `attribute_mapping` property.
+When creating or updating an identity provider with the [Supabase CLI](/docs/guides/cli) you can include this JSON as a file with the `--attribute-mapping /path/to/attribute/mapping.json` flag.
+
+For example, to change the attribute mappings to an existing provider you can use:
+
+```bash
+supabase sso update <provider-uuid> --project-ref <your-project> \
+  --attribute-mapping /path/to/attribute/mapping.json
+```
 
 Given a SAML 2.0 assertion that includes these attributes:
 
@@ -268,23 +268,25 @@ Supabase Auth does not require specifying attribute mappings if you only need ac
 
 At this time it is not possible to have users without an email address, so SAML assertions without one will be rejected.
 
-Most SAML 2.0 identity providers use LDAP attribute names. However, due to their variability and complexity operators of Identity Providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Please refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
+Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Please refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
 
 ### Remove a connection
 
-Once a connection to an identity provider is established, you can remove it by invoking the `DELETE` method on it:
+Once a connection to an identity provider is established, you can remove it by running:
 
 ```bash
-curl -X DELETE \
-  -H 'Content-Type: application/json' \
-  -H 'apikey: <anon-jwt>' \
-  -H 'Authorization: Bearer <service_role-jwt>' \
-  'https://<project>.supabase.co/auth/v1/admin/sso/providers/<provider-uuid>'
+supabase sso remove <provider-id> --project-ref <your-project>
 ```
 
-Once a connection is removed, all user accounts from that identity provider will be immediately logged out. User information will remain in the system, but it will no longer be possible for any of those accounts to be accessed in the future, even if you add the connection again.
+If successful, the details of the removed identity provider will be shown. All user accounts from that identity provider will be immediately logged out. User information will remain in the system, but it will no longer be possible for any of those accounts to be accessed in the future, even if you add the connection again.
 
 If you need to reassign those user accounts to another identity provider, please [open a support ticket](https://app.supabase.com/support/new).
+
+A list of all registered identity providers can be displayed by running:
+
+```bash
+supabase sso list --project-ref <your-project>
+```
 
 ### Update a connection
 
@@ -293,23 +295,69 @@ You may wish to update settings about a connection to a SAML 2.0 identity provid
 Commonly this is necessary when:
 
 - Cryptographic keys are rotated or have expired
-- Metadata URL has changed, but is the same Identity Provider
-- Other SAML 2.0 Metadata attributes have changed, but it is still the same Identity Provider
+- Metadata URL has changed, but is the same identity provider
+- Other SAML 2.0 Metadata attributes have changed, but it is still the same identity provider
 - You are updating the domains or attribute mapping
 
-```bash
-curl -X PUT \
-  -H 'Content-Type: application/json' \
-  -H 'apikey: <anon-jwt>' \
-  -H 'Authorization: Bearer <service_role-jwt>' \
-  --data-binary '@/tmp/body.json' \
-  'https://<project>.supabase.co/auth/v1/admin/sso/providers/<provider-uuid>'
+You can use the following command to update the configuration of an identity provider:
 
+```bash
+supabase sso update <provider-id> --project-ref <your-project>
 ```
 
-The request body has the same structure as when you're adding a connection to an Identity Provider.
+Please use `--help` to see all available flags.
 
-It is not possible to change the Identity Provider's unique SAML identifier known as `EntityID`. Everything else can be updated. If the SAML `EntityID` of your identity provider has changed, it is regarded as a new identity provider and you will have to register it like a new connection.
+It is not possible to change the unique SAML identifier of the identity provider, known as `EntityID`. Everything else can be updated. If the SAML `EntityID` of your identity provider has changed, it is regarded as a new identity provider and you will have to register it like a new connection.
+
+### Retrieving information about a connection
+
+You can always obtain a list of all registered providers using:
+
+```bash
+supabase sso list --project-ref <your-project>
+```
+
+This list will only include basic information about each provider. To see all of the information about a provider you can use:
+
+```bash
+supabase sso show <provider-id> --project-ref <your-project>
+```
+
+You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, please use `--help` to see all available options.
+
+## Frequently Asked Questions
+
+### How do I publish my application to an identity provider's marketplace?
+
+Many cloud-based identity providers offer a marketplace where you can register your application for easy on-boarding with customers. When you use Supabase Auth's SAML 2.0 support you can register your project in any one of these marketplaces.
+
+Please refer to the relevant documentation for each cloud-based identity provider on how you can do this. Some common marketplaces are:
+
+- [Okta Integration Network](https://developer.okta.com/docs/guides/build-sso-integration/saml2/main/)
+- [Azure Active Directory App Gallery](https://learn.microsoft.com/en-us/azure/active-directory-b2c/publish-app-to-azure-ad-app-gallery)
+- [Google Workspaces Pre-integrated SAML apps catalog](https://support.google.com/a/table/9217027)
+
+### Why do some users get: SAML Assertion does not contain email address?
+
+Identity providers do not have to send back and email address for the user, though they often do. Supabase Auth requires that an email address is present.
+
+The following list of commonly used SAML attribute names is inspected, in order of appearance, to discover the email address in the assertion:
+
+- `urn:oid:0.9.2342.19200300.100.1.3`
+- `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
+- `http://schemas.xmlsoap.org/claims/EmailAddress`
+- `mail`
+- `email`
+
+Finally if there is no such attribute, it will use the SAML `NameID` value but only if the format is advertised as `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`.
+
+Should you run into this problem, it is most likely a misconfiguration issue **on the identity provider side.** Please instruct your contact at the company to map the user's email address to one of the above listed attribute names, typically `email`.
+
+### How do I access the private key used for SAML in my project?
+
+At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Please use a SAML 2.0 Metadata URL whenever possible for this reason!)
+
+If you really need access to the key, please [open a support ticket](https://app.supabase.com/support/new) and we'll try to support you as best as possible.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -369,6 +369,7 @@ export default {
         transition
         shadow-sm
         rounded
+        border
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -376,13 +377,13 @@ export default {
         `,
       inactive: `
         bg-scale-200
-        border border-scale-700 hover:border-scale-900
+        border-scale-700 hover:border-scale-900
         text-scale-900 hover:text-scale-1200
       `,
       active: `
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
+        bg-scale-600
+        text-scale-1200
+        border-scale-800
       `,
     },
     'rounded-pills': {
@@ -977,7 +978,6 @@ export default {
       flex flex-col
       fixed
       inset-y-0
-      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
