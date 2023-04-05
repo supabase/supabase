@@ -1,13 +1,11 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import cn from 'classnames'
 import useConfData from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import { useRouter } from 'next/router'
-import LoadingDots from './loading-dots'
 import styleUtils from './utils.module.css'
 import styles from './form.module.css'
 import useEmailQueryParam from '~/components/LaunchWeek/Ticket/hooks/use-email-query-param'
 import { IconLoader } from '~/../../packages/ui'
-// import Captcha, { useCaptcha } from './captcha'
 
 type FormState = 'default' | 'loading' | 'error'
 
@@ -37,45 +35,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const router = useRouter()
   const isCaptchaEnabled = false
 
-  useEffect(() => {
-    if (session?.user) {
-      document.body.classList.add('ticket-generated')
-      const username = session.user.user_metadata.user_name
-      const name = session.user.user_metadata.full_name
-      const email = session.user.email
-      supabase
-        .from('lw6_tickets')
-        .upsert({ email, name, username }, { onConflict: 'email', ignoreDuplicates: false })
-        .eq('email', email)
-        .select()
-        .single()
-        .then(async ({ error }) => {
-          if (error) return supabase.auth.signOut()
-          const { data } = await supabase
-            .from('lw6_tickets_golden')
-            .select('*')
-            .eq('username', username)
-            .single()
-          setUserData(data)
-          setFormState('default')
-
-          // Prefetch GitHub avatar
-          new Image().src = `https://github.com/${username}.png`
-
-          // Prefetch the twitter share URL to eagerly generate the page
-          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
-          // Prefetch ticket og image.
-          fetch(
-            `https://obuldanrptloktxcffvn.functions.supabase.co/launchweek-ticket-og?username=${encodeURIComponent(
-              username ?? ''
-            )}`
-          ).catch((_) => {})
-
-          setPageState('ticket')
-        })
-    }
-  }, [session])
-
+  // NOTE: this is not in use anymore as we're only allowing GitHub signups since LW7!
   async function register(email: string, token?: string): Promise<ConfUser> {
     const { error } = await supabase!.from('lw6_tickets').insert({ email })
     if (error) {

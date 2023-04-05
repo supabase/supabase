@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://app.supabase.com',
+    destination: 'https://supabase.com/dashboard',
   },
   {
     permanent: true,
@@ -1220,13 +1220,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime#broadcast',
+    source: '/docs/guides/realtime#broadcast',
+    destination: '/docs/guides/realtime/broadcast',
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime#presence',
+    source: '/docs/guides/realtime#presence',
+    destination: '/docs/guides/realtime/presence',
   },
   {
     permanent: true,
@@ -1458,17 +1458,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://app.supabase.com/sign-in',
+    destination: 'https://supabase.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://app.supabase.com/sign-up',
+    destination: 'https://supabase.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://app.supabase.com/forgot-password',
+    destination: 'https://supabase.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1488,7 +1488,7 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://app.supabase.com/projects',
+    destination: 'https://supabase.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
@@ -1531,7 +1531,7 @@ module.exports = [
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
-  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
@@ -1780,37 +1780,37 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/introduction',
+    destination: '/docs/reference/javascript/start',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/introduction',
+    destination: '/docs/reference/dart/start',
   },
   {
     permanent: true,
     source: '/docs/reference/cli',
-    destination: '/docs/reference/cli/introduction',
+    destination: '/docs/reference/cli/start',
   },
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/introduction',
+    destination: '/docs/reference/api/start',
   },
   {
     permanent: true,
     source: '/docs/reference/auth',
-    destination: '/docs/reference/auth/introduction',
+    destination: '/docs/reference/self-hosting-auth/start',
   },
   {
     permanent: true,
     source: '/docs/reference/storage',
-    destination: '/docs/reference/storage/introduction',
+    destination: '/docs/reference/self-hosting-storage/start',
   },
   {
     permanent: true,
     source: '/docs/reference/realtime',
-    destination: '/docs/reference/realtime/introduction',
+    destination: '/docs/reference/self-hosting-realtime/start',
   },
   {
     permanent: true,
@@ -1836,5 +1836,71 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/dart/upgrade-guide',
     destination: '/docs/reference/dart/v0/upgrade-guide',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/examples',
+    destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/v0/rpc',
+    destination: '/docs/reference/javascript/rpc',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/database-usage',
+    destination: '/docs/guides/platform/database-size',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
+    destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/first-row-in-group',
+    destination: '/docs/guides/database/postgres/first-row-in-group',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/which-version-of-postgres',
+    destination: '/docs/guides/database/postgres/which-version-of-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime/extensions/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime/extensions/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/extensions/postgres-changes',
+  },
+  // Serverless APIs
+  {
+    permanent: true,
+    source: '/docs/guides/database/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
   },
 ]

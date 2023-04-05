@@ -5,7 +5,8 @@ import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag, useProjectUsage } from 'hooks'
+import { checkPermissions, useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
@@ -14,6 +15,7 @@ import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import NoPermission from 'components/ui/NoPermission'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 interface Props {
   project: any
@@ -32,10 +34,9 @@ const Subscription: FC<Props> = ({
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
-  const { ui } = useStore()
   const router = useRouter()
 
-  const { ref } = router.query
+  const { ref: projectRef } = useParams()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
@@ -44,7 +45,7 @@ const Subscription: FC<Props> = ({
     'stripe.subscriptions'
   )
 
-  const { usage, isLoading: loadingUsage } = useProjectUsage(ref as string)
+  const { data: usage, isLoading: loadingUsage } = useProjectUsageQuery({ projectRef })
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -62,7 +63,7 @@ const Subscription: FC<Props> = ({
         ? 0
         : Object.keys(usage)
             .map((productKey) => {
-              return usage[productKey].cost ?? 0
+              return usage[productKey as ProjectUsageResponseUsageKeys].cost ?? 0
             })
             .reduce((prev, current) => prev + current, 0)
 
@@ -71,7 +72,7 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading || loadingUsage}>
-      <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
+      <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
@@ -97,29 +98,31 @@ const Subscription: FC<Props> = ({
                   </Button>
                 </Tooltip.Trigger>
                 {!canUpdateSubscription || projectUpdateDisabled ? (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'border border-scale-200 text-center', //border
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        {projectUpdateDisabled ? (
-                          <>
-                            Subscription changes are currently disabled.
-                            <br />
-                            Our engineers are working on a fix.
-                          </>
-                        ) : !canUpdateSubscription ? (
-                          'You need additional permissions to amend subscriptions'
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'border border-scale-200 text-center', //border
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          {projectUpdateDisabled ? (
+                            <>
+                              Subscription changes are currently disabled.
+                              <br />
+                              Our engineers are working on a fix.
+                            </>
+                          ) : !canUpdateSubscription ? (
+                            'You need additional permissions to amend subscriptions'
+                          ) : (
+                            ''
+                          )}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 ) : (
                   <></>
                 )}
@@ -134,7 +137,7 @@ const Subscription: FC<Props> = ({
               </p>
             </div>
           )}
-          <div className="mt-2 px-6 pb-4">
+          <div className="px-6 pb-4 mt-2">
             <p className="text-sm text-scale-1100">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
@@ -151,7 +154,7 @@ const Subscription: FC<Props> = ({
           ) : !loading && subscription ? (
             // Cost breakdown
             <>
-              <div className="relative flex items-center border-t border-panel-border-light px-6 py-3 dark:border-panel-border-dark">
+              <div className="relative flex items-center px-6 py-3 border-t border-panel-border-light dark:border-panel-border-dark">
                 <div className="w-[40%]">
                   <p className="text-xs uppercase text-scale-900">Item</p>
                 </div>
@@ -183,9 +186,11 @@ const Subscription: FC<Props> = ({
               {isPayg &&
                 USAGE_BASED_PRODUCTS.map((product) => {
                   return product.features.map((feature) => {
-                    const amount = usage?.[feature.key]?.usage ?? 0
-                    const limit = usage?.[feature.key]?.limit ?? 0
-                    const cost = (usage?.[feature.key]?.cost ?? 0).toFixed(2)
+                    const amount = usage?.[feature.key as ProjectUsageResponseUsageKeys]?.usage ?? 0
+                    const limit = usage?.[feature.key as ProjectUsageResponseUsageKeys]?.limit ?? 0
+                    const cost = (
+                      usage?.[feature.key as ProjectUsageResponseUsageKeys]?.cost ?? 0
+                    ).toFixed(2)
 
                     return (
                       <CostBreakdownRow

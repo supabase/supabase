@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 
 interface Props {
   currentOption?: any

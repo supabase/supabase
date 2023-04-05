@@ -1,8 +1,9 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import { useRef, useState } from 'react'
-import { useSWRConfig } from 'swr'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -12,12 +13,12 @@ const signInSchema = object({
 
 const SignInSSOForm = () => {
   const { ui } = useStore()
-  const { cache } = useSWRConfig()
+  const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
 
-  const onSignIn = async ({ email, password }: { email: string; password: string }) => {
+  const onSignIn = async ({ email }: { email: string }) => {
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Signing in...`,
@@ -35,16 +36,14 @@ const SignInSSOForm = () => {
         captchaToken: token ?? undefined,
         redirectTo: `${
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-            ? process.env.NEXT_PUBLIC_VERCEL_URL
+            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${getReturnToPath()}`,
+        }${BASE_PATH}${getReturnToPath()}`,
       },
     })
 
     if (!error) {
-      // .clear() does actually exist on the cache object, but it's not in the types 🤦🏻
-      // @ts-ignore
-      cache.clear()
+      await queryClient.resetQueries()
 
       if (data) {
         // redirect to SSO identity provider page
