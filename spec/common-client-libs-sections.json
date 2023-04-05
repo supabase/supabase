@@ -300,7 +300,7 @@
         "items": [
           {
             "id": "db-modifiers-select",
-            "title": "Select the query",
+            "title": "Return data after inserting",
             "slug": "db-modifiers-select",
             "product": "database",
             "parent": "modifiers",
@@ -308,7 +308,7 @@
           },
           {
             "id": "order",
-            "title": "Order the query",
+            "title": "Order the results",
             "slug": "order",
             "product": "database",
             "parent": "modifiers",
@@ -316,7 +316,7 @@
           },
           {
             "id": "limit",
-            "title": "Limit the query",
+            "title": "Limit the number of rows returned",
             "slug": "limit",
             "product": "database",
             "parent": "modifiers",
@@ -858,7 +858,7 @@
   },
   {
     "title": "Misc",
-    "excludes": ["reference_dart_v1", "reference_dart_v0"],
+    "excludes": ["reference_dart_v1", "reference_dart_v0", "reference_python_v2", "reference_csharp_v0", "reference_swift_v1"],
     "items": [
       {
         "title": "Release Notes",
