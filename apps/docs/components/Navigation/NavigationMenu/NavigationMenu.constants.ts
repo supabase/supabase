@@ -28,6 +28,12 @@ export const REFERENCES: References = {
     versions: ['v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
+  swift: {
+    name: 'Swift',
+    library: 'supabase-swift',
+    versions: ['v1'],
+    icon: '/docs/img/libraries/swift-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -944,6 +950,13 @@ export const reference = {
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python',
         },
+        {
+          name: 'supbase-swift',
+          url: '/reference/swift/start',
+          level: 'reference_swift',
+          items: [],
+          icon: '/img/icons/menu/reference-swift',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1010,6 +1023,13 @@ export const reference_python_v2 = {
   icon: 'reference-python',
   title: 'Python',
   url: '/guides/reference/python',
+  parent: '/reference',
+}
+
+export const reference_swift_v1 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
   parent: '/reference',
 }
 
@@ -1119,6 +1139,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/c-sharp-icon.svg',
         url: '/reference/csharp/start',
+      },
+      {
+        label: 'supabase-swift',
+        versions: ['v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/swift-icon.svg',
+        url: '/reference/swift/start',
       },
     ],
   },
