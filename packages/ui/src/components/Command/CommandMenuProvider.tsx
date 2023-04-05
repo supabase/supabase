@@ -105,6 +105,7 @@ function useKeyboardEvents({
         case 'k':
         case '/':
           if (event.metaKey || event.ctrlKey) {
+            event.preventDefault()
             setIsOpen(true)
           }
           return
