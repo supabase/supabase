@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
-import { useStore } from 'hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useTheme } from 'common'
 
 export interface ViewDefinitionProps {
   name: string
@@ -14,8 +14,7 @@ const ViewDefinition = ({ name }: ViewDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
 
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
+  const { isDarkMode } = useTheme()
 
   const { project } = useProjectContext()
   const { data: definition, isLoading } = useViewDefinitionQuery({
@@ -56,7 +55,7 @@ const ViewDefinition = ({ name }: ViewDefinitionProps) => {
     <div className="flex-grow overflow-y-auto border-t border-scale-400">
       <Editor
         className="monaco-editor"
-        theme={isDarkTheme ? 'vs-dark' : 'vs'}
+        theme={isDarkMode ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         defaultValue={definition}
