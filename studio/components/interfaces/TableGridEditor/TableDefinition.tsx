@@ -33,7 +33,8 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
       connectionString: project?.connectionString,
     },
     {
-      enabled: entityType?.type === ENTITY_TYPE.VIEW,
+      enabled:
+        entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW,
     }
   )
 
@@ -50,11 +51,15 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   )
 
   const { data: definition, isLoading } =
-    entityType?.type === ENTITY_TYPE.VIEW ? viewResult : tableResult
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+      ? viewResult
+      : tableResult
 
   const prepend =
     entityType?.type === ENTITY_TYPE.VIEW
       ? `create view ${entityType.schema}.${entityType.name} as\n`
+      : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+      ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
       : ''
 
   const formattedDefinition = useMemo(
