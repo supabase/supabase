@@ -89,7 +89,7 @@ functions:
           which join you intend to use. For convenience, you can also give an
           alias for each column. For example, if we had a shop of products,
           and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          (both in the users) table
         code: |
           ```js
           let message: MessageModel = try await client.database
@@ -2311,11 +2311,10 @@ functions:
         code: |
           ```js
           try await supabase.functions.invoke(
-            functionName: "hello",
-            invokeOptions: body: FooModel(foo: "baa"))
-            { data, response in
-
-            }
+             functionName: "hello",
+             invokeOptions: .init(body: Foo(foo: "baa"))) {
+               data, response in
+             }
           ```
       - id: parsing-custom-headers
         name: Parsing custom headers.
