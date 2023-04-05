@@ -363,6 +363,18 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 })
 ```
 
+### Refreshed Tokens
+
+You will need to refresh tokens on your own, but once generated, you can pass them to Realtime.
+
+For example, if you're using the `supabase-js` `v2` client then you can pass your token like this:
+
+```js
+// Client setup
+
+supabase.realtime.setAuth('fresh-token')
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
