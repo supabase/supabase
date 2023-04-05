@@ -29,7 +29,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketHome({ users }: Props) {
-  const TITLE = 'Get your #SupaLaunchWeek Ticket'
+  const TITLE = 'Supabase LaunchWeek 7'
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
@@ -130,9 +130,8 @@ export default function TicketHome({ users }: Props) {
               )}
             </div>
             <LaunchWeekPrizeSection className="pt-10 md:pt-20" />
-
-            {users && <TicketBrickWall users={users} />}
           </SectionContainer>
+          {users && <TicketBrickWall users={users} />}
         </div>
         <CTABanner />
       </DefaultLayout>
