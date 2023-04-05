@@ -1,0 +1,108 @@
+---
+id: introduction
+title: Introduction
+hideTitle: true
+---
+
+<div className="flex items-start gap-6 not-prose" id="introduction">
+  <img src="/docs/img/icons/menu/reference-analytics.svg" className="w-8 h-8 rounded" />
+  <div className="flex flex-col gap-2">
+    <h1 className="text-3xl text-scale-1200 m-0">Self-Hosting Analytics</h1>
+  </div>
+</div>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+The Supabase Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytics events.
+
+When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
+However, it's important to note that certain [differences](#differences) may arise due to the platform's infrastructure.
+
+<Admonition type="info" label="Logflare Technical Docs">
+  All logflare technical docs are available at
+  [https://docs.logflare.app](https://docs.logflare.app)
+</Admonition>
+
+## Getting Started
+
+Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
+
+```bash
+# assuming you clone the supabase/supabase repo.
+cd docker
+docker compose -f docker-compose.yml -f docker-compose-logging.yml up
+```
+
+This would include two additional docker services to your compose stack: Logflare and Vector.
+
+<Admonition type="info" label="Self-hosting">
+  Read more about [self-hosting Logflare](https://docs.logflare.app/self-hosting) as your analytics
+  server.
+</Admonition>
+
+## Differences
+
+API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
+
+Within the self-hosted setup, all logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
+This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
+
+## BigQuery
+
+All log event data is stored in and queried from BigQuery. To use the Analytics server with Supabase you'll need a Google Cloud Platform account for access to BigQuery.
+
+Make sure to set the `GOOGLE_DATASET_ID_APPEND`, `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` environment variables.
+
+Download your Google Cloud API JWT and store it under gcloud.json in your working directory.
+
+<Admonition>
+  You must also enable billing on your Google Cloud project, as the streaming inserts feature is
+  required.
+</Admonition>
+
+## Production Recommendations
+
+To self-host in a production setting, we recommend performing the following for a better experience.
+
+### Ensure that Logflare is behind a firewall and restrict all network access to it besides safe requests.
+
+Self-hosted Logflare has UI authentication disabled and is intended for exposure to the internet. We recommend restricting access to the dashboard, accessible at the `/dashboard` path.
+If dashboard access is required for managing sources, we recommend having an authentication layer, such as a VPN.
+
+### Use a different Postgres Database to store Logflare data.
+
+Logflare requires a Postgres database to function. However, if there is an issue with you self-hosted Postgres service, you would not be able to debug it as it would also bring Logflare down together.
+
+The self-hosted example is only used as a minimal example on running the entire stack, however it is not recommended to use the same database server for both production and observability.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ### Client libraries
+
+    - [JavaScript - Pino Transport](https://github.com/Logflare/pino-logflare)
+    - [Elixir](https://github.com/Logflare/logflare_api_client)
+    - [Elixir - Logger Backend](https://github.com/Logflare/logflare_logger_backend)
+    - [Erlang](https://github.com/Logflare/logflare_erl)
+    - [Erlang - Lager Backend](https://github.com/Logflare/logflare_lager_backend)
+    - [Cloudflare Worker](https://gist.github.com/chasers/c7a220e91820a1084b27fcfdb18ad6bd)
+
+    ### Integrations
+
+    - [Fly - Logs](https://github.com/Logflare/fly-log-shipper)
+    - [Vercel Integration - Logs](https://vercel.com/integrations/logflare)
+    - [Cloudflare App - Logs](https://www.cloudflare.com/apps/logflare/install)
+
+    ### Additional links
+
+    - [Source code](https://github.com/logflare/logflare)
+    - [Analytics guides](/docs/guides/analytics) - TODO
+    - [OpenAPI docs](https://logflare.app/api/openapi)
+    - [Supabase Acquires Logflare](https://supabase.com/blog/supabase-acquires-logflare)
+    - [Logflare self-hosting docs](https://docs.logflare.app/self-hosting)
+
+  </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
