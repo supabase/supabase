@@ -26,6 +26,7 @@ function CountdownStep({ value, unit }: CountdownStepProps) {
 function CountdownBanner() {
   const { pathname } = useRouter()
   const isLaunchWeekPage = pathname === '/launch-week'
+  const isLaunchWeekSection = pathname.includes('launch-week')
 
   const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
     if (completed) {
@@ -45,7 +46,12 @@ function CountdownBanner() {
     } else {
       // Render a countdown
       return (
-        <div className="w-full flex gap-3 md:gap-6 items-center md:justify-center text-sm md:text-base">
+        <div
+          className={[
+            'w-full flex gap-3 md:gap-6 items-center md:justify-center text-sm md:text-base',
+            isLaunchWeekSection && '!justify-center',
+          ].join(' ')}
+        >
           <p>
             <span className="hidden md:inline">Supabase</span> Launch Week 7
           </p>
@@ -56,7 +62,7 @@ function CountdownBanner() {
             <CountdownStep value={seconds} unit="s" />
           </div>
           {!isLaunchWeekPage && (
-            <div>
+            <div className="hidden md:block">
               <Link href="/launch-week">
                 <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
                   Get your ticket
