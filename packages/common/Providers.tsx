@@ -37,10 +37,13 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {
     const newMode = typeof darkMode === 'boolean' ? darkMode : !isDarkMode
-
     localStorage.setItem('supabaseDarkMode', newMode.toString())
 
     const key = localStorage.getItem('supabaseDarkMode')
+    const newTheme = key === 'true' ? 'dark' : 'light'
+    const currentTheme = isDarkMode ? 'dark' : 'light'
+
+    document.body.classList.replace(currentTheme, newTheme)
     document.documentElement.className = key === 'true' ? 'dark' : ''
 
     setIsDarkMode(newMode)
