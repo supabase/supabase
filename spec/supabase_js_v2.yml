@@ -258,6 +258,18 @@ functions:
             phone: '+13334445555',
           })
           ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user
+        will need to have a Twilio linked WhatsApp account in order to use this feature.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithOtp({
+            phone: '+13334445555',
+            channel: 'whatsapp'
+          })
+          ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'

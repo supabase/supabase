@@ -297,6 +297,41 @@ The user does not have a password therefore will need to sign in via this method
 
 ## WhatsApp OTP Logins
 
+In some cases, you may wish to use WhatsApp as a delivery channel instead. Here are some examples our users have cited:
+
+- You want higher deliverability
+- You wish for a secure channel with end to end encryption
+- Your users mostly use WhatsApp as a messaging platform
+
+To make use of WhatsApp OTP, please completed the following steps:
+
+- Upgrade Twilio account to a paid account
+- Please go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up)
+- Submit a template via the [Twilio Guide For Submitting WhatsApp templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval).
+
+```js
+let { user, error } = await supabase.auth.signInWithOtp({
+  phone: '+13334445555',
+  channel: 'whatsapp',
+})
+```
+
+```js
+// After receiving a SMS with a OTP.
+const { data, error } = await supabase.auth.signInWithPassword({
+  phone: '+13334445555',
+  channel: 'whatsapp'
+  password: 'testsupabasenow',
+})
+
+```
+
+<Caution>
+
+The message template submitted to Twilio must exactly match the message you enter on the Supabase dashboard.
+
+</Caution>
+
 Pre-requisites:
 - Please go through the  Setting up a Whatsapp Verified Sender guide by Twilio
 - Please [submit WhatsApp message templates to Twilio for verification](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval)
