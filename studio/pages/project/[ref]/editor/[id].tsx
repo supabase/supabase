@@ -58,6 +58,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   const tables: PostgresTable[] = meta.tables.list()
   const views: SchemaView[] = meta.views.list()
+  const materializedViews = meta.materializedViews.list()
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
 
   const selectedTable = !isNaN(Number(id))
@@ -65,6 +66,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       tables
         // @ts-ignore
         .concat(views)
+        // @ts-ignore
+        .concat(materializedViews)
         // @ts-ignore
         .concat(foreignTables)
         .find((table) => table.id === Number(id))

@@ -1061,8 +1061,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      bg-brand-900
-      hover:bg-brand-900
+      !bg-brand-900
+      !hover:bg-brand-900
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1081,11 +1081,11 @@ export default {
         transition
         ease-in-out duration-200
       `,
-      tiny: 'h-3 w-3',
-      small: 'h-5 w-5',
-      medium: 'h-5 w-5',
-      large: 'h-6 w-6',
-      xlarge: 'h-6 w-6',
+      tiny: '!h-3 !w-3',
+      small: '!h-5 !w-5',
+      medium: '!h-5 !w-5',
+      large: '!h-6 !w-6',
+      xlarge: '!h-6 !w-6',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
