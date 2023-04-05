@@ -28,6 +28,7 @@ const Announcement = ({
   const [hidden, setHidden] = useState(true)
 
   const router = useRouter()
+  const isLaunchWeekSection = router.pathname.includes('launch-week')
 
   // override to hide announcement
   if (!show || !announcement.show) return null
@@ -54,17 +55,20 @@ const Announcement = ({
     router.push(announcement.link)
   }
 
-  if (hidden) {
+  // Always show if on LW section
+  if (!isLaunchWeekSection && hidden) {
     return null
   } else {
     return (
       <div onClick={handleLink} className={['relative w-full cursor-pointer', className].join(' ')}>
-        <div
-          className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
-          onClick={handleClose}
-        >
-          <IconX size={16} />
-        </div>
+        {!isLaunchWeekSection && (
+          <div
+            className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
+            onClick={handleClose}
+          >
+            <IconX size={16} />
+          </div>
+        )}
         {children}
       </div>
     )

@@ -1,11 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
 import Countdown from 'react-countdown'
+import _announcement from '~/data/Announcement.json'
+import { AnnouncementProps } from '../../Nav/Announcement'
+import { useRouter } from 'next/router'
 
 interface CountdownStepProps {
   value: string | number
   unit: string
 }
+
+const announcement = _announcement as AnnouncementProps
 
 function CountdownStep({ value, unit }: CountdownStepProps) {
   return (
@@ -19,7 +24,8 @@ function CountdownStep({ value, unit }: CountdownStepProps) {
 }
 
 function CountdownBanner() {
-  const LW7_DATE = '2023-04-10T07:00:00.000-04:00'
+  const { pathname } = useRouter()
+  const isLaunchWeekPage = pathname === '/launch-week'
 
   const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
     if (completed) {
@@ -49,13 +55,15 @@ function CountdownBanner() {
             <CountdownStep value={minutes} unit="m" /> :
             <CountdownStep value={seconds} unit="s" />
           </div>
-          <div>
-            <Link href="/launch-week">
-              <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-                Get your ticket
-              </a>
-            </Link>
-          </div>
+          {!isLaunchWeekPage && (
+            <div>
+              <Link href="/launch-week">
+                <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
+                  Get your ticket
+                </a>
+              </Link>
+            </div>
+          )}
         </div>
       )
     }
@@ -63,7 +71,7 @@ function CountdownBanner() {
 
   return (
     <div className="w-full h-14 p-2 bg-gradient-to-r from-[#9E44EF] to-[#DBB8BF] bg-blue-300 flex items-center justify-center text-white">
-      <Countdown date={new Date(LW7_DATE)} renderer={renderer} />
+      <Countdown date={new Date(announcement.launchDate)} renderer={renderer} />
     </div>
   )
 }
