@@ -18,12 +18,12 @@ functions:
     title: 'Initializing'
     $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
-      You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
+      You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
       The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
     examples:
-      - id: create-client
-        name: createClient()
+      - id: initialize-client
+        name: Initialize Client
         code: |
           ```js
           let client = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
@@ -137,7 +137,7 @@ functions:
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
+      This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - id: create-a-record
@@ -190,7 +190,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          let toUpdate = CountryModel(name: "Austrailia")
+          let toUpdate = CountryModel(name: "Australia")
           try await client.database
                           .from("countries")
                           .update(toUpdate)
@@ -201,7 +201,7 @@ functions:
         name: Update a record and return it
         code: |
           ```js
-          let toUpdate = CountryModel(name: "Austrailia")
+          let toUpdate = CountryModel(name: "Australia")
           try await client.database
                           .from("countries")
                           .update(toUpdate, returning: .representation)
@@ -364,7 +364,7 @@ functions:
 
       Filters can be used on `select()`, `update()`, and `delete()` queries.
 
-      If a Database function returns a table response, you can also apply filters.
+      If a database function returns a table response, you can also apply filters.
     examples:
       - id: applying-filters
         name: Applying Filters
@@ -457,7 +457,8 @@ functions:
           ```js
           try await client.database
                 .from("countries")
-                .select("""
+                .select(columns:
+                        """
                           name,
                           cities!inner (
                             name
@@ -526,7 +527,7 @@ functions:
           ```js
           try await client.database
                 .from("countries")
-                .select("name")
+                .select(columns: "name")
                 .or(filters: "id.eq.2,name.eq.Algeria")
                 .execute()
           ```
@@ -536,7 +537,7 @@ functions:
           ```js
           try await client.database
                 .from("countries")
-                .select("name")
+                .select(columns: "name")
                 .or(filters: "id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
                 .execute()
           ```
@@ -580,7 +581,7 @@ functions:
           ```js
             try await client.database
                 .from("countries")
-                .select("name")
+                .select(columns: "name")
                 .match(query: ["id" : 2, "name": "Albania"])
                 .execute()
           ```
@@ -1108,6 +1109,8 @@ functions:
 
   - id: range-lt
     title: rangeLt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is less than any element in range.
     examples:
       - id: with-select
         name: With `select()`
@@ -1120,9 +1123,48 @@ functions:
                   .rangeLt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-gt
     title: rangeGt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
+
     examples:
       - id: with-select
         name: With `select()`
@@ -1135,9 +1177,47 @@ functions:
                   .rangeGt(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-gte
     title: rangeGte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is either contained in range or greater than any element in range.
     examples:
       - id: with-select
         name: With `select()`
@@ -1150,9 +1230,48 @@ functions:
                   .rangeGte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                   .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-lte
     title: rangeLte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.
+
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
@@ -1166,9 +1285,48 @@ functions:
                 .rangeLte(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                 .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: range-adjacent
     title: rangeAdjacent()
+    description: |
+      Only relevant for range columns. Match only rows where column is mutually exclusive to range and there can be no element between the two ranges.
+
     examples:
       - id: with-select
         name: With `select()`
@@ -1181,10 +1339,45 @@ functions:
                 .rangeAdjacent(column: "during", value: "[2000-01-02 08:30, 2000-01-02 09:30]")
                 .execute()
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+
+        hideCodeBlock: true
 
   - id: overlaps
     title: overlaps()
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
+    description: |
+      Only relevant for array and range columns. Match only rows where column and value have an element in common.
+
     examples:
       - id: on-array-columns
         name: On array columns
@@ -1192,7 +1385,7 @@ functions:
           ```js
           try await client.database
                 .from("issues")
-                .select("title")
+                .select(columns: "title")
                 .overlaps(column: "tags", value: "['is:closed', 'severity:high']")
                 .execute()
           ```
@@ -1232,7 +1425,7 @@ functions:
           ```js
           try await client.database
                 .from("issues")
-                .select("title")
+                .select(columns: "title")
                 .overlaps(column: "tags", value: "['is:closed', 'severity:high']")
                 .execute()
           ```
@@ -1278,7 +1471,7 @@ functions:
     description: |
       Only relevant for text and tsvector columns. Match only rows where `column`matches the query string in `query`.
 
-      For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
+      For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
     examples:
       - id: text-search
         name: Text search
@@ -1286,7 +1479,7 @@ functions:
           ```js
           try await client.database
                 .from("quotes")
-                .select("catchphrase")
+                .select(columns: "catchphrase")
                 .textSearch(column: "catchphrase",
                             query: "'fat' & 'cat'",
                             config: "english")
@@ -1299,7 +1492,7 @@ functions:
           ```js
           try await client.database
                 .from("quotes")
-                .select("catchphrase")
+                .select(columns: "catchphrase")
                 .textSearch(column: "catchphrase",
                             query: "'fat' & 'cat'",
                             config: "english",
@@ -1313,7 +1506,7 @@ functions:
           ```js
           try await client.database
                 .from("quotes")
-                .select("catchphrase")
+                .select(columns: "catchphrase")
                 .textSearch(column: "catchphrase",
                             query: "'fat' & 'cat'",
                             config: "english",
@@ -1336,7 +1529,7 @@ functions:
           ```js
           try await client.database
                 .from("quotes")
-                .select("catchphrase")
+                .select(columns: "catchphrase")
                 .textSearch(column: "catchphrase",
                             query: "'fat' & 'cat'",
                             config: "english",
@@ -1456,7 +1649,7 @@ functions:
       Filters work on the row level—they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
-      change the format of the response (e.g., returning a CSV string).
+      change the format of the response (e.g. returning a CSV string).
 
       Modifiers must be specified after filters. Some modifiers only apply for
       queries that return rows (e.g., `select()` or `rpc()` on a function that
@@ -1465,6 +1658,8 @@ functions:
   - id: db-modifiers-select
     title: select()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    description: |
+      Perform a SELECT on the query result.
     examples:
       - id: with-upsert
         name: With `upsert()`
@@ -1504,6 +1699,8 @@ functions:
         isSpotlight: true
   - id: order
     title: order()
+    description: |
+      Order the query result by column.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
     examples:
       - id: with-select
@@ -1622,6 +1819,8 @@ functions:
 
   - id: limit
     title: limit()
+    description: |
+      Limit the query result by count.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
     examples:
       - id: with-select
@@ -1719,6 +1918,8 @@ functions:
         hideCodeBlock: true
   - id: range
     title: range()
+    description: |
+      Limit the query result by from and to inclusively.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
     examples:
       - id: with-select
@@ -1770,7 +1971,7 @@ functions:
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the supabase.auth namespace.
+      - The auth methods can be accessed via the Supabase GoTrue Auth client.
     examples:
       - id: create-auth-client
         name: Create auth client
@@ -1859,7 +2060,7 @@ functions:
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -1895,9 +2096,8 @@ functions:
         isSpotlight: true
         description: |
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
-          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs. 
-          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation). 
-
+          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
+          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
@@ -1978,6 +2178,8 @@ functions:
   - id: get-session
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
+    description: |
+      - Returns the session, refreshing it if necessary. The session returned can be null if the session is not detected which can happen in the event a user is not signed-in or has logged out.
     examples:
       - id: get-the-session-data
         name: Get the session data
@@ -1989,7 +2191,7 @@ functions:
   - id: get-user
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
-    notes: |
+    description: |
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
       - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
@@ -2006,7 +2208,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
@@ -2059,11 +2261,11 @@ functions:
       - This method will refresh the session whether the current one is expired or not.
     examples:
       - id: refresh-session-using-the-current-session
-        name: Refresh session using the current session
+        name: Refresh session using the refresh token
         isSpotlight: true
         code: |
           ```js
-          try await supabase.auth.setSessionrefreshSession(refreshToken: "refreshToken")
+          try await supabase.auth.refreshSession(refreshToken: "refreshToken")
           ```
   - id: on-auth-state-change
     title: 'onAuthStateChange()'
@@ -2246,7 +2448,8 @@ functions:
       Unsubscribes and removes Realtime channel from Realtime client.
     title: 'removeChannel()'
     notes: |
-      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
+      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: removes-a-channel
         name: Remove a channel
@@ -2497,4 +2700,3 @@ functions:
                   .from(id: "avatars")
                   .list()
           ```
-
