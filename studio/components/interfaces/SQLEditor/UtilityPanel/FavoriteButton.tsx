@@ -1,4 +1,4 @@
-import { Button, IconHeart } from '@supabase/ui'
+import { Button, IconHeart } from 'ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { contentKeys } from 'data/content/keys'
 import { Content, ContentData } from 'data/content/content-query'

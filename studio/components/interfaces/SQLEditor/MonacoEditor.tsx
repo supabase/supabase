@@ -49,7 +49,6 @@ const MonacoEditor = ({ id, isExecuting, executeQuery }: MonacoEditorProps) => {
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        // [Joshen TODO] If executing, prevent executing more
         if (isExecuting) return
 
         const selectedValue = (editorRef?.current)
