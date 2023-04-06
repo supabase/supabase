@@ -139,7 +139,7 @@ export default function LW7Releases() {
             )}
           </span>
         </div>
-        <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>
+        {shipped && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
       </div>
     )
   }
@@ -182,7 +182,11 @@ export default function LW7Releases() {
 
   const publishedSections =
     days
-      .filter((day) => Date.parse(day.publishedAt) <= Date.now())
+      .filter(
+        (day) =>
+          // Date.parse(day.publishedAt) <= Date.now()
+          true
+      )
       .map((day) => day.d.toString()) ?? []
 
   const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
@@ -215,13 +219,11 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">
-                  Supabase + FlutterFlow Hackathon
-                </span>
+                <span className="text-black dark:text-white mr-2">Supa AI Hackathon</span>
               </div>
             </div>
             <div className="flex gap-2 z-10">
-              <Link href={'/blog/who-we-hire'} target="_blank" rel="noopener">
+              <Link href={'/blog/launch-week-7-hackathon'} target="_blank" rel="noopener">
                 <a>
                   <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#34323210] to-[#FFFFFF10] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
                     Blog post
