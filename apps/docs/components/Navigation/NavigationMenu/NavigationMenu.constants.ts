@@ -28,6 +28,12 @@ export const REFERENCES: References = {
     versions: ['v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
+  swift: {
+    name: 'Swift',
+    library: 'supabase-swift',
+    versions: ['v1'],
+    icon: '/docs/img/libraries/swift-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -284,7 +290,7 @@ export const auth = {
           url: '/guides/auth/enterprise-sso',
           items: [
             {
-              name: 'SAML 2.0 (Beta)',
+              name: 'SAML 2.0',
               url: '/guides/auth/sso/auth-sso-saml',
             },
           ],
@@ -828,6 +834,13 @@ export const self_hosting = {
         { name: 'Configuration', url: '/guides/self-hosting/realtime/config' },
       ],
     },
+    {
+      name: 'Analytics Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-analytics/introduction', items: [] },
+        { name: 'Configuration', url: '/guides/self-hosting/analytics/config', items: [] },
+      ],
+    },
   ],
 }
 
@@ -937,6 +950,13 @@ export const reference = {
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python',
         },
+        {
+          name: 'supbase-swift',
+          url: '/reference/swift/start',
+          level: 'reference_swift',
+          items: [],
+          icon: '/img/icons/menu/reference-swift',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1006,6 +1026,13 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
+export const reference_swift_v1 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
@@ -1034,9 +1061,16 @@ export const reference_self_hosting_storage = {
 }
 
 export const reference_self_hosting_realtime = {
-  icon: 'reference-auth',
+  icon: 'reference-realtime',
   title: 'Self-Hosting Realtime',
   url: '/guides/reference/self-hosting/realtime',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_analytics = {
+  icon: 'reference-analytics',
+  title: 'Self-Hosting Analytics',
+  url: '/guides/reference/self-hosting/analytics',
   parent: '/reference',
 }
 
@@ -1105,6 +1139,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/c-sharp-icon.svg',
         url: '/reference/csharp/start',
+      },
+      {
+        label: 'supabase-swift',
+        versions: ['v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/swift-icon.svg',
+        url: '/reference/swift/start',
       },
     ],
   },

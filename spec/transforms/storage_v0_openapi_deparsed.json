@@ -58,6 +58,22 @@
                   "public": {
                     "type": "boolean",
                     "example": false
+                  },
+                  "file_size_limit": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "allowed_mime_types": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": ["name"]
@@ -158,6 +174,15 @@
                       },
                       "public": {
                         "type": "boolean"
+                      },
+                      "file_size_limit": {
+                        "type": "integer"
+                      },
+                      "allowed_mime_types": {
+                        "type": ["null", "array"],
+                        "items": {
+                          "type": "string"
+                        }
                       },
                       "created_at": {
                         "type": "string"
@@ -342,6 +367,15 @@
                     "public": {
                       "type": "boolean"
                     },
+                    "file_size_limit": {
+                      "type": "integer"
+                    },
+                    "allowed_mime_types": {
+                      "type": ["null", "array"],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "created_at": {
                       "type": "string"
                     },
@@ -407,6 +441,22 @@
                   "public": {
                     "type": "boolean",
                     "example": false
+                  },
+                  "file_size_limit": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "allowed_mime_types": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -923,6 +973,9 @@
                           }
                         ]
                       },
+                      "version": {
+                        "type": "string"
+                      },
                       "created_at": {
                         "anyOf": [
                           {
@@ -968,6 +1021,15 @@
                           },
                           "public": {
                             "type": "boolean"
+                          },
+                          "file_size_limit": {
+                            "type": "integer"
+                          },
+                          "allowed_mime_types": {
+                            "type": ["null", "array"],
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "created_at": {
                             "type": "string"
@@ -1070,6 +1132,167 @@
           }
         ],
         "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/upload/sign/{bucketName}/{wildcard}": {
+      "post": {
+        "summary": "Generate a presigned url to upload an object",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "example": "/object/sign/upload/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+                    }
+                  },
+                  "required": ["url"]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["statusCode", "error", "message"],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Uploads an object via a presigned URL",
+        "tags": ["object"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk"
+            },
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk",
+            "in": "query",
+            "name": "token",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": {
+                      "type": "string",
+                      "example": "projectref/avatars/folder/cat.png"
+                    }
+                  },
+                  "required": ["Key"]
+                }
+              }
+            }
+          },
           "4XX": {
             "description": "Error response",
             "content": {
@@ -1603,6 +1826,9 @@
                           }
                         ]
                       },
+                      "version": {
+                        "type": "string"
+                      },
                       "created_at": {
                         "anyOf": [
                           {
@@ -1648,6 +1874,15 @@
                           },
                           "public": {
                             "type": "boolean"
+                          },
+                          "file_size_limit": {
+                            "type": "integer"
+                          },
+                          "allowed_mime_types": {
+                            "type": ["null", "array"],
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "created_at": {
                             "type": "string"
