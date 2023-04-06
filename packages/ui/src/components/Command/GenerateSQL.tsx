@@ -3,7 +3,6 @@ import type { CreateCompletionResponse } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   Button,
-  CodeBlock,
   IconAlertCircle,
   IconAlertTriangle,
   IconCheck,
@@ -16,10 +15,9 @@ import {
 
 import { cn } from './../../utils/cn'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem } from './Command.utils'
+import { CommandItem } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import { noop } from 'lodash'
 import { SAMPLE_QUERIES } from './Command.constants'
 
 function getEdgeFunctionUrl() {
@@ -80,16 +78,12 @@ function promptDataReducer(
   return [...current]
 }
 
-const SQLOutputActions = ({
-  answer,
-  onSaveGeneratedSQL,
-}: {
-  answer: string
-  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
-}) => {
+const SQLOutputActions = ({ answer }: { answer: string }) => {
   const [showCopied, setShowCopied] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+
+  const { project, onSaveGeneratedSQL } = useCommandMenu()
 
   const applyCallback = () =>
     onSaveGeneratedSQL !== undefined
@@ -132,7 +126,7 @@ const SQLOutputActions = ({
           {showCopied ? 'Copied' : 'Copy SQL'}
         </Button>
       </CopyToClipboard>
-      {onSaveGeneratedSQL !== undefined && (
+      {project?.ref !== undefined && onSaveGeneratedSQL !== undefined && (
         <Button
           type="default"
           loading={isSaving}
@@ -299,16 +293,10 @@ Postgres SQL query:
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
                         <div className="space-y-2 flex-grow">
-                          {/* @ts-expect-error */}
                           <MarkdownHandler className="prose dark:prose-dark bg-scale-300 px-4 py-4 rounded-md w-full">
                             {prompt.answer}
                           </MarkdownHandler>
-                          {!isResponding && (
-                            <SQLOutputActions
-                              answer={prompt.answer}
-                              onSaveGeneratedSQL={onSaveGeneratedSQL}
-                            />
-                          )}
+                          {!isResponding && <SQLOutputActions answer={prompt.answer} />}
                         </div>
                       )}
                     </>

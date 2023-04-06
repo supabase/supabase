@@ -2,6 +2,7 @@ import { useTheme, UseThemeProps } from 'common'
 import * as React from 'react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import CommandMenu from './CommandMenu'
+import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
 
 export interface CommandMenuContextValue {
   isOpen: boolean
@@ -16,9 +17,12 @@ export interface CommandMenuContextValue {
   currentPage?: string
   site: 'studio' | 'docs'
 
+  // Project metadata for easy retrieval
+  project?: { ref?: string; apiKeys?: { anon?: string; service?: string } }
+
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element // to do: remove this. although it breaks our jest tests
 
   // Optional callback to save a generated SQL output
   onSaveGeneratedSQL?: (answer: string, resolve: any) => void
@@ -41,9 +45,10 @@ export interface CommandMenuActions {
 export interface CommandMenuProviderProps {
   site: 'studio' | 'docs'
   projectRef?: string
+  apiKeys?: { anon?: string; service?: string }
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
   onSaveGeneratedSQL?: (answer: string, resolve: any) => void
 }
 
@@ -51,6 +56,7 @@ const CommandMenuProvider = ({
   children,
   site,
   projectRef,
+  apiKeys,
   MarkdownHandler,
   onSaveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
@@ -61,9 +67,8 @@ const CommandMenuProvider = ({
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
-  const actions: CommandMenuActions = {
-    toggleTheme,
-  }
+  const actions: CommandMenuActions = { toggleTheme }
+  const project = projectRef !== undefined ? { ref: projectRef, apiKeys } : undefined
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
 
@@ -81,6 +86,7 @@ const CommandMenuProvider = ({
         setPages,
         currentPage,
         site,
+        project,
         MarkdownHandler,
         onSaveGeneratedSQL,
       }}
