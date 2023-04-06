@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'common'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useStore } from 'hooks'
@@ -9,26 +8,38 @@ import { IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { Dropdown, IconEdit2, IconTrash, Button, IconChevronDown, Modal } from 'ui'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import clsx from 'clsx'
+import Link from 'next/link'
 
 export interface QueryItemProps {
   tabInfo: QueryTab
-  canCreateSQLSnippet: boolean
 }
 
-const QueryItem = ({ tabInfo, canCreateSQLSnippet }: QueryItemProps) => {
+const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
   const { id, name } = tabInfo || {}
-  const active = id === activeId
+  const isActive = id === activeId
 
   return (
-    <ProductMenuItem
+    <div
       key={id}
-      isActive={active}
-      name={name}
-      action={active && canCreateSQLSnippet && <QueryItemActions tabInfo={tabInfo} />}
-      textClassName="w-44"
-      url={`/project/${ref}/sql/${id}`}
-    />
+      className={clsx(
+        'flex items-center justify-between rounded-md group',
+        isActive && 'text-scale-1200 bg-scale-300'
+      )}
+    >
+      <Link href={`/project/${ref}/sql/${id}`}>
+        <a className="py-1 px-3 w-full">
+          <p
+            title={name}
+            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
+          >
+            {name}
+          </p>
+        </a>
+      </Link>
+      <div className="pr-3">{isActive && <QueryItemActions tabInfo={tabInfo} />}</div>
+    </div>
   )
 }
 
@@ -92,7 +103,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
           <Button
             as="span"
             type="text"
-            icon={<IconChevronDown size={12} />}
+            icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
             style={{ padding: '3px' }}
           />
         </Dropdown>

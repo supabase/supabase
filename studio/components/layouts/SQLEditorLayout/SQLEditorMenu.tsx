@@ -137,13 +137,7 @@ const SideBarContent = observer(() => {
                   <div className="space-y-1">
                     {favouriteTabs.map((tabInfo: any) => {
                       const { id } = tabInfo || {}
-                      return (
-                        <QueryItem
-                          key={id}
-                          tabInfo={tabInfo}
-                          canCreateSQLSnippet={canCreateSQLSnippet}
-                        />
-                      )
+                      return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
                   </div>
                 </div>
@@ -154,13 +148,7 @@ const SideBarContent = observer(() => {
                   <div className="space-y-1">
                     {queryTabs.map((tabInfo: any) => {
                       const { id } = tabInfo || {}
-                      return (
-                        <QueryItem
-                          key={id}
-                          tabInfo={tabInfo}
-                          canCreateSQLSnippet={canCreateSQLSnippet}
-                        />
-                      )
+                      return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
                   </div>
                 </div>
