@@ -6,11 +6,11 @@ const BlogLinks = () => {
   const SectionButtons = ({
     blog,
     docs,
-    video,
+    youtube_id,
   }: {
     blog: string
     docs?: string
-    video?: string
+    youtube_id?: string
   }) => {
     return (
       <div className="flex gap-2 z-10">
@@ -22,7 +22,7 @@ const BlogLinks = () => {
             </div>
           </div>
         </a>
-        {docs && (
+        {!!docs?.length && (
           <a href={docs} target="_blank" rel="noopener">
             <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
               Docs
@@ -32,8 +32,12 @@ const BlogLinks = () => {
             </div>
           </a>
         )}
-        {video && (
-          <a href={video} target="_blank" rel="noopener">
+        {!!youtube_id?.length && (
+          <a
+            href={`https://www.youtube.com/watch?v=${youtube_id}&ab_channel=Supabase`}
+            target="_blank"
+            rel="noopener"
+          >
             <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
               Video
               <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
@@ -51,44 +55,45 @@ const BlogLinks = () => {
   if (!activeDays.length) return null
 
   return (
-    <div className="flex flex-col items-center gap-4 lg:gap-6">
-      <h3 className="text-white text-xl">More Launch Week 7</h3>
+    <div className="flex flex-col gap-3 lg:gap-4 border-t border-scale-400 py-4 lg:py-8 mt-4 lg:mt-8">
+      <h3 className="text-white text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) => (
         <div
-          className={`h-[150px] w-full flex flex-col lg:flex-row group/day${day.d} relative overflow-hidden`}
+          className={`min-h-[150px] w-full flex flex-col lg:flex-row group/day${day.d} relative overflow-hidden`}
         >
           <div
             className={`
                 flex flex-col flex-1 gap-3 items-start justify-center border rounded-xl h-full relative overflow-hidden
-                px-6 lg:px-10 py-4 text-2xl
+                p-6 lg:p-10 text-2xl
                 before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0
                 before:border-[#1f3536] before:-z-10
               `}
           >
             <div className="flex items-center lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-              <div>{day.title}</div>
+              <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9]">
+                {day.title}
+              </div>
             </div>
             <SectionButtons
               docs={day.steps[0].docs}
               blog={day.steps[0].blog}
-              video={'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=Supabase'}
+              youtube_id={day.steps[0].youtube_id}
             />
           </div>
           {day.steps[0].thumb && (
             <Image
               src={day.steps[0].thumb}
               className={`
-                  absolute group-hover/day${day.d}:scale-105 opacity-90
-                  group-hover/day${day.d}:opacity-100
+                  absolute opacity-90
                   w-full h-full -z-10 transition-all duration-300
                 `}
               layout="fill"
               objectPosition="100% 50%"
-              objectFit="contain"
+              objectFit="cover"
             />
           )}
           <div
-            className={`absolute group-hover/day${day.d}:scale-105 opacity-10 group-hover/day${day.d}:opacity-100 w-full h-full -z-10 transition-all duration-300`}
+            className={`absolute opacity-10 w-full h-full -z-10 transition-all duration-300`}
             style={{
               background: `radial-gradient(650px 150px at 50% 100%, #4635A730, transparent)`,
             }}

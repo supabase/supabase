@@ -16,6 +16,7 @@ export interface WeekDayProps {
     isNew: boolean
     description: string
     thumb?: string
+    youtube_id?: string
   }[]
 }
 
@@ -35,7 +36,7 @@ const days: WeekDayProps[] = [
       {
         title: 'AI generated OG images',
         blog: '/blog/',
-        docs: '/docs',
+        docs: '',
         isNew: false,
         description: '',
         thumb: '/images/launchweek/seven/day0/ai-images-thumb.png',

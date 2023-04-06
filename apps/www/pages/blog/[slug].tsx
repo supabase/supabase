@@ -6,6 +6,7 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useInView } from 'react-intersection-observer'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -14,7 +15,8 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import BlogLinks from '~/components/LaunchWeek/BlogLinks'
-import HackernewsShare from '~/components/LaunchWeek/HackernewsShare'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -64,9 +66,11 @@ export async function getStaticProps({ params }: any) {
 }
 
 function BlogPostPage(props: any) {
+  const articleRef = useRef(null)
+  const [showStickyShare, setShowStickyShare] = useState(false)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const isLaunchWeek7 = props.blog.launchWeek7
+  const isLaunchWeek7 = props.blog.launchweek === 7
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
@@ -106,7 +110,7 @@ function BlogPostPage(props: any) {
   const toc = props.blog.toc && (
     <div className="space-y-8 py-8 lg:py-0">
       <div>
-        <div className="space-x-2">
+        <div className="flex flex-wrap gap-2">
           {props.blog.tags.map((tag: string) => {
             return (
               <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
@@ -188,6 +192,21 @@ function BlogPostPage(props: any) {
     </div>
   )
 
+  const handleScroll = () => {
+    const article = articleRef?.current
+    if (!article || typeof window === 'undefined') return null
+    const articleContainer = (article as any)?.getBoundingClientRect()
+    setShowStickyShare(articleContainer.top <= 65 && articleContainer.bottom >= 100)
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <>
       <NextSeo
@@ -249,6 +268,18 @@ function BlogPostPage(props: any) {
                   Back
                 </a>
               </p>
+              <motion.div
+                className="hidden lg:block lg:sticky lg:top-16"
+                animate={{ opacity: showStickyShare ? 1 : 0 }}
+                transition={{ duration: 0.2, ease: [0.6, 0, 0.2, 1] }}
+              >
+                <div className="py-4 lg:py-8">
+                  <div className="text-scale-900 dark:text-scale-1000 text-sm">
+                    Share this article
+                  </div>
+                  <ShareArticleActions />
+                </div>
+              </motion.div>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
@@ -296,14 +327,14 @@ function BlogPostPage(props: any) {
                         )
                       })}
                     </div>
-                    <ShareArticleActions />
+                    {/* <ShareArticleActions /> */}
                   </div>
                 </div>
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
-                  <article>
+                  <article ref={articleRef}>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
                         <iframe
@@ -331,13 +362,13 @@ function BlogPostPage(props: any) {
                       <MDXRemote {...content} components={mdxComponents()} />
                     </div>
                   </article>
-                  <div className="py-16">
+                  {isLaunchWeek7 && <BlogLinks />}
+                  <div className="py-4 lg:py-8">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
                     </div>
                     <ShareArticleActions />
                   </div>
-                  {isLaunchWeek7 && <BlogLinks />}
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
                     <div>
                       {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
@@ -351,7 +382,8 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
+                  {/* <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24"> */}
+                  <div className="space-y-8 lg:mb-24">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
