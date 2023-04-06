@@ -1,5 +1,4 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-import {Accordion} from 'ui'
 export const meta = {
   id: 'auth-twilio',
   title: 'Phone Auth with Twilio',
@@ -312,27 +311,15 @@ To make use of WhatsApp OTP, please complete the following steps:
 The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase dashboard.
 </Admonition>
 
-The sign up and sign in process with WhatsApp is similar to the process for SMS. The key difference
-is that there is a `whatsapp` channel parameter under `options`:
+The sign in process with WhatsApp is similar to the process for SMS. Do note the additional `whatsapp` parameter added:
 
 ```js
-const {data, error }= await supabase.auth.signInWithOtp({
+const {data, error } = await supabase.auth.signInWithOtp({
     phone: '+57336567365',
     options: {
       channel:'whatsapp'
     }
  })
-```
-
-```js
-const {data, error }= await supabase.auth.signUp({
-   phone: '+57336567365',
-   password: 'testsupabasenow',
-   options: {
-     channel:'whatsapp',
-   }
-})
-
 ```
 
 There is no change in the verification process - do continue the `sms` type for verification
