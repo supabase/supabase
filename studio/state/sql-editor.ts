@@ -10,7 +10,6 @@ export const sqlEditorState = proxy({
     [key: string]: {
       snippet: SqlSnippet
       splitSizes: number[]
-      utilityPanelCollapsed: boolean
       projectRef: string
     }
   },
@@ -38,7 +37,6 @@ export const sqlEditorState = proxy({
       sqlEditorState.snippets[snippet.id] = {
         snippet,
         splitSizes: [50, 50],
-        utilityPanelCollapsed: false,
         projectRef,
       }
       sqlEditorState.results[snippet.id] = []
@@ -56,20 +54,16 @@ export const sqlEditorState = proxy({
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = splitSizes
-
-      if (sqlEditorState.snippets[id].utilityPanelCollapsed) {
-        sqlEditorState.snippets[id].utilityPanelCollapsed = false
-      }
     }
   },
   collapseUtilityPanel: (id: string) => {
     if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].utilityPanelCollapsed = true
+      sqlEditorState.snippets[id].splitSizes = [100, 0]
     }
   },
   restoreUtilityPanel: (id: string) => {
     if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].utilityPanelCollapsed = false
+      sqlEditorState.snippets[id].splitSizes = [50, 50]
     }
   },
   setSql: (id: string, sql: string) => {
@@ -112,6 +106,7 @@ export const useSqlEditorStateSnapshot = (options?: Parameters<typeof useSnapsho
 
 async function update(id: string, projectRef: string, content: Partial<Content>) {
   try {
+    sqlEditorState.savingStates[id] = 'UPDATING'
     await updateContent({ projectRef, id, content })
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
@@ -119,7 +114,7 @@ async function update(id: string, projectRef: string, content: Partial<Content>)
   }
 }
 
-const memoizedUpdate = memoize((_id: string) => debounce(update, 1500))
+const memoizedUpdate = memoize((_id: string) => debounce(update, 1000))
 const debouncedUpdate = (id: string, projectRef: string, content: Partial<Content>) =>
   memoizedUpdate(id)(id, projectRef, content)
 
@@ -140,7 +135,6 @@ if (typeof window !== 'undefined') {
         })
 
         sqlEditorState.needsSaving.delete(id)
-        sqlEditorState.savingStates[id] = 'UPDATING'
       }
     })
   })

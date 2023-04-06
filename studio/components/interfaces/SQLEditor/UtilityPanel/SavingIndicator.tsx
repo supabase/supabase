@@ -45,28 +45,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           Retry
         </Button>
       )}
-      {savingState === 'UPDATING' && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Saving changes...</span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      )}
-      {savingState === 'UPDATING_FAILED' && (
-        <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
-      )}
-      {showSavedText && (
+      {showSavedText ? (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <IconCheck className="text-brand-800" size={14} strokeWidth={3} />
@@ -83,7 +62,41 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
-      )}
+      ) : savingState === 'UPDATING' ? (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">Saving changes...</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      ) : savingState === 'UPDATING_FAILED' ? (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border ',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">Failed to save changes</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      ) : null}
       <span className="text-scale-1000 text-sm">
         {savingState === 'UPDATING_FAILED' && 'Failed to save'}
       </span>

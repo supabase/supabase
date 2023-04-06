@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-// import { useWindowDimensions } from 'hooks'
 import { useCallback, useRef } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -30,10 +29,9 @@ const SQLEditor = () => {
   const minSize = 44
   const snippet = id ? snap.snippets[id] : null
   const snapOffset = 50
-  // const tabMenuHeight = 44
-  // const offset = 3
 
   const isLoading = !(id && ref && snap.loaded[ref])
+  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
 
   const onDragEnd = useCallback((sizes: number[]) => {
     const id = idRef.current
@@ -67,7 +65,7 @@ const SQLEditor = () => {
         minSize={minSize}
         snapOffset={snapOffset}
         expandToMin={true}
-        collapsed={snippet?.utilityPanelCollapsed ? 1 : undefined}
+        collapsed={isUtilityPanelCollapsed ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
         <div className="dark:border-dark flex-grow overflow-y-auto border-b">
