@@ -13,10 +13,11 @@ export interface WeekDayProps {
     title: string
     blog?: string
     docs?: string
-    isNew?: boolean
     description?: string
-    thumb?: string
     github?: string
+    hackernews?: string
+    isNew?: boolean
+    thumb?: string
     url?: string
     youtube_id?: string
   }[]
@@ -29,7 +30,7 @@ const days: WeekDayProps[] = [
     title: 'AI generated OG images',
     shipped: true,
     date: '',
-    publishedAt: '2023-04-07T07:00:00.000-07:00',
+    publishedAt: '2023-04-05T07:00:00.000-07:00',
     description: 'AI generated OG images',
     d: 0,
     dd: 'Pre-release',
@@ -47,7 +48,8 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Supavisor',
-        github: '/blog/',
+        github: 'github_link',
+        hackernews: 'hackernews_link',
       },
     ],
   },
