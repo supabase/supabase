@@ -10,11 +10,15 @@ export const meta = {
 
 Supabase auto-generates three types of API directly from your database schema.
 
-- REST - interact with your database through a restful interface.
+- REST - connect to your database through a restful interface, directly from the browser.
 - GraphQL - manipulate your database using a graph-like query language.
 - Realtime - listen to database changes.
 
-The APIs are:
+All the APIs are auto-generated from your database and are designed to get you building as fast as possible, without writing a single line of code.
+
+You can use them directly from the browser (two-tier architecture), or as a complement to your own API server (three-tier architecture).
+
+## Features
 
 - **Instant and auto-generated.** <br />As you update your database the changes are immediately accessible through your API.
 - **Self documenting.** <br />Supabase generates documentation in the Dashboard which updates as you make database changes.
@@ -36,15 +40,6 @@ The REST interface is automatically reflected from your database's schema and su
 - Works with the Postgres security model - including Row Level Security, Roles, and Grants.
 
 The REST API resolves all requests to a single SQL statement leading to fast response times and high throughput.
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/rPAJJFdtPw0"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
 
 Reference:
 - [Docs](https://postgrest.org/)
