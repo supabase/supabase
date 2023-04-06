@@ -5,6 +5,7 @@ export const COMMAND_ROUTES = {
   THEME: 'Theme',
   AI_ASK_ANYTHING: 'Ask anything',
   AI_RLS_POLICY: 'Help me create a RLS policy',
+  API_KEYS: 'Project API keys',
 }
 
 type QueryCategory = {

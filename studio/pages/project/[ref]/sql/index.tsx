@@ -9,32 +9,33 @@ import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/Pg
 import { useStore } from 'hooks'
 import { SQLEditorLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
+import { useTheme } from 'common'
 
 const SqlEditor: NextPageWithLayout = () => {
-  const { meta, ui } = useStore()
-  const { isDarkTheme } = ui
+  const { meta } = useStore()
+  const { isDarkMode } = useTheme()
   const sqlEditorStore: any = useSqlStore()
   const monaco = useMonaco()
 
   useEffect(() => {
     if (monaco) {
       monaco.editor.defineTheme('supabase', {
-        base: isDarkTheme ? 'vs-dark' : 'vs', // can also be hc-black
+        base: isDarkMode ? 'vs-dark' : 'vs', // can also be hc-black
         inherit: true, // can also be false to completely replace the builtin rules
         rules: [
-          { token: '', background: isDarkTheme ? '1f1f1f' : 'f0f0f0' },
+          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
           { token: 'string.sql', foreground: '24b47e' },
           { token: 'comment', foreground: '666666' },
           // { token: 'predefined.sql', foreground: 'D4D4D4' },
         ],
         colors: {
-          'editor.background': isDarkTheme ? '#1f1f1f' : '#f0f0f0',
+          'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0',
           // 'editorGutter.background': '#30313f',
           // 'editorLineNumber.foreground': '#555671',
         },
       })
     }
-  }, [monaco, isDarkTheme])
+  }, [monaco, isDarkMode])
 
   useEffect(() => {
     if (monaco) {

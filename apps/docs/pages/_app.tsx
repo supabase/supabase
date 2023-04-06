@@ -78,7 +78,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <ThemeProvider>
           <CommandMenuProvider
             site="docs"
-            MarkdownHandler={({ ...props }) => (
+            MarkdownHandler={(props) => (
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
             )}
           >
