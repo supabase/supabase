@@ -17,6 +17,7 @@ import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import CountdownBanner from '../LaunchWeek/Banners/CountdownBanner'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -194,7 +195,9 @@ const Nav = () => {
 
   return (
     <>
-      {/* <Announcement /> */}
+      <Announcement>
+        <CountdownBanner />
+      </Announcement>
       <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -206,7 +209,7 @@ const Nav = () => {
         <nav
           className={[
             `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 border-[#e0d2f430]',
+            showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
           ].join(' ')}
         >
           {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}
@@ -331,7 +334,6 @@ const Nav = () => {
                 )}
               </div>
             </div>
-            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
           </div>
           {/* </div> */}
           {/* Mobile Nav Menu */}

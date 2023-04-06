@@ -44,6 +44,7 @@ import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
 import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import ViewStore, { IViewStore } from './ViewStore'
+import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 
 const BATCH_SIZE = 1000
@@ -57,6 +58,7 @@ export interface IMetaStore {
   columns: IPostgresMetaInterface<PostgresColumn>
   schemas: IPostgresMetaInterface<PostgresSchema>
   views: IViewStore
+  materializedViews: IMaterializedViewStore
   foreignTables: IForeignTableStore
 
   hooks: IPostgresMetaInterface<any>
@@ -129,7 +131,12 @@ export interface IMetaStore {
     columns: ColumnField[],
     isRealtimeEnabled: boolean
   ) => any
-
+  insertRowsViaSpreadsheet: (
+    file: any,
+    table: PostgresTable,
+    selectedHeaders: string[],
+    onProgressUpdate: (progress: number) => void
+  ) => void
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
@@ -139,6 +146,7 @@ export default class MetaStore implements IMetaStore {
   columns: ColumnStore
   schemas: SchemaStore
   views: ViewStore
+  materializedViews: MaterializedViewStore
   foreignTables: ForeignTableStore
 
   hooks: HooksStore
@@ -192,6 +200,11 @@ export default class MetaStore implements IMetaStore {
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
+    this.materializedViews = new MaterializedViewStore(
+      this.rootStore,
+      `${this.baseUrl}/materialized-views`,
+      this.headers
+    )
     this.foreignTables = new ForeignTableStore(
       this.rootStore,
       `${this.baseUrl}/foreign-tables`,
@@ -652,6 +665,7 @@ export default class MetaStore implements IMetaStore {
           const { error }: any = await this.insertRowsViaSpreadsheet(
             importContent.file,
             table,
+            importContent.selectedHeaders,
             (progress: number) => {
               this.rootStore.ui.setNotification({
                 id: toastId,
@@ -834,6 +848,7 @@ export default class MetaStore implements IMetaStore {
   async insertRowsViaSpreadsheet(
     file: any,
     table: PostgresTable,
+    selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) {
     let chunkNumber = 0
@@ -849,9 +864,15 @@ export default class MetaStore implements IMetaStore {
         chunk: async (results: any, parser: any) => {
           parser.pause()
 
+          const formattedData = results.data.map((row: any) => {
+            const formattedRow: any = {}
+            selectedHeaders.forEach((header) => (formattedRow[header] = row[header]))
+            return formattedRow
+          })
+
           const insertQuery = new Query()
             .from(table.name, table.schema)
-            .insert(results.data)
+            .insert(formattedData)
             .toSql()
           const res = await this.query(insertQuery)
 
@@ -936,6 +957,9 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
+
+    this.materializedViews.setUrl(`${this.baseUrl}/materialized-views`)
+    this.materializedViews.setHeaders(this.headers)
 
     this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
     this.foreignTables.setHeaders(this.headers)

@@ -9,7 +9,7 @@ import { useStore, useUrlState } from 'hooks'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { RowEditor, ColumnEditor, TableEditor } from '.'
+import { RowEditor, ColumnEditor, TableEditor, SpreadsheetImport } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import {
   ColumnField,
@@ -38,7 +38,7 @@ export interface SidePanelEditorProps {
     row: any
     column: any
   }
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   isDuplicating?: boolean
   closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
@@ -74,9 +74,14 @@ const SidePanelEditor = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
+  const enumArrayColumns = (selectedTable?.columns ?? [])
+    .filter((column) => {
+      return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+    })
+    .map((column) => column.name)
 
   const { project } = useProjectContext()
-  const { mutateAsync: createTableRow } = useTableRowCreateMutation()
+  const { mutateAsync: createTableRows } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
     async onMutate({ projectRef, table, configuration, payload }) {
       closePanel()
@@ -146,16 +151,9 @@ const SidePanelEditor = ({
     }
 
     let saveRowError = false
-    // @ts-ignore
-    const enumArrayColumns = selectedTable.columns
-      .filter((column) => {
-        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-      })
-      .map((column) => column.name)
-
     if (isNewRecord) {
       try {
-        const result = await createTableRow({
+        const result = await createTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
@@ -277,6 +275,13 @@ const SidePanelEditor = ({
         meta.tables.loadById(selectedTable!.id),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
@@ -402,7 +407,20 @@ const SidePanelEditor = ({
             message: `Table ${table.name} has been updated, but there were some errors`,
           })
         } else {
-          await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+          queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+          await Promise.all([
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+            ),
+            queryClient.invalidateQueries(
+              sqlKeys.query(project?.ref, [
+                'table-definition',
+                selectedTable!.schema,
+                selectedTable!.name,
+              ])
+            ),
+            queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          ])
 
           ui.setNotification({
             id: toastId,
@@ -411,8 +429,6 @@ const SidePanelEditor = ({
           })
         }
       }
-
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
     } catch (error: any) {
       saveTableError = true
       ui.setNotification({ id: toastId, category: 'error', message: error.message })
@@ -424,6 +440,54 @@ const SidePanelEditor = ({
     }
 
     resolve()
+  }
+
+  const onImportData = async (importContent: ImportContent) => {
+    if (!project || selectedTable === undefined) {
+      return console.error('no project or table selected')
+    }
+
+    const { file, rowCount, selectedHeaders, resolve } = importContent
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+    })
+    const { error }: any = await meta.insertRowsViaSpreadsheet(
+      file,
+      selectedTable,
+      selectedHeaders,
+      (progress: number) => {
+        ui.setNotification({
+          id: toastId,
+          progress,
+          category: 'loading',
+          message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+        })
+      }
+    )
+
+    if (error) {
+      ui.setNotification({
+        error,
+        id: toastId,
+        category: 'error',
+        message: `Failed to import data: ${error.message}`,
+      })
+      resolve()
+    } else {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+      ])
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
+      })
+      resolve()
+      closePanel()
+    }
   }
 
   const onClosePanel = () => {
@@ -480,6 +544,13 @@ const SidePanelEditor = ({
         foreignKey={selectedForeignKeyToEdit?.foreignKey}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
+      />
+      <SpreadsheetImport
+        visible={sidePanelKey === 'csv-import'}
+        selectedTable={selectedTableToEdit}
+        saveContent={onImportData}
+        closePanel={onClosePanel}
+        updateEditorDirty={setIsEdited}
       />
       <ConfirmationModal
         visible={isClosingPanel}

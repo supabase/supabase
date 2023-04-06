@@ -91,7 +91,7 @@ const Column: FC<Props> = ({
           />
         </div>
       </div>
-      <div className="w-[5%]  pl-0.5">
+      <div className="w-[5%] mr-2.5">
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <Button
@@ -156,7 +156,7 @@ const Column: FC<Props> = ({
         </div>
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
-        <div className="w-[90%]">
+        <div className="w-[95%]">
           <InputWithSuggestions
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
