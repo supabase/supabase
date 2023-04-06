@@ -294,8 +294,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
-        theme={isDarkMode ? 'dark' : 'light'}
         onImportData={onImportData}
+        theme={isDarkMode ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger
