@@ -7,7 +7,7 @@ import { useParams } from 'common/hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { uuidv4 } from 'lib/helpers'
-import { createSqlSnippetSkeleton } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
+import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
