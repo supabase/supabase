@@ -71,7 +71,7 @@ export default function Ticket({
           />
           {username && (
             <div className="w-full">
-              <TicketCopy username={username} />
+              <TicketCopy username={username} isGolden={golden} />
             </div>
           )}
         </div>

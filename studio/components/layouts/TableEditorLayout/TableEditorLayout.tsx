@@ -74,6 +74,8 @@ const TableEditorLayout = ({
       if (entity?.type) {
         switch (entity.type) {
           case ENTITY_TYPE.MATERIALIZED_VIEW:
+            return meta.materializedViews.loadById(entity.id)
+
           case ENTITY_TYPE.VIEW:
             return meta.views.loadById(entity.id)
 

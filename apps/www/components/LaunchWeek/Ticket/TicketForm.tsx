@@ -48,7 +48,9 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             .select('*')
             .eq('username', username)
             .single()
-          setUserData(data)
+          if (data) {
+            setUserData(data)
+          }
           setFormState('default')
 
           // Prefetch GitHub avatar
@@ -66,7 +68,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           setPageState('ticket')
 
           // Listen to realtime changes
-          if (!realtimeChannel && !data.golden) {
+          if (!realtimeChannel && !data?.golden) {
             const channel = supabase
               .channel('changes')
               .on(

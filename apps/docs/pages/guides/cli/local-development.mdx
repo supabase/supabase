@@ -407,12 +407,43 @@ If your project uses Edge Functions, you can deploy these using [`functions depl
 supabase functions deploy <function_name>
 ```
 
+### Enabling Local Logging
+
+Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
+
+<Admonition type="note">
+The Google Cloud project must have billing enabled.
+</Admonition>
+
+Requirements:
+
+1. Google Cloud project number (must be paid)
+2. Google Cloud project ID
+3. Google Cloud JWT, obtained through [Google Cloud IAM dashboard](https://console.cloud.google.com/iam-admin/iam)
+
+Once you have these 3 items, follow these steps:
+
+1. Update your project's `config.toml` and fill in the following:
+
+```
+[analytics]
+enabled = true
+gcp_project_number = "123456"
+gcp_project_id = "my-project-id"
+gcp_jwt_path = "supabase/gcloud.json"
+```
+
+2. Place your JWT file at the corresponding path and ensure that it is correctly named.
+
+3. Start your local stack using `supabase start`
+
+This will switch the logging drivers and will direct logs to the Analytics server. You will be able to view and query your logs via the Studio Logs Explorer and Logs UI.
+
 ## Limitations and considerations
 
 The local development environment is not as feature-complete as the Supabase Platform. We're working towards parity between the hosted platform and the local environment. Here are some of the differences:
 
 - The Functions interface is coming soon.
-- Logs are not supported through the interface, but you can access them through the Docker containers.
 - You cannot update your project settings in the Dashboard. This must be done using the CLI.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
