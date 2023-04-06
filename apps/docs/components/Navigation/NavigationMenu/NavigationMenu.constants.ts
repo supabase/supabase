@@ -53,16 +53,21 @@ export const gettingstarted = {
       name: 'Use Cases',
       items: [
         {
-          name: 'OpenAI Vector Search',
-          url: '/guides/getting-started/quickstarts/openai-vector-search',
-        },
-        {
           name: 'Subscription Payments (SaaS)',
           url: 'https://github.com/vercel/nextjs-subscription-payments#nextjs-subscription-payments-starter',
         },
         {
           name: 'Partner Gallery',
           url: 'https://github.com/supabase-community/partner-gallery-example#supabase-partner-gallery-example',
+        },
+      ],
+    },
+    {
+      name: 'OpenAI',
+      items: [
+        {
+          name: 'Vector Search',
+          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },

@@ -2,19 +2,45 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Supabase with OpenAI',
+  title: 'OpenAI Embeddings & Vector Search',
   subtitle:
     'Learn how to build your own custom ChatGPT style doc search powered by Next.js, OpenAI, and Supabase.',
   breadcrumb: 'OpenAI',
 }
 
-Some time ago we've built [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) a ChatGPT for the Supabase Docs. In this tutorial we'll look at how you can build your own custom ChatGPT experience based on your own knowledge base.
+We've built [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) a ChatGPT for the Supabase Docs. In this tutorial we'll look at how you can build your own custom ChatGPT experience based on your own knowledge base.
 
 We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project.
 
-You can find the complete code, ready to be deployed to Vercel, [on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
+</Admonition>
 
-## Configure the Database
+## Create a project
+
+1. [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+## Set up the database
+
+Now we are going to set up the database schema. We can use the "OpenAI Vector Search" quickstart in the SQL Editor, or you can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
+2. Click **OpenAI Vector Search**.
+3. Click **Run**.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 <StepHikeCompact>
 
@@ -194,6 +220,9 @@ You can find the complete code, ready to be deployed to Vercel, [on GitHub](http
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+</TabPanel>
+</Tabs>
 
 ## Pre-process the knowledge base at build time
 
