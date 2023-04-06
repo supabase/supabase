@@ -7,7 +7,8 @@ import { compact } from 'lodash'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-// import MarkdownTable from 'markdown-table'
+// @ts-ignore
+import MarkdownTable from 'markdown-table'
 
 export type ResultsDropdownProps = {
   id: string
@@ -46,18 +47,15 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         return temp
       })
       const table = [columns].concat(rows)
-      console.log('Copy', table)
+      const markdownData = MarkdownTable(table)
 
-      // [Joshen TODO] Fix below
-      // const markdownData = MarkdownTable(table)
-
-      // copyToClipboard(markdownData, () => {
-      //   ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
-      //   Telemetry.sendEvent(
-      //     { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
-      //     ui.googleAnalyticsProps
-      //   )
-      // })
+      copyToClipboard(markdownData, () => {
+        ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
+          ui.googleAnalyticsProps
+        )
+      })
     }
   }
 
