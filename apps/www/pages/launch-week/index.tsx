@@ -1,21 +1,28 @@
-import { NextSeo } from 'next-seo'
 import { GetServerSideProps } from 'next'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketContainer from '~/components/LaunchWeek/Ticket/TicketContainer'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { NextSeo } from 'next-seo'
+import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import { useState, useEffect } from 'react'
-import { IconArrowDown } from 'ui'
-import LaunchWeekPrizeSection from '~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 
+import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+
+import { IconArrowDown } from 'ui'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
-import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWall'
-import LW7BgGraphic from '../../components/LaunchWeek/LW7BgGraphic'
-import CTABanner from '../../components/CTABanner'
-import LW7Releases from '../../components/LaunchWeek/Releases/LW7'
+import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
+
+const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
+const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection')
+)
+const TicketBrickWall = dynamic(
+  () => import('~/components/LaunchWeek/LaunchSection/TicketBrickWall')
+)
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
   users: UserData[]
@@ -29,15 +36,16 @@ const supabaseAdmin = createClient(
 )
 
 export default function TicketHome({ users }: Props) {
+  const { query } = useRouter()
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isGolden, setIsGolden] = useState(false)
+
   const TITLE = 'Supabase LaunchWeek 7'
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
-  const [isGolden, setIsGolden] = useState(false)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -97,7 +105,7 @@ export default function TicketHome({ users }: Props) {
       />
       <DefaultLayout>
         <div className="bg-[#1C1C1C] -mt-[65px]">
-          <div className="relative bg-lw7 pt-20">
+          <div className="relative bg-lw7 pt-16">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
                 <LaunchWeekLogoHeader />
@@ -109,8 +117,8 @@ export default function TicketHome({ users }: Props) {
             />
           </div>
 
-          <SectionContainer className="relative w-full -mt-40 md:-mt-96 z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
-            <div className="mb-8">
+          <SectionContainer className="relative w-full -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+            <div className="mb-4">
               <a href="#lw-7-prizes" className="flex items-center text-white text-sm my-4 gap-4">
                 Join Hackathon{' '}
                 <span className="bounce-loop">

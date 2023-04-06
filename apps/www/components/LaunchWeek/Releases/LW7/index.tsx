@@ -1,193 +1,32 @@
-// @ts-nocheck
 import Image from 'next/image'
+import { useEffect } from 'react'
+import { Accordion } from 'ui'
 
-import _days from '~/components/LaunchWeek/lw7_days.json'
+import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/lw7_days'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import {
+  AccordionHeader,
+  CartTitle,
+  ChipLink,
+  PencilSvg,
+  PlaySvg,
+  SectionButtons,
+  SmallCard,
+  StyledArticleBadge,
+} from './components'
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
-import { Accordion, Badge } from 'ui'
-
-import styleUtils from './styles/utils7.module.css'
 import styles from './styles/launchWeek7.module.css'
-import Link from 'next/link'
-
-interface WeekDayProps {
-  title: string
-  shipped: boolean
-  date: string
-  publishedAt: string
-  description: string
-  d: number
-  dd: string
-  youtube_id: string
-  blogpost: string
-  docs: string
-  steps: {
-    title: string
-    blog: string
-    isNew: boolean
-    description: string
-  }[]
-}
-
-const days = _days as WeekDayProps[]
-
-const PencilSvg = () => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M3.21792 11.2469L11.8015 2.66333L14.0953 4.95709L5.51167 13.5407M3.21792 11.2469L2.34219 14.4164L5.51167 13.5407M3.21792 11.2469L5.51167 13.5407"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      strokeLinejoin="bevel"
-    />
-  </svg>
-)
-const DocsSvg = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M4.96289 9.48618H10.9629M4.96289 7.48618H10.9629M4.96289 11.4862H8.96289M3 2.00034V13.9998H12.9996V5.60113L9.38156 2.00034H3ZM12.9644 5.58432L9.38004 2L9.38004 5.58432L12.9644 5.58432Z"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      stroke-linejoin="bevel"
-    />
-  </svg>
-)
-const PlaySvg = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M13.4287 8L8.74762 10.7026L4.06653 13.4053L4.06653 8L4.06653 2.59474L8.74762 5.29737L13.4287 8Z"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      strokeLinejoin="bevel"
-    />
-  </svg>
-)
-
-const SmallCard = ({ className, children, bgGradient = false }) => (
-  <div className="relative p-[1px] bg-gradient-to-b from-[#48484880] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg">
-    <div
-      className={[
-        'rounded-2xl text-sm px-6 py-4 flex flex-col sm:flex-row justify-between items-center backdrop-blur-md',
-        bgGradient ? styles['lw7-article-card-gradient'] : 'bg-[#1c1c1c99]',
-        className,
-      ].join(' ')}
-    >
-      {children}
-    </div>
-  </div>
-)
-
-const StyledArticleBadge = ({ className, children }) => (
-  <div
-    className={[
-      'relative bg-gradient-to-br p-[1.5px] from-[#F4FFFA90] to-[#7E7AAD] overflow-hidden rounded-full',
-      className,
-    ].join(' ')}
-  >
-    <div className="!bg-[#1C1C1C] rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none backdrop-blur-md">
-      <span className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
-        {children}
-      </span>
-    </div>
-  </div>
-)
 
 export default function LW7Releases() {
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
-
-  useEffect(() => {
-    if (!supabase) {
-      setSupabase(
-        createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
-      )
-    }
-  }, [])
+  const [preRelease, day1, day2, day3, day4, day5] = days
+  const publishedSections =
+    days
+      .filter((day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now())
+      .map((day: WeekDayProps) => day.d.toString()) ?? []
 
   useEffect(() => {
     document.body.className = 'dark bg-[#1C1C1C]'
   }, [])
-
-  const AccordionHeader = ({ date, day, title, shipped }: any) => {
-    return (
-      <div className="flex flex-1 flex-col sm:flex-row">
-        <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
-          <Badge
-            className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
-              shipped
-                ? 'bg-gradient-to-br from-[#2A1E6C] to-[#2A1E6C00] dark:from-[#2A1E6C] dark:to-[#2A1E6C00] !border-[#6044FF40] dark:!border-[#6044FF40]'
-                : '!border-[#FFFFFF20] dark:!border-[#FFFFFF20]'
-            }`}
-          >
-            <span className="text-transparent text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-              {shipped ? 'Shipped' : 'Coming Soon'}
-            </span>
-          </Badge>
-
-          <span className="text-scale-900 text-sm">
-            <span className="inline sm:hidden md:inline">{day} </span>
-            {date && (
-              <span>
-                <span className="inline sm:hidden md:inline">・</span> {date}
-              </span>
-            )}
-          </span>
-        </div>
-        {shipped && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
-      </div>
-    )
-  }
-
-  const SectionButtons = ({ blog, docs, video }) => {
-    return (
-      <div className="flex gap-2 z-10">
-        <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-            Blog post
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <PencilSvg />
-            </div>
-          </div>
-        </a>
-        {docs && (
-          <a href={docs} target="_blank" rel="noopener">
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Docs
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <DocsSvg />
-              </div>
-            </div>
-          </a>
-        )}
-        {video && (
-          <a href={video} target="_blank" rel="noopener">
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Video
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <PlaySvg />
-              </div>
-            </div>
-          </a>
-        )}
-      </div>
-    )
-  }
-  const [preRelease, day1, day2, day3, day4, day5] = days
-
-  const publishedSections =
-    days
-      .filter(
-        (day) =>
-          // Date.parse(day.publishedAt) <= Date.now()
-          true
-      )
-      .map((day) => day.d.toString()) ?? []
 
   const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
   const day1Shipped = Date.parse(day1.publishedAt) <= Date.now()
@@ -196,13 +35,23 @@ export default function LW7Releases() {
   const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
   const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
 
+  const isHackathonLive = prereleaseShipped && Date.parse(endOfLW7) >= Date.now()
+
   return (
     <>
       <SectionContainer className="!py-0 ">
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <SmallCard bgGradient>
+        <div className="grid grid-cols-1 gap-4">
+          <SmallCard
+            bgGradient
+            className={[isHackathonLive && 'from-[#4635A7] to-[#A69DC920]'].join(' ')}
+          >
             <div className="relative flex items-center mb-4 sm:mb-0">
-              <div className="flex min-w-[20px]">
+              <div
+                className={[
+                  'flex min-w-[20px] opacity-50',
+                  isHackathonLive && 'opacity-pulse',
+                ].join(' ')}
+              >
                 <svg
                   width="21"
                   height="21"
@@ -223,51 +72,12 @@ export default function LW7Releases() {
               </div>
             </div>
             <div className="flex gap-2 z-10">
-              <Link href={'/blog/launch-week-7-hackathon'} target="_blank" rel="noopener">
-                <a>
-                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#34323210] to-[#FFFFFF10] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                    Blog post
-                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                      <PencilSvg />
-                    </div>
-                  </div>
-                </a>
-              </Link>
-            </div>
-          </SmallCard>
-          <SmallCard bgGradient>
-            <div className="relative flex items-center mb-4 sm:mb-0">
-              {/* <div className="flex min-w-[20px]">
-                <svg
-                  width="21"
-                  height="21"
-                  viewBox="0 0 21 21"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M5.55025 3.97258C5.94078 4.36311 5.94078 4.99627 5.55025 5.38679C2.81658 8.12046 2.81658 12.5526 5.55025 15.2863C5.94078 15.6768 5.94078 16.31 5.55025 16.7005C5.15973 17.091 4.52656 17.091 4.13604 16.7005C0.62132 13.1858 0.62132 7.4873 4.13604 3.97258C4.52656 3.58206 5.15973 3.58206 5.55025 3.97258ZM15.4498 3.97281C15.8403 3.58229 16.4735 3.58229 16.864 3.97281C20.3787 7.48753 20.3787 13.186 16.864 16.7007C16.4735 17.0913 15.8403 17.0913 15.4498 16.7007C15.0592 16.3102 15.0592 15.677 15.4498 15.2865C18.1834 12.5529 18.1834 8.1207 15.4498 5.38703C15.0592 4.9965 15.0592 4.36334 15.4498 3.97281ZM8.37869 6.80101C8.76921 7.19153 8.76921 7.8247 8.37869 8.21522C7.20711 9.38679 7.20711 11.2863 8.37869 12.4579C8.76921 12.8484 8.76921 13.4816 8.37868 13.8721C7.98816 14.2626 7.355 14.2626 6.96447 13.8721C5.01185 11.9195 5.01185 8.75363 6.96447 6.80101C7.355 6.41048 7.98816 6.41048 8.37869 6.80101ZM12.6213 6.80124C13.0119 6.41072 13.645 6.41072 14.0355 6.80124C15.9882 8.75386 15.9882 11.9197 14.0355 13.8723C13.645 14.2628 13.0119 14.2628 12.6213 13.8723C12.2308 13.4818 12.2308 12.8486 12.6213 12.4581C13.7929 11.2865 13.7929 9.38703 12.6213 8.21545C12.2308 7.82493 12.2308 7.19176 12.6213 6.80124ZM10.5 9.33677C11.0523 9.33677 11.5 9.78449 11.5 10.3368V10.3468C11.5 10.8991 11.0523 11.3468 10.5 11.3468C9.94772 11.3468 9.5 10.8991 9.5 10.3468V10.3368C9.5 9.78449 9.94772 9.33677 10.5 9.33677Z"
-                    fill="#F2F2F2"
-                  />
-                </svg>
-              </div> */}
-              <div className="flex flex-col lg:flex-row">
-                <span className="text-black dark:text-white mr-2">SupaClub</span>
-              </div>
-            </div>
-            <div className="flex gap-2 z-10">
-              <Link href={'/blog/supaclub'} target="_blank" rel="noopener">
-                <a>
-                  <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#34323210] to-[#FFFFFF10] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-                    Blog post
-                    <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                      <PencilSvg />
-                    </div>
-                  </div>
-                </a>
-              </Link>
+              <ChipLink href={'/blog/launch-week-7-hackathon'}>
+                Blog post
+                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                  <PencilSvg />
+                </div>
+              </ChipLink>
             </div>
           </SmallCard>
         </div>
@@ -279,7 +89,7 @@ export default function LW7Releases() {
           size="large"
           className="text-scale-900 dark:text-white"
           justified={false}
-          bordered={false}
+          // bordered={false}
           chevronAlign="right"
           defaultValue={publishedSections}
         >
@@ -320,7 +130,7 @@ export default function LW7Releases() {
                   <div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat p-14 text-2xl bg-contain
+                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-14 lg:px-10 text-2xl bg-contain
                       `}
                   >
                     <div
@@ -331,14 +141,12 @@ export default function LW7Releases() {
                     ></div>
                     <div className="flex flex-col items-center gap-2 min-w-[300px]">
                       <StyledArticleBadge>New</StyledArticleBadge>
-                      <span className="text-black dark:text-white">
-                        {preRelease.steps[1].title}
-                      </span>
+                      <CartTitle>{preRelease.steps[1].title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[1].description}</p>
                     </div>
                     <SectionButtons
-                      docs={preRelease.steps[1].docs}
-                      blog={preRelease.steps[1].blog}
+                      github={preRelease.steps[1].github}
+                      url={preRelease.steps[1].url}
                     />
                   </div>
                 </div>
