@@ -3,20 +3,20 @@ import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type TableColumn = {
-  schema: string
-  table: string
-  name: string
-  isTable: boolean
+  schemaname: string
+  tablename: string
+  quoted_name: string
+  is_table: boolean
   columns: any[]
 }
 
 export const getTableColumnsQuery = () => {
   const sql = /* SQL */ `
   SELECT
-    tbl.schemaname as schema,
-    tbl.tablename as table,
-    tbl.quoted_name as name,
-    tbl.is_table as isTable,
+    tbl.schemaname,
+    tbl.tablename,
+    tbl.quoted_name,
+    tbl.is_table,
     json_agg(a) as columns
   FROM
     (
@@ -78,7 +78,7 @@ export type TableColumnsVariables = {
   connectionString?: string
 }
 
-export type TableColumnsData = TableColumn[]
+export type TableColumnsData = { result: TableColumn[] }
 export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(

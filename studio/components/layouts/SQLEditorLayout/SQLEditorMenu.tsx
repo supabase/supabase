@@ -142,7 +142,7 @@ const SideBarContent = observer(() => {
                 <div className="editor-product-menu">
                   <Menu.Group title="Favorites" />
                   <div className="space-y-1">
-                    {favouriteTabs.map((tabInfo: any) => {
+                    {favouriteTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
@@ -153,7 +153,7 @@ const SideBarContent = observer(() => {
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
                   <div className="space-y-1">
-                    {queryTabs.map((tabInfo: any) => {
+                    {queryTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}

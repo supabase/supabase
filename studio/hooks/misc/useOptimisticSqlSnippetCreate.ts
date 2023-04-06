@@ -1,6 +1,5 @@
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useProfileQuery } from 'data/profile/profile-query'
-// import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useCallback } from 'react'
 import { useStore } from './useStore'
 import { useContentCreateMutation } from 'data/content/content-create-mutation'
@@ -14,8 +13,6 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
   const { data: profile } = useProfileQuery()
   const { ui, content: contentStore } = useStore()
   const { mutateAsync: createContent } = useContentCreateMutation()
-
-  // const sqlEditorStore: any = useSqlStore()
 
   return useCallback(
     async (args?: Parameters<typeof createSqlSnippetSkeleton>[0]) => {
