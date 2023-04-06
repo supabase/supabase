@@ -9,10 +9,16 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230216-e731b77
+    image: supabase/studio:20230330-99fed3d
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" ]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -53,10 +59,19 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.47.0
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9999/health"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -102,7 +117,8 @@ services:
     container_name: supabase-rest
     image: postgrest/postgrest:v10.1.2
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     restart: unless-stopped
     environment:
@@ -116,10 +132,17 @@ services:
     container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.5.1
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "bash", "-c", "printf \\0 > /dev/tcp/localhost/4000" ]
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "printf \\0 > /dev/tcp/localhost/4000"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -147,14 +170,23 @@ services:
     container_name: supabase-storage
     image: supabase/storage-api:v0.28.2
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
       rest:
         condition: service_started
       imgproxy:
         condition: service_started
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status" ]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5000/status"
+        ]
       timeout: 5s
       interval: 5s
       retries: 3
@@ -197,7 +229,8 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.60.7
     depends_on:
-      db: # Disable this if you are using an external Postgres database
+      db:
+        # Disable this if you are using an external Postgres database
         condition: service_healthy
     restart: unless-stopped
     environment:
@@ -243,3 +276,5 @@ services:
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
+
+# If you want to use logging, please run with `docker compose -f docker-compose.yml -f docker-compose-logging.yml up`
