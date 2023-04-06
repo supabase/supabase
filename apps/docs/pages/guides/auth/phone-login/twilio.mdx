@@ -311,7 +311,7 @@ To make use of WhatsApp OTP, please complete the following steps:
 The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase dashboard.
 </Admonition>
 
-The sign in process with WhatsApp is similar to the process for SMS. Do note the additional `whatsapp` parameter added:
+The sign in process with WhatsApp is similar to the sign in process for SMS. Do note the additional `whatsapp` parameter added:
 
 ```js
 const {data, error } = await supabase.auth.signInWithOtp({
@@ -322,7 +322,7 @@ const {data, error } = await supabase.auth.signInWithOtp({
  })
 ```
 
-There is no change in the verification process - do continue the `sms` type for verification
+There is no change in the verification process - do continue to use the `sms` type for verification
 ```js
 // After receiving a WhatsApp OTP
 let { data, error } = await supabase.auth.verifyOtp({
