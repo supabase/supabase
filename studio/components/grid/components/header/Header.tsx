@@ -1,6 +1,16 @@
-import { saveAs } from 'file-saver'
+import saveAs from 'file-saver'
+import Papa from 'papaparse'
 import { useState, ReactNode } from 'react'
-import { Button, IconDownload, IconX, IconTrash, Dropdown, IconChevronDown } from 'ui'
+import {
+  Button,
+  IconDownload,
+  IconX,
+  IconTrash,
+  Dropdown,
+  IconChevronDown,
+  IconFileText,
+  IconArrowUp,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useUrlState } from 'hooks'
@@ -9,7 +19,6 @@ import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { Sort, Filter, SupaTable } from 'components/grid/types'
-import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
@@ -18,6 +27,7 @@ import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import RLSBannerWarning from './RLSBannerWarning'
+import clsx from 'clsx'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -28,22 +38,47 @@ export type HeaderProps = {
   table: SupaTable
   sorts: Sort[]
   filters: Filter[]
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
   headerActions?: ReactNode
+  customHeader: ReactNode
 }
 
-const Header = ({ table, sorts, filters, onAddColumn, onAddRow, headerActions }: HeaderProps) => {
+const Header = ({
+  table,
+  sorts,
+  filters,
+  onAddColumn,
+  onAddRow,
+  onImportData,
+  headerActions,
+  customHeader,
+  isRefetching,
+}: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div>
       <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-        {selectedRows.size > 0 ? (
-          <RowHeader table={table} sorts={sorts} filters={filters} />
+        {customHeader ? (
+          <>{customHeader}</>
         ) : (
-          <DefaultHeader table={table} onAddColumn={onAddColumn} onAddRow={onAddRow} />
+          <>
+            {selectedRows.size > 0 ? (
+              <RowHeader table={table} sorts={sorts} filters={filters} />
+            ) : (
+              <DefaultHeader
+                table={table}
+                isRefetching={isRefetching}
+                onAddColumn={onAddColumn}
+                onAddRow={onAddRow}
+                onImportData={onImportData}
+              />
+            )}
+          </>
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
@@ -56,10 +91,18 @@ export default Header
 
 type DefaultHeaderProps = {
   table: SupaTable
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
 }
-const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => {
+const DefaultHeader = ({
+  table,
+  isRefetching,
+  onAddColumn,
+  onAddRow,
+  onImportData,
+}: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -72,7 +115,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton table={table} />
+        <RefreshButton table={table} isRefetching={isRefetching} />
         <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
@@ -92,7 +135,6 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
                           key="add-row"
                           className="group"
                           onClick={onAddRow}
-                          disabled={onAddRow === undefined}
                           icon={
                             <div className="-mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[15px] h-[4px]" />
@@ -119,7 +161,6 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
                           key="add-column"
                           className="group"
                           onClick={onAddColumn}
-                          disabled={onAddColumn === undefined}
                           icon={
                             <div className="flex -mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[4px] h-[15px]" />
@@ -136,6 +177,33 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow }: DefaultHeaderProps) => 
                           <div className="">
                             <p>Insert column</p>
                             <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onImportData !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="import-data"
+                          className="group"
+                          onClick={onImportData}
+                          icon={
+                            <div className="relative -mt-2">
+                              <IconFileText className="-translate-x-[2px]" />
+                              <IconArrowUp
+                                className={clsx(
+                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
+                                  'group-hover:translate-y-0 group-hover:text-brand-900 group-hover:opacity-100'
+                                )}
+                                strokeWidth={3}
+                                size={12}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Import data from CSV</p>
+                            <p className="text-scale-1000">Insert new rows from a CSV</p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -281,8 +349,18 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
+    const formattedRows = rows.map((row) => {
+      const formattedRow = row
+      Object.keys(row).map((column) => {
+        if (typeof row[column] === 'object' && row[column] !== null)
+          formattedRow[column] = JSON.stringify(formattedRow[column])
+      })
+      return formattedRow
+    })
 
-    const csv = exportRowsToCsv(state.table!.columns, rows)
+    const csv = Papa.unparse(formattedRows, {
+      columns: state.table!.columns.map((column) => column.name),
+    })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
