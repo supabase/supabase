@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'

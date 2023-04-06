@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from '@supabase/ui'
+import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 import { usePrevious } from 'hooks'
 import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
