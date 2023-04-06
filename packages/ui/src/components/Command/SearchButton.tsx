@@ -3,6 +3,7 @@ import { useCommandMenu } from './CommandMenuProvider'
 
 const SearchButton = ({
   children,
+  className,
   ...props
 }: PropsWithChildren<
   DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
@@ -15,12 +16,8 @@ const SearchButton = ({
       type="button"
       ref={searchButtonRef}
       onClick={() => setIsOpen(true)}
+      className={className}
       {...props}
-      className={
-        site === 'studio'
-          ? 'flex border-none rounded bg-transparent p-0 outline-none outline-offset-1 transition-all focus:outline-4 focus:outline-scale-600'
-          : ''
-      }
     >
       {children}
     </button>
