@@ -15,7 +15,6 @@ import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import BlogLinks from '~/components/LaunchWeek/BlogLinks'
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -66,7 +65,6 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   const articleRef = useRef(null)
-  const [showStickyShare, setShowStickyShare] = useState(false)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
   const isLaunchWeek7 = props.blog.launchweek === 7
@@ -192,10 +190,7 @@ function BlogPostPage(props: any) {
   )
 
   const handleScroll = () => {
-    const article = articleRef?.current
-    if (!article || typeof window === 'undefined') return null
-    const articleContainer = (article as any)?.getBoundingClientRect()
-    setShowStickyShare(articleContainer.top <= 65 && articleContainer.bottom >= 100)
+    // TODO: activate toc sections
   }
 
   useEffect(() => {
@@ -267,18 +262,6 @@ function BlogPostPage(props: any) {
                   Back
                 </a>
               </p>
-              <motion.div
-                className="hidden lg:block lg:sticky lg:top-16"
-                animate={{ opacity: showStickyShare ? 1 : 0 }}
-                transition={{ duration: 0.2, ease: [0.6, 0, 0.2, 1] }}
-              >
-                <div className="py-4 lg:py-8">
-                  <div className="text-scale-900 dark:text-scale-1000 text-sm">
-                    Share this article
-                  </div>
-                  <ShareArticleActions />
-                </div>
-              </motion.div>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
@@ -381,8 +364,7 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  {/* <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24"> */}
-                  <div className="space-y-8 lg:mb-24">
+                  <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
@@ -394,9 +376,9 @@ function BlogPostPage(props: any) {
                             <div>
                               <p className="cursor-pointer">
                                 <div className="flex gap-2">
-                                  <div className="text-scale-900">
+                                  {/* <div className="text-scale-900">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  </div>
+                                  </div> */}
                                   <span className="text-scale-1100 hover:text-gray-1200 text-sm">
                                     {post.title}
                                   </span>
@@ -412,6 +394,10 @@ function BlogPostPage(props: any) {
                               View all posts
                             </a>
                           </Link>
+                        </div>
+                        <div className="py-4 lg:py-8">
+                          <div className="text-scale-1200 text-sm">Share this article</div>
+                          <ShareArticleActions />
                         </div>
                       </div>
                     </div>

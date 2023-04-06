@@ -15,7 +15,7 @@ const BlogLinks = () => {
     return (
       <div className="flex gap-2 z-10">
         <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
+          <div className="flex items-center border border-slate-400 bg-gradient-to-r to-[#fcfcfc] from-[#f2f2f2] hover:from-[#d5d5d5] text-black dark:text-white dark:to-[#191919] dark:from-[#464444] dark:hover:from-[#4e4e4e] rounded-full text-xs py-1 pl-3 pr-1">
             Blog post
             <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
               <PencilSvg />
@@ -58,9 +58,7 @@ const BlogLinks = () => {
     <div className="flex flex-col gap-3 lg:gap-4 border-t border-scale-400 py-4 lg:py-8 mt-4 lg:mt-8">
       <h3 className="text-white text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) => (
-        <div
-          className={`min-h-[150px] w-full flex flex-col lg:flex-row group/day${day.d} relative overflow-hidden`}
-        >
+        <div className={`h-auto w-full flex flex-col lg:flex-row relative overflow-hidden`}>
           <div
             className={`
                 flex flex-col flex-1 gap-3 items-start justify-center border rounded-xl h-full relative overflow-hidden
@@ -69,15 +67,15 @@ const BlogLinks = () => {
                 before:border-[#1f3536] before:-z-10
               `}
           >
-            <div className="flex items-center lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+            <div className="flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
               <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9]">
                 {day.title}
               </div>
             </div>
             <SectionButtons
-              docs={day.steps[0].docs}
+              // docs={day.steps[0].docs}
               blog={day.steps[0].blog}
-              youtube_id={day.steps[0].youtube_id}
+              // youtube_id={day.steps[0].youtube_id}
             />
           </div>
           {day.steps[0].thumb && (
