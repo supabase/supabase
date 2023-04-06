@@ -322,6 +322,18 @@ const {data, error } = await supabase.auth.signInWithOtp({
  })
 ```
 
+You can also sign up with `whatsapp` as a channel:
+
+```js
+const {data, error }= await supabase.auth.signUp({
+   phone: '+57336567365',
+   password: 'testsupabasenow',
+   options: {
+     channel:'whatsapp',
+   }
+})
+```
+
 There is no change in the verification process - do continue to use the `sms` type for verification
 ```js
 // After receiving a WhatsApp OTP
