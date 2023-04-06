@@ -1,9 +1,8 @@
-import clsx from 'clsx'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { Badge, IconCommand, IconSearch, SearchButton } from 'ui'
+import { Badge, Button, IconCommand, IconSearch, useCommandMenu } from 'ui'
 
 import { detectOS } from 'lib/helpers'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -24,6 +23,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { selectedOrganization, selectedProject } = ui
 
   const os = detectOS()
+  const { setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')
 
   const { ref: projectRef } = useParams()
@@ -122,17 +122,13 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {IS_PLATFORM && showCmdkHelper && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <SearchButton>
-                <span
-                  className={clsx(
-                    'cursor-pointer text-center ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1',
-                    'text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700',
-                    'hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600  shadow-sm text-xs px-2 py-1'
-                  )}
-                >
-                  <IconSearch className="text-scale-1100" size={16} strokeWidth={2} />
-                </span>
-              </SearchButton>
+              <div className="flex">
+                <Button
+                  type="default"
+                  icon={<IconSearch size={16} strokeWidth={1.5} className="text-scale-1200" />}
+                  onClick={() => setIsOpen(true)}
+                />
+              </div>
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
