@@ -1,8 +1,4 @@
 .info {
-  display: flex;
-  gap: 0px;
-  margin-bottom: 64px;
-  padding: 32px;
 }
 
 @media (min-width: 768px) {

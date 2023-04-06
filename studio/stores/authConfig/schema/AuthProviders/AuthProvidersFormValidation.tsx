@@ -1,5 +1,5 @@
 import { boolean, number, object, string } from 'yup'
-import { domainRegex } from 'components/interfaces/Auth/Auth.constants'
+import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -305,7 +305,15 @@ const EXTERNAL_PROVIDER_APPLE = {
       title: 'Services ID',
       description: `
 Client identifier when authenticating or validating users.
-[learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      type: 'string',
+    },
+    EXTERNAL_IOS_BUNDLE_ID: {
+      /**
+       * to do: change docs
+       */
+      title: 'IOS Bundle ID',
+      description: `The iOS app's unique identifier. [Learn more](https://developer.apple.com/documentation/appstoreconnectapi/bundle_ids)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
@@ -320,19 +328,38 @@ The secret key is a JWT token that must be generated.
       isSecret: true,
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_CLIENT_ID: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Services ID is required'),
-      otherwise: (schema) => schema,
-    }),
-    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('Secret key is required'),
-      otherwise: (schema) => schema,
-    }),
-  }),
+  validationSchema: object().shape(
+    {
+      EXTERNAL_APPLE_ENABLED: boolean().required(),
+      EXTERNAL_APPLE_SECRET: string().when(['EXTERNAL_APPLE_ENABLED'], {
+        is: true,
+        then: (schema) => schema.required('Secret key is required'),
+        otherwise: (schema) => schema,
+      }),
+      EXTERNAL_APPLE_CLIENT_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_IOS_BUNDLE_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_IOS_BUNDLE_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_IOS_BUNDLE_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+      EXTERNAL_IOS_BUNDLE_ID: string().when(
+        ['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'],
+        {
+          is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
+            return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
+          },
+          then: (schema) => schema.required('Either the Services ID or iOS Bundle ID is required'),
+          otherwise: (schema) => schema,
+        }
+      ),
+    },
+    // this is necessary for the "either or" validation on EXTERNAL_APPLE_CLIENT_ID and EXTERNAL_IOS_BUNDLE_ID
+    [['EXTERNAL_APPLE_CLIENT_ID', 'EXTERNAL_IOS_BUNDLE_ID']]
+  ),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
@@ -385,7 +412,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -583,7 +610,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -671,8 +698,8 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
       then: (schema) =>
-        schema.matches(domainRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(domainRegex, 'Must be a valid URL'),
+        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
     }),
   }),
   misc: {
@@ -937,7 +964,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(domainRegex, 'Must be a valid URL')
+      .matches(urlRegex, 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),
@@ -998,534 +1025,30 @@ const EXTERNAL_PROVIDER_ZOOM = {
   },
 }
 
-export const OLD = {
+export const PROVIDER_SAML = {
+  $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  required: [
-    'SITE_URL',
-    'DISABLE_SIGNUP',
-    'JWT_EXP',
-    'JWT_AUD',
-    'JWT_DEFAULT_GROUP_NAME',
-    'SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION',
-    'EXTERNAL_EMAIL_ENABLED',
-    'EXTERNAL_PHONE_ENABLED',
-    'EXTERNAL_APPLE_ENABLED',
-    'EXTERNAL_AZURE_ENABLED',
-    'EXTERNAL_BITBUCKET_ENABLED',
-    'EXTERNAL_DISCORD_ENABLED',
-    'EXTERNAL_FACEBOOK_ENABLED',
-    'EXTERNAL_GITHUB_ENABLED',
-    'EXTERNAL_GITLAB_ENABLED',
-    'EXTERNAL_GOOGLE_ENABLED',
-    'EXTERNAL_KEYCLOAK_ENABLED',
-    'EXTERNAL_LINKEDIN_ENABLED',
-    'EXTERNAL_NOTION_ENABLED',
-    'EXTERNAL_TWITCH_ENABLED',
-    'EXTERNAL_TWITTER_ENABLED',
-    'EXTERNAL_SLACK_ENABLED',
-    'EXTERNAL_SPOTIFY_ENABLED',
-    'EXTERNAL_WORKOS_ENABLED',
-    'EXTERNAL_ZOOM_ENABLED',
-    'SMS_AUTOCONFIRM',
-    'SMS_MAX_FREQUENCY',
-    'SMS_OTP_EXP',
-    'SMS_OTP_LENGTH',
-    'SMS_PROVIDER',
-    'SMS_TEMPLATE',
-    'MAILER_AUTOCONFIRM',
-    'MAILER_URLPATHS_INVITE',
-    'MAILER_URLPATHS_CONFIRMATION',
-    'MAILER_URLPATHS_RECOVERY',
-    'MAILER_URLPATHS_EMAIL_CHANGE',
-    'MAILER_SUBJECTS_INVITE',
-    'MAILER_SUBJECTS_CONFIRMATION',
-    'MAILER_SUBJECTS_RECOVERY',
-    'MAILER_SUBJECTS_MAGIC_LINK',
-    'MAILER_SUBJECTS_EMAIL_CHANGE',
-    'MAILER_TEMPLATES_INVITE_CONTENT',
-    'MAILER_TEMPLATES_CONFIRMATION_CONTENT',
-    'MAILER_TEMPLATES_RECOVERY_CONTENT',
-    'MAILER_TEMPLATES_MAGIC_LINK_CONTENT',
-    'MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT',
-  ],
+  title: 'SAML 2.0',
   properties: {
-    SITE_URL: {
-      title: 'Site URL',
-      type: 'string',
-      help: 'The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.',
-    },
-    URI_ALLOW_LIST: {
-      title: 'Additional redirect URLs',
-      type: 'string',
-      help: 'A comma separated list of *exact* URLs that auth providers are permitted to redirect to post authentication.',
-    },
-    DISABLE_SIGNUP: {
-      title: 'Disable signup',
-      type: 'boolean',
-      help: 'Allow/disallow new user signups to your project.',
-    },
-    EXTERNAL_EMAIL_ENABLED: {
-      title: 'Enable email signup',
-      type: 'boolean',
-      help: 'Allow/disallow new user signups via email to your project.',
-    },
-    EXTERNAL_PHONE_ENABLED: {
-      title: 'Enable phone signup',
-      type: 'boolean',
-      help: 'Allow/disallow new user signups via phone to your project.',
-    },
-    JWT_EXP: {
-      title: 'JWT expiry',
-      type: 'integer',
-      help: 'How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).',
-      minimum: 1,
-      maximum: 604800,
-      multipleof: 1,
-    },
-    JWT_AUD: {
-      title: 'JWT audience',
-      type: 'string',
-    },
-    JWT_DEFAULT_GROUP_NAME: {
-      title: 'Default user group',
-      type: 'string',
-    },
-    EXTERNAL_APPLE_ENABLED: {
-      title: 'Apple enabled',
+    SAML_ENABLED: {
+      title: 'Enable SAML 2.0 Single Sign-on',
+      description:
+        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
-    EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Apple client ID',
-      type: 'string',
-    },
-    EXTERNAL_APPLE_SECRET: {
-      title: 'Apple secret',
-      type: 'string',
-    },
-    EXTERNAL_AZURE_ENABLED: {
-      title: 'Azure enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_AZURE_CLIENT_ID: {
-      title: 'Azure client ID',
-      type: 'string',
-    },
-    EXTERNAL_AZURE_SECRET: {
-      title: 'Azure secret',
-      type: 'string',
-    },
-    EXTERNAL_AZURE_URL: {
-      title: 'Azure Tenant URL',
-      type: 'string',
-    },
-    EXTERNAL_BITBUCKET_ENABLED: {
-      title: 'Bitbucket enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_BITBUCKET_CLIENT_ID: {
-      title: 'Bitbucket client ID',
-      type: 'string',
-    },
-    EXTERNAL_BITBUCKET_SECRET: {
-      title: 'Bitbucket secret',
-      type: 'string',
-    },
-    EXTERNAL_DISCORD_ENABLED: {
-      title: 'Discord enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_DISCORD_CLIENT_ID: {
-      title: 'Discord client ID',
-      type: 'string',
-    },
-    EXTERNAL_DISCORD_SECRET: {
-      title: 'Discord secret',
-      type: 'string',
-    },
-    EXTERNAL_FACEBOOK_ENABLED: {
-      title: 'Facebook enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_FACEBOOK_CLIENT_ID: {
-      title: 'Facebook client ID',
-      type: 'string',
-    },
-    EXTERNAL_FACEBOOK_SECRET: {
-      title: 'Facebook secret',
-      type: 'string',
-    },
-    EXTERNAL_GITHUB_ENABLED: {
-      title: 'GitHub enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_GITHUB_CLIENT_ID: {
-      title: 'GitHub client ID',
-      type: 'string',
-    },
-    EXTERNAL_GITHUB_SECRET: {
-      title: 'GitHub secret',
-      type: 'string',
-    },
-    EXTERNAL_GITLAB_ENABLED: {
-      title: 'GitLab enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_GITLAB_CLIENT_ID: {
-      title: 'GitLab client ID',
-      type: 'string',
-    },
-    EXTERNAL_GITLAB_SECRET: {
-      title: 'Gitlab secret',
-      type: 'string',
-    },
-    EXTERNAL_GITLAB_URL: {
-      title:
-        'The base URL used for constructing the URLs to request authorization and access tokens.',
-      type: 'string',
-    },
-    EXTERNAL_GOOGLE_ENABLED: {
-      title: 'Google enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Google client ID',
-      type: 'string',
-    },
-    EXTERNAL_GOOGLE_SECRET: {
-      title: 'Google secret',
-      type: 'string',
-    },
-    EXTERNAL_KEYCLOAK_ENABLED: {
-      title: 'Keycloak enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_KEYCLOAK_CLIENT_ID: {
-      title: 'Keycloak client ID',
-      type: 'string',
-    },
-    EXTERNAL_KEYCLOAK_SECRET: {
-      title: 'Keycloak secret',
-      type: 'string',
-    },
-    EXTERNAL_KEYCLOAK_URL: {
-      title: 'Keycloak URL',
-      type: 'string',
-    },
-    EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_LINKEDIN_CLIENT_ID: {
-      title: 'Linkedin client ID',
-      type: 'string',
-    },
-    EXTERNAL_LINKEDIN_SECRET: {
-      title: 'Linkedin secret',
-      type: 'string',
-    },
-    EXTERNAL_NOTION_ENABLED: {
-      title: 'Notion enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_NOTION_CLIENT_ID: {
-      title: 'Notion client ID',
-      type: 'string',
-    },
-    EXTERNAL_NOTION_SECRET: {
-      title: 'Notion secret',
-      type: 'string',
-    },
-    EXTERNAL_TWITCH_ENABLED: {
-      title: 'Twitch enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_TWITCH_CLIENT_ID: {
-      title: 'Twitch client ID',
-      type: 'string',
-    },
-    EXTERNAL_TWITCH_SECRET: {
-      title: 'Twitch secret',
-      type: 'string',
-    },
-    EXTERNAL_TWITTER_ENABLED: {
-      title: 'Twitter enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_TWITTER_CLIENT_ID: {
-      title: 'Twitter client ID',
-      type: 'string',
-    },
-    EXTERNAL_TWITTER_SECRET: {
-      title: 'Twitter secret',
-      type: 'string',
-    },
-    EXTERNAL_SLACK_ENABLED: {
-      title: 'Slack enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_SLACK_CLIENT_ID: {
-      title: 'Slack client ID',
-      type: 'string',
-    },
-    EXTERNAL_SLACK_SECRET: {
-      title: 'Slack secret',
-      type: 'string',
-    },
-    EXTERNAL_SPOTIFY_ENABLED: {
-      title: 'Spotify enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_SPOTIFY_CLIENT_ID: {
-      title: 'Spotify client ID',
-      type: 'string',
-    },
-    EXTERNAL_SPOTIFY_SECRET: {
-      title: 'Spotify secret',
-      type: 'string',
-    },
-    EXTERNAL_WORKOS_ENABLED: {
-      title: 'WorkOS enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_WORKOS_CLIENT_ID: {
-      title: 'WorkOS client ID',
-      type: 'string',
-    },
-    EXTERNAL_WORKOS_SECRET: {
-      title: 'WorkOS secret',
-      type: 'string',
-    },
-    EXTERNAL_WORKOS_URL: {
-      title: 'WorkOS URL',
-      type: 'string',
-    },
-    EXTERNAL_ZOOM_ENABLED: {
-      title: 'Zoom enabled',
-      type: 'boolean',
-    },
-    EXTERNAL_ZOOM_CLIENT_ID: {
-      title: 'Zoom client ID',
-      type: 'string',
-    },
-    EXTERNAL_ZOOM_SECRET: {
-      title: 'Zoom secret',
-      type: 'string',
-    },
-    SMTP_ADMIN_EMAIL: {
-      title: 'SMTP admin email',
-      type: 'string',
-    },
-    SMTP_HOST: {
-      title: 'SMTP host',
-      type: 'string',
-    },
-    SMTP_PORT: {
-      title: 'SMTP port',
-      type: 'string',
-    },
-    SMTP_USER: {
-      title: 'SMTP user',
-      type: 'string',
-    },
-    SMTP_PASS: {
-      title: 'SMTP password',
-      type: 'string',
-    },
-    SMTP_PASS_ENCRYPTED: {
-      title: 'SMTP password',
-      type: 'string',
-    },
-    SMTP_SENDER_NAME: {
-      title: 'SMTP sender name',
-      type: 'string',
-    },
-    RATE_LIMIT_EMAIL_SENT: {
-      title: 'Rate limit',
-      type: 'number',
-      help: 'Maximum number of emails sent per hour (Default: 30, Max: 32,767)',
-      minimum: 1,
-      maximum: 32767,
-      multipleof: 1,
-    },
-    RATE_LIMIT_SMS_SENT: {
-      title: 'Rate limit',
-      type: 'number',
-      help: 'Maximum number of SMS-es sent per hour (Default: 30, Max: 32,767)',
-      minimum: 1,
-      maximum: 32767,
-      multipleof: 1,
-    },
-    MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
-      title: 'Double confirm email changes',
-      type: 'boolean',
-      help: 'If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm',
-    },
-    MAILER_AUTOCONFIRM: {
-      title: 'Enable email confirmations',
-      type: 'boolean',
-      help: 'If enabled, users need to confirm their email address before signing in.',
-    },
-    MAILER_URLPATHS_INVITE: {
-      title: 'Confirmation URL',
-      type: 'string',
-    },
-    MAILER_URLPATHS_CONFIRMATION: {
-      title: 'Path',
-      type: 'string',
-    },
-    MAILER_URLPATHS_RECOVERY: {
-      title: 'Confirmation URL',
-      type: 'string',
-    },
-    MAILER_URLPATHS_EMAIL_CHANGE: {
-      title: 'Confirmation URL',
-      type: 'string',
-    },
-    MAILER_SUBJECTS_INVITE: {
-      title: 'Subject',
-      type: 'string',
-    },
-    MAILER_SUBJECTS_CONFIRMATION: {
-      title: 'Subject',
-      type: 'string',
-    },
-    MAILER_SUBJECTS_MAGIC_LINK: {
-      title: 'Subject',
-      type: 'string',
-    },
-    MAILER_SUBJECTS_RECOVERY: {
-      title: 'Subject',
-      type: 'string',
-    },
-    MAILER_SUBJECTS_EMAIL_CHANGE: {
-      title: 'Subject',
-      type: 'string',
-    },
-    MAILER_TEMPLATES_INVITE: {
-      type: 'string',
-    },
-    MAILER_TEMPLATES_INVITE_CONTENT: {
-      title: 'Body',
-      type: 'string',
-    },
-    MAILER_TEMPLATES_CONFIRMATION: {
-      type: 'string',
-    },
-    MAILER_TEMPLATES_CONFIRMATION_CONTENT: {
-      title: 'Body',
-      type: 'string',
-    },
-    MAILER_TEMPLATES_RECOVERY: {
-      type: 'string',
-    },
-    MAILER_TEMPLATES_MAGIC_LINK: {
-      type: 'string',
-    },
-    MAILER_TEMPLATES_RECOVERY_CONTENT: {
-      title: 'Body',
-      type: 'string',
-    },
-    MAILER_TEMPLATES_MAGIC_LINK_CONTENT: {
-      title: 'Body',
-      type: 'string',
-    },
-    MAILER_TEMPLATES_EMAIL_CHANGE: {
-      type: 'string',
-    },
-    MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: {
-      title: 'Body',
-      type: 'string',
-    },
-    PASSWORD_MIN_LENGTH: {
-      title: 'Minimum password length',
-      type: 'integer',
-    },
-    SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
-      title: 'Enable strict password updates',
-      type: 'boolean',
-      help: 'If enabled, users need to reauthenticate via email or phone before updating their passwords.',
-    },
-    SMS_AUTOCONFIRM: {
-      title: 'Enable phone confirmations',
-      type: 'boolean',
-      help: 'If enabled, users need to confirm their phone number before signing in.',
-    },
-    SMS_PROVIDER: {
-      title: 'Sms provider',
-      type: 'string',
-      options: [
-        {
-          value: 'twilio',
-          label: 'Twilio',
-        },
-        {
-          value: 'messagebird',
-          label: 'Messagebird',
-        },
-        {
-          value: 'vonage',
-          label: 'Vonage',
-        },
-        {
-          value: 'textlocal',
-          label: 'Textlocal',
-        },
-      ],
-    },
-    SMS_TEXTLOCAL_API_KEY: {
-      title: 'Textlocal API key',
-      type: 'string',
-    },
-    SMS_TEXTLOCAL_SENDER: {
-      title: 'Textlocal sender',
-      type: 'string',
-      help: 'Textlocal sender phone number',
-    },
-    SMS_TWILIO_ACCOUNT_SID: {
-      title: 'Twilio account SID',
-      type: 'string',
-    },
-    SMS_TWILIO_AUTH_TOKEN: {
-      title: 'Twilio auth token',
-      type: 'string',
-    },
-    SMS_TWILIO_MESSAGE_SERVICE_SID: {
-      title: 'Twilio message service SID',
-      type: 'string',
-      help: 'Twilio message service SID or twilio phone number',
-    },
-    SMS_MESSAGEBIRD_ACCESS_KEY: {
-      title: 'Messagebird access key',
-      type: 'string',
-    },
-    SMS_MESSAGEBIRD_ORIGINATOR: {
-      title: 'Messagebird originator',
-      type: 'string',
-      help: 'Messagebird sender name or phone number',
-    },
-    SMS_VONAGE_API_KEY: {
-      title: 'Vonage API key',
-      type: 'string',
-    },
-    SMS_VONAGE_API_SECRET: {
-      title: 'Vonage API secret',
-      type: 'string',
-    },
-    SMS_VONAGE_FROM: {
-      title: 'Vonage sender',
-      type: 'string',
-      help: 'Vonage sender phone number',
-    },
-    SMS_TEMPLATE: {
-      title: 'Body',
-      type: 'string',
-    },
+  },
+  validationSchema: object().shape({
+    SAML_ENABLED: boolean().required(),
+  }),
+  misc: {
+    iconKey: 'saml-icon',
   },
 }
 
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
+  PROVIDER_SAML,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,
