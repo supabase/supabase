@@ -164,7 +164,7 @@ export default function Ticket({
                     href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}
                     className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}
                   >
-                    Get your ticket
+                    Go to Launch Week 7
                   </a>
                 </div>
               </>
