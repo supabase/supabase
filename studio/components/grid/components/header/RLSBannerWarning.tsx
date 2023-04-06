@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Button, IconAlertCircle, IconExternalLink, Modal } from 'ui'
+import { Button, IconAlertCircle, Modal } from 'ui'
 import Link from 'next/link'
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
-
-const RLS_ACKNOWLEDGED_KEY = 'supabase-acknowledge-rls-warning'
+import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+import RLSDisableModalContent from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSDisableModal'
 
 export default function RLSBannerWarning() {
   const { meta } = useStore()
@@ -32,8 +32,8 @@ export default function RLSBannerWarning() {
         <div>
           <div className="text-center bg-amber-500 text-amber-1100 dark:text-amber-900 text-xs py-2.5 flex items-center justify-center relative">
             <IconAlertCircle size={16} strokeWidth={2} />
-            <span className="uppercase font-bold ml-2">Warning</span>: This table is publicly
-            readable and writable.{' '}
+            <span className="uppercase font-bold ml-2">Warning</span>: You are allowing anonymous
+            access to your table.{' '}
             <Link href={`/project/${projectRef}/auth/policies?search=${tableID}`}>
               <a className="underline ml-2 opacity-80 hover:opacity-100 transition">
                 Enable Row Level Security
@@ -51,30 +51,15 @@ export default function RLSBannerWarning() {
           </div>
 
           <ConfirmationModal
-            danger
             visible={isOpen}
-            header="Warning: Your data is public"
-            buttonLabel="I understand, dismiss this warning"
+            header="Turn off Row Level Security"
+            buttonLabel="Confirm"
+            size="medium"
             onSelectCancel={() => setIsOpen(false)}
             onSelectConfirm={handleDismissWarning}
             children={
               <Modal.Content>
-                <div className="mt-4 mb-6 space-y-4">
-                  <p className="text-sm text-scale-1100">
-                    Data in this table is publicly <u>readable and writable</u> by anyone with the
-                    anon key. We strongly recommend creating RLS (Row-Level Security) policies to
-                    allow access to this table.
-                  </p>
-                  <div>
-                    <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                      <a target="_blank">
-                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                          About RLS Policies
-                        </Button>
-                      </a>
-                    </Link>
-                  </div>
-                </div>
+                <RLSDisableModalContent />
               </Modal.Content>
             }
           />
