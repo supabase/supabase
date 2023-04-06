@@ -1,7 +1,5 @@
-drop function match_page_sections;
-
 -- Return a setof page_section so that we can use PostgREST resource embeddings (joins with other tables)
-create or replace function match_page_sections(embedding vector(1536), match_threshold float, min_content_length int)
+create or replace function match_page_sections_v2(embedding vector(1536), match_threshold float, min_content_length int)
 returns setof page_section
 language plpgsql
 as $$
