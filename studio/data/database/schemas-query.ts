@@ -26,7 +26,7 @@ export type SchemasVariables = {
   connectionString?: string
 }
 
-export type SchemasData = Schema[]
+export type SchemasData = { result: Schema[] }
 export type SchemasError = unknown
 
 export const useSchemasQuery = <TData extends SchemasData = SchemasData>(

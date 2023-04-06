@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useParams } from 'common'
-import QueryTab from 'localStores/sqlEditor/QueryTab'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useStore } from 'hooks'
@@ -12,9 +11,10 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useRouter } from 'next/router'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 
 export interface QueryItemProps {
-  tabInfo: QueryTab
+  tabInfo: SqlSnippet
 }
 
 const QueryItem = ({ tabInfo }: QueryItemProps) => {
@@ -47,7 +47,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
 
 export default QueryItem
 
-const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
+const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
@@ -74,6 +74,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 
   const onConfirmDelete = async () => {
     if (!ref) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
 
     try {
       await deleteContent({ projectRef: ref, id })

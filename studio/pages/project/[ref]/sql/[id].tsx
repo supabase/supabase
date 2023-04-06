@@ -1,85 +1,128 @@
-import React, { useEffect } from 'react'
+import { useTheme } from 'common'
+import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
-import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-import getPgsqlCompletionProvider from 'components/to-be-cleaned/SqlEditor/PgsqlCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/PgsqlSignatureHelpProvider'
-import { useStore } from 'hooks'
-import { SQLEditorLayout } from 'components/layouts'
+
 import { NextPageWithLayout } from 'types'
-import { useTheme } from 'common'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useKeywordsQuery } from 'data/database/keywords-query'
+import { useFunctionsQuery } from 'data/database/functions-query'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTableColumnsQuery } from 'data/database/table-columns-query'
+
+import { SQLEditorLayout } from 'components/layouts'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 
 const SqlEditor: NextPageWithLayout = () => {
-  const { meta } = useStore()
-  const { isDarkMode } = useTheme()
-  const sqlEditorStore: any = useSqlStore()
   const monaco = useMonaco()
+  const { isDarkMode } = useTheme()
+  const { project } = useProjectContext()
 
-  useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme('supabase', {
-        base: isDarkMode ? 'vs-dark' : 'vs', // can also be hc-black
-        inherit: true, // can also be false to completely replace the builtin rules
-        rules: [
-          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-          // { token: 'predefined.sql', foreground: 'D4D4D4' },
-        ],
-        colors: {
-          'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0',
-          // 'editorGutter.background': '#30313f',
-          // 'editorLineNumber.foreground': '#555671',
-        },
-      })
-    }
-  }, [monaco, isDarkMode])
-
-  useEffect(() => {
-    if (monaco) {
-      // Enable pgsql format
-      const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model: any) {
-          const value = model.getValue()
-          const formatted = await formatPgsql(value)
-          return [
-            {
-              range: model.getFullModelRange(),
-              text: formatted,
-            },
-          ]
-        },
-      })
-
-      // register completion item provider for pgsql
-      const completeProvider = monaco.languages.registerCompletionItemProvider(
-        'pgsql',
-        getPgsqlCompletionProvider(monaco, sqlEditorStore)
-      )
-      const signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
-        'pgsql',
-        getPgsqlSignatureHelpProvider(monaco, sqlEditorStore)
-      )
-
-      return () => {
-        formatprovider.dispose()
-        completeProvider.dispose()
-        signatureHelpProvider.dispose()
-      }
-    }
-  }, [monaco])
-
-  async function formatPgsql(value: any) {
+  const { mutateAsync: formatQuery } = useFormatQueryMutation()
+  async function formatPgsql(value: string) {
     try {
-      const formatted = await meta.formatQuery(value)
-      if (formatted.error) throw formatted.error
-      return formatted
+      if (!project) throw new Error('No project')
+      const formatted = await formatQuery({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: value,
+      })
+      return formatted.result
     } catch (error) {
       console.error('formatPgsql error:', error)
       return value
     }
   }
+
+  const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  console.log({ schemas, tableColumns, keywords, functions })
+
+  const pgInfoRef = useRef<any>(null)
+  const formatPgsqlRef = useRef(formatPgsql)
+  formatPgsqlRef.current = formatPgsql
+
+  const isPgInfoReady =
+    isTableColumnsSuccess && isSchemasSuccess && isKeywordsSuccess && isFunctionsSuccess
+  if (isPgInfoReady) {
+    if (pgInfoRef.current === null) {
+      pgInfoRef.current = {}
+    }
+    pgInfoRef.current.tableColumns = tableColumns?.result
+    pgInfoRef.current.schemas = schemas?.result
+    pgInfoRef.current.keywords = keywords?.result
+    pgInfoRef.current.functions = functions?.result
+  }
+
+  useEffect(() => {
+    if (monaco) {
+      monaco.editor.defineTheme('supabase', {
+        base: isDarkMode ? 'vs-dark' : 'vs',
+        inherit: true,
+        rules: [
+          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
+          { token: 'string.sql', foreground: '24b47e' },
+          { token: 'comment', foreground: '666666' },
+        ],
+        colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
+      })
+    }
+  }, [monaco, isDarkMode])
+
+  // Enable pgsql format
+  useEffect(() => {
+    if (monaco) {
+      const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+        async provideDocumentFormattingEdits(model: any) {
+          const value = model.getValue()
+          const formatted = await formatPgsqlRef.current(value)
+          return [{ range: model.getFullModelRange(), text: formatted }]
+        },
+      })
+      return () => formatProvider.dispose()
+    }
+  }, [monaco])
+
+  // Register auto completion item provider for pgsql
+  useEffect(() => {
+    if (isPgInfoReady) {
+      let completeProvider: any
+      let signatureHelpProvider: any
+
+      if (monaco && isPgInfoReady) {
+        completeProvider = monaco.languages.registerCompletionItemProvider(
+          'pgsql',
+          getPgsqlCompletionProvider(monaco, pgInfoRef)
+        )
+        signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
+          'pgsql',
+          getPgsqlSignatureHelpProvider(monaco, pgInfoRef)
+        )
+      }
+
+      return () => {
+        completeProvider?.dispose()
+        signatureHelpProvider?.dispose()
+      }
+    }
+  }, [isPgInfoReady])
 
   return (
     <div className="SQLTabContainer flex-1">
@@ -89,5 +132,4 @@ const SqlEditor: NextPageWithLayout = () => {
 }
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
-
 export default observer(SqlEditor)
