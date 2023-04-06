@@ -311,7 +311,7 @@ function BlogPostPage(props: any) {
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
-                  <div className="block lg:hidden py-4 lg:py-8">
+                  <div className="block lg:hidden py-8">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
                     </div>
