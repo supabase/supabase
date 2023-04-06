@@ -53,7 +53,6 @@ const SqlEditor: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  console.log({ schemas, tableColumns, keywords, functions })
 
   const pgInfoRef = useRef<any>(null)
   const formatPgsqlRef = useRef(formatPgsql)
