@@ -58,7 +58,7 @@ const DocsSearch = () => {
       setIsLoading(true)
 
       const { error, data: pageResults } = await supabaseClient.functions.invoke<PageResult[]>(
-        'search',
+        'search-v2',
         {
           body: { query },
         }
