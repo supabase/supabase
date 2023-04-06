@@ -140,7 +140,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
         .filter((item: any) => item.schema !== schema)
       const formattedPurgedData = keyBy(purgedData, this.identifier)
 
-      this.data = { ...formattedPurgedData, ...formattedData }
+      this.data = { ...formattedPurgedData, ...formattedData } as any
       this.setState(LOADED)
 
       return data
@@ -154,7 +154,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
 
   initialDataArray(value: T[]) {
     if (this.state === this.STATES.INITIAL) {
-      this.data = keyBy(value, this.identifier)
+      this.data = keyBy(value, this.identifier) as any
       this.state = this.STATES.LOADED
     }
   }
@@ -164,7 +164,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   }
 
   setDataArray(value: T[]) {
-    this.data = keyBy(value, this.identifier)
+    this.data = keyBy(value, this.identifier) as any
   }
 
   setError(value: any) {
