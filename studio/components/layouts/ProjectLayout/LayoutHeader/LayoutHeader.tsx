@@ -1,9 +1,13 @@
+import clsx from 'clsx'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
+import { Badge, IconCommand, IconSearch, SearchButton } from 'ui'
 
+import { detectOS } from 'lib/helpers'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useFlag, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
@@ -13,16 +17,17 @@ import NotificationsPopover from './NotificationsPopover'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { Badge, IconSearch, SearchButton } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
 
+  const os = detectOS()
+  const showCmdkHelper = useFlag('dashboardCmdk')
+
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-
   const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -114,15 +119,40 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && (
-          <SearchButton>
-            <span
-              className="
-                 cursor-pointer text-center ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600  shadow-sm text-xs px-2.5 py-1"
-            >
-              <IconSearch className="text-scale-1100" size={16} strokeWidth={2} />
-            </span>
-          </SearchButton>
+        {IS_PLATFORM && showCmdkHelper && (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <SearchButton>
+                <span
+                  className={clsx(
+                    'cursor-pointer text-center ease-out duration-200 rounded outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1',
+                    'text-scale-1200 bg-scale-100 hover:bg-scale-300 bordershadow-scale-600 hover:bordershadow-scale-700 dark:bordershadow-scale-700',
+                    'hover:dark:bordershadow-scale-800 dark:bg-scale-500 dark:hover:bg-scale-600 focus-visible:outline-brand-600  shadow-sm text-xs px-2 py-1'
+                  )}
+                >
+                  <IconSearch className="text-scale-1100" size={16} strokeWidth={2} />
+                </span>
+              </SearchButton>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200 flex items-center space-x-1',
+                  ].join(' ')}
+                >
+                  {os === 'macos' ? (
+                    <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
+                  ) : (
+                    <p className="text-xs">CTRL</p>
+                  )}
+                  <p className="text-xs">K</p>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
         )}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
