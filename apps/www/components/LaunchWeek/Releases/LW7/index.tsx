@@ -19,6 +19,7 @@ import styles from './styles/launchWeek7.module.css'
 
 export default function LW7Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
+
   const publishedSections =
     days
       .filter((day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now())
@@ -34,7 +35,6 @@ export default function LW7Releases() {
   const day3Shipped = Date.parse(day3.publishedAt) <= Date.now()
   const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
   const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
-
   const isHackathonLive = prereleaseShipped && Date.parse(endOfLW7) >= Date.now()
 
   return (
@@ -103,6 +103,7 @@ export default function LW7Releases() {
                   shipped={prereleaseShipped}
                 />
               }
+              key={preRelease.dd}
               disabled={!prereleaseShipped}
               className="h-[79px]"
               id={preRelease.d.toString()}
@@ -117,7 +118,7 @@ export default function LW7Releases() {
                       style={{
                         background: `radial-gradient(90% 130px at 80% 0px, #4635A7, transparent)`,
                       }}
-                    ></div>
+                    />
                     <div className="flex items-center lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                       <div>{preRelease.steps[0].title}</div>
                       <StyledArticleBadge className="lg:ml-4">Guide</StyledArticleBadge>
@@ -138,7 +139,7 @@ export default function LW7Releases() {
                       style={{
                         background: `radial-gradient(90% 40% at 50% -10%, #4635A7, transparent)`,
                       }}
-                    ></div>
+                    />
                     <div className="flex flex-col items-center gap-2 min-w-[300px]">
                       <StyledArticleBadge>New</StyledArticleBadge>
                       <CartTitle>{preRelease.steps[1].title}</CartTitle>
@@ -146,7 +147,7 @@ export default function LW7Releases() {
                     </div>
                     <SectionButtons
                       github={preRelease.steps[1].github}
-                      url={preRelease.steps[1].url}
+                      hackernews={preRelease.steps[1].hackernews}
                     />
                   </div>
                 </div>
