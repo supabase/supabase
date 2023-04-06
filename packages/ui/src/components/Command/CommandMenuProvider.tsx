@@ -1,6 +1,7 @@
-import { useTheme, UseThemeProps } from 'common'
+import { useParams, useTheme, UseThemeProps } from 'common'
 import * as React from 'react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { COMMAND_ROUTES } from './Command.constants'
 import CommandMenu from './CommandMenu'
 
 export interface CommandMenuContextValue {
@@ -51,6 +52,16 @@ const CommandMenuProvider = ({
   const [pages, setPages] = React.useState<string[]>([])
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
+  const { q: query } = useParams()
+
+  // Immediately run search if we have a query param
+  useEffect(() => {
+    if (query) {
+      setPages([COMMAND_ROUTES.DOCS_SEARCH])
+      setSearch(query)
+      setIsOpen(true)
+    }
+  }, [query])
 
   const actions: CommandMenuActions = {
     toggleTheme,

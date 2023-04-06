@@ -57,6 +57,11 @@ const DocsSearch = () => {
       setHasSearchError(false)
       setIsLoading(true)
 
+      // Update the query param in address bar for deep linking
+      const url = new URL(window.location.href)
+      url.searchParams.set('q', query)
+      window.history.replaceState(null, '', url)
+
       const { error, data: pageSections } = await supabaseClient.functions.invoke('search', {
         body: { query },
       })
