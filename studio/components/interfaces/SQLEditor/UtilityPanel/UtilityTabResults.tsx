@@ -1,4 +1,3 @@
-import { Typography } from '@supabase/ui'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import Results from './Results'
 
@@ -10,10 +9,10 @@ export type UtilityTabResultsProps = {
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snap = useSqlEditorStateSnapshot()
   const snippet = snap.snippets[id]
-  const utilityPanelCollapsed = snippet?.utilityPanelCollapsed ?? false
   const result = snap.results[id]?.[0]
+  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
 
-  if (utilityPanelCollapsed) return null
+  if (isUtilityPanelCollapsed) return null
 
   if (isExecuting) {
     return (
@@ -24,19 +23,15 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   } else if (result?.error) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text>
-          <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
       </div>
     )
   } else if (!result) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text type="secondary">
-          <p className="m-0 border-0 px-6 py-4 ">
-            Click <Typography.Text code>RUN</Typography.Text> to execute your query.
-          </p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1100">
+          Click <code>RUN</code> to execute your query.
+        </p>
       </div>
     )
   }
