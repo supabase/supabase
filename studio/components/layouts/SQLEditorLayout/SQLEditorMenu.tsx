@@ -11,7 +11,7 @@ import { useProfileQuery } from 'data/profile/profile-query'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -67,7 +67,14 @@ const SideBarContent = observer(() => {
 
     try {
       const payload = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
-      const response = await createContent({ projectRef: ref, payload })
+      const response = await createContent(
+        { projectRef: ref, payload },
+        {
+          onSuccess(data) {
+            snap.addSnippet(data.content[0] as SqlSnippet, ref)
+          },
+        }
+      )
       const snippetId = response.content[0].id
       router.push(`/project/${ref}/sql/${snippetId}`)
     } catch (error: any) {

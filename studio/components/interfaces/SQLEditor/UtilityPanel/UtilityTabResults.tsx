@@ -9,10 +9,12 @@ export type UtilityTabResultsProps = {
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snap = useSqlEditorStateSnapshot()
-  const utilityPanelCollapsed = snap.snippets[id].utilityPanelCollapsed
-  const result = snap.results[id][0]
+  const snippet = snap.snippets[id]
+  const utilityPanelCollapsed = snippet?.utilityPanelCollapsed ?? false
+  const result = snap.results[id]?.[0]
 
   if (utilityPanelCollapsed) return null
+
   if (isExecuting) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">

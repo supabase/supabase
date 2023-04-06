@@ -7,10 +7,12 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type FavoriteButtonProps = { id: string }
 const FavoriteButton = ({ id }: FavoriteButtonProps) => {
+  const client = useQueryClient()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
-  const isFavorite = snap.snippets[id].snippet.content.favorite
-  const client = useQueryClient()
+
+  const snippet = snap.snippets[id]
+  const isFavorite = snippet !== undefined ? snippet.snippet.content.favorite : false
 
   async function addFavorite() {
     snap.addFavorite(id)

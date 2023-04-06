@@ -30,19 +30,28 @@ export const sqlEditorState = proxy({
 
   setInitialSnippets: (snippets: SqlSnippet[], projectRef: string) => {
     snippets.forEach((snippet) => {
-      if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
-        sqlEditorState.snippets[snippet.id] = {
-          snippet,
-          splitSizes: [50, 50],
-          utilityPanelCollapsed: false,
-          projectRef,
-        }
-        sqlEditorState.results[snippet.id] = []
-        sqlEditorState.savingStates[snippet.id] = 'IDLE'
-      }
-
-      sqlEditorState.loaded[projectRef] = true
+      sqlEditorState.addSnippet(snippet, projectRef)
     })
+  },
+  addSnippet: (snippet: SqlSnippet, projectRef: string) => {
+    if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
+      sqlEditorState.snippets[snippet.id] = {
+        snippet,
+        splitSizes: [50, 50],
+        utilityPanelCollapsed: false,
+        projectRef,
+      }
+      sqlEditorState.results[snippet.id] = []
+      sqlEditorState.savingStates[snippet.id] = 'IDLE'
+    }
+    sqlEditorState.loaded[projectRef] = true
+  },
+  removeSnippet: (id: string) => {
+    const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
+    sqlEditorState.snippets = otherSnippets
+
+    const { [id]: result, ...otherResults } = sqlEditorState.results
+    sqlEditorState.results = otherResults
   },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {

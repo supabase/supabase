@@ -1,14 +1,13 @@
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useProfileQuery } from 'data/profile/profile-query'
-import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
+// import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useCallback } from 'react'
 import { useStore } from './useStore'
 import { useContentCreateMutation } from 'data/content/content-create-mutation'
 import { useParams } from 'common'
 import { uuidv4 } from 'lib/helpers'
 
-// [Joshen] Can we not call checkPermissions in here? rather than passing it in as an arg
-// [Joshen] Choosing to deprecate this tbh
+// [Joshen] Currently not using this after the SQL store refactor to valtio/RQ
 
 export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
   const { ref } = useParams()

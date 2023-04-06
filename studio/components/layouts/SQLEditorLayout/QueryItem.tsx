@@ -10,6 +10,8 @@ import { Dropdown, IconEdit2, IconTrash, Button, IconChevronDown, Modal } from '
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import clsx from 'clsx'
 import Link from 'next/link'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useRouter } from 'next/router'
 
 export interface QueryItemProps {
   tabInfo: QueryTab
@@ -48,6 +50,8 @@ export default QueryItem
 const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const router = useRouter()
+  const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: deleteContent } = useContentDeleteMutation()
 
   const { id, name } = tabInfo || {}
@@ -73,7 +77,14 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 
     try {
       await deleteContent({ projectRef: ref, id })
-      // [Joshen TODO] Needs to load another tab through router push
+      snap.removeSnippet(id)
+
+      const existingSnippetIds = Object.keys(snap.snippets)
+      if (existingSnippetIds.length === 0) {
+        router.push(`/project/${ref}/sql`)
+      } else {
+        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
+      }
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -95,7 +106,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
               </Dropdown.Item>
               <Dropdown.Separator />
               <Dropdown.Item onClick={onClickDelete} icon={<IconTrash size="tiny" />}>
-                Remove query
+                Delete query
               </Dropdown.Item>
             </>
           }
@@ -119,14 +130,15 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
       />
 
       <ConfirmationModal
-        header="Confirm to remove"
-        buttonLabel="Confirm"
+        header="Confirm to delete"
+        buttonLabel="Delete query"
+        buttonLoadingLabel="Deleting query"
         visible={deleteModalOpen}
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to remove '${name}' ?`}</p>
+          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to delete '${name}' ?`}</p>
         </Modal.Content>
       </ConfirmationModal>
     </div>

@@ -42,6 +42,7 @@ const SizeToggleButton = ({ id }: { id: string }) => {
     snap.restoreUtilityPanel(id)
   }
 
+  if (!snippet) return null
   return snippet.utilityPanelCollapsed ? (
     <Button
       type="text"
