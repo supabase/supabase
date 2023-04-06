@@ -38,6 +38,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
   },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
+  },
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
@@ -86,6 +90,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
+  reference_swift_v1: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v1.0',
+  },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
     name: 'CLI Reference',
@@ -105,6 +113,10 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
   },
 }
 
