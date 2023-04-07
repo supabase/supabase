@@ -1,5 +1,5 @@
 const images = {
-  '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-image-01.png',
+  '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-images-01.png',
   '0-ogImages-02': '/images/launchweek/seven/day0/ai-images/ai-image-03.png',
   '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.png',
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
