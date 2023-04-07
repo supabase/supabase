@@ -47,6 +47,7 @@ export const LinkSvg = () => (
   <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M6.875 4.0013H4.20833C3.47195 4.0013 2.875 4.59826 2.875 5.33464V12.0013C2.875 12.7377 3.47195 13.3346 4.20833 13.3346H10.875C11.6114 13.3346 12.2083 12.7377 12.2083 12.0013V9.33464M9.54167 2.66797H13.5417M13.5417 2.66797V6.66797M13.5417 2.66797L6.875 9.33464"
+      // stroke="#A69DC9"
       stroke="#8F8F8F"
       strokeWidth="1"
       strokeLinecap="round"
@@ -99,15 +100,15 @@ export const StyledArticleBadge = ({
   children: any
 }) => (
   <div
-    className={[
-      'relative bg-gradient-to-br p-[1.5px] from-[#F4FFFA90] to-[#7E7AAD] overflow-hidden rounded-full',
-      className,
-    ].join(' ')}
+    className={['relative bg-transparent border border-[#F4FFFA90] rounded-full', className].join(
+      ' '
+    )}
   >
-    <div className="!bg-[#1C1C1C] rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none backdrop-blur-md">
-      <span className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
+    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none">
+      <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
+      <div className="absolute inset-0 w-full h-full bg-[#1C1C1C] rounded-full blur-2xl" />
     </div>
   </div>
 )
@@ -144,7 +145,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
 
 export const ChipLink = ({ href, children }: { href: string; children: any }) => (
   <Link href={href} target="_blank" rel="noopener">
-    <a className="flex items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#464444] to-[#191919] hover:from-[#4e4e4e] hover:to-[#191919] rounded-full text-sm py-2 pl-3 pr-2">
+    <a className="flex items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2">
       {children}
     </a>
   </Link>
@@ -220,8 +221,9 @@ export const SectionButtons = ({
 }
 
 export const CartTitle = ({ children }: { children: any }) => (
-  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7">
+  <span className="z-0 relative text-[#F4FFFA] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
     {children}
+    <div className="absolute -z-10 inset-0 w-full h-full bg-[#1C1C1C90] rounded-full blur-xl" />
   </span>
 )
 
