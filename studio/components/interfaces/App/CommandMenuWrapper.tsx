@@ -12,7 +12,11 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const { content } = useStore()
+  const { content, ui } = useStore()
+
+  const { opt_in_tags } = ui.selectedOrganization ?? {}
+
+  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
   const { data: profile } = useProfileQuery()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
@@ -56,6 +60,7 @@ ${answer}
       apiKeys={apiKeys}
       MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
       onSaveGeneratedSQL={onSaveGeneratedSQL}
+      isOptedInToAI={isOptedInToAI}
     >
       {children}
     </CommandMenuProvider>
