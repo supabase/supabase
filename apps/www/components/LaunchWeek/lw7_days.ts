@@ -45,7 +45,7 @@ const days: WeekDayProps[] = [
   {
     title: 'AI generated OG images',
     shipped: true,
-    date: '',
+    date: '07 Apr',
     // publishedAt: '2023-04-07T07:00:00.000-07:00',
     publishedAt: '2023-04-05T07:00:00.000-07:00',
     description: 'AI generated OG images',
