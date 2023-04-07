@@ -426,6 +426,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-whatsapp-otp",
+        "title": "Sign in a user through WhatsApp",
+        "slug": "auth-signinwithwhatsappotp",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-out",
         "title": "Sign out a user",
         "slug": "auth-signout",
