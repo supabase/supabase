@@ -54,7 +54,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
+    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
     {
       name: 'Framework Quickstarts',
       items: [
@@ -130,6 +130,15 @@ export const gettingstarted = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+      ],
+    },
+    {
+      name: 'AI & ML',
+      items: [
+        {
+          name: 'Vector Search with OpenAI',
+          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },

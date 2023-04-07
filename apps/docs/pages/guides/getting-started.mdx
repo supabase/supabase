@@ -36,6 +36,22 @@ export const meta = {
 
 </div>
 
+### Use Cases
+
+<div className="grid lg:grid-cols-12 gap-6 not-prose">
+  {useCases.map((item) => {
+    return (
+      <Link href={`${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
 ### Framework Quickstarts
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
@@ -83,6 +99,27 @@ export const meta = {
     )
   })}
 </div>
+
+export const useCases = [
+  {
+    title: 'OpenAI Vector Search',
+    href: '/guides/getting-started/openai/vector-search',
+    description: `Build your own custom ChatGPT with Next.js, OpenAI and pg_vector.`,
+    icon: '/docs/img/icons/openai_logo',
+  },
+  {
+    title: 'Subscription Payments (SaaS)',
+    href: 'https://github.com/vercel/nextjs-subscription-payments#nextjs-subscription-payments-starter',
+    description: `Clone, deploy, and fully customize a SaaS subscription application with Next.js.`,
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+  {
+    title: 'Partner Gallery',
+    href: 'https://github.com/supabase-community/partner-gallery-example#supabase-partner-gallery-example',
+    description: `Postgres full-text search, image storage, and more.`,
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+]
 
 export const quickstarts = [
   {
