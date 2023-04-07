@@ -43,12 +43,12 @@ export const endOfLW7 = '2023-04-16T23:59:59.999-07:00'
 
 const days: WeekDayProps[] = [
   {
-    title: 'AI generated OG images',
+    title: '',
     shipped: true,
     date: '07 Apr',
     // publishedAt: '2023-04-07T07:00:00.000-07:00',
     publishedAt: '2023-04-05T07:00:00.000-07:00',
-    description: 'AI generated OG images',
+    description: '',
     d: 0,
     dd: 'Pre-release',
     youtube_id: '',
@@ -56,7 +56,7 @@ const days: WeekDayProps[] = [
     docs: 'https://supabase.com/docs',
     steps: [
       {
-        title: 'Designing with AI Midjourney',
+        title: 'Designing with AI',
         blog: '/blog/designing-with-ai-midjourney',
         // docs: '',
         // isNew: false,
