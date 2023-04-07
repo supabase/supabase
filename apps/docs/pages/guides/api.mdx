@@ -11,8 +11,8 @@ export const meta = {
 Supabase auto-generates three types of API directly from your database schema.
 
 - REST - connect to your database through a restful interface, directly from the browser.
-- Realtime - for listening to database changes.
-- GraphQL - a fast and auto-generate GraphQL API.
+- GraphQL - manipulate your database using a graph-like query language.
+- Realtime - listen to database changes.
 
 All the APIs are auto-generated from your database and are designed to get you building as fast as possible, without writing a single line of code.
 
@@ -29,17 +29,40 @@ You can use them directly from the browser (two-tier architecture), or as a comp
 ## REST API [#rest-api-overview]
 
 Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
-It provides everything you need from a CRUD API:
+It provides everything you need from a CRUD API at the URL `https://<project_ref>.supabase.co/rest/v1/`.
 
-- Basic CRUD operations
-- Deeply nested joins, allowing you to fetch data from multiple tables in a single fetch
-- Works with Postgres Views
+The REST interface is automatically reflected from your database's schema and supports:
+- Basic CRUD operations (Create/Read/Update/Delete)
+- Arbitrarily deep relationships among tables/views, functions that return table types can also nest related tables/views.
+- Works with Postgres Views, Materialized Views and Foreign Tables
 - Works with Postgres Functions
+- User defined computed columns and computed relationships
 - Works with the Postgres security model - including Row Level Security, Roles, and Grants.
+
+The REST API resolves all requests to a single SQL statement leading to fast response times and high throughput.
+
+Reference:
+- [Docs](https://postgrest.org/)
+- [Source Code](https://github.com/PostgREST/postgrest)
 
 ## GraphQL API [#graphql-api-overview]
 
-GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL.
+Supabase uses [pg_graphql](https://supabase.github.io/pg_graphql/) to expose a GraphQL API endpoint at `https://<project_ref>.supabase.co/graphql/v1/`.
+You can introspect and query the GraphQL API of an existing Supabase project within Studio [here](https://app.supabase.com/project/_/api/graphiql),
+or navigate there manually at `API Docs > GraphQL > GraphiQL`.
+
+The GraphQL interface is automatically reflected from your database's schema and supports:
+- Basic CRUD operations (Create/Read/Update/Delete)
+- Support for Tables, Views, Materialized Views, and Foreign Tables
+- Arbitrarily deep relationships among tables/views
+- User defined computed fields
+- The Postgres security model - including Row Level Security, Roles, and Grants.
+
+The GraphQL API resolves all requests in a single round-trip leading to fast response times and high throughput.
+
+Reference:
+- [Docs](https://supabase.github.io/pg_graphql/)
+- [Source Code](https://github.com/supabase/pg_graphql)
 
 ## Realtime API [#realtime-api-overview]
 

@@ -287,6 +287,53 @@
     ]
   },
   {
+    "title": "Authentication",
+    "items": [
+      {
+        "id": "supabase-sso",
+        "title": "Manage SSO on your project",
+        "slug": "supabase-sso",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-list",
+        "title": "List all identity providers",
+        "slug": "supabase-sso-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-show",
+        "title": "Show information for an identity providers",
+        "slug": "supabase-sso-show",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-add",
+        "title": "Add an identity provider",
+        "slug": "supabase-sso-add",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-update",
+        "title": "Update an identity provider",
+        "slug": "supabase-sso-update",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-remove",
+        "title": "Remove an identity provider",
+        "slug": "supabase-sso-remove",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-info",
+        "title": "See your project's SSO information",
+        "slug": "supabase-sso-info",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
     "title": "Custom Domains",
     "items": [
       {

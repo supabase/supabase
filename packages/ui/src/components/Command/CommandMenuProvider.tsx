@@ -105,6 +105,9 @@ function useKeyboardEvents({
         case 'k':
         case '/':
           if (event.metaKey || event.ctrlKey) {
+            // Some browsers (ie. firefox) will focus the address bar by default
+            event.preventDefault()
+
             setIsOpen(true)
           }
           return
