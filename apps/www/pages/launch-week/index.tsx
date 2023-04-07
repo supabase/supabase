@@ -118,14 +118,6 @@ export default function TicketHome({ users }: Props) {
           </div>
 
           <SectionContainer className="relative w-full -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
-            <div className="mb-4">
-              <a href="#lw-7-prizes" className="flex items-center text-white text-sm my-4 gap-4">
-                Join Hackathon{' '}
-                <span className="bounce-loop">
-                  <IconArrowDown w={10} h={12} />
-                </span>
-              </a>
-            </div>
             <LW7Releases />
             <div className="w-full flex justify-center py-8 md:py-14 !px-2">
               {supabase && (
