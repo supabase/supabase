@@ -11,7 +11,6 @@ import { Badge, Divider, IconChevronLeft, IconFile } from 'ui'
 import { generateReadingTime } from '~/lib/helpers'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import BlogLinks from '~/components/LaunchWeek/BlogLinks'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -68,7 +67,6 @@ function BlogPostPage(props: any) {
   const articleRef = useRef(null)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const isLaunchWeek7 = props.blog.launchweek === 7
   const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
   const [activeSection, setActiveSection] = useState<any>('')
 
@@ -310,7 +308,6 @@ function BlogPostPage(props: any) {
                       <MDXRemote {...content} components={mdxComponents()} />
                     </div>
                   </article>
-                  {isLaunchWeek7 && <BlogLinks />}
                   <div className="block lg:hidden py-8">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
