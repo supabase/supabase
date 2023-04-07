@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useEffect } from 'react'
-import { Accordion, IconArrowDown } from 'ui'
+import { Accordion } from 'ui'
 import Lottie from 'lottie-react'
 
 import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/lw7_days'
@@ -10,13 +10,11 @@ import {
   CartTitle,
   ChipLink,
   PencilSvg,
-  PlaySvg,
   SectionButtons,
   SmallCard,
   StyledArticleBadge,
 } from './components'
 
-import styles from './styles/launchWeek7.module.css'
 import { useMobileViewport } from '../../../../hooks/useMobileViewport'
 import { motion } from 'framer-motion'
 
