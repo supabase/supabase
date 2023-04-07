@@ -1,3 +1,4 @@
+import { createContent } from 'data/content/content-create-mutation'
 import { Content } from 'data/content/content-query'
 import { updateContent } from 'data/content/content-update-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -29,6 +30,7 @@ export const sqlEditorState = proxy({
     [key: string]: boolean
   },
 
+  needsCreating: proxySet<string>([]),
   needsSaving: proxySet<string>([]),
   savingStates: {} as {
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
@@ -57,7 +59,7 @@ export const sqlEditorState = proxy({
       sqlEditorState.addSnippet(snippet, projectRef)
     })
   },
-  addSnippet: (snippet: SqlSnippet, projectRef: string) => {
+  addSnippet: (snippet: SqlSnippet, projectRef: string, isNew?: boolean) => {
     if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
       sqlEditorState.snippets[snippet.id] = {
         snippet,
@@ -68,6 +70,9 @@ export const sqlEditorState = proxy({
       sqlEditorState.savingStates[snippet.id] = 'IDLE'
       if (!sqlEditorState.orders[projectRef].includes(snippet.id)) {
         sqlEditorState.orders[projectRef].unshift(snippet.id)
+      }
+      if (isNew) {
+        sqlEditorState.needsCreating.add(snippet.id)
       }
     }
     sqlEditorState.loaded[projectRef] = true
@@ -82,6 +87,9 @@ export const sqlEditorState = proxy({
     sqlEditorState.orders[snippet.projectRef] = sqlEditorState.orders[snippet.projectRef].filter(
       (s) => s !== id
     )
+
+    sqlEditorState.needsSaving.delete(id)
+    sqlEditorState.needsCreating.delete(id)
   },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
@@ -163,21 +171,49 @@ const debouncedUpdate = (id: string, projectRef: string, content: Partial<Conten
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
 
-  subscribe(sqlEditorState.needsSaving, () => {
+  subscribe(sqlEditorState.needsCreating, () => {
     const state = getSqlEditorStateSnapshot()
 
-    state.needsSaving.forEach((id) => {
+    state.needsCreating.forEach((id) => {
       const snippet = state.snippets[id]
 
       if (snippet) {
-        debouncedUpdate(id, snippet.projectRef, {
-          content: { ...snippet.snippet.content, content_id: id },
-          type: 'sql',
-          id,
+        sqlEditorState.savingStates[id] = 'UPDATING'
+        createContent({
+          projectRef: snippet.projectRef,
+          payload: {
+            ...snippet.snippet,
+            type: 'sql',
+          },
         })
-
-        sqlEditorState.needsSaving.delete(id)
+          .then(() => {
+            sqlEditorState.savingStates[id] = 'IDLE'
+            sqlEditorState.needsCreating.delete(id)
+          })
+          .catch(() => {
+            sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
+          })
       }
     })
+  })
+
+  subscribe(sqlEditorState.needsSaving, () => {
+    const state = getSqlEditorStateSnapshot()
+
+    Array.from(state.needsSaving)
+      .filter((id) => !state.needsCreating.has(id))
+      .forEach((id) => {
+        const snippet = state.snippets[id]
+
+        if (snippet) {
+          debouncedUpdate(id, snippet.projectRef, {
+            content: { ...snippet.snippet.content, content_id: id },
+            type: 'sql',
+            id,
+          })
+
+          sqlEditorState.needsSaving.delete(id)
+        }
+      })
   })
 }

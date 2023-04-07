@@ -7,6 +7,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfileQuery } from 'data/profile/profile-query'
+import { uuidv4 } from 'lib/helpers'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
@@ -15,7 +16,6 @@ import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useContentCreateMutation } from 'data/content/content-create-mutation'
 import { useRouter } from 'next/router'
 
 const SideBarContent = observer(() => {
@@ -31,7 +31,6 @@ const SideBarContent = observer(() => {
       if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },
   })
-  const { mutateAsync: createContent } = useContentCreateMutation()
 
   const snippets = useSnippets(ref)
 
@@ -67,17 +66,12 @@ const SideBarContent = observer(() => {
     }
 
     try {
-      const payload = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
-      const response = await createContent(
-        { projectRef: ref, payload },
-        {
-          onSuccess(data) {
-            snap.addSnippet(data.content[0] as SqlSnippet, ref)
-          },
-        }
-      )
-      const snippetId = response.content[0].id
-      router.push(`/project/${ref}/sql/${snippetId}`)
+      const snippet = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
+      const data = { ...snippet, id: uuidv4() }
+
+      snap.addSnippet(data as SqlSnippet, ref, true)
+
+      router.push(`/project/${ref}/sql/${data.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
