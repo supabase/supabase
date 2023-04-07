@@ -14,7 +14,7 @@ export async function updateContent(
   { projectRef, id, content }: UpdateContentVariables,
   signal?: AbortSignal
 ) {
-  const created = await patch<UserContent>(
+  const created = await patch<UserContent[]>(
     `${API_URL}/projects/${projectRef}/content?id=${id}`,
     content,
     { signal }
@@ -23,7 +23,7 @@ export async function updateContent(
     throw created.error
   }
 
-  return { content: created }
+  return { content: created[0] }
 }
 
 type UpdateContentData = Awaited<ReturnType<typeof updateContent>>
