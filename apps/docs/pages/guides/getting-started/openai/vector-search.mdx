@@ -4,16 +4,16 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 export const meta = {
   title: 'OpenAI Embeddings & Vector Search',
   subtitle:
-    'Learn how to build your own custom ChatGPT style doc search powered by Next.js, OpenAI, and Supabase.',
+    'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and Supabase.',
   breadcrumb: 'OpenAI',
 }
 
-We've built [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) a ChatGPT for the Supabase Docs. In this tutorial we'll look at how you can build your own custom ChatGPT experience based on your own knowledge base.
+In this tutorial we'll look at how you can build a custom ChatGPT-like search experience for your own knowledge base. See our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for an example of how this will look.
 
 We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project.
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
+  You can find the [full example on
   GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
 </Admonition>
 
@@ -23,9 +23,9 @@ We assume that you have a Next.js project with a collection of `.mdx` files nest
 1. Enter your project details.
 1. Wait for the new database to launch.
 
-## Set up the database
+## Prepare the database
 
-Now we are going to set up the database schema. We can use the "OpenAI Vector Search" quickstart in the SQL Editor, or you can just copy/paste the SQL from below and run it yourself.
+Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](https://app.supabase.com/project/_/sql), or you can copy/paste the SQL below and run it yourself.
 
 <Tabs
   scrollable
@@ -65,7 +65,7 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Enable the pgvector extension">
+    <StepHikeCompact.Details title="Create a migrations file">
 
     To make changes to our local database, we need to create a new migration. This will create a new `.sql` file in our `supabase/migrations` folder, where we can write SQL that will be applied to our local database when starting Supabase locally.
 
@@ -77,8 +77,18 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
       supabase migration new init
       ```
 
-      Copy the following SQL line into the newly created migration file to enable the pgvector extension.
+    </StepHikeCompact.Code>
 
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Enable the pgvector extension">
+
+    Copy the following SQL line into the newly created migration file to enable the pgvector extension.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
 
       ```sql
       -- Enable pgvector extension
@@ -92,19 +102,16 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Create the database schema">
 
-    Next, we will set up two tables:
-
-    1. `nods_page`: we use this to store the checksum of our pages to make sure we only regenerate the embeddings when the page content has changed.
-    2. `nods_page_section`: here we store the actual embeddings with some metadata.
-
-    To do so, copy these SQL queries to your init migration file.
+    Copy these SQL queries to your migration file. It will create two tables in our database schema.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
     ```sql
-    -- Create tables
+    -- Stores the checksum of our pages.
+    -- This ensures that we only regenerate embeddings
+    -- when the page content has changed.
     create table "public"."nods_page" (
       id bigserial primary key,
       parent_page_id bigint references public.nods_page,
@@ -114,8 +121,10 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
       type text,
       source text
     );
-    alter table "public"."nods_page" enable row level security;
+    alter table "public"."nods_page"
+      enable row level security;
 
+    -- Stores the actual embeddings with some metadata
     create table "public"."nods_page_section" (
       id bigserial primary key,
       page_id bigint not null references public.nods_page on delete cascade,
@@ -125,7 +134,8 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
       slug text,
       heading text
     );
-    alter table "public"."nods_page_section" enable row level security;
+    alter table "public"."nods_page_section"
+      enable row level security;
     ```
 
     </StepHikeCompact.Code>
@@ -135,9 +145,9 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create similarity search database function">
 
-    Anytime the user sends us a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
+    Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
 
-    As these are quite complex SQL operations, we wrap them in database functions that we can then easily call from our frontend using [RPC](https://supabase.com/docs/reference/javascript/rpc).
+    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](https://supabase.com/docs/reference/javascript/rpc).
 
     </StepHikeCompact.Details>
 
@@ -145,8 +155,20 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
 
     ```sql
     -- Create embedding similarity search functions
-    create or replace function match_page_sections(embedding vector(1536), match_threshold float, match_count int, min_content_length int)
-    returns table (id bigint, page_id bigint, slug text, heading text, content text, similarity float)
+    create or replace function match_page_sections(
+        embedding vector(1536),
+        match_threshold float,
+        match_count int,
+        min_content_length int
+    )
+    returns table (
+        id bigint,
+        page_id bigint,
+        slug text,
+        heading text,
+        content text,
+        similarity float
+    )
     language plpgsql
     as $$
     #variable_conflict use_variable
@@ -226,23 +248,34 @@ Now we are going to set up the database schema. We can use the "OpenAI Vector Se
 
 ## Pre-process the knowledge base at build time
 
-Now that our database is set up, we will write a script to process all `.mdx` files in the `pages` directory. You can find the full script [here](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/lib/generate-embeddings.ts).
+With our database set up, we need to process and store all `.mdx` files in the `pages` directory. You can find the full script [here](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/lib/generate-embeddings.ts), or follow the steps below:
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Generate Embeddings">
 
-    We can now write a script to pre-process our `.mdx` files at build time and generate the embeddings. Create a new file `lib/generate-embeddings.ts` and copy the code over from [GitHub](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/lib/generate-embeddings.ts)
+    Create a new file `lib/generate-embeddings.ts` and copy the code over from [GitHub](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/lib/generate-embeddings.ts).
 
     </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash
+      curl \
+      https://raw.githubusercontent.com/supabase-community/nextjs-openai-doc-search/main/lib/generate-embeddings.ts \
+      -o "lib/generate-embeddings.ts"
+      ```
+
+    </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Set up environment variables">
 
-    We will need a couple environment variables to run the script. Add them to your `.env` file and make sure your `.env` file is not committed to source control!
+    We need some environment variables to run the script. Add them to your `.env` file and make sure your `.env` file is not committed to source control!
+    You can get your local Supabase credentials by running `supabase status`.
 
     </StepHikeCompact.Details>
 
@@ -255,12 +288,6 @@ Now that our database is set up, we will write a script to process all `.mdx` fi
 
       # Get your key at https://platform.openai.com/account/api-keys
       OPENAI_KEY=
-      ```
-
-      You can get your local Supabase credentials by running
-
-      ```bash
-      supabase status
       ```
 
     </StepHikeCompact.Code>
@@ -293,7 +320,7 @@ Now that our database is set up, we will write a script to process all `.mdx` fi
 
 ## Create Text Completion with OpenAI API
 
-Anytime the user asks a question, we will need to create an embedding for their question, perform a similarity search, and then send a text completion request to the OpenAI API with the query and then context content merged together into a prompt.
+Anytime a user asks a question, we need to create an embedding for their question, perform a similarity search, and then send a text completion request to the OpenAI API with the query and then context content merged together into a prompt.
 
 All of this is glued together in a [Vercel Edge Function](https://vercel.com/docs/concepts/functions/edge-functions), the code for which can be found on [GitHub](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/pages/api/vector-search.ts).
 
@@ -427,9 +454,9 @@ All of this is glued together in a [Vercel Edge Function](https://vercel.com/doc
 
 </StepHikeCompact>
 
-## Show the answer on the frontend
+## Display the answer on the frontend
 
-In a last step, we need to process the event stream from the OpenAI API and print the answer to the user. The full code for this can be found on [GitHub]().
+In a last step, we need to process the event stream from the OpenAI API and print the answer to the user. The full code for this can be found on [GitHub](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/components/SearchDialog.tsx).
 
 ```tsx
 const handleConfirm = React.useCallback(
@@ -500,9 +527,9 @@ const handleConfirm = React.useCallback(
 
 Want to learn more about the awesome tech that is powering this?
 
-- Read the blogpost on how we built [ChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
-- [[Docs] pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
-- Watch [Greg's](https://twitter.com/ggrdson) "How I built this" [video](https://youtu.be/Yhtjd7yGGGA) on the [Rabbit Hole Syndrome YouTube Channel](https://www.youtube.com/@RabbitHoleSyndrome):
+- Read about how we built [ChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
+- Read the pgvector Docs for [Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- Watch Greg's video for a full breakdown:
 
 <div class="video-container">
   <iframe
