@@ -319,6 +319,50 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:  
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```js
+            // You can extract the user's email domain and use it to trigger the
+            // authentication flow with the correct identity provider.
+
+            const { data, error } = await supabase.auth.signInWithSSO({
+              domain: 'company.com'
+            })
+
+            if (data?.url) {
+              // redirect the user to the identity provider's authentication flow
+              window.location.href = data.url
+            }
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```js
+            // Useful when you need to map a user's sign in request according
+            // to different rules that can't use email domains.
+
+            const { data, error } = await supabase.auth.signInWithSSO({
+              providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92'
+            })
+
+            if (data?.url) {
+              // redirect the user to the identity provider's authentication flow
+              window.location.href = data.url
+            }
+          ```
   - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
