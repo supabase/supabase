@@ -7,7 +7,6 @@ import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
-import { IconArrowDown } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
@@ -15,7 +14,7 @@ import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
-const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7'))
+const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection')
 )
