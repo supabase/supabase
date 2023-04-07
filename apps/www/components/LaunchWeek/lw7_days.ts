@@ -1,3 +1,16 @@
+import * as ogImages01Data from '~/components/LaunchWeek/7/assets/day0/00-ai-images.json'
+
+const images = {
+  '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-image-01.png',
+  '0-ogImages-02': '/images/launchweek/seven/day0/ai-images/ai-image-03.png',
+  '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.png',
+  '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
+  '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
+  // '0-ogImages-04': ogImages01Data,
+  '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
+  '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.png',
+}
+
 export interface WeekDayProps {
   title: string
   shipped: boolean
@@ -20,6 +33,11 @@ export interface WeekDayProps {
     thumb?: string
     url?: string
     youtube_id?: string
+    bg_layers?: {
+      lottie?: any
+      img?: string
+      mobileImg?: string
+    }[]
   }[]
 }
 
@@ -30,26 +48,35 @@ const days: WeekDayProps[] = [
     title: 'AI generated OG images',
     shipped: true,
     date: '',
-    publishedAt: '2023-04-07T07:00:00.000-07:00',
+    // publishedAt: '2023-04-07T07:00:00.000-07:00',
+    publishedAt: '2023-04-05T07:00:00.000-07:00',
     description: 'AI generated OG images',
     d: 0,
     dd: 'Pre-release',
     youtube_id: '',
-    blogpost: 'https://supabase.com/blog/new-supabase-docs-built-with-nextjs',
+    blogpost: 'https://supabase.com/blog/designing-with-ai-midjourney',
     docs: 'https://supabase.com/docs',
     steps: [
       {
-        title: 'AI generated OG images',
-        blog: '/blog/',
-        docs: '',
-        isNew: false,
-        description: '',
+        title: 'Designing with AI Midjourney',
+        blog: '/blog/designing-with-ai-midjourney',
+        // docs: '',
+        // isNew: false,
+        // description: '',
         thumb: '/images/launchweek/seven/day0/ai-images-thumb.png',
+        bg_layers: [
+          { img: images['0-ogImages-01'] },
+          { img: images['0-ogImages-02'] },
+          { img: images['0-ogImages-03'], mobileImg: images['0-ogImages-03-mobile'] },
+          { img: images['0-ogImages-04'] },
+          // { lottie: images['0-ogImages-04'] },
+        ],
       },
       {
         title: 'Supavisor',
-        github: 'github_link',
-        hackernews: 'hackernews_link',
+        github: 'https://github.com/supabase/supavisor',
+        // hackernews: 'hackernews_link',
+        bg_layers: [{ img: images['0-supavisor-01'] }, { img: images['0-supavisor-02'] }],
       },
     ],
   },
