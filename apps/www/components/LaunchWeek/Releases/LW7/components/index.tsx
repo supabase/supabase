@@ -77,7 +77,7 @@ export const SmallCard = ({
 }) => (
   <div
     className={[
-      'relative p-[1px] bg-gradient-to-b from-[#48484880] to-[#1C1C1C60] rounded-2xl overflow-hidden',
+      'relative p-[1px] bg-gradient-to-b from-[#48484880] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
       className,
     ].join(' ')}
   >

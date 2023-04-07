@@ -74,16 +74,6 @@ export default function LW7Releases() {
 
   return (
     <>
-      {isHackathonLive && (
-        <div className="mb-4">
-          <a href="#hackathon" className="flex items-center text-white text-sm my-4 gap-4">
-            Join Hackathon{' '}
-            <span className="bounce-loop">
-              <IconArrowDown w={10} h={12} />
-            </span>
-          </a>
-        </div>
-      )}
       <SectionContainer className="!py-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
           <SmallCard
@@ -113,7 +103,9 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">Supa AI Hackathon</span>
+                <span className="text-black dark:text-white mr-2">
+                  Supabase AI Hackathon is on. Join now!
+                </span>
               </div>
             </div>
             <div className="flex gap-2 z-10">
@@ -198,7 +190,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center
+                      basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -263,7 +255,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-14 lg:px-10 text-2xl bg-contain
+                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-14 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
