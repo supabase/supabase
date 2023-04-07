@@ -118,6 +118,22 @@ export interface Database {
         Args: {
           embedding: unknown
           match_threshold: number
+          match_count: number
+          min_content_length: number
+        }
+        Returns: {
+          id: number
+          page_id: number
+          slug: string
+          heading: string
+          content: string
+          similarity: number
+        }[]
+      }
+      match_page_sections_v2: {
+        Args: {
+          embedding: unknown
+          match_threshold: number
           min_content_length: number
         }
         Returns: {
