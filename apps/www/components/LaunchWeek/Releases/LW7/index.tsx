@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useEffect } from 'react'
-import { Accordion } from 'ui'
+import { Accordion, IconArrowDown } from 'ui'
 
 import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/lw7_days'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -39,11 +39,21 @@ export default function LW7Releases() {
 
   return (
     <>
-      <SectionContainer className="!py-0 ">
+      {isHackathonLive && (
+        <div className="mb-4">
+          <a href="#lw-7-prizes" className="flex items-center text-white text-sm my-4 gap-4">
+            Join Hackathon{' '}
+            <span className="bounce-loop">
+              <IconArrowDown w={10} h={12} />
+            </span>
+          </a>
+        </div>
+      )}
+      <SectionContainer className="!py-0">
         <div className="grid grid-cols-1 gap-4">
           <SmallCard
             bgGradient
-            className={[isHackathonLive && 'from-[#4635A7] to-[#A69DC920]'].join(' ')}
+            className={[isHackathonLive && '!from-[#4635A7] !to-[#A69DC920]'].join(' ')}
           >
             <div className="relative flex items-center mb-4 sm:mb-0">
               <div
