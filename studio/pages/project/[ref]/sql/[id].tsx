@@ -131,4 +131,5 @@ const SqlEditor: NextPageWithLayout = () => {
 }
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+
 export default observer(SqlEditor)

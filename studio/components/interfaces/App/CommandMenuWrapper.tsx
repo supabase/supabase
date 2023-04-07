@@ -44,9 +44,9 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
     answer = answer.replace(/`/g, '').replace(/sql\n/g, '')
 
     const formattedSql = `
--- Note: This query was generated via Supabase AI, please do verify the correctness of the
--- SQL snippet before running it against your database as we are not able to guarantee the
--- correctness of the snippet that was generated.
+-- Note: This query was generated via Supabase AI, please verify the correctness of the
+-- SQL snippet before running it against your database as we are not able to guarantee it
+-- will do exactly what you requested the AI.
 
 ${answer}
 `.trim()

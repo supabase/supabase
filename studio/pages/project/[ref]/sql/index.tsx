@@ -8,4 +8,5 @@ const SqlEditorWelcome: NextPageWithLayout = () => {
 }
 
 SqlEditorWelcome.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+
 export default observer(SqlEditorWelcome)
