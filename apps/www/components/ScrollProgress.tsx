@@ -28,7 +28,7 @@ const ScrollProgress = () => {
   let isActive = progressPercentage <= 100
 
   return (
-    <div className="h-[1px] w-full flex justify-start relative">
+    <div className="h-[2px] w-full flex justify-start relative">
       <div
         className="h-full top-0 bottom-0 right-0 absolute w-screen bg-brand-900 will-change-transform transition-opacity"
         style={{
