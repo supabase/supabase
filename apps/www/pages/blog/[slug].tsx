@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,15 +5,17 @@ import { useRouter } from 'next/router'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
-import { Badge, Divider, IconChevronLeft, IconFile } from 'ui'
+import { Badge, Divider, IconChevronLeft } from 'ui'
 
-import { generateReadingTime } from '~/lib/helpers'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+
+import { generateReadingTime } from '~/lib/helpers'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
+import useActiveAnchors from '~/hooks/useActiveAnchors'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import ShareArticleActions from '../../components/Blog/ShareArticleActions'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -64,34 +65,9 @@ export async function getStaticProps({ params }: any) {
 }
 
 function BlogPostPage(props: any) {
-  const articleRef = useRef(null)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
-  const [activeSection, setActiveSection] = useState<any>('')
-
-  const handleScroll = () => {
-    const pageYOffset = window.pageYOffset
-    let newActiveAnchor = null
-    const offset = 150
-
-    anchors.current?.forEach((anchor) => {
-      if (pageYOffset >= anchor.offsetTop - offset) {
-        newActiveAnchor = anchor.id
-      }
-    })
-
-    setActiveSection(newActiveAnchor)
-  }
-
-  useEffect(() => {
-    anchors.current = document.querySelectorAll('h2')
-    window.addEventListener('scroll', handleScroll)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+  const activeSection = useActiveAnchors('h2')
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
@@ -280,7 +256,7 @@ function BlogPostPage(props: any) {
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
-                  <article ref={articleRef}>
+                  <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
                         <iframe
