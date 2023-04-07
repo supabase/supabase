@@ -42,6 +42,7 @@ import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import Favicons from 'components/head/Favicons'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -99,6 +100,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <title>Supabase</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
               </Head>
+              <Favicons />
 
               <Script
                 src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
