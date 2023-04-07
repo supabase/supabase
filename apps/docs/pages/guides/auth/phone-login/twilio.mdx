@@ -334,7 +334,7 @@ const {data, error }= await supabase.auth.signUp({
 })
 ```
 
-There is no change in the verification process - do continue to use the `sms` type for verification
+There is no change in the verification process, you should continue to use the `sms` type for verification
 ```js
 // After receiving a WhatsApp OTP
 let { data, error } = await supabase.auth.verifyOtp({
