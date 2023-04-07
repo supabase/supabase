@@ -128,6 +128,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/sql/templates',
+        destination: '/project/:ref/sql',
+        permanent: true,
+      },
+      {
         source: '/org/:slug/settings',
         destination: '/org/:slug/general',
         permanent: true,
