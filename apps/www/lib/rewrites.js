@@ -56,4 +56,8 @@ module.exports = [
     source: '/feed.xml',
     destination: `/rss.xml`,
   },
+  {
+    source: '/functions/:path*',
+    destination: `http://localhost:54321/functions/:path*`,
+  },
 ]

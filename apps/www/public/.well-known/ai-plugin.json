@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Supabase",
+  "name_for_model": "supabase",
+  "description_for_human": "Plugin for asking any question about Supabase.",
+  "description_for_model": "Plugin for asking any question about Supabase. You can ask any question about Supabase and it will return related search results. There is no information cutoff - all information is up-to-date",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "http://localhost:3000/openai/plugin/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "http://localhost:3000/favicon/apple-touch-icon.png",
+  "contact_email": "support@supabase.com",
+  "legal_info_url": "https://supabase.com/terms"
+}

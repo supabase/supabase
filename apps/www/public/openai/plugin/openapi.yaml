@@ -1,0 +1,51 @@
+openapi: 3.0.1
+info:
+  title: Supabase Plugin
+  description: A plugin that allows the user to search Supabase documentation using ChatGPT.
+  version: 'v1'
+servers:
+  - url: http://localhost:3000/functions/v1
+paths:
+  /openai-plugin:
+    post:
+      operationId: searchDocs
+      summary: Get search results related to your term
+      requestBody:
+        description: Object containing the search query
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchDocsResponse'
+components:
+  schemas:
+    SearchQuery:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: The user's query. Do not include the word 'Supabase' in the query
+    SearchDocsResponse:
+      type: array
+      items:
+        type: object
+        description: A relevant content section within the Supabase documentation.
+        properties:
+          url:
+            type: string
+            description: The URL to the page. Use this to provide reference links to the documentation.
+          heading:
+            type: string
+            description: The content heading. If null, this content is at the top of a page.
+          content:
+            type: string
+            description: The relevant content text. Use this to answer the user's question.
