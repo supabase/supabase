@@ -52,7 +52,13 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
   const { ref } = useParams()
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
-  const { mutateAsync: deleteContent } = useContentDeleteMutation()
+  const { mutateAsync: deleteContent } = useContentDeleteMutation({
+    onSuccess(data) {
+      if (data.id) {
+        snap.removeSnippet(data.id)
+      }
+    },
+  })
 
   const { id, name } = tabInfo || {}
   const [renameModalOpen, setRenameModalOpen] = useState(false)
@@ -78,7 +84,6 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
 
     try {
       await deleteContent({ projectRef: ref, id })
-      snap.removeSnippet(id)
 
       const existingSnippetIds = Object.keys(snap.snippets)
       if (existingSnippetIds.length === 0) {
