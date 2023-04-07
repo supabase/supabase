@@ -419,6 +419,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-whatsapp-otp",
+        "title": "Sign in a user through WhatsApp",
+        "slug": "auth-signinwithwhatsappotp",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-oauth",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithoauth",
@@ -426,9 +433,9 @@
         "type": "function"
       },
       {
-        "id": "sign-in-with-whatsapp-otp",
-        "title": "Sign in a user through WhatsApp",
-        "slug": "auth-signinwithwhatsappotp",
+        "id": "sign-in-with-sso",
+        "title": "Sign in a user through SSO",
+        "slug": "auth-signinwithsso",
         "product": "auth",
         "type": "function"
       },
