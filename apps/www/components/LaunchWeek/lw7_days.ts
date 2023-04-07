@@ -4,7 +4,7 @@ const images = {
   '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.png',
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
   '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
-  // '0-ogImages-04': ogImages01Data,
+  '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
   '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
   '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.png',
 }
@@ -67,6 +67,7 @@ const days: WeekDayProps[] = [
           { img: images['0-ogImages-02'] },
           { img: images['0-ogImages-03'], mobileImg: images['0-ogImages-03-mobile'] },
           { img: images['0-ogImages-04'] },
+          { img: images['0-ogImages-05'] },
           // { lottie: images['0-ogImages-04'] },
         ],
       },
