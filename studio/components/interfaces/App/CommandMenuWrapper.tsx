@@ -28,7 +28,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     // remove backticks from returned answer
-    answer = answer.replace(/`/g, '')
+    answer = answer.replace(/```.*/g, '').trim()
 
     const formattedOutput = `
 -- Note: This query was generated via Supabase AI, please do verify the correctness of the
