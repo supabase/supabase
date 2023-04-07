@@ -124,7 +124,7 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
               : '!border-[#FFFFFF20] dark:!border-[#FFFFFF20]'
           }`}
         >
-          <span className="text-transparent text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
             {shipped ? 'Shipped' : 'Coming Soon'}
           </span>
         </Badge>
