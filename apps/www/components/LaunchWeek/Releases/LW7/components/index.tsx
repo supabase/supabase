@@ -221,7 +221,7 @@ export const SectionButtons = ({
 }
 
 export const CartTitle = ({ children }: { children: any }) => (
-  <span className="z-0 relative text-[#F4FFFA] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+  <span className="z-0 relative text-[#F4FFFA90] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
     {children}
     <div className="absolute -z-10 inset-0 w-full h-full bg-[#1C1C1C90] rounded-full blur-xl" />
   </span>
