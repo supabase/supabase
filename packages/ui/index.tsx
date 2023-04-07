@@ -63,6 +63,11 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
+// layout
+
+// banners
+export * from './src/layout/banners'
+
 // config
 
 // export { default as Config } from './../ui.config'
