@@ -14,18 +14,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
-  // const contentString = renderToString(props.children)
   const [active, setActive] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
 
   useEffect(() => {
     setTimeout(function () {
