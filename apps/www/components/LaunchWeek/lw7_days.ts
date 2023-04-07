@@ -1,5 +1,3 @@
-import * as ogImages01Data from '~/components/LaunchWeek/7/assets/day0/00-ai-images.json'
-
 const images = {
   '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-image-01.png',
   '0-ogImages-02': '/images/launchweek/seven/day0/ai-images/ai-image-03.png',
