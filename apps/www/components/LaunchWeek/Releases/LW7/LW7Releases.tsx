@@ -90,7 +90,7 @@ export default function LW7Releases() {
             bgGradient
             className={[isHackathonLive && '!from-[#4635A7] !to-[#A69DC920]'].join(' ')}
           >
-            <div className="relative flex items-center mb-4 sm:mb-0">
+            <div className="relative z-10 flex items-center mb-4 sm:mb-0">
               <div
                 className={[
                   'flex min-w-[20px] opacity-50',
@@ -125,7 +125,7 @@ export default function LW7Releases() {
               </ChipLink>
             </div>
             {isHackathonLive && (
-              <div className="absolute opacity-pulse inset-0 w-full h-full bg-gradient-to-b from-[#1C1C1C40] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg pointer-events-none" />
+              <div className="absolute opacity-pulse inset-0 w-full h-full bg-gradient-to-b from-[#1C1C1C80] to-[#1C1C1C] rounded-2xl overflow-hidden shadow-lg pointer-events-none" />
             )}
           </SmallCard>
           <SmallCard bgGradient>

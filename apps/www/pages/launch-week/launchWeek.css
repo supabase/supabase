@@ -31,6 +31,10 @@
   animation: opacity-pulse 0.6s ease-in-out infinite alternate both;
 }
 
+.opacity-pulse-full {
+  animation: opacity-pulse-full 0.6s ease-in-out infinite alternate both;
+}
+
 .glass-tile-gradient {
   position: absolute;
 
@@ -59,6 +63,15 @@
 @keyframes opacity-pulse {
   0% {
     opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity-pulse-full {
+  0% {
+    opacity: 0;
   }
   100% {
     opacity: 1;
