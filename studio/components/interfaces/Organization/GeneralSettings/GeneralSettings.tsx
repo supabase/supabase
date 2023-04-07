@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Form, Input } from 'ui'
+import { Form, Input, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -20,9 +20,24 @@ import {
 const GeneralSettings = () => {
   const { app, ui } = useStore()
   const { slug } = useParams()
+  const { name, opt_in_tags } = ui.selectedOrganization ?? {}
+
+  const [optIn, setOptIn] = useState(
+    opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ? true : false
+  )
+  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
+
+  useEffect(() => {
+    setOptIn(isOptedInToAI ? true : false)
+  }, [opt_in_tags])
 
   const formId = 'org-general-settings'
-  const initialValues = { name: ui.selectedOrganization?.name ?? '' }
+
+  const initialValues = {
+    name: name ?? '',
+    opt_in_tags: optIn,
+  }
+
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -38,6 +53,9 @@ const GeneralSettings = () => {
 
     const response = await patch(`${API_URL}/organizations/${slug}`, {
       ...values,
+      opt_in_tags: optIn
+        ? [...(ui.selectedOrganization?.opt_in_tags ?? []), 'AI_SQL_GENERATOR_OPT_IN']
+        : [],
       billing_email: ui.selectedOrganization?.billing_email ?? '',
     })
 
@@ -47,10 +65,10 @@ const GeneralSettings = () => {
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
-      const { name } = response
+      const { name, opt_in_tags } = response
       resetForm({
-        values: { name },
-        initialValues: { name },
+        values: { name, opt_in_tags },
+        initialValues: { name, opt_in_tags },
       })
 
       app.onOrgUpdated(response)
@@ -69,7 +87,10 @@ const GeneralSettings = () => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = { name: ui.selectedOrganization?.name ?? '' }
+            const values = {
+              name: name ?? '',
+              opt_in_tags: isOptedInToAI ?? false,
+            }
             resetForm({ values, initialValues: values })
           }, [ui.selectedOrganization?.slug])
 
@@ -91,9 +112,21 @@ const GeneralSettings = () => {
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>Organization name</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
+                  <label htmlFor="name">Organization name</label>
                   <Input id="name" size="small" disabled={!canUpdateOrganization} />
+
+                  <Toggle
+                    checked={isOptedInToAI}
+                    id="opt_in_tags"
+                    name="opt_in_tags"
+                    disabled={!canUpdateOrganization}
+                    size="small"
+                    onChange={() => setOptIn(!optIn)}
+                    label="Opt-in to sending anonymous data to OpenAI"
+                    descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
+                  />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

@@ -50,6 +50,7 @@ export interface CommandMenuProviderProps {
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
   MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
   onSaveGeneratedSQL?: (answer: string, resolve: any) => void
+  isOptedInToAI: boolean
 }
 
 const CommandMenuProvider = ({
@@ -59,6 +60,7 @@ const CommandMenuProvider = ({
   apiKeys,
   MarkdownHandler,
   onSaveGeneratedSQL,
+  isOptedInToAI,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -71,7 +73,7 @@ const CommandMenuProvider = ({
   const project = projectRef !== undefined ? { ref: projectRef, apiKeys } : undefined
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
-
+  console.log('org opted in to OpenAI?', isOptedInToAI ? 'true' : 'false')
   return (
     <CommandMenuContext.Provider
       value={{

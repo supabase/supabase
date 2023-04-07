@@ -307,47 +307,55 @@ Postgres SQL query:
           )
         })}
         {promptData.length === 0 && !hasClippyError && (
-          <div className="flex">
-            <div className="w-1/3 py-4 px-6">
-              <ul className="space-y-2 mr-8">
-                {SAMPLE_QUERIES.map((item, index) => (
-                  <li
-                    key={index}
-                    onClick={() => setSelectedCategory(item.category)}
-                    className={cn(
-                      'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md',
-                      selectedCategory === item.category && 'bg-slate-400 '
-                    )}
-                  >
-                    {item.category}
-                  </li>
-                ))}
-              </ul>
+          <div>
+            <div className="px-10">
+              <h3>Example queries</h3>
+              <p className="text-sm mt-1">
+                Use these example queries to help get your project started quickly.
+              </p>
             </div>
-            <div className="w-2/3 py-4 px-6">
-              <ul>
-                {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
-                  (query, index) => (
-                    <CommandItem
-                      type="command"
-                      onSelect={() => {
-                        if (!search) {
-                          handleConfirm(query)
-                        }
-                      }}
-                      forceMount
-                      key={query.replace(/\s+/g, '_')}
+            <div className="flex mt-4 border-t pt-4">
+              <div className="w-1/3 py-4 px-6">
+                <ul className="space-y-2 mr-8">
+                  {SAMPLE_QUERIES.map((item, index) => (
+                    <li
+                      key={index}
+                      onClick={() => setSelectedCategory(item.category)}
+                      className={cn(
+                        'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md',
+                        selectedCategory === item.category && 'bg-slate-400 '
+                      )}
                     >
-                      <div className="flex">
-                        <div>
-                          <AiIcon />
+                      {item.category}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="w-2/3 py-4 px-6">
+                <ul>
+                  {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
+                    (query, index) => (
+                      <CommandItem
+                        type="command"
+                        onSelect={() => {
+                          if (!search) {
+                            handleConfirm(query)
+                          }
+                        }}
+                        forceMount
+                        key={query.replace(/\s+/g, '_')}
+                      >
+                        <div className="flex">
+                          <div>
+                            <AiIcon />
+                          </div>
+                          <p>{query}</p>
                         </div>
-                        <p>{query}</p>
-                      </div>
-                    </CommandItem>
-                  )
-                )}
-              </ul>
+                      </CommandItem>
+                    )
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
         )}
