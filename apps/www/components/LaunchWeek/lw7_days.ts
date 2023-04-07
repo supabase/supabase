@@ -1,7 +1,7 @@
 const images = {
   '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-images-01.png',
   '0-ogImages-02': '/images/launchweek/seven/day0/ai-images/ai-image-03.png',
-  '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.png',
+  '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.svg',
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
   '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
   '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
@@ -46,8 +46,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '07 Apr',
-    // publishedAt: '2023-04-07T07:00:00.000-07:00',
-    publishedAt: '2023-04-05T07:00:00.000-07:00',
+    publishedAt: '2023-04-07T07:00:00.000-07:00',
     description: '',
     d: 0,
     dd: 'Pre-release',
@@ -58,9 +57,6 @@ const days: WeekDayProps[] = [
       {
         title: 'Designing with AI',
         blog: '/blog/designing-with-ai-midjourney',
-        // docs: '',
-        // isNew: false,
-        // description: '',
         thumb: '/images/launchweek/seven/day0/ai-images/00-ai-images-thumb.png',
         bg_layers: [
           { img: images['0-ogImages-01'] },
@@ -68,7 +64,6 @@ const days: WeekDayProps[] = [
           { img: images['0-ogImages-03'], mobileImg: images['0-ogImages-03-mobile'] },
           { img: images['0-ogImages-04'] },
           { img: images['0-ogImages-05'] },
-          // { lottie: images['0-ogImages-04'] },
         ],
       },
       {
