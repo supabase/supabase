@@ -1,17 +1,20 @@
 import { Content } from 'data/content/content-query'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { updateContent } from 'data/content/content-update-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
+import { useMemo } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
+export type StateSnippet = {
+  snippet: SqlSnippet
+  splitSizes: number[]
+  projectRef: string
+}
+
 export const sqlEditorState = proxy({
   snippets: {} as {
-    [key: string]: {
-      snippet: SqlSnippet
-      splitSizes: number[]
-      projectRef: string
-    }
+    [key: string]: StateSnippet
   },
   results: {} as {
     [key: string]: {
@@ -19,15 +22,37 @@ export const sqlEditorState = proxy({
       error?: any
     }[]
   },
-  loaded: {} as {
-    [key: string]: true
+  orders: {} as {
+    [key: string]: string[]
   },
+  loaded: {} as {
+    [key: string]: boolean
+  },
+
   needsSaving: proxySet<string>([]),
   savingStates: {} as {
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
 
-  setInitialSnippets: (snippets: SqlSnippet[], projectRef: string) => {
+  setRemoteSnippets: (snippets: SqlSnippet[], projectRef: string) => {
+    if (!sqlEditorState.orders[projectRef]) {
+      const orderedSnippets = snippets
+        .filter((s) => Boolean(s.id))
+        .sort((a, b) => {
+          // sort by snippet.inserted_at, falling back to snippet.id
+          if (a.inserted_at && b.inserted_at) {
+            const aDate = new Date(a.inserted_at)
+            const bDate = new Date(b.inserted_at)
+            // sort by date
+            return aDate > bDate ? -1 : 1
+          }
+
+          return a.id! > b.id! ? -1 : 1
+        })
+
+      sqlEditorState.orders[projectRef] = orderedSnippets.map((s) => s.id!)
+    }
+
     snippets.forEach((snippet) => {
       sqlEditorState.addSnippet(snippet, projectRef)
     })
@@ -41,6 +66,9 @@ export const sqlEditorState = proxy({
       }
       sqlEditorState.results[snippet.id] = []
       sqlEditorState.savingStates[snippet.id] = 'IDLE'
+      if (!sqlEditorState.orders[projectRef].includes(snippet.id)) {
+        sqlEditorState.orders[projectRef].unshift(snippet.id)
+      }
     }
     sqlEditorState.loaded[projectRef] = true
   },
@@ -50,6 +78,10 @@ export const sqlEditorState = proxy({
 
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
+
+    sqlEditorState.orders[snippet.projectRef] = sqlEditorState.orders[snippet.projectRef].filter(
+      (s) => s !== id
+    )
   },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
@@ -103,6 +135,16 @@ export const getSqlEditorStateSnapshot = () => snapshot(sqlEditorState)
 
 export const useSqlEditorStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(sqlEditorState, options)
+
+export const useSnippets = (projectRef: string | undefined) => {
+  const snapshot = useSqlEditorStateSnapshot()
+
+  return useMemo(() => {
+    return projectRef
+      ? snapshot.orders[projectRef]?.map((id) => snapshot.snippets[id].snippet) ?? []
+      : []
+  }, [projectRef, snapshot.orders, snapshot.snippets])
+}
 
 async function update(id: string, projectRef: string, content: Partial<Content>) {
   try {

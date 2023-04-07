@@ -10,7 +10,7 @@ import { useProfileQuery } from 'data/profile/profile-query'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
@@ -26,17 +26,18 @@ const SideBarContent = observer(() => {
   const [filterString, setFilterString] = useState('')
 
   const snap = useSqlEditorStateSnapshot()
-  const { data, isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
+  const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
     onSuccess(data) {
-      if (ref) snap.setInitialSnippets(data.snippets, ref)
+      if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },
   })
   const { mutateAsync: createContent } = useContentCreateMutation()
 
+  const snippets = useSnippets(ref)
+
   const [favorites, queries] = useMemo(
-    () =>
-      data?.snippets ? partition(data.snippets, (snippet) => snippet.content.favorite) : [[], []],
-    [data?.snippets]
+    () => (snippets ? partition(snippets, (snippet) => snippet.content.favorite) : [[], []]),
+    [snippets]
   )
 
   const favouriteTabs =
