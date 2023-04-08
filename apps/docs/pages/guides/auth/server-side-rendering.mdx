@@ -1,4 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { Accordion } from 'ui'
+import ReactMarkdown from 'react-markdown'
 
 export const meta = {
   id: 'server-side-rendering',
@@ -55,8 +57,24 @@ like `*` and `**` to allow redirects to different forms of URLs.
 
 </Admonition>
 
-These redirect URLs have the following structure:
+Users can choose between one of two flows:
 
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-scale-900 dark:text-white"
+  >
+    <div className="border-b pb-3">
+
+<Accordion.Item
+                          header={<span className="text-scale-1200">Implicit</span>}
+                          id={`implicit-flow`}
+                        >
+
+These redirect URLs have the following structure:
 ```
 https://yourapp.com/...#access_token=<...>&refresh_token=<...>&...
 ```
@@ -78,8 +96,22 @@ providers), we want to prevent hosting services from getting access to your
 user's authorization credentials by default. Even if the server is under your
 direct control, `GET` requests and their full URLs are often logged. This
 approach also avoids leaking credentials in request or access logs.
-
 </Admonition>
+
+  </Accordion.Item>
+  </div>
+    <div className="border-b pb-3">
+
+<Accordion.Item
+                          header={<span className="text-scale-1200">PKCE</span>}
+                          id={`pkce-flow`}
+                        >
+
+  Test
+  </Accordion.Item>
+    </div>
+
+</Accordion>
 
 ## Bringing it together
 
