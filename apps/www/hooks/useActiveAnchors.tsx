@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 
-const useActiveAnchors = (querySelector: string = 'h2') => {
+const useActiveAnchors = (
+  anchorsQuerySelector: string = 'h2',
+  tocQuerySelector: string = '.prose-toc a',
+  offset: number = 200
+) => {
   const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
-  const [activeSection, setActiveSection] = useState<any>('')
+  const toc = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
 
   const handleScroll = () => {
     const pageYOffset = window.pageYOffset
-    let newActiveAnchor = null
-    const offset = 150
+    let newActiveAnchor: string = ''
 
     anchors.current?.forEach((anchor) => {
       if (pageYOffset >= anchor.offsetTop - offset) {
@@ -15,11 +18,20 @@ const useActiveAnchors = (querySelector: string = 'h2') => {
       }
     })
 
-    setActiveSection(newActiveAnchor)
+    toc.current?.forEach((link) => {
+      link.classList.remove('translate-x-1')
+      link.classList.remove('!text-brand-900')
+      if (link.getAttribute('href')?.replace('#', '') === newActiveAnchor) {
+        link.classList.add('translate-x-1')
+        link.classList.add('!text-brand-900')
+      }
+    })
   }
 
   useEffect(() => {
-    anchors.current = document.querySelectorAll(querySelector)
+    anchors.current = document.querySelectorAll(anchorsQuerySelector)
+    toc.current = document.querySelectorAll(tocQuerySelector)
+
     window.addEventListener('scroll', handleScroll)
 
     return () => {
@@ -27,7 +39,7 @@ const useActiveAnchors = (querySelector: string = 'h2') => {
     }
   }, [])
 
-  return activeSection
+  return null
 }
 
 export default useActiveAnchors
