@@ -105,8 +105,6 @@ function BlogPostPage(props: any) {
     )
   }
 
-  // console.log('props.blog.toc', props.blog.toc)
-
   const toc = props.blog.toc && (
     <div className="space-y-8 py-8 lg:py-0">
       <div>
