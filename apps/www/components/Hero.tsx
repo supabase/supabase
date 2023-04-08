@@ -39,20 +39,23 @@ const Hero = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
-                        <a>
-                          <Button size="small" className="text-white">
-                            Start your project
-                          </Button>
-                        </a>
-                      </Link>
-                      <Link href="/docs" as="/docs" passHref>
-                        <a>
-                          <Button size="small" type="default" icon={<IconBookOpen />}>
-                            Documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button
+                        as="a"
+                        href="https://app.supabase.com"
+                        size="small"
+                        className="text-white"
+                      >
+                        Start your project
+                      </Button>
+                      <Button
+                        as="a"
+                        href="/docs"
+                        size="small"
+                        type="default"
+                        icon={<IconBookOpen />}
+                      >
+                        Documentation
+                      </Button>
                     </div>
                     <div className="flex flex-col gap-4">
                       <small className="small text-xs">backed by</small>

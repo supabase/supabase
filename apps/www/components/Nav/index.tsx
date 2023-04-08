@@ -276,15 +276,17 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button
-                    className="hidden group lg:flex"
-                    type="text"
-                    icon={
-                      <div className="flex items-center justify-center w-4 h-4 text-brand-800">
-                        <div
-                          className={[
-                            `text-scale-900 flex h-3 w-3 items-center justify-center
+                <Button
+                  as="a"
+                  href="https://github.com/supabase/supabase"
+                  target="_blank"
+                  className="hidden group lg:flex"
+                  type="text"
+                  icon={
+                    <div className="flex items-center justify-center w-4 h-4 text-brand-800">
+                      <div
+                        className={[
+                          `text-scale-900 flex h-3 w-3 items-center justify-center
 
                             transition-all
                             group-hover:h-4
@@ -294,21 +296,16 @@ const Nav = () => {
                             group-focus:w-4
 
                             group-focus:text-yellow-900`,
-                            showLaunchWeekNavMode && '!text-white',
-                          ].join(' ')}
-                        >
-                          <IconStar strokeWidth={2} />
-                        </div>
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
+                      >
+                        <IconStar strokeWidth={2} />
                       </div>
-                    }
-                  >
-                    <span
-                    // className={isLaunchWeekPage ? '!text-white' : ''}
-                    >
-                      Star us on GitHub
-                    </span>
-                  </Button>
-                </a>
+                    </div>
+                  }
+                >
+                  Star us on GitHub
+                </Button>
 
                 {isLoggedIn ? (
                   <Link href="/dashboard/projects">
@@ -318,18 +315,21 @@ const Nav = () => {
                   </Link>
                 ) : (
                   <>
-                    <Link href="https://app.supabase.com/">
-                      <a>
-                        <Button type="default" className="hidden lg:block">
-                          Sign in
-                        </Button>
-                      </a>
-                    </Link>
-                    <Link href="https://app.supabase.com/">
-                      <a>
-                        <Button className="hidden text-white lg:block">Start your project</Button>
-                      </a>
-                    </Link>
+                    <Button
+                      as="a"
+                      href="https://app.supabase.com/"
+                      type="default"
+                      className="hidden lg:block"
+                    >
+                      Sign in
+                    </Button>
+                    <Button
+                      as="a"
+                      href="https://app.supabase.com/"
+                      className="hidden text-white lg:block"
+                    >
+                      Start your project
+                    </Button>
                   </>
                 )}
               </div>
