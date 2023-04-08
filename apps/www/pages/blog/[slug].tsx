@@ -16,6 +16,7 @@ import useActiveAnchors from '~/hooks/useActiveAnchors'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -67,7 +68,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const activeSection = useActiveAnchors('h2')
+  useActiveAnchors('h2, h3, h4')
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
@@ -104,6 +105,8 @@ function BlogPostPage(props: any) {
     )
   }
 
+  // console.log('props.blog.toc', props.blog.toc)
+
   const toc = props.blog.toc && (
     <div className="space-y-8 py-8 lg:py-0">
       <div>
@@ -121,21 +124,7 @@ function BlogPostPage(props: any) {
         <div>
           <p className="text-scale-1200 mb-4">On this page</p>
           <div className="prose-toc">
-            <ul className="te">
-              {props.blog.toc.json.map((section: any) => (
-                <li key={section.slug} className="list-style-none">
-                  <a
-                    className={[
-                      'list-style-none translate-x-0 transition-all',
-                      section.slug === activeSection && 'translate-x-1 !text-brand-900',
-                    ].join(' ')}
-                    href={`#${section.slug}`}
-                  >
-                    {section.content}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
       </div>
