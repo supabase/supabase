@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 const useActiveAnchors = (
   anchorsQuerySelector: string = 'h2',
@@ -19,11 +19,15 @@ const useActiveAnchors = (
     })
 
     toc.current?.forEach((link) => {
-      link.classList.remove('translate-x-1')
-      link.classList.remove('!text-brand-900')
-      if (link.getAttribute('href')?.replace('#', '') === newActiveAnchor) {
-        link.classList.add('translate-x-1')
-        link.classList.add('!text-brand-900')
+      link.classList.remove('toc-animate')
+      // TODO: escape emojis
+      // The problem is that MDXRemote strips out emojis on slugs
+      // but ReactMarkdown doesn't,instead it encodes them
+      const sanitizedHref = (link.getAttribute('href') ?? '').replace('#', '')
+      const isMatch = sanitizedHref === newActiveAnchor
+
+      if (isMatch) {
+        link.classList.add('toc-animate')
       }
     })
   }
