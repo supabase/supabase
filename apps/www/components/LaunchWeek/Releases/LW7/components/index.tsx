@@ -83,7 +83,7 @@ export const SmallCard = ({
   >
     <div
       className={[
-        'rounded-2xl text-sm px-6 py-4 flex flex-col sm:flex-row justify-between items-center backdrop-blur-md',
+        'rounded-2xl text-sm px-4 sm:px-8 lg:px-10 py-4 flex flex-col sm:flex-row justify-between items-center backdrop-blur-md',
         bgGradient ? styles['lw7-article-card-gradient'] : 'bg-[#1c1c1c99]',
       ].join(' ')}
     >
@@ -143,9 +143,22 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
   )
 }
 
-export const ChipLink = ({ href, children }: { href: string; children: any }) => (
+export const ChipLink = ({
+  href,
+  className,
+  children,
+}: {
+  href: string
+  className?: string
+  children: any
+}) => (
   <Link href={href} target="_blank" rel="noopener">
-    <a className="flex items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2">
+    <a
+      className={[
+        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
+        className,
+      ].join(' ')}
+    >
       {children}
     </a>
   </Link>
@@ -167,7 +180,7 @@ export const SectionButtons = ({
   hackernews?: string
 }) => {
   return (
-    <div className="flex gap-2 z-10">
+    <div className="flex w-full md:w-auto justify-center gap-2 z-10">
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
