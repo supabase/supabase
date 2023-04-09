@@ -110,26 +110,29 @@ approach also avoids leaking credentials in request or access logs. If you wish 
         ```
         https://yourapp.com/...?code=<...>
         ```
-        The `code` can then be exchanged for an access token by calling `exchangeCodeForSession(code)` method.
+        The `code` parameter is commonly known as the Auth Code. The Auth Code can then be exchanged for an access token by calling `exchangeCodeForSession(code)` method.
 
-        As the flow is run server side,  `localStorage` may not be available. You may configure the client library to use a custom storage adapter
+        As the flow is run server side,  `localStorage` may not be available. You may configure the client library to use a custom storage adapter an alternate backing storage such as cookies
         by setting the `storage` option to an object with the following methods:
         ```js
         const customStorageAdapter: SupportedStorage = {
           getItem: (key) => {
             if (!supportsLocalStorage()) {
+              // Configure alternate storage
               return null
             }
             return globalThis.localStorage.getItem(key)
           },
           setItem: (key, value) => {
             if (!supportsLocalStorage()) {
+              // Configure alternate storage here
               return
             }
             globalThis.localStorage.setItem(key, value)
           },
           removeItem: (key) => {
             if (!supportsLocalStorage()) {
+              // Configure alternate storage here
               return
             }
             globalThis.localStorage.removeItem(key)
@@ -299,3 +302,9 @@ cache keys every hour or less.
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
+
+### In the PKCE Flow, can I re-use the authorization code?
+
+An Auth Code can only be exchanged for an access token once. If you need a new Auth Code, you will need to restart the flow. For instance, in the case
+of a magic link flow you will need to call `signInWithOtp()` and `verifyOTP()` again in order to get a new Auth Code. The Auth Code
+is valid until a successful exchange for an access token or until a new authentication flow is initiated.
