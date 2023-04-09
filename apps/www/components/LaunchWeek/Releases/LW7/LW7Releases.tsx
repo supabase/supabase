@@ -72,7 +72,7 @@ export default function LW7Releases() {
 
   return (
     <>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="!py-0 w-full !px-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
           <SmallCard
             bgGradient
@@ -157,7 +157,7 @@ export default function LW7Releases() {
           </SmallCard>
         </div>
       </SectionContainer>
-      <SectionContainer className="!pt-0">
+      <SectionContainer className="!pt-0 !w-full !px-0">
         <Accordion
           type="default"
           openBehaviour="multiple"
