@@ -31,20 +31,24 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
+
     // Default to dark mode if no preference config
-    setIsDarkMode(!key || key === 'true')
+    const mode = !key || key === 'true'
+
+    toggleTheme(mode)
   }, [])
 
   const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {
     const newMode = typeof darkMode === 'boolean' ? darkMode : !isDarkMode
     localStorage.setItem('supabaseDarkMode', newMode.toString())
 
-    const key = localStorage.getItem('supabaseDarkMode')
-    const newTheme = key === 'true' ? 'dark' : 'light'
-    const currentTheme = isDarkMode ? 'dark' : 'light'
+    const newTheme = newMode ? 'dark' : 'light'
 
-    document.body.classList.replace(currentTheme, newTheme)
-    document.documentElement.className = key === 'true' ? 'dark' : ''
+    document.body.classList.remove('light', 'dark')
+    document.body.classList.add(newTheme)
+
+    // Color scheme must be applied to document element (`<html>`)
+    document.documentElement.style.colorScheme = newTheme
 
     setIsDarkMode(newMode)
   }
