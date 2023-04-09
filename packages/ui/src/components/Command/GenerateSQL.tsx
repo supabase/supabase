@@ -111,7 +111,7 @@ const SQLOutputActions = ({ answer }: { answer: string }) => {
 
   return (
     <div className="flex items-center justify-end space-x-2 mr-12">
-      <CopyToClipboard text={answer?.replace(/`/g, '')}>
+      <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
         <Button
           type="default"
           icon={
