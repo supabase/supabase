@@ -111,6 +111,10 @@ approach also avoids leaking credentials in request or access logs. If you wish 
         https://yourapp.com/...?code=<...>
         ```
         The `code` parameter is commonly known as the Auth Code. The Auth Code can then be exchanged for an access token by calling `exchangeCodeForSession(code)` method.
+        <Admonition type="info">
+          For security purposes, the code has a validity of 5 minutes and can only be exchanged for an access token once. You
+          will need to initiate the authentication flow again if you wish to obtain a new access token.
+        </Admonition>
 
         As the flow is run server side,  `localStorage` may not be available. You may configure the client library to use a custom storage adapter an alternate backing storage such as cookies
         by setting the `storage` option to an object with the following methods:
@@ -303,8 +307,3 @@ export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
 
-### In the PKCE Flow, can I re-use the authorization code?
-
-An Auth Code can only be exchanged for an access token once. If you need a new Auth Code, you will need to restart the flow. For instance, in the case
-of a magic link flow you will need to call `signInWithOtp()` and `verifyOTP()` again in order to get a new Auth Code. The Auth Code
-is valid until a successful exchange for an access token or until a new authentication flow is initiated.
