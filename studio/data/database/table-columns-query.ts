@@ -1,15 +1,17 @@
-const SchemasQuery = `
-  SELECT nspname as name
-    FROM pg_namespace
-    WHERE
-      nspname not in ('information_schema', 'pg_catalog', 'pg_toast')
-      AND nspname not like 'pg_temp_%'
-      AND nspname not like 'pg_toast_temp_%'
-      AND has_schema_privilege(oid, 'CREATE, USAGE')
-    ORDER BY nspname;
-`
+import { useCallback } from 'react'
+import { UseQueryOptions } from '@tanstack/react-query'
+import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
-const TableColumnsQuery = `
+export type TableColumn = {
+  schemaname: string
+  tablename: string
+  quoted_name: string
+  is_table: boolean
+  columns: any[]
+}
+
+export const getTableColumnsQuery = () => {
+  const sql = /* SQL */ `
   SELECT
     tbl.schemaname,
     tbl.tablename,
@@ -66,25 +68,45 @@ const TableColumnsQuery = `
       AND has_column_privilege(tbl.quoted_name, a.attname, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
   GROUP BY schemaname, tablename, quoted_name, is_table;
-`
+`.trim()
 
-const AllFunctionsQuery = `
-  SELECT n.nspname as "schema",
-    p.proname as "name",
-    d.description,
-    pg_catalog.pg_get_function_result(p.oid) as "result_type",
-    pg_catalog.pg_get_function_arguments(p.oid) as "argument_types",
-  CASE
-    WHEN p.prokind = 'a' THEN 'agg'
-    WHEN p.prokind = 'w' THEN 'window'
-    WHEN p.prorettype = 'pg_catalog.trigger'::pg_catalog.regtype THEN 'trigger'
-    ELSE 'normal'
-    END as "type"
-  FROM pg_catalog.pg_proc p
-    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
-    LEFT JOIN pg_catalog.pg_description d ON p.oid = d.objoid
-  WHERE n.nspname = 'public'
-  ORDER BY 1, 2, 4;
-`
+  return sql
+}
 
-export { SchemasQuery, TableColumnsQuery, AllFunctionsQuery }
+export type TableColumnsVariables = {
+  projectRef?: string
+  connectionString?: string
+}
+
+export type TableColumnsData = { result: TableColumn[] }
+export type TableColumnsError = unknown
+
+export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
+  { projectRef, connectionString }: TableColumnsVariables,
+  options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
+) => {
+  return useExecuteSqlQuery(
+    {
+      projectRef,
+      connectionString,
+      sql: getTableColumnsQuery(),
+      queryKey: ['table-columns'],
+    },
+    options
+  )
+}
+
+export const useTableColumnsPrefetch = () => {
+  const prefetch = useExecuteSqlPrefetch()
+
+  return useCallback(
+    ({ projectRef, connectionString }: TableColumnsVariables) =>
+      prefetch({
+        projectRef,
+        connectionString,
+        sql: getTableColumnsQuery(),
+        queryKey: ['table-columns'],
+      }),
+    [prefetch]
+  )
+}

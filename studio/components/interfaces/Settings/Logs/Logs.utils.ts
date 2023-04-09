@@ -4,7 +4,7 @@ import { get } from 'lodash'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
-import BackwardIterator from 'components/to-be-cleaned/SqlEditor/BackwardIterator'
+import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import { uniqBy } from 'lodash'
 import { useEffect } from 'react'
 
