@@ -1,14 +1,13 @@
 .ticket-hero {
-  background: #c58cd2;
   background: linear-gradient(
     137.46deg,
-    rgba(255, 255, 255, 0.1) 6.19%,
-    rgba(255, 255, 255, 0.08) 103.29%
+    rgba(255, 255, 255, 0) 6.19%,
+    rgba(255, 255, 255, 0) 103.29%
   );
   z-index: 10;
   box-shadow: 0 1px 1px rgba(131, 6, 184, 0.08), 0 2px 2px rgba(128, 6, 184, 0.08),
-    inset 0 0.5px 0px 0.5px rgba(255, 255, 255, 0.14), inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08),
-    0px 4px 20px rgba(118, 7, 170, 0.15);
+    inset 0 0.5px 0px 0.5px rgba(255, 255, 255, 0.1), inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08),
+    0px 4px 20px rgba(118, 7, 170, 0.1);
 }
 
 .hero {

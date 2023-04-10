@@ -26,7 +26,56 @@ However, it's important to note that certain [differences](#differences) may ari
 
 ## Getting Started
 
+### Pre-requisites
+
+Logflare currently requires BigQuery usage. You will need to create a Google Cloud project with billing enabled.
+
+The requirements are as follows after creating the project:
+
+- Project ID
+- Project number
+- A service account key
+
+#### Setting up BigQuery Service Account
+
+To ensure that you have sufficient permissions to insert into your Google Cloud BigQuery, ensure that you have created a service account with either:
+
+- BigQuery Admin role; or
+- The following permissions:
+  - bigquery.datasets.create
+  - bigquery.datasets.get
+  - bigquery.datasets.getIamPolicy
+  - bigquery.datasets.update
+  - bigquery.jobs.create
+  - bigquery.routines.create
+  - bigquery.routines.update
+  - bigquery.tables.create
+  - bigquery.tables.delete
+  - bigquery.tables.get
+  - bigquery.tables.getData
+  - bigquery.tables.update
+  - bigquery.tables.updateData
+
+You can create the service account via the web console or `gcloud`, as per the [Google Cloud documentation](https://cloud.google.com/iam/docs/keys-create-delete). In the web console, you can create the key by navigating to IAM > Service Accounts > Actions (dropdown) > Manage Keys
+
+We recommend setting the BigQuery Admin role, as it simplifies permissions setup.
+
+#### Downloading the Service Account key
+
+After the service account is created, you will need to create a key for the service account. This key will sign the JWTs for API requests that the Analytics server makes with BigQuery.
+
+### Docker Compose
+
 Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
+
+You will first need to update the `.env.example` file with the necessary environment variables.
+
+- `GOOGLE_PROJECT_ID`
+- `GOOGLE_PROJECT_NUMBER`
+
+You will need to place your Service Account key in your present working directory with the filename `gcloud.json`.
+
+Thereafter, you can run the docker-compose commands and include the logging-specific compose file.
 
 ```bash
 # assuming you clone the supabase/supabase repo.
@@ -40,6 +89,18 @@ This would include two additional docker services to your compose stack: Logflar
   Read more about [self-hosting Logflare](https://docs.logflare.app/self-hosting) as your analytics
   server.
 </Admonition>
+
+#### Vector Usage
+
+In the Docker Compose example, we utilize vector to coordinate the logging pipeline between the services. However, if you peer into the [vector configuration file](https://github.com/supabase/supabase/blob/master/docker/volumes/logs/vector.yml), you will be able to see that Vector sends logs to the Analytics ingestion endpoint.
+
+If you need to customize the logging pipeline for your own needs, you must ensure that the payloads matches the expected event schema structure. Without the correct structure, it would cause the Studio Logs UI features to break.
+
+### Standalone Docker Container
+
+If desired, you can utilize the standalone docker-container. Please refer to the [docker-compose file](https://github.com/supabase/supabase/tree/master/docker/docker-compose-logging.yml) for required docker configuration.
+
+Additional supplementary technical documentation on self-hosting and using the `supabase/logflare` image for a full Logflare experience is available at the [official Logflare documentation](https://docs.logflare.app/self-hosting/).
 
 ## Differences
 
