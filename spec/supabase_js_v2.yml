@@ -325,7 +325,7 @@ functions:
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
-      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:  
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
     examples:
@@ -4201,7 +4201,8 @@ functions:
           })
 
           if (error instanceof FunctionsHttpError) {
-            console.log('Function returned an error', error.message)
+            const errorMessage = await error.context.json()
+            console.log('Function returned an error', errorMessage)
           } else if (error instanceof FunctionsRelayError) {
             console.log('Relay error:', error.message)
           } else if (error instanceof FunctionsFetchError) {
