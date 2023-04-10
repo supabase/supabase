@@ -10,34 +10,77 @@ import {
   IconSave,
   IconUser,
   Input,
+  Message,
   MessageRole,
   MessageStatus,
+  queryAi,
   useAiChat,
 } from 'ui'
 
+import { stripIndent } from 'common-tags'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { cn } from './../../utils/cn'
 import { SAMPLE_QUERIES } from './Command.constants'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandItem } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
-import { stripIndent } from 'common-tags'
 
-const SQLOutputActions = ({ answer }: { answer: string }) => {
+/**
+ * Formats a string for use as a title.
+ *
+ * Removes punctuation and capitalizes each word
+ */
+function formatTitle(value: string) {
+  let words = value.replace(/\.$/, '').replace(/['"]/g, '').split(' ')
+  words = words.map((word) => {
+    // Don't capitalize code
+    if (/[._\(\)]+/.test(word)) {
+      return word
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  })
+  return words.join(' ')
+}
+
+const SQLOutputActions = ({ answer, messages }: { answer: string; messages: Message[] }) => {
   const [showCopied, setShowCopied] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
-  const { project, onSaveGeneratedSQL } = useCommandMenu()
-
-  const applyCallback = () =>
-    onSaveGeneratedSQL !== undefined
-      ? new Promise((resolve) => onSaveGeneratedSQL(answer, resolve))
-      : {}
+  const { project, saveGeneratedSQL } = useCommandMenu()
 
   const onSelectSaveSnippet = async () => {
     setIsSaving(true)
-    await applyCallback()
+    let suggestedTitle
+    try {
+      suggestedTitle = await queryAi(
+        [
+          ...messages,
+          {
+            role: MessageRole.User,
+            content: stripIndent`
+            Generate a title for the above SQL snippet following all of these rules:
+            - The title is only for the last SQL snippet
+            - Focus on the main purposes of this snippet
+            - Use as few words as possible
+            - Title should be nouns, not verbs
+            - Do not include word articles (eg. a, the, for, of)
+            - Do not use words like "SQL" or "snippet"
+            - Do not output markdown, quotes, etc
+            - Do not be too verbose
+            `,
+            status: MessageStatus.Complete,
+          },
+        ],
+        10000
+      )
+    } catch (err) {
+      suggestedTitle = ''
+    }
+
+    const formattedTitle = formatTitle(suggestedTitle)
+
+    await saveGeneratedSQL?.(answer, formattedTitle)
     setIsSaved(true)
     setIsSaving(false)
   }
@@ -71,7 +114,7 @@ const SQLOutputActions = ({ answer }: { answer: string }) => {
           {showCopied ? 'Copied' : 'Copy SQL'}
         </Button>
       </CopyToClipboard>
-      {project?.ref !== undefined && onSaveGeneratedSQL !== undefined && (
+      {project?.ref !== undefined && saveGeneratedSQL !== undefined && (
         <Button
           type="default"
           loading={isSaving}
@@ -147,7 +190,7 @@ const GenerateSQL = () => {
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
-        {messages.map((message) => {
+        {messages.map((message, i) => {
           switch (message.role) {
             case MessageRole.User:
               return (
@@ -206,7 +249,9 @@ const GenerateSQL = () => {
                           >
                             {answer}
                           </CodeBlock>
-                          {!isResponding && <SQLOutputActions answer={answer} />}
+                          {!isResponding && (
+                            <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
+                          )}
                         </div>
                       )}
                     </>
