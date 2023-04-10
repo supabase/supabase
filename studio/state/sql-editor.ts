@@ -23,6 +23,7 @@ export const sqlEditorState = proxy({
       error?: any
     }[]
   },
+  // Project ref as the key, ids of each snippet as the order
   orders: {} as {
     [key: string]: string[]
   },
