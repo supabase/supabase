@@ -42,7 +42,7 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
     }
 
     // Remove markdown syntax from returned answer
-    answer = answer.replace(/`/g, '').replace(/sql\n/g, '')
+    answer = answer.replace(/`/g, '').replace(/sql\n/g, '').trim()
 
     const formattedSql = `
 -- Note: This query was generated via Supabase AI, please verify the correctness of the

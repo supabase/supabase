@@ -3,6 +3,7 @@ import type { CreateCompletionResponse } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   Button,
+  CodeBlock,
   IconAlertCircle,
   IconAlertTriangle,
   IconCheck,
@@ -110,7 +111,7 @@ const SQLOutputActions = ({ answer }: { answer: string }) => {
   }, [isSaved])
 
   return (
-    <div className="flex items-center justify-end space-x-2 mr-12">
+    <div className="flex items-center justify-end space-x-2">
       <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
         <Button
           type="default"
@@ -156,8 +157,7 @@ const GenerateSQL = () => {
 
   const eventSourceRef = useRef<SSE>()
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
-  const { isLoading, setIsLoading, search, setSearch, MarkdownHandler, onSaveGeneratedSQL } =
-    useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
 
@@ -290,12 +290,16 @@ Postgres SQL query:
                     </div>
                     <>
                       {isLoading && promptIndex === i ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
                       ) : (
-                        <div className="space-y-2 flex-grow">
-                          <MarkdownHandler className="prose dark:prose-dark bg-scale-300 px-4 py-4 rounded-md w-full">
-                            {prompt.answer}
-                          </MarkdownHandler>
+                        <div className="space-y-2 flex-grow max-w-[93%]">
+                          <CodeBlock
+                            hideCopy
+                            language="sql"
+                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
+                          >
+                            {(prompt?.answer ?? '').replace(/`/g, '').replace(/sql\n/g, '').trim()}
+                          </CodeBlock>
                           {!isResponding && <SQLOutputActions answer={prompt.answer} />}
                         </div>
                       )}

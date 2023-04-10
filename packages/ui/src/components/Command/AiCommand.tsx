@@ -7,7 +7,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertCircle, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 
@@ -128,9 +128,7 @@ const AiCommand = () => {
 
   const handleConfirm = useCallback(
     async (query: string) => {
-      if (!edgeFunctionUrl) {
-        return console.error('No edge function url')
-      }
+      if (!edgeFunctionUrl) return console.error('No edge function url')
 
       setSearch('')
       dispatchMessage({
