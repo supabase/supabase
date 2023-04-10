@@ -22,6 +22,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/database',
     name: 'Database',
   },
+  api: {
+    icon: '/docs/img/icons/menu/database',
+    name: 'Serverless APIs',
+  },
   auth: {
     icon: '/docs/img/icons/menu/auth',
     name: 'Auth',
@@ -33,6 +37,10 @@ const levelsData = {
   realtime: {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
+  },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
   },
   storage: {
     icon: '/docs/img/icons/menu/storage',
@@ -82,6 +90,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
+  reference_swift_v1: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v1.0',
+  },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
     name: 'CLI Reference',
@@ -101,6 +113,10 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
   },
 }
 
@@ -298,20 +314,6 @@ const NavContainer = memo(function NavContainer() {
 })
 
 const SiteLayout = ({ children }) => {
-  // const mobileMenuOpen = useMenuMobileOpen()
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-      document.documentElement.style.colorScheme = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-      document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
-    }
-  }, [])
-
   return (
     <>
       <Head>

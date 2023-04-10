@@ -23,7 +23,8 @@ import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
-import { useParams } from 'hooks'
+jest.mock('common/hooks')
+import { useParams } from 'common/hooks'
 
 beforeEach(() => {
   // reset mocks between tests
