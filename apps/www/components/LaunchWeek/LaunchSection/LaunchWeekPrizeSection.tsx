@@ -11,7 +11,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       <div className="">
         <div className="text-center relative z-10 text-white">
           <motion.div
-            className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
+            className="max-w-[38rem] mx-auto flex flex-col items-center gap-4"
             initial={{ y: -20, opacity: 0 }}
             whileInView={finalAnimationState}
             viewport={{ once: true, margin: '-150px' }}
@@ -56,7 +56,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             </p>
           </motion.div>
         </div>
-        <div className="px-4 pt-24">
+        <div className="pt-24">
           <div className="grid grid-cols-1 md:grid-cols-2 col-span-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto text-white">
             <LaunchWeekPrizeCard
               imageUrl="/images/launchweek/seven/keyboard.jpg"
