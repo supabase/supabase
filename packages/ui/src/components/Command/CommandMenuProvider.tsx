@@ -23,7 +23,7 @@ export interface CommandMenuContextValue {
   /**
    * Any additional metadata that CMDK component can use in its AI prompts
    */
-  metadata: any
+  metadata?: { definitions: string }
   /**
    * Opt in flag to use additional metadata in AI prompts
    */
@@ -65,7 +65,7 @@ export interface CommandMenuProviderProps {
   /**
    * Any additional metadata that CMDK component can use in its AI prompts
    */
-  metadata?: any
+  metadata?: { definitions: string }
   /**
    * TODO: remove this prop, temporary hack as ReactMarkdown fails our jest tests
    * if we import the package directly within this UI package

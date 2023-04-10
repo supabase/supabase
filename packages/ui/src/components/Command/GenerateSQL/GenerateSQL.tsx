@@ -18,7 +18,7 @@ import { CommandItem } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
-import { getEdgeFunctionUrl, promptDataReducer } from './GenerateSQL.utils'
+import { getEdgeFunctionUrl, promptDataReducer, generatePrompt } from './GenerateSQL.utils'
 
 const GenerateSQL = () => {
   const [promptIndex, setPromptIndex] = useState(0)
@@ -32,8 +32,6 @@ const GenerateSQL = () => {
   const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata } = useCommandMenu()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
-
-  console.log('Generate SQL', { isOptedInToAI, metadata })
 
   const handleConfirm = useCallback(
     async (query: string) => {
@@ -50,14 +48,7 @@ const GenerateSQL = () => {
       setHasClippyError(false)
       setIsLoading(true)
 
-      // [Joshen] Eventually we need to pass the table data in here as well
-      const queryToSend = `
-Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity":
-${query}
-
-Postgres SQL query:
-`.trim()
-
+      const queryToSend = generatePrompt(query, isOptedInToAI ? metadata : undefined)
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
