@@ -7,12 +7,12 @@ import { checkPermissions, useStore } from 'hooks'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import SQLCard from './SQLCard'
-import { useContentCreateMutation } from 'data/content/content-create-mutation'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { uuidv4 } from 'lib/helpers'
 
 const SQLTemplates = observer(() => {
   const { ui } = useStore()
@@ -22,7 +22,6 @@ const SQLTemplates = observer(() => {
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const snap = useSqlEditorStateSnapshot()
-  const { mutateAsync: createContent } = useContentCreateMutation()
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -40,17 +39,10 @@ const SQLTemplates = observer(() => {
     }
 
     try {
-      const payload = createSqlSnippetSkeleton({ sql, name, owner_id: profile?.id })
-      const response = await createContent(
-        { projectRef: ref, payload },
-        {
-          onSuccess(data) {
-            snap.addSnippet(data.content[0] as SqlSnippet, ref)
-          },
-        }
-      )
-      const snippetId = response.content[0].id
-      router.push(`/project/${ref}/sql/${snippetId}`)
+      const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
+      const data = { ...snippet, id: uuidv4() }
+      snap.addSnippet(data as SqlSnippet, ref, true)
+      router.push(`/project/${ref}/sql/${data.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

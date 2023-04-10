@@ -1,8 +1,10 @@
 import { SSE } from 'sse.js'
+import { format } from 'sql-formatter'
 import type { CreateCompletionResponse } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   Button,
+  CodeBlock,
   IconAlertCircle,
   IconAlertTriangle,
   IconCheck,
@@ -110,7 +112,7 @@ const SQLOutputActions = ({ answer }: { answer: string }) => {
   }, [isSaved])
 
   return (
-    <div className="flex items-center justify-end space-x-2 mr-12">
+    <div className="flex items-center justify-end space-x-2">
       <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
         <Button
           type="default"
@@ -156,8 +158,7 @@ const GenerateSQL = () => {
 
   const eventSourceRef = useRef<SSE>()
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
-  const { isLoading, setIsLoading, search, setSearch, MarkdownHandler, onSaveGeneratedSQL } =
-    useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
 
@@ -250,11 +251,30 @@ Postgres SQL query:
     }
   }, [])
 
+  const formatAnswer = (answer: string) => {
+    try {
+      return format(answer, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+    } catch (error: any) {
+      return answer
+    }
+  }
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
         {promptData.map((prompt, i) => {
           if (!prompt.query) return <></>
+
+          const formattedPromptAnwswer = (prompt?.answer ?? '')
+            .replace(/`/g, '')
+            .replace(/sql\n/g, '')
+            .trim()
+          const promptAnswer = isResponding
+            ? formattedPromptAnwswer
+            : formatAnswer(formattedPromptAnwswer)
 
           return (
             <>
@@ -290,12 +310,16 @@ Postgres SQL query:
                     </div>
                     <>
                       {isLoading && promptIndex === i ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
                       ) : (
-                        <div className="space-y-2 flex-grow">
-                          <MarkdownHandler className="prose dark:prose-dark bg-scale-300 px-4 py-4 rounded-md w-full">
-                            {prompt.answer}
-                          </MarkdownHandler>
+                        <div className="space-y-2 flex-grow max-w-[93%]">
+                          <CodeBlock
+                            hideCopy
+                            language="sql"
+                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
+                          >
+                            {promptAnswer}
+                          </CodeBlock>
                           {!isResponding && <SQLOutputActions answer={prompt.answer} />}
                         </div>
                       )}
@@ -310,13 +334,13 @@ Postgres SQL query:
           <div>
             <div className="px-10">
               <h3>Example queries</h3>
-              <p className="text-sm mt-1">
+              <p className="text-sm mt-1 text-scale-1100">
                 Use these example queries to help get your project started quickly.
               </p>
             </div>
-            <div className="flex mt-4 border-t pt-4">
+            <div className="flex mt-4 border-t pt-2">
               <div className="w-1/3 py-4 px-6">
-                <ul className="space-y-2 mr-8">
+                <ul className="space-y-2">
                   {SAMPLE_QUERIES.map((item, index) => (
                     <li
                       key={index}

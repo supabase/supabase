@@ -3,17 +3,18 @@ import ReactMarkdown from 'react-markdown'
 import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { CommandMenuProvider } from 'ui'
+import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { uuidv4 } from 'lib/helpers'
 import { checkPermissions, useStore } from 'hooks'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useContentCreateMutation } from 'data/content/content-create-mutation'
 
-const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
+const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { ui } = useStore()
 
@@ -24,7 +25,6 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { data: profile } = useProfileQuery()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
-  const { mutateAsync: createContent } = useContentCreateMutation()
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -38,14 +38,15 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
+      ui.setNotification({
         category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
+        message: 'Unable to save query as you do not have sufficient permissions for this project',
       })
+      return resolve()
     }
 
     // Remove markdown syntax from returned answer
-    answer = answer.replace(/`/g, '').replace(/sql\n/g, '')
+    answer = answer.replace(/`/g, '').replace(/sql\n/g, '').trim()
 
     const formattedSql = `
 -- Note: This query was generated via Supabase AI, please verify the correctness of the
@@ -56,23 +57,17 @@ ${answer}
 `.trim()
 
     try {
-      const payload = createSqlSnippetSkeleton({
+      const snippet = createSqlSnippetSkeleton({
         name: 'Generated query',
         owner_id: profile?.id,
         sql: formattedSql,
       })
-      await createContent(
-        { projectRef: ref, payload },
-        {
-          onSuccess(data) {
-            snap.addSnippet(data.content[0] as SqlSnippet, ref)
-            ui.setNotification({
-              category: 'success',
-              message: `Successfully saved snippet!`,
-            })
-          },
-        }
-      )
+      const data = { ...snippet, id: uuidv4() }
+      snap.addSnippet(data as SqlSnippet, ref, true)
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully saved snippet!`,
+      })
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -95,6 +90,6 @@ ${answer}
       {children}
     </CommandMenuProvider>
   )
-}
+})
 
 export default CommandMenuWrapper

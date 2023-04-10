@@ -85,7 +85,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
     try {
       await deleteContent({ projectRef: ref, id })
 
-      const existingSnippetIds = Object.keys(snap.snippets)
+      const existingSnippetIds = (snap.orders[ref] ?? []).filter((x) => x !== id)
       if (existingSnippetIds.length === 0) {
         router.push(`/project/${ref}/sql`)
       } else {

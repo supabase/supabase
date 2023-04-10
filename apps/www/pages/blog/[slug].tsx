@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import { generateReadingTime } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
@@ -64,6 +65,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
+  const isLaunchWeek7 = props.blog.launchweek === 7
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
@@ -264,6 +266,7 @@ function BlogPostPage(props: any) {
                       <MDXRemote {...content} components={mdxComponents()} />
                     </div>
                   </article>
+                  {isLaunchWeek7 && <BlogLinks />}
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
