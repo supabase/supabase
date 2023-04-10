@@ -7,19 +7,16 @@ const images = {
   '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
   '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
   '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.png',
-  '01-self-hosted-logs-01': '/images/launchweek/seven/day1/self-hosted-logs-000.svg',
-  '01-self-hosted-logs-02': '/images/launchweek/seven/day1/self-hosted-logs-001-b.svg',
-  '01-self-hosted-logs-02-mobile':
-    '/images/launchweek/seven/day1/self-hosted-logs-001-b-mobile.svg',
+  '01-self-hosted-logs-01': '/images/launchweek/seven/day1/self-hosted-logs-base.jpg',
+  '01-self-hosted-logs-01-mobile':
+    '/images/launchweek/seven/day1/self-hosted-logs-007-mobile-base.jpg',
   '01-self-hosted-logs-03': '/images/launchweek/seven/day1/self-hosted-logs-001-5.svg',
   '01-self-hosted-logs-03-mobile':
     '/images/launchweek/seven/day1/self-hosted-logs-001-5-mobile.svg',
   '01-self-hosted-logs-04': '/images/launchweek/seven/day1/self-hosted-logs-001-7.svg',
   '01-self-hosted-logs-04-mobile':
     '/images/launchweek/seven/day1/self-hosted-logs-001-7-mobile.svg',
-  '01-self-hosted-logs-05': '/images/launchweek/seven/day1/self-hosted-logs-003.svg',
   '01-self-hosted-logs-06': '/images/launchweek/seven/day1/self-hosted-logs-004.png',
-  '01-self-hosted-logs-07': '/images/launchweek/seven/day1/self-hosted-logs-005.svg',
 }
 
 export interface WeekDayProps {
@@ -105,10 +102,9 @@ const days: WeekDayProps[] = [
         blog: '/blog/supabase-logs-self-hosted',
         thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
         bg_layers: [
-          { img: images['01-self-hosted-logs-01'] },
           {
-            img: images['01-self-hosted-logs-02'],
-            mobileImg: images['01-self-hosted-logs-02-mobile'],
+            img: images['01-self-hosted-logs-01'],
+            mobileImg: images['01-self-hosted-logs-01-mobile'],
           },
           {
             img: images['01-self-hosted-logs-03'],
@@ -118,9 +114,7 @@ const days: WeekDayProps[] = [
             img: images['01-self-hosted-logs-04'],
             mobileImg: images['01-self-hosted-logs-04-mobile'],
           },
-          { img: images['01-self-hosted-logs-05'] },
           { img: images['01-self-hosted-logs-06'] },
-          { img: images['01-self-hosted-logs-07'] },
         ],
       },
     ],
