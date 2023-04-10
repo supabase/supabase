@@ -3,15 +3,22 @@ import LabelBadge from '../LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
 import { motion } from 'framer-motion'
 
-export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
+export default function LaunchWeekPrizeSection({
+  className,
+  ticket,
+}: {
+  className?: string
+  ticket?: any
+}) {
   const finalAnimationState = { y: 0, opacity: 1 }
+  const Ticket = ticket
 
   return (
-    <div id="lw-7-prizes" className={[className].join(' ')}>
-      <div className="">
+    <div id="lw-7-prizes" className={['scroll-mt-[75px]', className].join(' ')}>
+      <div className="!max-w-[100vw]">
         <div className="text-center relative z-10 text-white">
           <motion.div
-            className="max-w-[38rem] mx-auto flex flex-col items-center gap-4"
+            className="max-w-[38rem] mx-auto flex flex-col items-center gap-4 px-4"
             initial={{ y: -20, opacity: 0 }}
             whileInView={finalAnimationState}
             viewport={{ once: true, margin: '-150px' }}
@@ -56,7 +63,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             </p>
           </motion.div>
         </div>
-        <div className="pt-24">
+        {ticket && <Ticket />}
+        <div className="pt-4 px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 col-span-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto text-white">
             <LaunchWeekPrizeCard
               imageUrl="/images/launchweek/seven/keyboard.jpg"
