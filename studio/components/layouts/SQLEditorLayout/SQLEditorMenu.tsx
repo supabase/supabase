@@ -54,8 +54,6 @@ const SideBarContent = observer(() => {
     subject: { id: profile?.id },
   })
 
-  // [Joshen TODO] Removed optimistic query creation logic for now, need to figure out
-  // how to do that after using ids as part of the URL
   const handleNewQuery = async () => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
