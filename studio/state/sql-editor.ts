@@ -68,7 +68,10 @@ export const sqlEditorState = proxy({
       }
       sqlEditorState.results[snippet.id] = []
       sqlEditorState.savingStates[snippet.id] = 'IDLE'
-      if (!sqlEditorState.orders[projectRef].includes(snippet.id)) {
+      if (
+        sqlEditorState.orders[projectRef] !== undefined &&
+        !sqlEditorState.orders[projectRef].includes(snippet.id)
+      ) {
         sqlEditorState.orders[projectRef].unshift(snippet.id)
       }
       if (isNew) {
