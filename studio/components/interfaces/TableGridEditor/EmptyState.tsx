@@ -1,9 +1,10 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useLocalStorage, useStore } from 'hooks'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
   selectedSchema: string
@@ -12,14 +13,33 @@ interface Props {
 
 const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const { meta } = useStore()
-  const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
   const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
   const canCreateTables =
     !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
+  const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
+
+  const { project } = useProjectContext()
+  const { data } = useEntityTypesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: selectedSchema,
+      sort,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  const totalCount = data?.pages?.[0].data.count ?? 0
+
   return (
     <div className="w-full h-full flex items-center justify-center">
-      {tables.length === 0 ? (
+      {totalCount === 0 ? (
         <ProductEmptyState
           title="Table Editor"
           ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}

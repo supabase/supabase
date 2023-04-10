@@ -1,23 +1,21 @@
-import { useQueryClient, useIsFetching } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
 
 export type RefreshButtonProps = {
   table: SupaTable
+  isRefetching: boolean
 }
 
-const RefreshButton = ({ table }: RefreshButtonProps) => {
+const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
 
   const queryKey = sqlKeys.query(ref, [table.schema, table.name])
-
-  const loading = useIsFetching({ queryKey }) > 0
-
   const [status, setStatus] = useState<string>()
 
   useEffect(() => {
@@ -61,7 +59,7 @@ const RefreshButton = ({ table }: RefreshButtonProps) => {
       onClick={() => {
         if (!status) onClick()
       }}
-      loading={loading || status === 'saving'}
+      loading={isRefetching || status === 'saving'}
     >
       {!status ? 'Refresh' : status === 'saved' ? 'Changes saved' : 'Saving changes'}
     </Button>

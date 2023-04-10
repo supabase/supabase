@@ -28,9 +28,15 @@ const home = [
       level: 'database',
     },
     {
+      label: 'Serverless APIs',
+      icon: '/img/icons/menu/reference',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
       label: 'Auth',
       icon: '/img/icons/menu/auth',
-      href: '/guides/auth/overview',
+      href: '/guides/auth',
       level: 'auth',
     },
     {
@@ -107,6 +113,13 @@ const home = [
       icon: '/img/icons/menu/reference-csharp',
       href: '/reference/csharp/introduction',
       level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Swift',
+      icon: '/img/icons/menu/reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
       community: true,
     },
     {

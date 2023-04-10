@@ -48,6 +48,11 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
   })
 
   useEffect(() => {
+    // make sure the public schemas are loaded initially
+    meta.tables.loadBySchema('public')
+  }, [])
+
+  useEffect(() => {
     // Reset the state of the side panel
     if (visible) {
       setErrors({})

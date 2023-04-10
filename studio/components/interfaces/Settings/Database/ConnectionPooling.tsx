@@ -134,7 +134,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     )
 
     const [updates, setUpdates] = useState<any>({
-      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
       pool_mode: bouncerInfo.pool_mode || 'transaction',
       default_pool_size: bouncerInfo.default_pool_size || '',
       ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
@@ -159,11 +158,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
 
     const formSchema = {
       properties: {
-        pgbouncer_enabled: {
-          title: 'Enabled',
-          type: 'boolean',
-          help: 'Activates / deactivates Connection Pooling.',
-        },
         pool_mode: {
           title: 'Pool Mode',
           type: 'string',
@@ -176,16 +170,11 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
               label: 'Session',
               value: 'session',
             },
-            {
-              label: 'Statement',
-              value: 'statement',
-            },
           ],
         },
         ignore_startup_parameters: {
           title: 'Ignore Startup Parameters',
           type: 'string',
-          readOnly: true,
           help: 'Defaults are either blank or "extra_float_digits"',
         },
       },
@@ -208,16 +197,12 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
-            <ToggleField name="pgbouncer_enabled" />
-
-            <Divider light />
-
-            {updates.pgbouncer_enabled && (
+            {bouncerInfo.pgbouncer_enabled && (
               <>
                 <AutoField
                   name="pool_mode"
                   showInlineError
-                  errorMessage="You must select one of the three options"
+                  errorMessage="You must select one of the two options"
                 />
                 <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                   <p className="text-sm text-scale-900">
