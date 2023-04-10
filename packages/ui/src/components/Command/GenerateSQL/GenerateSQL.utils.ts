@@ -55,3 +55,22 @@ export function promptDataReducer(
 
   return [...current]
 }
+
+export const generatePrompt = (query: string, metadata?: { definitions: string }) => {
+  const { definitions } = metadata || {}
+  return `
+${
+  definitions !== undefined
+    ? `
+Given the following Postgres SQL tables:
+${definitions}
+`
+    : ''
+}
+
+Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity":
+${query}
+  
+Postgres SQL query:
+`.trim()
+}

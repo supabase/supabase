@@ -13,15 +13,15 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 
 const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { ui } = useStore()
-
   const { opt_in_tags } = ui.selectedOrganization ?? {}
 
-  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const snap = useSqlEditorStateSnapshot()
+  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
   const { data: profile } = useProfileQuery()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
@@ -34,6 +34,15 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
     anon: settings?.autoApiService?.defaultApiKey ?? undefined,
     service: settings?.autoApiService?.serviceApiKey ?? undefined,
   }
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      projectRef: ui.selectedProject?.ref,
+      connectionString: ui.selectedProject?.connectionString,
+    },
+    { enabled: isOptedInToAI }
+  )
+  const cmdkMetadata = { definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n') }
 
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     if (!ref) return console.error('Project ref is required')
@@ -85,6 +94,7 @@ ${answer}
       apiKeys={apiKeys}
       MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
       onSaveGeneratedSQL={onSaveGeneratedSQL}
+      metadata={cmdkMetadata}
       isOptedInToAI={isOptedInToAI}
     >
       {children}
