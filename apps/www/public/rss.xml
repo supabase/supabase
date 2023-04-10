@@ -9,7 +9,7 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/supabase-logs-self-hosted</guid>
-  <title>Supabase Logs is now open source</title>
+  <title>Supabase Logs: open source logging server</title>
   <link>https://supabase.com/blog/supabase-logs-self-hosted</link>
   <description>undefined</description>
   <pubDate>Sun, 09 Apr 2023 22:10:00 +0000</pubDate>
