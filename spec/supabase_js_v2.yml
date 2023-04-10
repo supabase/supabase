@@ -4740,24 +4740,44 @@ functions:
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
 
-  - id: from-create-upload-signed-url
-    title: from.createUploadSignedUrl()
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createUploadSignedUrl'
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `select`
+        - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
-      - id: create-signed-urls
-        name: Create Signed URLs
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
         isSpotlight: true
         code: |
           ```js
           const { data, error } = await supabase
             .storage
             .from('avatars')
-            .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
+            .createSignedUploadUrl('folder/cat.jpg')
+          ```
+
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a signed URL
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
           ```
 
   - id: from-get-public-url

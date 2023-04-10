@@ -161,6 +161,11 @@ const Nav = [
         items: [],
       },
       {
+        name: 'from.createSignedUploadUrl()',
+        url: '/reference/javascript/storage-from-createsigneduploadurl',
+        items: [],
+      },
+      {
         name: 'from.getPublicUrl()',
         url: '/reference/javascript/storage-from-getpublicurl',
         items: [],
