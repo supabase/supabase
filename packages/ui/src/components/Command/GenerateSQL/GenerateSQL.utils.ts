@@ -56,7 +56,7 @@ export function promptDataReducer(
   return [...current]
 }
 
-export const generatePrompt = (query: string, metadata?: { definitions: string }) => {
+export const generatePrompt = (query: string, metadata?: any) => {
   const { definitions } = metadata || {}
   return `
 ${
@@ -68,7 +68,9 @@ ${definitions}
     : ''
 }
 
-Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity":
+Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity". All Postgres SQL commands should be written in lowercase letters.
+
+Prompt:
 ${query}
   
 Postgres SQL query:
