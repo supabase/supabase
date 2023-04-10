@@ -72,7 +72,7 @@ export default function LW7Releases() {
 
   return (
     <>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
           <SmallCard
             bgGradient
@@ -106,7 +106,7 @@ export default function LW7Releases() {
                 </span>
               </div>
             </div>
-            <div className="flex gap-2 z-10">
+            <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
                 <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
@@ -146,18 +146,15 @@ export default function LW7Releases() {
                 <span className="text-black dark:text-white mr-2">Join the prize draw</span>
               </div>
             </div>
-            <div className="flex gap-2 z-10">
-              <ChipLink href="#lw-7-prizes">
-                Learn more
-                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                  <PencilSvg />
-                </div>
+            <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
+              <ChipLink href="#lw-7-prizes" className="pr-3 !justify-center">
+                More info
               </ChipLink>
             </div>
           </SmallCard>
         </div>
       </SectionContainer>
-      <SectionContainer className="!pt-0">
+      <SectionContainer className="!pt-0 !w-full !px-0 !max-w-none">
         <Accordion
           type="default"
           openBehaviour="multiple"
@@ -188,7 +185,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -253,7 +250,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-14 lg:px-10 text-2xl bg-contain shadow-lg
+                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-4 sm:px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
