@@ -33,7 +33,7 @@ const opacityVariant = {
 const opacityVariant2 = {
   default: { opacity: 0, ease: defaultEase, duration: 0.2 },
   hover: {
-    opacity: 0.08,
+    opacity: 0.2,
     transition: {
       duration: 0.4,
       ease: defaultEase,
@@ -70,10 +70,10 @@ const moveX10 = {
 
 const getDay1Motion = (index: number) => {
   switch (index) {
+    case 1:
     case 2:
-    case 3:
       return moveX10
-    case 5:
+    case 3:
       return opacityVariant2
     default:
       return undefined
@@ -384,8 +384,8 @@ export default function LW7Releases() {
                             <motion.div
                               className={[
                                 'absolute inset-0 w-full h-full -z-10',
-                                i === 6 && '!mix-blend-difference',
-                                i === 5 && '!mix-blend-overlay blur-2xl',
+                                // i === 6 && '!mix-blend-difference',
+                                i === 3 && '!mix-blend-overlay blur-2xl',
                               ].join(' ')}
                               variants={getDay1Motion(i)}
                             >
