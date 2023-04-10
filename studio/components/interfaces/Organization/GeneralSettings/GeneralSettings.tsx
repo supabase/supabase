@@ -47,7 +47,7 @@ const GeneralSettings = () => {
     const response = await patch(`${API_URL}/organizations/${slug}`, {
       name: values.name,
       billing_email: ui.selectedOrganization?.billing_email ?? '',
-      opt_in_tags: optInTags,
+      ...(allowCMDKDataOptIn && { opt_in_tags: optInTags }),
     })
 
     if (response.error) {
