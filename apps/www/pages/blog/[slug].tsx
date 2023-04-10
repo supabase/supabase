@@ -68,7 +68,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  useActiveAnchors('h2, h3, h4')
+  // useActiveAnchors('h2, h3, h4')
   const isLaunchWeek7 = props.blog.launchweek === 7
 
   const author = []
