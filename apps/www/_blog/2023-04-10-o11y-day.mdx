@@ -29,9 +29,13 @@ In the past few months we’ve made Logflare more developer-friendly for local d
 
 ![Realtime local logs](/images/blog/lw7-o11y/realtime-logs-screenshot.png)
 
-> 📢 Check out the [new self-hosting docs](http://localhost:3001/docs/reference/self-hosting-analytics/introduction) to get Logflare up and running as your analytics server.
->
-> It currently supports a BigQuery backend, and we are actively working on supporting more.
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
+
+📢 Check out the [new self-hosting docs](http://localhost:3001/docs/reference/self-hosting-analytics/introduction) to get Logflare up and running as your analytics server.
+
+</div>
+
+It currently supports a BigQuery backend, and we are actively working on supporting more.
 
 ## The Ingestion Pipeline
 
@@ -75,8 +79,8 @@ Using webhooks, we can send all GitHub events in the Supabase organization to Lo
       "type": "User",
       "url": "https://api.github.com/users/JohannesBauer97"
     },
-    "starred_at": "2023-03-30T20:33:55Z",
-		...
+    "starred_at": "2023-03-30T20:33:55Z"
+    //...
   },
   "timestamp": 1680208436849642
 }
@@ -115,51 +119,18 @@ This returns a JSON response with the top org wide contributors for the last 30 
 ```json
 {
   "result": [
-    {
-      "count": 23404,
-      "gh_user": "vercel[bot]"
-    },
-    {
-      "count": 10005,
-      "gh_user": "joshenlim"
-    },
-    {
-      "count": 7026,
-      "gh_user": "MildTomato"
-    },
-    {
-      "count": 6405,
-      "gh_user": "fsansalvadore"
-    },
-    {
-      "count": 5195,
-      "gh_user": "saltcod"
-    },
-    {
-      "count": 3454,
-      "gh_user": "alaister"
-    },
-    {
-      "count": 2691,
-      "gh_user": "kevcodez"
-    },
-    {
-      "count": 2117,
-      "gh_user": "gregnr"
-    },
-    {
-      "count": 1769,
-      "gh_user": "Ziinc"
-    },
-    {
-      "count": 1749,
-      "gh_user": "chasers"
-    },
-    {
-      "count": 1430,
-      "gh_user": "Isaiah-Hamilton"
-    },
-    ...
+    { "count": 23404, "gh_user": "vercel[bot]" },
+    { "count": 10005, "gh_user": "joshenlim" },
+    { "count": 7026, "gh_user": "MildTomato" },
+    { "count": 6405, "gh_user": "fsansalvadore" },
+    { "count": 5195, "gh_user": "saltcod" },
+    { "count": 3454, "gh_user": "alaister" },
+    { "count": 2691, "gh_user": "kevcodez" },
+    { "count": 2117, "gh_user": "gregnr" },
+    { "count": 1769, "gh_user": "Ziinc" },
+    { "count": 1749, "gh_user": "chasers" },
+    { "count": 1430, "gh_user": "Isaiah-Hamilton" }
+    //...
   ]
 }
 ```
