@@ -13,6 +13,7 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { codeBlock } from 'common-tags'
 
 const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -31,30 +32,30 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
     service: settings?.autoApiService?.serviceApiKey ?? undefined,
   }
 
-  const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
+  const onSaveGeneratedSQL = async (answer: string, title: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
       ui.setNotification({
         category: 'info',
         message: 'Unable to save query as you do not have sufficient permissions for this project',
       })
-      return resolve()
+      return
     }
 
     // Remove markdown syntax from returned answer
     answer = answer.replace(/`/g, '').replace(/sql\n/g, '').trim()
 
-    const formattedSql = `
--- Note: This query was generated via Supabase AI, please verify the correctness of the
--- SQL snippet before running it against your database as we are not able to guarantee it
--- will do exactly what you requested the AI.
+    const formattedSql = codeBlock`
+      -- Note: This query was generated via Supabase AI, please verify the correctness of the
+      -- SQL snippet before running it against your database as we are not able to guarantee it
+      -- will do exactly what you requested the AI.
 
-${answer}
-`.trim()
+      ${answer}
+    `
 
     try {
       const snippet = createSqlSnippetSkeleton({
-        name: 'Generated query',
+        name: title || 'Generated query',
         owner_id: profile?.id,
         sql: formattedSql,
       })
@@ -69,8 +70,6 @@ ${answer}
         category: 'error',
         message: `Failed to create new query: ${error.message}`,
       })
-    } finally {
-      resolve()
     }
   }
 
@@ -80,7 +79,7 @@ ${answer}
       projectRef={ref}
       apiKeys={apiKeys}
       MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
-      onSaveGeneratedSQL={onSaveGeneratedSQL}
+      saveGeneratedSQL={onSaveGeneratedSQL}
     >
       {children}
     </CommandMenuProvider>
