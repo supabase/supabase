@@ -140,7 +140,7 @@ export default function TicketsPage({ users }: Props) {
                   <Link href="/launch-week">
                     <a>
                       <Button type="outline" size="medium">
-                        Get your ticket now
+                        Go to Launch Week 7
                       </Button>
                     </a>
                   </Link>
