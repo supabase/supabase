@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Form, Input, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -22,21 +22,9 @@ const GeneralSettings = () => {
   const { slug } = useParams()
   const { name, opt_in_tags } = ui.selectedOrganization ?? {}
 
-  const [optIn, setOptIn] = useState(
-    opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ? true : false
-  )
-  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
-
-  useEffect(() => {
-    setOptIn(isOptedInToAI ? true : false)
-  }, [opt_in_tags])
-
+  const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
   const formId = 'org-general-settings'
-
-  const initialValues = {
-    name: name ?? '',
-    opt_in_tags: optIn,
-  }
+  const initialValues = { name: name ?? '', isOptedIntoAi }
 
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
@@ -51,12 +39,12 @@ const GeneralSettings = () => {
 
     setSubmitting(true)
 
+    // [Joshen] Need to update this logic once we support multiple opt in tags
+    const optInTags = values.isOptedIntoAi ? ['AI_SQL_GENERATOR_OPT_IN'] : []
     const response = await patch(`${API_URL}/organizations/${slug}`, {
-      ...values,
-      opt_in_tags: optIn
-        ? [...(ui.selectedOrganization?.opt_in_tags ?? []), 'AI_SQL_GENERATOR_OPT_IN']
-        : [],
+      name: values.name,
       billing_email: ui.selectedOrganization?.billing_email ?? '',
+      opt_in_tags: optInTags,
     })
 
     if (response.error) {
@@ -65,17 +53,9 @@ const GeneralSettings = () => {
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
-      const { name, opt_in_tags } = response
-      resetForm({
-        values: { name, opt_in_tags },
-        initialValues: { name, opt_in_tags },
-      })
-
+      resetForm({ values, initialValues: values })
       app.onOrgUpdated(response)
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully saved settings',
-      })
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     }
     setSubmitting(false)
   }
@@ -87,10 +67,7 @@ const GeneralSettings = () => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = {
-              name: name ?? '',
-              opt_in_tags: isOptedInToAI ?? false,
-            }
+            const values = { name: name ?? '', isOptedIntoAi }
             resetForm({ values, initialValues: values })
           }, [ui.selectedOrganization?.slug])
 
@@ -118,12 +95,10 @@ const GeneralSettings = () => {
                   <Input id="name" size="small" disabled={!canUpdateOrganization} />
 
                   <Toggle
-                    checked={isOptedInToAI}
-                    id="opt_in_tags"
-                    name="opt_in_tags"
+                    id="isOptedIntoAi"
+                    name="isOptedIntoAi"
                     disabled={!canUpdateOrganization}
                     size="small"
-                    onChange={() => setOptIn(!optIn)}
                     label="Opt-in to sending anonymous data to OpenAI"
                     descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
                   />

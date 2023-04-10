@@ -7,147 +7,18 @@ import {
   CodeBlock,
   IconAlertCircle,
   IconAlertTriangle,
-  IconCheck,
-  IconClipboard,
   IconCornerDownLeft,
-  IconSave,
   IconUser,
   Input,
 } from 'ui'
 
-import { cn } from './../../utils/cn'
-import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandItem } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { SAMPLE_QUERIES } from './Command.constants'
-
-function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
-
-  if (!supabaseUrl) return undefined
-
-  // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
-  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
-
-  if (isPlatform) {
-    const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
-    return `${schemeAndProjectId}.functions.${domain}.${tld}`
-  } else {
-    return `${supabaseUrl}/functions/v1`
-  }
-}
-
-function promptDataReducer(
-  state: any[],
-  action: {
-    index?: number
-    answer?: string | undefined
-    status?: string
-    query?: string | undefined
-    type?: 'remove-last-item' | string
-  }
-) {
-  // set a standard state to use later
-  let current = [...state]
-
-  if (action.type) {
-    switch (action.type) {
-      case 'remove-last-item':
-        current.pop()
-        return [...current]
-      default:
-        break
-    }
-  }
-
-  // check that an index is present
-  if (action.index === undefined) return [...state]
-
-  if (!current[action.index]) {
-    current[action.index] = { query: '', answer: '', status: '' }
-  }
-
-  current[action.index].answer = action.answer
-
-  if (action.query) {
-    current[action.index].query = action.query
-  }
-  if (action.status) {
-    current[action.index].status = action.status
-  }
-
-  return [...current]
-}
-
-const SQLOutputActions = ({ answer }: { answer: string }) => {
-  const [showCopied, setShowCopied] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
-
-  const { project, onSaveGeneratedSQL } = useCommandMenu()
-
-  const applyCallback = () =>
-    onSaveGeneratedSQL !== undefined
-      ? new Promise((resolve) => onSaveGeneratedSQL(answer, resolve))
-      : {}
-
-  const onSelectSaveSnippet = async () => {
-    setIsSaving(true)
-    await applyCallback()
-    setIsSaved(true)
-    setIsSaving(false)
-  }
-
-  useEffect(() => {
-    if (!showCopied) return
-    const timer = setTimeout(() => setShowCopied(false), 2000)
-    return () => clearTimeout(timer)
-  }, [showCopied])
-
-  useEffect(() => {
-    if (!isSaved) return
-    const timer = setTimeout(() => setIsSaved(false), 2000)
-    return () => clearTimeout(timer)
-  }, [isSaved])
-
-  return (
-    <div className="flex items-center justify-end space-x-2">
-      <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
-        <Button
-          type="default"
-          icon={
-            showCopied ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
-            ) : (
-              <IconClipboard size="tiny" />
-            )
-          }
-          onClick={() => setShowCopied(true)}
-        >
-          {showCopied ? 'Copied' : 'Copy SQL'}
-        </Button>
-      </CopyToClipboard>
-      {project?.ref !== undefined && onSaveGeneratedSQL !== undefined && (
-        <Button
-          type="default"
-          loading={isSaving}
-          disabled={isSaving}
-          icon={
-            isSaved ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
-            ) : (
-              <IconSave size="tiny" />
-            )
-          }
-          onClick={() => onSelectSaveSnippet()}
-        >
-          {isSaved ? 'Snippet saved!' : 'Save into new snippet'}
-        </Button>
-      )}
-    </div>
-  )
-}
+import { cn } from '../../../utils/cn'
+import { AiIcon, AiIconChat } from '../Command.icons'
+import { CommandItem } from '../Command.utils'
+import { useCommandMenu } from '../CommandMenuProvider'
+import { SAMPLE_QUERIES } from '../Command.constants'
+import SQLOutputActions from './SQLOutputActions'
+import { getEdgeFunctionUrl, promptDataReducer } from './GenerateSQL.utils'
 
 const GenerateSQL = () => {
   const [promptIndex, setPromptIndex] = useState(0)
@@ -158,9 +29,11 @@ const GenerateSQL = () => {
 
   const eventSourceRef = useRef<SSE>()
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata } = useCommandMenu()
 
   const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
+
+  console.log('Generate SQL', { isOptedInToAI, metadata })
 
   const handleConfirm = useCallback(
     async (query: string) => {
