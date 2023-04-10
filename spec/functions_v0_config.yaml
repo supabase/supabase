@@ -35,39 +35,3 @@ parameters:
     type: 'string'
     description: |
       Allows you to pass in an API key that will used for authentication. This is intended for programmatic usage where an external program sets the API key. It is advised to use the UI to configure the access tokens instead. If this value is not provided, the default API key will be automatically generated.
-  - id: 'LOGFLARE_SUPABASE_MODE' # {string} A unique identifier for this param.
-    title: 'LOGFLARE_SUPABASE_MODE' # {string} Any name.
-    tags: ['general'] # {string[]} These tags are useful for grouping parameters
-    links: [] # {string[]} These tags are useful for grouping parameters
-    required: true
-    default: 'false'
-    type: 'boolean'
-    description: |
-      This is a special mode for Logflare which will seed additional resources for usage with Supabase self-hosted.
-  - id: 'PHX_HTTP_PORT' # {string} A unique identifier for this param.
-    title: 'PHX_HTTP_PORT' # {string} Any name.
-    tags: ['general'] # {string[]} These tags are useful for grouping parameters
-    links: [] # {string[]} These tags are useful for grouping parameters
-    required: true
-    default: '4000'
-    type: 'string'
-    description: |
-      Port which serves HTTP requests
-  - id: 'DB_SCHEMA' # {string} A unique identifier for this param.
-    title: 'DB_SCHEMA' # {string} Any name.
-    tags: ['general'] # {string[]} These tags are useful for grouping parameters
-    links: [] # {string[]} These tags are useful for grouping parameters
-    required: true
-    default: ''
-    type: 'string'
-    description: |
-      This ENV variable sets the search path to a custom database schema. This allows you to customize the schema used on the database.
-  - id: 'LOGFLARE_LOG_LEVEL' # {string} A unique identifier for this param.
-    title: 'LOGFLARE_LOG_LEVEL' # {string} Any name.
-    tags: ['general'] # {string[]} These tags are useful for grouping parameters
-    links: [] # {string[]} These tags are useful for grouping parameters
-    required: true
-    default: 'info'
-    type: 'string'
-    description: |
-      Allows the setting of the log level at runtime. For production settings, we advise `warn`.
