@@ -351,7 +351,7 @@ const NavigationMenu = () => {
         id={'reference_self_hosting_functions'}
         active={isReference_Self_Hosting_Functions}
         commonSections={functionsServerCommonSections}
-        lib="self-hosting-analytics"
+        lib="self-hosting-functions"
       />
     </div>
   )
