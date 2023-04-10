@@ -69,7 +69,7 @@ const days: WeekDayProps[] = [
       {
         title: 'Supavisor',
         github: 'https://github.com/supabase/supavisor',
-        // hackernews: 'hackernews_link',
+        hackernews: 'https://news.ycombinator.com/item?id=35501718',
         thumb: '/images/launchweek/seven/day0/supavisor/supavisor-thumb.png',
         bg_layers: [{ img: images['0-supavisor-01'] }, { img: images['0-supavisor-02'] }],
       },

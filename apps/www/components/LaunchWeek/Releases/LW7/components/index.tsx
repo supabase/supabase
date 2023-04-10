@@ -146,14 +146,18 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
 export const ChipLink = ({
   href,
   className,
+  target,
   children,
 }: {
   href: string
   className?: string
+  target?: '_blank' | '_self' | '_parent' | '_top' | 'framename'
   children: any
 }) => (
-  <Link href={href} target="_blank" rel="noopener">
+  <Link href={href}>
     <a
+      target={target ?? '_self'}
+      rel="noopener"
       className={[
         'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
         className,
@@ -206,7 +210,7 @@ export const SectionButtons = ({
         </ChipLink>
       )}
       {!!github && (
-        <ChipLink href={github}>
+        <ChipLink href={github} target="_blank">
           View on Github
           <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
             <GithubSvg />
@@ -222,7 +226,7 @@ export const SectionButtons = ({
         </ChipLink>
       )}
       {hackernews && (
-        <ChipLink href={hackernews}>
+        <ChipLink href={hackernews} target="_blank">
           Read more
           <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
             <HackernewsSvg />
