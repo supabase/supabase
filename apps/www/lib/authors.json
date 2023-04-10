@@ -278,5 +278,26 @@
     "position": "Engineering",
     "author_url": "https://github.com/fsansalvadore",
     "author_image_url": "https://github.com/fsansalvadore.png"
+  },
+  {
+    "author_id": "marijana",
+    "author": "Marijana Šimag",
+    "position": "Design",
+    "author_url": "https://dribbble.com/marijanasimag",
+    "author_image_url": "https://github.com/marijanasimag.png"
+  },
+  {
+    "author_id": "ziinc",
+    "author": "Lee TzeYiing",
+    "position": "Engineering",
+    "author_url": "https://github.com/Ziinc",
+    "author_image_url": "https://github.com/Ziinc.png"
+  },
+  {
+    "author_id": "chasers",
+    "author": "Chase Granberry",
+    "position": "Engineering",
+    "author_url": "https://github.com/chasers",
+    "author_image_url": "https://github.com/chasers.png"
   }
 ]

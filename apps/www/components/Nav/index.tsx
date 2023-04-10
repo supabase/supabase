@@ -11,6 +11,8 @@ import SolutionsData from 'data/Solutions.json'
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
+import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
 import TextLink from '../TextLink'
@@ -111,7 +113,7 @@ const Nav = () => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 flex items-center px-2 lg:hidden"
+      className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button
@@ -194,7 +196,9 @@ const Nav = () => {
 
   return (
     <>
-      {/* <Announcement /> */}
+      <Announcement>
+        <CountdownBanner />
+      </Announcement>
       <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -206,7 +210,7 @@ const Nav = () => {
         <nav
           className={[
             `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 border-[#e0d2f430]',
+            showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
           ].join(' ')}
         >
           {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}
@@ -331,7 +335,6 @@ const Nav = () => {
                 )}
               </div>
             </div>
-            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
           </div>
           {/* </div> */}
           {/* Mobile Nav Menu */}
@@ -434,6 +437,7 @@ const Nav = () => {
         <FlyOut open={openDevelopers} handleCancel={handleCancel}>
           <Developers />
         </FlyOut>
+        <ScrollProgress />
       </div>
     </>
   )

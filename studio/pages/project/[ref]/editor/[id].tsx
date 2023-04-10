@@ -23,9 +23,11 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useTheme } from 'common'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
@@ -58,6 +60,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   const tables: PostgresTable[] = meta.tables.list()
   const views: SchemaView[] = meta.views.list()
+  const materializedViews = meta.materializedViews.list()
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
 
   const selectedTable = !isNaN(Number(id))
@@ -65,6 +68,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       tables
         // @ts-ignore
         .concat(views)
+        // @ts-ignore
+        .concat(materializedViews)
         // @ts-ignore
         .concat(foreignTables)
         .find((table) => table.id === Number(id))
@@ -289,8 +294,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
-        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
         onImportData={onImportData}
+        theme={isDarkMode ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger

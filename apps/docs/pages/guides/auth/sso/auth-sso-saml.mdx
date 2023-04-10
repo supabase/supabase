@@ -21,6 +21,8 @@ If you're having issues with identity provider software not on this list, please
 
 This guide requires the use of the [Supabase CLI](/docs/guides/cli). Please make sure you're using version v1.46.4 or higher. You can use `supabase -v` to see the currently installed version.
 
+You can use the `supabase sso` [subcommands](/docs/reference/cli/supabase-sso) to manage your project's configuration.
+
 SAML 2.0 support is disabled by default on Supabase projects. You can configure this on the [Auth Providers](https://app.supabase.com/project/_/auth/providers) page on your project.
 
 Please note that SAML 2.0 support is offered on tiers Pro and above. Check the [Pricing](https://supabase.com/pricing) page for more information.
@@ -67,7 +69,7 @@ Note that SLO (Single Logout) is not supported at this time with Supabase Auth a
 
 Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
 
-Alternatively, you can use the `supabase sso info --project-ref <your-project>` command to get setup information for your project.
+Alternatively, you can use the `supabase sso info --project-ref <your-project>` [command](/docs/reference/cli/supabase-sso-info) to get setup information for your project.
 
 ### User accounts and identities
 
@@ -129,7 +131,7 @@ CREATE POLICY "View organization settings."
 
 ## Managing SAML 2.0 connections
 
-Once you've enabled SAML 2.0 support on your project via the [Auth Providers](https://app.supabase.com/project/_/auth/providers) page in the dashboard, you can use the [Supabase CLI](/docs/guides/cli) to add, update, remove and view information about identity providers.
+Once you've enabled SAML 2.0 support on your project via the [Auth Providers](https://app.supabase.com/project/_/auth/providers) page in the dashboard, you can use the [Supabase CLI](/docs/reference/cli/supabase-sso) to add, update, remove and view information about identity providers.
 
 ### Add a connection
 
@@ -152,7 +154,7 @@ Commonly used SAML 2.0 Identity Providers that only support Metadata XML files:
 - Google Workspaces (GSuite)
 - Any self-hosted or on-prem identity provider behind a VPN
 
-Once you've obtained the SAML 2.0 Metadata XML file or URL you can establish a connection with your project's Supabase Auth server by using the [Supabase CLI](/docs/guides/cli):
+Once you've obtained the SAML 2.0 Metadata XML file or URL you can [establish a connection](/docs/reference/cli/supabase-sso-add) with your project's Supabase Auth server by running:
 
 ```bash
 supabase sso add --type saml --project-ref <your-project> \
@@ -185,7 +187,7 @@ supabase.auth.signInWithSSO({
 })
 ```
 
-Calling this method starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 ### Understanding attribute mappings
 
@@ -272,7 +274,7 @@ Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP
 
 ### Remove a connection
 
-Once a connection to an identity provider is established, you can remove it by running:
+Once a connection to an identity provider is established, you can [remove it](/docs/reference/cli/supabase-sso-remove) by running:
 
 ```bash
 supabase sso remove <provider-id> --project-ref <your-project>
@@ -282,7 +284,7 @@ If successful, the details of the removed identity provider will be shown. All u
 
 If you need to reassign those user accounts to another identity provider, please [open a support ticket](https://app.supabase.com/support/new).
 
-A list of all registered identity providers can be displayed by running:
+A [list of all](/docs/reference/cli/supabase-sso-list) registered identity providers can be displayed by running:
 
 ```bash
 supabase sso list --project-ref <your-project>
@@ -299,7 +301,7 @@ Commonly this is necessary when:
 - Other SAML 2.0 Metadata attributes have changed, but it is still the same identity provider
 - You are updating the domains or attribute mapping
 
-You can use the following command to update the configuration of an identity provider:
+You can use this command to [update](/docs/reference/cli/supabase-sso-update) the configuration of an identity provider:
 
 ```bash
 supabase sso update <provider-id> --project-ref <your-project>
@@ -311,13 +313,13 @@ It is not possible to change the unique SAML identifier of the identity provider
 
 ### Retrieving information about a connection
 
-You can always obtain a list of all registered providers using:
+You can always obtain a [list](/docs/reference/cli/supabase-sso-list) of all registered providers using:
 
 ```bash
 supabase sso list --project-ref <your-project>
 ```
 
-This list will only include basic information about each provider. To see all of the information about a provider you can use:
+This list will only include basic information about each provider. To see [all of the information](/docs/reference/cli/supabase-sso-show) about a provider you can use:
 
 ```bash
 supabase sso show <provider-id> --project-ref <your-project>

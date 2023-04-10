@@ -1,7 +1,19 @@
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button } from 'ui'
+import {
+  Badge,
+  Checkbox,
+  SidePanel,
+  Input,
+  Alert,
+  IconBookOpen,
+  Button,
+  Modal,
+  IconShieldOff,
+  IconLock,
+  IconAlertOctagon,
+} from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -20,6 +32,8 @@ import {
 } from './TableEditor.utils'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import RLSDisableModalContent from './RLSDisableModal'
 
 interface Props {
   table?: PostgresTable
@@ -74,6 +88,7 @@ const TableEditor: FC<Props> = ({
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -226,55 +241,62 @@ const TableEditor: FC<Props> = ({
                   <p>
                     Restrict access to your table by enabling RLS and writing Postgres policies.
                   </p>
-
-                  {tableFields.isRLSEnabled ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      className="!px-4 !py-3 mt-3"
-                      title="RLS policies are required to query data"
-                    >
-                      <p>
-                        You need to write a policy before you can query data from this table.
-                        Without a policy, querying this table will result in an <u>empty array</u>{' '}
-                        of results.
-                      </p>
-                      <p className="mt-4">
-                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                          <a target="_blank">
-                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </p>
-                    </Alert>
-                  ) : (
-                    <Alert
-                      withIcon
-                      variant="danger"
-                      className="!px-4 !py-3 mt-3"
-                      title="Turning off RLS means that you are allowing anonymous access to your table"
-                    >
-                      <p>As such, anyone with the anonymous key can modify or delete your data.</p>
-                      <p className="mt-4">
-                        <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                          <a target="_blank">
-                            <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                              RLS Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </p>
-                    </Alert>
-                  )}
                 </>
               }
               checked={tableFields.isRLSEnabled}
-              onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
+              onChange={() => {
+                // if isEnabled, show confirm modal to turn off
+                // if not enabled, allow turning on without modal confirmation
+                tableFields.isRLSEnabled
+                  ? setRlsConfirmVisible(true)
+                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+              }}
               size="medium"
             />
-
+            {tableFields.isRLSEnabled ? (
+              <Alert
+                withIcon
+                variant="info"
+                className="!px-4 !py-3 mt-3"
+                title="Policies are required to query data"
+              >
+                <p>
+                  You need to write an access policy before you can query data from this table.
+                  Without a policy, querying this table will result in an <u>empty array</u> of
+                  results.
+                </p>
+                {isNewRecord && (
+                  <p className="mt-3">You can create policies after you create this table.</p>
+                )}
+                <p className="mt-4">
+                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                        RLS Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </p>
+              </Alert>
+            ) : (
+              <Alert
+                withIcon
+                variant="warning"
+                className="!px-4 !py-3 mt-3"
+                title="You are allowing anonymous access to your table"
+              >
+                <p>The table foo will be publicly writable and readable</p>
+                <p className="mt-4">
+                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                    <a target="_blank">
+                      <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
+                        RLS Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </p>
+              </Alert>
+            )}
             <Checkbox
               id="enable-realtime"
               label="Enable Realtime"
@@ -325,6 +347,23 @@ const TableEditor: FC<Props> = ({
                 setIsImportingSpreadsheet(false)
               }}
               closePanel={() => setIsImportingSpreadsheet(false)}
+            />
+
+            <ConfirmationModal
+              visible={rlsConfirmVisible}
+              header="Turn off Row Level Security"
+              buttonLabel="Confirm"
+              size="medium"
+              onSelectCancel={() => setRlsConfirmVisible(false)}
+              onSelectConfirm={() => {
+                onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+                setRlsConfirmVisible(false)
+              }}
+              children={
+                <Modal.Content>
+                  <RLSDisableModalContent />
+                </Modal.Content>
+              }
             />
           </div>
         </SidePanel.Content>
