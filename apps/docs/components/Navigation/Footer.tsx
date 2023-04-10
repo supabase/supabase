@@ -23,7 +23,6 @@ const Footer = () => {
           <Button
             type="text"
             as="a"
-            // @ts-ignore
             href="https://youtube.com/c/supabase"
             target="_blank"
             rel="noreferrer noopener"
@@ -33,7 +32,6 @@ const Footer = () => {
           <Button
             type="text"
             as="a"
-            // @ts-ignore
             href="https://twitter.com/supabase"
             target="_blank"
             rel="noreferrer noopener"
@@ -43,7 +41,6 @@ const Footer = () => {
           <Button
             type="text"
             as="a"
-            // @ts-ignore
             href="https://discord.supabase.com/"
             target="_blank"
             rel="noreferrer noopener"

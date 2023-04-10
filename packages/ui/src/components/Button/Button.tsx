@@ -4,9 +4,7 @@ import { IconLoader } from './../Icon/icons/IconLoader'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
-export interface ButtonProps
-  extends React.HTMLAttributes<HTMLButtonElement>,
-    Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target' | 'rel'> {
+interface ButtonBaseProps {
   block?: boolean
   className?: string
   children?: React.ReactNode
@@ -38,11 +36,25 @@ export interface ButtonProps
   tabIndex?: 0 | -1
   role?: string
   textAlign?: 'left' | 'center' | 'right'
-  as?: keyof JSX.IntrinsicElements
   form?: string
 }
 
-interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
+export type ButtonProps<T extends keyof JSX.IntrinsicElements = 'button'> = {
+  /**
+   * Underlying HTML element to render the button as, which should provide accurate typing for props
+   * @default button
+   */
+  as?: T
+} & /**
+ * Props from the underlying HTML element might conflict with those of the same name in ButtonBaseProps (i.e. `type`)
+ * so let's keep our more specific typing
+ */ Omit<PropsOf<T>, keyof ButtonBaseProps> &
+  ButtonBaseProps
+
+type PropsOf<T extends keyof JSX.IntrinsicElements> = JSX.LibraryManagedAttributes<
+  T,
+  React.ComponentPropsWithoutRef<T>
+>
 
 interface RefHandle {
   // container: () => HTMLElement | null
@@ -170,4 +182,4 @@ export const Button = forwardRef<RefHandle, ButtonProps>(
       )
     }
   }
-)
+) as <T extends keyof JSX.IntrinsicElements = 'button'>(props: ButtonProps<T>) => JSX.Element

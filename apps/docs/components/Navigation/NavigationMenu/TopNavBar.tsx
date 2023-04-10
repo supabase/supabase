@@ -137,7 +137,6 @@ const TopNavBar: FC = () => {
           <Button
             type="outline"
             as="a"
-            // @ts-ignore
             href="https://app.supabase.com"
             className="text-scale-1100 text-sm"
             target="_blank"
