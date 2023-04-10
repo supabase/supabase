@@ -11,13 +11,14 @@ import SolutionsData from 'data/Solutions.json'
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
+import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
 import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import CountdownBanner from '../LaunchWeek/Banners/CountdownBanner'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -436,6 +437,7 @@ const Nav = () => {
         <FlyOut open={openDevelopers} handleCancel={handleCancel}>
           <Developers />
         </FlyOut>
+        <ScrollProgress />
       </div>
     </>
   )
