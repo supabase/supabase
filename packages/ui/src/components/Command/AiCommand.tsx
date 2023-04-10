@@ -3,7 +3,15 @@ import type {
   CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
 } from 'openai'
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 
 import { SSE } from 'sse.js'
 
@@ -14,7 +22,6 @@ import { CommandGroup, CommandItem } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import { cn } from './../../utils/cn'
-import { COMMAND_ROUTES } from './Command.constants'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -52,18 +59,18 @@ function getEdgeFunctionUrl() {
 
 const edgeFunctionUrl = getEdgeFunctionUrl()
 
-enum MessageRole {
+export enum MessageRole {
   User = 'user',
   Assistant = 'assistant',
 }
 
-enum MessageStatus {
+export enum MessageStatus {
   Pending = 'pending',
   InProgress = 'in-progress',
   Complete = 'complete',
 }
 
-interface Message {
+export interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
@@ -86,7 +93,11 @@ interface AppendContentAction {
   content: string
 }
 
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction
+interface ResetAction {
+  type: 'reset'
+}
+
+type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
 
 function messageReducer(state: Message[], messageAction: MessageAction) {
   let current = [...state]
@@ -100,12 +111,20 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
     }
     case 'update': {
       const { index, message } = messageAction
-      Object.assign(current[index], message)
+      if (current[index]) {
+        Object.assign(current[index], message)
+      }
       break
     }
     case 'append-content': {
       const { index, content } = messageAction
-      current[index].content += content
+      if (current[index]) {
+        current[index].content += content
+      }
+      break
+    }
+    case 'reset': {
+      current = []
       break
     }
     default: {
@@ -116,21 +135,27 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
   return current
 }
 
-const AiCommand = () => {
+export interface UseAiChatOptions {
+  messageTemplate?: (message: string) => string
+  setIsLoading?: Dispatch<SetStateAction<boolean>>
+}
+
+export function useAiChat({
+  messageTemplate = (message) => message,
+  setIsLoading,
+}: UseAiChatOptions) {
+  const eventSourceRef = useRef<SSE>()
+
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
-  const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
-    useCommandMenu()
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
 
-  const handleConfirm = useCallback(
+  const submit = useCallback(
     async (query: string) => {
       if (!edgeFunctionUrl) return console.error('No edge function url')
 
-      setSearch('')
       dispatchMessage({
         type: 'new',
         message: {
@@ -149,30 +174,7 @@ const AiCommand = () => {
       })
       setIsResponding(false)
       setHasError(false)
-      setIsLoading(true)
-
-      let queryToSend = query
-
-      switch (currentPage) {
-        case COMMAND_ROUTES.AI:
-          queryToSend = query
-          break
-        case COMMAND_ROUTES.AI_ASK_ANYTHING:
-          queryToSend = query
-          break
-
-        case COMMAND_ROUTES.AI_RLS_POLICY:
-          queryToSend = `Given this table schema:
-
-          Schema STRIPE has tables:
-            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
-            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
-
-          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
-          break
-        default:
-          break
-      }
+      setIsLoading?.(true)
 
       const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
         headers: {
@@ -184,21 +186,21 @@ const AiCommand = () => {
           messages: messages
             .filter(({ status }) => status === MessageStatus.Complete)
             .map(({ role, content }) => ({ role, content }))
-            .concat({ role: MessageRole.User, content: query }),
+            .concat({ role: MessageRole.User, content: messageTemplate(query) }),
         }),
       })
 
       function handleError<T>(err: T) {
-        setIsLoading(false)
+        setIsLoading?.(false)
         setIsResponding(false)
         setHasError(true)
         console.error(err)
       }
 
       eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: any) => {
+      eventSource.addEventListener('message', (e) => {
         try {
-          setIsLoading(false)
+          setIsLoading?.(false)
 
           if (e.data === '[DONE]') {
             setIsResponding(false)
@@ -230,13 +232,13 @@ const AiCommand = () => {
             },
           ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
 
-          const text = content ?? ''
-
-          dispatchMessage({
-            type: 'append-content',
-            index: currentMessageIndex,
-            content: text,
-          })
+          if (content) {
+            dispatchMessage({
+              type: 'append-content',
+              index: currentMessageIndex,
+              content,
+            })
+          }
         } catch (err) {
           handleError(err)
         }
@@ -246,22 +248,53 @@ const AiCommand = () => {
 
       eventSourceRef.current = eventSource
 
-      setIsLoading(true)
+      setIsLoading?.(true)
     },
     [currentMessageIndex, messages]
   )
 
-  function handleResetPrompt() {
+  function reset() {
     eventSourceRef.current?.close()
     eventSourceRef.current = undefined
-    setSearch('')
     setIsResponding(false)
     setHasError(false)
+    dispatchMessage({
+      type: 'reset',
+    })
   }
+
+  return {
+    submit,
+    reset,
+    messages,
+    isResponding,
+    hasError,
+  }
+}
+
+const AiCommand = () => {
+  const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
+
+  const { submit, reset, messages, isResponding, hasError } = useAiChat({
+    setIsLoading,
+  })
+
+  const handleSubmit = useCallback(
+    (message: string) => {
+      setSearch('')
+      submit(message)
+    },
+    [submit]
+  )
+
+  const handleReset = useCallback(() => {
+    setSearch('')
+    reset()
+  }, [reset])
 
   useEffect(() => {
     if (search) {
-      handleConfirm(search)
+      handleSubmit(search)
     }
   }, [])
 
@@ -328,7 +361,7 @@ const AiCommand = () => {
                   type="command"
                   onSelect={() => {
                     if (!search) {
-                      handleConfirm(question)
+                      handleSubmit(question)
                     }
                   }}
                   forceMount
@@ -348,7 +381,7 @@ const AiCommand = () => {
               Sorry, looks like Clippy is having a hard time!
             </p>
             <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
           </div>
@@ -394,7 +427,7 @@ const AiCommand = () => {
                 if (isLoading || isResponding) {
                   return
                 }
-                handleConfirm(search)
+                handleSubmit(search)
                 return
               default:
                 return
