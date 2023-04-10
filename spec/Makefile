@@ -71,6 +71,9 @@ dereference.storage.v0:
 dereference.analytics.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
+dereference.functions.v0:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/functions_v0_openapi_deparsed.json $(REPO_DIR)/functions_v0_openapi.json
+
 # No longer updated
 # dereference.tsdoc.v1:
 # 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions:v1
@@ -125,6 +128,9 @@ combine-raw.tsdoc.v2:
 
 validate.analytics.v0:
 	npx swagger-cli validate --no-schema $(REPO_DIR)/analytics_v0_openapi.json
+
+validate.functions.v0:
+	npx swagger-cli validate --no-schema $(REPO_DIR)/functions_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.
