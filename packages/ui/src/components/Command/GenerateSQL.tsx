@@ -65,7 +65,7 @@ const SQLOutputActions = ({ answer, messages }: { answer: string; messages: Mess
             - Use as few words as possible
             - Title should be nouns, not verbs
             - Do not include word articles (eg. a, the, for, of)
-            - Do not use words like "SQL" or "snippet"
+            - Do not use words like "SQL" or "snippet" or "title"
             - Do not output markdown, quotes, etc
             - Do not be too verbose
             `,
