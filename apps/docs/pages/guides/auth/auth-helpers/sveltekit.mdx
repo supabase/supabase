@@ -367,7 +367,6 @@ protect multiple routes at once.
 ```ts
 // src/hooks.server.ts
 import type { RequestHandler } from './$types';
-import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { redirect, error } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
