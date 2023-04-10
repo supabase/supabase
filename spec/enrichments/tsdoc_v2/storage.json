@@ -4968,7 +4968,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Creates a signed upload URL.\nSigned upload URLs can be used upload files to the bucket without further authentication.\nThey are valid for one minute."
+                    "shortText": "Creates a signed upload URL.\nSigned upload URLs can be used to upload files to the bucket without further authentication.\nThey are valid for one minute."
                   },
                   "parameters": [
                     {
@@ -7354,7 +7354,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Upload a file with a token generated from `createUploadSignedUrl`."
+                    "shortText": "Upload a file with a token generated from `createSignedUploadUrl`."
                   },
                   "parameters": [
                     {
@@ -7378,7 +7378,7 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The token generated from `createUploadSignedUrl`"
+                        "shortText": "The token generated from `createSignedUploadUrl`"
                       },
                       "type": {
                         "type": "intrinsic",
