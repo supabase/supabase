@@ -134,7 +134,7 @@ export default function LW7Releases() {
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
                 <span className="text-black dark:text-white mr-2">
-                  Supabase AI Hackathon is on. Join now!
+                  Supabase AI Hackathon has begun. Join now!
                 </span>
               </div>
             </div>
