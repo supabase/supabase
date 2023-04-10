@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Form, Input, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
@@ -22,9 +22,12 @@ const GeneralSettings = () => {
   const { slug } = useParams()
   const { name, opt_in_tags } = ui.selectedOrganization ?? {}
 
-  const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
   const formId = 'org-general-settings'
+  const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
   const initialValues = { name: name ?? '', isOptedIntoAi }
+
+  const showCMDK = useFlag('dashboardCmdk')
+  const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
 
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
@@ -94,14 +97,16 @@ const GeneralSettings = () => {
                   <label htmlFor="name">Organization name</label>
                   <Input id="name" size="small" disabled={!canUpdateOrganization} />
 
-                  <Toggle
-                    id="isOptedIntoAi"
-                    name="isOptedIntoAi"
-                    disabled={!canUpdateOrganization}
-                    size="small"
-                    label="Opt-in to sending anonymous data to OpenAI"
-                    descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
-                  />
+                  {showCMDK && allowCMDKDataOptIn && (
+                    <Toggle
+                      id="isOptedIntoAi"
+                      name="isOptedIntoAi"
+                      disabled={!canUpdateOrganization}
+                      size="small"
+                      label="Opt-in to sending anonymous data to OpenAI"
+                      descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
+                    />
+                  )}
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

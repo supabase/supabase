@@ -5,11 +5,11 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   Button,
   CodeBlock,
-  IconAlertCircle,
   IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
   Input,
+  Toggle,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
@@ -22,16 +22,20 @@ import { getEdgeFunctionUrl, promptDataReducer, generatePrompt } from './Generat
 
 const GenerateSQL = () => {
   const [promptIndex, setPromptIndex] = useState(0)
-  const [answer, setAnswer] = useState<string | undefined>('')
+  const [_, setAnswer] = useState<string | undefined>('')
   const [isResponding, setIsResponding] = useState(false)
   const [hasClippyError, setHasClippyError] = useState(false)
+  const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
   const eventSourceRef = useRef<SSE>()
   const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
-  const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata, project } =
+    useCommandMenu()
 
-  const cantHelp = answer?.trim() === "Sorry, I don't know how to help with that."
+  const { flags } = metadata || {}
+  const allowSendingSchemaMetadata =
+    project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
   const handleConfirm = useCallback(
     async (query: string) => {
@@ -48,7 +52,10 @@ const GenerateSQL = () => {
       setHasClippyError(false)
       setIsLoading(true)
 
-      const queryToSend = generatePrompt(query, isOptedInToAI ? metadata : undefined)
+      const queryToSend = generatePrompt(
+        query,
+        isOptedInToAI && includeSchemaMetadata ? metadata : undefined
+      )
       const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
@@ -128,7 +135,12 @@ const GenerateSQL = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div
+        className={cn(
+          'relative py-4 max-h-[720px] overflow-auto',
+          allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
+        )}
+      >
         {promptData.map((prompt, i) => {
           if (!prompt.query) return <></>
 
@@ -139,6 +151,10 @@ const GenerateSQL = () => {
           const promptAnswer = isResponding
             ? formattedPromptAnwswer
             : formatAnswer(formattedPromptAnwswer)
+
+          const cantHelp = (prompt?.answer ?? '').includes(
+            "Sorry, I don't know how to help with that."
+          )
 
           return (
             <>
@@ -152,44 +168,35 @@ const GenerateSQL = () => {
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                  <div className="prose text-scale-1000">{prompt.query}</div>
+                  <div className="flex items-center prose text-scale-1100 text-sm">
+                    {prompt.query}
+                  </div>
                 </div>
               )}
 
               <div className="px-4 [overflow-anchor:none] mb-6">
-                {cantHelp ? (
-                  <p className="flex flex-col gap-4 items-center p-4">
-                    <div className="grid md:flex items-center gap-2 mt-4 text-center justify-items-center">
-                      <IconAlertCircle />
-                      <p>Sorry, I don&apos;t know how to help with that.</p>
-                    </div>
-                    <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
-                      Try again?
-                    </Button>
-                  </p>
-                ) : (
-                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <div>
-                      <AiIconChat />
-                    </div>
-                    <>
-                      {isLoading && promptIndex === i ? (
-                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
-                      ) : (
-                        <div className="space-y-2 flex-grow max-w-[93%]">
-                          <CodeBlock
-                            hideCopy
-                            language="sql"
-                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
-                          >
-                            {promptAnswer}
-                          </CodeBlock>
-                          {!isResponding && <SQLOutputActions answer={prompt.answer} />}
-                        </div>
-                      )}
-                    </>
+                <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                  <div>
+                    <AiIconChat />
                   </div>
-                )}
+                  <>
+                    {isLoading && promptIndex === i ? (
+                      <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
+                    ) : (
+                      <div className="space-y-2 flex-grow max-w-[93%]">
+                        <CodeBlock
+                          hideCopy
+                          language="sql"
+                          className="relative prose dark:prose-dark bg-scale-300 max-w-none"
+                        >
+                          {promptAnswer}
+                        </CodeBlock>
+
+                        {!isResponding && !cantHelp && <SQLOutputActions answer={prompt.answer} />}
+                      </div>
+                    )}
+                  </>
+                </div>
               </div>
             </>
           )
@@ -198,7 +205,7 @@ const GenerateSQL = () => {
           <div>
             <div className="px-10">
               <h3>Example queries</h3>
-              <p className="text-sm mt-1 text-scale-1100">
+              <p className="text-sm text-scale-1100">
                 Use these example queries to help get your project started quickly.
               </p>
             </div>
@@ -222,13 +229,11 @@ const GenerateSQL = () => {
               <div className="w-2/3 py-4 px-6">
                 <ul>
                   {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
-                    (query, index) => (
+                    (query) => (
                       <CommandItem
                         type="command"
                         onSelect={() => {
-                          if (!search) {
-                            handleConfirm(query)
-                          }
+                          if (!search) handleConfirm(query)
                         }}
                         forceMount
                         key={query.replace(/\s+/g, '_')}
@@ -264,6 +269,23 @@ const GenerateSQL = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {allowSendingSchemaMetadata && (
+          <div className="flex items-center justify-between px-6 py-3">
+            <div>
+              <p className="text-sm">
+                Include table names, column names and their corresponding data types in prompt
+              </p>
+              <p className="text-sm text-scale-1100">
+                This will generate answers that are more relevant to your project's schema
+              </p>
+            </div>
+            <Toggle
+              disabled={!isOptedInToAI}
+              checked={includeSchemaMetadata}
+              onChange={() => setIncludeSchemaMetadata(!includeSchemaMetadata)}
+            />
+          </div>
+        )}
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
@@ -297,14 +319,8 @@ const GenerateSQL = () => {
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
-                  return
-                }
-                if (isLoading || isResponding) {
-                  return
-                }
-                handleConfirm(search)
-                return
+                if (!search || isLoading || isResponding) return
+                return handleConfirm(search)
               default:
                 return
             }

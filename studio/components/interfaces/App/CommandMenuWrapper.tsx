@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { uuidv4 } from 'lib/helpers'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -21,6 +21,7 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const { opt_in_tags } = ui.selectedOrganization ?? {}
 
   const snap = useSqlEditorStateSnapshot()
+  const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
   const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
   const { data: profile } = useProfileQuery()
@@ -42,7 +43,10 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
     },
     { enabled: isOptedInToAI }
   )
-  const cmdkMetadata = { definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n') }
+  const cmdkMetadata = {
+    definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n'),
+    flags: { allowCMDKDataOptIn },
+  }
 
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     if (!ref) return console.error('Project ref is required')
@@ -95,7 +99,7 @@ ${answer}
       MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
       onSaveGeneratedSQL={onSaveGeneratedSQL}
       metadata={cmdkMetadata}
-      isOptedInToAI={isOptedInToAI}
+      isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
     >
       {children}
     </CommandMenuProvider>
