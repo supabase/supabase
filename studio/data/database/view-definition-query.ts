@@ -7,20 +7,6 @@ type GetViewDefinition = {
   name?: string
 }
 
-type ViewDefinition = {
-  id: number
-  constraint_name: string
-  deletion_action: string
-  source_id: string
-  source_schema: string
-  source_table: string
-  source_columns: string
-  target_id: string
-  target_schema: string
-  target_table: string
-  target_columns: string
-}
-
 export const getViewDefinitionQuery = ({ schema, name }: GetViewDefinition) => {
   const fullName = [schema, name].filter(Boolean).join('.')
 

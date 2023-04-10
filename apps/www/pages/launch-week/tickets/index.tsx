@@ -109,7 +109,7 @@ export default function TicketsPage({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-20">
+        <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto h-auto">
@@ -140,7 +140,7 @@ export default function TicketsPage({ users }: Props) {
                   <Link href="/launch-week">
                     <a>
                       <Button type="outline" size="medium">
-                        Get your ticket now
+                        Go to Launch Week 7
                       </Button>
                     </a>
                   </Link>

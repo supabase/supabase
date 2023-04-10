@@ -47,7 +47,6 @@ const ProjectLayout = ({
           {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
         </title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         {/* Left-most navigation side bar to access products */}
@@ -143,3 +142,40 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     </>
   )
 })
+
+export const ProjectLayoutNonBlocking = ({
+  title,
+  product = '',
+  productMenu,
+  children,
+  hideHeader = false,
+  hideIconBar = false,
+}: PropsWithChildren<Props>) => {
+  const { ref: projectRef } = useParams()
+  const ongoingIncident = useFlag('ongoingIncident')
+
+  return (
+    <ProjectContextProvider projectRef={projectRef}>
+      <Head>
+        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <meta name="description" content="Supabase Studio" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="flex h-full">
+        {/* Left-most navigation side bar to access products */}
+        {!hideIconBar && <NavigationBar />}
+
+        {/* Product menu bar */}
+        {productMenu && <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>}
+
+        <main
+          className="flex w-full flex-1 flex-col overflow-x-hidden"
+          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
+        >
+          {!hideHeader && <LayoutHeader />}
+          {children}
+        </main>
+      </div>
+    </ProjectContextProvider>
+  )
+}
