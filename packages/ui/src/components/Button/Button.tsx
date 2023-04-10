@@ -15,19 +15,9 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   loading?: boolean
   loadingCentered?: boolean
   shadow?: boolean
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  size?: ButtonSize
   style?: React.CSSProperties
-  type?:
-    | 'primary'
-    | 'default'
-    | 'secondary'
-    | 'alternative'
-    | 'outline'
-    | 'dashed'
-    | 'link'
-    | 'text'
-    | 'danger'
-    | 'warning'
+  type?: ButtonType
   danger?: boolean
   htmlType?: 'button' | 'submit' | 'reset'
   ref?: any
@@ -39,6 +29,19 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   as?: keyof JSX.IntrinsicElements
   form?: string
 }
+
+export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+export type ButtonType =
+  | 'primary'
+  | 'default'
+  | 'secondary'
+  | 'alternative'
+  | 'outline'
+  | 'dashed'
+  | 'link'
+  | 'text'
+  | 'danger'
+  | 'warning'
 
 interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
 

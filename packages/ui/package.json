@@ -5,7 +5,8 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "build:icons": "node --experimental-modules internals/populate-icons.js"
+    "build:icons": "node --experimental-modules internals/populate-icons.js",
+    "test": "jest"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -42,6 +43,7 @@
     "tailwindcss-radix": "^1.6.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "sql-formatter": "^12.2.0",
