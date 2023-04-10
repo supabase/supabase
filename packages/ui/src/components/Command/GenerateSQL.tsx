@@ -1,4 +1,5 @@
 import { SSE } from 'sse.js'
+import { format } from 'sql-formatter'
 import type { CreateCompletionResponse } from 'openai'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
@@ -250,11 +251,30 @@ Postgres SQL query:
     }
   }, [])
 
+  const formatAnswer = (answer: string) => {
+    try {
+      return format(answer, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+    } catch (error: any) {
+      return answer
+    }
+  }
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
         {promptData.map((prompt, i) => {
           if (!prompt.query) return <></>
+
+          const formattedPromptAnwswer = (prompt?.answer ?? '')
+            .replace(/`/g, '')
+            .replace(/sql\n/g, '')
+            .trim()
+          const promptAnswer = isResponding
+            ? formattedPromptAnwswer
+            : formatAnswer(formattedPromptAnwswer)
 
           return (
             <>
@@ -298,7 +318,7 @@ Postgres SQL query:
                             language="sql"
                             className="relative prose dark:prose-dark bg-scale-300 max-w-none"
                           >
-                            {(prompt?.answer ?? '').replace(/`/g, '').replace(/sql\n/g, '').trim()}
+                            {promptAnswer}
                           </CodeBlock>
                           {!isResponding && <SQLOutputActions answer={prompt.answer} />}
                         </div>
