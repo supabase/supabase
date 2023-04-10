@@ -3,13 +3,7 @@ import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
-import {
-  ChatCompletionRequestMessage,
-  ChatCompletionRequestMessageRoleEnum,
-  Configuration,
-  CreateChatCompletionRequest,
-  OpenAIApi,
-} from 'https://esm.sh/openai@3.2.1'
+import { Configuration, CreateCompletionRequest, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
@@ -51,9 +45,6 @@ serve(async (req) => {
     if (!query) {
       throw new UserError('Missing query in request data')
     }
-
-    // Intentionally log the query
-    console.log({ query })
 
     const sanitizedQuery = query.trim()
 
@@ -136,76 +127,15 @@ serve(async (req) => {
       Answer as markdown (including related code snippets if available):
     `
 
-    const messages: ChatCompletionRequestMessage[] = [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.System,
-        content: codeBlock`
-          ${oneLine`
-            You are a very enthusiastic Supabase AI who loves
-            to help people! Given the following information from
-            the Supabase documentation, answer the user's question using
-            only that information, outputted in markdown format.
-          `}
-
-          ${oneLine`
-            If you are unsure
-            and the answer is not explicitly written in the documentation, say
-            "Sorry, I don't know how to help with that."
-          `}
-          
-          ${oneLine`
-            Always include related code snippets if available.
-          `}
-        `,
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: codeBlock`
-          Here is the Supabase documentation:
-          ${contextText}
-        `,
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: codeBlock`
-          ${oneLine`
-            Answer my next question using only the above documentation.
-            You must also follow the below rules when answering:
-          `}
-          ${oneLine`
-            - Do not make up answers that are not provided in the documentation.
-          `}
-          ${oneLine`
-            - If you are unsure and the answer is not explicitly written
-            in the documentation context, say
-            "Sorry, I don't know how to help with that."
-          `}
-          ${oneLine`
-            - Prefer splitting your response into multiple paragraphs.
-          `}
-          ${oneLine`
-            - Output as markdown with code snippets if available.
-          `}
-        `,
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: codeBlock`
-          Here is my question:
-          ${oneLine`${sanitizedQuery}`}
-      `,
-      },
-    ]
-
-    const completionOptions: CreateChatCompletionRequest = {
-      model: 'gpt-3.5-turbo',
-      messages,
-      max_tokens: 1024,
+    const completionOptions: CreateCompletionRequest = {
+      model: 'text-davinci-003',
+      prompt,
+      max_tokens: 512,
       temperature: 0,
       stream: true,
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/completions', {
       headers: {
         Authorization: `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',

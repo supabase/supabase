@@ -42,7 +42,7 @@ export default function Ticket({
   return (
     <div
       className={[
-        `relative w-full max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:p-2 rounded-3xl backdrop-blur lg:items-stretch h-auto"`,
+        `relative w-full max-w-screen md:max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:p-2 rounded-3xl backdrop-blur lg:items-stretch h-auto"`,
         !isMobile && styles['ticket-hero'],
       ].join(' ')}
       id="wayfinding--ticket-visual-wrapper-container"
