@@ -95,7 +95,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
             </div>
             <div className={['bg-lw7-gradient absolute inset-0 z-0', golden && 'gold'].join(' ')} />
           </div>
-          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
+          <LaunchWeekPrizeSection className="-mt-20 md:-mt-60 px-4" />
           <TicketBrickWall users={users} />
         </div>
         <CTABanner />

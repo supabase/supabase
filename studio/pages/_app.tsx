@@ -25,7 +25,7 @@ import Head from 'next/head'
 import Script from 'next/script'
 
 import { AppPropsWithLayout } from 'types'
-
+import { ThemeProvider } from 'common'
 import { useEffect, useState } from 'react'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -36,13 +36,21 @@ import { AuthProvider } from 'lib/auth'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
 
-import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
+import {
+  PortalToast,
+  RouteValidationWrapper,
+  AppBannerWrapper,
+  CommandMenuWrapper,
+} from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import Favicons from 'components/head/Favicons'
+import { IS_PLATFORM } from 'lib/constants'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { createClient } from '@supabase/supabase-js'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -54,6 +62,16 @@ dart(Prism)
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
+
+  // [Joshen] Some issues with using createBrowserSupabaseClient
+  const [supabase] = useState(() =>
+    IS_PLATFORM
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+        )
+      : undefined
+  )
 
   const getSavingState = () => rootStore.content.savingState
 
@@ -90,11 +108,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
+  const AuthContainer = (props: any) => {
+    return IS_PLATFORM ? (
+      <SessionContextProvider supabaseClient={supabase as any}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <StoreProvider rootStore={rootStore}>
-          <AuthProvider>
+          <AuthContainer>
             <FlagProvider>
               <Head>
                 <title>Supabase</title>
@@ -119,7 +147,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>
-                    <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+                    <ThemeProvider>
+                      <CommandMenuWrapper>
+                        <AppBannerWrapper>
+                          {getLayout(<Component {...pageProps} />)}
+                        </AppBannerWrapper>
+                      </CommandMenuWrapper>
+                    </ThemeProvider>
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
@@ -128,7 +162,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
               <PortalToast />
               <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
             </FlagProvider>
-          </AuthProvider>
+          </AuthContainer>
         </StoreProvider>
       </Hydrate>
     </QueryClientProvider>

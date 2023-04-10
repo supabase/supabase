@@ -54,12 +54,13 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
+    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
     {
       name: 'Framework Quickstarts',
       items: [
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
@@ -130,6 +131,15 @@ export const gettingstarted = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+      ],
+    },
+    {
+      name: 'AI & ML',
+      items: [
+        {
+          name: 'Vector Search with OpenAI',
+          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },
