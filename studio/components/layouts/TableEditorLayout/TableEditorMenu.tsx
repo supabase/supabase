@@ -1,21 +1,15 @@
-import SVG from 'react-inlinesvg'
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
   IconCheck,
-  IconChevronDown,
   IconChevronsDown,
-  IconCopy,
   IconEdit,
   IconLoader,
-  IconLock,
   IconRefreshCw,
   IconSearch,
-  IconTrash,
   IconX,
   Input,
   Listbox,
@@ -26,15 +20,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useParams } from 'common/hooks'
-import { BASE_PATH } from 'lib/constants'
 import { checkPermissions, useStore, useLocalStorage } from 'hooks'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
-import clsx from 'clsx'
+import EntityListItem from './EntityListItem'
 
 export interface TableEditorMenuProps {
   selectedSchema?: string
@@ -363,154 +354,3 @@ const TableEditorMenu = ({
 }
 
 export default observer(TableEditorMenu)
-
-export interface EntityListItemProps {
-  id: number
-  projectRef: string
-  item: Entity
-  isLocked: boolean
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-  isLoadingTableMetadata?: boolean
-}
-
-const EntityListItem = ({
-  id,
-  projectRef,
-  item: entity,
-  isLocked,
-  onEditTable,
-  onDeleteTable,
-  onDuplicateTable,
-  isLoadingTableMetadata = false,
-}: EntityListItemProps) => {
-  const isActive = Number(id) === entity.id
-  const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
-  }
-
-  return (
-    <ProductMenuItem
-      url={`/project/${projectRef}/editor/${entity.id}`}
-      name={entity.name}
-      hoverText={entity.comment ? entity.comment : entity.name}
-      isActive={isActive}
-      icon={
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="w-full flex items-center">
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <SVG
-                className="table-icon"
-                src={`${BASE_PATH}/img/icons/table-icon.svg`}
-                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                preProcessor={(code: any) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <SVG
-                className="view-icon"
-                src={`${BASE_PATH}/img/icons/view-icon.svg`}
-                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                preProcessor={(code: any) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-              />
-            ) : (
-              <div
-                className={clsx(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200 capitalize">
-                  {formatTooltipText(entity.type)}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      }
-      action={
-        entity.type === ENTITY_TYPE.TABLE &&
-        isActive &&
-        !isLocked && (
-          <Dropdown
-            size="small"
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="edit-table"
-                icon={<IconEdit size="tiny" />}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEditTable(entity)
-                }}
-                disabled={isLoadingTableMetadata}
-              >
-                Edit Table
-              </Dropdown.Item>,
-              <Dropdown.Item
-                key="duplicate-table"
-                icon={<IconCopy size="tiny" />}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDuplicateTable(entity)
-                }}
-                disabled={isLoadingTableMetadata}
-              >
-                Duplicate Table
-              </Dropdown.Item>,
-              <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
-                <a>
-                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
-                    View Policies
-                  </Dropdown.Item>
-                </a>
-              </Link>,
-              <Dropdown.Separator key="separator" />,
-              <Dropdown.Item
-                key="delete-table"
-                icon={<IconTrash size="tiny" />}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDeleteTable(entity)
-                }}
-                disabled={isLoadingTableMetadata}
-              >
-                Delete Table
-              </Dropdown.Item>,
-            ]}
-          >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
-              <IconChevronDown size={14} strokeWidth={2} />
-            </div>
-          </Dropdown>
-        )
-      }
-    />
-  )
-}

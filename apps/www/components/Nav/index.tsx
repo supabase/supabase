@@ -112,7 +112,7 @@ const Nav = () => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 flex items-center px-2 lg:hidden"
+      className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button

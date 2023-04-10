@@ -314,20 +314,6 @@ const NavContainer = memo(function NavContainer() {
 })
 
 const SiteLayout = ({ children }) => {
-  // const mobileMenuOpen = useMenuMobileOpen()
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-      document.documentElement.style.colorScheme = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-      document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
-    }
-  }, [])
-
   return (
     <>
       <Head>
