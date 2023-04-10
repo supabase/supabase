@@ -185,7 +185,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:basis-2/3 border rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
