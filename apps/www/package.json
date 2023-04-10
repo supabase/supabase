@@ -29,6 +29,7 @@
     "framer-motion": "^6.5.1",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
+    "lottie-react": "^2.4.0",
     "markdown-toc": "^1.2.0",
     "marked": "^4.0.12",
     "next": "12.3.2",
