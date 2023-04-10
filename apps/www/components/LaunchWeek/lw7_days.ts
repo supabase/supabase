@@ -101,9 +101,9 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: 'Self-hosted Logs & Observability',
+        title: 'Open Source Logging',
         blog: '/blog/o11y-day',
-        thumb: '/images/launchweek/seven/day1/01-self-hosted-logs-thumb.svg',
+        thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
         bg_layers: [
           { img: images['01-self-hosted-logs-01'] },
           {
