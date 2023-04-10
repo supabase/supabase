@@ -9,7 +9,7 @@ to_depth: 3
 author: chasers,ziinc
 ---
 
-Today, we’re releasing Supabase Logs for both self-hosted users and CLI development
+Today, we’re releasing Supabase Logs for both self-hosted users and CLI development.
 
 ## Logflare Introduction
 
@@ -35,7 +35,7 @@ In the past few months we’ve made Logflare more developer-friendly for local d
 
 ## The Ingestion Pipeline
 
-Logflare receives Supabase log events via multiple methods. Services like Postgres use Vector to clean and forward log events to our the Logflare ingest API. Other services such as Realtime and Storage utilize our [integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
+Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](vector.dev/) to clean and forward log events to our the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
 
 ## The Querying Pipeline
 
@@ -43,7 +43,7 @@ The hard part comes after ingesting the logs: searching, aggregating ,and analyz
 
 To solve these issues, we built and refined Logflare Endpoints, the query engine that powers many of Supabase’s features, such as the logs views, Logs Explorer, and usage charts.
 
-With Endpoints, you can create HTTP API endpoints from a SQL query, including parameterized queries. Endpoints is like a PostgREST view but with some benefits:
+With Endpoints, you can create HTTP API endpoints from a SQL query, including parameterized queries. Endpoints are like PostgREST views but with some benefits:
 
 - **Query parameters**
   - You can provide string parameters to the SQL query via the HTTP endpoint.
