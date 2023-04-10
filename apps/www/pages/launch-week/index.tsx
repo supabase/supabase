@@ -116,7 +116,7 @@ export default function TicketHome({ users }: Props) {
             />
           </div>
 
-          <div className="relative !w-full !px-2 sm:max-w-xl md:max-w-2xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+          <div className="relative !w-full !px-4 sm:max-w-xl md:max-w-2xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
             <LW7Releases />
             <div className="w-full flex justify-center py-8 md:py-14 !px-2">
               {supabase && (
