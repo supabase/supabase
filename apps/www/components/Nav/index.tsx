@@ -199,7 +199,7 @@ const Nav = () => {
       <Announcement>
         <CountdownBanner />
       </Announcement>
-      <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
+      <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
             'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
