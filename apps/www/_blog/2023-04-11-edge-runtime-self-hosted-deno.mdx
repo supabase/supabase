@@ -87,10 +87,11 @@ You may wonder why we cannot use Deno Runtime to self-host functions. Isn’t it
 
 However, Deno’s architecture makes it easy to extend its core capabilities and create a customized runtime to match our needs. Deno provides a Rust crate called `deno_core`, which abstracts the interactions with V8 JavaScript engine. Using `deno_core` we can create a JS context (known as a V8 Isolate). A V8 isolate has minimal overhead to boot up and a single process can host multiple V8 isolates. When you load a web page that contains scripts from multiple domains in a browser, each of them runs in a separate v8 isolate.
 
-<aside>
-ℹ️ Deno team has a detailed 2-part blog post on [how to create a custom runtime](https://deno.com/blog/roll-your-own-javascript-runtime).
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-</aside>
+Deno team has a detailed 2-part blog post on [how to create a custom runtime](https://deno.com/blog/roll-your-own-javascript-runtime).
+
+</div>
 
 Edge Runtime implements an HTTP server (using [hyper](https://github.com/hyperium/hyper)) that listens to incoming requests. When Edge Runtime is booted, it spins up a JS context (V8 isolate), which we call the `Main Worker`. Main Worker runs in a separate thread, executing the provided main module. When a new HTTP request is received, the Rust runtime will forward it to the Main Worker.
 
