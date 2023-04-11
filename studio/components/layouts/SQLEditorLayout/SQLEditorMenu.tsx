@@ -127,6 +127,7 @@ const SideBarContent = observer(() => {
                 ]}
               >
                 <Button
+                  disabled={isLoading}
                   type="default"
                   className="rounded-l-none px-[4px] py-[5px]"
                   icon={<IconChevronDown />}
