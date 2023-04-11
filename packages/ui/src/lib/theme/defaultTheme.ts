@@ -353,7 +353,7 @@ export default {
         hover:text-scale-1200
       `,
       active: `
-        text-scale-1200
+        !text-scale-1200
         border-b-2 border-scale-1200
       `,
     },
