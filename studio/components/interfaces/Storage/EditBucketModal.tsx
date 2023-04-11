@@ -228,7 +228,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                                   global upload limit
                                 </a>
                               </Link>{' '}
-                              takes precendence over this value ({formattedGlobalUploadLimit})
+                              takes precedence over this value ({formattedGlobalUploadLimit})
                             </p>
                           </div>
                         </div>

@@ -208,7 +208,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                                   global upload limit
                                 </a>
                               </Link>{' '}
-                              takes precendence over this value ({formattedGlobalUploadLimit})
+                              takes precedence over this value ({formattedGlobalUploadLimit})
                             </p>
                           </div>
                         </div>
