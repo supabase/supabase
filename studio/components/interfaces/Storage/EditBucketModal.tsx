@@ -44,8 +44,8 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
   const validate = (values: any) => {
     const errors = {} as any
-    if (values.has_file_size_limit && values.formatted_size_limit <= 0) {
-      errors.formatted_size_limit = 'Please provide a value greater than 0'
+    if (values.has_file_size_limit && values.formatted_size_limit < 0) {
+      errors.formatted_size_limit = 'File size upload limit has to be at least 0'
     }
     return errors
   }
@@ -59,8 +59,11 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
       public: values.public,
       file_size_limit: values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
-        : 0,
-      allowed_mime_types: values.allowed_mime_types.split(',').map((x: string) => x.trim()),
+        : null,
+      allowed_mime_types:
+        values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+          : null,
     }
 
     setSubmitting(true)
@@ -112,7 +115,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                 file_size_limit: bucket.file_size_limit,
                 allowed_mime_types: (bucket.allowed_mime_types ?? []).join(', '),
 
-                has_file_size_limit: (bucket.file_size_limit ?? 0) > 0,
+                has_file_size_limit: bucket.file_size_limit !== null,
                 formatted_size_limit: fileSizeLimit ?? 0,
               }
               resetForm({ values, initialValues: values })

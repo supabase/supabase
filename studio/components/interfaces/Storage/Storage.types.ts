@@ -3,16 +3,16 @@ export interface StorageBucket {
   name: string
   owner: string
   public: boolean
-  file_size_limit: number
-  allowed_mime_types: string[]
+  file_size_limit: number | null
+  allowed_mime_types: string[] | null
   created_at: string
   updated_at: string
 }
 
 export interface BucketUpdatePayload {
   public?: boolean
-  file_size_limit?: number
-  allowed_mime_types?: string[]
+  file_size_limit?: number | null
+  allowed_mime_types?: string[] | null
 }
 
 export interface BucketCreatePayload extends BucketUpdatePayload {
