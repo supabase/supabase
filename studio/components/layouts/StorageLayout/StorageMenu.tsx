@@ -12,12 +12,14 @@ import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
+  const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
   const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -29,13 +31,7 @@ const StorageMenu: FC<Props> = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const {
-    loaded,
-    buckets,
-    openCreateBucketModal,
-    openDeleteBucketModal,
-    openToggleBucketPublicModal,
-  } = storageExplorerStore || {}
+  const { loaded, buckets, openDeleteBucketModal } = storageExplorerStore || {}
 
   return (
     <>
@@ -53,7 +49,7 @@ const StorageMenu: FC<Props> = () => {
                 }
                 disabled={!canCreateBuckets}
                 style={{ justifyContent: 'start' }}
-                onClick={openCreateBucketModal}
+                onClick={() => setShowCreateBucketModal(true)}
               >
                 New bucket
               </Button>
@@ -123,6 +119,11 @@ const StorageMenu: FC<Props> = () => {
           </div>
         </div>
       </Menu>
+
+      <CreateBucketModal
+        visible={showCreateBucketModal}
+        onClose={() => setShowCreateBucketModal(false)}
+      />
 
       <EditBucketModal
         visible={selectedBucketToEdit !== undefined}

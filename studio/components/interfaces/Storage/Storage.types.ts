@@ -14,3 +14,8 @@ export interface BucketUpdatePayload {
   file_size_limit?: number
   allowed_mime_types?: string[]
 }
+
+export interface BucketCreatePayload extends BucketUpdatePayload {
+  id: string
+  name?: string
+}

@@ -1,5 +1,4 @@
 import { FC, ReactNode, useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
@@ -10,7 +9,6 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
-import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 
 interface Props {
@@ -20,17 +18,13 @@ interface Props {
 
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
-  const router = useRouter()
   const { ref: projectRef } = useParams()
 
   const storageExplorerStore = useStorageStore()
   const {
     selectedBucketToEdit,
-    closeCreateBucketModal,
-    showCreateBucketModal,
     closeDeleteBucketModal,
     showDeleteBucketModal,
-    createBucket,
     deleteBucket,
     buckets,
   } = storageExplorerStore || {}
@@ -61,11 +55,6 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     storageExplorerStore.setLoaded(true)
   }
 
-  const onSelectCreateBucket = async (bucketName: string, isPublic: boolean) => {
-    const bucket = await createBucket(bucketName, isPublic)
-    if (bucket !== undefined) router.push(`/project/${projectRef}/storage/buckets/${bucket.name}`)
-  }
-
   const onSelectDeleteBucket = async (bucket: any) => {
     const res = await deleteBucket(bucket)
     // Ideally this should be within deleteBucket as its a necessary side effect
@@ -90,24 +79,9 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     }
   }
 
-  // if (!isLoading && !canAccessStorage) {
-  //   return (
-  //     <BaseLayout>
-  //       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-  //         <NoPermission isFullPage resourceText="access your project's storage" />
-  //       </main>
-  //     </BaseLayout>
-  //   )
-  // }
-
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
       {children}
-      <CreateBucketModal
-        visible={showCreateBucketModal}
-        onSelectCancel={closeCreateBucketModal}
-        onSelectSave={onSelectCreateBucket}
-      />
       <DeleteBucketModal
         visible={showDeleteBucketModal}
         bucket={selectedBucketToEdit}
