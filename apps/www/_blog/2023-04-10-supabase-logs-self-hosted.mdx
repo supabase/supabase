@@ -13,6 +13,14 @@ thumb: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-ho
 
 Today, we’re releasing Supabase Logs for both self-hosted users and CLI development.
 
+## Logflare Introduction
+
+Since [Logflare joined Supabase](https://supabase.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the Supabase infrastructure - the API gateway, Postgres databases, Storage, Edge Functions, Auth, and Realtime.
+
+Logflare is a multi-node, highly available Elixir cluster, ingesting the log events and storing them into BigQuery for Supabase and Logflare’s customers. On average, the cluster has 6 nodes handling every spike our customers throw at it.
+
+To expose log data to customers, we leverage Logflare Endpoints. This provides an HTTP integration into Supabase Studio, powering the log query UIs and most time-series charts. These charts live across the studio, such as the project home page and the new API reports.
+
 <div className="video-container">
   <iframe
     className="w-full"
@@ -26,16 +34,6 @@ Today, we’re releasing Supabase Logs for both self-hosted users and CLI develo
   ></iframe>
   _Whatch the video announcement_
 </div>
-
-## Logflare Introduction
-
-Since [Logflare joined Supabase](https://supabase.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the Supabase infrastructure - the API gateway, Postgres databases, Storage, Edge Functions, Auth, and Realtime.
-
-Logflare is a multi-node, highly available Elixir cluster, ingesting the log events and storing them into BigQuery for Supabase and Logflare’s customers. On average, the cluster has 6 nodes handling every spike our customers throw at it.
-
-To expose log data to customers, we leverage Logflare Endpoints. This provides an HTTP integration into Supabase Studio, powering the log query UIs and most time-series charts. These charts live across the studio, such as the project home page and the new API reports.
-
-{/* <!--  add chart screenshot --> */}
 
 ## Self-hosting Logflare
 
