@@ -8,7 +8,7 @@ date: '2023-04-11'
 to_depth: 3
 author: laktek,inian
 image: launch-week-7/day-2-edge-runtime/edge-runtime-og.png
-thumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpg
+thumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpeg
 ---
 
 Today we’re open-sourcing [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) for self-hosting Deno Edge Functions.
@@ -35,11 +35,11 @@ Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runt
 
 We [launched](/blog/supabase-edge-functions) Supabase Edge Functions a little more than a year ago. We use [Deno Deploy](https://deno.com/deploy) to host your edge functions globally across 30+ data centers, so your users get super fast responses. This setup works great for us! We didn’t have an easy solution for self-hosting Edge Functions. We’re releasing Edge Runtime to address this.
 
-<aside>
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-ℹ️ One of our core principles is “[Everything is portable](/docs/guides/getting-started/architecture#everything-is-portable)”, meaning you should be able to take any part of Supabase stack and host it yourself.
+One of our core principles is “[Everything is portable](/docs/guides/getting-started/architecture#everything-is-portable)”, meaning you should be able to take any part of Supabase stack and host it yourself.
 
-</aside>
+</div>
 
 Supabase Edge Runtime is a web server written in Rust that uses a custom Deno runtime. It can serve TypeScript, JavaScript, and WASM functions. All your existing Edge Functions run on Edge Runtime without changing a single line of code.
 
