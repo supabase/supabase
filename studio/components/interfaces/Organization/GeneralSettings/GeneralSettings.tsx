@@ -94,18 +94,24 @@ const GeneralSettings = () => {
             >
               <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
-                  <label htmlFor="name">Organization name</label>
-                  <Input id="name" size="small" disabled={!canUpdateOrganization} />
+                  <Input
+                    id="name"
+                    size="small"
+                    label="Organization name"
+                    disabled={!canUpdateOrganization}
+                  />
 
                   {showCMDK && allowCMDKDataOptIn && (
-                    <Toggle
-                      id="isOptedIntoAi"
-                      name="isOptedIntoAi"
-                      disabled={!canUpdateOrganization}
-                      size="small"
-                      label="Opt-in to sending anonymous data to OpenAI"
-                      descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
-                    />
+                    <div className="mt-4">
+                      <Toggle
+                        id="isOptedIntoAi"
+                        name="isOptedIntoAi"
+                        disabled={!canUpdateOrganization}
+                        size="small"
+                        label="Opt-in to sending anonymous data to OpenAI"
+                        descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
+                      />
+                    </div>
                   )}
                 </FormSectionContent>
               </FormSection>
