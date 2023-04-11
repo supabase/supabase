@@ -5,22 +5,5 @@
     "slug": "introduction",
     "summary": "Introduction",
     "type": "markdown"
-  },
-  {
-    "title": "Management API",
-    "items": [
-      {
-        "id": "list-endpoints",
-        "slug": "list-endpoints",
-        "title": "List endpoints",
-        "type": "operation"
-      },
-      {
-        "id": "create-endpoint",
-        "slug": "create-endpoint",
-        "title": "Create endpoint",
-        "type": "operation"
-      }
-    ]
   }
 ]
