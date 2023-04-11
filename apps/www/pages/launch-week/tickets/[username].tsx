@@ -14,7 +14,7 @@ import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWa
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../../components/CTABanner'
-import { useTheme } from 'common'
+import { useTheme } from 'common/Providers'
 
 interface Props {
   user: UserData

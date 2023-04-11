@@ -14,7 +14,7 @@ import { debounce } from 'lodash'
 import TicketsGrid from '../../../components/LaunchWeek/Ticket/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
-import { useTheme } from 'common'
+import { useTheme } from 'common/Providers'
 
 interface Props {
   users: UserData[]
