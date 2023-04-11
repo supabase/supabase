@@ -55,7 +55,7 @@ It currently supports a BigQuery backend, and we are actively working on support
 
 ## The Ingestion Pipeline
 
-Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
+Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](https://vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
 
 ## The Querying Pipeline
 
