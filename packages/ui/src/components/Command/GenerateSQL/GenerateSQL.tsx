@@ -32,15 +32,19 @@ const GenerateSQL = () => {
   const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata, project } =
     useCommandMenu()
 
-  const { flags } = metadata || {}
+  const { flags, definitions } = metadata || {}
   const allowSendingSchemaMetadata =
     project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     messageTemplate: (message) => {
+      // [Joshen] Only pass the schema metadata at the start of the conversation if opted in
+      // Since the prompts are contextualized to the conversation, no need to keep sending it
       return generatePrompt(
         message,
-        isOptedInToAI && includeSchemaMetadataRef.current ? metadata : undefined
+        isOptedInToAI && includeSchemaMetadataRef.current && messages.length === 0
+          ? definitions
+          : undefined
       )
     },
     setIsLoading,
@@ -79,7 +83,7 @@ const GenerateSQL = () => {
     <div onClick={(e) => e.stopPropagation()}>
       <div
         className={cn(
-          'relative py-4 max-h-[720px] overflow-auto',
+          'relative py-4 max-h-[550px] overflow-auto',
           allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
         )}
       >
@@ -230,26 +234,49 @@ const GenerateSQL = () => {
 
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         {allowSendingSchemaMetadata && (
-          <div className="flex items-center justify-between px-6 py-3">
-            <div>
-              <p className="text-sm">
-                Include table names, column names and their corresponding data types in prompt
-              </p>
-              <p className="text-sm text-scale-1100">
-                This will generate answers that are more relevant to your project's schema
-              </p>
-            </div>
-            <Toggle
-              disabled={!isOptedInToAI || isLoading || isResponding}
-              checked={includeSchemaMetadata}
-              onChange={() =>
-                setIncludeSchemaMetadata((prev) => {
-                  includeSchemaMetadataRef.current = !prev
-                  return !prev
-                })
-              }
-            />
-          </div>
+          <>
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-between px-6 py-3">
+                <div>
+                  <p className="text-sm">
+                    Include table names, column names and their corresponding data types in
+                    conversation
+                  </p>
+                  <p className="text-sm text-scale-1100">
+                    This will generate answers that are more relevant to your project during the
+                    current conversation
+                  </p>
+                </div>
+                <Toggle
+                  disabled={!isOptedInToAI || isLoading || isResponding}
+                  checked={includeSchemaMetadata}
+                  onChange={() =>
+                    setIncludeSchemaMetadata((prev) => {
+                      includeSchemaMetadataRef.current = !prev
+                      return !prev
+                    })
+                  }
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-between px-6 py-3">
+                <div>
+                  <p className="text-sm">
+                    Table names, column names and their corresponding data types{' '}
+                    <span
+                      className={cn(includeSchemaMetadata ? 'text-brand-900' : 'text-amber-900')}
+                    >
+                      {includeSchemaMetadata ? 'are' : 'are not'} included
+                    </span>{' '}
+                    in this conversation
+                  </p>
+                  <p className="text-sm text-scale-1100">
+                    Start a new conversation to change this configuration
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
         )}
         <Input
           className="bg-scale-100 rounded mx-3"
