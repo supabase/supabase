@@ -44,7 +44,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
   const validate = (values: any) => {
     const errors = {} as any
-    if (values.has_file_size_limit && values.formatted_size_limit < 0) {
+    if (values.has_file_size_limit && values.formatted_size_limit <= 0) {
       errors.formatted_size_limit = 'Please provide a value greater than 0'
     }
     return errors
@@ -57,7 +57,9 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
     const payload: BucketUpdatePayload = {
       public: values.public,
-      file_size_limit: convertToBytes(values.formatted_size_limit, selectedUnit),
+      file_size_limit: values.has_file_size_limit
+        ? convertToBytes(values.formatted_size_limit, selectedUnit)
+        : 0,
       allowed_mime_types: values.allowed_mime_types.split(',').map((x: string) => x.trim()),
     }
 
@@ -154,7 +156,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                         {!bucket?.public && values.public
                           ? `This will make all objects in the bucket "${bucket?.name}" public`
                           : bucket?.public && !values.public
-                          ? `This will make all objects in "${bucket?.name}" private. They can only be accessed via signed URLs or downloaded with the right authorisation headers`
+                          ? `All objects in "${bucket?.name}" will be made private and will only be accessible via signed URLs or downloaded with the right authorisation headers`
                           : ''}
                       </p>
                     </Alert>

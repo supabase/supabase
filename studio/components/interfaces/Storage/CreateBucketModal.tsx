@@ -57,7 +57,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
-    if (values.has_file_size_limit && values.formatted_size_limit < 0) {
+    if (values.has_file_size_limit && values.formatted_size_limit <= 0) {
       errors.formatted_size_limit = 'Please provide a value greater than 0'
     }
     return errors
@@ -67,7 +67,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     const payload: BucketCreatePayload = {
       id: values.name,
       public: values.public,
-      file_size_limit: convertToBytes(values.formatted_size_limit, selectedUnit),
+      file_size_limit: values.has_file_size_limit
+        ? convertToBytes(values.formatted_size_limit, selectedUnit)
+        : 0,
       allowed_mime_types: values.allowed_mime_types.split(',').map((x: string) => x.trim()),
     }
 
