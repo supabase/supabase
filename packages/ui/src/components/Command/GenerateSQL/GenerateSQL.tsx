@@ -1,159 +1,48 @@
-import { useCallback, useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   CodeBlock,
   IconAlertTriangle,
-  IconCheck,
-  IconClipboard,
   IconCornerDownLeft,
-  IconSave,
   IconUser,
   Input,
-  Message,
+  Toggle,
   MessageRole,
   MessageStatus,
-  queryAi,
   useAiChat,
 } from 'ui'
 
-import { stripIndent } from 'common-tags'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { cn } from './../../utils/cn'
-import { SAMPLE_QUERIES } from './Command.constants'
-import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandItem } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
-
-/**
- * Formats a string for use as a title.
- *
- * Removes punctuation and capitalizes each word
- */
-function formatTitle(value: string) {
-  let words = value.replace(/\.$/, '').replace(/['"]/g, '').split(' ')
-  words = words.map((word) => {
-    // Don't capitalize code
-    if (/[._\(\)]+/.test(word)) {
-      return word
-    }
-    return word.charAt(0).toUpperCase() + word.slice(1)
-  })
-  return words.join(' ')
-}
-
-const SQLOutputActions = ({ answer, messages }: { answer: string; messages: Message[] }) => {
-  const [showCopied, setShowCopied] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
-
-  const { project, saveGeneratedSQL } = useCommandMenu()
-
-  const onSelectSaveSnippet = async () => {
-    setIsSaving(true)
-    let suggestedTitle
-    try {
-      suggestedTitle = await queryAi(
-        [
-          ...messages,
-          {
-            role: MessageRole.User,
-            content: stripIndent`
-            Generate a title for the above SQL snippet following all of these rules:
-            - The title is only for the last SQL snippet
-            - Focus on the main purposes of this snippet
-            - Use as few words as possible
-            - Title should be nouns, not verbs
-            - Do not include word articles (eg. a, the, for, of)
-            - Do not use words like "SQL" or "snippet" or "title"
-            - Do not output markdown, quotes, etc
-            - Do not be too verbose
-            `,
-            status: MessageStatus.Complete,
-          },
-        ],
-        10000
-      )
-    } catch (err) {
-      suggestedTitle = ''
-    }
-
-    const formattedTitle = formatTitle(suggestedTitle)
-
-    await saveGeneratedSQL?.(answer, formattedTitle)
-    setIsSaved(true)
-    setIsSaving(false)
-  }
-
-  useEffect(() => {
-    if (!showCopied) return
-    const timer = setTimeout(() => setShowCopied(false), 2000)
-    return () => clearTimeout(timer)
-  }, [showCopied])
-
-  useEffect(() => {
-    if (!isSaved) return
-    const timer = setTimeout(() => setIsSaved(false), 2000)
-    return () => clearTimeout(timer)
-  }, [isSaved])
-
-  return (
-    <div className="flex items-center justify-end space-x-2">
-      <CopyToClipboard text={answer?.replace(/```.*/g, '').trim()}>
-        <Button
-          type="default"
-          icon={
-            showCopied ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
-            ) : (
-              <IconClipboard size="tiny" />
-            )
-          }
-          onClick={() => setShowCopied(true)}
-        >
-          {showCopied ? 'Copied' : 'Copy SQL'}
-        </Button>
-      </CopyToClipboard>
-      {project?.ref !== undefined && saveGeneratedSQL !== undefined && (
-        <Button
-          type="default"
-          loading={isSaving}
-          disabled={isSaving}
-          icon={
-            isSaved ? (
-              <IconCheck size="tiny" className="text-brand-900" strokeWidth={2} />
-            ) : (
-              <IconSave size="tiny" />
-            )
-          }
-          onClick={() => onSelectSaveSnippet()}
-        >
-          {isSaved ? 'Snippet saved!' : 'Save into new snippet'}
-        </Button>
-      )}
-    </div>
-  )
-}
+import { cn } from '../../../utils/cn'
+import { AiIcon, AiIconChat } from '../Command.icons'
+import { CommandItem } from '../Command.utils'
+import { useCommandMenu } from '../CommandMenuProvider'
+import { SAMPLE_QUERIES } from '../Command.constants'
+import SQLOutputActions from './SQLOutputActions'
+import { generatePrompt } from './GenerateSQL.utils'
 
 const GenerateSQL = () => {
+  // [Joshen] Temp hack to ensure that generatePrompt receives updated value
+  // of includeSchemaMetadata, needs to be fixed
+  const includeSchemaMetadataRef = useRef<any>()
+
+  const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata, project } =
+    useCommandMenu()
+
+  const { flags } = metadata || {}
+  const allowSendingSchemaMetadata =
+    project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
-    messageTemplate: (message) =>
-      stripIndent`
-        Generate a Postgres SQL query based on the following natural language prompt.
-        - Only output valid SQL - all explanations must be SQL comments
-        - SQL comments should be short
-        - Your very last output should be "\`\`\`"
-        - For primary keys, always use "integer primary key generated always as identity"
-
-        Natural language prompt:
-        ${message}
-
-        Postgres SQL query (markdown SQL only):
-      `,
+    messageTemplate: (message) => {
+      return generatePrompt(
+        message,
+        isOptedInToAI && includeSchemaMetadataRef.current ? metadata : undefined
+      )
+    },
     setIsLoading,
   })
 
@@ -171,9 +60,8 @@ const GenerateSQL = () => {
   }, [reset])
 
   useEffect(() => {
-    if (search) {
-      handleSubmit(search)
-    }
+    if (search) handleSubmit(search)
+    includeSchemaMetadataRef.current = includeSchemaMetadata
   }, [])
 
   const formatAnswer = (answer: string) => {
@@ -189,7 +77,12 @@ const GenerateSQL = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div
+        className={cn(
+          'relative py-4 max-h-[720px] overflow-auto',
+          allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
+        )}
+      >
         {messages.map((message, i) => {
           switch (message.role) {
             case MessageRole.User:
@@ -203,18 +96,22 @@ const GenerateSQL = () => {
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                  <div className="prose text-scale-1000">{message.content}</div>
+                  <div className="flex items-center prose text-scale-1100 text-sm">
+                    {message.content}
+                  </div>
                 </div>
               )
             case MessageRole.Assistant:
-              const answer = formatAnswer(
-                message.content
-                  .replace(/```sql/g, '')
-                  .replace(/```.*/gs, '')
-                  .replace(/-- End of SQL query\.*/g, '')
-                  .trim()
-              )
+              const unformattedAnswer = message.content
+                .replace(/```sql/g, '')
+                .replace(/```.*/gs, '')
+                .replace(/-- End of SQL query\.*/g, '')
+                .trim()
 
+              const answer =
+                message.status === MessageStatus.Complete
+                  ? formatAnswer(unformattedAnswer)
+                  : unformattedAnswer
               const cantHelp = answer === "Sorry, I don't know how to help with that."
 
               return (
@@ -249,7 +146,7 @@ const GenerateSQL = () => {
                           >
                             {answer}
                           </CodeBlock>
-                          {!isResponding && (
+                          {message.status === MessageStatus.Complete && (
                             <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
                           )}
                         </div>
@@ -260,6 +157,7 @@ const GenerateSQL = () => {
               )
           }
         })}
+
         {messages.length === 0 && !hasError && (
           <div>
             <div className="px-10">
@@ -329,7 +227,30 @@ const GenerateSQL = () => {
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
+
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {allowSendingSchemaMetadata && (
+          <div className="flex items-center justify-between px-6 py-3">
+            <div>
+              <p className="text-sm">
+                Include table names, column names and their corresponding data types in prompt
+              </p>
+              <p className="text-sm text-scale-1100">
+                This will generate answers that are more relevant to your project's schema
+              </p>
+            </div>
+            <Toggle
+              disabled={!isOptedInToAI || isLoading || isResponding}
+              checked={includeSchemaMetadata}
+              onChange={() =>
+                setIncludeSchemaMetadata((prev) => {
+                  includeSchemaMetadataRef.current = !prev
+                  return !prev
+                })
+              }
+            />
+          </div>
+        )}
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
@@ -363,14 +284,8 @@ const GenerateSQL = () => {
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
-                  return
-                }
-                if (isLoading || isResponding) {
-                  return
-                }
-                handleSubmit(search)
-                return
+                if (!search || isLoading || isResponding) return
+                return handleSubmit(search)
               default:
                 return
             }
