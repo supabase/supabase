@@ -5,60 +5,13 @@ import React from 'react'
 import days from '~/components/LaunchWeek/lw7_days'
 
 const BlogLinks = () => {
-  const SectionButtons = ({
-    blog,
-    docs,
-    youtube_id,
-  }: {
-    blog?: string
-    docs?: string
-    youtube_id?: string
-  }) => {
-    return (
-      <div className="flex gap-2 z-10">
-        <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r to-[#fcfcfc] from-[#f2f2f2] hover:from-[#d5d5d5] text-black dark:text-white dark:to-[#191919] dark:from-[#464444] dark:hover:from-[#4e4e4e] rounded-full text-xs py-1 pl-3 pr-1">
-            Blog post
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <PencilSvg />
-            </div>
-          </div>
-        </a>
-        {!!docs?.length && (
-          <a href={docs} target="_blank" rel="noopener">
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Docs
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <DocsSvg />
-              </div>
-            </div>
-          </a>
-        )}
-        {!!youtube_id?.length && (
-          <a
-            href={`https://www.youtube.com/watch?v=${youtube_id}&ab_channel=Supabase`}
-            target="_blank"
-            rel="noopener"
-          >
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Video
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <PlaySvg />
-              </div>
-            </div>
-          </a>
-        )}
-      </div>
-    )
-  }
-
   const activeDays = days.filter((day) => Date.parse(day.publishedAt) <= Date.now())
 
   if (!activeDays.length) return null
 
   return (
     <div className="flex flex-col gap-3 lg:gap-4 border-t border-scale-400 py-4 lg:py-8 mt-4 lg:mt-8">
-      <h3 className="text-white text-xl mb-4">More Launch Week 7</h3>
+      <h3 className="text-black dark:text-white text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) =>
         day.steps?.map((step) => (
           <motion.div

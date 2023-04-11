@@ -4490,7 +4490,11 @@ functions:
           ```js
           const { data, error } = await supabase
             .storage
-            .createBucket('avatars', { public: false })
+            .createBucket('avatars', {
+              public: false,
+              allowedMimeTypes: ['image/png'],
+              fileSizeLimit: 1024
+            })
           ```
 
   - id: empty-bucket
@@ -4516,7 +4520,7 @@ functions:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
       - RLS policy permissions required:
-        - `buckets` table permissions: `update`
+        - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
@@ -4527,7 +4531,11 @@ functions:
           ```js
           const { data, error } = await supabase
             .storage
-            .updateBucket('avatars', { public: false })
+            .updateBucket('avatars', {
+              public: false,
+              allowedMimeTypes: ['image/png'],
+              fileSizeLimit: 1024
+            })
           ```
 
   - id: delete-bucket
@@ -4555,7 +4563,7 @@ functions:
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `insert`
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
@@ -4608,7 +4616,6 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              // Overwrite file if it exists
               upsert: true
             })
           ```
@@ -4733,6 +4740,46 @@ functions:
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
 
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl('folder/cat.jpg')
+          ```
+
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a signed URL
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
+          ```
+
   - id: from-get-public-url
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
@@ -4812,6 +4859,7 @@ functions:
               transform: {
                 width: 100,
                 height: 100,
+                quality: 80
               }
             })
           ```
