@@ -15,7 +15,19 @@ Today we’re open-sourcing [Supabase Edge Runtime](https://github.com/supabase/
 
 Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the Supabase CLI to serve functions then you’re already one of our Beta testers (thanks!).
 
-[lw-7-self-hosted-edge-functions.mp4](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fd55eb67-9860-47c3-8304-02643b190015/lw-7-self-hosted-edge-functions.mp4)
+<div className="video-container">
+  <iframe
+    className="w-full"
+    width="560"
+    height="315"
+    src="https://www.youtube-nocookie.com/embed/cPGxPl1lx4Y"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+  _Watch the video announcement_
+</div>
 
 ## Host your Edge Functions anywhere
 
@@ -38,10 +50,6 @@ Self-hosting is not the only benefit of Edge Runtime. It will improve the local 
 ### Serve all functions
 
 Supabase CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
-
-[https://twitter.com/supabase/status/1628417648814874629](https://twitter.com/supabase/status/1628417648814874629)
-
-_embed tweet: [https://twitter.com/supabase/status/1628417648814874629](https://twitter.com/supabase/status/1628417648814874629)_
 
 When you run `supabase functions serve`, the CLI uses Edge Runtime to serve all functions. It supports JWT verification, import maps, and passing custom environment variables. It hot-reloads local changes, giving you a seamless development experience.
 
