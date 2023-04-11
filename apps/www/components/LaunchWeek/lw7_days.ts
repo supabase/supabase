@@ -137,7 +137,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Self-hosted Deno Edge Functions',
-        blog: '/blog/self-hosted-edge-functions',
+        blog: '/blog/edge-runtime-self-hosted-deno',
         thumb: images['02-self-hosted-edge-functions-thumb'],
         bg_layers: [
           {
