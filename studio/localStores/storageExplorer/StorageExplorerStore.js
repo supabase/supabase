@@ -76,7 +76,6 @@ class StorageExplorerStore {
   endpoint = ''
 
   /* FE to toggle page level modals */
-  showCreateBucketModal = false
   showDeleteBucketModal = false
 
   /* FE Cacheing for file previews */
@@ -181,14 +180,6 @@ class StorageExplorerStore {
 
   setLoaded = (val) => {
     this.loaded = val
-  }
-
-  openCreateBucketModal = () => {
-    this.showCreateBucketModal = true
-  }
-
-  closeCreateBucketModal = () => {
-    this.showCreateBucketModal = false
   }
 
   openDeleteBucketModal = (bucket) => {
@@ -451,11 +442,9 @@ class StorageExplorerStore {
     const res = await post(`${this.endpoint}/buckets`, payload)
     if (res.error) {
       this.ui.setNotification({ category: 'error', message: res.error.message })
-      this.closeCreateBucketModal()
-      return undefined
+      return res
     } else {
       await this.fetchBuckets()
-      this.closeCreateBucketModal()
       return res
     }
   }
