@@ -75,12 +75,12 @@ const BlogLinks = () => {
               <a
                 className={`
                 flex flex-col flex-1 gap-3 items-start justify-center border rounded-xl h-full relative overflow-hidden
-                p-6 lg:p-10 text-2xl
+                p-6 lg:p-10 text-2xl bg-[#1C1C1C]
                 before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0
                 before:border-[#1f3536] before:-z-10
               `}
               >
-                <div className="flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                   <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg">
                     {step.title}
                   </div>
@@ -92,13 +92,13 @@ const BlogLinks = () => {
                 /> */}
                 {step.thumb && (
                   <motion.div
-                    className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                    className="absolute inset-0 w-full h-full z-0"
                     variants={hoverVariant}
                   >
                     <Image
                       src={step.thumb}
                       className={`
-                    absolute opacity-90
+                    absolute
                     w-full h-full -z-10 transition-all duration-300
                   `}
                       layout="fill"
@@ -158,10 +158,9 @@ const PlaySvg = () => (
 
 const defaultEase = [0.25, 0.25, 0, 1]
 const hoverVariant = {
-  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: 0.2 },
+  default: { scale: 1, ease: defaultEase, duration: 0.2 },
   hover: {
     scale: 1.05,
-    opacity: 1,
     transition: {
       duration: 0.4,
       ease: defaultEase,
