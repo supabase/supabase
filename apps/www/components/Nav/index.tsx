@@ -11,13 +11,14 @@ import SolutionsData from 'data/Solutions.json'
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
+import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
 import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import CountdownBanner from '../LaunchWeek/Banners/CountdownBanner'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -112,7 +113,7 @@ const Nav = () => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 flex items-center px-2 lg:hidden"
+      className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button
@@ -198,7 +199,7 @@ const Nav = () => {
       <Announcement>
         <CountdownBanner />
       </Announcement>
-      <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
+      <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
             'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
@@ -436,6 +437,7 @@ const Nav = () => {
         <FlyOut open={openDevelopers} handleCancel={handleCancel}>
           <Developers />
         </FlyOut>
+        <ScrollProgress />
       </div>
     </>
   )

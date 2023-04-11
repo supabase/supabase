@@ -3191,7 +3191,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 399,
+              "line": 396,
               "character": 8
             }
           ],
@@ -3243,7 +3243,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 605,
+              "line": 602,
               "character": 8
             }
           ],
@@ -3281,7 +3281,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 607,
+                                  "line": 604,
                                   "character": 8
                                 }
                               ],
@@ -3303,7 +3303,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 608,
+                                          "line": 605,
                                           "character": 10
                                         }
                                       ],
@@ -3333,7 +3333,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 610,
+                                  "line": 607,
                                   "character": 8
                                 }
                               ],
@@ -3370,7 +3370,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 613,
+                                  "line": 610,
                                   "character": 8
                                 }
                               ],
@@ -3392,7 +3392,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 614,
+                                          "line": 611,
                                           "character": 10
                                         }
                                       ],
@@ -3421,7 +3421,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 616,
+                                  "line": 613,
                                   "character": 8
                                 }
                               ],
@@ -3459,7 +3459,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 619,
+                                  "line": 616,
                                   "character": 8
                                 }
                               ],
@@ -3481,7 +3481,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 620,
+                                          "line": 617,
                                           "character": 10
                                         }
                                       ],
@@ -3510,7 +3510,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 622,
+                                  "line": 619,
                                   "character": 8
                                 }
                               ],
@@ -3548,7 +3548,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 668,
+              "line": 665,
               "character": 8
             }
           ],
@@ -3644,7 +3644,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 959,
+              "line": 956,
               "character": 2
             }
           ],
@@ -3746,7 +3746,7 @@
                       "sources": [
                         {
                           "fileName": "src/GoTrueClient.ts",
-                          "line": 960,
+                          "line": 957,
                           "character": 4
                         }
                       ],
@@ -3768,7 +3768,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 960,
+                                  "line": 957,
                                   "character": 12
                                 }
                               ],
@@ -3811,7 +3811,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 814,
+              "line": 811,
               "character": 8
             }
           ],
@@ -3855,7 +3855,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 814,
+                              "line": 811,
                               "character": 42
                             }
                           ],
@@ -3901,7 +3901,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 999,
+              "line": 996,
               "character": 8
             }
           ],
@@ -3959,7 +3959,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 1003,
+                              "line": 1000,
                               "character": 6
                             }
                           ],
@@ -3982,7 +3982,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 1002,
+                              "line": 999,
                               "character": 6
                             }
                           ],
@@ -4028,7 +4028,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1007,
+                                  "line": 1004,
                                   "character": 8
                                 }
                               ],
@@ -4052,7 +4052,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1008,
+                                  "line": 1005,
                                   "character": 8
                                 }
                               ],
@@ -4089,7 +4089,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1010,
+                                  "line": 1007,
                                   "character": 8
                                 }
                               ],
@@ -4107,7 +4107,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1010,
+                                  "line": 1007,
                                   "character": 20
                                 }
                               ],
@@ -4146,7 +4146,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 750,
+              "line": 747,
               "character": 8
             }
           ],
@@ -4188,7 +4188,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 751,
+                              "line": 748,
                               "character": 4
                             }
                           ],
@@ -4206,7 +4206,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 752,
+                              "line": 749,
                               "character": 4
                             }
                           ],
@@ -4252,7 +4252,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 429,
+              "line": 426,
               "character": 8
             }
           ],
@@ -4311,7 +4311,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 384,
+              "line": 381,
               "character": 8
             }
           ],
@@ -4364,7 +4364,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 477,
+              "line": 474,
               "character": 8
             }
           ],
@@ -4418,7 +4418,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 333,
+              "line": 331,
               "character": 8
             }
           ],
@@ -4431,7 +4431,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Log in an existing user with an email and password or phone and password.",
-                "text": "Be aware that you may get back an error message that will not distinguish\nbetween the cases where the account does not exist or that the\nemail/phone and password combination is wrong or that the account can only\nbe accessed via social login. Do note that you will need\nto configure a Whatsapp sender on Twilio if you are using phone sign in\nwith 'whatsapp'. The whatsapp channel is not supported on other providers\nat this time.\n"
+                "text": "Be aware that you may get back an error message that will not distingish\nbetween the cases where the account does not exist or that the\nemail/phone and password combination is wrong or that the account can only\nbe accessed via social login.\n"
               },
               "parameters": [
                 {
@@ -4442,7 +4442,7 @@
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 480,
+                    "id": 481,
                     "name": "SignInWithPasswordCredentials"
                   }
                 }
@@ -4472,7 +4472,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 576,
+              "line": 573,
               "character": 8
             }
           ],
@@ -4526,7 +4526,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 934,
+              "line": 931,
               "character": 8
             }
           ],
@@ -4562,7 +4562,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 934,
+                              "line": 931,
                               "character": 29
                             }
                           ],
@@ -4663,7 +4663,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 1288,
+              "line": 1285,
               "character": 8
             }
           ],
@@ -4676,7 +4676,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Starts an auto-refresh process in the background. The session is checked\nevery few seconds. Close to the time of expiration a process is started to\nrefresh the session. If refreshing fails it will be retried for as long as\nnecessary.",
-                "text": "If you set the {@link GoTrueClientOptions#autoRefreshToken} you don't need\nto call this function, it will be called for you.\n\nOn browsers the refresh process works only when the tab/window is in the\nforeground to conserve resources as well as prevent race conditions and\nflooding auth with requests. If you call this method any managed\nvisibility change callback will be removed and you must manage visibility\nchanges on your own.\n\nOn non-browser platforms the refresh process works *continuously* in the\nbackground, which may not be desirable. You should hook into your\nplatform's foreground indication mechanism and call these methods\nappropriately to conserve resources.\n\n{@see #stopAutoRefresh}\n"
+                "text": "If you set the {@link GoTrueClientOptions#autoRefreshToken} you don't need\nto call this function, it will be called for you.\n\nOn browsers the refresh process works only when the tab/window is in the\nforeground to conserve resources as well as prevent race conditions and\nflooding auth with requests. If you call this method any managed\nvisibility change callback will be removed and you must manage visibility\nchanges on your own.\n\nOn non-browser platforms the refresh process works *continuously* in the\nbackground, which may not be desireable. You should hook into your\nplatform's foreground indication mechanism and call these methods\nappropriately to conserve resources.\n\n{@see #stopAutoRefresh}\n"
               },
               "type": {
                 "type": "reference",
@@ -4702,7 +4702,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 1301,
+              "line": 1298,
               "character": 8
             }
           ],
@@ -4741,7 +4741,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 697,
+              "line": 694,
               "character": 8
             }
           ],
@@ -4794,7 +4794,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 700,
+                              "line": 697,
                               "character": 6
                             }
                           ],
@@ -4841,7 +4841,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 522,
+              "line": 519,
               "character": 8
             }
           ],
@@ -13095,7 +13095,7 @@
       }
     },
     {
-      "id": 480,
+      "id": 481,
       "name": "SignInWithPasswordCredentials",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -13103,7 +13103,7 @@
       "sources": [
         {
           "fileName": "src/lib/types.ts",
-          "line": 370,
+          "line": 372,
           "character": 12
         }
       ],
@@ -13113,14 +13113,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 481,
+              "id": 482,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 482,
+                  "id": 483,
                   "name": "email",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13131,7 +13131,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 373,
+                      "line": 375,
                       "character": 6
                     }
                   ],
@@ -13141,7 +13141,7 @@
                   }
                 },
                 {
-                  "id": 484,
+                  "id": 485,
                   "name": "options",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13151,21 +13151,21 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 376,
+                      "line": 378,
                       "character": 6
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 485,
+                      "id": 486,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 486,
+                          "id": 487,
                           "name": "captchaToken",
                           "kind": 1024,
                           "kindString": "Property",
@@ -13178,7 +13178,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 378,
+                              "line": 380,
                               "character": 8
                             }
                           ],
@@ -13192,13 +13192,13 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [486]
+                          "children": [487]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 376,
+                          "line": 378,
                           "character": 16
                         }
                       ]
@@ -13206,7 +13206,7 @@
                   }
                 },
                 {
-                  "id": 483,
+                  "id": 484,
                   "name": "password",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13217,7 +13217,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 375,
+                      "line": 377,
                       "character": 6
                     }
                   ],
@@ -13231,13 +13231,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [482, 484, 483]
+                  "children": [483, 485, 484]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 371,
+                  "line": 373,
                   "character": 4
                 }
               ]
@@ -13246,14 +13246,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 487,
+              "id": 488,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 490,
+                  "id": 491,
                   "name": "options",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13263,21 +13263,21 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 386,
+                      "line": 388,
                       "character": 6
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 491,
+                      "id": 492,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 493,
+                          "id": 494,
                           "name": "captchaToken",
                           "kind": 1024,
                           "kindString": "Property",
@@ -13290,7 +13290,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 394,
+                              "line": 396,
                               "character": 8
                             }
                           ],
@@ -13300,39 +13300,7 @@
                           }
                         },
                         {
-                          "id": 494,
-                          "name": "channel",
-                          "kind": 1024,
-                          "kindString": "Property",
-                          "flags": {
-                            "isOptional": true
-                          },
-                          "comment": {
-                            "shortText": "Messaging channel to use (e.g. whatsapp or sms)"
-                          },
-                          "sources": [
-                            {
-                              "fileName": "src/lib/types.ts",
-                              "line": 396,
-                              "character": 8
-                            }
-                          ],
-                          "type": {
-                            "type": "union",
-                            "types": [
-                              {
-                                "type": "literal",
-                                "value": "sms"
-                              },
-                              {
-                                "type": "literal",
-                                "value": "whatsapp"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "id": 492,
+                          "id": 493,
                           "name": "data",
                           "kind": 1024,
                           "kindString": "Property",
@@ -13346,7 +13314,7 @@
                           "sources": [
                             {
                               "fileName": "src/lib/types.ts",
-                              "line": 392,
+                              "line": 394,
                               "character": 8
                             }
                           ],
@@ -13360,13 +13328,13 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [493, 494, 492]
+                          "children": [494, 493]
                         }
                       ],
                       "sources": [
                         {
                           "fileName": "src/lib/types.ts",
-                          "line": 386,
+                          "line": 388,
                           "character": 16
                         }
                       ]
@@ -13374,7 +13342,7 @@
                   }
                 },
                 {
-                  "id": 489,
+                  "id": 490,
                   "name": "password",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13385,7 +13353,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 385,
+                      "line": 387,
                       "character": 6
                     }
                   ],
@@ -13395,7 +13363,7 @@
                   }
                 },
                 {
-                  "id": 488,
+                  "id": 489,
                   "name": "phone",
                   "kind": 1024,
                   "kindString": "Property",
@@ -13406,7 +13374,7 @@
                   "sources": [
                     {
                       "fileName": "src/lib/types.ts",
-                      "line": 383,
+                      "line": 385,
                       "character": 6
                     }
                   ],
@@ -13420,13 +13388,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [490, 489, 488]
+                  "children": [491, 490, 489]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/lib/types.ts",
-                  "line": 381,
+                  "line": 383,
                   "character": 4
                 }
               ]
@@ -14354,7 +14322,7 @@
                             "isOptional": true
                           },
                           "comment": {
-                            "shortText": "Verification token received when the user completes the captcha on the site."
+                            "shortText": "Verification token received when the user completes the captcha on the site. Requires a configured WhatsApp sender on Twilio"
                           },
                           "sources": [
                             {
@@ -14366,6 +14334,38 @@
                           "type": {
                             "type": "intrinsic",
                             "name": "string"
+                          }
+                        },
+                        {
+                          "id": 480,
+                          "name": "channel",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "comment": {
+                            "shortText": "Messaging channel to use (e.g. whatsapp or sms)"
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/lib/types.ts",
+                              "line": 369,
+                              "character": 8
+                            }
+                          ],
+                          "type": {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": "sms"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "whatsapp"
+                              }
+                            ]
                           }
                         },
                         {
@@ -14397,7 +14397,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [479, 478]
+                          "children": [479, 480, 478]
                         }
                       ],
                       "sources": [
@@ -14887,7 +14887,7 @@
       "children": [
         320, 319, 731, 722, 744, 735, 670, 646, 691, 680, 661, 633, 334, 690, 758, 552, 582, 572,
         591, 605, 592, 612, 577, 566, 321, 755, 629, 626, 613, 618, 621, 551, 512, 347, 772, 765,
-        318, 360, 526, 513, 480, 495, 553, 464, 754, 369, 534
+        318, 360, 526, 513, 481, 495, 553, 464, 754, 369, 534
       ]
     },
     {

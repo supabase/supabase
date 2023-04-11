@@ -4966,7 +4966,8 @@ functions:
           })
 
           if (error instanceof FunctionsHttpError) {
-            console.log('Function returned an error', error.message)
+            const errorMessage = await error.context.json()
+            console.log('Function returned an error', errorMessage)
           } else if (error instanceof FunctionsRelayError) {
             console.log('Relay error:', error.message)
           } else if (error instanceof FunctionsFetchError) {
