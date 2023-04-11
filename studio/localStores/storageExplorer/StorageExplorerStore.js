@@ -78,7 +78,6 @@ class StorageExplorerStore {
   /* FE to toggle page level modals */
   showCreateBucketModal = false
   showDeleteBucketModal = false
-  showToggleBucketPublicModal = false
 
   /* FE Cacheing for file previews */
   filePreviewCache = []
@@ -199,15 +198,6 @@ class StorageExplorerStore {
 
   closeDeleteBucketModal = () => {
     this.showDeleteBucketModal = false
-  }
-
-  openToggleBucketPublicModal = (bucket) => {
-    this.selectedBucketToEdit = bucket
-    this.showToggleBucketPublicModal = true
-  }
-
-  closeToggleBucketPublicModal = () => {
-    this.showToggleBucketPublicModal = false
   }
 
   setSelectedBucket = (bucket) => {
@@ -457,8 +447,8 @@ class StorageExplorerStore {
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
 
-  createBucket = async (bucketName, isPublic = false) => {
-    const res = await post(`${this.endpoint}/buckets`, { id: bucketName, public: isPublic })
+  createBucket = async (payload) => {
+    const res = await post(`${this.endpoint}/buckets`, payload)
     if (res.error) {
       this.ui.setNotification({ category: 'error', message: res.error.message })
       this.closeCreateBucketModal()

@@ -4,13 +4,5 @@ import StorageSettings from './StorageSettings/StorageSettings'
 
 import CreateBucketModal from './CreateBucketModal'
 import DeleteBucketModal from './DeleteBucketModal'
-import ToggleBucketPublicModal from './ToggleBucketPublicModal'
 
-export {
-  StorageExplorer,
-  StoragePolicies,
-  StorageSettings,
-  CreateBucketModal,
-  DeleteBucketModal,
-  ToggleBucketPublicModal,
-}
+export { StorageExplorer, StoragePolicies, StorageSettings, CreateBucketModal, DeleteBucketModal }

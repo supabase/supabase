@@ -12,7 +12,7 @@ import {
   IconChevronDown,
   Listbox,
 } from 'ui'
-import { BucketUpdatePayload, StorageBucket } from './Storage.types'
+import { BucketCreatePayload, StorageBucket } from './Storage.types'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
@@ -22,18 +22,19 @@ import {
 import { useStore } from 'hooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useRouter } from 'next/router'
 
-export interface EditBucketModalProps {
+export interface CreateBucketModalProps {
   visible: boolean
-  bucket?: StorageBucket
   onClose: () => void
 }
 
-const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
+const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const router = useRouter()
   const storageExplorerStore = useStorageStore()
-  const { editBucket } = storageExplorerStore
+  const { createBucket } = storageExplorerStore
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -42,8 +43,20 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   const [selectedUnit, setSelectedUnit] = useState<StorageSizeUnits>(StorageSizeUnits.BYTES)
   const [showConfiguration, setShowConfiguration] = useState(false)
 
+  const initialValues = {
+    name: '',
+    public: false,
+    file_size_limit: 0,
+    allowed_mime_types: '',
+    has_file_size_limit: false,
+    formatted_size_limit: 0,
+  }
+
   const validate = (values: any) => {
     const errors = {} as any
+    if (!values.name) {
+      errors.name = 'Please provide a name for your bucket'
+    }
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'Please provide a value greater than 0'
     }
@@ -51,33 +64,30 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
-    if (bucket === undefined) {
-      return console.error('Bucket is required')
-    }
-
-    const payload: BucketUpdatePayload = {
+    const payload: BucketCreatePayload = {
+      id: values.name,
       public: values.public,
       file_size_limit: convertToBytes(values.formatted_size_limit, selectedUnit),
       allowed_mime_types: values.allowed_mime_types.split(',').map((x: string) => x.trim()),
     }
 
     setSubmitting(true)
-    const res = await editBucket(bucket, payload)
+    const res = await createBucket(payload)
     if (res.error) {
       setSubmitting(false)
     } else {
       ui.setNotification({
         category: 'success',
-        message: `Successfully updated bucket "${bucket.name}"`,
+        message: `Successfully created bucket "${res.name}"`,
       })
+      router.push(`/project/${ref}/storage/buckets/${res.name}`)
       onClose()
     }
   }
 
   useEffect(() => {
     if (visible) {
-      const { unit } = convertFromBytes(bucket?.file_size_limit ?? 0)
-      setSelectedUnit(unit)
+      setSelectedUnit(StorageSizeUnits.BYTES)
       setShowConfiguration(false)
     }
   }, [visible])
@@ -87,41 +97,20 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
       hideFooter
       visible={visible}
       size="medium"
-      header={`Edit bucket "${bucket?.name}"`}
+      header="Create storage bucket"
       onCancel={onClose}
     >
-      <Form validateOnBlur={false} initialValues={{}} validate={validate} onSubmit={onSubmit}>
-        {({
-          values,
-          isSubmitting,
-          resetForm,
-        }: {
-          values: any
-          isSubmitting: boolean
-          resetForm: any
-        }) => {
-          useEffect(() => {
-            if (visible && bucket !== undefined) {
-              const { value: fileSizeLimit } = convertFromBytes(bucket.file_size_limit ?? 0)
-
-              const values = {
-                name: bucket.name ?? '',
-                public: bucket.public,
-                file_size_limit: bucket.file_size_limit,
-                allowed_mime_types: (bucket.allowed_mime_types ?? []).join(', '),
-
-                has_file_size_limit: (bucket.file_size_limit ?? 0) > 0,
-                formatted_size_limit: fileSizeLimit ?? 0,
-              }
-              resetForm({ values, initialValues: values })
-            }
-          }, [visible])
-
+      <Form
+        validateOnBlur={false}
+        initialValues={initialValues}
+        validate={validate}
+        onSubmit={onSubmit}
+      >
+        {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
                 <Input
-                  disabled
                   id="name"
                   name="name"
                   type="text"
@@ -129,6 +118,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                   layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
+                  descriptionText="Only lowercase letters, numbers, dots, and hyphens"
                 />
                 <div className="space-y-2 mt-6">
                   <Toggle
@@ -138,24 +128,14 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                     label="Public bucket"
                     descriptionText="Anyone can read any object without any authorization"
                   />
-                  {bucket?.public !== values.public && (
-                    <Alert
-                      title={
-                        !bucket?.public && values.public
-                          ? 'Warning: Making bucket public'
-                          : bucket?.public && !values.public
-                          ? 'Warning: Making bucket private'
-                          : ''
-                      }
-                      variant="warning"
-                      withIcon
-                    >
+                  {values.public && (
+                    <Alert title="Public buckets are not protected" variant="warning" withIcon>
                       <p className="mb-2">
-                        {!bucket?.public && values.public
-                          ? `This will make all objects in the bucket "${bucket?.name}" public`
-                          : bucket?.public && !values.public
-                          ? `This will make all objects in "${bucket?.name}" private. They can only be accessed via signed URLs or downloaded with the right authorisation headers`
-                          : ''}
+                        Users can read objects in public buckets without any authorization.
+                      </p>
+                      <p>
+                        Row level security (RLS) policies are still required for other operations
+                        such as object uploads and deletes.
                       </p>
                     </Alert>
                   )}
@@ -267,4 +247,4 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   )
 }
 
-export default EditBucketModal
+export default CreateBucketModal
