@@ -47,7 +47,6 @@ const ProjectLayout = ({
           {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
         </title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         {/* Left-most navigation side bar to access products */}
