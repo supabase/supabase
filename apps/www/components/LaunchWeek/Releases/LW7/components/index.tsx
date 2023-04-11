@@ -159,7 +159,7 @@ export const ChipLink = ({
       target={target ?? '_self'}
       rel="noopener"
       className={[
-        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
+        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
         className,
       ].join(' ')}
     >
@@ -188,7 +188,7 @@ export const SectionButtons = ({
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <PencilSvg />
           </div>
         </ChipLink>
@@ -196,7 +196,7 @@ export const SectionButtons = ({
       {!!docs && (
         <ChipLink href={docs}>
           Docs
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <DocsSvg />
           </div>
         </ChipLink>
@@ -204,7 +204,7 @@ export const SectionButtons = ({
       {!!video && (
         <ChipLink href={video}>
           Video
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <PlaySvg />
           </div>
         </ChipLink>
@@ -212,7 +212,7 @@ export const SectionButtons = ({
       {!!github && (
         <ChipLink href={github} target="_blank">
           View on Github
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <GithubSvg />
           </div>
         </ChipLink>
@@ -220,7 +220,7 @@ export const SectionButtons = ({
       {!!url && (
         <ChipLink href={url}>
           Read
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <LinkSvg />
           </div>
         </ChipLink>
@@ -228,7 +228,7 @@ export const SectionButtons = ({
       {hackernews && (
         <ChipLink href={hackernews} target="_blank">
           Read more
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <HackernewsSvg />
           </div>
         </ChipLink>

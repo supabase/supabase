@@ -5,60 +5,13 @@ import React from 'react'
 import days from '~/components/LaunchWeek/lw7_days'
 
 const BlogLinks = () => {
-  const SectionButtons = ({
-    blog,
-    docs,
-    youtube_id,
-  }: {
-    blog?: string
-    docs?: string
-    youtube_id?: string
-  }) => {
-    return (
-      <div className="flex gap-2 z-10">
-        <a href={blog} target="_blank" rel="noopener">
-          <div className="flex items-center border border-slate-400 bg-gradient-to-r to-[#fcfcfc] from-[#f2f2f2] hover:from-[#d5d5d5] text-black dark:text-white dark:to-[#191919] dark:from-[#464444] dark:hover:from-[#4e4e4e] rounded-full text-xs py-1 pl-3 pr-1">
-            Blog post
-            <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-              <PencilSvg />
-            </div>
-          </div>
-        </a>
-        {!!docs?.length && (
-          <a href={docs} target="_blank" rel="noopener">
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Docs
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <DocsSvg />
-              </div>
-            </div>
-          </a>
-        )}
-        {!!youtube_id?.length && (
-          <a
-            href={`https://www.youtube.com/watch?v=${youtube_id}&ab_channel=Supabase`}
-            target="_blank"
-            rel="noopener"
-          >
-            <div className="flex items-center border border-slate-400 bg-gradient-to-r from-[#fcfcfc] to-[#f2f2f2] hover:to-[#d5d5d5] text-black dark:text-white dark:from-[#191919] dark:to-[#464444] dark:hover:to-[#4e4e4e] rounded-full text-sm py-2 pl-3 pr-2">
-              Video
-              <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                <PlaySvg />
-              </div>
-            </div>
-          </a>
-        )}
-      </div>
-    )
-  }
-
   const activeDays = days.filter((day) => Date.parse(day.publishedAt) <= Date.now())
 
   if (!activeDays.length) return null
 
   return (
     <div className="flex flex-col gap-3 lg:gap-4 border-t border-scale-400 py-4 lg:py-8 mt-4 lg:mt-8">
-      <h3 className="text-white text-xl mb-4">More Launch Week 7</h3>
+      <h3 className="text-black dark:text-white text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) =>
         day.steps?.map((step) => (
           <motion.div
@@ -75,12 +28,12 @@ const BlogLinks = () => {
               <a
                 className={`
                 flex flex-col flex-1 gap-3 items-start justify-center border rounded-xl h-full relative overflow-hidden
-                p-6 lg:p-10 text-2xl
+                p-6 lg:p-10 text-2xl bg-[#1C1C1C]
                 before:absolute before:w-full before:h-full before:top-52 before:right-0 before:bottom-0 before:left-0
                 before:border-[#1f3536] before:-z-10
               `}
               >
-                <div className="flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                   <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg">
                     {step.title}
                   </div>
@@ -92,13 +45,13 @@ const BlogLinks = () => {
                 /> */}
                 {step.thumb && (
                   <motion.div
-                    className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                    className="absolute inset-0 w-full h-full z-0"
                     variants={hoverVariant}
                   >
                     <Image
                       src={step.thumb}
                       className={`
-                    absolute opacity-90
+                    absolute
                     w-full h-full -z-10 transition-all duration-300
                   `}
                       layout="fill"
@@ -158,10 +111,9 @@ const PlaySvg = () => (
 
 const defaultEase = [0.25, 0.25, 0, 1]
 const hoverVariant = {
-  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: 0.2 },
+  default: { scale: 1, ease: defaultEase, duration: 0.2 },
   hover: {
     scale: 1.05,
-    opacity: 1,
     transition: {
       duration: 0.4,
       ease: defaultEase,
