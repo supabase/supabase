@@ -860,7 +860,6 @@ export const self_hosting = {
       name: 'Functions Server',
       items: [
         { name: 'Reference', url: '/reference/self-hosting-functions/introduction', items: [] },
-        { name: 'Configuration', url: '/guides/self-hosting/functions/config', items: [] },
       ],
     },
   ],
