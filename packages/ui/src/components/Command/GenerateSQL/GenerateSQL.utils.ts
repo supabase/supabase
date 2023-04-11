@@ -82,3 +82,20 @@ ${prompt}
 Postgres SQL query (markdown SQL only):
 `.trim()
 }
+
+/**
+ * Formats a string for use as a title.
+ *
+ * Removes punctuation and capitalizes each word
+ */
+export function formatTitle(value: string) {
+  let words = value.replace(/\.$/, '').replace(/['"]/g, '').split(' ')
+  words = words.map((word) => {
+    // Don't capitalize code
+    if (/[._\(\)]+/.test(word)) {
+      return word
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  })
+  return words.join(' ')
+}

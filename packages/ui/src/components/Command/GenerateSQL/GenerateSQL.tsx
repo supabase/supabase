@@ -83,7 +83,7 @@ const GenerateSQL = () => {
           allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
         )}
       >
-        {messages.map((message) => {
+        {messages.map((message, i) => {
           switch (message.role) {
             case MessageRole.User:
               return (
@@ -147,7 +147,7 @@ const GenerateSQL = () => {
                             {answer}
                           </CodeBlock>
                           {message.status === MessageStatus.Complete && (
-                            <SQLOutputActions answer={answer} />
+                            <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
                           )}
                         </div>
                       )}
@@ -240,7 +240,7 @@ const GenerateSQL = () => {
               </p>
             </div>
             <Toggle
-              disabled={!isOptedInToAI}
+              disabled={!isOptedInToAI || isLoading || isResponding}
               checked={includeSchemaMetadata}
               onChange={() =>
                 setIncludeSchemaMetadata((prev) => {
