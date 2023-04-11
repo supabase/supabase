@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { uuidv4 } from 'lib/helpers'
@@ -36,6 +36,7 @@ const SideBarContent = observer(() => {
   const { data: profile } = useProfileQuery()
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
+  const showCmdkHelper = useFlag('dashboardCmdk')
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -97,7 +98,7 @@ const SideBarContent = observer(() => {
           <div className="my-4 mx-3 space-y-1 px-3">
             <div className="flex items-center">
               <Button
-                className="rounded-r-none px-3"
+                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
                 block
                 icon={<IconPlus />}
                 type="default"
@@ -107,32 +108,34 @@ const SideBarContent = observer(() => {
               >
                 New query
               </Button>
-              <Dropdown
-                align="end"
-                side="bottom"
-                overlay={[
-                  <Dropdown.Item
-                    onClick={() => {
-                      setIsOpen(true)
-                      setPages([COMMAND_ROUTES.GENERATE_SQL])
-                    }}
-                  >
-                    <div className="space-y-1">
-                      <p className="block text-scale-1200">New AI query</p>
-                      <p className="block text-scale-1100">
-                        Generate a SQL query using Supabase AI
-                      </p>
-                    </div>
-                  </Dropdown.Item>,
-                ]}
-              >
-                <Button
-                  disabled={isLoading}
-                  type="default"
-                  className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
-                />
-              </Dropdown>
+              {showCmdkHelper && (
+                <Dropdown
+                  align="end"
+                  side="bottom"
+                  overlay={[
+                    <Dropdown.Item
+                      onClick={() => {
+                        setIsOpen(true)
+                        setPages([COMMAND_ROUTES.GENERATE_SQL])
+                      }}
+                    >
+                      <div className="space-y-1">
+                        <p className="block text-scale-1200">New AI query</p>
+                        <p className="block text-scale-1100">
+                          Generate a SQL query using Supabase AI
+                        </p>
+                      </div>
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    disabled={isLoading}
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                  />
+                </Dropdown>
+              )}
             </div>
             <Input
               size="tiny"
