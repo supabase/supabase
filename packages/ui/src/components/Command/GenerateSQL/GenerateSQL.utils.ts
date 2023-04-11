@@ -58,8 +58,7 @@ export function promptDataReducer(
   return [...current]
 }
 
-export const generatePrompt = (prompt: string, metadata?: any) => {
-  const { definitions } = metadata || {}
+export const generatePrompt = (prompt: string, definitions?: any) => {
   return stripIndent`
 ${
   definitions !== undefined
