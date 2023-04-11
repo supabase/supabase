@@ -286,6 +286,15 @@ const GenerateSQL = () => {
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         <Input
+          inputRef={(inputElement) => {
+            if (inputElement) {
+              // We need to delay the focus until the end of the call stack
+              // due to order of operations
+              setTimeout(() => {
+                inputElement.focus()
+              }, 0)
+            }
+          }}
           className="bg-scale-100 rounded mx-3"
           autoFocus
           placeholder={
