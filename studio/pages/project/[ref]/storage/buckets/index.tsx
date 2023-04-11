@@ -31,7 +31,6 @@ const PageLayout: NextPageWithLayout = ({}) => {
     <div className="storage-container flex flex-grow">
       <ProductEmptyState
         title="Storage"
-        ctaButtonLabel="Create a new bucket"
         infoButtonLabel="About storage"
         infoButtonUrl="https://supabase.com/docs/guides/storage"
       >
