@@ -133,15 +133,13 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">
-                  Supabase AI Hackathon has begun. Join now!
-                </span>
+                <span className="text-white mr-2">Supabase AI Hackathon has begun. Join now!</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
-                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
                   <PencilSvg />
                 </div>
               </ChipLink>
@@ -175,7 +173,7 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">Join the prize draw</span>
+                <span className="text-white mr-2">Join the prize draw</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
@@ -191,13 +189,13 @@ export default function LW7Releases() {
           type="default"
           openBehaviour="multiple"
           size="large"
-          className="text-scale-900 dark:text-white"
+          className="text-white"
           justified={false}
           // bordered={false}
           chevronAlign="right"
           defaultValue={publishedSections}
         >
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -217,7 +215,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:flex-shrink xl:basis-2/3 border rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -229,7 +227,7 @@ export default function LW7Releases() {
                         background: `radial-gradient(90% 130px at 80% 0px, #4635A7, transparent)`,
                       }}
                     />
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
                       <CartTitle>{preRelease.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">Guide</StyledArticleBadge>
                     </div>
@@ -282,7 +280,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-4 sm:px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      basis-1/2 lg:basis-1/3 border border-[#232323] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-4 sm:px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -334,7 +332,7 @@ export default function LW7Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -353,13 +351,13 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border border-[#232323] rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
                       <CartTitle>{day1.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -417,7 +415,7 @@ export default function LW7Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -434,7 +432,7 @@ export default function LW7Releases() {
               <div></div>
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -451,7 +449,7 @@ export default function LW7Releases() {
               <div></div>
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -468,7 +466,7 @@ export default function LW7Releases() {
               <div></div>
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3" id="currentDay">
+          <div className="border-b border-[#232323] pb-3" id="currentDay">
             <Accordion.Item
               header={
                 <AccordionHeader
