@@ -80,7 +80,8 @@ services:
       options:
         syslog-address: "tcp://localhost:${VECTOR_PORT}"
         tag: meta
-  function:
+
+  functions:
     depends_on:
       analytics:
         condition: service_healthy
