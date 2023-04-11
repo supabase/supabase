@@ -71,9 +71,10 @@ To try it yourself:
 2. Clone the [demo repository](https://github.com/supabase/self-hosted-edge-functions-demo) to your machine
 3. Copy your Edge Function into the `./functions` directory in the demo repo.
 4. Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))
-5. [Optional] Edit `./functions/main/index.ts`, adding any other request preprocessing logic (for example, you can enable JWT validation, handle CORS requests)
+5. Optionally edit `./functions/main/index.ts`, adding any other request preprocessing logic (for example, you can enable JWT validation, handle CORS requests)
 6. Run `fly launch` to create a new app to serve your Edge Functions
 7. Access your Edge Function by visiting:
+
    `https://{your-app-name}.fly.dev/{your-function-name}`
 
 View the logs for the Edge Runtime by visiting Fly.io’s Dashboard > Your App > Metrics. You can serve Edge Runtime from multiple regions by running `fly regions add [REGION]`.
@@ -99,12 +100,8 @@ You can write a main module to handle all incoming requests. This would look lik
 
 User Workers are separate JS contexts (V8 isolates) that can run a given Edge Function. They have a restricted API (for example, they don’t get access to the host machine’s environment variables). You can also control the memory and duration a User Worker can run.
 
-- diagram reference
-  ![Screen Shot 2023-04-11 at 10.18.28 am.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e1cca108-b2c2-488a-b9b9-560264c87c26/Screen_Shot_2023-04-11_at_10.18.28_am.png)
-
-![dark mode version](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c6d7d400-cb78-4b06-9718-c706a90fa0db/edge-runtime-diagram--dark.svg)
-
-dark mode version
+![diagram reference](/images/blog/launch-week-7/day-2-edge-runtime/edge-runtime-dark-mode.svg)
+![diagram reference](/images/blog/launch-week-7/day-2-edge-runtime/edge-runtime-light-mode.svg)
 
 Here’s a simple implementation of a Main Worker that receives a request, then creates a User Worker and passes the handling of request to the worker.
 
