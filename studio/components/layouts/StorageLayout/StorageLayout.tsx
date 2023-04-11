@@ -6,15 +6,12 @@ import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
 import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
-import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
-import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   title: string
@@ -33,11 +30,8 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     showCreateBucketModal,
     closeDeleteBucketModal,
     showDeleteBucketModal,
-    closeToggleBucketPublicModal,
-    showToggleBucketPublicModal,
     createBucket,
     deleteBucket,
-    toggleBucketPublic,
     buckets,
   } = storageExplorerStore || {}
 
@@ -119,12 +113,6 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
         bucket={selectedBucketToEdit}
         onSelectCancel={closeDeleteBucketModal}
         onSelectDelete={onSelectDeleteBucket}
-      />
-      <ToggleBucketPublicModal
-        visible={showToggleBucketPublicModal}
-        bucket={selectedBucketToEdit}
-        onSelectCancel={closeToggleBucketPublicModal}
-        onSelectSave={toggleBucketPublic}
       />
     </ProjectLayout>
   )

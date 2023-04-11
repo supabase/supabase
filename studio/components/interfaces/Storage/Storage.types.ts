@@ -1,9 +1,3 @@
-import { PolicyFormField } from 'components/interfaces/Auth/Policies/Policies.types'
-
-export interface StoragePolicyFormField extends PolicyFormField {
-  allowedOperations: string[]
-}
-
 export interface StorageBucket {
   id: string
   name: string
@@ -13,4 +7,10 @@ export interface StorageBucket {
   allowed_mime_types: string[]
   created_at: string
   updated_at: string
+}
+
+export interface BucketUpdatePayload {
+  public?: boolean
+  file_size_limit?: number
+  allowed_mime_types?: string[]
 }

@@ -518,18 +518,18 @@ class StorageExplorerStore {
     return true
   }
 
-  toggleBucketPublic = async (bucket) => {
-    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, { public: !bucket.public })
+  editBucket = async (bucket, payload) => {
+    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, payload)
     if (res.error) {
       this.ui.setNotification({ category: 'error', message: res.error.message })
-      return this.closeToggleBucketPublicModal()
+      return res
     }
 
-    await this.fetchBuckets()
+    this.openBucket({ ...bucket, ...payload })
+    this.fetchBuckets()
     this.clearFilePreviewCache()
-    this.closeToggleBucketPublicModal()
 
-    await this.openBucket({ ...bucket, public: !bucket.public })
+    return res
   }
 
   /* Files CRUD */
@@ -783,7 +783,7 @@ class StorageExplorerStore {
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
 
-    const infoToastId = toast('Please do not close the browser until the delete is completed', {
+    const infoToastId = toast('Please do not close the browser until the move is completed', {
       duration: Infinity,
     })
 

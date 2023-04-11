@@ -2,6 +2,8 @@ import { FC, useEffect, useState } from 'react'
 import { Modal, Alert, Button } from 'ui'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
+// [Joshen TODO] To be deprecated
+
 interface Props {
   visible: boolean
   bucket: any
