@@ -18,9 +18,11 @@ const images = {
     '/images/launchweek/seven/day1/self-hosted-logs-001-7-mobile.svg',
   '01-self-hosted-logs-06': '/images/launchweek/seven/day1/self-hosted-logs-004.png',
   '02-self-hosted-edge-functions-thumb':
+    '/images/launchweek/seven/day2/self-hosted-edge-functions-thumb.png',
+  '02-self-hosted-edge-functions-01':
     '/images/launchweek/seven/day2/self-hosted-edge-functions-001.png',
   '02-self-hosted-edge-functions-02':
-    '/images/launchweek/seven/day2/self-hosted-edge-functions-thumb.png',
+    '/images/launchweek/seven/day2/self-hosted-edge-functions-002.png',
 }
 
 export interface WeekDayProps {
@@ -141,7 +143,7 @@ const days: WeekDayProps[] = [
         thumb: images['02-self-hosted-edge-functions-thumb'],
         bg_layers: [
           {
-            img: images['02-self-hosted-edge-functions-thumb'],
+            img: images['02-self-hosted-edge-functions-01'],
           },
           {
             img: images['02-self-hosted-edge-functions-02'],
