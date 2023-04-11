@@ -1,12 +1,12 @@
 const images = {
   '0-ogImages-01': '/images/launchweek/seven/day0/ai-images/ai-images-01.png',
   '0-ogImages-02': '/images/launchweek/seven/day0/ai-images/ai-image-03.svg',
-  '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.svg',
+  '0-ogImages-03': '/images/launchweek/seven/day0/ai-images/ai-image-04.png',
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
   '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
   '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
   '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
-  '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.png',
+  '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.svg',
   '01-self-hosted-logs-01': '/images/launchweek/seven/day1/self-hosted-logs-base.jpg',
   '01-self-hosted-logs-01-mobile':
     '/images/launchweek/seven/day1/self-hosted-logs-007-mobile-base.jpg',
@@ -17,6 +17,12 @@ const images = {
   '01-self-hosted-logs-04-mobile':
     '/images/launchweek/seven/day1/self-hosted-logs-001-7-mobile.svg',
   '01-self-hosted-logs-06': '/images/launchweek/seven/day1/self-hosted-logs-004.png',
+  '02-self-hosted-edge-functions-thumb':
+    '/images/launchweek/seven/day2/self-hosted-edge-functions-thumb.png',
+  '02-self-hosted-edge-functions-01':
+    '/images/launchweek/seven/day2/self-hosted-edge-functions-001.png',
+  '02-self-hosted-edge-functions-02':
+    '/images/launchweek/seven/day2/self-hosted-edge-functions-002.png',
 }
 
 export interface WeekDayProps {
@@ -89,7 +95,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '10 Apr',
-    publishedAt: '2023-04-09T07:00:00.000-07:00',
+    publishedAt: '2023-04-10T07:00:00.000-07:00',
     description: '',
     d: 1,
     dd: 'Mon',
@@ -121,16 +127,30 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '11 Apr',
-    publishedAt: '2023-04-11T07:00:00.000-07:00',
+    publishedAt: '2023-04-11T00:00:00.000-07:00',
     description: '',
     d: 2,
     dd: 'Tue',
     youtube_id: '',
     blogpost: '',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Self-hosted Deno Edge Functions',
+        blog: '/blog/edge-runtime-self-hosted-deno-functions',
+        thumb: images['02-self-hosted-edge-functions-thumb'],
+        bg_layers: [
+          {
+            img: images['02-self-hosted-edge-functions-01'],
+          },
+          {
+            img: images['02-self-hosted-edge-functions-02'],
+          },
+        ],
+      },
+    ],
   },
   {
     title: '',

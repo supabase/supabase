@@ -37,7 +37,12 @@ export default function TicketBrickWall({ users }: Props) {
         <div className="flex justify-center w-full mx-auto mt-2 lg:mt-4">
           <Link href="/launch-week/tickets">
             <a>
-              <Button type="outline" size="medium" onClick={() => window.scrollTo(0, 0)}>
+              <Button
+                type="outline"
+                size="medium"
+                onClick={() => window.scrollTo(0, 0)}
+                className="text-white"
+              >
                 View all tickets
               </Button>
             </a>

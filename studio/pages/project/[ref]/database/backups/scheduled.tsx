@@ -58,7 +58,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                   recovery that can be performed.{' '}
                   <a
                     className="text-brand-900 transition-colors hover:text-brand-1200"
-                    href="https://supabase.io/docs/guides/database/backups"
+                    href="https://supabase.com/docs/guides/platform/backups"
                   >
                     Learn more
                   </a>
