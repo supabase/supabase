@@ -241,13 +241,9 @@ services:
       PG_META_DB_USER: supabase_admin
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
-  function:
-    container_name: supabase-function
-    image: supabase/edge-runtime:v1.1.7
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
+  functions:
+    container_name: supabase-edge-functions
+    image: supabase/edge-runtime:v1.2.12
     restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}
@@ -256,6 +252,12 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@{POSTGRES_DB}:${POSTGRES_PORT}/${POSTGRES_DB}"
       VERIFY_JWT: false
+    volumes:
+      - ./volumes/functions:/home/deno/functions:Z
+    command:
+      - start
+      - --main-service
+      - /home/deno/functions/main
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
