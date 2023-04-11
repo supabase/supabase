@@ -34,7 +34,7 @@ export interface CommandMenuContextValue {
   MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
 
   // Optional callback to save a generated SQL output
-  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -74,7 +74,7 @@ export interface CommandMenuProviderProps {
   /**
    * Call back when save SQL snippet button is selected
    */
-  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
 }
 
 const CommandMenuProvider = ({
@@ -85,7 +85,7 @@ const CommandMenuProvider = ({
   metadata,
   isOptedInToAI = false,
   MarkdownHandler,
-  onSaveGeneratedSQL,
+  saveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -117,7 +117,7 @@ const CommandMenuProvider = ({
         metadata,
         isOptedInToAI,
         MarkdownHandler,
-        onSaveGeneratedSQL,
+        saveGeneratedSQL,
       }}
     >
       {children}
