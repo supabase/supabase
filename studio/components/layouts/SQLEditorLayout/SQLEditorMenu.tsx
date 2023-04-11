@@ -1,7 +1,17 @@
 import { partition } from 'lodash'
 import { useState, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Menu, Input, IconSearch, IconPlus, IconX } from 'ui'
+import {
+  Button,
+  Menu,
+  Input,
+  IconSearch,
+  IconPlus,
+  IconX,
+  Dropdown,
+  IconChevronDown,
+  useCommandMenu,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -17,6 +27,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useRouter } from 'next/router'
+import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
@@ -24,6 +35,7 @@ const SideBarContent = observer(() => {
   const router = useRouter()
   const { data: profile } = useProfileQuery()
   const [filterString, setFilterString] = useState('')
+  const { setPages, setIsOpen } = useCommandMenu()
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -83,16 +95,44 @@ const SideBarContent = observer(() => {
       <Menu type="pills">
         {IS_PLATFORM && (
           <div className="my-4 mx-3 space-y-1 px-3">
-            <Button
-              block
-              icon={<IconPlus />}
-              type="default"
-              disabled={isLoading}
-              style={{ justifyContent: 'start' }}
-              onClick={() => handleNewQuery()}
-            >
-              New query
-            </Button>
+            <div className="flex items-center">
+              <Button
+                className="rounded-r-none px-3"
+                block
+                icon={<IconPlus />}
+                type="default"
+                disabled={isLoading}
+                style={{ justifyContent: 'start' }}
+                onClick={() => handleNewQuery()}
+              >
+                New query
+              </Button>
+              <Dropdown
+                align="end"
+                side="bottom"
+                overlay={[
+                  <Dropdown.Item
+                    onClick={() => {
+                      setIsOpen(true)
+                      setPages([COMMAND_ROUTES.GENERATE_SQL])
+                    }}
+                  >
+                    <div className="space-y-1">
+                      <p className="block text-scale-1200">New AI query</p>
+                      <p className="block text-scale-1100">
+                        Generate a SQL query using Supabase AI
+                      </p>
+                    </div>
+                  </Dropdown.Item>,
+                ]}
+              >
+                <Button
+                  type="default"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                />
+              </Dropdown>
+            </div>
             <Input
               size="tiny"
               icon={<IconSearch size="tiny" />}
