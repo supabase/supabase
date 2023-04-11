@@ -1,7 +1,5 @@
-import { SSE } from 'sse.js'
 import { format } from 'sql-formatter'
-import type { CreateCompletionResponse } from 'openai'
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   CodeBlock,
@@ -10,6 +8,9 @@ import {
   IconUser,
   Input,
   Toggle,
+  MessageRole,
+  MessageStatus,
+  useAiChat,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
@@ -18,18 +19,16 @@ import { CommandItem } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
-import { getEdgeFunctionUrl, promptDataReducer, generatePrompt } from './GenerateSQL.utils'
+import { generatePrompt } from './GenerateSQL.utils'
 
 const GenerateSQL = () => {
-  const [promptIndex, setPromptIndex] = useState(0)
-  const [_, setAnswer] = useState<string | undefined>('')
-  const [isResponding, setIsResponding] = useState(false)
-  const [hasClippyError, setHasClippyError] = useState(false)
+  // [Joshen] Temp hack to ensure that generatePrompt receives updated value
+  // of includeSchemaMetadata, needs to be fixed
+  const includeSchemaMetadataRef = useRef<any>()
+
   const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
-  const eventSourceRef = useRef<SSE>()
-  const [promptData, dispatchPromptData] = useReducer(promptDataReducer, [])
   const { isLoading, setIsLoading, search, setSearch, isOptedInToAI, metadata, project } =
     useCommandMenu()
 
@@ -37,89 +36,32 @@ const GenerateSQL = () => {
   const allowSendingSchemaMetadata =
     project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
-  const handleConfirm = useCallback(
-    async (query: string) => {
-      const edgeFunctionUrl = getEdgeFunctionUrl()
-
-      if (!edgeFunctionUrl) {
-        return console.error('No edge function url')
-      }
-
-      setAnswer(undefined)
-      setSearch('')
-      dispatchPromptData({ index: promptIndex, answer: undefined, query })
-      setIsResponding(false)
-      setHasClippyError(false)
-      setIsLoading(true)
-
-      const queryToSend = generatePrompt(
-        query,
-        isOptedInToAI && includeSchemaMetadata ? metadata : undefined
+  const { submit, reset, messages, isResponding, hasError } = useAiChat({
+    messageTemplate: (message) => {
+      return generatePrompt(
+        message,
+        isOptedInToAI && includeSchemaMetadataRef.current ? metadata : undefined
       )
-      const eventSource = new SSE(`${edgeFunctionUrl}/clippy-search`, {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        payload: JSON.stringify({ query: queryToSend, context: promptData }),
-      })
-
-      function handleError<T>(err: T) {
-        setIsLoading(false)
-        setIsResponding(false)
-        setHasClippyError(true)
-        console.error(err)
-      }
-
-      eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: any) => {
-        try {
-          setIsLoading(false)
-          if (e.data === '[DONE]') {
-            setIsResponding(false)
-            setAnswer(undefined)
-            setPromptIndex((x) => {
-              return x + 1
-            })
-            return
-          }
-          setIsResponding(true)
-
-          const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
-          const [{ text: content }] = completionResponse.choices
-          const text = content ?? ''
-
-          setAnswer((answer) => {
-            const currentAnswer = answer ?? ''
-            dispatchPromptData({ index: promptIndex, answer: currentAnswer + text })
-            return (answer ?? '') + text
-          })
-        } catch (err) {
-          handleError(err)
-        }
-      })
-
-      eventSource.stream()
-      eventSourceRef.current = eventSource
-      setIsLoading(true)
     },
-    [promptIndex, promptData, includeSchemaMetadata]
+    setIsLoading,
+  })
+
+  const handleSubmit = useCallback(
+    (message: string) => {
+      setSearch('')
+      submit(message)
+    },
+    [submit]
   )
 
-  function handleResetPrompt() {
-    eventSourceRef.current?.close()
-    eventSourceRef.current = undefined
+  const handleReset = useCallback(() => {
     setSearch('')
-    setAnswer(undefined)
-    setIsResponding(false)
-    setHasClippyError(false)
-  }
+    reset()
+  }, [reset])
 
   useEffect(() => {
-    if (search) {
-      handleConfirm(search)
-    }
+    if (search) handleSubmit(search)
+    includeSchemaMetadataRef.current = includeSchemaMetadata
   }, [])
 
   const formatAnswer = (answer: string) => {
@@ -141,71 +83,86 @@ const GenerateSQL = () => {
           allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
         )}
       >
-        {promptData.map((prompt, i) => {
-          if (!prompt.query) return <></>
-
-          const formattedPromptAnwswer = (prompt?.answer ?? '')
-            .replace(/`/g, '')
-            .replace(/sql\n/g, '')
-            .trim()
-          const promptAnswer = isResponding
-            ? formattedPromptAnwswer
-            : formatAnswer(formattedPromptAnwswer)
-
-          const cantHelp = (prompt?.answer ?? '').includes(
-            "Sorry, I don't know how to help with that."
-          )
-
-          return (
-            <>
-              {prompt.query && (
+        {messages.map((message) => {
+          switch (message.role) {
+            case MessageRole.User:
+              return (
                 <div className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
                   <div
                     className="
                       w-7 h-7 bg-scale-200 rounded-full border border-scale-400 flex items-center justify-center text-scale-1000 first-letter:
                       ring-scale-200 ring-1 shadow-sm
-                  "
+                    "
                   >
                     <IconUser strokeWidth={1.5} size={16} />
                   </div>
                   <div className="flex items-center prose text-scale-1100 text-sm">
-                    {prompt.query}
+                    {message.content}
                   </div>
                 </div>
-              )}
+              )
+            case MessageRole.Assistant:
+              const unformattedAnswer = message.content
+                .replace(/```sql/g, '')
+                .replace(/```.*/gs, '')
+                .replace(/-- End of SQL query\.*/g, '')
+                .trim()
 
-              <div className="px-4 [overflow-anchor:none] mb-6">
-                <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                  <div>
-                    <AiIconChat />
+              const answer =
+                message.status === MessageStatus.Complete
+                  ? formatAnswer(unformattedAnswer)
+                  : unformattedAnswer
+              const cantHelp = answer === "Sorry, I don't know how to help with that."
+
+              return (
+                <div className="px-4 [overflow-anchor:none] mb-6">
+                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <div>
+                      <AiIconChat />
+                    </div>
+                    <>
+                      {message.status === MessageStatus.Pending ? (
+                        <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
+                      ) : cantHelp ? (
+                        <div className="p-6 flex flex-col flex-grow items-center gap-6 mt-4">
+                          <IconAlertTriangle
+                            className="text-amber-900"
+                            strokeWidth={1.5}
+                            size={21}
+                          />
+                          <p className="text-lg text-scale-1200 text-center">
+                            Sorry, I don't know how to help with that.
+                          </p>
+                          <Button size="tiny" type="secondary" onClick={handleReset}>
+                            Try again?
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 flex-grow max-w-[93%]">
+                          <CodeBlock
+                            hideCopy
+                            language="sql"
+                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
+                          >
+                            {answer}
+                          </CodeBlock>
+                          {message.status === MessageStatus.Complete && (
+                            <SQLOutputActions answer={answer} />
+                          )}
+                        </div>
+                      )}
+                    </>
                   </div>
-                  <>
-                    {isLoading && promptIndex === i ? (
-                      <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-bounce"></div>
-                    ) : (
-                      <div className="space-y-2 flex-grow max-w-[93%]">
-                        <CodeBlock
-                          hideCopy
-                          language="sql"
-                          className="relative prose dark:prose-dark bg-scale-300 max-w-none"
-                        >
-                          {promptAnswer}
-                        </CodeBlock>
-
-                        {!isResponding && !cantHelp && <SQLOutputActions answer={prompt.answer} />}
-                      </div>
-                    )}
-                  </>
                 </div>
-              </div>
-            </>
-          )
+              )
+          }
         })}
-        {promptData.length === 0 && !hasClippyError && (
+
+        {messages.length === 0 && !hasError && (
           <div>
             <div className="px-10">
               <h3>Example queries</h3>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm mt-1 text-scale-1100">
                 Use these example queries to help get your project started quickly.
               </p>
             </div>
@@ -229,11 +186,13 @@ const GenerateSQL = () => {
               <div className="w-2/3 py-4 px-6">
                 <ul>
                   {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
-                    (query) => (
+                    (query, index) => (
                       <CommandItem
                         type="command"
                         onSelect={() => {
-                          if (!search) handleConfirm(query)
+                          if (!search) {
+                            handleSubmit(query)
+                          }
                         }}
                         forceMount
                         key={query.replace(/\s+/g, '_')}
@@ -253,14 +212,14 @@ const GenerateSQL = () => {
           </div>
         )}
 
-        {hasClippyError && (
+        {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
             <p className="text-lg text-scale-1200 text-center">
               Sorry, looks like Clippy is having a hard time!
             </p>
             <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
           </div>
@@ -268,6 +227,7 @@ const GenerateSQL = () => {
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
+
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         {allowSendingSchemaMetadata && (
           <div className="flex items-center justify-between px-6 py-3">
@@ -282,7 +242,12 @@ const GenerateSQL = () => {
             <Toggle
               disabled={!isOptedInToAI}
               checked={includeSchemaMetadata}
-              onChange={() => setIncludeSchemaMetadata((prev) => !prev)}
+              onChange={() =>
+                setIncludeSchemaMetadata((prev) => {
+                  includeSchemaMetadataRef.current = !prev
+                  return !prev
+                })
+              }
             />
           </div>
         )}
@@ -320,7 +285,7 @@ const GenerateSQL = () => {
             switch (e.key) {
               case 'Enter':
                 if (!search || isLoading || isResponding) return
-                return handleConfirm(search)
+                return handleSubmit(search)
               default:
                 return
             }

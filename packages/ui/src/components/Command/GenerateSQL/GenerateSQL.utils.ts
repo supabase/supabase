@@ -1,3 +1,5 @@
+import { stripIndent } from 'common-tags'
+
 export function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
@@ -56,9 +58,9 @@ export function promptDataReducer(
   return [...current]
 }
 
-export const generatePrompt = (query: string, metadata?: any) => {
+export const generatePrompt = (prompt: string, metadata?: any) => {
   const { definitions } = metadata || {}
-  return `
+  return stripIndent`
 ${
   definitions !== undefined
     ? `
@@ -68,11 +70,15 @@ ${definitions}
     : ''
 }
 
-Generate a Postgres SQL query based on the following natural language prompt. For primary keys, always use "integer primary key generated always as identity". All Postgres SQL commands should be written in lowercase letters.
+Generate a Postgres SQL query based on the following natural language prompt.
+- Only output valid SQL - all explanations must be SQL comments
+- SQL comments should be short
+- Your very last output should be "\`\`\`"
+- For primary keys, always use "integer primary key generated always as identity"
 
-Prompt:
-${query}
+Natural language prompt:
+${prompt}
   
-Postgres SQL query:
+Postgres SQL query (markdown SQL only):
 `.trim()
 }
