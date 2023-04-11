@@ -104,7 +104,7 @@ const GenerateSQL = () => {
       eventSourceRef.current = eventSource
       setIsLoading(true)
     },
-    [promptIndex, promptData]
+    [promptIndex, promptData, includeSchemaMetadata]
   )
 
   function handleResetPrompt() {
