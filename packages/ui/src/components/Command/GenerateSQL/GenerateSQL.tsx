@@ -165,9 +165,12 @@ const GenerateSQL = () => {
         {messages.length === 0 && !hasError && (
           <div>
             <div className="px-10">
-              <h3>Example queries</h3>
+              <h3>
+                Describe what you need and Supabase AI will try to generate the relevant SQL
+                statements
+              </h3>
               <p className="text-sm mt-1 text-scale-1100">
-                Use these example queries to help get your project started quickly.
+                Here are some example prompts to try out.
               </p>
             </div>
             <div className="flex mt-4 border-t pt-2">
