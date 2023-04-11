@@ -1,6 +1,6 @@
 import remarkGfm from 'remark-gfm'
 import ReactMarkdown from 'react-markdown'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 import { useParams } from 'common'
 import { CommandMenuProvider } from 'ui'
 import { observer } from 'mobx-react-lite'
@@ -43,10 +43,13 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
     },
     { enabled: isOptedInToAI }
   )
-  const cmdkMetadata = {
-    definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n'),
-    flags: { allowCMDKDataOptIn },
-  }
+
+  const cmdkMetadata = useMemo(() => {
+    return {
+      definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n'),
+      flags: { allowCMDKDataOptIn },
+    }
+  }, [data, allowCMDKDataOptIn])
 
   const onSaveGeneratedSQL = async (answer: string, resolve: any) => {
     if (!ref) return console.error('Project ref is required')

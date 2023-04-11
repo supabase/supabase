@@ -282,7 +282,7 @@ const GenerateSQL = () => {
             <Toggle
               disabled={!isOptedInToAI}
               checked={includeSchemaMetadata}
-              onChange={() => setIncludeSchemaMetadata(!includeSchemaMetadata)}
+              onChange={() => setIncludeSchemaMetadata((prev) => !prev)}
             />
           </div>
         )}
