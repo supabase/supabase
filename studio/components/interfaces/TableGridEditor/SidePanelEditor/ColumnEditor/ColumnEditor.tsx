@@ -341,7 +341,7 @@ const ColumnEditor = ({
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"
-            placeholder={`length(${columnFields?.name || 'column_name'}) < 500`}
+            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
             type="text"
             value={columnFields?.check ?? ''}
             onChange={(event: any) => onUpdateField({ check: event.target.value })}
