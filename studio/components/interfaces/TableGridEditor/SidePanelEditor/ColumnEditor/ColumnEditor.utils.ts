@@ -73,7 +73,7 @@ export const generateColumnFieldFromPostgresColumn = (
     comment: column?.comment ?? '',
     format: isArray ? column.format.slice(1) : column.format,
     defaultValue: column?.default_value as string | null,
-    check: null,
+    check: column.check,
     isArray: isArray,
     isNullable: column.is_nullable,
     isIdentity: column.is_identity,
@@ -97,7 +97,7 @@ export const generateCreateColumnPayload = (
     name: field.name,
     comment: field.comment,
     type: field.isArray ? `${field.format}[]` : field.format,
-    check: field.check ?? undefined,
+    check: field.check?.trim() || undefined,
     isUnique: field.isUnique,
     isPrimaryKey: field.isPrimaryKey,
     ...(!field.isPrimaryKey && !isIdentity && { isNullable: field.isNullable }),
@@ -137,6 +137,10 @@ export const generateUpdateColumnPayload = (
   if (!isEqual(originalColumn.comment, comment)) {
     payload.comment = comment
   }
+  if (!isEqual(originalColumn.check?.trim(), field.check?.trim())) {
+    payload.check = field.check?.trim() || null
+  }
+
   if (!isEqual(originalColumn.format, type)) {
     payload.type = type
   }

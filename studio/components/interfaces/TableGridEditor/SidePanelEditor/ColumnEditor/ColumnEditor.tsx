@@ -345,6 +345,7 @@ const ColumnEditor = ({
             type="text"
             value={columnFields?.check ?? ''}
             onChange={(event: any) => onUpdateField({ check: event.target.value })}
+            className="[&_input]:font-mono"
           />
         </FormSectionContent>
       </FormSection>
