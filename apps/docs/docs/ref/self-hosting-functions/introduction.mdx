@@ -50,14 +50,14 @@ We have put together a demo on how to self-host edge functions on [Fly.io](http:
 
 To try it yourself,
 
-- Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://fly.io/docs/hands-on/install-flyctl/)
-- Clone the demo repository to your machine - https://github.com/supabase/self-hosted-edge-functions-demo
-- Copy your Edge Function into the `./functions` directory in the demo repo.
-- Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))
-- [Optional] Edit `./functions/main/index.ts`, adding any other request preprocessing logic (for example, you can enable JWT validation, handle CORS requests)
-- Run `fly launch` to create a new app to serve your Edge Functions
-- Access your Edge Function by visiting:
-  `https://{your-app-name}.fly.dev/{your-function-name}`
+1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://fly.io/docs/hands-on/install-flyctl/)
+2. Clone the demo repository to your machine - https://github.com/supabase/self-hosted-edge-functions-demo
+3. Copy your Edge Function into the `./functions` directory in the demo repo.
+4. Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))
+5. [Optional] Edit `./functions/main/index.ts`, adding any other request preprocessing logic (for example, you can enable JWT validation, handle CORS requests)
+6. Run `fly launch` to create a new app to serve your Edge Functions
+7. Access your Edge Function by visiting:
+   `https://{your-app-name}.fly.dev/{your-function-name}`
 
 You can view the logs for the Edge Runtime, by visiting Fly.io’s Dashboard > Your App > Metrics. Also, you can serve edge-runtime from multiple regions by running `fly regions add [REGION]`.
 
