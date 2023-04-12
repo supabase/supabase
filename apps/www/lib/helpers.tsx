@@ -29,3 +29,5 @@ export const toPixels = (value: string | number) => {
 
   return value
 }
+
+export const isBrowser = typeof window !== 'undefined'
