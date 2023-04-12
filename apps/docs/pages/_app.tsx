@@ -63,10 +63,10 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     /**
      * Send page telemetry on first page load
      */
-    if (router.route) {
+    if (router.isReady) {
       handlePageTelemetry(router.route)
     }
-  }, [])
+  }, [router.isReady])
 
   const SITE_TITLE = 'Supabase Documentation'
 
