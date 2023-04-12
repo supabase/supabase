@@ -411,7 +411,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 81,
+                  "line": 85,
                   "character": 8
                 }
               ],
@@ -465,21 +465,30 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the allowed mime types that this bucket can accept during upload"
+                                "shortText": "specifies the allowed mime types that this bucket can accept during upload.\nThe default value is null, which allows files with all mime types to be uploaded.\nEach mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 65
+                                  "line": 90,
+                                  "character": 6
                                 }
                               ],
                               "type": {
-                                "type": "array",
-                                "elementType": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
                               }
                             },
                             {
@@ -491,18 +500,22 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the file size limit that this bucket can accept during upload"
+                                "shortText": "specifies the max file size in bytes that can be uploaded to this bucket.\nThe global file size limit takes precedence over this value.\nThe default value is null, which doesn't set a per bucket file size limit."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 32
+                                  "line": 89,
+                                  "character": 6
                                 }
                               ],
                               "type": {
                                 "type": "union",
                                 "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
                                   {
                                     "type": "intrinsic",
                                     "name": "string"
@@ -526,8 +539,8 @@
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 15
+                                  "line": 88,
+                                  "character": 6
                                 }
                               ],
                               "type": {
@@ -572,7 +585,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 88,
+                                      "line": 96,
                                       "character": 8
                                     }
                                   ],
@@ -603,7 +616,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 89,
+                                      "line": 97,
                                       "character": 8
                                     }
                                   ],
@@ -640,7 +653,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 92,
+                                      "line": 100,
                                       "character": 8
                                     }
                                   ],
@@ -658,7 +671,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 93,
+                                      "line": 101,
                                       "character": 8
                                     }
                                   ],
@@ -707,7 +720,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 203,
+                  "line": 219,
                   "character": 8
                 }
               ],
@@ -761,7 +774,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 207,
+                                      "line": 223,
                                       "character": 8
                                     }
                                   ],
@@ -783,7 +796,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 207,
+                                              "line": 223,
                                               "character": 16
                                             }
                                           ],
@@ -812,7 +825,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 208,
+                                      "line": 224,
                                       "character": 8
                                     }
                                   ],
@@ -849,7 +862,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 211,
+                                      "line": 227,
                                       "character": 8
                                     }
                                   ],
@@ -867,7 +880,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 212,
+                                      "line": 228,
                                       "character": 8
                                     }
                                   ],
@@ -916,7 +929,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 168,
+                  "line": 184,
                   "character": 8
                 }
               ],
@@ -970,7 +983,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 172,
+                                      "line": 188,
                                       "character": 8
                                     }
                                   ],
@@ -992,7 +1005,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 172,
+                                              "line": 188,
                                               "character": 16
                                             }
                                           ],
@@ -1021,7 +1034,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 173,
+                                      "line": 189,
                                       "character": 8
                                     }
                                   ],
@@ -1058,7 +1071,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 176,
+                                      "line": 192,
                                       "character": 8
                                     }
                                   ],
@@ -1076,7 +1089,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 177,
+                                      "line": 193,
                                       "character": 8
                                     }
                                   ],
@@ -1513,7 +1526,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 127,
+                  "line": 139,
                   "character": 8
                 }
               ],
@@ -1566,21 +1579,30 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the allowed mime types that this bucket can accept during upload\n"
+                                "shortText": "specifies the allowed mime types that this bucket can accept during upload.\nThe default value is null, which allows files with all mime types to be uploaded.\nEach mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.\n"
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 65
+                                  "line": 144,
+                                  "character": 6
                                 }
                               ],
                               "type": {
-                                "type": "array",
-                                "elementType": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
                               }
                             },
                             {
@@ -1592,18 +1614,22 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the file size limit that this bucket can accept during upload"
+                                "shortText": "specifies the max file size in bytes that can be uploaded to this bucket.\nThe global file size limit takes precedence over this value.\nThe default value is null, which doesn't set a per bucket file size limit."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 32
+                                  "line": 143,
+                                  "character": 6
                                 }
                               ],
                               "type": {
                                 "type": "union",
                                 "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
                                   {
                                     "type": "intrinsic",
                                     "name": "string"
@@ -1627,8 +1653,8 @@
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 15
+                                  "line": 142,
+                                  "character": 6
                                 }
                               ],
                               "type": {
@@ -1672,7 +1698,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 132,
+                                      "line": 148,
                                       "character": 8
                                     }
                                   ],
@@ -1694,7 +1720,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 132,
+                                              "line": 148,
                                               "character": 16
                                             }
                                           ],
@@ -1723,7 +1749,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 133,
+                                      "line": 149,
                                       "character": 8
                                     }
                                   ],
@@ -1760,7 +1786,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 136,
+                                      "line": 152,
                                       "character": 8
                                     }
                                   ],
@@ -1778,7 +1804,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 137,
+                                      "line": 153,
                                       "character": 8
                                     }
                                   ],
@@ -3209,7 +3235,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 81,
+                  "line": 85,
                   "character": 8
                 }
               ],
@@ -3263,21 +3289,30 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the allowed mime types that this bucket can accept during upload"
+                                "shortText": "specifies the allowed mime types that this bucket can accept during upload.\nThe default value is null, which allows files with all mime types to be uploaded.\nEach mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 65
+                                  "line": 90,
+                                  "character": 6
                                 }
                               ],
                               "type": {
-                                "type": "array",
-                                "elementType": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
                               }
                             },
                             {
@@ -3289,18 +3324,22 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the file size limit that this bucket can accept during upload"
+                                "shortText": "specifies the max file size in bytes that can be uploaded to this bucket.\nThe global file size limit takes precedence over this value.\nThe default value is null, which doesn't set a per bucket file size limit."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 32
+                                  "line": 89,
+                                  "character": 6
                                 }
                               ],
                               "type": {
                                 "type": "union",
                                 "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
                                   {
                                     "type": "intrinsic",
                                     "name": "string"
@@ -3324,8 +3363,8 @@
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 83,
-                                  "character": 15
+                                  "line": 88,
+                                  "character": 6
                                 }
                               ],
                               "type": {
@@ -3370,7 +3409,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 88,
+                                      "line": 96,
                                       "character": 8
                                     }
                                   ],
@@ -3401,7 +3440,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 89,
+                                      "line": 97,
                                       "character": 8
                                     }
                                   ],
@@ -3438,7 +3477,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 92,
+                                      "line": 100,
                                       "character": 8
                                     }
                                   ],
@@ -3456,7 +3495,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 93,
+                                      "line": 101,
                                       "character": 8
                                     }
                                   ],
@@ -3495,7 +3534,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 203,
+                  "line": 219,
                   "character": 8
                 }
               ],
@@ -3549,7 +3588,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 207,
+                                      "line": 223,
                                       "character": 8
                                     }
                                   ],
@@ -3571,7 +3610,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 207,
+                                              "line": 223,
                                               "character": 16
                                             }
                                           ],
@@ -3600,7 +3639,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 208,
+                                      "line": 224,
                                       "character": 8
                                     }
                                   ],
@@ -3637,7 +3676,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 211,
+                                      "line": 227,
                                       "character": 8
                                     }
                                   ],
@@ -3655,7 +3694,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 212,
+                                      "line": 228,
                                       "character": 8
                                     }
                                   ],
@@ -3694,7 +3733,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 168,
+                  "line": 184,
                   "character": 8
                 }
               ],
@@ -3748,7 +3787,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 172,
+                                      "line": 188,
                                       "character": 8
                                     }
                                   ],
@@ -3770,7 +3809,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 172,
+                                              "line": 188,
                                               "character": 16
                                             }
                                           ],
@@ -3799,7 +3838,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 173,
+                                      "line": 189,
                                       "character": 8
                                     }
                                   ],
@@ -3836,7 +3875,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 176,
+                                      "line": 192,
                                       "character": 8
                                     }
                                   ],
@@ -3854,7 +3893,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 177,
+                                      "line": 193,
                                       "character": 8
                                     }
                                   ],
@@ -4214,7 +4253,7 @@
               "sources": [
                 {
                   "fileName": "src/packages/StorageBucketApi.ts",
-                  "line": 127,
+                  "line": 139,
                   "character": 8
                 }
               ],
@@ -4267,21 +4306,30 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the allowed mime types that this bucket can accept during upload\n"
+                                "shortText": "specifies the allowed mime types that this bucket can accept during upload.\nThe default value is null, which allows files with all mime types to be uploaded.\nEach mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.\n"
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 65
+                                  "line": 144,
+                                  "character": 6
                                 }
                               ],
                               "type": {
-                                "type": "array",
-                                "elementType": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
+                                "type": "union",
+                                "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
+                                  {
+                                    "type": "array",
+                                    "elementType": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
                               }
                             },
                             {
@@ -4293,18 +4341,22 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "specifies the file size limit that this bucket can accept during upload"
+                                "shortText": "specifies the max file size in bytes that can be uploaded to this bucket.\nThe global file size limit takes precedence over this value.\nThe default value is null, which doesn't set a per bucket file size limit."
                               },
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 32
+                                  "line": 143,
+                                  "character": 6
                                 }
                               ],
                               "type": {
                                 "type": "union",
                                 "types": [
+                                  {
+                                    "type": "literal",
+                                    "value": null
+                                  },
                                   {
                                     "type": "intrinsic",
                                     "name": "string"
@@ -4328,8 +4380,8 @@
                               "sources": [
                                 {
                                   "fileName": "src/packages/StorageBucketApi.ts",
-                                  "line": 129,
-                                  "character": 15
+                                  "line": 142,
+                                  "character": 6
                                 }
                               ],
                               "type": {
@@ -4373,7 +4425,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 132,
+                                      "line": 148,
                                       "character": 8
                                     }
                                   ],
@@ -4395,7 +4447,7 @@
                                           "sources": [
                                             {
                                               "fileName": "src/packages/StorageBucketApi.ts",
-                                              "line": 132,
+                                              "line": 148,
                                               "character": 16
                                             }
                                           ],
@@ -4424,7 +4476,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 133,
+                                      "line": 149,
                                       "character": 8
                                     }
                                   ],
@@ -4461,7 +4513,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 136,
+                                      "line": 152,
                                       "character": 8
                                     }
                                   ],
@@ -4479,7 +4531,7 @@
                                   "sources": [
                                     {
                                       "fileName": "src/packages/StorageBucketApi.ts",
-                                      "line": 137,
+                                      "line": 153,
                                       "character": 8
                                     }
                                   ],
