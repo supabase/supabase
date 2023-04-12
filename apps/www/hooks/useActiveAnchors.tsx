@@ -1,10 +1,13 @@
+import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
+import { isBrowser, stripEmojis } from '~/lib/helpers'
 
 const useActiveAnchors = (
   anchorsQuerySelector: string = 'h2',
   tocQuerySelector: string = '.prose-toc a',
   offset: number = 200
 ) => {
+  const router = useRouter()
   const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
   const toc = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
 
@@ -20,10 +23,12 @@ const useActiveAnchors = (
 
     toc.current?.forEach((link) => {
       link.classList.remove('toc-animate')
-      // TODO: escape emojis
-      // The problem is that MDXRemote strips out emojis on slugs
-      // but ReactMarkdown doesn't,instead it encodes them
-      const sanitizedHref = (link.getAttribute('href') ?? '').replace('#', '')
+
+      // Need to decodeURI the href to get emojis, then strip them off and remove "--""
+      // to make toc hrefs and content headings ids match
+      const sanitizedHref = stripEmojis(
+        decodeURI(link.getAttribute('href') ?? '').replace('#', '')
+      ).replace('--', '-')
       const isMatch = sanitizedHref === newActiveAnchor
 
       if (isMatch) {
@@ -33,6 +38,7 @@ const useActiveAnchors = (
   }
 
   useEffect(() => {
+    if (!isBrowser) return
     anchors.current = document.querySelectorAll(anchorsQuerySelector)
     toc.current = document.querySelectorAll(tocQuerySelector)
 

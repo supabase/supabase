@@ -85,8 +85,7 @@ h6:not(.overwrite) {
 }
 
 .toc-animate {
-  transform: translate3d(3px, 0, 0) !important;
-  color: hsla(153, 60%, 53%, 1) !important;
+  @apply !translate-x-1 !text-brand-900;
 }
 
 .prose-toc a {
