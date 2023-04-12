@@ -35,9 +35,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     /**
      * Send page telemetry on first page load
-     * if the route is not ready. Don't need to send it will be picked up by router.event above
      */
-    if (router.isReady) {
+    if (router.route) {
       handlePageTelemetry(router.route)
     }
   }, [])
