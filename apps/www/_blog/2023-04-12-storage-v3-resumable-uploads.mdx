@@ -5,10 +5,10 @@ tags:
   - launch-week
   - storage
 date: '2023-04-12'
-to_depth: 3
+toc_depth: 3
 author: fabrizio,inian
-image: launch-week-7/day-3-storage-resumable-uploads/storage-v3.jpg
-thumb: launch-week-7/day-3-storage-resumable-uploads/thumb-day3.jpg
+image: launch-week-7/day-3-storage-resumable-uploads/storage-v3-og.jpg
+thumb: launch-week-7/day-3-storage-resumable-uploads/storage-v3-thumb.jpg
 ---
 
 Supabase Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads , Quality Filters, Next.js support, and WebP support.
@@ -47,7 +47,7 @@ Storage v3 introduces a number of new features.
 
 We introduced image resizing last Launch Week. This time, we’ve added the ability to specify `quality` and `format` filters when downloading your image. When you request images via the transform endpoint, by default we render it as Webp, if the client supports it.
 
-```jsx
+```js
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
@@ -62,7 +62,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/image-transformations#nextjs-loader) on how to get started.
 
-```jsx
+```js
 // supabase-image-loader.js
 const projectId = '<SUPABASE_PROJECT_ID>'
 export default function supabaseLoader({ src, width, quality }) {
@@ -126,10 +126,10 @@ TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integ
 Using Uppy with Supabase Storage looks like this:
 
 ```jsx
-import { Uppy, Dashboard, Tus } from '<https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs>'
+import { Uppy, Dashboard, Tus } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
 const token = 'anon-key'
-const projectId = 'auafxsswdyhumisptuxe'
+const projectId = 'your-project-ref'
 const bucketName = 'avatars'
 const folderName = 'foldername'
 const supabaseUploadURL = `https://${projectId}.supabase.co/storage/v1/upload/resumable`
@@ -201,7 +201,7 @@ Option 1 would have affected the even distribution of requests across servers. W
 
 Postgres advisory locks offer a way for defining locking behaviour of resources _outside_ of the database. These are called _advisory_ locks because Postgres does not enforce their use - it is up to the application to acquire and release the locks when accessing the shared resource. In our case, the shared resource is an object in S3. Advisory locks can be used to mediate concurrent operations to the same object.
 
-```jsx
+```js
 
 const key = `/bucket-name/folder/bunny.jpg`
 const hashedKey = hash(key)
@@ -214,10 +214,12 @@ await db.withTransaction(() => {
 	// the current server can upload to s3 at the given key
 	await uploadObject();
 
-  // storage.objects stores the object metadata of all objects
-	// It doubles up as a way to check Authz.
-  // If a user is able to insert into this table, they can upload.
-	await db.run('insert into storage.objects(..) values(..)')
+   if (isLastChunk) {
+    // storage.objects stores the object metadata of all objects
+    // It doubles up as a way to enforce authorization.
+    // If a user is able to insert into this table, they can upload.
+    await db.run('insert into storage.objects(..) values(..)')
+   }
 });
 
 // the advisory lock is automatically released at this point
