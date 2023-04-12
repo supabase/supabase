@@ -4,7 +4,8 @@ import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -73,6 +74,8 @@ const TableEditorLayout = ({
       if (entity?.type) {
         switch (entity.type) {
           case ENTITY_TYPE.MATERIALIZED_VIEW:
+            return meta.materializedViews.loadById(entity.id)
+
           case ENTITY_TYPE.VIEW:
             return meta.views.loadById(entity.id)
 

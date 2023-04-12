@@ -54,6 +54,7 @@ We recommend installing all extensions into an `extensions` schema. This will ke
 since all tables in the `public` schema are exposed via the API.
 
 ```sql
+{/* prettier-ignore */}
 create schema if not exists extensions;
 create extension if not exists "uuid-ossp" with schema extensions;
 create extension if not exists pgcrypto with schema extensions;

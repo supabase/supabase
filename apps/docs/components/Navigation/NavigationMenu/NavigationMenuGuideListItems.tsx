@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
-import * as NavItems from './NavigationMenu.constants'
 import * as Accordion from '@radix-ui/react-accordion'
 
 const HeaderImage = React.memo(function HeaderImage(props: any) {
@@ -21,7 +20,11 @@ const HeaderImage = React.memo(function HeaderImage(props: any) {
   )
 })
 
-const HeaderLink = React.memo(function HeaderLink(props: any) {
+const HeaderLink = React.memo(function HeaderLink(props: {
+  title: string
+  id: string
+  url: string
+}) {
   const router = useRouter()
 
   return (

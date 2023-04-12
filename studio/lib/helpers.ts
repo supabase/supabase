@@ -214,3 +214,19 @@ export const detectBrowser = () => {
     return 'Safari'
   }
 }
+
+export const detectOS = () => {
+  if (typeof navigator === 'undefined' || !navigator) return undefined
+
+  const userAgent = window.navigator.userAgent.toLowerCase()
+  const macosPlatforms = /(macintosh|macintel|macppc|mac68k|macos)/i
+  const windowsPlatforms = /(win32|win64|windows|wince)/i
+
+  if (macosPlatforms.test(userAgent)) {
+    return 'macos'
+  } else if (windowsPlatforms.test(userAgent)) {
+    return 'windows'
+  } else {
+    return undefined
+  }
+}

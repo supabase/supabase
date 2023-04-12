@@ -112,19 +112,23 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
           </Button>
         </Tooltip.Trigger>
         {!disabled && projectUpdateDisabled && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200 w-[260px] flex items-center justify-center',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200 text-center">
-                Subscription changes are currently disabled, our engineers are working on a fix
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200 w-[260px] flex items-center justify-center',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200 text-center">
+                    Subscription changes are currently disabled, our engineers are working on a fix
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Portal>
         )}
       </Tooltip.Root>
     </div>

@@ -45,9 +45,18 @@ const PolicyTableRow: FC<Props> = ({
         <div className="p-4 px-6 space-y-1">
           <p className="text-scale-1100 text-sm">No policies created yet</p>
           {table.rls_enabled ? (
-            <p className="text-scale-1000 text-sm">
-              RLS is enabled - create a policy to allow access to this table.
-            </p>
+            <Alert
+              withIcon
+              variant="info"
+              className="!px-4 !py-3 !mt-3"
+              title="RLS is on. However, policies are required to query data."
+            >
+              <p>
+                You need to write an access policy before you can query data from this table.
+                Without a policy, querying this table will result in an <u>empty array</u> of
+                results.
+              </p>
+            </Alert>
           ) : (
             <Alert
               withIcon

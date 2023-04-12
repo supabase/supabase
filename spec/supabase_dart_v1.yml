@@ -77,11 +77,32 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-      - id: sign-up-with-third-party-providers
-        name: Sign up with third-party providers.
-        hideCodeBlock: true
-        description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
+      - id: sign-up-with-metadata
+        name: Sign up with additional metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            data: {'username': 'my_user_name'},
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-up-with-redirect-url
+        name: Sign up with redirect URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            emailRedirectTo: 'com.supabase.myapp://callback',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
 
   - id: sign-in-with-password
     title: 'signInWithPassword()'
