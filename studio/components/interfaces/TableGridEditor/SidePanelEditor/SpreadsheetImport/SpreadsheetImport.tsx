@@ -47,6 +47,7 @@ const SpreadsheetImport: FC<Props> = ({
     }
   }, [visible])
 
+  const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
   const [uploadedFile, setUploadedFile] = useState<File>()
   const [parseProgress, setParseProgress] = useState<number>(0)
@@ -142,7 +143,7 @@ const SpreadsheetImport: FC<Props> = ({
   }
 
   const onConfirm = (resolve: () => void) => {
-    if (uploadedFile === undefined) {
+    if (tab === 'fileUpload' && uploadedFile === undefined) {
       ui.setNotification({
         category: 'error',
         message: 'Please upload a file to import your data with',
@@ -198,7 +199,7 @@ const SpreadsheetImport: FC<Props> = ({
     >
       <SidePanel.Content>
         <div className="pt-6">
-          <Tabs block type="pills">
+          <Tabs block type="pills" onChange={setTab}>
             <Tabs.Panel id="fileUpload" label="Upload CSV">
               <SpreadSheetFileUpload
                 parseProgress={parseProgress}
