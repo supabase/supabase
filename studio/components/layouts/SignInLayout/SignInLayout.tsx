@@ -111,12 +111,10 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Link href="https://supabase.com/docs">
-                <a target="_blank">
-                  <Button type="default" icon={<IconFileText />}>
-                    Documentation
-                  </Button>
-                </a>
+              <Link href="https://supabase.com/docs" passHref>
+                <Button type="default" icon={<IconFileText />} as="a" target="_blank">
+                  Documentation
+                </Button>
               </Link>
             </div>
           </nav>
