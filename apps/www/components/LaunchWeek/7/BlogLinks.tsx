@@ -34,15 +34,15 @@ const BlogLinks = () => {
               `}
               >
                 <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-                  <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg">
+                  <div
+                    className={[
+                      'text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
+                      step.break_thumb_title && 'max-w-[290px]',
+                    ].join(' ')}
+                  >
                     {step.title}
                   </div>
                 </div>
-                {/* <SectionButtons
-                  // docs={step.docs}
-                  blog={step.blog}
-                  // youtube_id={step.youtube_id}
-                /> */}
                 {step.thumb && (
                   <motion.div
                     className="absolute inset-0 w-full h-full z-0"
@@ -75,45 +75,11 @@ const BlogLinks = () => {
   )
 }
 
-const PencilSvg = () => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M3.21792 11.2469L11.8015 2.66333L14.0953 4.95709L5.51167 13.5407M3.21792 11.2469L2.34219 14.4164L5.51167 13.5407M3.21792 11.2469L5.51167 13.5407"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      strokeLinejoin="bevel"
-    />
-  </svg>
-)
-const DocsSvg = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M4.96289 9.48618H10.9629M4.96289 7.48618H10.9629M4.96289 11.4862H8.96289M3 2.00034V13.9998H12.9996V5.60113L9.38156 2.00034H3ZM12.9644 5.58432L9.38004 2L9.38004 5.58432L12.9644 5.58432Z"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      stroke-linejoin="bevel"
-    />
-  </svg>
-)
-const PlaySvg = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M13.4287 8L8.74762 10.7026L4.06653 13.4053L4.06653 8L4.06653 2.59474L8.74762 5.29737L13.4287 8Z"
-      // stroke="#6453C5"
-      stroke="#A69DC9"
-      strokeMiterlimit="10"
-      strokeLinejoin="bevel"
-    />
-  </svg>
-)
-
-const defaultEase = [0.25, 0.25, 0, 1]
+const defaultEase = [0.5, 0, 0.35, 1]
 const hoverVariant = {
   default: { scale: 1, ease: defaultEase, duration: 0.2 },
   hover: {
-    scale: 1.05,
+    scale: 1.03,
     transition: {
       duration: 0.4,
       ease: defaultEase,
