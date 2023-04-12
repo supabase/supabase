@@ -347,7 +347,8 @@ class StorageExplorerStore {
   setFilePreview = async (file) => {
     const size = file.metadata?.size
     const mimeType = file.metadata?.mimetype
-    if (mimeType && size && this.selectedFilePreview.id !== file.id) {
+
+    if (mimeType && size) {
       // Skip fetching of file preview if file is too big
       if (size > PREVIEW_SIZE_LIMIT) {
         this.selectedFilePreview = { ...file, previewUrl: 'skipped' }
@@ -395,7 +396,7 @@ class StorageExplorerStore {
 
   copyFileURLToClipboard = async (file, expiresIn = 0) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
-    if (filePreview && expiresIn === 0) {
+    if (filePreview !== undefined && expiresIn === 0) {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
         this.ui.setNotification({
@@ -1128,14 +1129,25 @@ class StorageExplorerStore {
 
       if (res.error) {
         this.ui.setNotification({ category: 'error', message: res.error.message })
-      }
-      await this.refetchAllOpenedFolders()
+      } else {
+        this.ui.setNotification({
+          category: 'success',
+          message: `Successfully renamed "${originalName}" to "${newName}"`,
+        })
 
-      // Clear file preview cache if the renamed file exists in the cache
-      const updatedFilePreviewCache = this.filePreviewCache.filter(
-        (fileCache) => fileCache.id !== file.id
-      )
-      this.filePreviewCache = updatedFilePreviewCache
+        // Clear file preview cache if the renamed file exists in the cache
+        const updatedFilePreviewCache = this.filePreviewCache.filter(
+          (fileCache) => fileCache.id !== file.id
+        )
+        this.filePreviewCache = updatedFilePreviewCache
+
+        if (this.selectedFilePreview.name === originalName) {
+          const { previewUrl, ...fileData } = file
+          this.setFilePreview({ ...fileData, name: newName })
+        }
+
+        await this.refetchAllOpenedFolders()
+      }
     }
   }
 
