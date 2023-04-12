@@ -32,7 +32,7 @@ To build this feature, we implemented Postgres Advisory locks which solved some 
 
 Storage v3 introduces a number of new features.
 
-### More **image transformations options**
+### More image transformations options
 
 We introduced image resizing last Launch Week. This time, we’ve added the ability to specify `quality` and `format` filters when downloading your image. When you request images via the transform endpoint, by default we render it as Webp, if the client supports it.
 
@@ -47,7 +47,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 })
 ```
 
-### **Next.js loader**
+### Next.js loader
 
 You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/image-transformations#nextjs-loader) on how to get started.
 
@@ -75,13 +75,13 @@ const MyImage = (props) => {
 }
 ```
 
-### **Presigned upload URLs**
+### Presigned upload URLs
 
 Authenticated users can now generate presigned URLs.
 
 These URLs can then be shared with other users who can then upload to storage without further authorization. For example, you can generate a presigned URL on your server (ahem, Edge Function).
 
-Shoutout to community members **[@abbit](https://github.com/abbit) and** [@MagnusHJensen](https://github.com/MagnusHJensen) who [implemented](https://github.com/supabase/storage-api/pull/282) this feature on the Storage server and [@Rawnly](https://github.com/Rawnly) for the [client library bindings](https://github.com/supabase/storage-js/pull/152) 🎉.
+Shoutout to community members [@abbit](https://github.com/abbit) and [@MagnusHJensen](https://github.com/MagnusHJensen) who [implemented](https://github.com/supabase/storage-api/pull/282) this feature on the Storage server and [@Rawnly](https://github.com/Rawnly) for the [client library bindings](https://github.com/supabase/storage-js/pull/152) 🎉.
 
 ```js
 // create a signed upload url
@@ -115,13 +115,13 @@ For example, you can restrict your users a 1 MB and `image/*` files when uploadi
 
 Let’s get into the nuts-and-bolts of how we implemented Resumable Uploads.
 
-First, why do we need Resumable Uploads, when the HTTP protocol has a standard method for uploading files - **`multipart/form-data`** ? This approach works well for small files, since the file is streamed to the server in bytes over the network. For medium to large files this method becomes problematic, especially on spotty connections like mobile networks. Uploads that are interrupted need to be restarted from the beginning.
+First, why do we need Resumable Uploads, when the HTTP protocol has a standard method for uploading files - `multipart/form-data` ? This approach works well for small files, since the file is streamed to the server in bytes over the network. For medium to large files this method becomes problematic, especially on spotty connections like mobile networks. Uploads that are interrupted need to be restarted from the beginning.
 
 ### TUS - Resumable Protocol
 
-We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented **[TUS](https://tus.io/)** (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with Supabase Storage.
+We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with Supabase Storage.
 
-TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at Supabase, we love **[Uppy.js](https://uppy.io/docs/tus/)**, a multi-file uploader for TUS.
+TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at Supabase, we love [Uppy.js](https://uppy.io/docs/tus/), a multi-file uploader for TUS.
 
 Using Uppy with Supabase Storage looks like this:
 
