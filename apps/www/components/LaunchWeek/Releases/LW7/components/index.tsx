@@ -202,7 +202,7 @@ export const SectionButtons = ({
         </ChipLink>
       )}
       {!!video && (
-        <ChipLink href={video}>
+        <ChipLink href={video} target="_blank">
           Video
           <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <PlaySvg />

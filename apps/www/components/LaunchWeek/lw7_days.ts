@@ -23,6 +23,11 @@ const images = {
     '/images/launchweek/seven/day2/self-hosted-edge-functions-001.png',
   '02-self-hosted-edge-functions-02':
     '/images/launchweek/seven/day2/self-hosted-edge-functions-002.png',
+  '03-storage-thumb': '/images/launchweek/seven/day3/storage-v3-thumb.png',
+  '03-storage-01': '/images/launchweek/seven/day3/storage-01.png',
+  '03-storage-02': '/images/launchweek/seven/day3/storage-02.png',
+  '03-storage-02-mobile': '/images/launchweek/seven/day3/storage-02-mobile.png',
+  '03-storage-03': '/images/launchweek/seven/day3/storage-03.png',
 }
 
 export interface WeekDayProps {
@@ -46,7 +51,7 @@ export interface WeekDayProps {
     isNew?: boolean
     thumb?: string
     url?: string
-    youtube_id?: string
+    video?: string
     bg_layers?: {
       lottie?: any
       img?: string
@@ -107,6 +112,7 @@ const days: WeekDayProps[] = [
         title: 'Open Source Logging',
         blog: '/blog/supabase-logs-self-hosted',
         thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
+        video: 'https://www.youtube.com/watch?v=Ai2BjHV36Ng',
         bg_layers: [
           {
             img: images['01-self-hosted-logs-01'],
@@ -129,11 +135,11 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '11 Apr',
-    publishedAt: '2023-04-11T00:00:00.000-07:00',
+    publishedAt: '2023-04-11T07:00:00.000-07:00',
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: '',
+    youtube_id: 'cPGxPl1lx4Y',
     blogpost: '',
     docs: '',
     steps: [
@@ -141,6 +147,7 @@ const days: WeekDayProps[] = [
         title: 'Self-hosted Deno Edge Functions',
         blog: '/blog/edge-runtime-self-hosted-deno-functions',
         thumb: images['02-self-hosted-edge-functions-thumb'],
+        video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],
@@ -154,16 +161,36 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '12 Apr',
-    publishedAt: '2023-04-12T07:00:00.000-07:00',
+    publishedAt: '2023-04-12T00:00:00.000-07:00',
     description: '',
     d: 3,
     dd: 'Wed',
     youtube_id: '',
     blogpost: '',
-    docs: '',
-    steps: [],
+    docs: '/docs/guides/storage/uploading',
+    steps: [
+      {
+        title: 'Storage v3: Resumable Uploads with support for 50GB files',
+        blog: '/blog/resumable-uploads-with-postgres-advisory-locks',
+        thumb: images['03-storage-thumb'],
+        video: 'https://www.youtube.com/watch?v=pT2PcZFq_M0',
+        docs: '/docs/guides/storage/uploading',
+        bg_layers: [
+          {
+            img: images['03-storage-01'],
+          },
+          {
+            img: images['03-storage-02'],
+            mobileImg: images['03-storage-02-mobile'],
+          },
+          {
+            img: images['03-storage-03'],
+          },
+        ],
+      },
+    ],
   },
   {
     title: '',
