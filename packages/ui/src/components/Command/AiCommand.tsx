@@ -272,6 +272,70 @@ export function useAiChat({
   }
 }
 
+/**
+ * Perform a one-off query to AI based on a snapshot of messages
+ */
+export function queryAi(messages: Message[], timeout = 0) {
+  return new Promise<string>((resolve, reject) => {
+    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify({
+        messages: messages.map(({ role, content }) => ({ role, content })),
+      }),
+    })
+
+    let timeoutId: number | undefined
+
+    function handleError<T>(err: T) {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      console.error(err)
+      reject(err)
+    }
+
+    if (timeout > 0) {
+      timeoutId = window.setTimeout(() => {
+        handleError(new Error('AI query timed out'))
+      }, timeout)
+    }
+
+    let answer = ''
+
+    eventSource.addEventListener('error', handleError)
+    eventSource.addEventListener('message', (e) => {
+      try {
+        if (e.data === '[DONE]') {
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+          }
+          resolve(answer)
+          return
+        }
+
+        const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+        const [
+          {
+            delta: { content },
+          },
+        ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+
+        if (content) {
+          answer += content
+        }
+      } catch (err) {
+        handleError(err)
+      }
+    })
+
+    eventSource.stream()
+  })
+}
+
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
 

@@ -19,6 +19,7 @@ import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -227,7 +228,7 @@ const Nav = () => {
                       <Image
                         src={
                           isLaunchWeekPage
-                            ? supabaseLogoWordmarkDark
+                            ? supabaseLogoWordmarkWhite
                             : isDarkMode
                             ? supabaseLogoWordmarkDark
                             : supabaseLogoWordmarkLight
