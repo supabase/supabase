@@ -37,7 +37,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.route)
+      handlePageTelemetry(router.asPath)
     }
   }, [router.isReady])
 
