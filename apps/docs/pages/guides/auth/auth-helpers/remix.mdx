@@ -493,7 +493,7 @@ useEffect(() => {
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
-    if (session?.access_token !== serverAccessToken) {
+    if (event !== "INITIAL_SESSION" && session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
       // Remix recalls active loaders after actions complete
       fetcher.submit(null, {
