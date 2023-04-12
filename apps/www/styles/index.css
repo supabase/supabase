@@ -92,6 +92,13 @@ h6:not(.overwrite) {
   transition: all 0.07s ease-in-out;
 }
 
+.quote-figure p:first-child {
+  margin-top: 0 !important;
+}
+.quote-figure p:last-child {
+  margin-bottom: 0 !important;
+}
+
 @media only screen and (max-width: 960px) {
   .h1:not(.prose *):not(.overwrite) {
     font-size: 2.2rem !important;
