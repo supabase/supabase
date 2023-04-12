@@ -126,3 +126,7 @@ apps/new-docs/*
 
 packages/ui/styles/tokens
 packages/ui/tokens.json
+
+# Google cloud
+
+gcloud.json

@@ -196,6 +196,9 @@ const uiConfig = ui({
             'a:hover': {
               textDecorationColor: 'var(--colors-brand9)',
             },
+            figcaption: {
+              color: 'var(--colors-scale9)',
+            },
           },
         },
 

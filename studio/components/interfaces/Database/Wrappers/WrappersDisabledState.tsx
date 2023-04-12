@@ -8,10 +8,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
   const { ref } = useParams()
+  const { isDarkMode } = useTheme()
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
@@ -66,7 +68,7 @@ const WrappersDisabledState = () => {
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
-          backgroundImage: ui.isDarkTheme
+          backgroundImage: isDarkMode
             ? `url("${BASE_PATH}/img/wrappers-dark.png")`
             : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}

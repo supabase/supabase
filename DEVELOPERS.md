@@ -28,7 +28,7 @@ You need to install and configure the following dependencies on your machine to 
 
 - [Git](http://git-scm.com/)
 - [Node.js v16.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 7+ or [Yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com/) version 8.x.x or [Yarn](https://yarnpkg.com/)
 
 ## Local development
 

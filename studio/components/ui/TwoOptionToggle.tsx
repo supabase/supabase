@@ -20,7 +20,7 @@ const TwoOptionToggle: FC<Props> = ({
     isActive: boolean
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium
     ${
-      isActive ? 'hover:text-white' : 'hover:text-gray-600'
+      isActive ? 'hover:text-scale-1100 dark:hover:text-white' : 'hover:text-gray-600'
     } dark:hover:text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
     transition ease-in-out duration-150`
 
@@ -33,7 +33,7 @@ const TwoOptionToggle: FC<Props> = ({
         style={{ width, translate: activeOption === options[1] ? '0px' : `${width - 2}px` }}
         aria-hidden="true"
         className={clsx(
-          'z-0 inline-block rounded h-full dark:bg-scale-600 shadow transform',
+          'z-0 inline-block rounded h-full bg-scale-200 dark:bg-scale-600 shadow transform',
           'transition-all ease-in-out border border-scale-700'
         )}
       ></span>
@@ -42,14 +42,21 @@ const TwoOptionToggle: FC<Props> = ({
           key={`toggle_${index}`}
           style={{ width: width + 1 }}
           className={`
-              ${activeOption === option ? 'text-scale-1200' : 'text-scale-1000'} 
-              ${index === 0 ? 'right-0' : 'left-0'} 
+              ${activeOption === option ? 'text-scale-1200' : 'text-scale-1000'}
+              ${index === 0 ? 'right-0' : 'left-0'}
               ${buttonStyle(activeOption === option)}
               cursor-pointer
             `}
           onClick={() => onClickOption(option)}
         >
-          <span className="text-color-inherit capitalize">{option}</span>
+          <span
+            className={clsx(
+              'capitalize hover:text-scale-1200 dark:hover:text-scale-1200',
+              activeOption === option ? 'text-scale-1200' : 'text-scale-1000'
+            )}
+          >
+            {option}
+          </span>
         </span>
       ))}
     </div>
