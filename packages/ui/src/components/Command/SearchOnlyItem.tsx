@@ -1,5 +1,4 @@
 import { useCommandState } from 'cmdk-supabase'
-import React from 'react'
 import { CommandItem } from './Command.utils'
 
 export default function SearchOnlyItem({ children, isSubItem, ...props }: any) {

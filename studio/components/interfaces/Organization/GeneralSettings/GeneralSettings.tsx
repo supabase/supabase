@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Form, Input } from 'ui'
+import { Form, Input, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
@@ -20,9 +20,15 @@ import {
 const GeneralSettings = () => {
   const { app, ui } = useStore()
   const { slug } = useParams()
+  const { name, opt_in_tags } = ui.selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
-  const initialValues = { name: ui.selectedOrganization?.name ?? '' }
+  const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
+  const initialValues = { name: name ?? '', isOptedIntoAi }
+
+  const showCMDK = useFlag('dashboardCmdk')
+  const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
+
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -36,9 +42,12 @@ const GeneralSettings = () => {
 
     setSubmitting(true)
 
+    // [Joshen] Need to update this logic once we support multiple opt in tags
+    const optInTags = values.isOptedIntoAi ? ['AI_SQL_GENERATOR_OPT_IN'] : []
     const response = await patch(`${API_URL}/organizations/${slug}`, {
-      ...values,
+      name: values.name,
       billing_email: ui.selectedOrganization?.billing_email ?? '',
+      ...(allowCMDKDataOptIn && { opt_in_tags: optInTags }),
     })
 
     if (response.error) {
@@ -47,17 +56,9 @@ const GeneralSettings = () => {
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
-      const { name } = response
-      resetForm({
-        values: { name },
-        initialValues: { name },
-      })
-
+      resetForm({ values, initialValues: values })
       app.onOrgUpdated(response)
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully saved settings',
-      })
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     }
     setSubmitting(false)
   }
@@ -69,7 +70,7 @@ const GeneralSettings = () => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
           useEffect(() => {
-            const values = { name: ui.selectedOrganization?.name ?? '' }
+            const values = { name: name ?? '', isOptedIntoAi }
             resetForm({ values, initialValues: values })
           }, [ui.selectedOrganization?.slug])
 
@@ -91,9 +92,27 @@ const GeneralSettings = () => {
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>Organization name</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
-                  <Input id="name" size="small" disabled={!canUpdateOrganization} />
+                  <Input
+                    id="name"
+                    size="small"
+                    label="Organization name"
+                    disabled={!canUpdateOrganization}
+                  />
+
+                  {showCMDK && allowCMDKDataOptIn && (
+                    <div className="mt-4">
+                      <Toggle
+                        id="isOptedIntoAi"
+                        name="isOptedIntoAi"
+                        disabled={!canUpdateOrganization}
+                        size="small"
+                        label="Opt-in to sending anonymous data to OpenAI"
+                        descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
+                      />
+                    </div>
+                  )}
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

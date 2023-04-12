@@ -8,12 +8,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 interface Props {}
 
 const VaultToggle: FC<Props> = () => {
   const { meta, ui } = useStore()
   const { ref } = useParams()
+  const { isDarkMode } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
@@ -64,7 +66,7 @@ const VaultToggle: FC<Props> = () => {
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
-          backgroundImage: ui.isDarkTheme
+          backgroundImage: isDarkMode
             ? `url("${BASE_PATH}/img/vault-dark.png")`
             : `url("${BASE_PATH}/img/vault-light.png")`,
         }}
