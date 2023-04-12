@@ -13,7 +13,7 @@ import type {
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { timeout } from 'lib/helpers'
+import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
@@ -137,6 +137,12 @@ export interface IMetaStore {
     selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) => void
+  insertTableRows: (
+    table: PostgresTable,
+    rows: any,
+    selectedHeaders: string[],
+    onProgressUpdate: (progress: number) => void
+  ) => any
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
@@ -660,6 +666,7 @@ export default class MetaStore implements IMetaStore {
 
       // If the user is importing data via a spreadsheet
       if (!isUndefined(importContent)) {
+        console.log({ importContent })
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
@@ -699,14 +706,21 @@ export default class MetaStore implements IMetaStore {
           }
         } else {
           // Via text copy and paste
-          await this.insertTableRows(table, importContent.rows, (progress: number) => {
-            this.rootStore.ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
-            })
-          })
+          await this.insertTableRows(
+            table,
+            importContent.rows,
+            importContent.selectedHeaders,
+            (progress: number) => {
+              this.rootStore.ui.setNotification({
+                id: toastId,
+                progress,
+                category: 'loading',
+                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                  table.name
+                }`,
+              })
+            }
+          )
 
           // For identity columns, manually raise the sequences
           const identityColumns = columns.filter((column) => column.isIdentity)
@@ -866,7 +880,17 @@ export default class MetaStore implements IMetaStore {
 
           const formattedData = results.data.map((row: any) => {
             const formattedRow: any = {}
-            selectedHeaders.forEach((header) => (formattedRow[header] = row[header]))
+            selectedHeaders.forEach((header) => {
+              const column = table.columns?.find((c) => c.name === header)
+              if (
+                (column?.data_type ?? '') === 'ARRAY' ||
+                (column?.format ?? '').includes('json')
+              ) {
+                formattedRow[header] = tryParseJson(row[header])
+              } else {
+                formattedRow[header] = row[header]
+              }
+            })
             return formattedRow
           })
 
@@ -900,11 +924,26 @@ export default class MetaStore implements IMetaStore {
   async insertTableRows(
     table: PostgresTable,
     rows: any,
+    selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) {
     let insertError = undefined
     let insertProgress = 0
-    const batches = chunk(rows, BATCH_SIZE)
+
+    const formattedRows = rows.map((row: any) => {
+      const formattedRow: any = {}
+      selectedHeaders.forEach((header) => {
+        const column = table.columns?.find((c) => c.name === header)
+        if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
+          formattedRow[header] = tryParseJson(row[header])
+        } else {
+          formattedRow[header] = row[header]
+        }
+      })
+      return formattedRow
+    })
+
+    const batches = chunk(formattedRows, BATCH_SIZE)
     const promises = batches.map((batch: any) => {
       return () => {
         return Promise.race([
@@ -928,11 +967,10 @@ export default class MetaStore implements IMetaStore {
     for (const batchedPromise of batchedPromises) {
       const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
       const hasFailedBatch = find(res, { status: 'rejected' })
-      if (hasFailedBatch) {
-        break
-      }
+      if (hasFailedBatch) break
       onProgressUpdate(insertProgress * 100)
     }
+    return { error: insertError }
   }
 
   setProjectDetails({ ref, connectionString }: { ref: string; connectionString?: string }) {

@@ -70,9 +70,27 @@ h6 { */
   @apply text-xl;
 }
 
+h1:not(.overwrite),
+h2:not(.overwrite),
+h3:not(.overwrite),
+h4:not(.overwrite),
+h5:not(.overwrite),
+h6:not(.overwrite) {
+  scroll-margin-top: 90px;
+}
+
 .h1:not(.prose *):not(.overwrite),
 .h2:not(.prose *):not(.overwrite) {
   line-height: 1.2 !important;
+}
+
+.toc-animate {
+  transform: translate3d(3px, 0, 0) !important;
+  color: hsla(153, 60%, 53%, 1) !important;
+}
+
+.prose-toc a {
+  transition: all 0.07s ease-in-out;
 }
 
 @media only screen and (max-width: 960px) {

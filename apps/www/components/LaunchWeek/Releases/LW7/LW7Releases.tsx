@@ -30,6 +30,26 @@ const opacityVariant = {
     },
   },
 }
+const opacityVariant2 = {
+  default: { opacity: 0, ease: defaultEase, duration: 0.2 },
+  hover: {
+    opacity: 0.2,
+    transition: {
+      duration: 0.4,
+      ease: defaultEase,
+    },
+  },
+}
+const opacityVariant3 = {
+  default: { opacity: 0, ease: defaultEase, duration: 0.2 },
+  hover: {
+    opacity: 1,
+    transition: {
+      duration: 0.4,
+      ease: defaultEase,
+    },
+  },
+}
 const scaleOpacityVariant = {
   default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: 0.2 },
   hover: {
@@ -46,6 +66,46 @@ const aiImageMobileVariant = {
   hover: {
     scale: 0.9,
   },
+}
+const moveX10 = {
+  default: { x: 0, ease: defaultEase, duration: 0.2 },
+  hover: {
+    x: 10,
+    transition: {
+      duration: 0.4,
+      ease: defaultEase,
+    },
+  },
+}
+
+const getDay1Motion = (index: number) => {
+  switch (index) {
+    case 1:
+    case 2:
+      return moveX10
+    case 3:
+      return opacityVariant2
+    default:
+      return undefined
+  }
+}
+const getDay2Motion = (index: number) => {
+  switch (index) {
+    case 1:
+      return opacityVariant3
+    default:
+      return undefined
+  }
+}
+const getDay3Motion = (index: number) => {
+  switch (index) {
+    case 1:
+      return scaleOpacityVariant
+    case 2:
+      return opacityVariant3
+    default:
+      return undefined
+  }
 }
 
 export default function LW7Releases() {
@@ -72,7 +132,7 @@ export default function LW7Releases() {
 
   return (
     <>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
           <SmallCard
             bgGradient
@@ -101,15 +161,13 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">
-                  Supabase AI Hackathon is on. Join now!
-                </span>
+                <span className="text-white mr-2">Supabase AI Hackathon has begun. Join now!</span>
               </div>
             </div>
-            <div className="flex gap-2 z-10">
+            <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
-                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
                   <PencilSvg />
                 </div>
               </ChipLink>
@@ -143,32 +201,29 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-black dark:text-white mr-2">Join the prize draw</span>
+                <span className="text-white mr-2">Join the prize draw</span>
               </div>
             </div>
-            <div className="flex gap-2 z-10">
-              <ChipLink href="#lw-7-prizes">
-                Learn more
-                <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
-                  <PencilSvg />
-                </div>
+            <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
+              <ChipLink href="#lw-7-prizes" className="pr-3 !justify-center">
+                More info
               </ChipLink>
             </div>
           </SmallCard>
         </div>
       </SectionContainer>
-      <SectionContainer className="!pt-0">
+      <SectionContainer className="!pt-0 !w-full !px-0 !max-w-none">
         <Accordion
           type="default"
           openBehaviour="multiple"
           size="large"
-          className="text-scale-900 dark:text-white"
+          className="text-white"
           justified={false}
           // bordered={false}
           chevronAlign="right"
           defaultValue={publishedSections}
         >
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -188,7 +243,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:basis-2/3 border rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -200,9 +255,9 @@ export default function LW7Releases() {
                         background: `radial-gradient(90% 130px at 80% 0px, #4635A7, transparent)`,
                       }}
                     />
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
                       <CartTitle>{preRelease.steps[0].title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-4">Guide</StyledArticleBadge>
+                      <StyledArticleBadge className="lg:ml-2">Guide</StyledArticleBadge>
                     </div>
                     <SectionButtons
                       docs={preRelease.steps[0].docs}
@@ -253,7 +308,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border rounded-xl h-full bg-no-repeat py-14 lg:px-10 text-2xl bg-contain shadow-lg
+                      basis-1/2 lg:basis-1/3 border border-[#232323] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -305,7 +360,7 @@ export default function LW7Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -319,10 +374,81 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day1.d.toString()}
             >
-              <div></div>
+              {day1.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border border-[#232323] rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
+                      <CartTitle>{day1.steps[0].title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day1.steps[0].docs}
+                      blog={day1.steps[0].blog}
+                      video={day1.steps[0].video}
+                      hackernews={day1.steps[0].hackernews}
+                    />
+                    {day1.steps[0].bg_layers &&
+                      day1.steps[0].bg_layers?.map((layer, i) =>
+                        !!layer.lottie ? (
+                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
+                            <Lottie
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                width: '100%',
+                                height: '100%',
+                              }}
+                              autoplay={true}
+                              animationData={layer.lottie}
+                            />
+                          </div>
+                        ) : (
+                          !!layer.img && (
+                            <motion.div
+                              className={[
+                                'absolute inset-0 w-full h-full -z-10',
+                                i === 3 && '!mix-blend-overlay blur-2xl',
+                              ].join(' ')}
+                              variants={getDay1Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                  i === 5 && '',
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '25% 80%' : '80% 50%'
+                                }
+                                objectFit="cover"
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                        )
+                      )}
+                  </motion.div>
+                </div>
+              )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -336,10 +462,81 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day2.d.toString()}
             >
-              <div></div>
+              {day2.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                      <CartTitle>{day2.steps[0].title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day2.steps[0].docs}
+                      blog={day2.steps[0].blog}
+                      video={day2.steps[0].video}
+                      hackernews={day2.steps[0].hackernews}
+                    />
+                    {day2.steps[0].bg_layers &&
+                      day2.steps[0].bg_layers?.map((layer, i) =>
+                        !!layer.lottie ? (
+                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
+                            <Lottie
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                width: '100%',
+                                height: '100%',
+                              }}
+                              autoplay={true}
+                              animationData={layer.lottie}
+                            />
+                          </div>
+                        ) : (
+                          !!layer.img && (
+                            <motion.div
+                              className={[
+                                'absolute inset-0 w-full h-full -z-10',
+                                i === 3 && '!mix-blend-overlay blur-2xl',
+                              ].join(' ')}
+                              variants={getDay2Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                  i === 5 && '',
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '25% 80%' : '80% 50%'
+                                }
+                                objectFit="cover"
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                        )
+                      )}
+                  </motion.div>
+                </div>
+              )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -353,10 +550,80 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day3.d.toString()}
             >
-              <div></div>
+              {day3.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                      <CartTitle>{day3.steps[0].title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day3.steps[0].docs}
+                      blog={day3.steps[0].blog}
+                      video={day3.steps[0].video}
+                    />
+                    {day3.steps[0].bg_layers &&
+                      day3.steps[0].bg_layers?.map((layer, i) =>
+                        !!layer.lottie ? (
+                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
+                            <Lottie
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                width: '100%',
+                                height: '100%',
+                              }}
+                              autoplay={true}
+                              animationData={layer.lottie}
+                            />
+                          </div>
+                        ) : (
+                          !!layer.img && (
+                            <motion.div
+                              className={[
+                                'absolute inset-0 w-full h-full -z-10',
+                                i === 2 && '!mix-blend-overlay blur-2xl',
+                              ].join(' ')}
+                              variants={getDay3Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                  i === 5 && '',
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
+                                }
+                                objectFit={!!layer.mobileImg && isTablet ? 'contain' : 'cover'}
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                        )
+                      )}
+                  </motion.div>
+                </div>
+              )}
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3">
+          <div className="border-b border-[#232323] pb-3">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -373,7 +640,7 @@ export default function LW7Releases() {
               <div></div>
             </Accordion.Item>
           </div>
-          <div className="border-b pb-3" id="currentDay">
+          <div className="border-b border-[#232323] pb-3" id="currentDay">
             <Accordion.Item
               header={
                 <AccordionHeader

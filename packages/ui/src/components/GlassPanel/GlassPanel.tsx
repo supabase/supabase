@@ -85,12 +85,9 @@ const GlassPanel = ({
             "
         />
       )}
-      <img
-        src={`/docs/img/gradient-bg.png`}
-        className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
+      <div
+        className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
+        style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
       />
       <div
         className={[

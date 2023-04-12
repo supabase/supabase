@@ -134,7 +134,6 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         <main

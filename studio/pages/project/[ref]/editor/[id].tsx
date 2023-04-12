@@ -23,9 +23,11 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useTheme } from 'common'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
@@ -292,8 +294,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         onExpandJSONEditor={onExpandJSONEditor}
         onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
-        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
         onImportData={onImportData}
+        theme={isDarkMode ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger

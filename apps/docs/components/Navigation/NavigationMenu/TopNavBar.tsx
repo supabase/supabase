@@ -13,9 +13,7 @@ import {
   Listbox,
   SearchButton,
 } from 'ui'
-import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-
-import { getPageType } from '~/lib/helpers'
+import { REFERENCES } from './NavigationMenu.constants'
 
 const TopNavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -33,16 +31,9 @@ const TopNavBar: FC = () => {
     ? pathSegments[pathSegments.indexOf(library) + 1]
     : versions[0]
 
-  const pageType = getPageType(asPath)
-
   useEffect(() => {
     setMounted(true)
   }, [isDarkMode])
-
-  const pageLinks = [
-    { text: 'Guides', key: 'docs', link: '/' },
-    { text: 'Reference', key: 'reference', link: '/reference' },
-  ]
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
