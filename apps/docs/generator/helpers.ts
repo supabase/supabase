@@ -2,6 +2,7 @@ import * as _ from 'lodash'
 import * as fs from 'fs'
 
 export const slugify = (text: string) => {
+  if (!text) return ''
   return text
     .toString()
     .toLowerCase()

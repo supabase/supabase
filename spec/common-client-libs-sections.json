@@ -419,9 +419,23 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-whatsapp-otp",
+        "title": "Sign in a user through WhatsApp",
+        "slug": "auth-signinwithwhatsappotp",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-oauth",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithoauth",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-sso",
+        "title": "Sign in a user through SSO",
+        "slug": "auth-signinwithsso",
         "product": "auth",
         "type": "function"
       },
@@ -844,6 +858,20 @@
         "id": "from-create-signed-urls",
         "title": "Create signed URLs",
         "slug": "storage-from-createsignedurls",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from-create-signed-upload-url",
+        "title": "Create signed upload URL",
+        "slug": "storage-from-createsigneduploadurl",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from-upload-to-signed-url",
+        "title": "Upload to a signed URL",
+        "slug": "storage-from-uploadtosignedurl",
         "product": "storage",
         "type": "function"
       },
