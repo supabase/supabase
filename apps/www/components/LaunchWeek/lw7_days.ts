@@ -43,6 +43,7 @@ export interface WeekDayProps {
   docs: string
   steps: {
     title: string
+    break_thumb_title?: boolean
     blog?: string
     docs?: string
     description?: string
@@ -175,6 +176,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Storage v3: Resumable Uploads with support for 50GB files',
+        break_thumb_title: true,
         description: 'Resumable Uploads with support for 50GB files',
         blog: '/blog/storage-v3-resumable-uploads',
         thumb: images['03-storage-thumb'],
