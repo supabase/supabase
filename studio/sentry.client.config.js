@@ -42,6 +42,8 @@ Sentry.init({
     'The provided `href` (/org/[slug]/team) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/billing) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/invoices) value is missing query values (slug)',
+    // [Joshen] Seems to be from hcaptcha
+    "undefined is not an object (evaluating 'i.chat.setReady')",
   ],
   beforeSend: (event) => filterConsoleErrors(event),
 })
