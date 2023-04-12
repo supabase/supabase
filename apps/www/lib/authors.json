@@ -307,5 +307,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/joshenlim",
     "author_image_url": "https://github.com/joshenlim.png"
+  },
+  {
+    "author_id": "laktek",
+    "author": "Lakshan Perera",
+    "position": "Engineering",
+    "author_url": "https://github.com/laktek",
+    "author_image_url": "https://github.com/laktek.png"
   }
 ]
