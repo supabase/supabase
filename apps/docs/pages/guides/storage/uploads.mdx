@@ -21,7 +21,8 @@ It uses the traditional `multipart/form-data` format and is simple to implement 
 <Admonition type="note">
   You can upload up to 5GB file size using the standard upload method.
   <br />
-  For larger files, use [TUS Resumable Upload](#tus-resumable-upload).
+  For files greater than 6 MB in size, use [TUS Resumable Upload](#resumable-upload) for better
+  reliability.
 </Admonition>
 
 ```javascript
@@ -44,11 +45,8 @@ async function uploadFile(file) {
 ## Resumable Upload
 
 <Admonition type="note">
-Resumable upload is in **Beta**.
-
-It might not be available immediately for your project. <br />
-We are rolling this feature gradually, please contact us if you want to be prioritized.
-
+  Resumable upload is in **Beta**. We are rolling this feature gradually, please contact us if you
+  want to be prioritized.
 </Admonition>
 
 The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
@@ -112,27 +110,22 @@ function uploadFile(bucketName, fileName, file) {
 
 ### Upload URL
 
-When uploading using the resumable upload endpoint, the TUS client creates a unique URL for each upload, even for uploads to the same path.
-All the chunks will be uploaded to this URL using the `PATCH` method.
+When uploading using the resumable upload endpoint, the TUS server creates a unique URL for each upload, even for multiple uploads to the same path. All chunks will be uploaded to this URL using the `PATCH` method.
 
-This URL will be valid for **up to 24 hours**. If the upload is not completed within 24 hours, the URL will expire and you'll need to start the upload again.
-The tus client library will automatically create a new URL if the previous one expires.
-
+This URL will be valid for **up to 24 hours**. If the upload is not completed within 24 hours, the URL will expire and you'll need to start the upload again. The TUS client library will automatically create a new URL if the previous one expires.
 
 ### Concurrency
 
-When two or more clients tries to upload to the same Upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error.
-Only 1 client can upload to the same Upload URL at a time, this is to prevent data corruption.
+When two or more clients try to upload to the same Upload URL only one of them will succeed. The other clients will receive a `409 Conflict` error. Only 1 client can upload to the same Upload URL at a time which prevents data corruption.
 
 <Admonition type="note">
-We do not yet support checksum validation for the uploaded chunks.
-This means that if the client uploads a valid chunk that respect the current offset from a different file, the upload will still succeed.
-
-
-This has to be done intentionally by the client, it's unlikely to happen in normal circumstances.
+  We do not yet support checksum validation for the uploaded chunks. This means if a client changes
+  the file mid way through the upload, the final upload will be an amalgamation of both the files.
+  This has to be done intentionally by the client and is unlikely to happen in normal circumstances.
 </Admonition>
 
 When two or more clients upload a file to the same path using different upload URLs, the first client to complete the upload will succeed and the other clients will receive a `409 Conflict` error.
+
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
 
 ### UppyJS Example
@@ -145,7 +138,6 @@ Framework integration for UppyJS:
 - [Svelte](https://uppy.io/docs/svelte/)
 - [Vue](https://uppy.io/docs/vue/)
 - [Angular](https://uppy.io/docs/angular/)
-
 
 ## Overwriting Files
 
