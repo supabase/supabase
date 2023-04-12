@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Button, ButtonSize, ButtonType } from './Button'
 import defaultTheme from '../../lib/theme/defaultTheme'
+import Link from 'next/link'
 
 const SIZES: ButtonSize[] = ['tiny', 'small', 'medium', 'large', 'xlarge']
 const TYPES: ButtonType[] = [
@@ -87,5 +88,25 @@ describe('#Button', () => {
     render(<Button size={size}>Button</Button>)
 
     expect(screen.queryByRole('button')).toHaveClass(expected)
+  })
+
+  it("shouldn't crash when wrapped with next/link", () => {
+    expect(() =>
+      render(
+        <Link href="https://supabase.com">
+          <Button>Button</Button>
+        </Link>
+      )
+    ).not.toThrow()
+  })
+
+  it('should forward ref', () => {
+    const ref: React.MutableRefObject<HTMLButtonElement | null> = {
+      current: null,
+    }
+
+    render(<Button ref={ref}>Button</Button>)
+
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement)
   })
 })

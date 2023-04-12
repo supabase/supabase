@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useImperativeHandle } from 'react'
+import React, { forwardRef } from 'react'
 import { IconContext } from './../Icon/IconContext'
 import { IconLoader } from './../Icon/icons/IconLoader'
 
@@ -45,12 +45,7 @@ export type ButtonType =
 
 interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
 
-interface RefHandle {
-  // container: () => HTMLElement | null
-  button: () => HTMLButtonElement | null
-}
-
-export const Button = forwardRef<RefHandle, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       block,
@@ -78,16 +73,6 @@ export const Button = forwardRef<RefHandle, ButtonProps>(
     }: ButtonProps,
     ref
   ) => {
-    // button ref
-    // const containerRef = useRef<HTMLElement>(null)
-    const buttonRef = useRef<HTMLButtonElement>(null)
-
-    useImperativeHandle(ref, () => ({
-      button: () => {
-        return buttonRef.current
-      },
-    }))
-
     let __styles = styleHandler('button')
 
     // styles
@@ -153,7 +138,7 @@ export const Button = forwardRef<RefHandle, ButtonProps>(
         // <span ref={containerRef} className={containerClasses.join(' ')}>
         <button
           {...props}
-          ref={buttonRef}
+          ref={ref}
           className={classes.join(' ')}
           disabled={loading || (disabled && true)}
           onClick={onClick}
