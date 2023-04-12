@@ -13,17 +13,6 @@ thumb: launch-week-7/day-3-storage-resumable-uploads/storage-v3-thumb.jpg
 
 Supabase Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads , Quality Filters, Next.js support, and WebP support.
 
-<div className="video-container">
-  <iframe
-    className="w-full"
-    src="https://www.youtube-nocookie.com/embed/pT2PcZFq_M0"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-  ></iframe>
-</div>
-
 The key feature: **Resumable Uploads**! With Resumable Uploads, you can continue uploading a file from where you left off, even if you lose internet connectivity or accidentally close your browser tab while uploading.
 
 Resumable uploads divides the file into chucks before uploading them, emitting progress events during upload.
@@ -112,6 +101,17 @@ For example, you can restrict your users a 1 MB and `image/*` files when uploadi
 ![Bucket Restrictions](/images/blog/launch-week-7/day-3-storage-resumable-uploads/bucket-restrictions.png)
 
 ## Deep Dive into Resumable Uploads
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/pT2PcZFq_M0"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
 
 Let’s get into the nuts-and-bolts of how we implemented Resumable Uploads.
 
