@@ -35,7 +35,11 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
         const recalculatedDelay = i >= pageCount * 2 ? (i - pageCount * (offset - 1)) / 15 : i / 15
 
         return (
-          <Link href={`/launch-week/tickets/${user.username}`} key={`${user.username}-000${i}`}>
+          <Link
+            href={`/launch-week/tickets/${user.username}`}
+            key={`${user.username}-000${i}`}
+            onClick={() => window.scrollTo(0, 0)}
+          >
             <motion.a
               className="relative w-full p-[1px] rounded-lg sm:rounded-xl overflow-hidden hover:cursor-pointer bg-gradient-to-b from-[#ffffff60] to-[#ffffff10]"
               initial={{ opacity: 0, y: 20, x: isOddRow ? 30 : -30 }}

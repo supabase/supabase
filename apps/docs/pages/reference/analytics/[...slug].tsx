@@ -1,9 +1,7 @@
 import specFile from '~/../../spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
-import { Tabs } from '~/../../packages/ui'
+import { Tabs, CodeBlock } from 'ui'
 
-// @ts-ignore
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 export type AcceptedValue = {

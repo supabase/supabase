@@ -10,6 +10,7 @@ import { timeout } from 'lib/helpers'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
+import { useTheme } from 'common/Providers'
 
 export interface TableDefinitionProps {
   id?: number
@@ -18,13 +19,10 @@ export interface TableDefinitionProps {
 const TableDefinition = ({ id }: TableDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
-
+  const { isDarkMode } = useTheme()
   const entityType = useEntityType(id)
-
   const { project } = useProjectContext()
+
   const viewResult = useViewDefinitionQuery(
     {
       schema: entityType?.schema,
@@ -33,7 +31,8 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
       connectionString: project?.connectionString,
     },
     {
-      enabled: entityType?.type === ENTITY_TYPE.VIEW,
+      enabled:
+        entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW,
     }
   )
 
@@ -50,11 +49,15 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   )
 
   const { data: definition, isLoading } =
-    entityType?.type === ENTITY_TYPE.VIEW ? viewResult : tableResult
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+      ? viewResult
+      : tableResult
 
   const prepend =
     entityType?.type === ENTITY_TYPE.VIEW
       ? `create view ${entityType.schema}.${entityType.name} as\n`
+      : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+      ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
       : ''
 
   const formattedDefinition = useMemo(
@@ -100,7 +103,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
     <div className="flex-grow overflow-y-auto border-t border-scale-400">
       <Editor
         className="monaco-editor"
-        theme={isDarkTheme ? 'vs-dark' : 'vs'}
+        theme={isDarkMode ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

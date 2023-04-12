@@ -7,6 +7,7 @@ import sharedItems from './utils/shared-nav-items.json'
 
 export default function SearchableStudioItems() {
   const router = useRouter()
+
   return (
     <CommandGroup heading="Find">
       {sharedItems.tools

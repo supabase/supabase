@@ -1,13 +1,4 @@
-// import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
-// import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
-// import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
-// import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
-// import SupabaseCLINav from 'data/nav/supabase-cli'
-// import SupabaseAPINav from 'data/nav/supabase-api'
-// import AuthServerNav from 'data/nav/auth-server'
-// import StorageServerNav from 'data/nav/storage-server'
-
-import { NavMenu, References } from '../Navigation.types'
+import { References } from '../Navigation.types'
 
 export const REFERENCES: References = {
   javascript: {
@@ -27,6 +18,12 @@ export const REFERENCES: References = {
     library: 'supabase-csharp',
     versions: ['v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
+  },
+  swift: {
+    name: 'Swift',
+    library: 'supabase-swift',
+    versions: ['v1'],
+    icon: '/docs/img/libraries/swift-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -48,12 +45,13 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
+    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
     {
       name: 'Framework Quickstarts',
       items: [
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
@@ -124,6 +122,15 @@ export const gettingstarted = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+      ],
+    },
+    {
+      name: 'AI & ML',
+      items: [
+        {
+          name: 'Vector Search with OpenAI',
+          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },
@@ -667,6 +674,7 @@ export const storage = {
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
+    { name: 'Uploads', url: '/guides/storage/uploads' },
     { name: 'Access Control', url: '/guides/storage/access-control' },
     { name: 'CDN', url: '/guides/storage/cdn' },
     { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
@@ -795,6 +803,11 @@ export const resources = {
           name: 'Render',
           url: '/guides/resources/migrating-to-supabase/render',
         },
+        {
+          name: 'Amazon RDS',
+          url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
       ],
     },
   ],
@@ -847,6 +860,7 @@ export const migrate = {
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage' },
     { name: 'Heroku', url: '/guides/migrations/heroku' },
     { name: 'Render', url: '/guides/migrations/render' },
+    { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds' },
   ],
 }
 
@@ -944,6 +958,13 @@ export const reference = {
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python',
         },
+        {
+          name: 'supbase-swift',
+          url: '/reference/swift/start',
+          level: 'reference_swift',
+          items: [],
+          icon: '/img/icons/menu/reference-swift',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1010,6 +1031,13 @@ export const reference_python_v2 = {
   icon: 'reference-python',
   title: 'Python',
   url: '/guides/reference/python',
+  parent: '/reference',
+}
+
+export const reference_swift_v1 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
   parent: '/reference',
 }
 
@@ -1119,6 +1147,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/c-sharp-icon.svg',
         url: '/reference/csharp/start',
+      },
+      {
+        label: 'supabase-swift',
+        versions: ['v1'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/swift-icon.svg',
+        url: '/reference/swift/start',
       },
     ],
   },
