@@ -5,7 +5,7 @@ const images = {
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
   '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
   '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
-  '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
+  '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.svg',
   '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.svg',
   '01-self-hosted-logs-01': '/images/launchweek/seven/day1/self-hosted-logs-base.jpg',
   '01-self-hosted-logs-01-mobile':
@@ -175,7 +175,8 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Storage v3: Resumable Uploads with support for 50GB files',
-        blog: '/blog/resumable-uploads-with-postgres-advisory-locks',
+        description: 'Resumable Uploads with support for 50GB files',
+        blog: '/blog/storage-v3-resumable-uploads',
         thumb: images['03-storage-thumb'],
         video: 'https://www.youtube.com/watch?v=pT2PcZFq_M0',
         docs: '/docs/guides/storage/uploading',
