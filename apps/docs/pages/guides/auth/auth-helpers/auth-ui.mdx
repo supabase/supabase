@@ -260,6 +260,9 @@ const App = () => (
   <Auth
     supabaseClient={supabase}
     appearance={{
+      // If you want to extend the default styles instead of overriding it, set this to true
+      extend: false,
+      // Your custom classes
       className: {
         anchor: 'my-awesome-anchor',
         button: 'my-awesome-button',
