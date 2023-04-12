@@ -393,6 +393,7 @@ export default function LW7Releases() {
                       docs={day1.steps[0].docs}
                       blog={day1.steps[0].blog}
                       video={day1.steps[0].video}
+                      hackernews={day1.steps[0].hackernews}
                     />
                     {day1.steps[0].bg_layers &&
                       day1.steps[0].bg_layers?.map((layer, i) =>
@@ -480,6 +481,7 @@ export default function LW7Releases() {
                       docs={day2.steps[0].docs}
                       blog={day2.steps[0].blog}
                       video={day2.steps[0].video}
+                      hackernews={day2.steps[0].hackernews}
                     />
                     {day2.steps[0].bg_layers &&
                       day2.steps[0].bg_layers?.map((layer, i) =>
@@ -553,7 +555,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"

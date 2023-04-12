@@ -5,7 +5,7 @@ const images = {
   '0-ogImages-03-mobile': '/images/launchweek/seven/day0/ai-images/ai-image-text-input.png',
   '0-ogImages-04': '/images/launchweek/seven/day0/ai-images/images/img_3.png',
   '0-ogImages-05': '/images/launchweek/seven/day0/ai-images/ai-images-overlay.png',
-  '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.png',
+  '0-supavisor-01': '/images/launchweek/seven/day0/supavisor/supavisor_01.svg',
   '0-supavisor-02': '/images/launchweek/seven/day0/supavisor/supavisor_02.svg',
   '01-self-hosted-logs-01': '/images/launchweek/seven/day1/self-hosted-logs-base.jpg',
   '01-self-hosted-logs-01-mobile':
@@ -113,6 +113,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/supabase-logs-self-hosted',
         thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
         video: 'https://www.youtube.com/watch?v=Ai2BjHV36Ng',
+        hackernews: 'https://news.ycombinator.com/item?id=35518786',
         bg_layers: [
           {
             img: images['01-self-hosted-logs-01'],
@@ -148,6 +149,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/edge-runtime-self-hosted-deno-functions',
         thumb: images['02-self-hosted-edge-functions-thumb'],
         video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
+        hackernews: 'https://news.ycombinator.com/item?id=30868849',
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],
@@ -173,7 +175,8 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Storage v3: Resumable Uploads with support for 50GB files',
-        blog: '/blog/resumable-uploads-with-postgres-advisory-locks',
+        description: 'Resumable Uploads with support for 50GB files',
+        blog: '/blog/storage-v3-resumable-uploads',
         thumb: images['03-storage-thumb'],
         video: 'https://www.youtube.com/watch?v=pT2PcZFq_M0',
         docs: '/docs/guides/storage/uploading',
