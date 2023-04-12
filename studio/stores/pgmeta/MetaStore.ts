@@ -13,7 +13,7 @@ import type {
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { timeout } from 'lib/helpers'
+import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
@@ -866,7 +866,17 @@ export default class MetaStore implements IMetaStore {
 
           const formattedData = results.data.map((row: any) => {
             const formattedRow: any = {}
-            selectedHeaders.forEach((header) => (formattedRow[header] = row[header]))
+            selectedHeaders.forEach((header) => {
+              const column = table.columns?.find((c) => c.name === header)
+              if (
+                (column?.data_type ?? '') === 'ARRAY' ||
+                (column?.format ?? '').includes('json')
+              ) {
+                formattedRow[header] = tryParseJson(row[header])
+              } else {
+                formattedRow[header] = row[header]
+              }
+            })
             return formattedRow
           })
 
