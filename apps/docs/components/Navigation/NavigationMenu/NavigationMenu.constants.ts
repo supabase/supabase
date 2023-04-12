@@ -1,13 +1,4 @@
-// import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
-// import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
-// import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
-// import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
-// import SupabaseCLINav from 'data/nav/supabase-cli'
-// import SupabaseAPINav from 'data/nav/supabase-api'
-// import AuthServerNav from 'data/nav/auth-server'
-// import StorageServerNav from 'data/nav/storage-server'
-
-import { NavMenu, References } from '../Navigation.types'
+import { References } from '../Navigation.types'
 
 export const REFERENCES: References = {
   javascript: {
@@ -54,12 +45,13 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
+    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
     {
       name: 'Framework Quickstarts',
       items: [
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
@@ -130,6 +122,15 @@ export const gettingstarted = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+      ],
+    },
+    {
+      name: 'AI & ML',
+      items: [
+        {
+          name: 'Vector Search with OpenAI',
+          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },
@@ -801,6 +802,11 @@ export const resources = {
           name: 'Render',
           url: '/guides/resources/migrating-to-supabase/render',
         },
+        {
+          name: 'Amazon RDS',
+          url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
       ],
     },
   ],
@@ -853,6 +859,7 @@ export const migrate = {
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage' },
     { name: 'Heroku', url: '/guides/migrations/heroku' },
     { name: 'Render', url: '/guides/migrations/render' },
+    { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds' },
   ],
 }
 

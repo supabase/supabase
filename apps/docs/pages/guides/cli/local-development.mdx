@@ -412,14 +412,15 @@ supabase functions deploy <function_name>
 Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
 
 <Admonition type="note">
-The Google Cloud project must have billing enabled.
+  The Google Cloud project must have billing enabled. Read more about this requirement
+  [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
 </Admonition>
 
 Requirements:
 
-1. Google Cloud project number (must be paid)
+1. Google Cloud project number
 2. Google Cloud project ID
-3. Google Cloud JWT, obtained through [Google Cloud IAM dashboard](https://console.cloud.google.com/iam-admin/iam)
+3. Google Cloud Service Account Key, obtained through [Google Cloud IAM dashboard](https://console.cloud.google.com/iam-admin/iam), with BigQuery Admin role assigned to the service account.
 
 Once you have these 3 items, follow these steps:
 
@@ -433,7 +434,7 @@ gcp_project_id = "my-project-id"
 gcp_jwt_path = "supabase/gcloud.json"
 ```
 
-2. Place your JWT file at the corresponding path and ensure that it is correctly named.
+2. Place your service account key (a JSON file) at the corresponding path and ensure that it is correctly named.
 
 3. Start your local stack using `supabase start`
 

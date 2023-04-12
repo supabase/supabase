@@ -155,6 +155,14 @@
         }
       },
       {
+        "title": "Single Sign-On (SAML 2.0)",
+        "tiers": {
+          "free": false,
+          "pro": "50 free, then $0.015 per MAU",
+          "enterprise": "Contact Us"
+        }
+      },
+      {
         "title": "Advanced security features",
         "tiers": {
           "free": false,

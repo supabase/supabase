@@ -1,7 +1,7 @@
 import { useTheme, UseThemeProps } from 'common'
-import * as React from 'react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import CommandMenu from './CommandMenu'
+import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
 
 export interface CommandMenuContextValue {
   isOpen: boolean
@@ -16,9 +16,25 @@ export interface CommandMenuContextValue {
   currentPage?: string
   site: 'studio' | 'docs'
 
+  /**
+   * Project metadata for easy retrieval
+   */
+  project?: { ref?: string; apiKeys?: { anon?: string; service?: string } }
+  /**
+   * Any additional metadata that CMDK component can use in its AI prompts
+   */
+  metadata?: { definitions?: string; flags?: { [key: string]: string } }
+  /**
+   * Opt in flag to use additional metadata in AI prompts
+   */
+  isOptedInToAI: boolean
+
   // to do: remove this prop
   // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode // to do: remove this. although it breaks our jest tests
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
+
+  // Optional callback to save a generated SQL output
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -35,26 +51,51 @@ export interface CommandMenuActions {
   toggleTheme: UseThemeProps['toggleTheme']
 }
 
+export interface CommandMenuProviderProps {
+  site: 'studio' | 'docs'
+  projectRef?: string
+  /**
+   * Project's API keys, for easy access through CMDK
+   */
+  apiKeys?: { anon?: string; service?: string }
+  /**
+   * Opt in flag to use additional metadata in AI prompts
+   */
+  isOptedInToAI?: boolean
+  /**
+   * Any additional metadata that CMDK component can use in its AI prompts
+   */
+  metadata?: { definitions?: string; flags?: { [key: string]: string } }
+  /**
+   * TODO: remove this prop, temporary hack as ReactMarkdown fails our jest tests
+   * if we import the package directly within this UI package
+   */
+  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
+  /**
+   * Call back when save SQL snippet button is selected
+   */
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
+}
+
 const CommandMenuProvider = ({
   children,
   site,
+  projectRef,
+  apiKeys,
+  metadata,
+  isOptedInToAI = false,
   MarkdownHandler,
-}: PropsWithChildren<{
-  site: 'studio' | 'docs'
-  // to do: remove this prop
-  // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: any) => React.ReactNode
-}>) => {
+  saveGeneratedSQL,
+}: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [search, setSearch] = React.useState('')
-  const [pages, setPages] = React.useState<string[]>([])
+  const [search, setSearch] = useState('')
+  const [pages, setPages] = useState<string[]>([])
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
-  const actions: CommandMenuActions = {
-    toggleTheme,
-  }
+  const actions: CommandMenuActions = { toggleTheme }
+  const project = projectRef !== undefined ? { ref: projectRef, apiKeys } : undefined
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
 
@@ -72,11 +113,15 @@ const CommandMenuProvider = ({
         setPages,
         currentPage,
         site,
+        project,
+        metadata,
+        isOptedInToAI,
         MarkdownHandler,
+        saveGeneratedSQL,
       }}
     >
       {children}
-      <CommandMenu />
+      <CommandMenu projectRef={projectRef} />
     </CommandMenuContext.Provider>
   )
 }
