@@ -48,7 +48,7 @@ const SpreadsheetImport: FC<Props> = ({
   }, [visible])
 
   const [input, setInput] = useState<string>('')
-  const [uploadedFile, setUploadedFile] = useState<any>(null)
+  const [uploadedFile, setUploadedFile] = useState<File>()
   const [parseProgress, setParseProgress] = useState<number>(0)
   const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>({
     headers: headers,
@@ -104,7 +104,7 @@ const SpreadsheetImport: FC<Props> = ({
   const resetSpreadsheetImport = () => {
     setInput('')
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
-    setUploadedFile(null)
+    setUploadedFile(undefined)
     setErrors([])
     updateEditorDirty(false)
   }
@@ -142,7 +142,13 @@ const SpreadsheetImport: FC<Props> = ({
   }
 
   const onConfirm = (resolve: () => void) => {
-    if (selectedHeaders.length === 0) {
+    if (uploadedFile === undefined) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Please upload a file to import your data with',
+      })
+      resolve()
+    } else if (selectedHeaders.length === 0) {
       ui.setNotification({
         category: 'error',
         message: 'Please select at least one header from your CSV',
