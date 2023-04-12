@@ -216,7 +216,7 @@ await db.withTransaction(() => {
 
    if (isLastChunk) {
     // storage.objects stores the object metadata of all objects
-    // It doubles up as a way to check Authz.
+    // It doubles up as a way to enforce authorization.
     // If a user is able to insert into this table, they can upload.
     await db.run('insert into storage.objects(..) values(..)')
    }
