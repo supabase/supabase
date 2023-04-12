@@ -1,4 +1,4 @@
-clispec: '001'
+elispec: '001'
 info:
   id: cli
   version: 1.42.0
@@ -45,6 +45,253 @@ flags:
     description: path to a Supabase project directory
     default_value: ''
 commands:
+  - id: supabase-sso
+    title: supabase sso
+    summary: Manage SSO authentication for your project
+    description: |-
+      Manage SSO authentication for Supabase projects.
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-sso-list
+      - supabase-sso-show
+      - supabase-sso-add
+      - supabase-sso-remove
+      - supabase-sso-update
+      - supabase-sso-info
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+        type: string
+        required: true
+        inherit: true
+      - id: output
+        name: --output [ pretty | json | yaml | toml ]
+        description: Output format of the command, useful when using the CLI in scripts or CI workflows.
+        default_value: pretty
+        type: '[ pretty | json | yaml | toml ]'
+        inherit: true
+        accepted_values:
+          - name: pretty
+            value: pretty
+            type: '[ pretty | json | yaml | toml ]'
+          - name: json
+            value: json
+            type: '[ pretty | json | yaml | toml ]'
+          - name: yaml
+            value: yaml
+            type: '[ pretty | json | yaml | toml ]'
+          - name: toml
+            value: toml
+            type: '[ pretty | json | yaml | toml ]'
+            description: |-
+              Use only with certain commands to output the raw SAML 2.0 Metadata XML stored in your project's authentication configuration.
+  - id: supabase-sso-info
+    title: supabase sso info
+    summary: Show important SAML 2.0 information about your project
+    description: |-
+      Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
+    tags:
+      - management-api
+    flags: []
+    links: []
+    examples:
+      - id: basic-usage
+        name: Show project information
+        code: |-
+          supabase sso info --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about your project's SAML 2.0 configuration.
+  - id: supabase-sso-add
+    title: supabase sso add
+    summary: Add a connection to a SSO identity provider
+    description: |-
+      Add and configure a new connection to a SSO identity provider to your Supabase project.
+    tags:
+      - management-api
+    examples:
+      - id: basic-usage
+        name: Add with Metadata URL
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-url 'https://...' \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+      - id: with-xml
+        name: Add with Metadata File
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-file /path/to/metadata/file.xml \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+    flags:
+      - id: type
+        name: --type saml
+        description: |-
+          Type of identity provider being added. Only SAML 2.0 supported at this time.
+        type: string
+        accepted_values:
+          - name: saml
+            type: string
+        required: true
+      - id: metadata-url
+        name: --metadata-url <URL>
+        description: |-
+          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
+          Mutually exclusive with --metadata-file.
+        type: string
+        required: true
+      - id: metadata-file
+        name: --metadata-file <path to file>
+        description: |
+          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
+
+          Mutually exclusive with --metadata-url.
+        type: string
+        required: true
+      - id: domains
+        name: domains
+        description: |-
+          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user.
+        type: string
+      - id: attribute-mapping-file
+        name: attribute-mapping-file
+        type: string
+        description: |-
+          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
+  - id: supabase-sso-remove
+    title: supabase sso remove <provider-id>
+    summary: Remove a connection to a SSO identity provider
+    description: |-
+      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
+    tags:
+      - management-api
+    links: []
+    flags: []
+    examples:
+      - id: basic-usage
+        name: Remove a provider
+        code: |-
+          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about the removed identity provider. It's a good idea to
+          save this in case you need it later on.
+  - id: supabase-sso-update
+    title: supabase sso update <provider-id>
+    summary: Update the configuration of an identity provider
+    description: |-
+      Update the configuration settings of a already added SSO identity provider.
+    tags:
+      - management-api
+    links: []
+    examples:
+      - id: basic-usage
+        name: Replace domains
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --domains new-company.com,new-company.net
+        response: |-
+          Information about the updated provider.
+      - id: add-domains
+        name: Add an additional domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --add-domains company.net
+        response: |-
+          Information about the updated provider.
+      - id: remove-domains
+        name: Remove a domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --remove-domains company.org
+        response: |-
+          Information about the updated provider.
+    flags:
+      - id: metadata-url
+        name: --metadata-url <URL>
+        description: |-
+          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
+          Mutually exclusive with --metadata-file.
+        type: string
+      - id: metadata-file
+        name: --metadata-file <path to file>
+        description: |
+          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
+
+          Mutually exclusive with --metadata-url.
+        type: string
+      - id: domains
+        name: domains
+        description: |-
+          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user. When provided all of the domains already attached to the identity provider will be replaced with this list.
+        type: string
+      - id: add-domains
+        name: add-domains
+        description: |-
+          Associates these additional email domains to the existing set of domains. See --domains for a detailed explanation.
+      - id: remove-domains
+        name: remove-domains
+        description: |-
+          Removes these email domains from the existing set of domains. See --domains for a detailed explanation.
+      - id: attribute-mapping-file
+        name: attribute-mapping-file
+        type: string
+        description: |-
+          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
+  - id: supabase-sso-list
+    title: supabase sso list
+    summary: Lists all connections to identity providers
+    description: |-
+      List all connections to a SSO identity provider to your Supabase project.
+    tags:
+      - management-api
+    links: []
+    flags: []
+  - id: supabase-sso-show
+    title: supabase sso show <provider-id>
+    summary: Show information about an identity provider.
+    description: |-
+      Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
+    tags:
+      - management-api
+    examples:
+      - id: basic-usage
+        name: Show information
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about the identity provider in pretty output.
+      - id: metadata-output
+        name: Get raw SAML 2.0 Metadata XML
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --metadata
+        response: |-
+          Raw SAML 2.0 XML assigned to this identity provider. This is the
+          version used in the authentication project, and if using a SAML 2.0
+          Metadata URL it may change depending on the caching information
+          contained within the metadata.
+    links: []
+    flags: []
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
     summary: Manage vanity subdomains for Supabase projects

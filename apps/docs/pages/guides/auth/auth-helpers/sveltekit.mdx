@@ -199,8 +199,8 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 
   let loadedData = [];
   async function loadData() {
-    const { data } = await data.supabase.from('test').select('*').limit(20);
-    loadedData = data;
+    const { data: result } = await data.supabase.from('test').select('*').limit(20);
+    loadedData = result;
   }
 
   $: if (data.session) {
@@ -367,7 +367,6 @@ protect multiple routes at once.
 ```ts
 // src/hooks.server.ts
 import type { RequestHandler } from './$types';
-import { getSupabase } from '@supabase/auth-helpers-sveltekit';
 import { redirect, error } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {

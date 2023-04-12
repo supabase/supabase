@@ -1,6 +1,5 @@
 export * from './misc/useStore'
 export * from './misc/withAuth'
-export * from './misc/useOptimisticSqlSnippetCreate'
 export * from './misc/useImmutableValue'
 export * from './misc/useCheckPermissions'
 export * from './misc/useLocalStorage'

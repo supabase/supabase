@@ -57,9 +57,12 @@ const DocsSearch = () => {
       setHasSearchError(false)
       setIsLoading(true)
 
-      const { error, data: pageSections } = await supabaseClient.functions.invoke('search', {
-        body: { query },
-      })
+      const { error, data: pageResults } = await supabaseClient.functions.invoke<PageResult[]>(
+        'search-v2',
+        {
+          body: { query },
+        }
+      )
 
       setIsLoading(false)
 
@@ -71,14 +74,14 @@ const DocsSearch = () => {
         return
       }
 
-      if (!Array.isArray(pageSections)) {
+      if (!Array.isArray(pageResults)) {
         setIsLoading(false)
         setHasSearchError(true)
         console.error('Malformed response')
         return
       }
 
-      setResults(pageSections)
+      setResults(pageResults)
     },
     [supabaseClient]
   )

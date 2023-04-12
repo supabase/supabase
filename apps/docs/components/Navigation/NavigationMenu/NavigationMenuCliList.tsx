@@ -86,7 +86,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   return (
     <div
       className={[
-        'transition-all ml-8 duration-150 ease-out',
+        'transition-all duration-150 ease-out',
         // enabled
         currentLevel === id && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left

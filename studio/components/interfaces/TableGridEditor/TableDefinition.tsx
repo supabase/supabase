@@ -10,6 +10,7 @@ import { timeout } from 'lib/helpers'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
+import { useTheme } from 'common/Providers'
 
 export interface TableDefinitionProps {
   id?: number
@@ -18,13 +19,10 @@ export interface TableDefinitionProps {
 const TableDefinition = ({ id }: TableDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
-
+  const { isDarkMode } = useTheme()
   const entityType = useEntityType(id)
-
   const { project } = useProjectContext()
+
   const viewResult = useViewDefinitionQuery(
     {
       schema: entityType?.schema,
@@ -105,7 +103,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
     <div className="flex-grow overflow-y-auto border-t border-scale-400">
       <Editor
         className="monaco-editor"
-        theme={isDarkTheme ? 'vs-dark' : 'vs'}
+        theme={isDarkMode ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}
