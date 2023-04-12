@@ -1,19 +1,23 @@
 import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState, FC, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle } from 'ui'
+import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
 
-import { Member, Role } from 'types'
-import { useStore, useParams } from 'hooks'
-import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
+import { Member } from 'types'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 
-import { useProfileQuery } from 'data/profile/profile-query'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -21,23 +25,37 @@ interface SelectedMember extends Member {
 }
 
 export interface MembersViewProps {
-  roles: Role[]
-  members: Member[]
   searchString: string
 }
 
-const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
+const MembersView = ({ searchString }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
 
   const { data: profile } = useProfileQuery()
+  const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
+  const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })
+  const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
+    onSuccess() {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
+      })
+    },
+    onError() {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
+      })
+    },
+  })
 
+  const roles = rolesData?.roles ?? []
+  const members = detailData?.members ?? []
   const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
-
-  if (!members) return <div />
 
   const filteredMembers = (
     !searchString
@@ -59,21 +77,6 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
     return roles.find((x: any) => x.id === id)?.name
   }
 
-  const { isLoading, mutate } = useOrganizationMemberUpdateMutation({
-    onSuccess() {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
-      })
-    },
-    onError() {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update role for ${getUserDisplayName(selectedMember)}`,
-      })
-    },
-  })
-
   const handleRoleChange = async () => {
     if (!selectedMember) return
 
@@ -86,9 +89,18 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
       throw new Error('gotrue_id is required')
     }
 
-    mutate({ slug, gotrueId: gotrue_id, roleId: newRoleId })
-
+    updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
     setUserRoleChangeModalVisible(false)
+  }
+
+  if (isLoadingOrgDetails) {
+    return (
+      <div className="py-4 space-y-2">
+        <ShimmeringLoader />
+        <ShimmeringLoader className="w-3/4" />
+        <ShimmeringLoader className="w-1/2" />
+      </div>
+    )
   }
 
   return (
@@ -176,10 +188,13 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
                       </Table.td>
 
                       <Table.td>
-                        {!role && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
-                        {role && (
+                        {isLoadingRoles ? (
+                          <div className="w-[140px]">
+                            <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+                          </div>
+                        ) : role !== undefined ? (
                           <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger>
+                            <Tooltip.Trigger className="w-[140px]">
                               <Listbox
                                 className={disableRoleEdit ? 'pointer-events-none' : ''}
                                 disabled={disableRoleEdit}
@@ -200,37 +215,67 @@ const MembersView = ({ searchString, roles, members }: MembersViewProps) => {
                               </Listbox>
                             </Tooltip.Trigger>
                             {memberIsPendingInvite ? (
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                    'border border-scale-200 ', //border
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-scale-1200">
-                                    Role can only be changed after the user has accepted the invite
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      Role can only be changed after the user has accepted the
+                                      invite
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
                             ) : !memberIsUser && !canRemoveRole ? (
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                    'border border-scale-200 ', //border
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-scale-1200">
-                                    You need additional permissions to manage this team member
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      You need additional permissions to manage this team member
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
                             ) : (
                               <></>
                             )}
                           </Tooltip.Root>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <p className="text-sm text-scale-1100">Invalid role</p>
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <IconAlertCircle size={16} strokeWidth={1.5} />
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                      'border border-scale-200 ', //border
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs text-scale-1200">
+                                      This user has an invalid role, please reach out to us via
+                                      support
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          </div>
                         )}
                       </Table.td>
                       <Table.td>

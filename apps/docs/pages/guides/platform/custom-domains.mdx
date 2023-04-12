@@ -7,12 +7,6 @@ export const meta = {
   video: 'https://www.youtube.com/v/6rcGnW_Mh-0',
 }
 
-<Admonition type="note">
-
-Custom Domains are currently in beta, and are being slowly made available to projects.
-
-</Admonition>
-
 Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid tier](https://app.supabase.com/project/_/settings/billing/update). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
 
 <div className="video-container">
@@ -98,12 +92,6 @@ supabase domains delete --project-ref foobarbaz --experimental
 As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
 
 ## Vanity Subdomains
-
-<Admonition type="note">
-
-Vanity Subdomains are currently in beta, and are being slowly made available to projects. [Contact Support](https://app.supabase.com/support/new) if you'd like to request early access.
-
-</Admonition>
 
 Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
 
