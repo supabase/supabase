@@ -12,7 +12,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import { generateReadingTime } from '~/lib/helpers'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import useActiveAnchors from '~/hooks/useActiveAnchors'
+// import useActiveAnchors from '~/hooks/useActiveAnchors'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -208,7 +208,7 @@ function BlogPostPage(props: any) {
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
-                            <Link href={author.author_url}>
+                            <Link href={author.author_url} target="_blank">
                               <a className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {author.author_image_url && (

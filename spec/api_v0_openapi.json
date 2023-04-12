@@ -1190,6 +1190,68 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/config/database/postgres": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Gets project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve project's Postgres config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "summary": "Updates project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostgresConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to update project's Postgres config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
         "operationId": "createProviderForProject",
@@ -1711,6 +1773,64 @@
           "override_active_until": { "type": "string" }
         },
         "required": ["enabled", "override_enabled", "override_active_until"]
+      },
+      "PostgresConfigResponse": {
+        "type": "object",
+        "properties": {
+          "statement_timeout": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+          "effective_cache_size": { "type": "integer", "minimum": 1, "maximum": 2147483647 },
+          "maintenance_work_mem": { "type": "integer", "minimum": 1024, "maximum": 2147483647 },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "shared_buffers": { "type": "integer", "minimum": 16, "maximum": 1073741823 },
+          "work_mem": { "type": "integer", "minimum": 64, "maximum": 2147483647 },
+          "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
+        },
+        "required": [
+          "statement_timeout",
+          "effective_cache_size",
+          "maintenance_work_mem",
+          "max_connections",
+          "max_parallel_maintenance_workers",
+          "max_parallel_workers",
+          "max_parallel_workers_per_gather",
+          "max_worker_processes",
+          "shared_buffers",
+          "work_mem",
+          "session_replication_role"
+        ]
+      },
+      "UpdatePostgresConfigBody": {
+        "type": "object",
+        "properties": {
+          "statement_timeout": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+          "effective_cache_size": { "type": "integer", "minimum": 1, "maximum": 2147483647 },
+          "maintenance_work_mem": { "type": "integer", "minimum": 1024, "maximum": 2147483647 },
+          "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_parallel_workers_per_gather": { "type": "integer", "minimum": 0, "maximum": 1024 },
+          "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
+          "shared_buffers": { "type": "integer", "minimum": 16, "maximum": 1073741823 },
+          "work_mem": { "type": "integer", "minimum": 64, "maximum": 2147483647 },
+          "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
+        },
+        "required": [
+          "statement_timeout",
+          "effective_cache_size",
+          "maintenance_work_mem",
+          "max_connections",
+          "max_parallel_maintenance_workers",
+          "max_parallel_workers",
+          "max_parallel_workers_per_gather",
+          "max_worker_processes",
+          "shared_buffers",
+          "work_mem",
+          "session_replication_role"
+        ]
       },
       "AttributeValue": {
         "type": "object",
