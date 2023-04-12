@@ -58,7 +58,7 @@ const ImageFadeStack = ({ images, height = 'default', delay = 3000 }: ImageFadeS
         ))}
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="text-scale-1100 dark:text-white bg-scale-700 hover:bg-gray-1100 dark:hover:bg-gray-500 rounded-full p-0.5 transition-colors"
+          className="text-white bg-scale-1100 hover:bg-gray-1100 dark:hover:bg-gray-500 rounded-full p-0.5 transition-colors"
         >
           {isPlaying ? <IconPauseCircle w={12} /> : <IconPlayCircle w={12} />}
         </button>
