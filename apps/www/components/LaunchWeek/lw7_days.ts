@@ -113,6 +113,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/supabase-logs-self-hosted',
         thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
         video: 'https://www.youtube.com/watch?v=Ai2BjHV36Ng',
+        hackernews: 'https://news.ycombinator.com/item?id=35518786',
         bg_layers: [
           {
             img: images['01-self-hosted-logs-01'],
@@ -148,6 +149,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/edge-runtime-self-hosted-deno-functions',
         thumb: images['02-self-hosted-edge-functions-thumb'],
         video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
+        hackernews: 'https://news.ycombinator.com/item?id=30868849',
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],

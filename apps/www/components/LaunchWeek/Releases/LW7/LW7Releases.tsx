@@ -393,6 +393,7 @@ export default function LW7Releases() {
                       docs={day1.steps[0].docs}
                       blog={day1.steps[0].blog}
                       video={day1.steps[0].video}
+                      hackernews={day1.steps[0].hackernews}
                     />
                     {day1.steps[0].bg_layers &&
                       day1.steps[0].bg_layers?.map((layer, i) =>
@@ -480,6 +481,7 @@ export default function LW7Releases() {
                       docs={day2.steps[0].docs}
                       blog={day2.steps[0].blog}
                       video={day2.steps[0].video}
+                      hackernews={day2.steps[0].hackernews}
                     />
                     {day2.steps[0].bg_layers &&
                       day2.steps[0].bg_layers?.map((layer, i) =>
