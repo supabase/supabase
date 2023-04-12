@@ -418,7 +418,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 57,
+                    "id": 58,
                     "typeArguments": [
                       {
                         "type": "reference",
@@ -509,14 +509,14 @@
       ]
     },
     {
-      "id": 35,
+      "id": 36,
       "name": "FunctionsError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 36,
+          "id": 37,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -530,14 +530,14 @@
           ],
           "signatures": [
             {
-              "id": 37,
+              "id": 38,
               "name": "new FunctionsError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 38,
+                  "id": 39,
                   "name": "message",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -548,7 +548,7 @@
                   }
                 },
                 {
-                  "id": 39,
+                  "id": 40,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -560,7 +560,7 @@
                   "defaultValue": "'FunctionsError'"
                 },
                 {
-                  "id": 40,
+                  "id": 41,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -575,7 +575,7 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 35,
+                "id": 36,
                 "name": "FunctionsError"
               },
               "overwrites": {
@@ -590,7 +590,7 @@
           }
         },
         {
-          "id": 41,
+          "id": 42,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -612,12 +612,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [36]
+          "children": [37]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [41]
+          "children": [42]
         }
       ],
       "sources": [
@@ -638,30 +638,30 @@
       "extendedBy": [
         {
           "type": "reference",
-          "id": 42,
+          "id": 43,
           "name": "FunctionsFetchError"
         },
         {
           "type": "reference",
-          "id": 47,
+          "id": 48,
           "name": "FunctionsHttpError"
         },
         {
           "type": "reference",
-          "id": 52,
+          "id": 53,
           "name": "FunctionsRelayError"
         }
       ]
     },
     {
-      "id": 42,
+      "id": 43,
       "name": "FunctionsFetchError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 43,
+          "id": 44,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -675,14 +675,14 @@
           ],
           "signatures": [
             {
-              "id": 44,
+              "id": 45,
               "name": "new FunctionsFetchError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 45,
+                  "id": 46,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -695,24 +695,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 42,
+                "id": 43,
                 "name": "FunctionsFetchError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 37,
+                "id": 38,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 36,
+            "id": 37,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 46,
+          "id": 47,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -730,7 +730,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 41,
+            "id": 42,
             "name": "FunctionsError.context"
           }
         }
@@ -739,12 +739,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [43]
+          "children": [44]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [46]
+          "children": [47]
         }
       ],
       "sources": [
@@ -757,20 +757,20 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 35,
+          "id": 36,
           "name": "FunctionsError"
         }
       ]
     },
     {
-      "id": 47,
+      "id": 48,
       "name": "FunctionsHttpError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 48,
+          "id": 49,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -784,14 +784,14 @@
           ],
           "signatures": [
             {
-              "id": 49,
+              "id": 50,
               "name": "new FunctionsHttpError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 50,
+                  "id": 51,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -804,24 +804,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 47,
+                "id": 48,
                 "name": "FunctionsHttpError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 37,
+                "id": 38,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 36,
+            "id": 37,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 51,
+          "id": 52,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -839,7 +839,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 41,
+            "id": 42,
             "name": "FunctionsError.context"
           }
         }
@@ -848,12 +848,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [48]
+          "children": [49]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [51]
+          "children": [52]
         }
       ],
       "sources": [
@@ -866,20 +866,20 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 35,
+          "id": 36,
           "name": "FunctionsError"
         }
       ]
     },
     {
-      "id": 52,
+      "id": 53,
       "name": "FunctionsRelayError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 53,
+          "id": 54,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -893,14 +893,14 @@
           ],
           "signatures": [
             {
-              "id": 54,
+              "id": 55,
               "name": "new FunctionsRelayError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 55,
+                  "id": 56,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -913,24 +913,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 52,
+                "id": 53,
                 "name": "FunctionsRelayError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 37,
+                "id": 38,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 36,
+            "id": 37,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 56,
+          "id": 57,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -948,7 +948,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 41,
+            "id": 42,
             "name": "FunctionsError.context"
           }
         }
@@ -957,12 +957,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [53]
+          "children": [54]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [56]
+          "children": [57]
         }
       ],
       "sources": [
@@ -975,7 +975,7 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 35,
+          "id": 36,
           "name": "FunctionsError"
         }
       ]
@@ -1003,7 +1003,7 @@
           "flags": {},
           "children": [
             {
-              "id": 34,
+              "id": 35,
               "name": "body",
               "kind": 1024,
               "kindString": "Property",
@@ -1016,7 +1016,7 @@
               "sources": [
                 {
                   "fileName": "src/types.ts",
-                  "line": 52,
+                  "line": 56,
                   "character": 2
                 }
               ],
@@ -1142,13 +1142,57 @@
                   }
                 }
               }
+            },
+            {
+              "id": 34,
+              "name": "method",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The HTTP verb of the request"
+              },
+              "sources": [
+                {
+                  "fileName": "src/types.ts",
+                  "line": 52,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "union",
+                "types": [
+                  {
+                    "type": "literal",
+                    "value": "POST"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "GET"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "PUT"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "PATCH"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "DELETE"
+                  }
+                ]
+              }
             }
           ],
           "groups": [
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [34, 30]
+              "children": [35, 30, 34]
             }
           ],
           "sources": [
@@ -1162,7 +1206,7 @@
       }
     },
     {
-      "id": 57,
+      "id": 58,
       "name": "FunctionsResponse",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -1176,7 +1220,7 @@
       ],
       "typeParameter": [
         {
-          "id": 58,
+          "id": 59,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -1191,7 +1235,7 @@
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 58,
+                "id": 59,
                 "name": "T"
               }
             ],
@@ -1209,12 +1253,12 @@
     {
       "title": "Classes",
       "kind": 128,
-      "children": [1, 35, 42, 47, 52]
+      "children": [1, 36, 43, 48, 53]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
-      "children": [28, 57]
+      "children": [28, 58]
     }
   ],
   "sources": [

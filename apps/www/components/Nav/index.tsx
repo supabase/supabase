@@ -11,12 +11,15 @@ import SolutionsData from 'data/Solutions.json'
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
+import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
 import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -111,7 +114,7 @@ const Nav = () => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 flex items-center px-2 lg:hidden"
+      className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button
@@ -194,8 +197,10 @@ const Nav = () => {
 
   return (
     <>
-      {/* <Announcement /> */}
-      <div className="sticky top-0 z-50 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
+      <Announcement>
+        <CountdownBanner />
+      </Announcement>
+      <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
             'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
@@ -206,7 +211,7 @@ const Nav = () => {
         <nav
           className={[
             `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 border-[#e0d2f430]',
+            showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
           ].join(' ')}
         >
           {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}
@@ -223,7 +228,7 @@ const Nav = () => {
                       <Image
                         src={
                           isLaunchWeekPage
-                            ? supabaseLogoWordmarkDark
+                            ? supabaseLogoWordmarkWhite
                             : isDarkMode
                             ? supabaseLogoWordmarkDark
                             : supabaseLogoWordmarkLight
@@ -273,41 +278,39 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  as="a"
-                  className="hidden group lg:flex"
-                  // @ts-ignore
-                  href="https://github.com/supabase/supabase"
-                  target="_blank"
-                  type="text"
-                  icon={
-                    <div className="flex items-center justify-center w-4 h-4 text-brand-800">
-                      <div
-                        className={[
-                          `text-scale-900 flex h-3 w-3 items-center justify-center
+                <a href="https://github.com/supabase/supabase" target="_blank">
+                  <Button
+                    className="hidden group lg:flex"
+                    type="text"
+                    icon={
+                      <div className="flex items-center justify-center w-4 h-4 text-brand-800">
+                        <div
+                          className={[
+                            `text-scale-900 flex h-3 w-3 items-center justify-center
 
-                          transition-all
-                          group-hover:h-4
-                          group-hover:w-4
-                          group-hover:text-yellow-900
-                          group-focus:h-4
-                          group-focus:w-4
+                            transition-all
+                            group-hover:h-4
+                            group-hover:w-4
+                            group-hover:text-yellow-900
+                            group-focus:h-4
+                            group-focus:w-4
 
-                          group-focus:text-yellow-900`,
-                          showLaunchWeekNavMode && '!text-white',
-                        ].join(' ')}
-                      >
-                        <IconStar strokeWidth={2} />
+                            group-focus:text-yellow-900`,
+                            showLaunchWeekNavMode && '!text-white',
+                          ].join(' ')}
+                        >
+                          <IconStar strokeWidth={2} />
+                        </div>
                       </div>
-                    </div>
-                  }
-                >
-                  <span
-                  // className={isLaunchWeekPage ? '!text-white' : ''}
+                    }
                   >
-                    Star us on GitHub
-                  </span>
-                </Button>
+                    <span
+                    // className={isLaunchWeekPage ? '!text-white' : ''}
+                    >
+                      Star us on GitHub
+                    </span>
+                  </Button>
+                </a>
 
                 {isLoggedIn ? (
                   <Link href="/dashboard/projects">
@@ -333,7 +336,6 @@ const Nav = () => {
                 )}
               </div>
             </div>
-            {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
           </div>
           {/* </div> */}
           {/* Mobile Nav Menu */}
@@ -436,6 +438,7 @@ const Nav = () => {
         <FlyOut open={openDevelopers} handleCancel={handleCancel}>
           <Developers />
         </FlyOut>
+        <ScrollProgress />
       </div>
     </>
   )

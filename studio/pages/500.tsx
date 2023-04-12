@@ -7,11 +7,12 @@ import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
 import { auth, STORAGE_KEY } from 'lib/gotrue'
+import { useTheme } from 'common'
 
 const Error500: NextPage = () => {
   const router = useRouter()
   const { ui } = useStore()
-  const { theme } = ui
+  const { isDarkMode } = useTheme()
 
   const onClickLogout = async () => {
     await auth.signOut()
@@ -29,7 +30,7 @@ const Error500: NextPage = () => {
               <a href="/projects">
                 <Image
                   src={
-                    theme == 'dark'
+                    isDarkMode
                       ? `${router.basePath}/img/supabase-dark.svg`
                       : `${router.basePath}/img/supabase-light.svg`
                   }

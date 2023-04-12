@@ -66,6 +66,11 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     showCustomChildren,
     customHeader,
     children,
+    onAddRow,
+    onAddColumn,
+    updateTableRow,
+    onEditForeignKeyColumnValue,
+    onImportData,
   } = props
   const dispatch = useDispatch()
   const state = useTrackedState()
@@ -79,15 +84,13 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const sorts = formatSortURLParams(sort as string[])
   const filters = formatFilterURLParams(filter as string[])
 
-  const table = props.table
-
   const { project } = useProjectContext()
   const { data, isLoading, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [table.schema, table.name],
+      queryKey: [props.table.schema, props.table.name],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      table: props.table,
       sorts,
       filters,
       page: state.page,
@@ -194,17 +197,18 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     if (!state.table || refreshView || refreshTable) {
       initializeData()
     }
-  }, [state.metaService, state.table, table, props.schema])
+  }, [state.metaService, state.table, props.table, props.schema])
 
   return (
     <div className="sb-grid">
       <Header
-        table={table}
+        table={props.table}
         sorts={sorts}
         filters={filters}
         isRefetching={isRefetching}
-        onAddRow={editable ? props.onAddRow : undefined}
-        onAddColumn={editable ? props.onAddColumn : undefined}
+        onAddRow={editable ? onAddRow : undefined}
+        onAddColumn={editable ? onAddColumn : undefined}
+        onImportData={editable ? onImportData : undefined}
         headerActions={headerActions}
         customHeader={customHeader}
       />
@@ -216,8 +220,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
             ref={gridRef}
             {...gridProps}
             rows={data?.rows ?? []}
-            updateRow={props.updateTableRow}
-            onEditForeignKeyColumnValue={props.onEditForeignKeyColumnValue}
+            updateRow={updateTableRow}
+            onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
           <Footer isLoading={isLoading || isRefetching} />
           <Shortcuts gridRef={gridRef} />
@@ -225,7 +229,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       )}
 
       {mounted &&
-        createPortal(<RowContextMenu table={table} rows={data?.rows ?? []} />, document.body)}
+        createPortal(<RowContextMenu table={props.table} rows={data?.rows ?? []} />, document.body)}
     </div>
   )
 })

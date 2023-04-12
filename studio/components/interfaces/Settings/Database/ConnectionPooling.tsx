@@ -175,7 +175,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
         ignore_startup_parameters: {
           title: 'Ignore Startup Parameters',
           type: 'string',
-          readOnly: true,
           help: 'Defaults are either blank or "extra_float_digits"',
         },
       },

@@ -30,7 +30,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
-  function telemetry(route: string) {
+  function handlePageTelemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
@@ -43,7 +43,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       /*
        * handle telemetry
        */
-      telemetry(url)
+      handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -65,6 +65,15 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router.events])
 
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.route)
+    }
+  }, [router.isReady])
+
   const SITE_TITLE = 'Supabase Documentation'
 
   const AuthContainer = (props) => {
@@ -84,7 +93,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <ThemeProvider>
           <CommandMenuProvider
             site="docs"
-            MarkdownHandler={({ ...props }) => (
+            MarkdownHandler={(props) => (
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
             )}
           >
