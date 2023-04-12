@@ -12,7 +12,7 @@ import Head from 'next/head'
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
-  function telemetry(route: string) {
+  function handlePageTelemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
@@ -22,7 +22,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      telemetry(url)
+      handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -31,6 +31,16 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
   }, [router.events])
+
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     * if the route is not ready. Don't need to send it will be picked up by router.event above
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.route)
+    }
+  }, [])
 
   const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
   const { basePath } = useRouter()
