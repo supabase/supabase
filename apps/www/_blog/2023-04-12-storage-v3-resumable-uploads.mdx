@@ -129,7 +129,7 @@ Using Uppy with Supabase Storage looks like this:
 import { Uppy, Dashboard, Tus } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
 const token = 'anon-key'
-const projectId = 'auafxsswdyhumisptuxe'
+const projectId = 'your-project-ref'
 const bucketName = 'avatars'
 const folderName = 'foldername'
 const supabaseUploadURL = `https://${projectId}.supabase.co/storage/v1/upload/resumable`
@@ -214,10 +214,12 @@ await db.withTransaction(() => {
 	// the current server can upload to s3 at the given key
 	await uploadObject();
 
-  // storage.objects stores the object metadata of all objects
-	// It doubles up as a way to check Authz.
-  // If a user is able to insert into this table, they can upload.
-	await db.run('insert into storage.objects(..) values(..)')
+   if (isLastChunk) {
+    // storage.objects stores the object metadata of all objects
+    // It doubles up as a way to check Authz.
+    // If a user is able to insert into this table, they can upload.
+    await db.run('insert into storage.objects(..) values(..)')
+   }
 });
 
 // the advisory lock is automatically released at this point
