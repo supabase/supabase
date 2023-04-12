@@ -288,8 +288,8 @@ export default class MetaStore implements IMetaStore {
   }
 
   async addPrimaryKey(schema: string, table: string, columns: string[]) {
-    const primaryKeyColumns = columns.join(',')
-    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
+    const primaryKeyColumns = columns.join('","')
+    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
     return await this.query(query)
   }
 
@@ -501,11 +501,15 @@ export default class MetaStore implements IMetaStore {
           const removePK = await this.removePrimaryKey(column.schema, column.table)
           if (removePK.error) throw removePK.error
         }
+
         const primaryKeyColumns = isPrimaryKey
           ? existingPrimaryKeys.concat([column.name])
           : existingPrimaryKeys.filter((x) => x !== column.name)
-        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
-        if (addPK.error) throw addPK.error
+
+        if (primaryKeyColumns.length) {
+          const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+          if (addPK.error) throw addPK.error
+        }
       }
 
       // For updating of foreign key relationship, we remove the original one by default
