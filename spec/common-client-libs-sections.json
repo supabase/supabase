@@ -862,6 +862,20 @@
         "type": "function"
       },
       {
+        "id": "from-create-signed-upload-url",
+        "title": "Create signed upload URL",
+        "slug": "storage-from-createsigneduploadurl",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from-upload-to-signed-url",
+        "title": "Upload to a signed URL",
+        "slug": "storage-from-uploadtosignedurl",
+        "product": "storage",
+        "type": "function"
+      },
+      {
         "id": "from-get-public-url",
         "title": "Retrieve public URL",
         "slug": "storage-from-getpublicurl",

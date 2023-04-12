@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.{js,json,md,ts,tsx,jsx,css}\""
   },
   "dependencies": {
-    "@expo/webpack-config": "^0.17.0",
+    "@expo/webpack-config": "^18.0.3",
     "@react-native-async-storage/async-storage": "^1.17.9",
     "@supabase/supabase-js": "^2.0.4",
     "expo": "~46.0.9",
