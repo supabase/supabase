@@ -7,17 +7,32 @@ tags:
 date: '2023-04-12'
 to_depth: 3
 author: fabrizio,inian
-image: launch-week-7/day-2-edge-runtime/edge-runtime-og.png
-thumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpeg
+thumb: launch-week-7/day-3-storage-resumable-uploads/storage-v3.jpg
 ---
 
 Supabase Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads , Quality Filters, Next.js support, and WebP support.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/pT2PcZFq_M0"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
 
 The key feature: **Resumable Uploads**! With Resumable Uploads, you can continue uploading a file from where you left off, even if you lose internet connectivity or accidentally close your browser tab while.
 
 Resumable uploads divides the file into chucks before uploading them, emitting progress events during upload.
 
-[pause-upload.mov](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fa11b7b6-05fa-4d4a-a807-0bde9678d11a/pause-upload.mov)
+<video width="100%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+  <source
+    src="/images/blog/launch-week-7/day-3-storage-resumable-uploads/pause-upload.mov"
+    type="video/mp4"
+  />
+</video>
 
 With this release, you can now upload files as large as 50GB! (Previously the limit was 5GB).
 
@@ -93,7 +108,7 @@ You can now restrict the size and type of objects on a per-bucket basis. These f
 
 For example, you can restrict your users a 1 MB and `image/*` files when uploading their profile images:
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d72ee859-45df-4db8-922e-9529ae8667fe/Untitled.png)
+![Bucket Restrictions](/images/blog/launch-week-7/day-3-storage-resumable-uploads/bucket-restrictions.png)
 
 ## Deep Dive into Resumable Uploads
 
@@ -149,7 +164,12 @@ uppy.on('complete', (result) => {
 
 And there you have it, with a few lines of code, you can support parallel, resumable uploads of multiple files, with progress events!
 
-[parallel-uploads.mov](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3908b0f6-3a00-4132-86e7-f76e41202638/parallel-uploads.mov)
+<video width="100%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+  <source
+    src="/images/blog/launch-week-7/day-3-storage-resumable-uploads/parallel-uploads.mov"
+    type="video/mp4"
+  />
+</video>
 
 ## Implementing TUS inside Supabase Storage
 
@@ -207,6 +227,8 @@ With advisory locks, we’ve been able to utilize Postgres as a key part of the 
 ### Roll out
 
 Because this is a major update, we’re rolling it out gradually over the next month. You will receive a notification in your dashboard when the feature is available for project. Reach out to us if you want early access to this feature.
+
+![Let me in](/images/blog/launch-week-7/day-3-storage-resumable-uploads/let-me-in.gif)
 
 ## Coming up next
 
