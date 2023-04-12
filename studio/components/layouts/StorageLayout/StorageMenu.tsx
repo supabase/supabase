@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Menu, IconLoader, Alert, IconEdit } from 'ui'
+import { Button, Menu, Alert, IconEdit } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions } from 'hooks'
@@ -13,6 +13,7 @@ import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStor
 import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface Props {}
 
@@ -78,9 +79,10 @@ const StorageMenu: FC<Props> = () => {
             <div>
               <Menu.Group title="All buckets" />
               {!loaded ? (
-                <div className="flex items-center space-x-2 py-2 px-2">
-                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                  <span className="text-sm">Loading buckets</span>
+                <div className="space-y-2">
+                  <ShimmeringLoader className="!py-2.5" />
+                  <ShimmeringLoader className="!py-2.5 w-3/4" />
+                  <ShimmeringLoader className="!py-2.5 w-1/2" />
                 </div>
               ) : (
                 <>
