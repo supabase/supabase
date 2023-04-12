@@ -21,7 +21,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     queries: [
       'Create a table that stores a list of cities, and insert 10 rows of sample data into it',
       'Create tables (with foreign key relationships) for blog posts and comments',
-      'Create tables for employees, reviewers, and employee reviews reviews, with columns for employee ID, reviewer ID, and review text',
+      'Create tables for employees, reviewers, and employee reviews, with columns for employee ID, reviewer ID, and review text',
     ],
   },
   {
