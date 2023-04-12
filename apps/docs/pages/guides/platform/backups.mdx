@@ -9,7 +9,9 @@ Database backups are an integral part of any disaster recovery plan. Disasters c
 
 ## Frequency of Backups
 
-When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery. The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
+When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery (PITR). The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
+
+Daily Backups and PITR are mutually exclusive. If your project opts into using PITR, Daily Backups will no longer be taken. They're also unnecessary, as PITR supports a superset of functionality, in terms of the granular recovery that can be performed.
 
 <Admonition type="note">
   Database backups do not include objects stored via the Storage API, as the database only includes

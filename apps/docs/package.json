@@ -35,7 +35,10 @@
     "gen:supabase-js:v2": "npm-run-all gen:supabase-js:v2:ref",
     "gen:supabase-js:v2:ref": "ts-node ./generator/index.ts gen --type legacy --input ../../spec/supabase_js_v2.yml --output ./docs/reference/javascript/generated",
     "gen:realtime": "npm-run-all gen:realtime:config",
-    "gen:realtime:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/realtime_v0_config.yaml --output  ./docs/reference/realtime/generated/config.mdx"
+    "gen:realtime:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/realtime_v0_config.yaml --output  ./docs/reference/realtime/generated/config.mdx",
+    "gen:analytics": "npm-run-all gen:analytics:config gen:analytics:usage",
+    "gen:analytics:config": "ts-node ./generator/index.ts gen --type config --input ../../spec/analytics_v0_config.yaml --output  ./docs/reference/analytics/generated/config.mdx",
+    "gen:analytics:usage": "ts-node ./generator/index.ts gen --type api --input ../../spec/transforms/analytics_v0_openapi_deparsed.json --output ./docs/reference/analytics/generated/usage.mdx"
   },
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",
@@ -45,9 +48,9 @@
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^12.0.4",
     "@radix-ui/react-accordion": "^1.0.1",
-    "@supabase/auth-helpers-nextjs": "^0.5.4",
+    "@supabase/auth-helpers-nextjs": "^0.5.6",
     "@supabase/auth-helpers-react": "^0.3.1",
-    "@supabase/supabase-js": "^2.8.0",
+    "@supabase/supabase-js": "^2.13.0",
     "algoliasearch": "^4.14.2",
     "babel": "^6.23.0",
     "clsx": "^1.2.1",
@@ -65,6 +68,7 @@
     "mdast-util-to-markdown": "^1.5.0",
     "mdast-util-to-string": "^3.1.1",
     "mdx-mermaid": "2.0.0-rc3",
+    "mermaid": "^10.0.2",
     "micromark-extension-mdxjs": "^1.0.0",
     "next": "12.3.2",
     "next-compose-plugins": "^2.2.1",

@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
@@ -539,15 +539,16 @@ functions:
           ```
 
   - id: update
-    title: 'Modify data: update()'
     description: |
       Performs an UPDATE on the table.
+    title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
-      - name: Updating your data
+      - id: updating-your-data
+        name: Updating your data
         isSpotlight: true
-        dart: |
+        code: |
           ```dart
           final res = await supabase
             .from('cities')
@@ -555,13 +556,14 @@ functions:
             .match({ 'name': 'Auckland' })
             .execute();
           ```
-      - name: Updating JSON data
+      - id: updating-json-data
+        name: Updating JSON data
         description: |
           Postgres offers a
           [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
           for working with JSON data. Right now it is only possible to update an entire JSON document,
           but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
-        dart: |
+        code: |
           ```dart
           final res = await supabase
             .from('users')

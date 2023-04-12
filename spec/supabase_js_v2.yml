@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/supabase-js
-  title: Supabase Client
+  title: Supabase Javascript Client
   description: |
 
     Supabase JavaScript.
@@ -177,7 +177,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp(
@@ -232,8 +232,9 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -258,12 +259,25 @@ functions:
             phone: '+13334445555',
           })
           ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithOtp({
+            phone: '+13334445555',
+            options: {
+              channel:'whatsapp',
+            }
+          })
+          ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#configure-third-party-providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -279,7 +293,7 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -304,6 +318,50 @@ functions:
             }
           })
           const oAuthToken = data.session.provider_token // use to access provider API
+          ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```js
+            // You can extract the user's email domain and use it to trigger the
+            // authentication flow with the correct identity provider.
+
+            const { data, error } = await supabase.auth.signInWithSSO({
+              domain: 'company.com'
+            })
+
+            if (data?.url) {
+              // redirect the user to the identity provider's authentication flow
+              window.location.href = data.url
+            }
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```js
+            // Useful when you need to map a user's sign in request according
+            // to different rules that can't use email domains.
+
+            const { data, error } = await supabase.auth.signInWithSSO({
+              providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92'
+            })
+
+            if (data?.url) {
+              // redirect the user to the identity provider's authentication flow
+              window.location.href = data.url
+            }
           ```
   - id: sign-out
     title: 'signOut()'
@@ -753,7 +811,7 @@ functions:
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.updateUser({
@@ -812,9 +870,7 @@ functions:
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'signup',
             email: 'email@example.com',
-            options: {
-              'password': 'secret'
-            }
+            password: 'secret'
           })
           ```
       - id: generate-an-invite-link
@@ -1320,21 +1376,21 @@ functions:
           sql: |
             ```sql
             create table countries (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
             create table cities (
-              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null, 
-              "name" text, 
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
               "country_id" "uuid" references public.countries on delete cascade
             );
-            
+
             with country as (
-              insert into countries (name) 
+              insert into countries (name)
               values ('united kingdom') returning id
             )
-            insert into cities (name, country_id) values 
+            insert into cities (name, country_id) values
             ('London', (select id from country)),
             ('Manchester', (select id from country)),
             ('Liverpool', (select id from country)),
@@ -3550,7 +3606,7 @@ functions:
   - id: using-modifiers
     title: Using Modifiers
     description: |
-      Filters work on the row level—they allows you to return rows that
+      Filters work on the row level—they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g., returning a CSV string).
@@ -3889,7 +3945,7 @@ functions:
             }
             ```
         description: |
-          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. 
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests.
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
@@ -4145,7 +4201,8 @@ functions:
           })
 
           if (error instanceof FunctionsHttpError) {
-            console.log('Function returned an error', error.message)
+            const errorMessage = await error.context.json()
+            console.log('Function returned an error', errorMessage)
           } else if (error instanceof FunctionsRelayError) {
             console.log('Relay error:', error.message)
           } else if (error instanceof FunctionsFetchError) {
@@ -4433,7 +4490,11 @@ functions:
           ```js
           const { data, error } = await supabase
             .storage
-            .createBucket('avatars', { public: false })
+            .createBucket('avatars', {
+              public: false,
+              allowedMimeTypes: ['image/png'],
+              fileSizeLimit: 1024
+            })
           ```
 
   - id: empty-bucket
@@ -4459,7 +4520,7 @@ functions:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
       - RLS policy permissions required:
-        - `buckets` table permissions: `update`
+        - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
@@ -4470,7 +4531,11 @@ functions:
           ```js
           const { data, error } = await supabase
             .storage
-            .updateBucket('avatars', { public: false })
+            .updateBucket('avatars', {
+              public: false,
+              allowedMimeTypes: ['image/png'],
+              fileSizeLimit: 1024
+            })
           ```
 
   - id: delete-bucket
@@ -4498,7 +4563,7 @@ functions:
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `insert`
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
@@ -4551,7 +4616,6 @@ functions:
             .from('avatars')
             .update('public/avatar1.png', avatarFile, {
               cacheControl: '3600',
-              // Overwrite file if it exists
               upsert: true
             })
           ```
@@ -4676,6 +4740,46 @@ functions:
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
 
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl('folder/cat.jpg')
+          ```
+
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a signed URL
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
+          ```
+
   - id: from-get-public-url
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
@@ -4755,6 +4859,7 @@ functions:
               transform: {
                 width: 100,
                 height: 100,
+                quality: 80
               }
             })
           ```
