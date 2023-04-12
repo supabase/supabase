@@ -1338,11 +1338,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Succesful response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Succesful response",
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": {
