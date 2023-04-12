@@ -5,14 +5,49 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 06 Apr 2023 22:10:00 +0000</lastBuildDate>
+      <lastBuildDate>Mon, 10 Apr 2023 22:10:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/infinite-scroll-with-supabase</guid>
-  <title>Infinite scroll with NextJs, Supabase and Framer Motion</title>
-  <link>https://supabase.com/blog/infinite-scroll-with-supabase</link>
-  <description>Lazy load and paginate data on scroll with supabase-js and a sprinkle of Framer Motion magic ✨</description>
+  <guid>https://supabase.com/blog/edge-runtime-self-hosted-deno</guid>
+  <title>Supabase Edge Runtime: Self-hosted Deno Functions</title>
+  <link>https://supabase.com/blog/edge-runtime-self-hosted-deno</link>
+  <description>undefined</description>
+  <pubDate>Mon, 10 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-logs-self-hosted</guid>
+  <title>Supabase Logs: open source logging server</title>
+  <link>https://supabase.com/blog/supabase-logs-self-hosted</link>
+  <description>undefined</description>
+  <pubDate>Sun, 09 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-update-march-2023</guid>
+  <title>Supabase Beta March 2023</title>
+  <link>https://supabase.com/blog/supabase-beta-update-march-2023</link>
+  <description>We are in full shipping mode 🛥️… Launch Week 7 can’t come quickly enough!</description>
+  <pubDate>Fri, 07 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-7-hackathon</guid>
+  <title>The Supabase AI Hackathon</title>
+  <link>https://supabase.com/blog/launch-week-7-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
   <pubDate>Thu, 06 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/designing-with-ai-midjourney</guid>
+  <title>Designing with AI: Generating unique artwork for every user</title>
+  <link>https://supabase.com/blog/designing-with-ai-midjourney</link>
+  <description>Using MidJourney to generative artwork and serving ticket images with Edge Functions</description>
+  <pubDate>Thu, 06 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion</guid>
+  <title>Infinite scroll with Next.js, Framer Motion, and Supabase</title>
+  <link>https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion</link>
+  <description>Lazy load and paginate data on scroll with Next.js and a sprinkle of Framer Motion magic ✨</description>
+  <pubDate>Mon, 03 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supaclub</guid>

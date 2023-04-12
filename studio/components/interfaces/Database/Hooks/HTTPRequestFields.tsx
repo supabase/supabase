@@ -165,7 +165,7 @@ const HTTPRequestFields = ({
                       onClick={() =>
                         onAddHeader({
                           id: uuidv4(),
-                          name: ' Authorization',
+                          name: 'Authorization',
                           value: `Bearer ${anonKey}`,
                         })
                       }
@@ -183,7 +183,7 @@ const HTTPRequestFields = ({
                       onClick={() =>
                         onAddHeader({
                           id: uuidv4(),
-                          name: ' x-supabase-webhook-source',
+                          name: 'x-supabase-webhook-source',
                           value: `[Use a secret value]`,
                         })
                       }
