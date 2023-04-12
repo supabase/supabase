@@ -1,2 +1,2 @@
-export { PROVIDERS_SCHEMAS } from './AuthProviders/AuthProvidersFormValidation'
+export { PROVIDERS_SCHEMAS, PROVIDER_SAML } from './AuthProviders/AuthProvidersFormValidation'
 export { TEMPLATES_SCHEMAS } from './AuthProviders/AuthTemplatesValidation'

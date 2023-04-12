@@ -1,11 +1,12 @@
 import { useMonaco } from '@monaco-editor/react'
 import { autorun } from 'mobx'
-import { createContext, FC, useContext, useEffect, useCallback } from 'react'
+import { createContext, FC, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 import { IRootStore } from 'stores'
 import { getTheme } from 'components/ui/CodeEditor'
 import SparkBar from 'components/ui/SparkBar'
+import { useTheme } from 'common'
 
 const StoreContext = createContext<IRootStore>(undefined!)
 
@@ -24,28 +25,17 @@ interface StoreProvider {
 export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
   const monaco = useMonaco()
   const { ui } = rootStore
-  const { theme } = ui
+  const { isDarkMode } = useTheme()
 
   useEffect(() => {
     if (monaco) {
-      const theme: any = getTheme(ui.isDarkTheme)
+      const theme: any = getTheme(isDarkMode)
       monaco.editor.defineTheme('supabase', theme)
     }
-  }, [theme, monaco])
-
-  const matchMediaEvent = useCallback(() => {
-    ui.themeOption === 'system' &&
-      ui.setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-  }, [])
+  }, [isDarkMode, monaco])
 
   useEffect(() => {
     ui.load()
-
-    if (window?.matchMedia('(prefers-color-scheme: dark)')?.addEventListener) {
-      // backwards compatibility for safari < v14
-      // limited support for addEventListener()
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', matchMediaEvent)
-    }
 
     autorun(() => {
       if (ui.notification) {
@@ -100,11 +90,6 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
         }
       )
     }
-
-    return () =>
-      window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .removeEventListener('change', matchMediaEvent)
   }, [])
 
   return <StoreContext.Provider value={rootStore}>{children}</StoreContext.Provider>

@@ -1,5 +1,4 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-
 export const meta = {
   id: 'auth-twilio',
   title: 'Phone Auth with Twilio',
@@ -294,6 +293,56 @@ and the response should also be the same as above:
 ```
 
 The user does not have a password therefore will need to sign in via this method each time they want to access your service.
+
+## WhatsApp OTP Logins
+
+In some cases, you may wish to use WhatsApp as a delivery channel instead. Here are some examples our users have cited:
+
+- You want higher deliverability
+- You wish for a secure channel
+- Your users mostly use WhatsApp as a messaging platform
+
+To make use of WhatsApp OTP, please complete the following steps:
+
+- Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up)
+- Submit a template via the [Twilio Guide For Submitting WhatsApp templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval)
+
+<Admonition type="caution">
+The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase dashboard.
+</Admonition>
+
+The sign in process with WhatsApp is similar to the sign in process for SMS. Do note the additional `whatsapp` parameter added:
+
+```js
+const {data, error } = await supabase.auth.signInWithOtp({
+    phone: '+57336567365',
+    options: {
+      channel:'whatsapp'
+    }
+ })
+```
+
+You can also sign up with `whatsapp` as a channel:
+
+```js
+const {data, error }= await supabase.auth.signUp({
+   phone: '+57336567365',
+   password: 'testsupabasenow',
+   options: {
+     channel:'whatsapp',
+   }
+})
+```
+
+There is no change in the verification process, you should continue to use the `sms` type for verification
+```js
+// After receiving a WhatsApp OTP
+let { data, error } = await supabase.auth.verifyOtp({
+  phone: '+57336567365',
+  token: '123456',
+  type: 'sms',
+})
+```
 
 ## Resources
 

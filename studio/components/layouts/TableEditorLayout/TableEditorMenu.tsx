@@ -1,18 +1,15 @@
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
-  IconChevronDown,
-  IconCopy,
+  IconCheck,
+  IconChevronsDown,
   IconEdit,
   IconLoader,
-  IconLock,
   IconRefreshCw,
   IconSearch,
-  IconTrash,
   IconX,
   Input,
   Listbox,
@@ -22,13 +19,13 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
-import { checkPermissions, useStore, useParams } from 'hooks'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { useParams } from 'common/hooks'
+import { checkPermissions, useStore, useLocalStorage } from 'hooks'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import InfiniteList from 'components/ui/InfiniteList'
+import EntityListItem from './EntityListItem'
 
 export interface TableEditorMenuProps {
   selectedSchema?: string
@@ -51,6 +48,10 @@ const TableEditorMenu = ({
   const { id } = useParams()
 
   const [searchText, setSearchText] = useState<string>('')
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
 
   const { project } = useProjectContext()
   const {
@@ -68,6 +69,7 @@ const TableEditorMenu = ({
       connectionString: project?.connectionString,
       schema: selectedSchema,
       search: searchText || undefined,
+      sort,
     },
     {
       keepPreviousData: true,
@@ -176,19 +178,21 @@ const TableEditorMenu = ({
                 </Button>
               </Tooltip.Trigger>
               {!canCreateTables && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to create tables
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to create tables
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>
@@ -251,9 +255,75 @@ const TableEditorMenu = ({
                       <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
                     )}
                   </div>
-                  <button className="cursor-pointer" onClick={refreshTables}>
-                    <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-                  </button>
+
+                  <div className="flex gap-3 items-center">
+                    <Dropdown
+                      size="small"
+                      side="bottom"
+                      align="start"
+                      style={{ zIndex: 1 }}
+                      overlay={[
+                        <Dropdown.Item
+                          key="alphabetical"
+                          icon={
+                            sort === 'alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('alphabetical')
+                          }}
+                        >
+                          Alphabetical
+                        </Dropdown.Item>,
+                        <Dropdown.Item
+                          key="grouped-alphabetical"
+                          icon={
+                            sort === 'grouped-alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('grouped-alphabetical')
+                          }}
+                        >
+                          Entity Type
+                        </Dropdown.Item>,
+                      ]}
+                    >
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <IconChevronsDown size={18} strokeWidth={1} />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs">Sort By</span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Dropdown>
+
+                    <button
+                      className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                      onClick={refreshTables}
+                    >
+                      <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
+                    </button>
+                  </div>
                 </div>
               </>
             }
@@ -284,92 +354,3 @@ const TableEditorMenu = ({
 }
 
 export default observer(TableEditorMenu)
-
-export interface EntityListItemProps {
-  id: number
-  projectRef: string
-  item: Entity
-  isLocked: boolean
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-  isLoadingTableMetadata?: boolean
-}
-
-const EntityListItem = ({
-  id,
-  projectRef,
-  item: entity,
-  isLocked,
-  onEditTable,
-  onDeleteTable,
-  onDuplicateTable,
-  isLoadingTableMetadata = false,
-}: EntityListItemProps) => {
-  const isActive = Number(id) === entity.id
-
-  return (
-    <ProductMenuItem
-      url={`/project/${projectRef}/editor/${entity.id}`}
-      name={entity.name}
-      hoverText={entity.comment ? entity.comment : entity.name}
-      isActive={isActive}
-      icon={
-        <div className="flex items-center justify-center text-xs h-4 w-4 rounded-[2px] text-scale-1100 bg-scale-800">
-          {Object.entries(ENTITY_TYPE)
-            .find(([, value]) => value === entity.type)?.[0]?.[0]
-            ?.toUpperCase()}
-        </div>
-      }
-      action={
-        entity.type === ENTITY_TYPE.TABLE &&
-        isActive &&
-        !isLocked && (
-          <Dropdown
-            size="small"
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="edit-table"
-                icon={<IconEdit size="tiny" />}
-                onClick={() => onEditTable(entity)}
-                disabled={isLoadingTableMetadata}
-              >
-                Edit Table
-              </Dropdown.Item>,
-              <Dropdown.Item
-                key="duplicate-table"
-                icon={<IconCopy size="tiny" />}
-                onClick={() => onDuplicateTable(entity)}
-                disabled={isLoadingTableMetadata}
-              >
-                Duplicate Table
-              </Dropdown.Item>,
-              <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
-                <a>
-                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
-                    View Policies
-                  </Dropdown.Item>
-                </a>
-              </Link>,
-              <Dropdown.Separator key="separator" />,
-              <Dropdown.Item
-                key="delete-table"
-                icon={<IconTrash size="tiny" />}
-                onClick={() => onDeleteTable(entity)}
-                disabled={isLoadingTableMetadata}
-              >
-                Delete Table
-              </Dropdown.Item>,
-            ]}
-          >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
-              <IconChevronDown size={14} strokeWidth={2} />
-            </div>
-          </Dropdown>
-        )
-      }
-    />
-  )
-}
