@@ -951,6 +951,7 @@ class StorageExplorerStore {
               blob: new Blob([blob], { type: fileMimeType }),
             })
           } else {
+            console.error('Failed to download file', `${file.prefix}/${file.name}`)
             resolve(false)
           }
         })
@@ -973,8 +974,17 @@ class StorageExplorerStore {
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+    if (downloadedFiles.length === 0) {
+      return this.ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: `Failed to download files from the ${folder.name}`,
+      })
+    }
+
     downloadedFiles.forEach((file) => {
-      zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+      if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
     })
 
     const blobURL = URL.createObjectURL(await zipWriter.close())
@@ -1100,7 +1110,7 @@ class StorageExplorerStore {
     } else {
       if (toastId) {
         this.ui.setNotification({
-          error: error,
+          error: res.error,
           id: toastId,
           category: 'error',
           message: `Failed to download ${fileName}`,
@@ -1247,7 +1257,10 @@ class StorageExplorerStore {
           path: prefix,
           options,
         })
-        if (res.error) console.error('Error at fetchFoldersByPath:', res.error)
+        if (res.error) {
+          console.error('Error at fetchFoldersByPath:', res.error)
+          return []
+        }
         return res
       })
     )
@@ -1532,7 +1545,7 @@ class StorageExplorerStore {
 
   formatFolderItems = (items = []) => {
     const formattedItems =
-      items
+      (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
         .map((item) => {
           const type = item.id ? STORAGE_ROW_TYPES.FILE : STORAGE_ROW_TYPES.FOLDER
@@ -1655,8 +1668,8 @@ class StorageExplorerStore {
 
   loadExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
-    const preferences = localStorage.getItem(localStorageKey)
-    if (preferences) {
+    const preferences = localStorage?.getItem(localStorageKey) ?? undefined
+    if (preferences !== undefined) {
       const { view, sortBy, sortByOrder } = JSON.parse(preferences)
       this.view = view
       this.sortBy = sortBy
