@@ -36,10 +36,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     /**
      * Send page telemetry on first page load
      */
-    if (router.route) {
+    if (router.isReady) {
       handlePageTelemetry(router.route)
     }
-  }, [])
+  }, [router.isReady])
 
   const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
   const { basePath } = useRouter()
