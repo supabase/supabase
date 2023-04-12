@@ -45,6 +45,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
         '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
         'transition ease-out',
+        'place-self-start mx-auto top-24',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
