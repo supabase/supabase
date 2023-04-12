@@ -60,7 +60,7 @@ const HelpPopover: FC<Props> = () => {
             </div>
             <p className="text-sm text-scale-900">
               Expected response time is based on your billing tier. Pro and Pay as You Go plans are
-              prioritised.
+              prioritized.
             </p>
           </div>
           <Popover.Separator />
