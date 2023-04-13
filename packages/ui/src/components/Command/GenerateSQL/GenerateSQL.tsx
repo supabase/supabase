@@ -11,6 +11,7 @@ import {
   MessageRole,
   MessageStatus,
   useAiChat,
+  AiWarning,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
@@ -84,7 +85,7 @@ const GenerateSQL = () => {
       <div
         className={cn(
           'relative py-4 max-h-[550px] overflow-auto',
-          allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
+          allowSendingSchemaMetadata ? 'mb-[255px]' : 'mb-[150px]'
         )}
       >
         {messages.map((message, i) => {
@@ -116,7 +117,8 @@ const GenerateSQL = () => {
                 message.status === MessageStatus.Complete
                   ? formatAnswer(unformattedAnswer)
                   : unformattedAnswer
-              const cantHelp = answer === "Sorry, I don't know how to help with that."
+              const cantHelp =
+                answer.replace(/^-- /, '') === "Sorry, I don't know how to help with that."
 
               return (
                 <div className="px-4 [overflow-anchor:none] mb-6">
@@ -235,9 +237,14 @@ const GenerateSQL = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
 
-      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+      <div className="absolute bottom-0 w-full bg-scale-200 pt-4">
+        {messages.length > 0 && !hasError && (
+          <div className="mb-4">
+            <AiWarning />
+          </div>
+        )}
         {allowSendingSchemaMetadata && (
-          <>
+          <div className="mb-4">
             {messages.length === 0 ? (
               <div className="flex items-center justify-between px-6 py-3">
                 <div>
@@ -262,24 +269,20 @@ const GenerateSQL = () => {
                 />
               </div>
             ) : (
-              <div className="flex items-center justify-between px-6 py-3">
-                <div>
-                  <p className="text-sm">
-                    Table names, column names and their corresponding data types{' '}
-                    <span
-                      className={cn(includeSchemaMetadata ? 'text-brand-900' : 'text-amber-900')}
-                    >
-                      {includeSchemaMetadata ? 'are' : 'are not'} included
-                    </span>{' '}
-                    in this conversation
-                  </p>
-                  <p className="text-sm text-scale-1100">
-                    Start a new conversation to change this configuration
-                  </p>
-                </div>
+              <div className="mx-4 p-6 flex flex-col items-start gap-2 mt-4 border rounded-lg text-left text-xs text-scale-1100 border-scale-500 bg-white dark:bg-scale-300">
+                <p>
+                  Table names, column names and their corresponding data types{' '}
+                  <span className={cn(includeSchemaMetadata ? 'text-brand-900' : 'text-amber-900')}>
+                    {includeSchemaMetadata ? 'are' : 'are not'} included
+                  </span>{' '}
+                  in this conversation
+                </p>
+                <p className="text-scale-1000">
+                  Start a new conversation to change this configuration
+                </p>
               </div>
             )}
-          </>
+          </div>
         )}
         <Input
           inputRef={(inputElement) => {
@@ -291,7 +294,7 @@ const GenerateSQL = () => {
               }, 0)
             }
           }}
-          className="bg-scale-100 rounded mx-3"
+          className="bg-scale-100 rounded mx-3 mb-4"
           autoFocus
           placeholder={
             isLoading || isResponding
