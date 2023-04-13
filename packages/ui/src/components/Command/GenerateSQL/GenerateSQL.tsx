@@ -81,15 +81,6 @@ const GenerateSQL = () => {
     }
   }
 
-  const handleKeypress = (e, category) => {
-    //it triggers by pressing the enter key
-    if (e.keyCode === 13) {
-      setSelectedCategory(category)
-      // focus on the first item in the list after selecting a category
-      const firstItem = document.querySelector('.command-menu-item')
-    }
-  }
-
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div
