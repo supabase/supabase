@@ -2,17 +2,15 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
 export const tableEditorState = proxy({
-  loadedIds: {} as {
-    [key: string]: Set<number>
-  },
+  projectRef: undefined as undefined | string,
+  loadedIds: proxySet<number>([]),
   addLoadedId: (ref: string, id: number) => {
-    if (!tableEditorState.loadedIds[ref]) {
-      tableEditorState.loadedIds[ref] = proxySet<number>([])
+    if (ref !== tableEditorState.projectRef) {
+      tableEditorState.loadedIds.clear()
+      tableEditorState.projectRef = ref
     }
-    tableEditorState.loadedIds[ref].add(id)
-  },
-  clearLoadedIdsForProject: (ref: string) => {
-    tableEditorState.loadedIds[ref] = proxySet<number>([])
+
+    tableEditorState.loadedIds.add(id)
   },
 })
 
@@ -25,5 +23,6 @@ export const useIsTableLoaded = (ref?: string, id?: number) => {
   const snap = useTableEditorStateSnapshot()
 
   if (!ref || !id) return false
-  return snap.loadedIds[ref]?.has(id) ?? false
+  if (ref !== snap.projectRef) return false
+  return snap.loadedIds.has(id)
 }

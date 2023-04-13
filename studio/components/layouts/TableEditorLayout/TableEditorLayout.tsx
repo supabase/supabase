@@ -8,6 +8,7 @@ import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
@@ -15,7 +16,6 @@ import useEntityType from 'hooks/misc/useEntityType'
 import Connecting from 'components/ui/Loading/Loading'
 import useLatest from 'hooks/misc/useLatest'
 import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
-import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
