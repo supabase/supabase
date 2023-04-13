@@ -17,7 +17,7 @@ import { SSE } from 'sse.js'
 
 import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem } from './Command.utils'
+import { CommandGroup, CommandItem, useHistoryKeys } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
 
@@ -343,22 +343,15 @@ const AiCommand = () => {
     setIsLoading,
   })
 
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
+  })
+
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // Message index (of role === 'user') when hitting up/down on the keyboard (shell style)
-  const [, setMessageSelectionIndex] = useState(0)
-
-  const userMessages = messages.filter(({ role }) => role === MessageRole.User)
-
-  useEffect(() => {
-    if (isResponding) {
-      return
-    }
-
-    // Note: intentionally setting index to 1 greater than array length
-    setMessageSelectionIndex(userMessages.length)
-    console.log('setting index to', userMessages.length)
-  }, [messages, isResponding])
 
   const handleSubmit = useCallback(
     (message: string) => {
@@ -523,20 +516,6 @@ const AiCommand = () => {
                   return
                 }
                 handleSubmit(search)
-                return
-              case 'ArrowUp':
-                setMessageSelectionIndex((index) => {
-                  const newIndex = Math.max(index - 1, 0)
-                  setSearch(userMessages[newIndex]?.content ?? '')
-                  return newIndex
-                })
-                return
-              case 'ArrowDown':
-                setMessageSelectionIndex((index) => {
-                  const newIndex = Math.min(index + 1, userMessages.length)
-                  setSearch(userMessages[newIndex]?.content ?? '')
-                  return newIndex
-                })
                 return
               default:
                 return

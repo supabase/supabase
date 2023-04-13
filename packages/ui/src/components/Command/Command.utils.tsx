@@ -324,3 +324,56 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
 }
 
 TextHighlighter.displayName = 'TextHighlighter'
+
+export interface UseHistoryKeysOptions {
+  enable: boolean
+  messages: string[]
+  setPrompt: (prompt: string) => void
+}
+
+/**
+ * Enables a shell-style message history when hitting
+ * up/down on the keyboard
+ */
+export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOptions) {
+  // Message index when hitting up/down on the keyboard (shell style)
+  const [, setMessageSelectionIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (enable) {
+      return
+    }
+
+    // Note: intentionally setting index to 1 greater than array length
+    setMessageSelectionIndex(messages.length)
+  }, [messages, enable])
+
+  React.useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case 'ArrowUp':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.max(index - 1, 0)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        case 'ArrowDown':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.min(index + 1, messages.length)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        default:
+          return
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [messages])
+}
