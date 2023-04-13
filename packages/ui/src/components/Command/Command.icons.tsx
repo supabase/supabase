@@ -1,12 +1,17 @@
 import React from 'react'
-export const AiIcon = () => (
+
+interface AiIconProps {
+  className?: string
+}
+
+export const AiIcon = ({ className = 'text-brand-900' }: AiIconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth="1.5"
     stroke="currentColor"
-    className="w-6 h-6 text-brand-900"
+    className={`w-6 h-6 ${className}`}
   >
     <path
       strokeLinecap="round"

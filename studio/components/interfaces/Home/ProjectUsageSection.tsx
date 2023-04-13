@@ -11,6 +11,14 @@ const ProjectUsageSection: FC = observer(({}) => {
   const { ref: projectRef } = useParams()
   const { data: usage, error: usageError, isLoading } = useProjectUsageQuery({ projectRef })
 
+  const usageColumns = [
+    'db_egress',
+    'storage_egress',
+    'monthly_active_users',
+    'realtime_message_count',
+    'func_invocations',
+  ]
+
   if (usageError) {
     return (
       <InformationBox
@@ -23,7 +31,7 @@ const ProjectUsageSection: FC = observer(({}) => {
   }
 
   const hasProjectData = usage
-    ? Object.keys(usage)
+    ? usageColumns
         .map((key) => usage[key as ProjectUsageResponseUsageKeys].usage)
         .some((usage) => (usage ?? 0) > 0)
     : false

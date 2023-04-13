@@ -14,6 +14,7 @@ import { debounce } from 'lodash'
 import TicketsGrid from '../../../components/LaunchWeek/Ticket/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'common/Providers'
 
 interface Props {
   users: UserData[]
@@ -42,6 +43,7 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
 
+  const { isDarkMode } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -52,21 +54,12 @@ export default function TicketsPage({ users }: Props) {
     loadMoreUsers(offset)
   }, [hasLoaded])
 
-  const getPagination = (page: number = 1, size: number) => {
-    const limit = size ? +size : 3
-    const from = page ? page * limit : 0
-    const to = page ? from + size : size
-
-    return { from, to }
-  }
-
-  const loadUsers = async (offset = 0, pageCount: number) => {
-    const { from, to } = getPagination(offset, pageCount)
-
+  const loadUsers = async (offset: number) => {
+    const from = offset * PAGE_COUNT
     return await supabaseAdmin!
       .from('lw7_tickets_golden')
       .select('*')
-      .range(from, to - 1)
+      .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
   }
 
@@ -74,18 +67,14 @@ export default function TicketsPage({ users }: Props) {
     if (isLast) return
     setIsLoading(true)
     setOffset((prev) => prev + 1)
-    const { data: users } = await loadUsers(offset, PAGE_COUNT)
+    const { data: users } = await loadUsers(offset)
     setLoadedUsers((prevUsers) => [...prevUsers, ...(users as any[])])
     if ((users as any[]).length < PAGE_COUNT) setIsLast(true)
     setIsLoading(false)
   }
 
-  useEffect(() => {
-    document.body.className = 'dark bg-[#1C1C1C]'
-  }, [])
-
-  const isBottomInView = () => {
-    if (ref.current && window) {
+  const handleScroll = () => {
+    if (ref.current && typeof window !== 'undefined') {
       const rect = (ref.current as HTMLDivElement)?.getBoundingClientRect()
       const isInView = rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
       setHasLoaded((prev) => !prev && isInView)
@@ -93,13 +82,14 @@ export default function TicketsPage({ users }: Props) {
   }
 
   useEffect(() => {
-    window.addEventListener(
-      'scroll',
-      debounce(() => !isLast && isBottomInView(), 200)
-    )
+    document.body.className = '!dark bg-[#1C1C1C]'
+
+    const handleDebouncedScroll = debounce(() => !isLast && handleScroll(), 200)
+    window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      window.removeEventListener('scroll', isBottomInView)
+      document.body.className = isDarkMode ? 'dark' : 'light'
+      window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])
 
@@ -119,7 +109,7 @@ export default function TicketsPage({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-20">
+        <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto h-auto">
@@ -148,9 +138,11 @@ export default function TicketsPage({ users }: Props) {
                 </p>
                 <div className="mt-1">
                   <Link href="/launch-week">
-                    <Button as="a" type="outline" size="medium">
-                      Get your ticket now
-                    </Button>
+                    <a>
+                      <Button type="outline" size="medium">
+                        Go to Launch Week 7
+                      </Button>
+                    </a>
                   </Link>
                 </div>
               </motion.div>

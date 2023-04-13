@@ -116,6 +116,13 @@ const home = [
       community: true,
     },
     {
+      label: 'Swift',
+      icon: '/img/icons/menu/reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+      community: true,
+    },
+    {
       label: 'Tools',
     },
     {
