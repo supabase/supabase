@@ -38,7 +38,7 @@ const useActiveAnchors = (
   }
 
   useEffect(() => {
-    if (!isBrowser) return
+    if (!isBrowser || !router.isReady) return
     anchors.current = document.querySelectorAll(anchorsQuerySelector)
     toc.current = document.querySelectorAll(tocQuerySelector)
 
@@ -47,7 +47,7 @@ const useActiveAnchors = (
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, [router])
 
   return null
 }
