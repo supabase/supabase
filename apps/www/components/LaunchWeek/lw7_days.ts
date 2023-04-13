@@ -216,6 +216,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Supabase Auth: SSO, Mobile, and Server-side support',
+        break_thumb_title: true,
         description: '',
         blog: '/blog/supabase-auth-sso-pkce',
         thumb: images['04-sso-thumb'],
