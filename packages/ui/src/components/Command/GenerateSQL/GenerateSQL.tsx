@@ -12,6 +12,7 @@ import {
   MessageRole,
   MessageStatus,
   useAiChat,
+  Tabs,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
@@ -174,78 +175,47 @@ const GenerateSQL = () => {
 
         {messages.length === 0 && !hasError && (
           <div>
-            <div className="px-10">
-              <h3>
+            <div className="px-4">
+              <h3 className="text-base text-scale-1100">
                 Describe what you need and Supabase AI will try to generate the relevant SQL
                 statements
               </h3>
               <p className="text-sm mt-1 text-scale-1100">
-                Here are some example prompts to try out.
+                Here are some example prompts to try out:
               </p>
             </div>
-            <div className="flex mt-4 border-t pt-2">
-              <div className="w-1/3 py-4 px-6">
-                <ul className="space-y-2">
-                  {SAMPLE_QUERIES.map((item, index) => (
-                    <li key={index}>
-                      <button
-                        className={cn(
-                          'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md block w-full text-left',
-                          selectedCategory === item.category && 'bg-slate-400 '
-                        )}
-                        type="button"
-                        onClick={() => setSelectedCategory(item.category)}
-                        onKeyDown={(e) => handleKeypress(e, item.category)}
-                      >
-                        {item.category}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="w-2/3 py-4 px-6">
-                <ul>
-                  {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
-                    (query, index) => (
-                      <button
-                        onClick={() => {
-                          if (!search) {
+            <div className="mt-4 border-t pt-4 ml-4">
+              <Tabs type="rounded-pills" size="small">
+                {SAMPLE_QUERIES.map((sample) => (
+                  <Tabs.Panel
+                    key={sample.category}
+                    id={sample.category}
+                    label={sample.category}
+                    className="mt-4"
+                  >
+                    {SAMPLE_QUERIES.find((item) => item.category === sample.category)?.queries.map(
+                      (query) => (
+                        <CommandItem
+                          type="command"
+                          onSelect={() => {
                             handleSubmit(query)
-                          }
-                        }}
-                        key={query.replace(/\s+/g, '_')}
-                        type="button"
-                      >
-                        <div className="flex">
-                          <div>
-                            <AiIcon />
+                          }}
+                          onKeyDown={(e) => e.keyCode === 13 && handleSubmit(query)}
+                          forceMount
+                          key={query.replace(/\s+/g, '_')}
+                        >
+                          <div className="flex">
+                            <div>
+                              <AiIcon />
+                            </div>
+                            <p>{query}</p>
                           </div>
-                          {query}
-                        </div>
-                      </button>
-                      // <CommandItem
-                      //   type="command"
-                      //   onSelect={() => {
-                      //     if (!search) {
-                      //       handleSubmit(query)
-                      //     }
-                      //   }}
-                      //   forceMount
-                      //   key={query.replace(/\s+/g, '_')}
-                      // >
-                      //   <div className="flex">
-                      //     <div>
-                      //       <AiIcon />
-                      //     </div>
-                      //     <p>
-                      //       <button type="button">{query}</button>
-                      //     </p>
-                      //   </div>
-                      // </CommandItem>
-                    )
-                  )}
-                </ul>
-              </div>
+                        </CommandItem>
+                      )
+                    )}
+                  </Tabs.Panel>
+                ))}
+              </Tabs>
             </div>
           </div>
         )}
