@@ -97,6 +97,16 @@ const getDay2Motion = (index: number) => {
       return undefined
   }
 }
+const getDay3Motion = (index: number) => {
+  switch (index) {
+    case 1:
+      return scaleOpacityVariant
+    case 2:
+      return opacityVariant3
+    default:
+      return undefined
+  }
+}
 
 export default function LW7Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
@@ -233,7 +243,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-4 sm:px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -298,7 +308,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#232323] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-4 sm:px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      basis-1/2 lg:basis-1/3 border border-[#232323] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -369,7 +379,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border border-[#232323] rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border border-[#232323] rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -379,7 +389,12 @@ export default function LW7Releases() {
                       <CartTitle>{day1.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
-                    <SectionButtons docs={day1.steps[0].docs} blog={day1.steps[0].blog} />
+                    <SectionButtons
+                      docs={day1.steps[0].docs}
+                      blog={day1.steps[0].blog}
+                      video={day1.steps[0].video}
+                      hackernews={day1.steps[0].hackernews}
+                    />
                     {day1.steps[0].bg_layers &&
                       day1.steps[0].bg_layers?.map((layer, i) =>
                         !!layer.lottie ? (
@@ -452,7 +467,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full p-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
@@ -462,7 +477,12 @@ export default function LW7Releases() {
                       <CartTitle>{day2.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
-                    <SectionButtons docs={day2.steps[0].docs} blog={day2.steps[0].blog} />
+                    <SectionButtons
+                      docs={day2.steps[0].docs}
+                      blog={day2.steps[0].blog}
+                      video={day2.steps[0].video}
+                      hackernews={day2.steps[0].hackernews}
+                    />
                     {day2.steps[0].bg_layers &&
                       day2.steps[0].bg_layers?.map((layer, i) =>
                         !!layer.lottie ? (
@@ -530,7 +550,77 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day3.d.toString()}
             >
-              <div></div>
+              {day3.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                      <CartTitle>{day3.steps[0].title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day3.steps[0].docs}
+                      blog={day3.steps[0].blog}
+                      video={day3.steps[0].video}
+                    />
+                    {day3.steps[0].bg_layers &&
+                      day3.steps[0].bg_layers?.map((layer, i) =>
+                        !!layer.lottie ? (
+                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
+                            <Lottie
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                width: '100%',
+                                height: '100%',
+                              }}
+                              autoplay={true}
+                              animationData={layer.lottie}
+                            />
+                          </div>
+                        ) : (
+                          !!layer.img && (
+                            <motion.div
+                              className={[
+                                'absolute inset-0 w-full h-full -z-10',
+                                i === 2 && '!mix-blend-overlay blur-2xl',
+                              ].join(' ')}
+                              variants={getDay3Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                  i === 5 && '',
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
+                                }
+                                objectFit={!!layer.mobileImg && isTablet ? 'contain' : 'cover'}
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                        )
+                      )}
+                  </motion.div>
+                </div>
+              )}
             </Accordion.Item>
           </div>
           <div className="border-b border-[#232323] pb-3">
