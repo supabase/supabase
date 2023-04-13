@@ -848,6 +848,12 @@ export const self_hosting = {
         { name: 'Configuration', url: '/guides/self-hosting/analytics/config', items: [] },
       ],
     },
+    {
+      name: 'Functions Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-functions/introduction', items: [] },
+      ],
+    },
   ],
 }
 
@@ -1079,6 +1085,13 @@ export const reference_self_hosting_analytics = {
   icon: 'reference-analytics',
   title: 'Self-Hosting Analytics',
   url: '/guides/reference/self-hosting/analytics',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_functions = {
+  icon: 'reference-functions',
+  title: 'Self-Hosting Functions',
+  url: '/guides/reference/self-hosting/functions',
   parent: '/reference',
 }
 
