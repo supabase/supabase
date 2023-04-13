@@ -15,7 +15,7 @@ import {
 
 import { cn } from '../../../utils/cn'
 import { AiIcon, AiIconChat } from '../Command.icons'
-import { CommandItem } from '../Command.utils'
+import { CommandItem, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
@@ -48,6 +48,14 @@ const GenerateSQL = () => {
       )
     },
     setIsLoading,
+  })
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
