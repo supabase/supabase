@@ -26,7 +26,7 @@ import Script from 'next/script'
 
 import { AppPropsWithLayout } from 'types'
 import { ThemeProvider } from 'common'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
@@ -108,15 +108,18 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const AuthContainer = (props: any) => {
-    return IS_PLATFORM ? (
-      <SessionContextProvider supabaseClient={supabase as any}>
+  const AuthContainer = useMemo(
+    () => (props: any) => {
+      return IS_PLATFORM ? (
+        <SessionContextProvider supabaseClient={supabase as any}>
+          <AuthProvider>{props.children}</AuthProvider>
+        </SessionContextProvider>
+      ) : (
         <AuthProvider>{props.children}</AuthProvider>
-      </SessionContextProvider>
-    ) : (
-      <AuthProvider>{props.children}</AuthProvider>
-    )
-  }
+      )
+    },
+    [supabase]
+  )
 
   return (
     <QueryClientProvider client={queryClient}>
