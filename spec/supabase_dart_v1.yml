@@ -165,6 +165,22 @@ functions:
             phone: '+13334445555',
           );
           ```
+  - id: sign-in-with-apple
+    title: 'signInWithApple()'
+    description: |
+      Signs in a user using native Apple login.
+    notes: |
+      - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
+      - This method is only available in iOS and macOS
+      - For other platforms, [signInWithOAuth()](https://supabase.com/docs/reference/dart/auth-signinwithoauth) should be used.
+    examples:
+      - id: sign-in-with-apple
+        name: Sign in with Apple
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse = await supabase.auth.signInWithApple();
+          ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     description: |
