@@ -22,7 +22,7 @@ With Single Sign-On (SSO), your users can login with their company's identity pr
 
 Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policies. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://supabase.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
 
-Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO setup and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-tier and above](https://supabase.com/pricing), starting today.
+Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO set up and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-tier and above](https://supabase.com/pricing), starting today.
 
 <div className="video-container">
   <iframe
@@ -75,11 +75,11 @@ create policy "Only allow read-write access to tenants" on tablename as restrict
 );
 ```
 
-The journey to enterprise-readiness isn't an end goal, it is a continuous process that demands constant attention and maintenance. With Supabase Auth, your team can offload this engineering burden to us and prioritize the features that actually matter.
+The journey to enterprise readiness isn't an end goal, it is a continuous process that demands constant attention and maintenance. With Supabase Auth, your team can offload this engineering burden to us and prioritize the features that matter.
 
 ## Server-Side and Mobile Auth
 
-Many developers today are using Supabase to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update which touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
+Many developers today are using Supabase to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update that touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
 
 ### A brief history of Supabase Auth
 
@@ -134,7 +134,7 @@ The PKCE flow introduces a _code verifier_ (a randomly generated secret) and a _
 
 ### Migrating to PKCE on the client
 
-Over the next few weeks you'll be able to use it with the Supabase libraries. We've already added PKCE to the [JavaScript](https://supabase.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://supabase.com/docs/guides/auth/auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
+Over the next few weeks, you'll be able to use it with the Supabase libraries. We've already added PKCE to the [JavaScript](https://supabase.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://supabase.com/docs/guides/auth/auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
@@ -222,7 +222,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 ### Roll out
 
-Since this is a major update which touches many of the authentication routes, we will roll it out gradually over the next few weeks. You will receive a notification in your dashboard when the feature is available for your project. Reach out to us if you want early access to this feature.
+Since this is a major update that touches many of the authentication routes, we will roll it out gradually over the next few weeks. You will receive a notification in your dashboard when the feature is available for your project. Reach out to us if you want early access to this feature.
 
 ## Native Apple login on iOS
 
