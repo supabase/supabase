@@ -277,7 +277,7 @@ export default function LW7Releases() {
                         background: `radial-gradient(90% 130px at 80% 0px, #4635A7, transparent)`,
                       }}
                     />
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
                       <CartTitle>{preRelease.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">Guide</StyledArticleBadge>
                     </div>
@@ -401,13 +401,13 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border border-[#232323] rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border border-[#232323] rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
                       <CartTitle>{day1.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -489,13 +489,13 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                       <CartTitle>{day2.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -577,13 +577,13 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                       <CartTitle>{day3.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
                     </div>
@@ -664,13 +664,13 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                       <CartTitle>{day4.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -678,6 +678,8 @@ export default function LW7Releases() {
                       docs={day4.steps[0].docs}
                       blog={day4.steps[0].blog}
                       video={day4.steps[0].video}
+                      hackernews={day4.steps[0].hackernews}
+                      mobileGrid
                     />
                     {day4.steps[0].bg_layers &&
                       day4.steps[0].bg_layers?.map((layer, i) =>
