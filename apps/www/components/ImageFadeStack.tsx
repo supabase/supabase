@@ -1,17 +1,27 @@
 import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
-import { IconCircle, IconDroplet, IconPauseCircle, IconPlayCircle } from 'ui'
+import { IconPauseCircle, IconPlayCircle } from 'ui'
 import { cn } from '~/../../packages/ui/src/utils/cn'
 
 interface ImageFadeStackProps {
+  autoplay?: boolean
   images: string[]
   height?: 'default'
   delay?: number
+  altText?: string
+  showNavigation?: boolean
 }
 
-const ImageFadeStack = ({ images, height = 'default', delay = 3000 }: ImageFadeStackProps) => {
+const ImageFadeStack = ({
+  images,
+  height = 'default',
+  delay = 3000,
+  autoplay = false,
+  altText = 'Image',
+  showNavigation = false,
+}: ImageFadeStackProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(autoplay)
 
   useEffect(() => {
     if (isPlaying) {
@@ -29,7 +39,7 @@ const ImageFadeStack = ({ images, height = 'default', delay = 3000 }: ImageFadeS
   }
 
   return (
-    <div className={`relative ${height === 'default' ? 'min-h-[320px]' : 'min-h-[400px]'} my-12`}>
+    <div className={`relative ${height === 'default' ? 'h-[320px]' : 'h-[400px]'} my-12`}>
       {images.map((image, index) => (
         <>
           <Image
@@ -37,7 +47,7 @@ const ImageFadeStack = ({ images, height = 'default', delay = 3000 }: ImageFadeS
             key={index}
             src={image}
             layout="fill"
-            alt={`Image ${index + 1}`}
+            alt={altText}
             style={{
               opacity: currentImageIndex === index ? 1 : 0,
               transition: 'opacity 1s ease-in-out',
@@ -46,16 +56,17 @@ const ImageFadeStack = ({ images, height = 'default', delay = 3000 }: ImageFadeS
         </>
       ))}
       <div className="absolute bottom-4 right-4 flex gap-3">
-        {images.map((_, index) => (
-          <button className="text-white" onClick={() => handleNavClick(index)}>
-            <div
-              className={cn(
-                'w-2 h-2 rounded-full bg-scale-900 hover:bg-gray-300 transition-colors',
-                currentImageIndex === index && 'bg-scale-700'
-              )}
-            />
-          </button>
-        ))}
+        {showNavigation &&
+          images.map((_, index) => (
+            <button className="text-white" onClick={() => handleNavClick(index)}>
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full bg-scale-900 hover:bg-gray-300 transition-colors',
+                  currentImageIndex === index && 'bg-scale-700'
+                )}
+              />
+            </button>
+          ))}
         <button
           onClick={() => setIsPlaying(!isPlaying)}
           className="text-white bg-scale-1100 hover:bg-gray-1100 dark:hover:bg-gray-500 rounded-full p-0.5 transition-colors"

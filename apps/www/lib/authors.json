@@ -314,5 +314,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/laktek",
     "author_image_url": "https://github.com/laktek.png"
+  },
+  {
+    "author_id": "saltcod",
+    "author": "Terry Sutton",
+    "position": "Engineering",
+    "author_url": "https://github.com/saltcod",
+    "author_image_url": "https://github.com/saltcod.png"
   }
 ]
