@@ -23,7 +23,7 @@ Here's the birds-eye-view:
   <li>[**Foreign key Selector**](#item-one): Lookup a referencing row in another table</li>
   <li>[**Postgres Roles**](#item-one): Manage your Postgres roles and privileges</li>
   <li>[**Database Webhooks**](#item-one): Update webhooks and select Edge Functions</li>
-  <li>[**Network restrictions**](#item-one): Block access from specified IP ranges</li>
+  <li>[**Network Restrictions**](#item-one): Block access from specified IP ranges</li>
   <li>[**Table/View definitions**](#item-one): View SQL definitions for tables and views</li>
   <li>[**API Autodocs**](#item-one): Auto-generated docs, right in the Table Editor</li>
   <li>[**Support for many tables**](#item-one): Editor support for thousands of tables</li>
@@ -72,7 +72,7 @@ As with every ⌘K menu, quick navigation is at the heart of things. You'll now 
 
 We'll be actively working on our ⌘K menu in the coming months to make it faster and even more useful for you. We're going to focus next on better support for writing RLS policies. Stay tuned!
 
-## New features
+---
 
 Along with the new AI features, we also doubled-down on some of the critical missing pieces for a Postgres UI. Before we started to work on any of these, we combed through user feedback and tallied up the most submitted Feature Requests on Github.
 
@@ -82,70 +82,66 @@ Along with the new AI features, we also doubled-down on some of the critical mis
 
 </div>
 
-### GraphiQL
+## GraphiQL
 
 ![Logs UI](/images/blog/lw7-studio/graphiql.png)
 
 While GraphQL has been available in Supabase for just over a year, we haven't provided a visual tool for using it. You can now use the very popular GraphiQL directly from the Studio. GraphiQL is a browser tool for writing, validating, and testing GraphQL testing. Being able to use a fully integrated GraphQL IDE is a huge DX win.
 
-### Cascade deletes
+## Cascade deletes
 
-![Logs UI](/images/blog/lw7-studio/cascade-deletes.png)
+<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/cascade-delete.mp4"
+    type="video/mp4"
+  />
+</video>
 
 Cascade deletes are a core feature of Postgres, but have not been available in the Studio UI until now. This has been the #1 feature request from the community for a long time. You can now choose what you want to happen when deleting a referenced row in another table, right from Table Editor side panel.
 
-### Query Performance
+## Query Performance
 
 ![Logs UI](/images/blog/lw7-studio/query-performance.png)
 
 We've just released a new Query Performance tool to help you identify slow queries. Using this tool, along with our new [guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) should help you speed things up. These tools can help you uncover where you might have inefficient queries or schemas, or where you might need indexes or even additional compute resources.
 
-### Foreign key selector
+## Foreign key selector
 
-<ImageFadeStack
-  autoplay
-  showNavigation
-  altText="Studio cmdk menu"
-  delay={4000}
-  images={[
-    '/images/blog/lw7-studio/foreign-table-lookup-1.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-2.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-3.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-4.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-5.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-6.png',
-    '/images/blog/lw7-studio/foreign-table-lookup-7.png',
-  ]}
-/>
+<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4"
+    type="video/mp4"
+  />
+</video>
 You can now select a referencing row from another table, rather than having to pass a value manually.
 You can also quickly jump to the row being referenced in another table with the _View referencing_ record
 button from the grid itself.
 
-### Postgres Roles
+## Postgres Roles
 
 ![Logs UI](/images/blog/lw7-studio/roles.png)
 
 The Roles page got a huge revision, making it easy for you to manage access control through users, groups, and permissions. It's now easy to see how many connections you're using and where they're coming from.
 
-### Database Webhooks
+## Database Webhooks
 
 ![Logs UI](/images/blog/lw7-studio/webhooks.png)
 
 We've wanted to improve the webhooks interface for a long time, and we've finally gotten to it. We now have full support for editing your webhooks, and you can now select an edge function to call instead of having to pass in a url. We're happy to roll this very common request out to the community.
 
-### Network restrictions
+## Network Restrictions
 
 [need a screenshot]
 
 A new add-on for you to configure restrictions on the IP ranges that are allowed to connect to your Postgres database. With network restrictions, you're able to control exactly who has access to your data. Read more in the Docs.
 
-### Table/View definitions
+## Table/View definitions
 
 ![Logs UI](/images/blog/lw7-studio/definitions.png)
 
 You can now see the SQL definitions for your tables and views, directly from the Table Editor. This is a great way to see how Supabase is translating your UI changes into SQL. This can be useful for creating migrations, getting help, or just for learning more about how Supabase and SQL works.
 
-### API Autodocs
+## API Autodocs
 
 ![Logs UI](/images/blog/lw7-studio/api-autodocs.png)
 

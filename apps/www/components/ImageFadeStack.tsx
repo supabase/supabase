@@ -39,7 +39,7 @@ const ImageFadeStack = ({
   }
 
   return (
-    <div className={`relative ${height === 'default' ? 'h-[320px]' : 'h-[400px]'} my-12`}>
+    <div className={`relative ${height === 'default' ? 'h-[300px]' : 'h-[400px]'} my-6`}>
       {images.map((image, index) => (
         <>
           <Image
