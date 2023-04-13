@@ -37,7 +37,7 @@ const BlogLinks = () => {
                   <div
                     className={[
                       'text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
-                      step.break_thumb_title && 'max-w-[290px]',
+                      step.break_thumb_title && 'max-w-[270px]',
                     ].join(' ')}
                   >
                     {step.title}
