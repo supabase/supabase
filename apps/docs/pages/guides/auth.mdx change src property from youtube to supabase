@@ -1,3 +1,11 @@
+
+in some countries youtube is block , this mdn has one reference to youtube and rest provided by supabase itself
+my suggestion is to change resource to supabase 
+
+
+
+
+
 import Layout from '~/layouts/DefaultGuideLayout'
 
 import { useRouter } from 'next/router'
@@ -8,7 +16,7 @@ export const meta = {
   description: 'Use Supabase to Authenticate and Authorize your users.',
   sidebar_label: 'Overview',
   video: 'https://www.youtube.com/v/6ow_jW4epf8',
-}
+}this video link should replace 
 
 ## Overview
 
@@ -131,6 +139,7 @@ Authentication only gets you so far. When you need granular authorization rules,
     playsInline
   />
 </video>
+this source comes from supabase and is good
 
 ### Policies
 
