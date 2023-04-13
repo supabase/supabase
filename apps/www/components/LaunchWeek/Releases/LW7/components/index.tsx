@@ -175,6 +175,7 @@ export const SectionButtons = ({
   github,
   url,
   hackernews,
+  mobileGrid,
 }: {
   blog?: string
   docs?: string
@@ -182,9 +183,15 @@ export const SectionButtons = ({
   github?: string
   url?: string
   hackernews?: string
+  mobileGrid?: boolean
 }) => {
   return (
-    <div className="flex w-full md:w-auto justify-center gap-2 z-10">
+    <div
+      className={[
+        'flex w-full md:w-auto justify-center gap-2 z-10',
+        mobileGrid && 'grid grid-cols-2 gap-2 sm:flex',
+      ].join(' ')}
+    >
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
