@@ -343,6 +343,23 @@ const AiCommand = () => {
     setIsLoading,
   })
 
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Message index (of role === 'user') when hitting up/down on the keyboard (shell style)
+  const [, setMessageSelectionIndex] = useState(0)
+
+  const userMessages = messages.filter(({ role }) => role === MessageRole.User)
+
+  useEffect(() => {
+    if (isResponding) {
+      return
+    }
+
+    // Note: intentionally setting index to 1 greater than array length
+    setMessageSelectionIndex(userMessages.length)
+    console.log('setting index to', userMessages.length)
+  }, [messages, isResponding])
+
   const handleSubmit = useCallback(
     (message: string) => {
       setSearch('')
@@ -359,6 +376,19 @@ const AiCommand = () => {
   useEffect(() => {
     if (search) {
       handleSubmit(search)
+    }
+  }, [])
+
+  // Focus the input when typing from anywhere
+  useEffect(() => {
+    function onKeyDown() {
+      inputRef.current?.focus()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
     }
   }, [])
 
@@ -456,6 +486,7 @@ const AiCommand = () => {
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         <Input
           className="bg-scale-100 rounded mx-3"
+          inputRef={inputRef}
           autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
@@ -492,6 +523,20 @@ const AiCommand = () => {
                   return
                 }
                 handleSubmit(search)
+                return
+              case 'ArrowUp':
+                setMessageSelectionIndex((index) => {
+                  const newIndex = Math.max(index - 1, 0)
+                  setSearch(userMessages[newIndex]?.content ?? '')
+                  return newIndex
+                })
+                return
+              case 'ArrowDown':
+                setMessageSelectionIndex((index) => {
+                  const newIndex = Math.min(index + 1, userMessages.length)
+                  setSearch(userMessages[newIndex]?.content ?? '')
+                  return newIndex
+                })
                 return
               default:
                 return
