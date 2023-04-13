@@ -27,7 +27,7 @@ Building SSO into your application isn't necessarily hard, but does come with so
 <div className="video-container">
   <iframe
     className="w-full"
-    src="https://www.youtube.com/embed/hAwJeR6mhB0"
+    src="https://www.youtube-nocookie.com/embed/hAwJeR6mhB0"
     title="YouTube video player"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -79,7 +79,7 @@ The journey to enterprise-readiness isn't an end goal, it is a continuous proces
 
 ## Server-Side and Mobile Auth
 
-Many developers today are using Supabase to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use-cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update which touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
+Many developers today are using Supabase to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update which touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
 
 ### A brief history of Supabase Auth
 
@@ -102,7 +102,7 @@ As developers built more complex apps, they encountered two problems with this a
 - **Server-Side Email Verification Links**
   Data provided in a URL fragment is only accessible in a browser environment, not on the server. This is problematic for email verification links that redirect users to a server-side route.
 - **Challenges with Mobile App Authentication**
-  The implicit grant flow raised security concerns for mobile use-cases since [malicious apps could potentially obtain the user session](https://www.rfc-editor.org/rfc/rfc7636#section-1).
+  The implicit grant flow raised security concerns for mobile use cases since [malicious apps could potentially obtain the user session](https://www.rfc-editor.org/rfc/rfc7636#section-1).
 
 Server-side auth unlocks a number of benefits. Developers can:
 
