@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useContext } from 'react'
 import UserContext from '~/lib/UserContext'
-import { addChannel, deleteChannel } from '~/lib/Store'
+import { supabase, addChannel, deleteChannel } from '~/lib/Store'
 import TrashIcon from '~/components/TrashIcon'
 
 export default function Layout(props) {
@@ -19,9 +19,12 @@ export default function Layout(props) {
   }
 
   const newChannel = async () => {
-    const slug = prompt('Please enter your name')
+    const slug = prompt('Please enter the name of the channel')
     if (slug) {
-      addChannel(slugify(slug), user.id)
+      const providerId = user?.app_metadata?.provider.startsWith('sso')
+        ? user?.app_metadata?.provider
+        : 'public'
+      addChannel(slugify(slug), user.id, providerId)
     }
   }
 
@@ -29,10 +32,10 @@ export default function Layout(props) {
     <main className="main flex h-screen w-screen overflow-hidden">
       {/* Sidebar */}
       <nav
-        className="w-64 bg-gray-900 text-gray-100 overflow-scroll "
+        className="w-64 bg-gray-900 text-gray-100"
         style={{ maxWidth: '20%', minWidth: 150, maxHeight: '100vh' }}
       >
-        <div className="p-2 ">
+        <div className="p-2">
           <div className="p-2">
             <button
               className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
@@ -41,28 +44,52 @@ export default function Layout(props) {
               New Channel
             </button>
           </div>
-          <hr className="m-2" />
-          <div className="p-2 flex flex-col space-y-2">
+          <hr className="my-2" />
+          <div className="p-2">
             <h6 className="text-xs">{user?.email}</h6>
+            <h6 className="text-xs">{user?.user_metadata?.custom_claims?.organization ?? '-'}</h6>
             <button
-              className="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded w-full transition duration-150"
+              className="bg-blue-900 hover:bg-blue-800 text-white mt-2 py-2 px-4 rounded w-full transition duration-150"
               onClick={() => signOut()}
             >
               Log out
             </button>
           </div>
-          <hr className="m-2" />
+          <hr className="my-2" />
           <h4 className="font-bold">Channels</h4>
           <ul className="channel-list">
-            {props.channels.map((x) => (
-              <SidebarItem
-                channel={x}
-                key={x.id}
-                isActiveChannel={x.id === props.activeChannelId}
-                user={user}
-                userRoles={userRoles}
-              />
-            ))}
+            {props.channels.map((channel) =>
+              channel.provider_id === 'public' ? (
+                <SidebarItem
+                  channel={channel}
+                  key={channel.id}
+                  isActiveChannel={channel.id === props.activeChannelId}
+                  user={user}
+                  userRoles={userRoles}
+                />
+              ) : null
+            )}
+          </ul>
+          {props.channels.some((channel) => channel.provider_id !== 'public') ? (
+            <>
+              <hr className="my-2" />
+              <h4 className="font-bold">
+                {user?.user_metadata?.custom_claims?.organization ?? 'Private'}
+              </h4>
+            </>
+          ) : null}
+          <ul className="channel-list">
+            {props.channels.map((channel) =>
+              channel.provider_id !== 'public' ? (
+                <SidebarItem
+                  channel={channel}
+                  key={channel.id}
+                  isActiveChannel={channel.id === props.activeChannelId}
+                  user={user}
+                  userRoles={userRoles}
+                />
+              ) : null
+            )}
           </ul>
         </div>
       </nav>

@@ -9,8 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.4",
-    "next": "latest",
+    "@supabase/supabase-js": "^2.14.0",
+    "next": "12",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "sass": "^1.26.2",

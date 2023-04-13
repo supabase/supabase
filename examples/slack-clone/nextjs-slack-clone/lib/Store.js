@@ -26,38 +26,28 @@ export const useStore = (props) => {
     // Listen for new and deleted messages
     const messageListener = supabase
       .channel('public:messages')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => handleNewMessage(payload.new)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
+        handleNewMessage(payload.new)
       )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'messages' },
-        (payload) => handleDeletedMessage(payload.old)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, (payload) =>
+        handleDeletedMessage(payload.old)
       )
       .subscribe()
     // Listen for changes to our users
     const userListener = supabase
       .channel('public:users')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'users' },
-        (payload) => handleNewOrUpdatedUser(payload.new)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, (payload) =>
+        handleNewOrUpdatedUser(payload.new)
       )
       .subscribe()
     // Listen for new and deleted channels
     const channelListener = supabase
       .channel('public:channels')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'channels' },
-        (payload) => handleNewChannel(payload.new)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'channels' }, (payload) =>
+        handleNewChannel(payload.new)
       )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'channels' },
-        (payload) => handleDeletedChannel(payload.old)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'channels' }, (payload) =>
+        handleDeletedChannel(payload.old)
       )
       .subscribe()
     // Cleanup on unmount
@@ -191,10 +181,14 @@ export const fetchMessages = async (channelId, setState) => {
  * Insert a new channel into the DB
  * @param {string} slug The channel name
  * @param {number} user_id The channel creator
+ * @param {number} provider_id The tenant id of the channel. Defaults to "public"
  */
-export const addChannel = async (slug, user_id) => {
+export const addChannel = async (slug, user_id, provider_id = 'public') => {
   try {
-    let { data } = await supabase.from('channels').insert([{ slug, created_by: user_id }]).select()
+    let { data } = await supabase
+      .from('channels')
+      .insert([{ slug, created_by: user_id, provider_id }])
+      .select()
     return data
   } catch (error) {
     console.log('error', error)
@@ -209,7 +203,10 @@ export const addChannel = async (slug, user_id) => {
  */
 export const addMessage = async (message, channel_id, user_id) => {
   try {
-    let { data } = await supabase.from('messages').insert([{ message, channel_id, user_id }]).select()
+    let { data } = await supabase
+      .from('messages')
+      .insert([{ message, channel_id, user_id }])
+      .select()
     return data
   } catch (error) {
     console.log('error', error)
