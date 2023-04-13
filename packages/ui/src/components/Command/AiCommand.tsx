@@ -336,6 +336,17 @@ export function queryAi(messages: Message[], timeout = 0) {
   })
 }
 
+export const AiWarning = () => (
+  <div className="mx-4 p-6 flex flex-row items-center gap-2 border rounded-lg text-left text-xs text-scale-1100 border-scale-500 bg-white dark:bg-scale-300">
+    <div className="flex flex-row items-center gap-2 text-xs text-amber-900">
+      <IconAlertTriangle strokeWidth={1.5} size={18} />
+      <strong>Warning</strong>
+    </div>{' '}
+    Supabase AI is experimental and may produce incorrect answers. Always verify the output before
+    executing.
+  </div>
+)
+
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
 
@@ -364,7 +375,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[140px] py-4 max-h-[720px] overflow-auto')}>
         {messages.map((message, index) => {
           switch (message.role) {
             case MessageRole.User:
@@ -454,6 +465,11 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {messages.length > 0 && !hasError && (
+          <div className="mb-4">
+            <AiWarning />
+          </div>
+        )}
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
