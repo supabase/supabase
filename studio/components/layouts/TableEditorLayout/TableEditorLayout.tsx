@@ -8,6 +8,7 @@ import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
@@ -36,9 +37,10 @@ const TableEditorLayout = ({
 }: PropsWithChildren<TableEditorLayoutProps>) => {
   const { vault, meta, ui } = useStore()
   const router = useRouter()
-  const { id: _id } = useParams()
+  const { ref, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
+  const snap = useTableEditorStateSnapshot()
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
@@ -54,15 +56,10 @@ const TableEditorLayout = ({
     }
   }, [ui.selectedProject?.ref])
 
-  const [loadedIds, setLoadedIds] = useState<Set<number>>(() => new Set())
-  const isLoaded = id !== undefined && loadedIds.has(id)
+  const isLoaded = useIsTableLoaded(ref, id)
 
   const entity = useEntityType(id, function onNotFound(id) {
-    setLoadedIds((loadedIds) => {
-      const newLoadedIds = new Set(loadedIds)
-      newLoadedIds.add(id)
-      return newLoadedIds
-    })
+    if (ref) snap.addLoadedId(ref, id)
   })
 
   const prefetch = useLatest(useTableRowsPrefetchWrapper())
@@ -91,32 +88,23 @@ const TableEditorLayout = ({
     loadTable()
       ?.then(async (entity: any) => {
         await prefetch.current(entity)
-
         return entity
       })
       .then((entity: any) => {
-        if (mounted) {
-          setLoadedIds((loadedIds) => {
-            const newLoadedIds = new Set(loadedIds)
-            newLoadedIds.add(entity.id ?? entity?.id)
-            return newLoadedIds
-          })
+        if (mounted && ref) {
+          snap.addLoadedId(ref, entity.id)
         }
       })
       .catch(() => {
-        if (mounted && entity?.id) {
-          setLoadedIds((loadedIds) => {
-            const newLoadedIds = new Set(loadedIds)
-            newLoadedIds.add(entity.id)
-            return newLoadedIds
-          })
+        if (mounted && entity?.id && ref) {
+          snap.addLoadedId(ref, entity.id)
         }
       })
 
     return () => {
       mounted = false
     }
-  }, [entity])
+  }, [entity?.id])
 
   useEffect(() => {
     if (isVaultEnabled) {
