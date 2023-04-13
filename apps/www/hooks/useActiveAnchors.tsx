@@ -28,8 +28,8 @@ const useActiveAnchors = (
       // to make toc hrefs and content headings ids match
       const sanitizedHref = stripEmojis(
         decodeURI(link.getAttribute('href') ?? '').replace('#', '')
-      ).replace('--', '-')
-      const isMatch = sanitizedHref === newActiveAnchor
+      ).replaceAll('-', '')
+      const isMatch = sanitizedHref === newActiveAnchor.replaceAll('-', '')
 
       if (isMatch) {
         link.classList.add('toc-animate')
