@@ -153,7 +153,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/edge-runtime-self-hosted-deno-functions',
         thumb: images['02-self-hosted-edge-functions-thumb'],
         video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
-        hackernews: 'https://news.ycombinator.com/item?id=30868849',
+        hackernews: 'https://news.ycombinator.com/item?id=35525222',
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],
