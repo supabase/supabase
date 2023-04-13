@@ -27,7 +27,7 @@ const PageTelemetry: FC = ({ children }) => {
      * if the route is not ready. Don't need to send it will be picked up by router.event above
      */
     if (router.isReady) {
-      handlePageTelemetry(router.route)
+      handlePageTelemetry(router.asPath)
     }
   }, [])
 

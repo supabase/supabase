@@ -176,7 +176,7 @@ Update your `src/routes/+layout.svelte`:
 	import { invalidate } from '$app/navigation'
 	import { onMount } from 'svelte'
 	import type { LayoutData } from './$types'
-	
+
 	export let data: LayoutData
 
 	$: ({ supabase, session } = data)
@@ -353,7 +353,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 		<div>
 			<label for="website">Website</label>
-			<input id="website" name="website" type="website" value={form?.website ?? website} />
+			<input id="website" name="website" type="url" value={form?.website ?? website} />
 		</div>
 
 		<div>

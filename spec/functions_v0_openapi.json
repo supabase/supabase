@@ -1,0 +1,983 @@
+{
+  "components": {
+    "responses": {},
+    "schemas": {
+      "Accepted": {
+        "title": "Accepted"
+      },
+      "Endpoint": {
+        "properties": {
+          "cache_duration_seconds": {
+            "type": "integer"
+          },
+          "enable_auth": {
+            "type": "boolean"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "max_limit": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "proactive_requerying_seconds": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          },
+          "sandboxable": {
+            "type": "boolean"
+          },
+          "source_mapping": {
+            "type": "object"
+          },
+          "token": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": ["name", "query"],
+        "title": "Endpoint",
+        "type": "object"
+      },
+      "NotFound": {
+        "title": "NotFound"
+      },
+      "Notification": {
+        "properties": {
+          "other_email_notifications": {
+            "type": "string"
+          },
+          "team_user_ids_for_email": {
+            "allOf": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "team_user_ids_for_schema_updates": {
+            "allOf": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "team_user_ids_for_sms": {
+            "allOf": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "user_email_notifications": {
+            "type": "boolean"
+          },
+          "user_schema_update_notifications": {
+            "type": "boolean"
+          },
+          "user_text_notifications": {
+            "type": "boolean"
+          }
+        },
+        "title": "Notification",
+        "type": "object"
+      },
+      "Source": {
+        "properties": {
+          "api_quota": {
+            "type": "integer"
+          },
+          "bigquery_table_ttl": {
+            "type": "integer"
+          },
+          "bq_table_id": {
+            "type": "string"
+          },
+          "bq_table_schema": {
+            "type": "object"
+          },
+          "custom_event_message_keys": {
+            "type": "string"
+          },
+          "favorite": {
+            "type": "boolean"
+          },
+          "has_rejected_events": {
+            "type": "boolean"
+          },
+          "id": {},
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notifications": {
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            },
+            "type": "array"
+          },
+          "public_token": {
+            "type": "string"
+          },
+          "slack_hook_url": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "webhook_notification_url": {
+            "type": "string"
+          }
+        },
+        "required": ["name"],
+        "title": "Source",
+        "type": "object"
+      },
+      "Team": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "team_users": {
+            "items": {
+              "$ref": "#/components/schemas/TeamUser"
+            },
+            "type": "array"
+          },
+          "token": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": ["name"],
+        "title": "Team",
+        "type": "object"
+      },
+      "TeamUser": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["email", "name"],
+        "title": "TeamUser",
+        "type": "object"
+      },
+      "User": {
+        "properties": {
+          "api_key": {
+            "type": "string"
+          },
+          "api_quota": {
+            "type": "integer"
+          },
+          "bigquery_dataset_id": {
+            "type": "string"
+          },
+          "bigquery_dataset_location": {
+            "type": "string"
+          },
+          "bigquery_project_id": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "email_me_product": {
+            "type": "boolean"
+          },
+          "email_preferred": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["email", "provider", "token", "provider_uid", "api_key"],
+        "title": "User",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "logflare",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/endpoints": {
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Endpoint"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Endpoint List Response"
+          }
+        },
+        "summary": "List endpoints",
+        "tags": ["management"]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Endpoint"
+              }
+            }
+          },
+          "description": "Endpoint Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpoint"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Create endpoint",
+        "tags": ["management"]
+      }
+    },
+    "/api/endpoints/{token}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.delete",
+        "parameters": [
+          {
+            "description": "Endpoint Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            },
+            "description": "Accepted Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Delete endpoint",
+        "tags": ["management", "management"]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.show",
+        "parameters": [
+          {
+            "description": "Endpoint Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpoint"
+                }
+              }
+            },
+            "description": "Endpoint Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Fetch endpoint",
+        "tags": ["management"]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.update",
+        "parameters": [
+          {
+            "description": "Endpoint Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Endpoint"
+              }
+            }
+          },
+          "description": "Endpoint Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpoint"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update endpoint",
+        "tags": ["management"]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.EndpointController.update (2)",
+        "parameters": [
+          {
+            "description": "Endpoint Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Endpoint"
+              }
+            }
+          },
+          "description": "Endpoint Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Endpoint"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update endpoint",
+        "tags": ["management"]
+      }
+    },
+    "/api/sources": {
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Source"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Source List Response"
+          }
+        },
+        "summary": "List sources",
+        "tags": ["management"]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Source"
+              }
+            }
+          },
+          "description": "Source Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Source"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Create source",
+        "tags": ["management"]
+      }
+    },
+    "/api/sources/{token}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.delete",
+        "parameters": [
+          {
+            "description": "Source Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            },
+            "description": "Accepted Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Delete source",
+        "tags": ["management"]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.show",
+        "parameters": [
+          {
+            "description": "Source Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Source"
+                }
+              }
+            },
+            "description": "Source Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Fetch source",
+        "tags": ["management"]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.update",
+        "parameters": [
+          {
+            "description": "Source Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Source"
+              }
+            }
+          },
+          "description": "Source Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Source"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update source",
+        "tags": ["management"]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.SourceController.update (2)",
+        "parameters": [
+          {
+            "description": "Source Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Source"
+              }
+            }
+          },
+          "description": "Source Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Source"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update source",
+        "tags": ["management"]
+      }
+    },
+    "/api/teams": {
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Team"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Team List Response"
+          }
+        },
+        "summary": "List teams",
+        "tags": ["management"]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Team"
+              }
+            }
+          },
+          "description": "Team Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Create Team",
+        "tags": ["management"]
+      }
+    },
+    "/api/teams/{token}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.delete",
+        "parameters": [
+          {
+            "description": "Team Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            },
+            "description": "Accepted Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Delete Team",
+        "tags": ["management"]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.show",
+        "parameters": [
+          {
+            "description": "Team Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            },
+            "description": "Team Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Fetch team",
+        "tags": ["management"]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.update",
+        "parameters": [
+          {
+            "description": "Team Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Team"
+              }
+            }
+          },
+          "description": "Team Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update team",
+        "tags": ["management"]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "LogflareWeb.Api.TeamController.update (2)",
+        "parameters": [
+          {
+            "description": "Team Token",
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Team"
+              }
+            }
+          },
+          "description": "Team Parameters",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            },
+            "description": "Created Response"
+          },
+          "404": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "summary": "Update team",
+        "tags": ["management"]
+      }
+    }
+  },
+  "security": [],
+  "servers": [
+    {
+      "url": "https://logflare.app",
+      "variables": {}
+    }
+  ],
+  "tags": []
+}
