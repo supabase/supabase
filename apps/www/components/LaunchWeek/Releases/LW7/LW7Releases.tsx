@@ -19,44 +19,56 @@ import { useMobileViewport } from '../../../../hooks/useMobileViewport'
 import { motion } from 'framer-motion'
 
 const defaultEase = [0.25, 0.25, 0, 1]
+const defaultDuratonIn = 0.25
+const defaultDuratonOut = 0.1
 
 const opacityVariant = {
-  default: { opacity: 0.9, ease: defaultEase, duration: 0.2 },
+  default: { opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
     transition: {
-      duration: 0.4,
+      duration: defaultDuratonIn,
       ease: defaultEase,
     },
   },
 }
 const opacityVariant2 = {
-  default: { opacity: 0, ease: defaultEase, duration: 0.2 },
+  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 0.2,
     transition: {
-      duration: 0.4,
+      duration: defaultDuratonIn,
       ease: defaultEase,
     },
   },
 }
 const opacityVariant3 = {
-  default: { opacity: 0, ease: defaultEase, duration: 0.2 },
+  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
     transition: {
-      duration: 0.4,
+      duration: defaultDuratonIn,
+      ease: defaultEase,
+    },
+  },
+}
+const opacityVariant4 = {
+  default: { opacity: 0.3, ease: defaultEase, duration: defaultDuratonOut },
+  hover: {
+    opacity: 1,
+    transition: {
+      duration: defaultDuratonIn,
       ease: defaultEase,
     },
   },
 }
 const scaleOpacityVariant = {
-  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: 0.2 },
+  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     scale: 1.05,
     opacity: 1,
     transition: {
-      duration: 0.4,
+      duration: defaultDuratonIn,
       ease: defaultEase,
     },
   },
@@ -68,11 +80,11 @@ const aiImageMobileVariant = {
   },
 }
 const moveX10 = {
-  default: { x: 0, ease: defaultEase, duration: 0.2 },
+  default: { x: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     x: 10,
     transition: {
-      duration: 0.4,
+      duration: defaultDuratonIn,
       ease: defaultEase,
     },
   },
@@ -103,6 +115,16 @@ const getDay3Motion = (index: number) => {
       return scaleOpacityVariant
     case 2:
       return opacityVariant3
+    default:
+      return undefined
+  }
+}
+const getDay4Motion = (index: number) => {
+  switch (index) {
+    case 0:
+      return opacityVariant4
+    // case 2:
+    //   return opacityVariant3
     default:
       return undefined
   }
@@ -427,7 +449,7 @@ export default function LW7Releases() {
                                 }
                                 className={[
                                   `
-                                  absolute opacity-90
+                                  absolute
                                   w-full h-full -z-10 transition-all duration-300
                                 `,
                                   i === 5 && '',
@@ -515,7 +537,7 @@ export default function LW7Releases() {
                                 }
                                 className={[
                                   `
-                                  absolute opacity-90
+                                  absolute
                                   w-full h-full -z-10 transition-all duration-300
                                 `,
                                   i === 5 && '',
@@ -602,7 +624,7 @@ export default function LW7Releases() {
                                 }
                                 className={[
                                   `
-                                  absolute opacity-90
+                                  absolute
                                   w-full h-full -z-10 transition-all duration-300
                                 `,
                                   i === 5 && '',
@@ -637,7 +659,73 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day4.d.toString()}
             >
-              <div></div>
+              {day4.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border rounded-xl h-full px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left lg: justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                      <CartTitle>{day4.steps[0].title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day4.steps[0].docs}
+                      blog={day4.steps[0].blog}
+                      video={day4.steps[0].video}
+                    />
+                    {day4.steps[0].bg_layers &&
+                      day4.steps[0].bg_layers?.map((layer, i) =>
+                        !!layer.lottie ? (
+                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
+                            <Lottie
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                width: '100%',
+                                height: '100%',
+                              }}
+                              autoplay={true}
+                              animationData={layer.lottie}
+                            />
+                          </div>
+                        ) : (
+                          !!layer.img && (
+                            <motion.div
+                              className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                              variants={getDay4Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
+                                }
+                                objectFit="cover"
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                        )
+                      )}
+                  </motion.div>
+                </div>
+              )}
             </Accordion.Item>
           </div>
           <div className="border-b border-[#232323] pb-3" id="currentDay">
