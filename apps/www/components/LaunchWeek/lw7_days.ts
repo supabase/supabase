@@ -213,12 +213,12 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: 'SSO Support for Projects',
+        title: 'Supabase Auth: SSO, Mobile, and Server-side support',
         description: '',
-        blog: '/blog/sso-support-for-projects',
+        blog: '/blog/supabase-auth-sso-pkce',
         thumb: images['04-sso-thumb'],
-        video: '',
-        docs: '',
+        video: 'https://www.youtube.com/watch?v=hAwJeR6mhB0',
+        docs: '/docs/guides/auth/sso/auth-sso-saml',
         bg_layers: [
           {
             img: images['04-sso-01'],
