@@ -65,6 +65,11 @@ function Accordion({
 
   function handleOnChange(e: string | string[]) {
     if (onChange) onChange(e)
+    const value = e == typeof String ? e.split(' ') : e
+    // setCurrentItems(e)
+    // console.log('about to change state')
+    // currentItems = e
+    // console.log('currentItems', currentItems)
   }
 
   return (
