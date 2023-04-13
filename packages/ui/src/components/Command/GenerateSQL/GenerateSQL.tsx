@@ -1,3 +1,4 @@
+import React from 'react'
 import { format } from 'sql-formatter'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -76,6 +77,15 @@ const GenerateSQL = () => {
       })
     } catch (error: any) {
       return answer
+    }
+  }
+
+  const handleKeypress = (e, category) => {
+    //it triggers by pressing the enter key
+    if (e.keyCode === 13) {
+      setSelectedCategory(category)
+      // focus on the first item in the list after selecting a category
+      const firstItem = document.querySelector('.command-menu-item')
     }
   }
 
@@ -177,15 +187,18 @@ const GenerateSQL = () => {
               <div className="w-1/3 py-4 px-6">
                 <ul className="space-y-2">
                   {SAMPLE_QUERIES.map((item, index) => (
-                    <li
-                      key={index}
-                      onClick={() => setSelectedCategory(item.category)}
-                      className={cn(
-                        'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md',
-                        selectedCategory === item.category && 'bg-slate-400 '
-                      )}
-                    >
-                      {item.category}
+                    <li key={index}>
+                      <button
+                        className={cn(
+                          'px-4 py-1 cursor-pointer text-sm hover:bg-slate-300 rounded-md block w-full text-left',
+                          selectedCategory === item.category && 'bg-slate-400 '
+                        )}
+                        type="button"
+                        onClick={() => setSelectedCategory(item.category)}
+                        onKeyDown={(e) => handleKeypress(e, item.category)}
+                      >
+                        {item.category}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -194,23 +207,41 @@ const GenerateSQL = () => {
                 <ul>
                   {SAMPLE_QUERIES.find((item) => item.category === selectedCategory)?.queries.map(
                     (query, index) => (
-                      <CommandItem
-                        type="command"
-                        onSelect={() => {
+                      <button
+                        onClick={() => {
                           if (!search) {
                             handleSubmit(query)
                           }
                         }}
-                        forceMount
                         key={query.replace(/\s+/g, '_')}
+                        type="button"
                       >
                         <div className="flex">
                           <div>
                             <AiIcon />
                           </div>
-                          <p>{query}</p>
+                          {query}
                         </div>
-                      </CommandItem>
+                      </button>
+                      // <CommandItem
+                      //   type="command"
+                      //   onSelect={() => {
+                      //     if (!search) {
+                      //       handleSubmit(query)
+                      //     }
+                      //   }}
+                      //   forceMount
+                      //   key={query.replace(/\s+/g, '_')}
+                      // >
+                      //   <div className="flex">
+                      //     <div>
+                      //       <AiIcon />
+                      //     </div>
+                      //     <p>
+                      //       <button type="button">{query}</button>
+                      //     </p>
+                      //   </div>
+                      // </CommandItem>
                     )
                   )}
                 </ul>
