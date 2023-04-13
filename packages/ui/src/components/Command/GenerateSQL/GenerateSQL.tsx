@@ -184,8 +184,10 @@ const GenerateSQL = () => {
                     label={sample.category}
                     className="mt-4"
                   >
-                    {SAMPLE_QUERIES.find((item) => item.category === sample.category)?.queries.map(
-                      (query) => (
+                    <div className="mr-8">
+                      {SAMPLE_QUERIES.find(
+                        (item) => item.category === sample.category
+                      )?.queries.map((query) => (
                         <CommandItem
                           type="command"
                           onSelect={() => {
@@ -202,8 +204,8 @@ const GenerateSQL = () => {
                             <p>{query}</p>
                           </div>
                         </CommandItem>
-                      )
-                    )}
+                      ))}
+                    </div>
                   </Tabs.Panel>
                 ))}
               </Tabs>
