@@ -599,6 +599,7 @@ export const functions = {
           name: 'Taking Screenshots with Puppeteer',
           url: '/guides/functions/examples/screenshots',
         },
+        { name: 'Dart Edge on Supabase', url: '/guides/functions/examples/dart-edge' },
       ],
     },
   ],
