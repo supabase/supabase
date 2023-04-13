@@ -13,8 +13,9 @@ thumb: launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-sso-pkce-og.jpg
 
 Today we're excited to announce a few new features for Supabase Auth:
 
-1. Easily add Single Sign-On support to your projects using SAML 2.0.
-2. Better support for server-side rendering and mobile apps using PKCE.
+1. [Easily add Single Sign-On support to your projects using SAML 2.0](/blog/supabase-auth-sso-pkce#single-sign-on-support-using-saml-20)
+2. [Better support for server-side rendering and mobile apps using PKCE](/blog/supabase-auth-sso-pkce#server-side-and-mobile-auth)
+3. [Native Apple login on iOS](/blog/supabase-auth-sso-pkce#native-apple-login-on-ios)
 
 ## Single Sign-On Support using SAML 2.0
 
@@ -71,7 +72,7 @@ For example, you can use Row Level Security (RLS) to build multi-tenant applicat
 
 ```sql
 create policy "Only allow read-write access to tenants" on tablename as restrictive to authenticated using (
-  tenant_id = (auth.jwt () - > 'app_metadata' - > > 'provider')
+  tenant_id = (auth.jwt () -> 'app_metadata' ->> 'provider')
 );
 ```
 
