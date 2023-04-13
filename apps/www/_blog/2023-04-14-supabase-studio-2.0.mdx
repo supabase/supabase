@@ -6,68 +6,165 @@ tags:
   - studio
 date: '2023-04-14'
 to_depth: 3
-author: alaister,joshenlim
+author: alaister,joshenlim,saltcod
 image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
 
-Today, we're releasing Supabase Logs for both self-hosted users and CLI development.
+Today we're announcing Supabase Studio 2.0, packed with a ton of new stuff. We have features people have been asking for forever, and new capabilities that will change the way you work.
 
-Nullam a magna ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec fermentum nisi erat, et convallis magna accumsan id. Integer vehicula elit id accumsan rhoncus. Ut non turpis lacinia, ultrices enim ac, tincidunt sem. Sed semper lectus nec quam porta molestie.
+Here's the birds-eye-view:
 
-<ImageFadeStack
-  images={[
-    'https://supabase.com/_next/image?url=%2Fimages%2Fblog%2Flaunch-week-7%2Fday-3-storage-resumable-uploads%2Fstorage-v3-thumb.jpg&w=2048&q=75',
-    'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg/reg_bg_10.png',
-    'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg/reg_bg_11.png',
-  ]}
-  delay={3000}
-/>
+<ul>
+  <li>[**⌘K Menu with AI**](#k-menu-with-ai): ChatGPT, right in the Studio</li>
+  <li>[**GraphiQL**](#item-one): Query your database with GraphQL</li>
+  <li>[**Cascade deletes**](#item-one): Our #1 most requested feature from the community</li>
+  <li>[**Query Performance**](#item-one): Investiate slow running queries</li>
+  <li>[**Foreign key Selector**](#item-one): Lookup a referencing row in another table</li>
+  <li>[**Postgres Roles**](#item-one): Manage your Postgres roles and privileges</li>
+  <li>[**Database Webhooks**](#item-one): Update webhooks and select Edge Functions</li>
+  <li>[**Network restrictions**](#item-one): Block access from specified IP ranges</li>
+  <li>[**Table/View definitions**](#item-one): View SQL definitions for tables and views</li>
+  <li>[**API Autodocs**](#item-one): Auto-generated docs, right in the Table Editor</li>
+  <li>[**Support for many tables**](#item-one): Editor support for thousands of tables</li>
+  <li>[**JSON editing**](#item-one): Improved JSON editing</li>
+  <li>[**Nullable columns**](#item-one): Allow text/bool cells to be null or empty</li>
+</ul>
 
 <div className="video-container">
   <iframe
     className="w-full"
-    width="560"
-    height="315"
-    src="https://www.youtube.com/embed/Ai2BjHV36Ng"
+    src="https://www.youtube-nocookie.com/embed/cPGxPl1lx4Y"
     title="YouTube video player"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     allowfullscreen
   ></iframe>
-  _Whatch the video announcement_
 </div>
 
-## Introduction
+## ⌘K Menu with AI
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo quam neque, ut volutpat quam ultrices ut. Fusce aliquet porta fermentum. Ut ultricies bibendum justo, vel sagittis sem porta ac.
+<ImageFadeStack
+  autoplay
+  showNavigation
+  altText="Studio cmdk menu"
+  delay={3000}
+  images={[
+    '/images/blog/lw7-studio/cmdk-1.png',
+    '/images/blog/lw7-studio/cmdk-2.png',
+    '/images/blog/lw7-studio/cmdk-3.png',
+    '/images/blog/lw7-studio/cmdk-4.png',
+    '/images/blog/lw7-studio/cmdk-5.png',
+  ]}
+/>
 
-Nullam a magna ante. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec fermentum nisi erat, et convallis magna accumsan id. Integer vehicula elit id accumsan rhoncus. Ut non turpis lacinia, ultrices enim ac, tincidunt sem. Sed semper lectus nec quam porta molestie.
+One of our guiding principles at Supabase is to to make SQL more accessible to developers. We don't want to just abstract it away with a custom implementation. By embracing SQL, developers learn important, transferrable skills while they build on top of Supabase.
 
-- **[item one](#item-one)** — item one description
-- **[item two](#item-two)** — item two description
-- **[item three](#item-three)** — item three description
+In the past few months, AI advancements have made this easy! Writing a complex SQL query is now as simple as asking ChatGPT, and we're leaning into this approach with our Studio. AI gives developers superpowers, and by providing relevant context, Supabase gives AI superpowers.
 
-## Item one
+AI has already changed a lot about the way we work as developers. We can use ChatGPT to write code for us as fast as we cant prompt it. We wanted to bring this power into the Studio with integrations that will help you work even faster than before.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo quam neque, ut volutpat quam ultrices ut. Fusce aliquet porta fermentum. Ut ultricies bibendum justo, vel sagittis sem porta ac.
+Today you'll be able to do many common SQL operations with the help of AI. You can create tables, views and indexes, write functions and triggers, and more, right from the ⌘K menu.
 
-## Item two
+Soon, we'll also let you opt-in to sending your table schemas to OpenAI to help fine tune queries to your project. All this should result in a dramatic boost in development speed. Maybe you'll only need half a weekend to scale to millions now!
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo quam neque, ut volutpat quam ultrices ut. Fusce aliquet porta fermentum. Ut ultricies bibendum justo, vel sagittis sem porta ac.
+As with every ⌘K menu, quick navigation is at the heart of things. You'll now be able to jump to any page in the Studio in a couple of keystrokes. You can also search the Docs directly from the menu.
 
-## Item three
+We'll be actively working on our ⌘K menu in the coming months to make it faster and even more useful for you. We're going to focus next on better support for writing RLS policies. Stay tuned!
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo quam neque, ut volutpat quam ultrices ut. Fusce aliquet porta fermentum. Ut ultricies bibendum justo, vel sagittis sem porta ac.
+## New features
 
-![Logs UI](/images/blog/lw7-o11y/logs-screenshot.png)
+Along with the new AI features, we also doubled-down on some of the critical missing pieces for a Postgres UI. Before we started to work on any of these, we combed through user feedback and tallied up the most submitted Feature Requests on Github.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-📢 Check out the [lorem ipsum](https://supabase.com/docs/reference/self-hosting-analytics/introduction) to learn more.
+📢 Many of the features and enhancements below came from user requests — [please keep them coming](https://github.com/orgs/supabase/discussions/categories/feature-requests)!
 
 </div>
 
+### GraphiQL
+
+![Logs UI](/images/blog/lw7-studio/graphiql.png)
+
+While GraphQL has been available in Supabase for just over a year, we haven't provided a visual tool for using it. You can now use the very popular GraphiQL directly from the Studio. GraphiQL is a browser tool for writing, validating, and testing GraphQL testing. Being able to use a fully integrated GraphQL IDE is a huge DX win.
+
+### Cascade deletes
+
+![Logs UI](/images/blog/lw7-studio/cascade-deletes.png)
+
+Cascade deletes are a core feature of Postgres, but have not been available in the Studio UI until now. This has been the #1 feature request from the community for a long time. You can now choose what you want to happen when deleting a referenced row in another table, right from Table Editor side panel.
+
+### Query Performance
+
+![Logs UI](/images/blog/lw7-studio/query-performance.png)
+
+We've just released a new Query Performance tool to help you identify slow queries. Using this tool, along with our new [guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) should help you speed things up. These tools can help you uncover where you might have inefficient queries or schemas, or where you might need indexes or even additional compute resources.
+
+### Foreign key selector
+
+<ImageFadeStack
+  autoplay
+  showNavigation
+  altText="Studio cmdk menu"
+  delay={4000}
+  images={[
+    '/images/blog/lw7-studio/foreign-table-lookup-1.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-2.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-3.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-4.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-5.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-6.png',
+    '/images/blog/lw7-studio/foreign-table-lookup-7.png',
+  ]}
+/>
+You can now select a referencing row from another table, rather than having to pass a value manually.
+You can also quickly jump to the row being referenced in another table with the _View referencing_ record
+button from the grid itself.
+
+### Postgres Roles
+
+![Logs UI](/images/blog/lw7-studio/roles.png)
+
+The Roles page got a huge revision, making it easy for you to manage access control through users, groups, and permissions. It's now easy to see how many connections you're using and where they're coming from.
+
+### Database Webhooks
+
+![Logs UI](/images/blog/lw7-studio/webhooks.png)
+
+We've wanted to improve the webhooks interface for a long time, and we've finally gotten to it. We now have full support for editing your webhooks, and you can now select an edge function to call instead of having to pass in a url. We're happy to roll this very common request out to the community.
+
+### Network restrictions
+
+[need a screenshot]
+
+A new add-on for you to configure restrictions on the IP ranges that are allowed to connect to your Postgres database. With network restrictions, you're able to control exactly who has access to your data. Read more in the Docs.
+
+### Table/View definitions
+
+![Logs UI](/images/blog/lw7-studio/definitions.png)
+
+You can now see the SQL definitions for your tables and views, directly from the Table Editor. This is a great way to see how Supabase is translating your UI changes into SQL. This can be useful for creating migrations, getting help, or just for learning more about how Supabase and SQL works.
+
+### API Autodocs
+
+![Logs UI](/images/blog/lw7-studio/api-autodocs.png)
+
+You can now view the auto-generated API docs right from the Table Editor. Grab the SQL and `supabase-js` code for all of the CRUD operations, straight from the table. You can also quickly generate and download a Typescript types file for your table, right from the editor.
+
+### Quality of life improvements
+
+#### Support for many tables
+
+Previously, the Table Editor would get slow and unresponsive when you had many tables. We've made a number of improvements to make it much faster and more responsive. Feel free to make all the tables you need!
+
+#### JSON editing
+
+You've always been able to use the JSON data type in your tables, but editing the data wasn't easy. We've improved the inline table editor, and also now allow you open json cells from the side panel for a more spacious editing experience. Next Launch Week we're hoping to decide if it's pronounced “Jason” or “Jay-sawn”. Stay tuned.
+
+#### Nullable columns
+
+Speaking of extremely common feature requests, we've gotten this one a lot in the past few months. You used to have to handle this manually, but now you can now allow text/boolean cells to be null or empty. Supabase, where productivity is more than just an empty (or null) promise.
+
 ## Wrapping Up
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo quam neque, ut volutpat quam ultrices ut. Fusce aliquet porta fermentum. Ut ultricies bibendum justo, vel sagittis sem porta ac.
+We hope you get a lot of value out of these new features and enhancements. As we mentioned earlier, many of the features listed here came directly from [Feature Requests](https://github.com/orgs/supabase/discussions/categories/feature-requests) on Github. Thanks to everyone who have taken the time to submit these, and encourage submissions for anything else you'd like to see.
