@@ -20,7 +20,7 @@ Today we're excited to announce a few new features for Supabase Auth:
 
 With Single Sign-On (SSO), your users can login with their company's identity provider (IDP), a critical feature when you're building applications for Enterprises.
 
-Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policues. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://supabase.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
+Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policies. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://supabase.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
 
 Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO setup and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-tier and above](https://supabase.com/pricing), starting today.
 
@@ -100,7 +100,7 @@ When we [launched](https://news.ycombinator.com/item?id=24072051) Supabase Auth,
 As developers built more complex apps, they encountered two problems with this authentication flow:
 
 - **Server-Side Email Verification Links**
-  Data provided in a URL fragment is only accessible in a browser environment, not on the server. This is problematic for email verifications links that redirect users to a server-side route.
+  Data provided in a URL fragment is only accessible in a browser environment, not on the server. This is problematic for email verification links that redirect users to a server-side route.
 - **Challenges with Mobile App Authentication**
   The implicit grant flow raised security concerns for mobile use-cases since [malicious apps could potentially obtain the user session](https://www.rfc-editor.org/rfc/rfc7636#section-1).
 
