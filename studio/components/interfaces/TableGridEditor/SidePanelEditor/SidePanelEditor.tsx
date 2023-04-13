@@ -410,13 +410,13 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
             queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+              sqlKeys.query(project?.ref, [selectedTableToEdit.schema, selectedTableToEdit.name])
             ),
             queryClient.invalidateQueries(
               sqlKeys.query(project?.ref, [
                 'table-definition',
-                selectedTable!.schema,
-                selectedTable!.name,
+                selectedTableToEdit.schema,
+                selectedTableToEdit.name,
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
@@ -431,7 +431,7 @@ const SidePanelEditor = ({
       }
     } catch (error: any) {
       saveTableError = true
-      ui.setNotification({ id: toastId, category: 'error', message: error.message })
+      ui.setNotification({ error, id: toastId, category: 'error', message: error.message })
     }
 
     if (!saveTableError) {

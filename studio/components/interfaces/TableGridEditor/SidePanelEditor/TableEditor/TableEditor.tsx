@@ -1,19 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import {
-  Badge,
-  Checkbox,
-  SidePanel,
-  Input,
-  Alert,
-  IconBookOpen,
-  Button,
-  Modal,
-  IconShieldOff,
-  IconLock,
-  IconAlertOctagon,
-} from 'ui'
+import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button, Modal } from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
