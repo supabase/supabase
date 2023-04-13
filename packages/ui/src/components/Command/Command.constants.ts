@@ -21,6 +21,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     queries: [
       'Create a table that stores a list of cities, and insert 10 rows of sample data into it',
       'Create tables (with foreign key relationships) for blog posts and comments',
+      'Create tables for employees, reviewers, and employee reviews, with columns for employee ID, reviewer ID, and review text',
     ],
   },
   {
@@ -44,6 +45,8 @@ export const SAMPLE_QUERIES: SampleQueries = [
     category: 'Select data',
     queries: [
       'Retrieve a list of employees from the employees table who have a salary greater than $50,000',
+      'Retrieve a list of all employees with the title "Manager" from the employees table',
+      'Retrieve a list of all employees hired in the last 6 months',
       'Retrieve the department and average salary of each department from the employees table, group by department',
     ],
   },
@@ -51,6 +54,9 @@ export const SAMPLE_QUERIES: SampleQueries = [
     category: 'Create triggers',
     queries: [
       'Create a trigger that updates the updated_at column on the orders table with the current time when the row of the orders table is updated',
+      'Create a trigger to add a new user to the users table when someone new registers',
+      'Create a trigger to send an email whenever there is an insert in the orders table',
+      'Create a trigger to delete all orders placed by a customer when that customer is deleted from the customers table',
     ],
   },
   {
@@ -67,6 +73,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
       "Create a function to add a new entry to a user's table when a new user signs up",
       'Create an a function to calculate the average price of a product in a given category',
       'Create a function to insert a new order and update the inventory for the ordered products',
+      'Create a function to calculate the total sales for a product given an id',
     ],
   },
 ]
