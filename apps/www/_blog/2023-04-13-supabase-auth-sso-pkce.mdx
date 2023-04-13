@@ -23,7 +23,7 @@ With Single Sign-On (SSO), your users can login with their company's identity pr
 
 Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policies. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://supabase.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
 
-Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO set up and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-tier and above](https://supabase.com/pricing), starting today.
+Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO set up and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-tier and above](https://supabase.com/pricing), starting today. This will also be available on the self-hosted version.
 
 <div className="video-container">
   <iframe
@@ -229,7 +229,7 @@ Since this is a major update that touches many of the authentication routes, we 
 
 While PKCE support is great, that is not the only news for you mobile app developers out there.
 
-Building apps for iOS requires support for native _Sign in with Apple_. We heard the community's requests for native sign-in. We hope you join our excitement to officially announce support for native _Sign in with Apple_.
+Building apps for iOS requires [^1] support for native _Sign in with Apple_. We heard the community's requests for native sign-in. We hope you join our excitement to officially announce support for native _Sign in with Apple_.
 
 Your app's iOS Bundle ID can now be configured in the Apple provider section of your project's dashboard.
 
@@ -248,3 +248,5 @@ We're just starting with Apple login, and soon add support for Google login.
 ## Wrapping Up
 
 Supabase Auth aims to continue developing auth features that are secure by default yet simple to implement. We use Supabase Auth for our hosted platform and continuously dogfood the latest version on it. If you are interested to migrate to Supabase Auth, you can check out this blog post on how [Parqet migrated 125,000 users from Auth0 to Supabase Auth](https://kevcodez.medium.com/migrating-125-000-users-from-auth0-to-supabase-81c0568de307).
+
+[^1]: [App store review guidelines](https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple)
