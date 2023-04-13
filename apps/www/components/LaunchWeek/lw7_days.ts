@@ -30,7 +30,9 @@ const images = {
   '03-storage-03': '/images/launchweek/seven/day3/storage-03.png',
   '04-sso-thumb': '/images/launchweek/seven/day4/sso-support-thumb.jpg',
   '04-sso-01': '/images/launchweek/seven/day4/sso-support-01.png',
+  '04-sso-01-mobile': '/images/launchweek/seven/day4/sso-support-01-mobile.jpg',
   '04-sso-02': '/images/launchweek/seven/day4/sso-support-02.png',
+  '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
 }
 
 export interface WeekDayProps {
@@ -222,9 +224,11 @@ const days: WeekDayProps[] = [
         bg_layers: [
           {
             img: images['04-sso-01'],
+            mobileImg: images['04-sso-01-mobile'],
           },
           {
             img: images['04-sso-02'],
+            mobileImg: images['04-sso-02-mobile'],
           },
         ],
       },

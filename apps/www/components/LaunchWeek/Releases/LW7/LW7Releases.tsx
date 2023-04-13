@@ -53,7 +53,7 @@ const opacityVariant3 = {
   },
 }
 const opacityVariant4 = {
-  default: { opacity: 0.2, ease: defaultEase, duration: defaultDuratonOut },
+  default: { opacity: 0.3, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
     transition: {
@@ -697,10 +697,7 @@ export default function LW7Releases() {
                         ) : (
                           !!layer.img && (
                             <motion.div
-                              className={[
-                                'absolute inset-0 w-full h-full -z-10',
-                                i === 2 && '!mix-blend-overlay blur-2xl',
-                              ].join(' ')}
+                              className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
                               variants={getDay4Motion(i)}
                             >
                               <Image
@@ -719,7 +716,7 @@ export default function LW7Releases() {
                                 objectPosition={
                                   !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
                                 }
-                                objectFit={!!layer.mobileImg && isTablet ? 'contain' : 'cover'}
+                                objectFit="cover"
                                 quality={100}
                               />
                             </motion.div>
