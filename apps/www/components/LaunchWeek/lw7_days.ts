@@ -28,6 +28,9 @@ const images = {
   '03-storage-02': '/images/launchweek/seven/day3/storage-02.png',
   '03-storage-02-mobile': '/images/launchweek/seven/day3/storage-02-mobile.png',
   '03-storage-03': '/images/launchweek/seven/day3/storage-03.png',
+  '04-sso-thumb': '/images/launchweek/seven/day4/sso-support-thumb.jpg',
+  '04-sso-01': '/images/launchweek/seven/day4/sso-support-01.png',
+  '04-sso-02': '/images/launchweek/seven/day4/sso-support-02.png',
 }
 
 export interface WeekDayProps {
@@ -166,7 +169,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '12 Apr',
-    publishedAt: '2023-04-12T00:00:00.000-07:00',
+    publishedAt: '2023-04-12T07:00:00.000-07:00',
     description: '',
     d: 3,
     dd: 'Wed',
@@ -199,16 +202,33 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '13 Apr',
-    publishedAt: '2023-04-13T07:00:00.000-07:00',
+    publishedAt: '2023-04-13T00:00:00.000-07:00',
     description: '',
     d: 4,
     dd: 'Thu',
     youtube_id: '',
     blogpost: '',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'SSO Support for Projects',
+        description: '',
+        blog: '/blog/sso-support-for-projects',
+        thumb: images['04-sso-thumb'],
+        video: '',
+        docs: '',
+        bg_layers: [
+          {
+            img: images['04-sso-01'],
+          },
+          {
+            img: images['04-sso-02'],
+          },
+        ],
+      },
+    ],
   },
   {
     title: '',
