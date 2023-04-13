@@ -2659,7 +2659,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30]')
           ```
         data:
           sql: |
@@ -2674,8 +2674,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -2684,7 +2684,7 @@ functions:
               {
                 "id": 1,
                 "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
               }
             ],
             "status": 200,
@@ -2786,7 +2786,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
+            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59]')
           ```
         data:
           sql: |
@@ -2801,8 +2801,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -2811,7 +2811,7 @@ functions:
               {
                 "id": 1,
                 "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
               }
             ],
             "status": 200,
@@ -2874,7 +2874,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)')
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00]')
           ```
         data:
           sql: |
@@ -2889,8 +2889,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -2899,7 +2899,7 @@ functions:
                 {
                   "id": 2,
                   "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\"]"
                 }
               ],
               "status": 200,
@@ -2925,7 +2925,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)')
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30]')
           ```
         data:
           sql: |
@@ -2940,8 +2940,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -2950,7 +2950,7 @@ functions:
                 {
                   "id": 2,
                   "room_name": "Topaz",
-                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\"]"
                 }
               ],
               "status": 200,
@@ -2976,7 +2976,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)')
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00]')
           ```
         data:
           sql: |
@@ -2991,8 +2991,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -3001,7 +3001,7 @@ functions:
               {
                 "id": 1,
                 "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
               }
             ],
             "status": 200,
@@ -3026,7 +3026,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00)')
+            .rangeLte('during', '[2000-01-01 14:00, 2000-01-01 16:00]')
           ```
         data:
           sql: |
@@ -3041,8 +3041,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -3051,7 +3051,7 @@ functions:
                 {
                   "id": 1,
                   "room_name": "Emerald",
-                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
                 }
               ],
               "status": 200,
@@ -3077,7 +3077,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)')
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00]')
           ```
         data:
           sql: |
@@ -3092,8 +3092,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -3102,7 +3102,7 @@ functions:
               {
                 "id": 1,
                 "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
               }
             ],
             "status": 200,
@@ -3167,7 +3167,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)')
+            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15]')
           ```
         data:
           sql: |
@@ -3182,8 +3182,8 @@ functions:
             insert into
               reservations (id, room_name, during)
             values
-              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
-              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00]'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00]');
             ```
         response: |
           ```json
@@ -3192,7 +3192,7 @@ functions:
               {
                 "id": 1,
                 "room_name": "Emerald",
-                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\"]"
               }
             ],
             "status": 200,
