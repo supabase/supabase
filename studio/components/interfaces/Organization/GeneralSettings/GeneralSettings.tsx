@@ -161,7 +161,7 @@ const GeneralSettings = () => {
                             <p>
                               For more information about how we use personal information, please see
                               our{' '}
-                              <Link href="/">
+                              <Link href="https://supabase.com/privacy">
                                 <a
                                   target="_blank"
                                   className="text-brand-900 border-b border-brand-900"
