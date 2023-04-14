@@ -21,6 +21,7 @@ import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
+import { AiWarning } from './Command.alerts'
 
 import { cn } from './../../utils/cn'
 
@@ -337,18 +338,6 @@ export function queryAi(messages: Message[], timeout = 0) {
   })
 }
 
-export const AiWarning = ({ className }: { className?: string }) => (
-  <Alert
-    variant="warning"
-    title="Experimental"
-    className={className}
-    icon={<IconAlertTriangle strokeWidth={1.5} size={18} />}
-  >
-    Supabase AI is experimental and may produce incorrect answers. Always verify the output before
-    executing.
-  </Alert>
-)
-
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
 
@@ -467,7 +456,7 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />}
+        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus

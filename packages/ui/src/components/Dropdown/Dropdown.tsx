@@ -98,7 +98,10 @@ export function Item({ icon, className, ...props }: ItemProps) {
   let __styles = styleHandler('dropdown')
 
   return (
-    <RadixDropdown.Item className={cn(__styles.item, className)} {...props}>
+    <RadixDropdown.Item
+      className={cn(__styles.item, className, props.disabled && __styles.disabled)}
+      {...props}
+    >
       {icon && icon}
       <span>{props.children}</span>
     </RadixDropdown.Item>

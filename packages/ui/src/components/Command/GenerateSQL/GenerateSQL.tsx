@@ -12,9 +12,6 @@ import {
   MessageRole,
   MessageStatus,
   useAiChat,
-  AiWarning,
-  IconAlertCircle,
-  Alert,
   Tabs,
 } from 'ui'
 
@@ -25,6 +22,7 @@ import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
 import { generatePrompt } from './GenerateSQL.utils'
+import { ExcludeSchemaAlert, IncludeSchemaAlert, AiWarning } from '../Command.alerts'
 
 const GenerateSQL = () => {
   // [Joshen] Temp hack to ensure that generatePrompt receives updated value
@@ -88,8 +86,8 @@ const GenerateSQL = () => {
     <div onClick={(e) => e.stopPropagation()}>
       <div
         className={cn(
-          'relative py-4 max-h-[550px] overflow-auto',
-          allowSendingSchemaMetadata ? 'mb-[265px]' : 'mb-[155px]'
+          'relative py-4 max-h-[420px] overflow-auto',
+          allowSendingSchemaMetadata ? 'mb-[155px]' : 'mb-[64px]'
         )}
       >
         {messages.map((message, i) => {
@@ -149,13 +147,20 @@ const GenerateSQL = () => {
                         </div>
                       ) : (
                         <div className="space-y-2 flex-grow max-w-[93%]">
-                          <CodeBlock
-                            hideCopy
-                            language="sql"
-                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
-                          >
-                            {answer}
-                          </CodeBlock>
+                          <div className="-space-y-px">
+                            <CodeBlock
+                              hideCopy
+                              language="sql"
+                              className="
+                                relative prose dark:prose-dark bg-scale-300 max-w-none !mb-0
+                                !rounded-b-none
+                                
+                              "
+                            >
+                              {answer}
+                            </CodeBlock>
+                            <AiWarning className="!rounded-t-none border-scale-400" />
+                          </div>
                           {message.status === MessageStatus.Complete && (
                             <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
                           )}
@@ -234,7 +239,7 @@ const GenerateSQL = () => {
       </div>
 
       <div className="absolute bottom-0 w-full bg-scale-200 pt-4">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />}
+        {/* {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />} */}
         {allowSendingSchemaMetadata && (
           <div className="mb-4">
             {messages.length === 0 ? (
@@ -260,32 +265,10 @@ const GenerateSQL = () => {
                   }
                 />
               </div>
+            ) : includeSchemaMetadata ? (
+              <IncludeSchemaAlert />
             ) : (
-              <Alert
-                variant={includeSchemaMetadata ? 'info' : 'warning'}
-                title="Project metadata"
-                icon={
-                  includeSchemaMetadata ? (
-                    <IconAlertCircle strokeWidth={1.5} size={18} />
-                  ) : (
-                    <IconAlertTriangle strokeWidth={1.5} size={18} />
-                  )
-                }
-                className="mx-4"
-              >
-                <div className="flex flex-col gap-2">
-                  <p>
-                    This project's metadata (tables, columns, and data types){' '}
-                    <span className="text-scale-1200">
-                      {includeSchemaMetadata ? 'will be' : 'will not be'} sent as context
-                    </span>{' '}
-                    in this conversation
-                  </p>
-                  <p className="text-scale-1000">
-                    Start a new conversation to change this configuration
-                  </p>
-                </div>
-              </Alert>
+              <ExcludeSchemaAlert />
             )}
           </div>
         )}
