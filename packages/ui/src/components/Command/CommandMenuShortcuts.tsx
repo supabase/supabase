@@ -1,6 +1,6 @@
 import { IconArrowLeft } from '../Icon/icons/IconArrowLeft'
 
-import { Badge } from 'ui'
+import { BadgeExperimental } from './Command.Badges'
 import { COMMAND_ROUTES } from './Command.constants'
 import { CommandShortcut } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -32,11 +32,7 @@ export default function CommandMenuShortcuts() {
           </CommandShortcut>
         ))}
 
-        {currentPage && isExperimental(currentPage) && (
-          <Badge dot color="scale">
-            Experimental
-          </Badge>
-        )}
+        {currentPage && isExperimental(currentPage) && <BadgeExperimental />}
       </div>
     </div>
   )
