@@ -6,8 +6,8 @@ import { useParams } from 'common/hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import { PROJECT_STATUS } from 'lib/constants'
 import { IconAlertCircle } from 'ui'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export const PageContext: any = createContext(null)
 
@@ -15,7 +15,7 @@ const ApiSettings: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { meta, ui } = useStore()
   const project = ui.selectedProject
-  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const isActive = useIsProjectActive()
 
   // [Joshen] Will need to deprecate this
   const PageState: any = useLocalObservable(() => ({

@@ -1,21 +1,20 @@
-import { FC } from 'react'
+import Link from 'next/link'
 import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useFlag, useStore } from 'hooks'
-import { PROJECT_STATUS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { useFlag } from 'hooks'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from 'components/interfaces/Billing'
-import Link from 'next/link'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {
+interface PlanCTAButtonProps {
   plan: any
   currentPlan?: StripeProduct
   onSelectPlan: (plan: any) => void
 }
 
-const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
-  const { ui } = useStore()
-  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) => {
+  const isActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const getButtonType = (plan: any, currentPlan: any) => {

@@ -7,7 +7,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { PROJECT_STATUS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -16,6 +16,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
   showProjectName?: boolean
@@ -25,8 +26,8 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
   const router = useRouter()
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const isActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
   const canUpdateSubscription = checkPermissions(
