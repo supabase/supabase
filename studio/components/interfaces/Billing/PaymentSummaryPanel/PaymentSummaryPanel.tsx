@@ -1,15 +1,10 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import {
-  BASE_PATH,
-  PRICING_TIER_PRODUCT_IDS,
-  PROJECT_STATUS,
-  STRIPE_PRODUCT_IDS,
-} from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -18,10 +13,11 @@ import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
-interface Props {
+interface PaymentSummaryPanelProps {
   isRefreshingPreview: boolean
   currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
@@ -61,7 +57,7 @@ interface Props {
 // [Joshen] Eventually if we do support more addons, it'll be better to generalize
 // the selectedComputeSize to an addOns array. But for now, we keep it simple, don't over-engineer too early
 
-const PaymentSummaryPanel: FC<Props> = ({
+const PaymentSummaryPanel = ({
   isRefreshingPreview,
   isSpendCapEnabled,
   currentSubscription,
@@ -82,9 +78,9 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
   captcha,
-}) => {
+}: PaymentSummaryPanelProps) => {
   const { ui } = useStore()
-  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const isActive = useIsProjectActive()
   const projectRegion = ui.selectedProject?.region
 
   // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
