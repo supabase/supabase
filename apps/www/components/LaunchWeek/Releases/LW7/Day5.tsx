@@ -5,7 +5,7 @@ import { useMobileViewport } from '~/hooks/useMobileViewport'
 import { CartTitle, MultistepSectionHeader, SectionButtons, StyledArticleBadge } from './components'
 
 import { WeekDayProps } from '~/components/LaunchWeek/lw7_days'
-import { opacityVariant4, scaleOpacityVariant2 } from './LW7Releases'
+import { opacityVariant4, scaleOpacityVariant, scaleOpacityVariant2 } from './LW7Releases'
 
 import styles from './day5.module.css'
 
@@ -13,6 +13,17 @@ const getDay5Motion = (index: number) => {
   switch (index) {
     case 0:
       return scaleOpacityVariant2
+    default:
+      return undefined
+  }
+}
+
+const getDay5Community02Motion = (index: number) => {
+  switch (index) {
+    case 0:
+      return opacityVariant4
+    case 1:
+      return scaleOpacityVariant
     default:
       return undefined
   }
@@ -30,7 +41,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           className={`
                       relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
                       basis-1/2 lg:flex-shrink xl:basis-2/3 w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 xs:text-2xl text-xl sm:text-2xl md:text-xl text-center shadow-lg
-                      h-[400px]
+                      min-h-[400px]
                     `}
           initial="default"
           animate="default"
@@ -67,7 +78,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           className={`
                       relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 xs:text-2xl text-xl sm:text-2xl md:text-xl text-center shadow-lg
-                      h-[400px]
+                      min-h-[400px]
                     `}
           initial="default"
           animate="default"
@@ -84,7 +95,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                 !!layer.img && (
                   <motion.div
                     className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
-                    variants={getDay5Motion(i)}
+                    variants={getDay5Community02Motion(i)}
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
@@ -93,7 +104,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       )}
                       layout="fill"
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
+                      objectFit={i === 1 && isTablet ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
