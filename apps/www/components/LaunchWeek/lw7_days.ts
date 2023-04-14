@@ -287,12 +287,11 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Community Highlight',
-        thumb: '',
         hideInBlog: true,
         steps: [
           {
             title: 'Community Highlight',
-            blog: '/blog/supabase-auth-sso-pkce',
+            blog: '/blog/launch-week-7-community-highlights',
             thumb: images['05-community-01-thumb'],
             bg_layers: [
               {
@@ -308,14 +307,14 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Studio Updates',
-        blog: '/blog/studio',
+        blog: '/blog/studio-v2',
         thumb: images['05-studio-01-thumb'],
         steps: [
           {
             title: '⌘K',
             badge: 'New',
             className: 'span-full',
-            blog: '/blog/',
+            url: '#command-k',
             hideInBlog: true,
             bg_layers: [
               {
@@ -328,7 +327,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Foreign Data Wrappers',
             badge: 'Update',
-            blog: '/blog/',
+            url: '#foreign-data-wrappers',
             hideInBlog: true,
             bg_layers: [
               {
@@ -340,7 +339,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Nullable columns',
             badge: 'New',
-            blog: '/blog/',
+            url: '#nullable-columns',
             hideInBlog: true,
             bg_layers: [
               {
@@ -352,7 +351,7 @@ const days: WeekDayProps[] = [
           {
             title: 'API Autodocs',
             badge: 'New',
-            blog: '/blog/',
+            url: '#api-autodocs',
             hideInBlog: true,
             bg_layers: [
               {
@@ -364,7 +363,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Postgres Roles',
             badge: 'New',
-            blog: '/blog/',
+            url: '#postgres-roles',
             hideInBlog: true,
             bg_layers: [
               {
@@ -376,7 +375,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Cascade deletes',
             badge: 'New',
-            blog: '/blog/',
+            url: '#cascade-deletes',
             hideInBlog: true,
             bg_layers: [
               {
@@ -388,7 +387,7 @@ const days: WeekDayProps[] = [
           {
             title: 'GraphiQL',
             badge: 'New',
-            blog: '/blog/',
+            url: '#graphiql',
             hideInBlog: true,
             bg_layers: [
               {
@@ -400,7 +399,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Database Webhooks',
             badge: 'Updated',
-            blog: '/blog/',
+            url: '#database-webhooks',
             hideInBlog: true,
             bg_layers: [
               {
@@ -412,7 +411,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Supports 1000s of tables and views',
             badge: 'Enhanced',
-            blog: '/blog/',
+            url: '#supports-1000s-of-tables-and-views',
             hideInBlog: true,
             bg_layers: [
               {
@@ -424,7 +423,7 @@ const days: WeekDayProps[] = [
           {
             title: 'JSON Support',
             badge: 'Improved',
-            blog: '/blog/',
+            url: '#json-support',
             hideInBlog: true,
             bg_layers: [
               {
@@ -436,7 +435,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Insights/Query Performance',
             badge: 'New',
-            blog: '/blog/',
+            url: '#insights-query-performance',
             hideInBlog: true,
             bg_layers: [
               {
@@ -449,13 +448,12 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'One more thing',
-        thumb: '',
         hideInBlog: true,
         steps: [
           {
             title: 'dbdev',
             badge: 'New',
-            blog: '/blog/supabase-auth-sso-pkce',
+            blog: '/blog/db-dev',
             thumb: images['05-omt-01-thumb'],
             bg_layers: [
               {
@@ -473,7 +471,7 @@ const days: WeekDayProps[] = [
             title: 'Postgres TLE',
             badge: 'New',
             thumb: images['05-omt-02-thumb'],
-            blog: '/blog/supabase-auth-sso-pkce',
+            blog: '/blog/postgres-tle',
             bg_layers: [
               {
                 img: images['05-omt-02-001'],

@@ -2,12 +2,20 @@ import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useMobileViewport } from '~/hooks/useMobileViewport'
-import { CartTitle, MultistepSectionHeader, SectionButtons, StyledArticleBadge } from './components'
+import {
+  ArrowTopRightSvg,
+  CartTitle,
+  ChipLink,
+  MultistepSectionHeader,
+  SectionButtons,
+  StyledArticleBadge,
+} from './components'
 
 import { WeekDayProps } from '~/components/LaunchWeek/lw7_days'
 import { opacityVariant4, scaleOpacityVariant, scaleOpacityVariant2 } from './LW7Releases'
 
 import styles from './day5.module.css'
+import Link from 'next/link'
 
 const getDay5Motion = (index: number) => {
   switch (index) {
@@ -100,11 +108,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'commandK' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[0].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[0].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[0].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[4].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[0].bg_layers &&
             day.steps[1].steps[0].bg_layers?.map(
@@ -139,9 +158,20 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'wrappers' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[1].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center md:text-left justify-between flex-col md:items-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[1].title}</CartTitle>
-            <StyledArticleBadge>{day.steps[1].steps[1].badge}</StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge>{day.steps[1].steps[1].badge}</StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[1].bg_layers &&
             day.steps[1].steps[1].bg_layers?.map(
@@ -176,11 +206,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'nullable' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[2].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex flex-col items-center text-center gap-3 text-white">
             <CartTitle>{day.steps[1].steps[2].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[2].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[2].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[2].bg_layers &&
             day.steps[1].steps[2].bg_layers?.map(
@@ -191,12 +232,12 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                     variants={getDay5Motion(i)}
                   >
                     <Image
-                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
+                      objectPosition={isMobile ? '50% 70%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
                     />
@@ -215,11 +256,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'apiAutodocs' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[3].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[3].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[3].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[3].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[3].bg_layers &&
             day.steps[1].steps[3].bg_layers?.map(
@@ -235,7 +287,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
+                      objectPosition={isMobile ? '50% 90%' : '50% 50%'}
                       objectFit="cover"
                       quality={100}
                     />
@@ -254,11 +306,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'pgRoles' }}
         >
-          <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[4].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
+          <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 lg:gap-2 text-white">
             <CartTitle>{day.steps[1].steps[4].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[4].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[4].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[4].bg_layers &&
             day.steps[1].steps[4].bg_layers?.map(
@@ -293,11 +356,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'casDeletes' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[5].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[5].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[5].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[5].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[5].bg_layers &&
             day.steps[1].steps[5].bg_layers?.map(
@@ -332,11 +406,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'graphiQL' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[6].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[6].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[6].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[6].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[6].bg_layers &&
             day.steps[1].steps[6].bg_layers?.map(
@@ -371,11 +456,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'dbWebhooks' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[7].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[7].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[7].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[7].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[7].bg_layers &&
             day.steps[1].steps[7].bg_layers?.map(
@@ -410,11 +506,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'viewsTables' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[8].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[8].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[8].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[8].bg_layers &&
             day.steps[1].steps[8].bg_layers?.map(
@@ -449,11 +556,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'JSONsupport' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[9].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center flex-col gap-3 text-white">
             <CartTitle>{day.steps[1].steps[9].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[9].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[9].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[9].bg_layers &&
             day.steps[1].steps[9].bg_layers?.map(
@@ -488,11 +606,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           whileHover="hover"
           style={{ gridArea: 'insights' }}
         >
+          <Link href={`${day.steps[1].blog}${day.steps[1].steps[10].url}`}>
+            <a className="absolute inset-0 z-10" />
+          </Link>
           <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[10].title}</CartTitle>
-            <StyledArticleBadge className="lg:ml-2">
-              {day.steps[1].steps[10].badge}
-            </StyledArticleBadge>
+            <div className="flex gap-2">
+              <StyledArticleBadge className="lg:ml-2">
+                {day.steps[1].steps[10].badge}
+              </StyledArticleBadge>
+              <ChipLink
+                uiOnly
+                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+              >
+                <ArrowTopRightSvg />
+              </ChipLink>
+            </div>
           </div>
           {day.steps[1].steps[10].bg_layers &&
             day.steps[1].steps[10].bg_layers?.map(
