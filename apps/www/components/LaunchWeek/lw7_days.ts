@@ -54,10 +54,12 @@ const images = {
   '05-omt-01-001': '/images/launchweek/seven/day5/one-more-thing/omt-01-01.jpg',
   '05-omt-01-001-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-01-01-mobile.jpg',
   '05-omt-01-002': '/images/launchweek/seven/day5/one-more-thing/omt-01-02.png',
+  '05-omt-01-003': '/images/launchweek/seven/day5/one-more-thing/omt-01-03.png',
   '05-omt-01-002-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-01-02-mobile.png',
   '05-omt-02-001': '/images/launchweek/seven/day5/one-more-thing/omt-02-01.jpg',
   '05-omt-02-001-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-01-mobile.jpg',
   '05-omt-02-002': '/images/launchweek/seven/day5/one-more-thing/omt-02-02.png',
+  '05-omt-02-003': '/images/launchweek/seven/day5/one-more-thing/omt-02-03.png',
   '05-omt-02-002-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-02-mobile.png',
   '05-omt-01-thumb': '/images/launchweek/seven/day5/one-more-thing/dbdev-thumb.jpg',
   '05-omt-02-thumb': '/images/launchweek/seven/day5/one-more-thing/pgTLE-thumb.jpg',
@@ -467,6 +469,9 @@ const days: WeekDayProps[] = [
                 img: images['05-omt-01-002'],
                 mobileImg: images['05-omt-01-002-mobile'],
               },
+              {
+                img: images['05-omt-01-003'],
+              },
             ],
             steps: [],
           },
@@ -483,6 +488,9 @@ const days: WeekDayProps[] = [
               {
                 img: images['05-omt-02-002'],
                 mobileImg: images['05-omt-02-002-mobile'],
+              },
+              {
+                img: images['05-omt-02-003'],
               },
             ],
             steps: [],
