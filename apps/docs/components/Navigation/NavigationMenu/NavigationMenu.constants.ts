@@ -578,6 +578,7 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
       ],
     },
     {

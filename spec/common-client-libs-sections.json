@@ -426,6 +426,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-apple",
+        "title": "Sign in with Apple",
+        "slug": "sign-in-with-apple",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-oauth",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithoauth",
