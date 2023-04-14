@@ -180,10 +180,11 @@ type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPr
 
 export interface CommandItemProps extends CommandPrimitiveItemProps {
   type: 'link' | 'block-link' | 'command'
+  badge?: string
 }
 
 export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
-  ({ className, type, ...props }, ref) => (
+  ({ className, type, children, badge, ...props }, ref) => (
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
@@ -238,7 +239,16 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         className
       )}
       {...props}
-    />
+    >
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex flex-row items-center">{children}</div>
+        {badge && (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10 bg-brand-200 text-brand-1100 border border-brand-700">
+            {badge}
+          </span>
+        )}
+      </div>
+    </CommandPrimitive.Item>
   )
 )
 
