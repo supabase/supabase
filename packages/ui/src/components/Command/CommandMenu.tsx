@@ -65,11 +65,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
-  const handleRouteChange = (url: string) => {
-    router.push(url)
-    setIsOpen(false)
-  }
-
   return (
     <>
       <CommandDialog
@@ -213,7 +208,10 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                       <CommandItem
                         key={item.url}
                         type="link"
-                        onSelect={() => handleRouteChange(itemUrl)}
+                        onSelect={() => {
+                          router.push(item.url)
+                          setIsOpen(false)
+                        }}
                       >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
