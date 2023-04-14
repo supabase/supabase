@@ -18,12 +18,18 @@ const getDay5Motion = (index: number) => {
   }
 }
 
-const getDay5Community02Motion = (index: number) => {
+const getDay5omt01Motion = (index: number) => {
+  switch (index) {
+    case 0:
+      return scaleOpacityVariant
+    default:
+      return undefined
+  }
+}
+const getDay5omt02Motion = (index: number) => {
   switch (index) {
     case 0:
       return opacityVariant4
-    case 1:
-      return scaleOpacityVariant
     default:
       return undefined
   }
@@ -504,6 +510,88 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       layout="fill"
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
                       objectFit="cover"
+                      quality={100}
+                    />
+                  </motion.div>
+                )
+            )}
+        </motion.div>
+      </div>
+      {/* One More Thing */}
+      <MultistepSectionHeader title={day.steps[2].title} />
+      <div className="h-auto flex flex-col md:grid md:grid-cols-3 gap-5 lg:flex-row">
+        <motion.div
+          className={`
+                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 md:items-start justify-between
+                      grid-ro w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 text-xl sm:text-2xl md:text-xl text-center shadow-lg
+                      min-h-[400px] md:min-h-[250px] col-span-2
+                    `}
+          initial="default"
+          animate="default"
+          whileHover="hover"
+        >
+          <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row lg:justify-start gap-3 text-white">
+            <CartTitle>{day.steps[2].steps[0].title}</CartTitle>
+            <StyledArticleBadge className="lg:ml-2">
+              {day.steps[2].steps[0].badge}
+            </StyledArticleBadge>
+          </div>
+          <SectionButtons blog={day.steps[2].steps[0].blog} />
+          {day.steps[2].steps[0].bg_layers &&
+            day.steps[2].steps[0].bg_layers?.map(
+              (layer, i) =>
+                !!layer.img && (
+                  <motion.div
+                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    variants={getDay5omt01Motion(i)}
+                  >
+                    <Image
+                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
+                        ' '
+                      )}
+                      layout="fill"
+                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '80% 50%'}
+                      objectFit="cover"
+                      quality={100}
+                    />
+                  </motion.div>
+                )
+            )}
+        </motion.div>
+        <motion.div
+          className={`
+                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 md:items-start justify-between text-xl sm:text-2xl md:text-xl shadow-lg
+                      w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 text-center 
+                      min-h-[400px] md:min-h-[250px] 
+                    `}
+          initial="default"
+          animate="default"
+          whileHover="hover"
+        >
+          <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row lg:justify-start gap-3 text-white">
+            <CartTitle>{day.steps[2].steps[1].title}</CartTitle>
+            <StyledArticleBadge>{day.steps[2].steps[1].badge}</StyledArticleBadge>
+          </div>
+          <SectionButtons blog={day.steps[2].steps[1].blog} />
+          {day.steps[2].steps[1].bg_layers &&
+            day.steps[2].steps[1].bg_layers?.map(
+              (layer, i) =>
+                !!layer.img && (
+                  <motion.div
+                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    variants={getDay5omt02Motion(i)}
+                  >
+                    <Image
+                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
+                        ' '
+                      )}
+                      layout="fill"
+                      objectPosition={
+                        i == 1 && !!layer.mobileImg && isTablet ? '50% 60%' : '80% 50%'
+                      }
+                      objectFit={i == 1 && !!layer.mobileImg && isTablet ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
