@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import clsx from 'clsx'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Form, Input, Toggle } from 'ui'
+import { Collapsible, Form, IconChevronRight, IconHelpCircle, Input, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions, useFlag } from 'hooks'
@@ -20,6 +22,7 @@ import {
 const GeneralSettings = () => {
   const { app, ui } = useStore()
   const { slug } = useParams()
+  const [open, setOpen] = useState(false)
   const { name, opt_in_tags } = ui.selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
@@ -100,7 +103,6 @@ const GeneralSettings = () => {
                     label="Organization name"
                     disabled={!canUpdateOrganization}
                   />
-
                   {showCMDK && allowCMDKDataOptIn && (
                     <div className="mt-4">
                       <Toggle
@@ -109,8 +111,69 @@ const GeneralSettings = () => {
                         disabled={!canUpdateOrganization}
                         size="small"
                         label="Opt-in to sending anonymous data to OpenAI"
-                        descriptionText="You can choose to share anonymous metadata with OpenAI to enhance your experience on Supabase anywhere we use AI. Only information such as table schemas with table names, column names, and data types will be shared. None of your actual table data will be sent to OpenAI."
+                        descriptionText="By opting into sending anonymous data, Supabase AI can improve the answers it shows you"
                       />
+                      <Collapsible open={open} onOpenChange={setOpen}>
+                        <Collapsible.Trigger asChild>
+                          <div className="flex items-center space-x-2 ml-16 cursor-pointer">
+                            <IconChevronRight
+                              strokeWidth={2}
+                              size={16}
+                              className={clsx('transition-all', open ? 'rotate-90' : '')}
+                            />
+                            <p className="text-sm text-scale-1000 underline">
+                              Important information regarding opting in
+                            </p>
+                          </div>
+                        </Collapsible.Trigger>
+                        <Collapsible.Content>
+                          <div className="space-y-2 py-4 ml-16 text-sm text-scale-1100">
+                            <p>
+                              Supabase AI is a chatbot support tool powered by OpenAI. Supabase will
+                              share the query you submit and information about the databases you
+                              manage through Supabase with OpenAI, L.L.C. and its affiliates in
+                              order to provide the Supabase AI tool.
+                            </p>
+                            <p>
+                              OpenAI will only access information about the structure of your
+                              databases, such as table names, column and row headings. OpenAI will
+                              not access the contents of the database itself.
+                            </p>
+                            <p>
+                              OpenAI uses this information to generate responses to your query, and
+                              does not retain or use the information to train its algorithms or
+                              otherwise improve its products and services.
+                            </p>
+                            <p>
+                              If you have your own individual account on Supabase, we will use any
+                              personal information collected through [Supabase AI] to provide you
+                              with the [Supabase AI] tool. If you are in the UK, EEA or Switzerland,
+                              the processing of this personal information is necessary for the
+                              performance of a contract between you and us.
+                            </p>
+                            <p>
+                              Supabase collects information about the queries you submit through
+                              Supabase AI and the responses you receive to assess the performance of
+                              the Supabase AI tool and improve our services. If you are in the UK,
+                              EEA or Switzerland, the processing is necessary for our legitimate
+                              interests, namely informing our product development and improvement.
+                            </p>
+                            <p>
+                              For more information about how we use personal information, please see
+                              our{' '}
+                              <Link href="https://supabase.com/privacy">
+                                <a
+                                  target="_blank"
+                                  className="text-brand-900 border-b border-brand-900"
+                                >
+                                  privacy policy
+                                </a>
+                              </Link>
+                              .
+                            </p>
+                          </div>
+                        </Collapsible.Content>
+                      </Collapsible>
                     </div>
                   )}
                 </FormSectionContent>

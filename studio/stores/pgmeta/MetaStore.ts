@@ -469,8 +469,6 @@ export default class MetaStore implements IMetaStore {
         category: 'error',
         message: `An error occurred while creating the column "${payload.name}"`,
       })
-      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
-      await this.rootStore.meta.query(query)
       return { error }
     }
   }
