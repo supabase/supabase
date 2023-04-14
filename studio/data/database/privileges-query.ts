@@ -74,7 +74,7 @@ const sql = /* SQL */ `
       entity_name AS table_name,
       role_name,
       column_name,
-      BOOL_OR(is_column_specific) AS is_column_specific,
+      BOOL_AND(is_column_specific) AS is_column_specific,
       ARRAY_AGG(privilege_type) AS privileges
     FROM
       data
