@@ -28,6 +28,11 @@ const images = {
   '03-storage-02': '/images/launchweek/seven/day3/storage-02.png',
   '03-storage-02-mobile': '/images/launchweek/seven/day3/storage-02-mobile.png',
   '03-storage-03': '/images/launchweek/seven/day3/storage-03.png',
+  '04-sso-thumb': '/images/launchweek/seven/day4/sso-support-thumb.jpg',
+  '04-sso-01': '/images/launchweek/seven/day4/sso-support-01.png',
+  '04-sso-01-mobile': '/images/launchweek/seven/day4/sso-support-01-mobile.jpg',
+  '04-sso-02': '/images/launchweek/seven/day4/sso-support-02.png',
+  '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
 }
 
 export interface WeekDayProps {
@@ -150,7 +155,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/edge-runtime-self-hosted-deno-functions',
         thumb: images['02-self-hosted-edge-functions-thumb'],
         video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
-        hackernews: 'https://news.ycombinator.com/item?id=30868849',
+        hackernews: 'https://news.ycombinator.com/item?id=35525222',
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],
@@ -166,7 +171,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '12 Apr',
-    publishedAt: '2023-04-12T00:00:00.000-07:00',
+    publishedAt: '2023-04-12T07:00:00.000-07:00',
     description: '',
     d: 3,
     dd: 'Wed',
@@ -199,16 +204,37 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '13 Apr',
-    publishedAt: '2023-04-13T07:00:00.000-07:00',
+    publishedAt: '2023-04-13T00:00:00.000-07:00',
     description: '',
     d: 4,
     dd: 'Thu',
     youtube_id: '',
     blogpost: '',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Auth: SSO, Mobile, and Server-side support',
+        break_thumb_title: true,
+        description: '',
+        blog: '/blog/supabase-auth-sso-pkce',
+        thumb: images['04-sso-thumb'],
+        video: 'https://www.youtube.com/watch?v=hAwJeR6mhB0',
+        docs: '/docs/guides/auth/sso/auth-sso-saml',
+        hackernews: 'https://news.ycombinator.com/item?id=35555263',
+        bg_layers: [
+          {
+            img: images['04-sso-01'],
+            mobileImg: images['04-sso-01-mobile'],
+          },
+          {
+            img: images['04-sso-02'],
+            mobileImg: images['04-sso-02-mobile'],
+          },
+        ],
+      },
+    ],
   },
   {
     title: '',

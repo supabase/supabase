@@ -91,6 +91,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   type="command"
+                  badge="Experimental"
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -174,6 +175,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   <CommandItem
                     forceMount
                     type="command"
+                    badge="Experimental"
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
                     <AiIcon className="text-scale-1100" />

@@ -45,7 +45,7 @@ You can use any standard React components in these `.mdx` files without having t
 
 ### Reference docs for client libraries
 
-We maintain client libraries for [Javascript](https://supabase.com/docs/reference/javascript) and [Flutter/Dart](https://supabase.com/docs/reference/dart) (with more to come). These reference docs document every object and method available for developers to use. The are assembled from different sources and work much differently than the `.mdx` Guides we just looked at.
+We maintain client libraries for [JavaScript](https://supabase.com/docs/reference/javascript) and [Flutter/Dart](https://supabase.com/docs/reference/dart) (with more to come). These reference docs document every object and method available for developers to use. They are assembled from different sources and work much differently than the `.mdx` Guides we just looked at.
 
 The client libraries are essentially wrappers around the clients for the various tools we use — GoTrue, PostgREST, Storage, Functions, and Realtime. The easiest way to describe how the things fit together is to look at an example and trace where the various pieces of information are coming from.
 

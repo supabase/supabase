@@ -36,8 +36,8 @@ const BlogLinks = () => {
                 <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
                   <div
                     className={[
-                      'text-transparent bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
-                      step.break_thumb_title && 'max-w-[290px]',
+                      'text-transparent bg-clip-text bg-gradient-to-r text-base from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',
+                      step.break_thumb_title && 'max-w-[240px]',
                     ].join(' ')}
                   >
                     {step.title}

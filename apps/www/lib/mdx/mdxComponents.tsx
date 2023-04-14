@@ -12,6 +12,18 @@ import { Badge } from 'ui'
 
 const ignoreClass = 'ignore-on-export'
 
+const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
+  switch (align) {
+    case 'left':
+      return 'text-left'
+    case 'right':
+      return 'text-right'
+    case 'center':
+    default:
+      return 'text-center'
+  }
+}
+
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
@@ -43,6 +55,22 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       }
       return <img {...props} />
     },
+    Img: (props: any) => (
+      <figure>
+        <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
+          <Image
+            {...props}
+            className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
+            layout="fill"
+          />
+        </span>
+        {props.caption && (
+          <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
+            {props.caption}
+          </figcaption>
+        )}
+      </figure>
+    ),
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
   }
 
