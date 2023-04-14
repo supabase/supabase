@@ -159,7 +159,7 @@ export const ChipLink = ({
       target={target ?? '_self'}
       rel="noopener"
       className={[
-        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
+        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 pl-3 pr-2',
         className,
       ].join(' ')}
     >
@@ -175,6 +175,7 @@ export const SectionButtons = ({
   github,
   url,
   hackernews,
+  mobileGrid,
 }: {
   blog?: string
   docs?: string
@@ -182,9 +183,15 @@ export const SectionButtons = ({
   github?: string
   url?: string
   hackernews?: string
+  mobileGrid?: boolean
 }) => {
   return (
-    <div className="flex w-full md:w-auto justify-center gap-2 z-10">
+    <div
+      className={[
+        'flex w-full md:w-auto justify-center gap-2 z-10',
+        mobileGrid && 'grid grid-cols-2 gap-2 sm:flex',
+      ].join(' ')}
+    >
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
@@ -202,7 +209,7 @@ export const SectionButtons = ({
         </ChipLink>
       )}
       {!!video && (
-        <ChipLink href={video}>
+        <ChipLink href={video} target="_blank">
           Video
           <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
             <PlaySvg />

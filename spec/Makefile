@@ -57,7 +57,7 @@ download.analytics.v0:
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
-transform: dereference.api.v0  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2 
+transform: dereference.api.v0  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
 
 dereference.api.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
