@@ -1,5 +1,6 @@
 ---
 title: 'dbdev: PostgreSQL Package Manager'
+description: We're publicly previewing dbdev, a PostgreSQL package manager. 
 launchweek: 7
 tags:
   - launch-week
@@ -20,7 +21,7 @@ Today we’re publicly previewing [**`database.dev`**](https://database.dev), a 
 
 The initial preview is compatible with [new projects](https://database.new) on the Supabase platform. It can also be installed on any PostgreSQL instance that support [`pg_tle`](https://github.com/aws/pg_tle) and [`pgsql-http`](https://github.com/pramsey/pgsql-http).
 
-## **Get Started with dbdev**
+## Get Started with dbdev
 
 The in-database client is the easiest way to get started. You can setup the installer by executing the SQL snippet available at [database.dev/installer](https://database.dev/installer).
 
@@ -231,7 +232,7 @@ For a more in-depth explanation of Trusted Language Extensions checkout  [AWS's 
 
 A recent development in the PostgreSQL extension ecosystem is the 1.0 release of a new trusted language, [`pl/rust`](https://github.com/tcdi/plrust), allowing users to define SQL functions written in Rust. As a compiled language, `pl/rust` functions can execute an order of magnitude faster than `pl/pgSQL` for computationally heavy workloads. That closes the biggest capability gap between native extensions with C components and TLEs. `pl/rust` hasn’t released to Supabase yet, but we’re excited about rolling it out in the coming weeks.
 
-## Please Give **Feedback**
+## Please Give Feedback
 
 As this is a preview, we anticipate that there may be a few rough edges. If you do take the time to explore `dbdev` at this stage, please contribute to its development at [github.com/supabase/dbdev](https://github.com/supabase/dbdev).
 
