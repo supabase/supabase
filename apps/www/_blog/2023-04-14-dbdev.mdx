@@ -1,21 +1,25 @@
 ---
 title: 'dbdev: PostgreSQL Package Manager'
-description: We're publicly previewing dbdev, a PostgreSQL package manager. 
+description: We're publicly previewing dbdev, a PostgreSQL package manager.
 launchweek: 7
 tags:
   - launch-week
-  - postgres 
+  - postgres
 date: '2023-04-14'
+published_at: '2023-04-14T08:00:00.000-07:00'
 toc_depth: 3
 author: oli_rice
 image: launch-week-7/day-5-one-more-thing/day-5-dbdev-og.jpg
-thumb: launch-week-7/day-5-one-more-thing/day-5-dbdev-thumb.jpg 
-
+thumb: launch-week-7/day-5-one-more-thing/day-5-dbdev-thumb.jpg
 ---
 
-Today we’re publicly previewing [**`database.dev`**](https://database.dev), a PostgreSQL package manager. At this stage the package registry is read-only. We've preloaded it with a handful of packages, or pglets (PostGres appLETs), to showcase some of the more interesting possibilities. 
+Today we’re publicly previewing [**`database.dev`**](https://database.dev), a PostgreSQL package manager. At this stage the package registry is read-only. We've preloaded it with a handful of packages, or pglets (PostGres appLETs), to showcase some of the more interesting possibilities.
 
-<Img src="/images/blog/launch-week-7/day-5-one-more-thing/dbdev-landing.png" wide={true} alt="db dev landing page"/>
+<Img
+  src="/images/blog/launch-week-7/day-5-one-more-thing/dbdev-landing.png"
+  wide={true}
+  alt="db dev landing page"
+/>
 
 `dbdev` fills the same role for PostgreSQL as `npm` for JavaScript, `pip` for Python and `cargo` for Rust in that it enables publishing libraries and applications for repeatable deployment. We'll be releasing the tooling necessary for third-parties to publish `pglets` to the registry once we’ve collected some community feedback and incorporate any great new ideas. Our goal is to create an [open ecosystem](https://github.com/supabase/dbdev) for packaging and discovering SQL.
 
@@ -29,11 +33,11 @@ Once the `dbdev` client is present, `pglet`s can be installed from the registry 
 
 ```sql
 -- Load the package from the package index
-select dbdev.install('olirice-asciiplot');
+select
+  dbdev.install ('olirice-asciiplot');
 
 -- Enable the extension
-create extension "olirice-asciiplot"
-	version '0.2.1';
+create extension "olirice-asciiplot" version '0.2.1';
 ```
 
 You can explore all available `pglet`s on [database.dev](https://database.dev).
@@ -46,7 +50,7 @@ With our extension installed, you can use it like any other PostgreSQL extension
 select
   scatter(
     val::numeric, -- x
-    val::numeric, -- y 
+    val::numeric, -- y
     'stonks!',    -- title
     15,           -- height
     50            -- width
@@ -57,18 +61,18 @@ from
                     stonks!
 ----------------------------------------------
 |                                       *
-|                                        
-|                                  *    
-|                              *         
-|                                        
-|                          *             
-|                                        
-|                     *                  
-|                 *                      
-|                                        
-|            *                           
-|                                        
-|        *                               
+|
+|                                  *
+|                              *
+|
+|                          *
+|
+|                     *
+|                 *
+|
+|            *
+|
+|        *
 |   *
 */
 ```
@@ -86,7 +90,7 @@ Two common challenges faced by package indexes are name squatting and typo squat
 - Name squatting: reserving names for future use
 - Typo squatting: reserving misspelling of existing package
 
-The ethics of name squatting get dicey at scale while typo squatting is widely viewed as malicious behavior. To mitigate both issues, all `pglet`s published to [database.dev](https://database.dev) are namespaced to their owning organization or user’s handle. For example a `pglet` named  [`olirice-index_advisor`](https://database.dev/olirice/index_advisor) was created by the account `olirice` under the name `index_advisor`. If another user, `some_user`, forks and republishes the project, it would be available under `some_user-index_advisor`. Problem solved ✅
+The ethics of name squatting get dicey at scale while typo squatting is widely viewed as malicious behavior. To mitigate both issues, all `pglet`s published to [database.dev](https://database.dev) are namespaced to their owning organization or user’s handle. For example a `pglet` named [`olirice-index_advisor`](https://database.dev/olirice/index_advisor) was created by the account `olirice` under the name `index_advisor`. If another user, `some_user`, forks and republishes the project, it would be available under `some_user-index_advisor`. Problem solved ✅
 
 ## Running on Supabase
 
@@ -94,50 +98,51 @@ The ethics of name squatting get dicey at scale while typo squatting is widely v
 
 Supabase reflects APIs directly from your database’s structure, so a `pglet` can contain an entire stateful application, pre-configured with authentication, REST, GraphQL, and realtime change data capture all baked in!
 
-For example, our friends at [LangChain](https://python.langchain.com/en/latest/index.html) published a Supabase backend for their docs search tool that uses a hybrid of document embeddings and full text search to find relevant documents for a user’s query 
+For example, our friends at [LangChain](https://python.langchain.com/en/latest/index.html) published a Supabase backend for their docs search tool that uses a hybrid of document embeddings and full text search to find relevant documents for a user’s query
 
 Its available at [`langchain-hybrid_search`](https://database.dev/langchain/hybrid_search) and here’s how you’d set it up:
 
 ```sql
-select dbdev.install('langchain-hybrid_search');
+select
+  dbdev.install ('langchain-hybrid_search');
+
 create extension if not exists vector;
-create extension "langchain-hybrid_search"
-    schema public
-    version '1.0.0';
+
+create extension "langchain-hybrid_search" schema public version '1.0.0';
 ```
 
 That creates the relevant `documents` table and associated search functions. Then, you can immediately hit it from your front end for best-in-class document search.
 
 ```jsx
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { createClient } from "@supabase/supabase-js";
-import { SupabaseHybridSearch } from "langchain/retrievers/supabase";
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { createClient } from '@supabase/supabase-js'
+import { SupabaseHybridSearch } from 'langchain/retrievers/supabase'
 
-const privateKey = process.env.SUPABASE_PRIVATE_KEY;
-if (!privateKey) throw new Error(`Expected env var SUPABASE_PRIVATE_KEY`);
+const privateKey = process.env.SUPABASE_PRIVATE_KEY
+if (!privateKey) throw new Error(`Expected env var SUPABASE_PRIVATE_KEY`)
 
-const url = process.env.SUPABASE_URL;
-if (!url) throw new Error(`Expected env var SUPABASE_URL`);
+const url = process.env.SUPABASE_URL
+if (!url) throw new Error(`Expected env var SUPABASE_URL`)
 
 export const run = async () => {
-  const client = createClient(url, privateKey);
+  const client = createClient(url, privateKey)
 
-  const embeddings = new OpenAIEmbeddings();
+  const embeddings = new OpenAIEmbeddings()
 
   const retriever = new SupabaseHybridSearch(embeddings, {
     client,
     //  Below are the defaults, expecting that you set up your supabase table and functions according to the guide above. Please change if necessary.
     similarityK: 2,
     keywordK: 2,
-    tableName: "documents",
-    similarityQueryName: "match_documents",
-    keywordQueryName: "kw_match_documents",
-  });
+    tableName: 'documents',
+    similarityQueryName: 'match_documents',
+    keywordQueryName: 'kw_match_documents',
+  })
 
-  const results = await retriever.getRelevantDocuments("hello bye");
+  const results = await retriever.getRelevantDocuments('hello bye')
 
-  console.log(results);
-};
+  console.log(results)
+}
 ```
 
 ## Package Highlights
@@ -158,11 +163,11 @@ For example, you could apply a deny listing to your API using `hdr.in_deny_list(
 
 ```sql
 select
-	*
+  *
 from
-	app.memos
+  app.memos
 where
-	not hdr.in_deny_list();
+  not hdr.in_deny_list ();
 ```
 
 ### olirice-index_advisor
@@ -193,7 +198,7 @@ which shows
 
 ```markdown
 | startup_cost_before | startup_cost_after | total_cost_before | total_cost_after | index_statements                                      |
-|---------------------|--------------------|-------------------|------------------|-------------------------------------------------------|
+| ------------------- | ------------------ | ----------------- | ---------------- | ----------------------------------------------------- |
 | 0.00                | 1.17               | 25.88             | 6.40             | {"CREATE INDEX ON public.account USING btree (name)"} |
 ```
 
@@ -209,8 +214,8 @@ Keep an eye open for it in Launch Week 8.
 
 For example, to identify potentially unused indexes that can be dropped, you could use the `index_usage` view, which has columns for:
 
-|     Column      |  Type  |
-|-----------------|--------|
+| Column          | Type   |
+| --------------- | ------ |
 | schemaname      | name   |
 | tablename       | name   |
 | num_rows        | bigint |
@@ -220,15 +225,15 @@ For example, to identify potentially unused indexes that can be dropped, you cou
 | unique          | text   |
 | number_of_scans | bigint |
 | tuples_read     | bigint |
-| tuples_fetched  | bigint | 
+| tuples_fetched  | bigint |
 
 ## Limitations
 
 There are several procedural languages (PL) that can be embedded in PostgreSQL and used to define functions. The ones that ship with stock PostgreSQL are `SQL`, and `pl/pgSQL` but there others that can be installed separately, including `pl/v8` for JavaScript, or `pl/perl` for Perl. A **trusted** language has been restricted to remove potentially hazardous functionality like access to the network stack and file system. `pl/v8` and `pl/perl` are examples of trusted languages. In contrast, `pl/python3u` is **untrusted**.
 
-A [Trusted Language Extension (TLE)](https://github.com/aws/pg_tle) is a [PostgreSQL extension](https://www.postgresql.org/docs/current/extend-extensions.html), written exclusively using trusted languages. In some ways that makes them less flexible than classic extensions, which can have C language components (more on that in a second). The advantage to TLEs is that they don't require direct access to the PostgreSQL server’s file system to install. That enables TLEs to be installed by end-users rather than by database administrators or hosting providers. TLEs are the enabling technology that allows a package manager like `dbdev` to function on hosted PostgreSQL platforms like Supabase. 
+A [Trusted Language Extension (TLE)](https://github.com/aws/pg_tle) is a [PostgreSQL extension](https://www.postgresql.org/docs/current/extend-extensions.html), written exclusively using trusted languages. In some ways that makes them less flexible than classic extensions, which can have C language components (more on that in a second). The advantage to TLEs is that they don't require direct access to the PostgreSQL server’s file system to install. That enables TLEs to be installed by end-users rather than by database administrators or hosting providers. TLEs are the enabling technology that allows a package manager like `dbdev` to function on hosted PostgreSQL platforms like Supabase.
 
-For a more in-depth explanation of Trusted Language Extensions checkout  [AWS's pg_tle on Supabase blog post](https://aws.amazon.com/blogs/opensource/supabase-makes-extensions-easier-for-developers-with-trusted-language-extensions-for-postgresql/) or dive into the code at [github.com/aws/pg_tle](https://github.com/aws/pg_tle).
+For a more in-depth explanation of Trusted Language Extensions checkout [AWS's pg_tle on Supabase blog post](https://aws.amazon.com/blogs/opensource/supabase-makes-extensions-easier-for-developers-with-trusted-language-extensions-for-postgresql/) or dive into the code at [github.com/aws/pg_tle](https://github.com/aws/pg_tle).
 
 A recent development in the PostgreSQL extension ecosystem is the 1.0 release of a new trusted language, [`pl/rust`](https://github.com/tcdi/plrust), allowing users to define SQL functions written in Rust. As a compiled language, `pl/rust` functions can execute an order of magnitude faster than `pl/pgSQL` for computationally heavy workloads. That closes the biggest capability gap between native extensions with C components and TLEs. `pl/rust` hasn’t released to Supabase yet, but we’re excited about rolling it out in the coming weeks.
 
