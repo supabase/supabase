@@ -5,12 +5,12 @@ name: Studio Unit Tests
 
 on:
   push:
-    branches: [master]
+    branches: [master, studio]
     paths:
       - 'studio/**'
       - 'package-lock.json'
   pull_request:
-    branches: [master]
+    branches: [master, studio]
     paths:
       - 'studio/**'
       - 'package-lock.json'
