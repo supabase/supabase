@@ -3,7 +3,6 @@ import { CommandItem } from './Command.utils'
 import React from 'react'
 
 export default function SearchOnlyItem({ children, isSubItem, ...props }: any) {
-  console.log(children)
   const search = useCommandState((state) => state.search)
   // if search is empty & items is marked as a subItem, don't show it
   // ie: only show these items in search results, not top level
