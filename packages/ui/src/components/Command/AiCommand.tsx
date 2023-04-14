@@ -17,7 +17,7 @@ import { SSE } from 'sse.js'
 
 import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem, useHistoryKeys } from './Command.utils'
+import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
 
@@ -343,6 +343,8 @@ const AiCommand = () => {
     setIsLoading,
   })
 
+  const inputRef = useAutoInputFocus()
+
   useHistoryKeys({
     enable: !isResponding,
     messages: messages
@@ -350,8 +352,6 @@ const AiCommand = () => {
       .map(({ content }) => content),
     setPrompt: setSearch,
   })
-
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = useCallback(
     (message: string) => {
@@ -369,19 +369,6 @@ const AiCommand = () => {
   useEffect(() => {
     if (search) {
       handleSubmit(search)
-    }
-  }, [])
-
-  // Focus the input when typing from anywhere
-  useEffect(() => {
-    function onKeyDown() {
-      inputRef.current?.focus()
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
     }
   }, [])
 

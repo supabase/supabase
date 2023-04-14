@@ -377,3 +377,41 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
     }
   }, [messages])
 }
+
+/**
+ * Automatically focuses an input on key press
+ * and on load (after the call stack)
+ *
+ * @returns An input ref for the input to focus
+ */
+export function useAutoInputFocus() {
+  const [input, setInput] = React.useState<HTMLInputElement>()
+
+  // Use a callback-style ref to access the element when it mounts
+  const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
+    if (inputElement) {
+      setInput(inputElement)
+
+      // We need to delay the focus until the end of the call stack
+      // due to order of operations
+      setTimeout(() => {
+        inputElement.focus()
+      }, 0)
+    }
+  }, [])
+
+  // Focus the input when typing from anywhere
+  React.useEffect(() => {
+    function onKeyDown() {
+      input?.focus()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [input])
+
+  return inputRef
+}
