@@ -47,6 +47,14 @@ const images = {
   '05-studio-09-base': '/images/launchweek/seven/day5/studio/studio-09-viewsTables.jpg',
   '05-studio-10-base': '/images/launchweek/seven/day5/studio/studio-10-JSONsupport.jpg',
   '05-studio-11-base': '/images/launchweek/seven/day5/studio/studio-11-insights.jpg',
+  '05-omt-01-001': '/images/launchweek/seven/day5/one-more-thing/omt-01-01.jpg',
+  '05-omt-01-001-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-01-01-mobile.jpg',
+  '05-omt-01-002': '/images/launchweek/seven/day5/one-more-thing/omt-01-02.png',
+  '05-omt-01-002-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-01-02-mobile.png',
+  '05-omt-02-001': '/images/launchweek/seven/day5/one-more-thing/omt-02-01.jpg',
+  '05-omt-02-001-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-01-mobile.jpg',
+  '05-omt-02-002': '/images/launchweek/seven/day5/one-more-thing/omt-02-02.png',
+  '05-omt-02-002-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-02-mobile.png',
 }
 
 export interface StepProps {
@@ -439,21 +447,32 @@ const days: WeekDayProps[] = [
             title: 'dbdev',
             badge: 'New',
             blog: '/blog/supabase-auth-sso-pkce',
-            bg_layers: [],
+            bg_layers: [
+              {
+                img: images['05-omt-01-001'],
+                mobileImg: images['05-omt-01-001-mobile'],
+              },
+              {
+                img: images['05-omt-01-002'],
+                mobileImg: images['05-omt-01-002-mobile'],
+              },
+            ],
             steps: [],
           },
           {
             title: 'Postgres TLE',
             badge: 'New',
             blog: '/blog/supabase-auth-sso-pkce',
-            bg_layers: [],
-            steps: [],
-          },
-          {
-            title: 'pg_graphql v1.2',
-            badge: 'Updated',
-            blog: '/blog/supabase-auth-sso-pkce',
-            bg_layers: [],
+            bg_layers: [
+              {
+                img: images['05-omt-02-001'],
+                mobileImg: images['05-omt-02-001-mobile'],
+              },
+              {
+                img: images['05-omt-02-002'],
+                mobileImg: images['05-omt-02-002-mobile'],
+              },
+            ],
             steps: [],
           },
         ],
