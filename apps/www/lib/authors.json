@@ -321,5 +321,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/saltcod",
     "author_image_url": "https://github.com/saltcod.png"
+  },
+  {
+    "author_id": "daltjoh-aws",
+    "author": "John Dalton",
+    "position": "Product Management Leader @ AWS",
+    "author_url": "https://github.com/daltjoh-aws",
+    "author_image_url": "https://github.com/daltjoh-aws.png"
   }
 ]
