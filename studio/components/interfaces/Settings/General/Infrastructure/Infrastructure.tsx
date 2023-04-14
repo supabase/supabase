@@ -28,7 +28,11 @@ const Infrastructure = ({}: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
   const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
-  const { data, isLoading: isLoadingUpgradeElibility } = useProjectUpgradeEligibilityQuery({
+  const {
+    data,
+    isLoading: isLoadingUpgradeElibility,
+    isError,
+  } = useProjectUpgradeEligibilityQuery({
     projectRef: ref,
   })
   const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
@@ -91,7 +95,9 @@ const Infrastructure = ({}: InfrastructureProps) => {
             <Input
               readOnly
               disabled
-              value={currentPgVersion}
+              value={
+                currentPgVersion ?? (isError ? 'Unable to fetch Postgres version of project' : '')
+              }
               label="Current version"
               actions={[
                 isOnLatestVersion && (
