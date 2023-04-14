@@ -204,7 +204,15 @@ const GenerateSQL = () => {
                               handleSubmit(query)
                             }
                           }}
-                          onKeyDown={(e) => e.keyCode === 13 && handleSubmit(query)}
+                          onKeyDown={(e) => {
+                            switch (e.key) {
+                              case 'Enter':
+                                if (!search || isLoading || isResponding) return
+                                return handleSubmit(query)
+                              default:
+                                return
+                            }
+                          }}
                           forceMount
                           key={query.replace(/\s+/g, '_')}
                         >
