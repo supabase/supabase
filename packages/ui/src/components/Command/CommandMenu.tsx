@@ -257,7 +257,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               </CommandGroup>
 
               <ThemeOptions isSubItem />
-              {site === 'studio' && <SearchableStudioItems />}
+              {site === 'studio' && search && <SearchableStudioItems />}
             </>
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
