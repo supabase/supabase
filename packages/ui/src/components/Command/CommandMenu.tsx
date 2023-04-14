@@ -65,6 +65,11 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
+  const handleRouteChange = (url: string) => {
+    router.push(url)
+    setIsOpen(false)
+  }
+
   return (
     <>
       <CommandDialog
@@ -205,7 +210,11 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     ).split('https://app.supabase.com')[1]
 
                     return (
-                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <CommandItem
+                        key={item.url}
+                        type="link"
+                        onSelect={() => handleRouteChange(itemUrl)}
+                      >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
@@ -248,7 +257,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               </CommandGroup>
 
               <ThemeOptions isSubItem />
-              {site === 'studio' && search && <SearchableStudioItems />}
+              {site === 'studio' && <SearchableStudioItems />}
             </>
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
