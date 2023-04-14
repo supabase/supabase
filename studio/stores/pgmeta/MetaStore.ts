@@ -405,7 +405,6 @@ export default class MetaStore implements IMetaStore {
     try {
       // Once pg-meta supports composite keys, we can remove this logic
       const { isPrimaryKey, ...formattedPayload } = payload
-
       const column: any = await this.columns.create(formattedPayload)
       if (column.error) throw column.error
 
@@ -469,8 +468,6 @@ export default class MetaStore implements IMetaStore {
         category: 'error',
         message: `An error occurred while creating the column "${payload.name}"`,
       })
-      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
-      await this.rootStore.meta.query(query)
       return { error }
     }
   }
