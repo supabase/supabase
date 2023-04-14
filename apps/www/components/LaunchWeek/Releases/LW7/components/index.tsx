@@ -197,22 +197,20 @@ export const ChipLink = ({
     >
       {children}
     </span>
-  ) : (
-    !!href && (
-      <Link href={href}>
-        <a
-          target={target ?? '_self'}
-          rel="noopener"
-          className={[
-            'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 pl-3 pr-2',
-            className,
-          ].join(' ')}
-        >
-          {children}
-        </a>
-      </Link>
-    )
-  )
+  ) : !!href ? (
+    <Link href={href}>
+      <a
+        target={target ?? '_self'}
+        rel="noopener"
+        className={[
+          'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 pl-3 pr-2',
+          className,
+        ].join(' ')}
+      >
+        {children}
+      </a>
+    </Link>
+  ) : null
 
 export const SectionButtons = ({
   blog,
