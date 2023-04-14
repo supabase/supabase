@@ -206,7 +206,14 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     ).split('https://app.supabase.com')[1]
 
                     return (
-                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <CommandItem
+                        key={item.url}
+                        type="link"
+                        onSelect={() => {
+                          router.push(item.url)
+                          setIsOpen(false)
+                        }}
+                      >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
