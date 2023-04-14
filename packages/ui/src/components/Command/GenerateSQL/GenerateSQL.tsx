@@ -12,6 +12,8 @@ import {
   MessageStatus,
   useAiChat,
   AiWarning,
+  IconAlertCircle,
+  Alert,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
@@ -85,7 +87,7 @@ const GenerateSQL = () => {
       <div
         className={cn(
           'relative py-4 max-h-[550px] overflow-auto',
-          allowSendingSchemaMetadata ? 'mb-[255px]' : 'mb-[150px]'
+          allowSendingSchemaMetadata ? 'mb-[265px]' : 'mb-[155px]'
         )}
       >
         {messages.map((message, i) => {
@@ -238,11 +240,7 @@ const GenerateSQL = () => {
       </div>
 
       <div className="absolute bottom-0 w-full bg-scale-200 pt-4">
-        {messages.length > 0 && !hasError && (
-          <div className="mb-4">
-            <AiWarning />
-          </div>
-        )}
+        {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />}
         {allowSendingSchemaMetadata && (
           <div className="mb-4">
             {messages.length === 0 ? (
@@ -269,18 +267,31 @@ const GenerateSQL = () => {
                 />
               </div>
             ) : (
-              <div className="mx-4 p-6 flex flex-col items-start gap-2 mt-4 border rounded-lg text-left text-xs text-scale-1100 border-scale-500 bg-white dark:bg-scale-300">
-                <p>
-                  Table names, column names and their corresponding data types{' '}
-                  <span className={cn(includeSchemaMetadata ? 'text-brand-900' : 'text-amber-900')}>
-                    {includeSchemaMetadata ? 'are' : 'are not'} included
-                  </span>{' '}
-                  in this conversation
-                </p>
-                <p className="text-scale-1000">
-                  Start a new conversation to change this configuration
-                </p>
-              </div>
+              <Alert
+                variant={includeSchemaMetadata ? 'info' : 'warning'}
+                title="Project metadata"
+                icon={
+                  includeSchemaMetadata ? (
+                    <IconAlertCircle strokeWidth={1.5} size={18} />
+                  ) : (
+                    <IconAlertTriangle strokeWidth={1.5} size={18} />
+                  )
+                }
+                className="mx-4"
+              >
+                <div className="flex flex-col gap-2">
+                  <p>
+                    This project's metadata (tables, columns, and data types){' '}
+                    <span className="text-scale-1200">
+                      {includeSchemaMetadata ? 'will be' : 'will not be'} sent as context
+                    </span>{' '}
+                    in this conversation
+                  </p>
+                  <p className="text-scale-1000">
+                    Start a new conversation to change this configuration
+                  </p>
+                </div>
+              </Alert>
             )}
           </div>
         )}
