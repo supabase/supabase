@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { FC, ReactNode, PropsWithChildren, Fragment } from 'react'
+import { ReactNode, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth, useFlag } from 'hooks'
@@ -16,14 +16,16 @@ import BuildingState from './BuildingState'
 import { ProjectContextProvider } from './ProjectContext'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import ProjectPausedState from './ProjectPausedState'
 
-interface Props {
+export interface ProjectLayoutProps {
   title?: string
   isLoading?: boolean
   product?: string
   productMenu?: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
+  children: ReactNode
 }
 
 const ProjectLayout = ({
@@ -34,11 +36,17 @@ const ProjectLayout = ({
   children,
   hideHeader = false,
   hideIconBar = false,
-}: PropsWithChildren<Props>) => {
-  const { ref: projectRef } = useParams()
+}: ProjectLayoutProps) => {
   const { ui } = useStore()
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
   const ongoingIncident = useFlag('ongoingIncident')
   const projectName = ui.selectedProject?.name
+
+  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const ignorePausedState =
+    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+  const showPausedState = isPaused && !ignorePausedState
 
   return (
     <ProjectContextProvider projectRef={projectRef}>
@@ -53,16 +61,26 @@ const ProjectLayout = ({
         {!hideIconBar && <NavigationBar />}
 
         {/* Product menu bar */}
-        <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
-          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        </MenuBarWrapper>
+        {!showPausedState && (
+          <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
+            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+          </MenuBarWrapper>
+        )}
 
         <main
           className="flex flex-col flex-1 w-full overflow-x-hidden"
           style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
-          <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+          {showPausedState ? (
+            <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+              <div className="w-full">
+                <ProjectPausedState product={product} />
+              </div>
+            </div>
+          ) : (
+            <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+          )}
         </main>
       </div>
     </ProjectContextProvider>
@@ -76,15 +94,17 @@ export default observer(ProjectLayout)
 interface MenuBarWrapperProps {
   isLoading: boolean
   productMenu?: ReactNode
+  children: ReactNode
 }
 
-const MenuBarWrapper: FC<MenuBarWrapperProps> = observer(({ isLoading, productMenu, children }) => {
+const MenuBarWrapper = observer(({ isLoading, productMenu, children }: MenuBarWrapperProps) => {
   const { ui } = useStore()
   return <>{!isLoading && productMenu && ui.selectedProject !== undefined ? children : null}</>
 })
 
 interface ContentWrapperProps {
   isLoading: boolean
+  children: ReactNode
 }
 
 /**
@@ -99,7 +119,7 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
+const ContentWrapper = observer(({ isLoading, children }: ContentWrapperProps) => {
   const { ui } = useStore()
   const router = useRouter()
 
@@ -143,6 +163,11 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   )
 })
 
+/**
+ * Shows the children irregardless of whether the selected project has loaded or not
+ * We'll eventually want to use this instead of the current ProjectLayout to prevent
+ * a catch-all spinner on the dashboard
+ */
 export const ProjectLayoutNonBlocking = ({
   title,
   product = '',
@@ -150,9 +175,15 @@ export const ProjectLayoutNonBlocking = ({
   children,
   hideHeader = false,
   hideIconBar = false,
-}: PropsWithChildren<Props>) => {
+}: ProjectLayoutProps) => {
+  const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const ongoingIncident = useFlag('ongoingIncident')
+  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const ignorePausedState =
+    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+  const showPausedState = isPaused && !ignorePausedState
 
   return (
     <ProjectContextProvider projectRef={projectRef}>
@@ -166,14 +197,24 @@ export const ProjectLayoutNonBlocking = ({
         {!hideIconBar && <NavigationBar />}
 
         {/* Product menu bar */}
-        {productMenu && <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>}
+        {productMenu && !showPausedState && (
+          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+        )}
 
         <main
           className="flex w-full flex-1 flex-col overflow-x-hidden"
           style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
-          {children}
+          {showPausedState ? (
+            <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+              <div className="w-full">
+                <ProjectPausedState product={product} />
+              </div>
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
     </ProjectContextProvider>
