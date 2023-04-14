@@ -16,11 +16,12 @@ import {
 
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import { Alert, Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
+import { AiWarning } from './Command.alerts'
 
 import { cn } from './../../utils/cn'
 
@@ -365,7 +366,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
         {messages.map((message, index) => {
           switch (message.role) {
             case MessageRole.User:
@@ -455,6 +456,7 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
           className="bg-scale-100 rounded mx-3"
           autoFocus
