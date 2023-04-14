@@ -55,7 +55,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     >
       <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
-        {selectedOrganization ? (
+        {projectRef && selectedOrganization ? (
           <>
             {/* Org Dropdown */}
             <OrgDropdown />
