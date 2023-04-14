@@ -309,14 +309,14 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Studio Updates',
-        blog: '/blog/studio-v2',
+        blog: '/blog/supabase-studio-2.0',
         thumb: images['05-studio-01-thumb'],
         steps: [
           {
             title: '⌘K',
             badge: 'New',
             className: 'span-full',
-            url: '#command-k',
+            url: '#supabase-ai--assisted-database-development',
             hideInBlog: true,
             bg_layers: [
               {
@@ -329,7 +329,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Foreign Data Wrappers',
             badge: 'Update',
-            url: '#foreign-data-wrappers',
+            url: '#foreign-key-selector',
             hideInBlog: true,
             bg_layers: [
               {
@@ -414,7 +414,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Supports 1000s of tables and views',
             badge: 'Enhanced',
-            url: '#supports-1000s-of-tables-and-views',
+            url: '#tableview-definitions',
             hideInBlog: true,
             bg_layers: [
               {
@@ -426,7 +426,7 @@ const days: WeekDayProps[] = [
           {
             title: 'JSON Support',
             badge: 'Improved',
-            url: '#json-support',
+            url: '#json-editing',
             hideInBlog: true,
             bg_layers: [
               {
@@ -438,7 +438,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Insights/Query Performance',
             badge: 'New',
-            url: '#insights-query-performance',
+            url: '#query-performance',
             hideInBlog: true,
             bg_layers: [
               {
