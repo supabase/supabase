@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
@@ -65,8 +65,12 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
       align="start"
       overlay={
         <>
-          <Dropdown.Item onClick={onDownloadCSV}>Download CSV</Dropdown.Item>
-          <Dropdown.Item onClick={onCopyAsMarkdown}>Copy as markdown</Dropdown.Item>
+          <Dropdown.Item icon={<IconDownload size="tiny" />} onClick={onDownloadCSV}>
+            Download CSV
+          </Dropdown.Item>
+          <Dropdown.Item icon={<IconClipboard size="tiny" />} onClick={onCopyAsMarkdown}>
+            Copy as markdown
+          </Dropdown.Item>
         </>
       }
     >
