@@ -28,15 +28,15 @@ const getDay5Motion = (index: number) => {
 
 const getDay5omt01Motion = (index: number) => {
   switch (index) {
-    case 0:
-      return scaleOpacityVariant
+    case 2:
+      return opacityVariant4
     default:
       return undefined
   }
 }
 const getDay5omt02Motion = (index: number) => {
   switch (index) {
-    case 0:
+    case 2:
       return opacityVariant4
     default:
       return undefined
@@ -671,16 +671,19 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               (layer, i) =>
                 !!layer.img && (
                   <motion.div
-                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    className={[
+                      'absolute inset-0 w-full h-full -z-10',
+                      i === 2 && '!mix-blend-overlay blur-2xl',
+                    ].join(' ')}
                     variants={getDay5omt01Motion(i)}
                   >
                     <Image
-                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '80% 50%'}
+                      objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
                       objectFit="cover"
                       quality={100}
                     />
@@ -708,19 +711,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               (layer, i) =>
                 !!layer.img && (
                   <motion.div
-                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    className={[
+                      'absolute inset-0 w-full h-full -z-10',
+                      i === 2 && '!mix-blend-overlay opacity-50 blur-2xl',
+                    ].join(' ')}
                     variants={getDay5omt02Motion(i)}
                   >
                     <Image
-                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
                       layout="fill"
                       objectPosition={
-                        i == 1 && !!layer.mobileImg && isTablet ? '50% 60%' : '80% 50%'
+                        i == 1 && !!layer.mobileImg && isMobile ? '50% 60%' : '80% 50%'
                       }
-                      objectFit={i == 1 && !!layer.mobileImg && isTablet ? 'contain' : 'cover'}
+                      objectFit={i == 1 && !!layer.mobileImg && isMobile ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
