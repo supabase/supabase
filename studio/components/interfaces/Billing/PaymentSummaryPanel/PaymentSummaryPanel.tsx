@@ -4,7 +4,12 @@ import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import {
+  BASE_PATH,
+  PRICING_TIER_PRODUCT_IDS,
+  PROJECT_STATUS,
+  STRIPE_PRODUCT_IDS,
+} from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -79,6 +84,7 @@ const PaymentSummaryPanel: FC<Props> = ({
   captcha,
 }) => {
   const { ui } = useStore()
+  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const projectRegion = ui.selectedProject?.region
 
   // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
@@ -444,6 +450,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 size="medium"
                 loading={isSubmitting}
                 disabled={
+                  !isActive ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -454,7 +461,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 Confirm payment
               </Button>
             </Tooltip.Trigger>
-            {!hasChangesToPlan ? (
+            {!hasChangesToPlan || !selectedPaymentMethod || !isActive ? (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -465,28 +472,18 @@ const PaymentSummaryPanel: FC<Props> = ({
                     ].join(' ')}
                   >
                     <span className="text-xs text-scale-1200">
-                      No changes made to your subscription
+                      {!hasChangesToPlan
+                        ? 'No changes made to your subscription'
+                        : !selectedPaymentMethod
+                        ? 'Please select a payment method'
+                        : !isActive
+                        ? 'Unable to update subscription as project is not active'
+                        : ''}
                     </span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            ) : !selectedPaymentMethod ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">Please select a payment method</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </Tooltip.Root>
         </div>
       </div>

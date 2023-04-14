@@ -1,5 +1,4 @@
 import { createContext } from 'react'
-import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -12,7 +11,6 @@ export const PageContext: any = createContext(null)
 
 const ApiSettings: NextPageWithLayout = () => {
   const { ref } = useParams()
-
   const { meta, ui } = useStore()
   const project = ui.selectedProject
 

@@ -2,8 +2,8 @@ import { FC } from 'react'
 import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useFlag } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { useFlag, useStore } from 'hooks'
+import { PROJECT_STATUS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from 'components/interfaces/Billing'
 import Link from 'next/link'
 
@@ -14,6 +14,8 @@ interface Props {
 }
 
 const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
+  const { ui } = useStore()
+  const isActive = ui.selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const getButtonType = (plan: any, currentPlan: any) => {
@@ -84,7 +86,8 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   const type = getButtonType(plan, currentPlan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
-    plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE
+    (!isActive && plan.name !== 'Enterprise') ||
+    (plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE)
 
   if (plan.name === 'Enterprise') {
     return (
@@ -111,7 +114,7 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
             {ctaText}
           </Button>
         </Tooltip.Trigger>
-        {!disabled && projectUpdateDisabled && (
+        {(projectUpdateDisabled || !isActive) && (
           <Tooltip.Portal>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -123,7 +126,11 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
                   ].join(' ')}
                 >
                   <span className="text-xs text-scale-1200 text-center">
-                    Subscription changes are currently disabled, our engineers are working on a fix
+                    {projectUpdateDisabled
+                      ? 'Subscription changes are currently disabled, our engineers are working on a fix'
+                      : !isActive
+                      ? 'Unable to update subscription as project is not active'
+                      : ''}
                   </span>
                 </div>
               </Tooltip.Content>
