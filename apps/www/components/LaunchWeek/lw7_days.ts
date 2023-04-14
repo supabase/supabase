@@ -35,10 +35,6 @@ const images = {
   '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
   '05-community-01-001': '/images/launchweek/seven/day5/community/community-01-01.jpg',
   '05-community-01-002': '/images/launchweek/seven/day5/community/community-01-02.png',
-  '05-community-02-001':
-    '/images/launchweek/seven/day5/community/community-02-01-Postgrest-v11.jpg',
-  '05-community-02-002':
-    '/images/launchweek/seven/day5/community/community-02-02-Postgrest-v11.png',
   '05-studio-01-base': '/images/launchweek/seven/day5/studio/studio-01-commandK.jpg',
   '05-studio-01-base-mobile': '/images/launchweek/seven/day5/studio/studio-01-commandK-mobile.jpg',
   '05-studio-02-base': '/images/launchweek/seven/day5/studio/studio-02-wrappers.jpg',
@@ -289,20 +285,6 @@ const days: WeekDayProps[] = [
               },
               {
                 img: images['05-community-01-002'],
-              },
-            ],
-            steps: [],
-          },
-          {
-            title: 'PostgREST v11',
-            blog: '/blog/supabase-auth-sso-pkce',
-            docs: '/docs',
-            bg_layers: [
-              {
-                img: images['05-community-02-001'],
-              },
-              {
-                img: images['05-community-02-002'],
               },
             ],
             steps: [],
