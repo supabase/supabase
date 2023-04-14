@@ -17,7 +17,7 @@ export const IncludeSchemaAlert = () => (
     variant={'warning'}
     title="Project metadata (tables, columns, and data types) is being shared with OpenAI"
     withIcon
-    className="mx-4"
+    className="mx-3"
   >
     Start a new conversation to change this configuration
   </Alert>
@@ -28,7 +28,7 @@ export const ExcludeSchemaAlert = () => (
     variant={'info'}
     title="Project metadata (tables, columns, and data types) is not being shared with OpenAI"
     withIcon
-    className="mx-4"
+    className="mx-3"
   >
     Start a new conversation to change this configuration
   </Alert>
