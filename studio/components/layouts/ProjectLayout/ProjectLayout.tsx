@@ -168,55 +168,57 @@ const ContentWrapper = observer(({ isLoading, children }: ContentWrapperProps) =
  * We'll eventually want to use this instead of the current ProjectLayout to prevent
  * a catch-all spinner on the dashboard
  */
-export const ProjectLayoutNonBlocking = ({
-  title,
-  product = '',
-  productMenu,
-  children,
-  hideHeader = false,
-  hideIconBar = false,
-}: ProjectLayoutProps) => {
-  const { ui } = useStore()
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const ongoingIncident = useFlag('ongoingIncident')
-  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
-  const showPausedState = isPaused && !ignorePausedState
+export const ProjectLayoutNonBlocking = observer(
+  ({
+    title,
+    product = '',
+    productMenu,
+    children,
+    hideHeader = false,
+    hideIconBar = false,
+  }: ProjectLayoutProps) => {
+    const { ui } = useStore()
+    const router = useRouter()
+    const { ref: projectRef } = useParams()
+    const ongoingIncident = useFlag('ongoingIncident')
+    const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+    const ignorePausedState =
+      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+    const showPausedState = isPaused && !ignorePausedState
 
-  return (
-    <ProjectContextProvider projectRef={projectRef}>
-      <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
-        <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="flex h-full">
-        {/* Left-most navigation side bar to access products */}
-        {!hideIconBar && <NavigationBar />}
+    return (
+      <ProjectContextProvider projectRef={projectRef}>
+        <Head>
+          <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+          <meta name="description" content="Supabase Studio" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="flex h-full">
+          {/* Left-most navigation side bar to access products */}
+          {!hideIconBar && <NavigationBar />}
 
-        {/* Product menu bar */}
-        {productMenu && !showPausedState && (
-          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        )}
-
-        <main
-          className="flex w-full flex-1 flex-col overflow-x-hidden"
-          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
-        >
-          {!hideHeader && <LayoutHeader />}
-          {showPausedState ? (
-            <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-              <div className="w-full">
-                <ProjectPausedState product={product} />
-              </div>
-            </div>
-          ) : (
-            children
+          {/* Product menu bar */}
+          {productMenu && !showPausedState && (
+            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
           )}
-        </main>
-      </div>
-    </ProjectContextProvider>
-  )
-}
+
+          <main
+            className="flex w-full flex-1 flex-col overflow-x-hidden"
+            style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
+          >
+            {!hideHeader && <LayoutHeader />}
+            {showPausedState ? (
+              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                <div className="w-full">
+                  <ProjectPausedState product={product} />
+                </div>
+              </div>
+            ) : (
+              children
+            )}
+          </main>
+        </div>
+      </ProjectContextProvider>
+    )
+  }
+)
