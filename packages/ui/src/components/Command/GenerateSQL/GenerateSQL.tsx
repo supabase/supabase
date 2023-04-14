@@ -200,7 +200,9 @@ const GenerateSQL = () => {
                         <CommandItem
                           type="command"
                           onSelect={() => {
-                            handleSubmit(query)
+                            if (!search) {
+                              handleSubmit(query)
+                            }
                           }}
                           onKeyDown={(e) => e.keyCode === 13 && handleSubmit(query)}
                           forceMount
