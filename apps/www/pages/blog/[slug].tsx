@@ -12,7 +12,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import { generateReadingTime } from '~/lib/helpers'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-// import useActiveAnchors from '~/hooks/useActiveAnchors'
+import useActiveAnchors from '~/hooks/useActiveAnchors'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -56,9 +56,9 @@ export async function getStaticProps({ params }: any) {
       relatedPosts,
       blog: {
         slug: `${params.slug}`,
-        content: mdxSource,
         source: content,
         ...data,
+        content: mdxSource,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
@@ -68,7 +68,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  // useActiveAnchors('h2, h3, h4')
+  useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
 
   const author = []

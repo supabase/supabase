@@ -222,6 +222,7 @@ const days: WeekDayProps[] = [
         thumb: images['04-sso-thumb'],
         video: 'https://www.youtube.com/watch?v=hAwJeR6mhB0',
         docs: '/docs/guides/auth/sso/auth-sso-saml',
+        hackernews: 'https://news.ycombinator.com/item?id=35555263',
         bg_layers: [
           {
             img: images['04-sso-01'],

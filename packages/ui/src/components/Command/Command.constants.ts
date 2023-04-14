@@ -17,7 +17,7 @@ type SampleQueries = QueryCategory[]
 
 export const SAMPLE_QUERIES: SampleQueries = [
   {
-    category: 'Create tables',
+    category: 'Tables',
     queries: [
       'Create a table that stores a list of cities, and insert 10 rows of sample data into it',
       'Create tables (with foreign key relationships) for blog posts and comments',
@@ -25,7 +25,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Create views',
+    category: 'Views',
     queries: [
       'Create a view that shows the total revenue for each customer',
       'Create a view that shows all orders that were placed in the last week',
@@ -34,7 +34,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Create indexes',
+    category: 'Indexes',
     queries: [
       'Create an index on the primary key column of my orders table',
       'Create a partial index on the orders table:',
@@ -42,7 +42,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Select data',
+    category: 'Select',
     queries: [
       'Retrieve a list of employees from the employees table who have a salary greater than $50,000',
       'Retrieve a list of all employees with the title "Manager" from the employees table',
@@ -51,7 +51,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Create triggers',
+    category: 'Triggers',
     queries: [
       'Create a trigger that updates the updated_at column on the orders table with the current time when the row of the orders table is updated',
       'Create a trigger to add a new user to the users table when someone new registers',
@@ -60,7 +60,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Row level security',
+    category: 'Row Level Security',
     queries: [
       'Create an RLS policy that grants only authenticated access to the profiles table',
       'Create an RLS policy that grants SELECT access to the sales_rep role for the customers table, but denies access to all other roles',
@@ -68,7 +68,7 @@ export const SAMPLE_QUERIES: SampleQueries = [
     ],
   },
   {
-    category: 'Postgres functions',
+    category: 'Functions',
     queries: [
       "Create a function to add a new entry to a user's table when a new user signs up",
       'Create an a function to calculate the average price of a product in a given category',

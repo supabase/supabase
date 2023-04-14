@@ -78,8 +78,8 @@ We'll create a database table called `todos` for storing tasks. This creates a c
       -- Allow anonymous access
       create policy "Allow anonymous access"
         on todos
-        to anon
         for select
+        to anon
         using (true);
       ```
 
