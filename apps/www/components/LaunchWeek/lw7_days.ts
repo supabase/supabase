@@ -46,6 +46,8 @@ const images = {
   '05-studio-06-base': '/images/launchweek/seven/day5/studio/studio-06-casDeletes.jpg',
   '05-studio-07-base': '/images/launchweek/seven/day5/studio/studio-07-graphiQL.jpg',
   '05-studio-08-base': '/images/launchweek/seven/day5/studio/studio-08-dbWebhooks.jpg',
+  '05-studio-08-base-mobile':
+    '/images/launchweek/seven/day5/studio/studio-08-dbWebhooks-mobile.jpg',
   '05-studio-09-base': '/images/launchweek/seven/day5/studio/studio-09-viewsTables.jpg',
   '05-studio-10-base': '/images/launchweek/seven/day5/studio/studio-10-JSONsupport.jpg',
   '05-studio-11-base': '/images/launchweek/seven/day5/studio/studio-11-insights.jpg',
@@ -404,6 +406,7 @@ const days: WeekDayProps[] = [
             bg_layers: [
               {
                 img: images['05-studio-08-base'],
+                mobileImg: images['05-studio-08-base-mobile'],
               },
             ],
             steps: [],
