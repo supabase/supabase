@@ -344,7 +344,7 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
       return
     }
 
-    // Note: intentionally setting index to 1 greater than array length
+    // Note: intentionally setting index to 1 greater than max index
     setMessageSelectionIndex(messages.length)
   }, [messages, enable])
 
