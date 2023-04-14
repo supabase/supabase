@@ -456,7 +456,7 @@ const days: WeekDayProps[] = [
           {
             title: 'dbdev',
             badge: 'New',
-            blog: '/blog/db-dev',
+            blog: '/blog/dbdev',
             thumb: images['05-omt-01-thumb'],
             bg_layers: [
               {
@@ -474,7 +474,7 @@ const days: WeekDayProps[] = [
             title: 'Postgres TLE',
             badge: 'New',
             thumb: images['05-omt-02-thumb'],
-            blog: '/blog/postgres-tle',
+            blog: '/blog/pg-tle',
             bg_layers: [
               {
                 img: images['05-omt-02-001'],

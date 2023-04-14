@@ -8,10 +8,24 @@
       <lastBuildDate>Thu, 13 Apr 2023 22:10:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/pg-tle</guid>
+  <title>Trusted Language Extensions for Postgres</title>
+  <link>https://supabase.com/blog/pg-tle</link>
+  <description>undefined</description>
+  <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/launch-week-7-community-highlights</guid>
   <title>Launch Week 7 Community Highlights</title>
   <link>https://supabase.com/blog/launch-week-7-community-highlights</link>
   <description>undefined</description>
+  <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/dbdev</guid>
+  <title>dbdev: PostgreSQL Package Manager</title>
+  <link>https://supabase.com/blog/dbdev</link>
+  <description>We're publicly previewing dbdev, a PostgreSQL package manager.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
