@@ -142,6 +142,23 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
     </div>
   )
 }
+export const MultistepSectionHeader = ({ title, blog }: any) => {
+  return (
+    <div className="flex flex-1 flex-col sm:flex-row py-8">
+      <div className="flex gap-4 w-full items-center justify-between md:justify-start">
+        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {!!blog && (
+          <ChipLink href={blog} className="!w-auto">
+            Blog post
+            <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+              <PencilSvg />
+            </div>
+          </ChipLink>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export const ChipLink = ({
   href,

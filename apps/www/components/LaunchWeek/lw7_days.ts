@@ -33,8 +33,41 @@ const images = {
   '04-sso-01-mobile': '/images/launchweek/seven/day4/sso-support-01-mobile.jpg',
   '04-sso-02': '/images/launchweek/seven/day4/sso-support-02.png',
   '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
+  '05-studio-01-base': '/images/launchweek/seven/day5/studio/studio-01-commandK.jpg',
+  '05-studio-01-base-mobile': '/images/launchweek/seven/day5/studio/studio-01-commandK-mobile.jpg',
+  '05-studio-02-base': '/images/launchweek/seven/day5/studio/studio-02-wrappers.jpg',
+  '05-studio-03-base': '/images/launchweek/seven/day5/studio/studio-03-nullableCols.jpg',
+  '05-studio-04-base': '/images/launchweek/seven/day5/studio/studio-04-apiAutodocs.jpg',
+  '05-studio-05-base': '/images/launchweek/seven/day5/studio/studio-05-pgRoles.jpg',
+  '05-studio-06-base': '/images/launchweek/seven/day5/studio/studio-06-casDeletes.jpg',
+  '05-studio-07-base': '/images/launchweek/seven/day5/studio/studio-07-graphiQL.jpg',
+  '05-studio-08-base': '/images/launchweek/seven/day5/studio/studio-08-dbWebhooks.jpg',
+  '05-studio-09-base': '/images/launchweek/seven/day5/studio/studio-09-viewsTables.jpg',
+  '05-studio-10-base': '/images/launchweek/seven/day5/studio/studio-10-JSONsupport.jpg',
+  '05-studio-11-base': '/images/launchweek/seven/day5/studio/studio-11-insights.jpg',
 }
 
+export interface StepProps {
+  title: string
+  badge?: string
+  break_thumb_title?: boolean
+  blog?: string
+  docs?: string
+  description?: string
+  github?: string
+  hackernews?: string
+  isNew?: boolean
+  thumb?: string
+  url?: string
+  video?: string
+  className?: string
+  bg_layers?: {
+    lottie?: any
+    img?: string
+    mobileImg?: string
+  }[]
+  steps: StepProps[] | []
+}
 export interface WeekDayProps {
   title: string
   shipped: boolean
@@ -46,24 +79,7 @@ export interface WeekDayProps {
   youtube_id: string
   blogpost: string
   docs: string
-  steps: {
-    title: string
-    break_thumb_title?: boolean
-    blog?: string
-    docs?: string
-    description?: string
-    github?: string
-    hackernews?: string
-    isNew?: boolean
-    thumb?: string
-    url?: string
-    video?: string
-    bg_layers?: {
-      lottie?: any
-      img?: string
-      mobileImg?: string
-    }[]
-  }[]
+  steps: StepProps[] | []
 }
 
 export const endOfLW7 = '2023-04-16T23:59:59.999-07:00'
@@ -92,6 +108,7 @@ const days: WeekDayProps[] = [
           { img: images['0-ogImages-04'] },
           { img: images['0-ogImages-05'] },
         ],
+        steps: [],
       },
       {
         title: 'Supavisor',
@@ -99,6 +116,7 @@ const days: WeekDayProps[] = [
         hackernews: 'https://news.ycombinator.com/item?id=35501718',
         thumb: '/images/launchweek/seven/day0/supavisor/supavisor-thumb.png',
         bg_layers: [{ img: images['0-supavisor-01'] }, { img: images['0-supavisor-02'] }],
+        steps: [],
       },
     ],
   },
@@ -120,6 +138,7 @@ const days: WeekDayProps[] = [
         thumb: '/images/launchweek/seven/day1/self-hosted-logs-thumb.jpg',
         video: 'https://www.youtube.com/watch?v=Ai2BjHV36Ng',
         hackernews: 'https://news.ycombinator.com/item?id=35518786',
+        steps: [],
         bg_layers: [
           {
             img: images['01-self-hosted-logs-01'],
@@ -156,6 +175,7 @@ const days: WeekDayProps[] = [
         thumb: images['02-self-hosted-edge-functions-thumb'],
         video: 'https://www.youtube.com/watch?v=cPGxPl1lx4Y',
         hackernews: 'https://news.ycombinator.com/item?id=35525222',
+        steps: [],
         bg_layers: [
           {
             img: images['02-self-hosted-edge-functions-01'],
@@ -187,6 +207,7 @@ const days: WeekDayProps[] = [
         thumb: images['03-storage-thumb'],
         video: 'https://www.youtube.com/watch?v=pT2PcZFq_M0',
         docs: '/docs/guides/storage/uploads#resumable-upload',
+        steps: [],
         bg_layers: [
           {
             img: images['03-storage-01'],
@@ -206,7 +227,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '13 Apr',
-    publishedAt: '2023-04-13T00:00:00.000-07:00',
+    publishedAt: '2023-04-13T07:00:00.000-07:00',
     description: '',
     d: 4,
     dd: 'Thu',
@@ -223,6 +244,7 @@ const days: WeekDayProps[] = [
         video: 'https://www.youtube.com/watch?v=hAwJeR6mhB0',
         docs: '/docs/guides/auth/sso/auth-sso-saml',
         hackernews: 'https://news.ycombinator.com/item?id=35555263',
+        steps: [],
         bg_layers: [
           {
             img: images['04-sso-01'],
@@ -238,16 +260,213 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '14 Apr',
-    publishedAt: '2023-04-14T07:00:00.000-07:00',
+    publishedAt: '2023-04-13T00:00:00.000-07:00',
     description: '',
     d: 5,
     dd: 'Fri',
     youtube_id: '',
     blogpost: '',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: '',
+        thumb: '',
+        steps: [
+          {
+            title: 'Community Highlight',
+            blog: '/blog/supabase-auth-sso-pkce',
+            bg_layers: [
+              {
+                img: images['04-sso-01'],
+                mobileImg: images['04-sso-01-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'PostgREST v11',
+            blog: '/blog/supabase-auth-sso-pkce',
+            docs: '/docs',
+            bg_layers: [
+              {
+                img: images['04-sso-01'],
+                mobileImg: images['04-sso-01-mobile'],
+              },
+            ],
+            steps: [],
+          },
+        ],
+      },
+      {
+        title: 'Studio Updates',
+        blog: '/blog/studio',
+        thumb: '',
+        steps: [
+          {
+            title: '⌘K',
+            badge: 'New',
+            className: 'span-full',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-01-base'],
+                mobileImg: images['05-studio-01-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Foreign Data Wrappers',
+            badge: 'Update',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-02-base'],
+                // mobileImg: images['05-studio-02-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Nullable columns',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-03-base'],
+                // mobileImg: images['05-studio-03-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'API Autodocs',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-04-base'],
+                // mobileImg: images['05-studio-04-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Postgres Roles',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-05-base'],
+                // mobileImg: images['05-studio-05-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Cascade deletes',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-06-base'],
+                // mobileImg: images['05-studio-06-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'GraphiQL',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-07-base'],
+                // mobileImg: images['05-studio-07-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Database Webhooks',
+            badge: 'Updated',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-08-base'],
+                // mobileImg: images['05-studio-08-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Supports 1000s of tables and views',
+            badge: 'Enhanced',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-09-base'],
+                // mobileImg: images['05-studio-09-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'JSON Support',
+            badge: 'Improved',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-10-base'],
+                // mobileImg: images['05-studio-10-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+          {
+            title: 'Insights/Query Performance',
+            badge: 'New',
+            blog: '/blog/',
+            bg_layers: [
+              {
+                img: images['05-studio-11-base'],
+                // mobileImg: images['05-studio-11-base-mobile'],
+              },
+            ],
+            steps: [],
+          },
+        ],
+      },
+      {
+        title: 'One more thing',
+        thumb: '',
+        steps: [
+          {
+            title: 'dbdev',
+            badge: 'New',
+            blog: '/blog/supabase-auth-sso-pkce',
+            bg_layers: [],
+            steps: [],
+          },
+          {
+            title: 'Postgres TLE',
+            badge: 'New',
+            blog: '/blog/supabase-auth-sso-pkce',
+            bg_layers: [],
+            steps: [],
+          },
+          {
+            title: 'pg_graphql v1.2',
+            badge: 'Updated',
+            blog: '/blog/supabase-auth-sso-pkce',
+            bg_layers: [],
+            steps: [],
+          },
+        ],
+      },
+    ],
   },
 ]
 
