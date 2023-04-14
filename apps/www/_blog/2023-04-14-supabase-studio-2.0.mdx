@@ -6,7 +6,7 @@ tags:
   - studio
 date: '2023-04-14'
 to_depth: 3
-author: alaister,joshenlim,saltcod
+author: alaister,joshenlim,jonny,saltcod
 image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
@@ -16,41 +16,37 @@ Today we're announcing Supabase Studio 2.0, packed with a ton of new stuff. We h
 Here's the birds-eye-view:
 
 <ul>
-  <li>[**Supabase AI**](supabase-ai-command-menu): ChatGPT, right in the Studio</li>
-  <li>[**GraphiQL**](#item-one): Query your database with GraphQL</li>
-  <li>[**Cascade deletes**](#item-one): Our #1 most requested feature from the community</li>
-  <li>[**Query Performance**](#item-one): Investigate slow running queries</li>
-  <li>[**Foreign key Selector**](#item-one): Look up a row in reference table</li>
-  <li>[**Postgres Roles**](#item-one): Manage your Postgres roles and privileges</li>
-  <li>[**Database Webhooks**](#item-one): Database triggers for Edge Functions</li>
-  <li>[**Table/View definitions**](#item-one): View SQL definitions for tables and views</li>
-  <li>[**API Autodocs**](#item-one): View auto-generated docs right from the Table Editor</li>
-  <li>[**Support for many tables**](#item-one): Table Editor now supports 1000s of tables</li>
-  <li>[**JSON editing**](#item-one): Improved JSON editing</li>
-  <li>[**Nullable columns**](#item-one): Allow text/bool cells to be null or empty</li>
+  <li>
+    [**Supabase AI**](#supabase-ai--assisted-database-development): ChatGPT, right in the Studio
+  </li>
+  <li>[**GraphiQL**](#graphiql): Query your database with GraphQL</li>
+  <li>[**Cascade deletes**](#cascade-deletes): Our #1 most requested feature from the community</li>
+  <li>[**Query Performance**](#query-performance): Investigate slow running queries</li>
+  <li>[**Foreign key Selector**](#foreign-key-selector): Look up a row in reference table</li>
+  <li>[**Postgres Roles**](#postgres-roles): Manage your Postgres roles and privileges</li>
+  <li>[**Database Webhooks**](#database-webhooks): Database triggers for Edge Functions</li>
+  <li>
+    [**Table/View definitions**](#tableview-definitions): View SQL definitions for tables and views
+  </li>
+  <li>[**API Autodocs**](#api-autodocs): View auto-generated docs right from the Table Editor</li>
+  <li>
+    [**Support for many tables**](#support-for-many-tables): Table Editor now supports 1000s of
+    tables
+  </li>
+  <li>[**JSON editing**](#json-editing): Improved JSON editing</li>
+  <li>[**Nullable columns**](#nullable-columns): Allow text/bool cells to be null or empty</li>
 </ul>
-
-<div className="video-container">
-  <iframe
-    className="w-full"
-    src="https://www.youtube-nocookie.com/embed/cPGxPl1lx4Y"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-  ></iframe>
-</div>
 
 ## Supabase AI — assisted database development
 
-<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/cmdk.mp4"
     type="video/mp4"
   />
 </video>
 
-One of our guiding principles at Supabase is to to make SQL more accessible to developers. We don't want to just abstract it away with a custom implementation. By embracing SQL, developers learn important, transferable skills while they build on top of Supabase.
+One of our guiding principles at Supabase is to make SQL more accessible to developers. We don't want to just abstract it away with a custom implementation. By embracing SQL, developers learn important, transferable skills while they build on top of Supabase.
 
 In the past few months, AI advancements have made this easy! Writing a complex SQL query is now as simple as asking ChatGPT, and we're leaning into this approach with our Studio. AI gives developers superpowers, and by providing relevant context, Supabase gives AI superpowers.
 
@@ -68,7 +64,7 @@ Huge props for the amazing work done on the [⌘K package](https://cmdk.paco.me/
 
 ---
 
-Along with the new AI features, we also doubled-down on some of the critical missing pieces for a Postgres UI. Before we started to work on any of these, we combed through user feedback and tallied up the most submitted Feature Requests on Github.
+Along with the new AI features, we also doubled-down on some of the critical missing pieces for a Postgres UI. Before we started to work on any of these, we combed through user feedback and tallied up the most submitted Feature Requests on GitHub.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
@@ -84,7 +80,7 @@ While GraphQL has been available in Supabase for just over a year, we haven't pr
 
 ## Cascade deletes
 
-<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/cascade-delete.mp4"
     type="video/mp4"
@@ -101,7 +97,7 @@ We've just released a new Query Performance tool to help you identify slow queri
 
 ## Foreign key selector
 
-<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4"
     type="video/mp4"
@@ -152,4 +148,4 @@ Speaking of extremely common feature requests, we've gotten this one a lot in th
 
 ## Wrapping Up
 
-We hope you get a lot of value out of these new features and enhancements. As we mentioned earlier, many of the features listed here came directly from [Feature Requests](https://github.com/orgs/supabase/discussions/categories/feature-requests) on Github. Thanks to everyone who have taken the time to submit these, and encourage submissions for anything else you'd like to see.
+We hope you get a lot of value out of these new features and enhancements. As we mentioned earlier, many of the features listed here came directly from [Feature Requests](https://github.com/orgs/supabase/discussions/categories/feature-requests) on GitHub. Thanks to everyone who have taken the time to submit these, and encourage submissions for anything else you'd like to see.
