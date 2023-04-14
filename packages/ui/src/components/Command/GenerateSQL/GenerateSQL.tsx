@@ -15,7 +15,7 @@ import {
 
 import { cn } from '../../../utils/cn'
 import { AiIcon, AiIconChat } from '../Command.icons'
-import { CommandItem, useHistoryKeys } from '../Command.utils'
+import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
@@ -49,6 +49,8 @@ const GenerateSQL = () => {
     },
     setIsLoading,
   })
+
+  const inputRef = useAutoInputFocus()
 
   useHistoryKeys({
     enable: !isResponding,
@@ -290,15 +292,7 @@ const GenerateSQL = () => {
           </>
         )}
         <Input
-          inputRef={(inputElement) => {
-            if (inputElement) {
-              // We need to delay the focus until the end of the call stack
-              // due to order of operations
-              setTimeout(() => {
-                inputElement.focus()
-              }, 0)
-            }
-          }}
+          inputRef={inputRef}
           className="bg-scale-100 rounded mx-3"
           autoFocus
           placeholder={
