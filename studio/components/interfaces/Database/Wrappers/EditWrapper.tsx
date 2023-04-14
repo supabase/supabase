@@ -333,7 +333,8 @@ const EditWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-scale-1000">
-                                {wrapperMeta.tables[table.index].label}: {table.columns.join(', ')}
+                                {wrapperMeta.tables[table.index].label}:{' '}
+                                {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">

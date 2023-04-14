@@ -3,8 +3,7 @@ import { useFormik, FormikConfig } from 'formik'
 import { FormContextProvider } from './FormContext'
 
 // interface Props extends FormikProps<any>, Partial FormikConfig<any> {
-interface Props
-  extends Omit<FormikConfig<any>, 'validateOnMount' | 'validateOnChange'> {
+interface Props extends Omit<FormikConfig<any>, 'validateOnMount' | 'validateOnChange'> {
   children: any
   handleIsSubmitting?: any
   handleIsValidating?: any
@@ -89,6 +88,8 @@ export default function Form({ validate, ...props }: Props) {
           handleReset: formik.handleReset,
           /** Resets the form with custom values */
           resetForm: formik.resetForm,
+          /** Manually sets a fields value */
+          setFieldValue: formik.setFieldValue,
         })}
       />
     </form>
