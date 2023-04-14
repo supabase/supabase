@@ -33,6 +33,7 @@ import ThemeOptions from './ThemeOptions'
 import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
+import { BadgeExperimental } from './Command.Badges'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -91,7 +92,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   type="command"
-                  badge="Experimental"
+                  badge={<BadgeExperimental />}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -175,7 +176,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   <CommandItem
                     forceMount
                     type="command"
-                    badge="Experimental"
+                    badge={<BadgeExperimental />}
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
                     <AiIcon className="text-scale-1100" />
@@ -205,7 +206,14 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     ).split('https://app.supabase.com')[1]
 
                     return (
-                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <CommandItem
+                        key={item.url}
+                        type="link"
+                        onSelect={() => {
+                          router.push(item.url)
+                          setIsOpen(false)
+                        }}
+                      >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
