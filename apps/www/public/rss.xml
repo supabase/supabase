@@ -8,6 +8,13 @@
       <lastBuildDate>Thu, 13 Apr 2023 02:02:30 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-studio-2.0</guid>
+  <title>Supabase Studio 2.0: help when you need it most</title>
+  <link>https://supabase.com/blog/supabase-studio-2.0</link>
+  <description>undefined</description>
+  <pubDate>Thu, 13 Apr 2023 02:02:30 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/pg-tle</guid>
   <title>Trusted Language Extensions for Postgres</title>
   <link>https://supabase.com/blog/pg-tle</link>
