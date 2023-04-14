@@ -35,6 +35,8 @@ const images = {
   '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
   '05-community-01-001': '/images/launchweek/seven/day5/community/community-01-01.jpg',
   '05-community-01-002': '/images/launchweek/seven/day5/community/community-01-02.png',
+  '05-community-01-thumb': '/images/launchweek/seven/day5/community/community-thumb.jpg',
+  '05-studio-01-thumb': '/images/launchweek/seven/day5/studio/studio-thumb.jpg',
   '05-studio-01-base': '/images/launchweek/seven/day5/studio/studio-01-commandK.jpg',
   '05-studio-01-base-mobile': '/images/launchweek/seven/day5/studio/studio-01-commandK-mobile.jpg',
   '05-studio-02-base': '/images/launchweek/seven/day5/studio/studio-02-wrappers.jpg',
@@ -55,6 +57,8 @@ const images = {
   '05-omt-02-001-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-01-mobile.jpg',
   '05-omt-02-002': '/images/launchweek/seven/day5/one-more-thing/omt-02-02.png',
   '05-omt-02-002-mobile': '/images/launchweek/seven/day5/one-more-thing/omt-02-02-mobile.png',
+  '05-omt-01-thumb': '/images/launchweek/seven/day5/one-more-thing/dbdev-thumb.jpg',
+  '05-omt-02-thumb': '/images/launchweek/seven/day5/one-more-thing/pgTLE-thumb.jpg',
 }
 
 export interface StepProps {
@@ -71,6 +75,7 @@ export interface StepProps {
   url?: string
   video?: string
   className?: string
+  hideInBlog?: boolean
   bg_layers?: {
     lottie?: any
     img?: string
@@ -281,12 +286,14 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: '',
+        title: 'Community Highlight',
         thumb: '',
+        hideInBlog: true,
         steps: [
           {
             title: 'Community Highlight',
             blog: '/blog/supabase-auth-sso-pkce',
+            thumb: images['05-community-01-thumb'],
             bg_layers: [
               {
                 img: images['05-community-01-001'],
@@ -302,13 +309,14 @@ const days: WeekDayProps[] = [
       {
         title: 'Studio Updates',
         blog: '/blog/studio',
-        thumb: '',
+        thumb: images['05-studio-01-thumb'],
         steps: [
           {
             title: '⌘K',
             badge: 'New',
             className: 'span-full',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-01-base'],
@@ -321,10 +329,10 @@ const days: WeekDayProps[] = [
             title: 'Foreign Data Wrappers',
             badge: 'Update',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-02-base'],
-                // mobileImg: images['05-studio-02-base-mobile'],
               },
             ],
             steps: [],
@@ -333,10 +341,10 @@ const days: WeekDayProps[] = [
             title: 'Nullable columns',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-03-base'],
-                // mobileImg: images['05-studio-03-base-mobile'],
               },
             ],
             steps: [],
@@ -345,10 +353,10 @@ const days: WeekDayProps[] = [
             title: 'API Autodocs',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-04-base'],
-                // mobileImg: images['05-studio-04-base-mobile'],
               },
             ],
             steps: [],
@@ -357,10 +365,10 @@ const days: WeekDayProps[] = [
             title: 'Postgres Roles',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-05-base'],
-                // mobileImg: images['05-studio-05-base-mobile'],
               },
             ],
             steps: [],
@@ -369,10 +377,10 @@ const days: WeekDayProps[] = [
             title: 'Cascade deletes',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-06-base'],
-                // mobileImg: images['05-studio-06-base-mobile'],
               },
             ],
             steps: [],
@@ -381,10 +389,10 @@ const days: WeekDayProps[] = [
             title: 'GraphiQL',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-07-base'],
-                // mobileImg: images['05-studio-07-base-mobile'],
               },
             ],
             steps: [],
@@ -393,10 +401,10 @@ const days: WeekDayProps[] = [
             title: 'Database Webhooks',
             badge: 'Updated',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-08-base'],
-                // mobileImg: images['05-studio-08-base-mobile'],
               },
             ],
             steps: [],
@@ -405,10 +413,10 @@ const days: WeekDayProps[] = [
             title: 'Supports 1000s of tables and views',
             badge: 'Enhanced',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-09-base'],
-                // mobileImg: images['05-studio-09-base-mobile'],
               },
             ],
             steps: [],
@@ -417,10 +425,10 @@ const days: WeekDayProps[] = [
             title: 'JSON Support',
             badge: 'Improved',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-10-base'],
-                // mobileImg: images['05-studio-10-base-mobile'],
               },
             ],
             steps: [],
@@ -429,10 +437,10 @@ const days: WeekDayProps[] = [
             title: 'Insights/Query Performance',
             badge: 'New',
             blog: '/blog/',
+            hideInBlog: true,
             bg_layers: [
               {
                 img: images['05-studio-11-base'],
-                // mobileImg: images['05-studio-11-base-mobile'],
               },
             ],
             steps: [],
@@ -442,11 +450,13 @@ const days: WeekDayProps[] = [
       {
         title: 'One more thing',
         thumb: '',
+        hideInBlog: true,
         steps: [
           {
             title: 'dbdev',
             badge: 'New',
             blog: '/blog/supabase-auth-sso-pkce',
+            thumb: images['05-omt-01-thumb'],
             bg_layers: [
               {
                 img: images['05-omt-01-001'],
@@ -462,6 +472,7 @@ const days: WeekDayProps[] = [
           {
             title: 'Postgres TLE',
             badge: 'New',
+            thumb: images['05-omt-02-thumb'],
             blog: '/blog/supabase-auth-sso-pkce',
             bg_layers: [
               {
