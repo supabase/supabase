@@ -50,7 +50,7 @@ void main() {
 }
 ```
 
-`SupabaseFunctions` class has a `fetch` handler, which is expected to return a `Response` object, and has a `request` parameter, which contains information about the request such as body and headers. 
+`SupabaseFunctions` class has a `fetch` handler, which is expected to return a `Response` object, and has a `request` parameter, which contains information about the request such as body and headers.
 
 ## Using Supabase Client
 
@@ -70,43 +70,11 @@ We also need to use a special HTTP client to HTTP requests in the edge environme
 dart pub add edge_http_client
 ```
 
-We also need to add the `yet_another_json_isolate` package, which is the JSON encoder/decoder that utilizes isolate. 
-
-```bash
-dart pub add yet_another_json_isolate
-```
-
-### Override the JSON isolate
-
-Since isolates are not supported in the edge, we have to override its behavior to handle JSON serialization using the main thread. 
-
-```dart
-import 'package:yet_another_json_isolate/yet_another_json_isolate.dart';
-
-class EdgeIsolate implements YAJsonIsolate {
-  @override
-  Future decode(String json) {
-    return Future.value(jsonDecode(json));
-  }
-
-  @override
-  Future<void> dispose() async {}
-
-  @override
-  Future<String> encode(Object? json) {
-    return Future.value(jsonEncode(json));
-  }
-
-  @override
-  Future<void> initialize() async {}
-}
-```
-
 ### Initialize SupabaseClient
 
-At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client) and the `EdgeIsolate`. We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary. 
+At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary.
 
-Combining the isolates we overrode earlier, we have the following sample functions code to query Supabase database using the Supabase client.
+Now we have the following sample functions code to query Supabase database using the Supabase client.
 
 ```dart
 import 'dart:convert';
@@ -114,14 +82,12 @@ import 'dart:convert';
 import 'package:supabase_functions/supabase_functions.dart';
 import 'package:edge_http_client/edge_http_client.dart';
 import 'package:supabase/supabase.dart';
-import 'package:yet_another_json_isolate/yet_another_json_isolate.dart';
 
 void main() {
   final supabase = SupabaseClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, // Use service role key to bypass RLS
     httpClient: EdgeHttpClient(),
-    isolate: EdgeIsolate(),
   );
 
   SupabaseFunctions(fetch: (request) async {
@@ -129,24 +95,6 @@ void main() {
     final List users = await supabase.from('users').select().limit(10);
     return Response.json(users);
   });
-}
-
-class EdgeIsolate implements YAJsonIsolate {
-  @override
-  Future decode(String json) {
-    return Future.value(jsonDecode(json));
-  }
-
-  @override
-  Future<void> dispose() async {}
-
-  @override
-  Future<String> encode(Object? json) {
-    return Future.value(jsonEncode(json));
-  }
-
-  @override
-  Future<void> initialize() async {}
 }
 ```
 
@@ -178,7 +126,7 @@ You should be able to access your local function here:
 
 ### Deploy to the Edge
 
-Run the following commands to compile and deploy your function on Supabase Edge functions. 
+Run the following commands to compile and deploy your function on Supabase Edge functions.
 
 ```bash
 edge build supabase_functions
