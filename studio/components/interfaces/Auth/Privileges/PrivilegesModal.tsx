@@ -7,13 +7,14 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { PrivilegesData, PrivilegesDataResponse } from 'data/database/privileges-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { sqlKeys } from 'data/sql/keys'
-import { generatePrivilegesSQLQuery } from './Privileges.utils'
+import { PrivilegesDataUI } from './Privileges.types'
+import { generatePrivilegesSQLQuery, mapFromUIPrivilegesData } from './Privileges.utils'
 import PrivilegesReview from './PrivilegesReview'
 
 interface Props {
   visible: boolean
   original: PrivilegesData
-  changes: PrivilegesData
+  changes: PrivilegesDataUI
   onCancel: () => void
   onSuccess: () => void
 }
@@ -33,7 +34,7 @@ const PrivilegesModal: FC<Props> = (props) => {
 
       if (previous) {
         queryClient.setQueryData<PrivilegesDataResponse>(queryKey, {
-          result: [{ result_json: props.changes }],
+          result: [{ result_json: mapFromUIPrivilegesData(props.changes) }],
         })
       }
 

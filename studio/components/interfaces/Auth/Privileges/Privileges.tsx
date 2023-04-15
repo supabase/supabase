@@ -1,6 +1,7 @@
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PrivilegesData } from 'data/database/privileges-query'
 import React from 'react'
+import { PrivilegesDataUI } from './Privileges.types'
 import { arePrivilegesEqual } from './Privileges.utils'
 import PrivilegesBody from './PrivilegesBody'
 import PrivilegesFooter from './PrivilegesFooter'
@@ -9,6 +10,7 @@ import PrivilegesModal from './PrivilegesModal'
 
 interface Props {
   data: PrivilegesData
+  dataUI: PrivilegesDataUI
   tables: string[]
   selectedSchema: string
   selectedRole: string
@@ -26,7 +28,7 @@ interface Props {
 }
 
 function Privileges(props: Props) {
-  const [data, setData] = React.useState<PrivilegesData>(props.data)
+  const [data, setData] = React.useState<PrivilegesDataUI>(props.dataUI)
   const [isModalOpen, setModalOpen] = React.useState(false)
 
   const handleChangePrivileges = (table: string, columnName: string, privileges: string[]) => {
@@ -44,14 +46,14 @@ function Privileges(props: Props) {
     }))
   }
 
-  const handleReset = () => setData({ ...props.data })
+  const handleReset = () => setData(props.dataUI)
 
   const handleSuccess = () => {
     setModalOpen(false)
     props.onRefetch()
   }
 
-  const hasChanges = !arePrivilegesEqual(props.data, data)
+  const hasChanges = !arePrivilegesEqual(props.dataUI, data)
 
   return (
     <>

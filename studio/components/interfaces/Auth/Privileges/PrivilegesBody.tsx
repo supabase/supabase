@@ -2,11 +2,11 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { FC } from 'react'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { ColumnPrivileges } from 'data/database/privileges-query'
+import { PrivilegeColumnUI } from './Privileges.types'
 import PrivilegesTable from './PrivilegesTable'
 
 interface Props {
-  privileges: Record<string, ColumnPrivileges[]>
+  privileges: Record<string, PrivilegeColumnUI[]>
   hasChanges: boolean
   table?: PostgresTable
   onChange: (table: string, columnName: string, privileges: string[]) => void
@@ -15,13 +15,13 @@ interface Props {
 const PrivilegesBody: FC<Props> = (props) => {
   const { table } = props
 
-  const handleToggle = (tableName: string, column: ColumnPrivileges, action: string) => {
+  const handleToggle = (tableName: string, column: PrivilegeColumnUI, privileges: string[]) => {
     props.onChange(
       tableName,
       column.name,
-      column.privileges.includes(action)
-        ? column.privileges.filter((p) => p !== action)
-        : [...column.privileges, action]
+      column.privileges.some((p) => privileges.includes(p))
+        ? column.privileges.filter((p) => !privileges.includes(p))
+        : [...new Set([...column.privileges, ...privileges])]
     )
   }
 
@@ -37,7 +37,7 @@ const PrivilegesBody: FC<Props> = (props) => {
       </div>
       <PrivilegesTable
         columns={props.privileges[table.name]}
-        onToggle={(column, action) => handleToggle(table.name, column, action)}
+        onToggle={(column, privileges) => handleToggle(table.name, column, privileges)}
       />
     </section>
   )

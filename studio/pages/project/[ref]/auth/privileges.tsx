@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import Privileges from 'components/interfaces/Auth/Privileges/Privileges'
+import { mapToUIPrivilegesData } from 'components/interfaces/Auth/Privileges/Privileges.utils'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
@@ -17,7 +18,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [selectedRole, setSelectedRole] = useState<string>('anon')
   const tables = meta.tables.list((table: { schema: string }) => table.schema === selectedSchema)
-  const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables[0]?.name ?? '')
+  const [selectedTable, setSelectedTable] = useState<string>(
+    pathParams.table ?? tables[0]?.name ?? ''
+  )
   const { ref } = useParams()
   const { project } = useProjectContext()
   const query = usePrivilegesQuery({
@@ -55,6 +58,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   return (
     <Privileges
       data={query.data}
+      dataUI={mapToUIPrivilegesData(query.data)}
       tables={tables.map((t) => t.name)}
       selectedSchema={selectedSchema}
       selectedRole={selectedRole}

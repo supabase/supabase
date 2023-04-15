@@ -67,60 +67,77 @@ const sql = /* SQL */ `
         entity_name,
         column_name,
         privilege_type
+    ),
+    aggregated AS (
+      SELECT
+        schema_name,
+        entity_name AS table_name,
+        role_name,
+        column_name,
+        privilege_type,
+        BOOL_OR(NOT is_column_specific) AS is_global,
+        BOOL_OR(is_column_specific) AS is_column_specific
+      FROM
+        data
+      GROUP BY
+        schema_name,
+        entity_name,
+        role_name,
+        column_name,
+        privilege_type
   ),
-  aggregated AS (
-    SELECT
-      schema_name,
-      entity_name AS table_name,
-      role_name,
-      column_name,
-      BOOL_AND(is_column_specific) AS is_column_specific,
-      ARRAY_AGG(privilege_type) AS privileges
-    FROM
-      data
-    GROUP BY
-      schema_name,
-      entity_name,
-      role_name,
-      column_name
-  ),
-  json_columns AS (
+  json_privileges AS (
     SELECT
       schema_name,
       table_name,
       role_name,
-      jsonb_agg(jsonb_build_object('name', column_name, 'isColumnSpecific', is_column_specific, 'privileges', privileges)) AS columns
+      privilege_type,
+      jsonb_agg(jsonb_build_object('name', column_name, 'isGlobal', is_global, 'isColumnSpecific', is_column_specific)) AS columns
     FROM
       aggregated
     GROUP BY
       schema_name,
       table_name,
-      role_name
+      role_name,
+      privilege_type
   ),
   json_tables AS (
     SELECT
       schema_name,
       role_name,
-      jsonb_object_agg(table_name, columns) AS tables
+      table_name,
+      jsonb_object_agg(privilege_type, columns) AS privileges
     FROM
-      json_columns
+      json_privileges
     GROUP BY
       schema_name,
-      role_name
+      role_name,
+      table_name
   ),
   json_roles AS (
     SELECT
       schema_name,
-      jsonb_object_agg(role_name, tables) AS roles
+      role_name,
+      jsonb_object_agg(table_name, privileges) AS tables
     FROM
       json_tables
+    GROUP BY
+      schema_name,
+      role_name
+  ),
+  json_schemas AS (
+    SELECT
+      schema_name,
+      jsonb_object_agg(role_name, tables) AS roles
+    FROM
+      json_roles
     GROUP BY
       schema_name
   )
   SELECT
     jsonb_object_agg(schema_name, roles) AS result_json
   FROM
-    json_roles;
+    json_schemas;
 `.trim()
 
 export type PrivilegesVariables = {
@@ -128,17 +145,20 @@ export type PrivilegesVariables = {
   connectionString?: string
 }
 
-export type ColumnPrivileges = {
+export type PrivilegeColumn = {
   name: string
+  isGlobal: boolean
   isColumnSpecific: boolean
-  privileges: string[]
 }
 
 export type PrivilegesDataResponse = {
   result: [{ result_json: PrivilegesData }]
 }
 
-export type PrivilegesData = Record<string, Record<string, Record<string, ColumnPrivileges[]>>>
+export type PrivilegesData = Record<
+  string,
+  Record<string, Record<string, Record<string, PrivilegeColumn[]>>>
+>
 
 export type PrivilegesError = unknown
 

@@ -1,7 +1,72 @@
 import { PrivilegesData } from 'data/database/privileges-query'
 import { PRIVILEGE_TYPES } from './Privileges.constants'
+import { PrivilegeDataCalculation, PrivilegesDataUI } from './Privileges.types'
 
-export function arePrivilegesEqual(a: PrivilegesData, b: PrivilegesData) {
+export function mapFromUIPrivilegesData(data: PrivilegesDataUI): PrivilegesData {
+  const result: PrivilegesData = {}
+
+  for (const schema in data) {
+    result[schema] = {}
+
+    for (const role in data[schema]) {
+      result[schema][role] = {}
+
+      for (const table in data[schema][role]) {
+        result[schema][role][table] = {}
+
+        for (const privilege of PRIVILEGE_TYPES) {
+          result[schema][role][table][privilege] = []
+        }
+
+        for (const column of data[schema][role][table]) {
+          for (const privilege of column.privileges) {
+            result[schema][role][table][privilege].push({
+              name: column.name,
+              isGlobal: false,
+              isColumnSpecific: true,
+            })
+          }
+        }
+      }
+    }
+  }
+
+  return result
+}
+
+export function mapToUIPrivilegesData(data: PrivilegesData): PrivilegesDataUI {
+  const result: PrivilegesDataUI = {}
+
+  for (const schema in data) {
+    result[schema] = {}
+
+    for (const role in data[schema]) {
+      result[schema][role] = {}
+
+      for (const table in data[schema][role]) {
+        result[schema][role][table] = []
+
+        for (const [privilege, columns] of Object.entries(data[schema][role][table])) {
+          for (const column of columns) {
+            const columnUI = result[schema][role][table].find((c) => c.name === column.name)
+            if (columnUI) {
+              columnUI.privileges.push(privilege)
+            } else {
+              result[schema][role][table].push({
+                name: column.name,
+                privileges: [privilege],
+              })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return result
+}
+
+export function arePrivilegesEqual(a: PrivilegesDataUI, b: PrivilegesDataUI) {
   return Object.keys(a).every((schema) => {
     return Object.keys(a[schema]).every((role) => {
       return Object.keys(a[schema][role]).every((table) => {
@@ -20,41 +85,45 @@ export function arePrivilegesEqual(a: PrivilegesData, b: PrivilegesData) {
 
 export function generatePrivilegesSQLQuery(
   originalData: PrivilegesData,
-  changesData: PrivilegesData
+  changesData: PrivilegesDataUI
 ): string {
   const queries: string[] = []
 
-  const originalMapped = mapPrivilegesData(originalData)
-  const changesMapped = mapPrivilegesData(changesData)
+  const changesMapped = mapCalculationPrivilegesData(changesData)
 
   for (const schema in changesMapped) {
     for (const role in changesMapped[schema]) {
       for (const table in changesMapped[schema][role]) {
         for (const privilege in changesMapped[schema][role][table]) {
           let changes = changesMapped[schema][role][table][privilege]
-          let original = originalMapped[schema][role][table][privilege]
+          let originalColumnsOn = originalData[schema][role][table][privilege] ?? []
 
-          if (arraysEqual(changes.columnsOn, original.columnsOn)) continue
+          if (
+            arraysEqual(
+              changes.columnsOn,
+              originalColumnsOn.map((c) => c.name)
+            )
+          )
+            continue
 
-          if (!original.isColumnSpecific && original.columnsOn.length > 0) {
+          if (originalColumnsOn.some((c) => c.isGlobal)) {
             queries.push(`REVOKE ${privilege} ON TABLE ${schema}.${table} FROM ${role};`)
-            original = {
-              ...original,
-              columnsOn: [],
-              columnsOff: original.columnsOn,
-            }
+            originalColumnsOn = originalColumnsOn.filter(
+              (c) => !(c.isGlobal && !c.isColumnSpecific)
+            )
           }
 
           if (changes.columnsOff.length === 0 && changes.columnsOn.length > 0) {
             queries.push(`GRANT ${privilege} ON TABLE ${schema}.${table} TO ${role};`)
             changes = {
-              ...changes,
               columnsOn: [],
-              columnsOff: original.columnsOn,
+              columnsOff: originalColumnsOn.map((c) => c.name),
             }
           }
 
-          const columnsOff = changes.columnsOff.filter((c) => original.columnsOn.includes(c))
+          const columnsOff = changes.columnsOff.filter((c) =>
+            originalColumnsOn.some((o) => o.name === c)
+          )
 
           if (columnsOff.length > 0) {
             queries.unshift(
@@ -64,7 +133,9 @@ export function generatePrivilegesSQLQuery(
             )
           }
 
-          const columnsOn = changes.columnsOn.filter((c) => !original.columnsOn.includes(c))
+          const columnsOn = changes.columnsOn.filter(
+            (c) => !originalColumnsOn.some((o) => o.name === c)
+          )
 
           if (columnsOn.length > 0) {
             queries.push(
@@ -79,17 +150,8 @@ export function generatePrivilegesSQLQuery(
   return queries.join('\n')
 }
 
-function mapPrivilegesData(data: PrivilegesData) {
-  const mapped: Record<
-    string,
-    Record<
-      string,
-      Record<
-        string,
-        Record<string, { columnsOn: string[]; columnsOff: string[]; isColumnSpecific: boolean }>
-      >
-    >
-  > = {}
+function mapCalculationPrivilegesData(data: PrivilegesDataUI): PrivilegeDataCalculation {
+  const mapped: PrivilegeDataCalculation = {}
 
   Object.keys(data).forEach((schema) => {
     Object.keys(data[schema]).forEach((role) => {
@@ -104,7 +166,6 @@ function mapPrivilegesData(data: PrivilegesData) {
                 {
                   columnsOn: [],
                   columnsOff: [],
-                  isColumnSpecific: data[schema][role][table].some((c) => c.isColumnSpecific),
                 },
               ])
             )

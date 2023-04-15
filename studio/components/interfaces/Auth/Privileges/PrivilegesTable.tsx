@@ -1,26 +1,43 @@
 import { FC } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
-import { ColumnPrivileges } from 'data/database/privileges-query'
 import { Toggle } from 'ui'
 import { PRIVILEGE_TYPES } from './Privileges.constants'
+import { PrivilegeColumnUI } from './Privileges.types'
 
 interface Props {
-  columns: ColumnPrivileges[]
-  onToggle: (column: ColumnPrivileges, action: string) => void
+  columns: PrivilegeColumnUI[]
+  onToggle: (column: PrivilegeColumnUI, privileges: string[]) => void
 }
 
 const PrivilegesTable: FC<Props> = (props) => {
-  const handleClickTableHead = (action: string) => {
-    const allColumnsHaveAction = props.columns.every((column) => column.privileges.includes(action))
+  const handleClickPrivilege = (privilege: string) => {
+    const allColumnsHavePrivilege = props.columns.every((column) =>
+      column.privileges.includes(privilege)
+    )
 
     props.columns.forEach((column) => {
-      if (allColumnsHaveAction) {
-        props.onToggle(column, action)
-      } else if (!column.privileges.includes(action)) {
-        props.onToggle(column, action)
+      if (allColumnsHavePrivilege) {
+        props.onToggle(column, [privilege])
+      } else if (!column.privileges.includes(privilege)) {
+        props.onToggle(column, [privilege])
       }
     })
+  }
+
+  const handleClickColumnName = (column: PrivilegeColumnUI) => {
+    const hasAllPriviliges = PRIVILEGE_TYPES.every((privilege) =>
+      column.privileges.includes(privilege)
+    )
+
+    if (hasAllPriviliges) {
+      props.onToggle(column, PRIVILEGE_TYPES)
+    } else {
+      props.onToggle(
+        column,
+        PRIVILEGE_TYPES.filter((privilege) => !column.privileges.includes(privilege))
+      )
+    }
   }
 
   return (
@@ -28,21 +45,26 @@ const PrivilegesTable: FC<Props> = (props) => {
       className="table-fixed mb-4"
       head={[
         <Table.th key="header-column">Column</Table.th>,
-        ...PRIVILEGE_TYPES.map((action) => (
-          <Table.th key={`header-${action}`}>
-            <PrivilegeActionButton action={action} onClick={() => handleClickTableHead(action)} />
+        ...PRIVILEGE_TYPES.map((privilege) => (
+          <Table.th key={`header-${privilege}`}>
+            <PrivilegeButton
+              privilege={privilege}
+              onClick={() => handleClickPrivilege(privilege)}
+            />
           </Table.th>
         )),
       ]}
       body={props.columns.map((column) => (
         <Table.tr key={column.name}>
-          <Table.td>{column.name}</Table.td>
-          {PRIVILEGE_TYPES.map((action) => (
-            <Table.td key={action}>
+          <Table.td>
+            <button onClick={() => handleClickColumnName(column)}>{column.name}</button>
+          </Table.td>
+          {PRIVILEGE_TYPES.map((privilege) => (
+            <Table.td key={privilege}>
               <Toggle
-                checked={column.privileges.includes(action)}
+                checked={column.privileges.includes(privilege)}
                 size="tiny"
-                onChange={() => props.onToggle(column, action)}
+                onChange={() => props.onToggle(column, [privilege])}
               />
             </Table.td>
           ))}
@@ -52,8 +74,8 @@ const PrivilegesTable: FC<Props> = (props) => {
   )
 }
 
-function PrivilegeActionButton(props: { action: string; onClick: () => void }) {
-  const formatted = props.action.charAt(0) + props.action.slice(1).toLowerCase()
+function PrivilegeButton(props: { privilege: string; onClick: () => void }) {
+  const formatted = props.privilege.charAt(0) + props.privilege.slice(1).toLowerCase()
 
   return <button onClick={props.onClick}>{formatted}</button>
 }
