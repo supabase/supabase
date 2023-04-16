@@ -19,8 +19,10 @@ export interface QueryItemProps {
 
 const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
-  const { id, name } = tabInfo || {}
+  const { id, name, content } = tabInfo || {}
   const isActive = id === activeId
+
+  const snap = useSqlEditorStateSnapshot({ sync: true })
 
   return (
     <div
@@ -29,6 +31,9 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         'flex items-center justify-between rounded-md group',
         isActive && 'text-scale-1200 bg-scale-300'
       )}
+      onClick={() => {
+        if (id) snap.setSql(id, content.sql)
+      }}
     >
       <Link href={`/project/${ref}/sql/${id}`}>
         <a className="py-1 px-3 w-full">
