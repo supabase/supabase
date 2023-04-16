@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import useLatest from 'hooks/misc/useLatest'
 import MonacoEditor from './MonacoEditor'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
@@ -23,8 +24,7 @@ const SQLEditor = () => {
     },
   })
 
-  const idRef = useRef(id)
-  idRef.current = id
+  const idRef = useLatest(id)
 
   const minSize = 44
   const snippet = id ? snap.snippets[id] : null
@@ -42,7 +42,7 @@ const SQLEditor = () => {
     (overrideSql?: string) => {
       // use the latest state
       const state = getSqlEditorStateSnapshot()
-      const snippet = id && state.snippets[id]
+      const snippet = idRef.current && state.snippets[idRef.current]
 
       if (project && snippet && !isExecuting) {
         execute?.({
