@@ -5,12 +5,13 @@ import {
   DatabaseUpgradeProgress,
 } from '@supabase/shared-types/out/events'
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import { useCallback } from 'react'
 import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
+  projectStatus?: string
 }
 
 export type ProjectUpgradingStatusResponse = {
@@ -39,7 +40,7 @@ export type ProjectUpgradingStatusData = Awaited<ReturnType<typeof getProjectUpg
 export type ProjectUpgradingStatusError = unknown
 
 export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusData>(
-  { projectRef }: ProjectUpgradingStatusVariables,
+  { projectRef, projectStatus }: ProjectUpgradingStatusVariables,
   {
     enabled = true,
     ...options
@@ -54,10 +55,17 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
       enabled: enabled && typeof projectRef !== 'undefined',
       refetchInterval(data) {
         const response = data as unknown as ProjectUpgradingStatusResponse
-        if (!response || response.databaseUpgradeStatus === null) return false
+        if (!response) return false
 
         const interval =
-          response.databaseUpgradeStatus.status === DatabaseUpgradeStatus.Upgrading ? 5000 : false
+          // Transited to UPGRADING state via client, but job not yet picked up
+          (projectStatus === PROJECT_STATUS.UPGRADING &&
+            response.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
+          // Project currently getting upgraded
+          response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
+            ? 5000
+            : false
+
         return interval
       },
       onSuccess(data) {

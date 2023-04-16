@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,19 +7,33 @@ import { isUndefined, isNaN } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore, withAuth, useUrlState, useParams } from 'hooks'
+import { useStore, withAuth, useUrlState } from 'hooks'
+import { useParams } from 'common/hooks'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { Entity } from 'data/entity-types/entity-type-query'
+import { sqlKeys } from 'data/sql/keys'
 import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { NextPageWithLayout, SchemaView } from 'types'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useTheme } from 'common'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { isDarkMode } = useTheme()
   const { id, ref: projectRef } = useParams()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
+  const { project } = useProjectContext()
+
+  const queryClient = useQueryClient()
 
   const { meta, ui } = useStore()
   const [selectedSchema, setSelectedSchema] = useState<string>()
@@ -30,14 +45,22 @@ const TableEditorPage: NextPageWithLayout = () => {
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
-  const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table' | 'json'>()
+  const [sidePanelKey, setSidePanelKey] = useState<
+    'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
+  >()
   const [selectedRowToEdit, setSelectedRowToEdit] = useState<Dictionary<any>>()
   const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
+  const [selectedForeignKeyToEdit, setSelectedForeignKeyToEdit] = useState<{
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }>()
 
   const tables: PostgresTable[] = meta.tables.list()
   const views: SchemaView[] = meta.views.list()
+  const materializedViews = meta.materializedViews.list()
   const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
 
   const selectedTable = !isNaN(Number(id))
@@ -45,6 +68,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       tables
         // @ts-ignore
         .concat(views)
+        // @ts-ignore
+        .concat(materializedViews)
         // @ts-ignore
         .concat(foreignTables)
         .find((table) => table.id === Number(id))
@@ -88,27 +113,60 @@ const TableEditorPage: NextPageWithLayout = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onEditTable = (table: PostgresTable) => {
+  const onEditTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(false)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
-  const onDeleteTable = (table: PostgresTable) => {
+  const onDeleteTable = (entity: Entity) => {
     setIsDeleting(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToDelete(table)
     setIsDeleteWithCascade(false)
   }
 
-  const onDuplicateTable = (table: PostgresTable) => {
+  const onDuplicateTable = (entity: Entity) => {
     setSidePanelKey('table')
     setIsDuplicating(true)
+
+    const table = meta.tables.byId(entity.id)
     setSelectedTableToEdit(table)
   }
 
   const onExpandJSONEditor = (column: string, row: any) => {
     setSidePanelKey('json')
     setSelectedValueForJsonEdit({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+  }
+
+  const onImportData = () => {
+    if (id) {
+      setSidePanelKey('csv-import')
+      const table = meta.tables.byId(id)
+      setSelectedTableToEdit(table)
+    } else {
+      console.error('Table ID not found')
+    }
+  }
+
+  const onEditForeignKeyColumnValue = ({
+    foreignKey,
+    row,
+    column,
+  }: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => {
+    setSidePanelKey('foreign-row-selector')
+    setSelectedForeignKeyToEdit({
+      foreignKey,
+      row,
+      column,
+    })
   }
 
   const onClosePanel = () => {
@@ -148,7 +206,21 @@ const TableEditorPage: NextPageWithLayout = () => {
         message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
       })
 
-      await meta.tables.loadById(selectedColumnToDelete!.table_id)
+      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+      await Promise.all([
+        meta.tables.loadById(selectedColumnToDelete!.table_id),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        ),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, [
+            'table-definition',
+            selectedTable!.schema,
+            selectedTable!.name,
+          ])
+        ),
+      ])
+
       if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
     } catch (error: any) {
       ui.setNotification({
@@ -169,6 +241,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       if (response.error) throw response.error
 
       const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+
+      await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 
       // For simplicity for now, we just open the first table within the same schema
       if (tables.length > 0) {
@@ -211,14 +285,17 @@ const TableEditorPage: NextPageWithLayout = () => {
         selectedColumnToEdit={selectedColumnToEdit}
         selectedTableToEdit={selectedTableToEdit}
         selectedValueForJsonEdit={selectedValueForJsonEdit}
+        selectedForeignKeyToEdit={selectedForeignKeyToEdit}
         onAddRow={onAddRow}
         onEditRow={onEditRow}
         onAddColumn={onAddColumn}
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
         onExpandJSONEditor={onExpandJSONEditor}
+        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
         onClosePanel={onClosePanel}
-        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
+        onImportData={onImportData}
+        theme={isDarkMode ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger

@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://app.supabase.com',
+    destination: 'https://supabase.com/dashboard',
   },
   {
     permanent: true,
@@ -1458,17 +1458,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://app.supabase.com/sign-in',
+    destination: 'https://supabase.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://app.supabase.com/sign-up',
+    destination: 'https://supabase.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://app.supabase.com/forgot-password',
+    destination: 'https://supabase.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1488,7 +1488,7 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://app.supabase.com/projects',
+    destination: 'https://supabase.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
@@ -1531,7 +1531,7 @@ module.exports = [
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
-  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
@@ -1829,16 +1829,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/api',
-    destination: '/docs/guides/database/api',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/api/generating-types',
-    destination: '/docs/guides/database/api/generating-types',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1876,5 +1866,46 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/resources/postgres/which-version-of-postgres',
     destination: '/docs/guides/database/postgres/which-version-of-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime/extensions/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime/extensions/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/extensions/postgres-changes',
+  },
+  // Serverless APIs
+  {
+    permanent: true,
+    source: '/docs/guides/database/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
+  },
+  {
+    permanent: true,
+    source: '/docs/support',
+    destination: '/support',
   },
 ]

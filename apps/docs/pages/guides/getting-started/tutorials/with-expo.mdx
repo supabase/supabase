@@ -36,6 +36,7 @@ Then let's install the additional dependencies: [supabase-js](https://github.com
 ```bash
 npm install @supabase/supabase-js
 npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
+npx expo install expo-secure-store
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -44,15 +45,28 @@ These variables will be exposed on the browser, and that's completely fine since
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```ts title=lib/supabase.ts
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from "expo-secure-store";
 import { createClient } from '@supabase/supabase-js'
+
+
+const ExpoSecureStoreAdapter = {
+  getItem: (key: string) => {
+    return SecureStore.getItemAsync(key);
+  },
+  setItem: (key: string, value: string) => {
+    SecureStore.setItemAsync(key, value);
+  },
+  removeItem: (key: string) => {
+    SecureStore.deleteItemAsync(key);
+  },
+};
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
 const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage: AsyncStorage as any,
+    storage: ExpoSecureStoreAdapter as any,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
@@ -99,7 +113,7 @@ export default function Auth() {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input
           label="Email"
@@ -234,7 +248,7 @@ export default function Account({ session }: { session: Session }) {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input label="Email" value={session?.user?.email} disabled />
       </View>

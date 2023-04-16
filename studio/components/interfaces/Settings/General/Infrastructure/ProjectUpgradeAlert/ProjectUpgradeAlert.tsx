@@ -12,7 +12,8 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import InformationBox from 'components/ui/InformationBox'
@@ -75,19 +76,22 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
         hideFooter
         visible={showUpgradeModal}
         onCancel={() => setShowUpgradeModal(false)}
-        header={<h3>Upgrade project's Postgres</h3>}
+        header={<h3>Upgrade Postgres</h3>}
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
           {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+            const selectedVersion = (data?.target_upgrade_versions ?? []).find(
+              (x) => x.postgres_version === values.version
+            )
+
             return (
               <>
                 <div className="py-6">
                   <Modal.Content>
                     <div className="space-y-4">
                       <p className="text-sm">
-                        All of your project's services, such as GoTrue, PostgREST, Supautils, and
-                        all database extensions will be upgraded as well, and this action cannot be
-                        undone.
+                        All services, including Auth, Rest, and Extensions will be upgraded. This
+                        action cannot be undone.
                       </p>
                       {(data?.potential_breaking_changes ?? []).length > 0 && (
                         <InformationBox
@@ -102,9 +106,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                                     <li key={reason}>
                                       <p className="text-scale-1200">{change.title}</p>
                                       <p className="flex items-center space-x-1">
-                                        <span>
-                                          Breaking changes with this version are highlighted{' '}
-                                        </span>
+                                        <span>This update has breaking changes. Read more </span>
                                         <Link href={change.url}>
                                           <a className="text-brand-900 opacity-90 flex items-center space-x-1">
                                             <span>here</span>
@@ -133,7 +135,10 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                         id="version"
                         name="version"
                         label="Select the version of Postgres to upgrade to"
-                        descriptionText={`Your project's Postgres will be upgraded from ${currentPgVersion} to ${values.version}`}
+                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${
+                          selectedVersion?.app_version?.split('supabase-postgres-')[1] ??
+                          values.version
+                        }`}
                       >
                         {data?.target_upgrade_versions.map((version) => (
                           <Listbox.Option

@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { FC } from 'react'
 
 interface Props {
@@ -30,10 +31,15 @@ const SparkBar: FC<Props> = ({
       <div className="flex flex-col w-full">
         {hasLabels && (
           <div className="flex align-baseline justify-between pb-1 space-x-8">
-            <span className="text-scale-1200 text-sm truncate capitalize-sentence">
+            <p
+              className={clsx(
+                'text-scale-1200 text-sm truncate capitalize-sentence',
+                labelTop.length > 0 && 'max-w-[75%]'
+              )}
+            >
               {labelBottom}
-            </span>
-            <span className="text-scale-1100 text-sm tabular-nums">{labelTop}</span>
+            </p>
+            <p className="text-scale-1100 text-sm tabular-nums">{labelTop}</p>
           </div>
         )}
         <div

@@ -1,8 +1,9 @@
+import Image from 'next/image'
+import { AutoApiService } from 'data/config/project-api-query'
+import { BASE_PATH } from 'lib/constants'
 import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
-import Image from 'next/image'
-import { useStore } from 'hooks'
-import { AutoApiService } from 'data/config/project-api-query'
+import { useTheme } from 'common'
 
 const libs = [
   {
@@ -25,8 +26,7 @@ interface Props {
 }
 
 export default function Introduction({ autoApiService, selectedLang }: Props) {
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
+  const { isDarkMode } = useTheme()
 
   return (
     <>
@@ -64,7 +64,9 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
                   "
                 >
                   <Image
-                    src={`/img/icons/reference-${isDarkTheme ? lib.icon : `${lib.icon}-light`}.svg`}
+                    src={`${BASE_PATH}/img/icons/reference-${
+                      isDarkMode ? lib.icon : `${lib.icon}-light`
+                    }.svg`}
                     width={16}
                     height={16}
                     alt={lib.name}

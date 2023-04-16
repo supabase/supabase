@@ -24,6 +24,7 @@ const csp = [
   .join(' ')
 
 const nextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   async redirects() {
     return [
       {
@@ -124,6 +125,11 @@ const nextConfig = {
       {
         source: '/project/:ref/logs-explorer',
         destination: '/project/:ref/logs/explorer',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/sql/templates',
+        destination: '/project/:ref/sql',
         permanent: true,
       },
       {

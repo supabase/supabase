@@ -1,15 +1,17 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { FC, useEffect, ReactNode, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
 
-import { checkPermissions, useParams, useStore, withAuth } from 'hooks'
+import { checkPermissions, withAuth } from 'hooks'
+import { useParams } from 'common/hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import BaseLayout from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { TerminalInstructions } from 'components/interfaces/Functions'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 
 interface Props {
   title?: string
@@ -17,14 +19,10 @@ interface Props {
 }
 
 const FunctionsLayout: FC<Props> = ({ title, children }) => {
-  const router = useRouter()
-  const { id, ref } = useParams()
-  const { functions, ui } = useStore()
+  const { functionSlug, ref } = useParams()
   const [showTerminalInstructions, setShowTerminalInstructions] = useState(false)
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) functions.load()
-  }, [ui.selectedProjectRef])
+  const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
   const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
@@ -37,27 +35,21 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
     )
   }
 
-  const item = id ? functions.byId(id) : null
-  const name = item?.name || ''
-
-  const hasFunctions = functions.list().length > 0
+  const name = selectedFunction?.name || ''
+  const hasFunctions = (functions ?? []).length > 0
   const centered = !hasFunctions
 
   return (
-    <BaseLayout
-      isLoading={!functions.isLoaded}
-      title={title || 'Edge Functions'}
-      product="Edge Functions"
-    >
+    <BaseLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">
             <div
-              className="item-center 
-            flex 
+              className="item-center
+            flex
             flex-col
-            justify-between 
-            gap-y-4 
+            justify-between
+            gap-y-4
             xl:flex-row"
             >
               <div className="flex items-center gap-3">
@@ -149,7 +141,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 </div>
               </div>
             </div>
-            {item && <FunctionsNav item={item} />}
+            {selectedFunction !== undefined && <FunctionsNav item={selectedFunction} />}
           </div>
           <div
             className={[

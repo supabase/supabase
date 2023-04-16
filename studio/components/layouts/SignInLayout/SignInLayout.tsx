@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useTheme } from 'common'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Head from 'next/head'
@@ -26,9 +27,8 @@ const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const pushNext = usePushNext()
-  const { ui } = useStore()
   const queryClient = useQueryClient()
-  const { theme } = ui
+  const { isDarkMode } = useTheme()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -80,7 +80,9 @@ const SignInLayout = ({
         <Head>
           <script
             dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace(window._getReturnToPath())}`,
+              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace('${
+                BASE_PATH ?? ''
+              }' + window._getReturnToPath())}`,
             }}
           />
         </Head>
@@ -94,7 +96,11 @@ const SignInLayout = ({
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                   <a>
                     <Image
-                      src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                      src={
+                        isDarkMode
+                          ? `${BASE_PATH}/img/supabase-dark.svg`
+                          : `${BASE_PATH}/img/supabase-light.svg`
+                      }
                       alt="Supabase Logo"
                       height={24}
                       width={120}

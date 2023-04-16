@@ -123,7 +123,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -256,7 +256,7 @@ export default {
 
   alert: {
     base: `
-      relative rounded border py-4 px-6
+      relative rounded-md border py-4 px-6
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -275,10 +275,10 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-blue-200 dark:bg-blue-100 border-blue-700`,
-        icon: `text-blue-900`,
-        header: `text-blue-1200`,
-        description: `text-blue-1100`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
+        icon: `text-scale-900`,
+        header: `text-scale-1200`,
+        description: `text-scale-1100`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
@@ -353,7 +353,7 @@ export default {
         hover:text-scale-1200
       `,
       active: `
-        text-scale-1200
+        !text-scale-1200
         border-b-2 border-scale-1200
       `,
     },
@@ -369,6 +369,7 @@ export default {
         transition
         shadow-sm
         rounded
+        border
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -376,13 +377,13 @@ export default {
         `,
       inactive: `
         bg-scale-200
-        border border-scale-700 hover:border-scale-900
+        border-scale-700 hover:border-scale-900
         text-scale-900 hover:text-scale-1200
       `,
       active: `
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
+        bg-scale-600
+        text-scale-1200
+        border-scale-800
       `,
     },
     'rounded-pills': {
@@ -972,11 +973,11 @@ export default {
 
   sidepanel: {
     base: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
       inset-y-0
-      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
@@ -1023,6 +1024,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1059,8 +1061,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      bg-brand-900
-      hover:bg-brand-900
+      !bg-brand-900
+      !hover:bg-brand-900
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1079,11 +1081,11 @@ export default {
         transition
         ease-in-out duration-200
       `,
-      tiny: 'h-3 w-3',
-      small: 'h-5 w-5',
-      medium: 'h-5 w-5',
-      large: 'h-6 w-6',
-      xlarge: 'h-6 w-6',
+      tiny: '!h-3 !w-3',
+      small: '!h-5 !w-5',
+      medium: '!h-5 !w-5',
+      large: '!h-6 !w-6',
+      xlarge: '!h-6 !w-6',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
@@ -1210,12 +1212,12 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1245,6 +1247,7 @@ export default {
       border-none
       focus:outline-none
     `,
+    disabled: `opacity-50 cursor-default`,
     label: `
       text-scale-900
       px-4 flex items-center space-x-2 py-1.5
@@ -1297,6 +1300,7 @@ export default {
 
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1469,6 +1473,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1480,13 +1485,13 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-40
       fixed
       inset-0
       grid
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
     `,
     separator: `
       w-full
