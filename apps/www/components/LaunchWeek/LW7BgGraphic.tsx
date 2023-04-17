@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
-import { useBreakpoint } from '../../hooks/useBreakpoint'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import styles from './lw7-bg-graphic.module.css'
 
 export default function LW7BgGraphic() {

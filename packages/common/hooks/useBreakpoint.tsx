@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { isBrowser } from '~/lib/helpers'
+
+const isBrowser = typeof window !== 'undefined'
 
 export function useBreakpoint(breakpoint = 768) {
   if (!isBrowser) return
-  const [isMobile, setIsMobile] = useState(false)
+  const [isBreakpoint, setIsBreakpoint] = useState(false)
   const { width } = useWindowSize()
 
   useEffect(() => {
     if (width <= breakpoint) {
-      setIsMobile(true)
+      setIsBreakpoint(true)
     } else {
-      setIsMobile(false)
+      setIsBreakpoint(false)
     }
   }, [width])
 
-  return isMobile
+  return isBreakpoint
 }
