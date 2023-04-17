@@ -45,6 +45,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
         '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
         'transition ease-out',
+        'place-self-start mx-auto top-24',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
@@ -179,10 +180,11 @@ type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPr
 
 export interface CommandItemProps extends CommandPrimitiveItemProps {
   type: 'link' | 'block-link' | 'command'
+  badge?: React.ReactNode
 }
 
 export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
-  ({ className, type, ...props }, ref) => (
+  ({ className, type, children, badge, ...props }, ref) => (
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
@@ -237,7 +239,12 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         className
       )}
       {...props}
-    />
+    >
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex flex-row items-center">{children}</div>
+        {badge}
+      </div>
+    </CommandPrimitive.Item>
   )
 )
 

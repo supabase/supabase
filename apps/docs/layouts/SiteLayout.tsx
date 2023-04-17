@@ -118,6 +118,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-analytics',
     name: 'Analytics Server Reference',
   },
+  reference_self_hosting_functions: {
+    icon: '/docs/img/icons/menu/reference-functions',
+    name: 'Functions Server Reference',
+  },
 }
 
 const MobileHeader = memo(function MobileHeader() {
