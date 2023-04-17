@@ -80,7 +80,10 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => {
         return (
-          <div className="Code codeBlockWrapper group cursor-pointer" onClick={() => handleCopyCode(children)}>
+          <div
+            className="Code codeBlockWrapper group cursor-pointer"
+            onClick={() => handleCopyCode(children)}
+          >
             <pre ref={target} className={`codeBlock ${className}`}>
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i })
