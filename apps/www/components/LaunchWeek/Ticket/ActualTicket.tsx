@@ -10,7 +10,7 @@ import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
 import { SITE_URL } from '~/lib/constants'
-import { useBreakpoint } from '../../../hooks/useBreakpoint'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 type TicketGenerationState = 'default' | 'loading'
 

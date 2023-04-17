@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useBreakpoint } from '~/hooks/useBreakpoint'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import {
   ArrowTopRightSvg,
   CartTitle,
