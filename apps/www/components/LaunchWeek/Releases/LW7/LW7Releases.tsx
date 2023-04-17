@@ -200,7 +200,7 @@ export default function LW7Releases() {
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
-                <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
                   <PencilSvg />
                 </div>
               </ChipLink>
@@ -423,7 +423,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day1.steps[0].docs}
                       blog={day1.steps[0].blog}
                       video={day1.steps[0].video}
                       hackernews={day1.steps[0].hackernews}
@@ -511,7 +510,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day2.steps[0].docs}
                       blog={day2.steps[0].blog}
                       video={day2.steps[0].video}
                       hackernews={day2.steps[0].hackernews}
