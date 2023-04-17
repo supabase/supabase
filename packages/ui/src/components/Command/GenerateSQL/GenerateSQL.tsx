@@ -18,7 +18,7 @@ import {
 
 import { cn } from '../../../utils/cn'
 import { AiIcon, AiIconChat } from '../Command.icons'
-import { CommandItem } from '../Command.utils'
+import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
@@ -45,6 +45,16 @@ const GenerateSQL = () => {
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     messageTemplate,
     setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
@@ -271,15 +281,7 @@ const GenerateSQL = () => {
           </div>
         )}
         <Input
-          inputRef={(inputElement) => {
-            if (inputElement) {
-              // We need to delay the focus until the end of the call stack
-              // due to order of operations
-              setTimeout(() => {
-                inputElement.focus()
-              }, 0)
-            }
-          }}
+          inputRef={inputRef}
           className="bg-scale-100 rounded mx-3 mb-4"
           autoFocus
           placeholder={
