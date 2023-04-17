@@ -15,7 +15,7 @@ import {
   StyledArticleBadge,
 } from './components'
 
-import { useMobileViewport } from '../../../../hooks/useMobileViewport'
+import { useBreakpoint } from '../../../../hooks/useBreakpoint'
 import { motion } from 'framer-motion'
 import Day5 from './Day5'
 
@@ -144,7 +144,7 @@ const getDay4Motion = (index: number) => {
 
 export default function LW7Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
-  const isTablet = useMobileViewport(1023)
+  const isTablet = useBreakpoint(1023)
   const showAll = false
   const publishedSections =
     days

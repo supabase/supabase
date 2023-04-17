@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useMobileViewport } from '~/hooks/useMobileViewport'
+import { useBreakpoint } from '~/hooks/useBreakpoint'
 import {
   ArrowTopRightSvg,
   CartTitle,
@@ -12,7 +12,7 @@ import {
 } from './components'
 
 import { WeekDayProps } from '~/components/LaunchWeek/lw7_days'
-import { opacityVariant4, scaleOpacityVariant, scaleOpacityVariant2 } from './LW7Releases'
+import { opacityVariant4, scaleOpacityVariant2 } from './LW7Releases'
 
 import styles from './day5.module.css'
 import Link from 'next/link'
@@ -44,9 +44,9 @@ const getDay5omt02Motion = (index: number) => {
 }
 
 const Day5 = ({ day }: { day: WeekDayProps }) => {
-  const isMobile = useMobileViewport(767)
-  const isTablet = useMobileViewport(1023)
-  const isDesktop = useMobileViewport(1279)
+  const isMobile = useBreakpoint(767)
+  const isTablet = useBreakpoint(1023)
+  const isDesktop = useBreakpoint(1279)
 
   return (
     <>
