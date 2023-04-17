@@ -2,41 +2,31 @@ import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
 import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
-import Telemetry from 'lib/telemetry'
+import Telemetry, { GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
-  language: 'en_US'
-  theme: 'dark' | 'light'
-  themeOption: 'dark' | 'light' | 'system'
-
+  language: 'en-US'
   selectedProjectRef?: string
-  isDarkTheme: boolean
   selectedProject?: Project
   selectedProjectBaseInfo?: ProjectBase
   selectedOrganization?: Organization
   notification?: Notification
-  profile?: User
   permissions?: Permission[]
-
+  googleAnalyticsProps?: GoogleAnalyticsProps
   load: () => void
-  setTheme: (theme: 'dark' | 'light') => void
-  onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
-  setProfile: (value?: User) => void
+  setProfile: (value: User) => void
   setPermissions: (permissions?: Permission[]) => void
+  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
-  language: 'en_US' = 'en_US'
-  theme: 'dark' | 'light' = 'dark'
-  themeOption: 'dark' | 'light' | 'system' = 'dark'
-
+  language: 'en-US' = 'en-US'
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
   notification?: Notification
-  profile?: User
   permissions?: Permission[] = []
 
   constructor(rootStore: IRootStore) {
@@ -94,43 +84,16 @@ export default class UiStore implements IUiStore {
     return undefined
   }
 
-  get isDarkTheme() {
-    return this.theme === 'dark'
+  get googleAnalyticsProps() {
+    return {
+      screenResolution:
+        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined,
+      language: this.language,
+    }
   }
 
   load() {
     if (typeof window === 'undefined') return
-    const localStorageThemeOption = window.localStorage.getItem('theme')
-    if (localStorageThemeOption === 'system') {
-      this.themeOption = localStorageThemeOption
-      return this.setTheme(
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    }
-    if (localStorageThemeOption === 'light') {
-      this.themeOption = localStorageThemeOption
-      return this.setTheme('light')
-    }
-    window.localStorage.setItem('theme', 'dark')
-    this.themeOption = 'dark'
-    this.setTheme('dark')
-  }
-
-  setTheme(theme: 'dark' | 'light') {
-    this.theme = theme
-    document.body.className = theme
-  }
-
-  onThemeOptionChange(themeOption: 'dark' | 'light' | 'system') {
-    this.themeOption = themeOption
-    if (themeOption === 'system') {
-      window.localStorage.setItem('theme', 'system')
-      return this.setTheme(
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    }
-    window.localStorage.setItem('theme', themeOption)
-    this.setTheme(themeOption)
   }
 
   setProjectRef(ref?: string) {
@@ -147,15 +110,20 @@ export default class UiStore implements IUiStore {
     return id
   }
 
-  setProfile(value?: User) {
-    if (value && value?.id !== this.profile?.id) {
-      Telemetry.sendIdentify(value)
-    }
-
-    this.profile = value
+  setProfile(value: User) {
+    Telemetry.sendIdentify(value, this.googleAnalyticsProps)
   }
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
+  }
+
+  setGaClientId(clientId?: string) {
+    /**
+     * We need to access ga client_id from base.constructHeaders method
+     * in order to set custom header('ga_client_id).
+     * TODO: Do we have a better way than storing in local storage?
+     */
+    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }

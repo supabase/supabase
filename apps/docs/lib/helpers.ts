@@ -1,4 +1,7 @@
 // [Joshen] I think this can be done better, as its mostly used to choose what
+
+import { ICommonFunc } from '../components/reference/Reference.types'
+
 // menus to render in the SideBar.js (Ref Nav.constants.ts)
 export function getPageType(asPath: string) {
   let page
@@ -33,9 +36,9 @@ export function getPageType(asPath: string) {
   return page
 }
 
-export function flattenSections(sections) {
-  var a = []
-  for (var i = 0; i < sections.length; i++) {
+export function flattenSections(sections: ICommonFunc[]) {
+  let a: ICommonFunc[] = []
+  for (let i = 0; i < sections.length; i++) {
     if (sections[i].id) {
       // only push a section that has an id
       // these are reserved for sidebar subtitles

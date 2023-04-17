@@ -1,5 +1,4 @@
 import { v4 as _uuidV4 } from 'uuid'
-import { PostgresColumn } from '@supabase/postgres-meta'
 import { post } from 'lib/common/fetch'
 import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
 
@@ -111,7 +110,7 @@ export const filterSensitiveProjectProps = (project: any) => {
 }
 
 /**
- * Returns undefine if the string isn't parse-able
+ * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
@@ -121,7 +120,7 @@ export const tryParseInt = (str: string) => {
   }
 }
 
-// Used as checker for memoised components
+// Used as checker for memoized components
 export const propsAreEqual = (prevProps: any, nextProps: any) => {
   try {
     Object.keys(prevProps).forEach((key) => {
@@ -213,5 +212,21 @@ export const detectBrowser = () => {
     return 'Firefox'
   } else if (navigator.userAgent.indexOf('Safari') !== -1) {
     return 'Safari'
+  }
+}
+
+export const detectOS = () => {
+  if (typeof navigator === 'undefined' || !navigator) return undefined
+
+  const userAgent = window.navigator.userAgent.toLowerCase()
+  const macosPlatforms = /(macintosh|macintel|macppc|mac68k|macos)/i
+  const windowsPlatforms = /(win32|win64|windows|wince)/i
+
+  if (macosPlatforms.test(userAgent)) {
+    return 'macos'
+  } else if (windowsPlatforms.test(userAgent)) {
+    return 'windows'
+  } else {
+    return undefined
   }
 }

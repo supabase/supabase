@@ -15,7 +15,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
   disabled?: boolean
   error?: string
   icon?: any
-  inputRef?: string
+  inputRef?: React.LegacyRef<HTMLInputElement>
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
@@ -97,7 +97,7 @@ function Input({
   // }, [errors, touched])
 
   function onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
+    navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
         setCopyLabel('Copied')

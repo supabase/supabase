@@ -5,18 +5,20 @@ import { SubscriptionPreview } from '../Billing.types'
 import CostBreakdownModal from './CostBreakdownModal'
 
 interface Props {
+  totalMonthlyCost: number
   subscriptionPreview?: SubscriptionPreview
   isRefreshingPreview: boolean
   isSpendCapEnabled: boolean
 }
 
 const PaymentTotal: FC<Props> = ({
+  totalMonthlyCost,
   subscriptionPreview,
   isRefreshingPreview,
   isSpendCapEnabled,
 }) => {
   const hasChanges = subscriptionPreview?.has_changes ?? false
-  const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
+  // const totalMonthlyCost = (subscriptionPreview?.base_amount_due_next_billing_cycle ?? 0) / 100
   const amountDueImmediately = (subscriptionPreview?.amount_due_immediately ?? 0) / 100
   const billingDate = new Date((subscriptionPreview?.bill_on ?? 0) * 1000)
   const isBillingToday =
@@ -52,17 +54,19 @@ const PaymentTotal: FC<Props> = ({
                         onClick={() => setShowCostBreakdown(true)}
                       />
                     </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                          'border border-scale-200 ', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">How is this calculated?</span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                            'border border-scale-200 ', //border
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">How is this calculated?</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   </Tooltip.Root>
                 )}
               </div>

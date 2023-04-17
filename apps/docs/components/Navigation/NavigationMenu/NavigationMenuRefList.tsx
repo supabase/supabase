@@ -25,10 +25,14 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   active,
   spec,
 }) => {
+  const filteredSections = commonSections.filter((section) => {
+    return !section.excludes?.includes(id)
+  })
+
   return (
     <div
       className={[
-        'transition-all ml-8 duration-150 ease-out',
+        'transition-all duration-150 ease-out',
         // enabled
         active && 'opacity-100 ml-0 delay-150 h-auto',
         // move menu back to margin-left
@@ -38,7 +42,7 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
         !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
       ].join(' ')}
     >
-      <NavigationMenuRefListItems id={id} lib={lib} commonSections={commonSections} spec={spec} />
+      <NavigationMenuRefListItems id={id} lib={lib} commonSections={filteredSections} spec={spec} />
     </div>
   )
 }

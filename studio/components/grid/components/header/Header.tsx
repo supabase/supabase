@@ -1,106 +1,269 @@
-import { FC, useState, ReactNode } from 'react'
-import { Button, IconDownload, IconPlus, IconX, IconTrash } from 'ui'
-import { saveAs } from 'file-saver'
+import saveAs from 'file-saver'
+import Papa from 'papaparse'
+import { useState, ReactNode } from 'react'
+import {
+  Button,
+  IconDownload,
+  IconX,
+  IconTrash,
+  Dropdown,
+  IconChevronDown,
+  IconFileText,
+  IconArrowUp,
+} from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { Sort, Filter } from 'components/grid/types'
-import { exportRowsToCsv } from 'components/grid/utils'
+import { Sort, Filter, SupaTable } from 'components/grid/types'
 import { useDispatch, useTrackedState } from 'components/grid/store'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import RLSBannerWarning from './RLSBannerWarning'
+import clsx from 'clsx'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
 const MAX_EXPORT_ROW_COUNT = 500000
 
-interface HeaderProps {
+export type HeaderProps = {
+  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
   headerActions?: ReactNode
+  customHeader: ReactNode
 }
 
-const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, headerActions }) => {
+const Header = ({
+  table,
+  sorts,
+  filters,
+  onAddColumn,
+  onAddRow,
+  onImportData,
+  headerActions,
+  customHeader,
+  isRefetching,
+}: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
-    <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
-      {selectedRows.size > 0 ? (
-        <RowHeader sorts={sorts} filters={filters} />
-      ) : (
-        <DefaultHeader
-          sorts={sorts}
-          filters={filters}
-          onAddColumn={onAddColumn}
-          onAddRow={onAddRow}
-        />
-      )}
-      <div className="sb-grid-header__inner">
-        <RefreshButton filters={filters} sorts={sorts} />
-        {headerActions}
+    <div>
+      <div className="flex h-10 items-center justify-between bg-scale-100 px-5 py-1.5 dark:bg-scale-300">
+        {customHeader ? (
+          <>{customHeader}</>
+        ) : (
+          <>
+            {selectedRows.size > 0 ? (
+              <RowHeader table={table} sorts={sorts} filters={filters} />
+            ) : (
+              <DefaultHeader
+                table={table}
+                isRefetching={isRefetching}
+                onAddColumn={onAddColumn}
+                onAddRow={onAddRow}
+                onImportData={onImportData}
+              />
+            )}
+          </>
+        )}
+        <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
+      <RLSBannerWarning />
     </div>
   )
 }
+
 export default Header
 
-interface DefaultHeaderProps {
-  sorts: Sort[]
-  filters: Filter[]
+type DefaultHeaderProps = {
+  table: SupaTable
+  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
+  onImportData?: () => void
 }
-const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, onAddRow }) => {
-  const renderNewColumn = (onAddColumn?: () => void) => {
-    if (!onAddColumn) return null
-    return (
-      <Button type="text" onClick={onAddColumn}>
-        New Column
-      </Button>
-    )
-  }
+const DefaultHeader = ({
+  table,
+  isRefetching,
+  onAddColumn,
+  onAddRow,
+  onImportData,
+}: DefaultHeaderProps) => {
+  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
-  const renderAddRow = (onAddRow?: () => void) => {
-    if (!onAddRow) return null
-    return (
-      <Button size="tiny" icon={<IconPlus size={14} strokeWidth={2} />} onClick={onAddRow}>
-        Insert row
-      </Button>
-    )
-  }
+  // [Joshen] Using this logic to block both column and row creation/update/delete
+  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
+  const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterDropdown />
-        <SortPopover />
+        <RefreshButton table={table} isRefetching={isRefetching} />
+        <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
+        <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
-      <div className="h-[50%] w-px bg-scale-600"></div>
-      <div className="flex items-center gap-2">
-        {renderNewColumn(onAddColumn)}
-        {renderAddRow(onAddRow)}
-      </div>
+      {canAddNew && (
+        <>
+          <div className="h-[20px] w-px border-r border-scale-600"></div>
+          <div className="flex items-center gap-2">
+            {canCreateColumns && (
+              <Dropdown
+                side="bottom"
+                align="start"
+                size="medium"
+                overlay={[
+                  ...(onAddRow !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-row"
+                          className="group"
+                          onClick={onAddRow}
+                          icon={
+                            <div className="-mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[15px] h-[4px]" />
+                              <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
+                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-x-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert row</p>
+                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onAddColumn !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-column"
+                          className="group"
+                          onClick={onAddColumn}
+                          icon={
+                            <div className="flex -mt-2 pr-1.5">
+                              <div className="border border-scale-1000 w-[4px] h-[15px]" />
+                              <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
+                              <div
+                                className={[
+                                  'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
+                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-y-0',
+                                ].join(' ')}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Insert column</p>
+                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onImportData !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="import-data"
+                          className="group"
+                          onClick={onImportData}
+                          icon={
+                            <div className="relative -mt-2">
+                              <IconFileText className="-translate-x-[2px]" />
+                              <IconArrowUp
+                                className={clsx(
+                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
+                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand-900 group-data-[highlighted]:opacity-100'
+                                )}
+                                strokeWidth={3}
+                                size={12}
+                              />
+                            </div>
+                          }
+                        >
+                          <div className="">
+                            <p>Import data from CSV</p>
+                            <p className="text-scale-1000">Insert new rows from a CSV</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                ]}
+              >
+                <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                  Insert
+                </Button>
+              </Dropdown>
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }
 
-interface RowHeaderProps {
+type RowHeaderProps = {
+  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
 }
-const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
+const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
-  const [isExporting, setIsExporting] = useState(false)
+  const { project } = useProjectContext()
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation()
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation()
 
-  const { selectedRows, rows: allRows, editable, allRowsSelected, totalRows } = state
+  const { data } = useTableRowsQuery({
+    queryKey: [table.schema, table.name],
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    table,
+    sorts,
+    filters,
+    page: state.page,
+    limit: state.rowsPerPage,
+  })
+
+  const allRows = data?.rows ?? []
+
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      queryKey: [table?.schema, table?.name, 'count'],
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      table,
+      filters,
+    },
+    { keepPreviousData: true }
+  )
+
+  const totalRows = countData?.count ?? 0
+
+  const { selectedRows, editable, allRowsSelected } = state
 
   const onSelectAllRows = () => {
     dispatch({
@@ -118,37 +281,59 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
       }? This action cannot be undone.`,
       confirmText: `Delete ${numRows} rows`,
       onAsyncConfirm: async () => {
+        if (!project) return
+
         if (allRowsSelected) {
-          const { error } =
-            filters.length === 0
-              ? await state.rowService!.truncate()
-              : await state.rowService!.deleteAll(filters)
-          if (error) {
-            if (state.onError) state.onError(error)
-          } else {
+          try {
+            if (filters.length === 0) {
+              await truncateRows({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table,
+              })
+            } else {
+              await deleteAllRows({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                table,
+                filters,
+              })
+            }
+
             dispatch({ type: 'REMOVE_ALL_ROWS' })
             dispatch({
               type: 'SELECTED_ROWS_CHANGE',
               payload: { selectedRows: new Set() },
             })
+          } catch (error) {
+            if (state.onError) state.onError(error)
           }
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-          const { error } = await state.rowService!.delete(rows)
-          if (error) {
-            if (state.onError) state.onError(error)
-          } else {
+
+          try {
+            await deleteRows({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              table,
+              rows,
+            })
+
             dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
             dispatch({
               type: 'SELECTED_ROWS_CHANGE',
               payload: { selectedRows: new Set() },
             })
+          } catch (error) {
+            if (state.onError) state.onError(error)
           }
         }
       },
     })
   }
+
+  const [isExporting, setIsExporting] = useState(false)
 
   async function onRowsExportCSV() {
     setIsExporting(true)
@@ -164,8 +349,18 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
+    const formattedRows = rows.map((row) => {
+      const formattedRow = row
+      Object.keys(row).map((column) => {
+        if (typeof row[column] === 'object' && row[column] !== null)
+          formattedRow[column] = JSON.stringify(formattedRow[column])
+      })
+      return formattedRow
+    })
 
-    const csv = exportRowsToCsv(state.table!.columns, rows)
+    const csv = Papa.unparse(formattedRows, {
+      columns: state.table!.columns.map((column) => column.name),
+    })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)

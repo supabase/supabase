@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react'
 
-const ACTION_KEY_DEFAULT = ['Ctrl ', 'Control']
-const ACTION_KEY_APPLE = ['⌘', 'Command']
+const ACTION_KEY_DEFAULT = ['Ctrl ', 'Control'] as const
+const ACTION_KEY_APPLE = ['⌘', 'Command'] as const
 
 export function useActionKey() {
-  let [actionKey, setActionKey] = useState()
+  let [actionKey, setActionKey] = useState<readonly [string, string]>()
 
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
       if (/(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
-        // @ts-ignore
         setActionKey(ACTION_KEY_APPLE)
       } else {
-        // @ts-ignore
         setActionKey(ACTION_KEY_DEFAULT)
       }
     }

@@ -16,6 +16,29 @@ export const POSTGRES_DATA_TYPES = sortBy(
   concat(NUMERICAL_TYPES, JSON_TYPES, TEXT_TYPES, DATETIME_TYPES, OTHER_DATA_TYPES)
 )
 
+export const RECOMMENDED_ALTERNATIVE_DATA_TYPE: {
+  [key: string]: { alternative: string; reference: string }
+} = {
+  varchar: {
+    alternative: 'text',
+    reference:
+      "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_varchar.28n.29_by_default",
+  },
+  json: {
+    alternative: 'jsonb',
+    reference: 'https://www.postgresql.org/docs/current/datatype-json.html',
+  },
+  timetz: {
+    alternative: 'timestamptz',
+    reference: "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timetz",
+  },
+  timestamp: {
+    alternative: 'timestamptz',
+    reference:
+      "https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29",
+  },
+}
+
 export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
   {
     name: 'int2',

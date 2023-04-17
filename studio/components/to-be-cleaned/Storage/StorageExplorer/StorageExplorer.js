@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { compact, find, isEmpty, uniqBy, get } from 'lodash'
+import { compact, isEmpty, uniqBy, get } from 'lodash'
 
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
@@ -11,47 +11,34 @@ import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
+import CustomExpiryModal from './CustomExpiryModal'
 
 const StorageExplorer = observer(({ bucket }) => {
   const storageExplorerStore = useStorageStore()
   const {
     columns,
     selectedFilePreview,
-    setFilePreview,
     closeFilePreview,
     selectedItems,
     setSelectedItems,
     clearSelectedItems,
     selectedItemsToDelete,
-    setSelectedItemsToDelete,
     clearSelectedItemsToDelete,
     openedFolders,
-    pushOpenedFolderAtIndex,
     popColumnAtIndex,
     popOpenedFoldersAtIndex,
-    setSelectedItemToRename,
     selectedItemsToMove,
-    setSelectedItemsToMove,
     clearSelectedItemsToMove,
     view,
-    setView,
-    setSortBy,
-    setSortByOrder,
     currentBucketName,
-    copyFileURLToClipboard,
     openBucket,
 
     loadExplorerPreferences,
-    addNewFolderPlaceholder,
-    addNewFolder,
     fetchFolderContents,
     fetchMoreFolderContents,
-    renameFolder,
     deleteFolder,
     uploadFiles,
     deleteFiles,
-    downloadFile,
-    renameFile,
     moveFiles,
   } = storageExplorerStore
 
@@ -100,34 +87,8 @@ const StorageExplorer = observer(({ bucket }) => {
     openBucket(bucket)
   }, [bucket])
 
-  /** Navigation methods */
-
-  const onSelectFile = async (columnIndex, file) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    setFilePreview(file)
-    clearSelectedItems()
-  }
-
-  const onSelectFolder = async (columnIndex, folder) => {
-    closeFilePreview()
-    clearSelectedItems(columnIndex + 1)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    pushOpenedFolderAtIndex(folder, columnIndex)
-    await fetchFolderContents(folder.id, folder.name, columnIndex)
-  }
-
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
-
-  const onCheckItem = (item) => {
-    if (find(selectedItems, item) === undefined) {
-      setSelectedItems(selectedItems.concat([item]))
-    } else {
-      setSelectedItems(selectedItems.filter((selectedItem) => item.id !== selectedItem.id))
-    }
-    closeFilePreview()
-  }
 
   const onSelectAllItemsInColumn = (columnIndex) => {
     const columnFiles = columns[columnIndex].items
@@ -150,42 +111,6 @@ const StorageExplorer = observer(({ bucket }) => {
   }
 
   /** File manipulation methods */
-
-  const onSelectCreateFolder = (columnIndex = -1) => {
-    addNewFolderPlaceholder(columnIndex)
-  }
-
-  const onCreateFolder = (folderName, columnIndex) => {
-    addNewFolder(folderName, columnIndex)
-  }
-
-  const onRenameFolder = (folder, newName, columnIndex) => {
-    renameFolder(folder, newName, columnIndex)
-  }
-
-  const onSelectItemDelete = (file) => {
-    setSelectedItemsToDelete([file])
-  }
-
-  const onSelectItemRename = (file) => {
-    setSelectedItemToRename(file)
-  }
-
-  const onSelectItemMove = (file) => {
-    setSelectedItemsToMove([file])
-  }
-
-  const onCopyFileURL = async (file) => {
-    await copyFileURLToClipboard(file)
-  }
-
-  const onDownloadFile = async (file) => {
-    await downloadFile(file)
-  }
-
-  const onRenameFile = async (file, newName, columnIndex) => {
-    await renameFile(file, newName, columnIndex)
-  }
 
   const onFilesUpload = async (event, columnIndex = -1) => {
     event.persist()
@@ -225,12 +150,6 @@ const StorageExplorer = observer(({ bucket }) => {
     clearSelectedItems()
   }
 
-  const onChangeView = (view) => setView(view)
-
-  const onChangeSortBy = (sortBy) => setSortBy(sortBy)
-
-  const onChangeSortByOrder = (sortByOrder) => setSortByOrder(sortByOrder)
-
   return (
     <div
       ref={storageExplorerRef}
@@ -255,24 +174,9 @@ const StorageExplorer = observer(({ bucket }) => {
           openedFolders={openedFolders}
           selectedItems={selectedItems}
           selectedFilePreview={selectedFilePreview}
-          onCheckItem={onCheckItem}
-          onSelectFile={onSelectFile}
-          onRenameFile={onRenameFile}
           onFilesUpload={onFilesUpload}
-          onCopyFileURL={onCopyFileURL}
-          onDownloadFile={onDownloadFile}
-          onSelectFolder={onSelectFolder}
-          onRenameFolder={onRenameFolder}
-          onCreateFolder={onCreateFolder}
-          onSelectItemDelete={onSelectItemDelete}
-          onSelectItemRename={onSelectItemRename}
-          onSelectItemMove={onSelectItemMove}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-          onSelectCreateFolder={onSelectCreateFolder}
-          onChangeView={onChangeView}
-          onChangeSortBy={onChangeSortBy}
-          onChangeSortByOrder={onChangeSortByOrder}
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }
@@ -292,6 +196,7 @@ const StorageExplorer = observer(({ bucket }) => {
         onSelectCancel={clearSelectedItemsToMove}
         onSelectMove={onMoveSelectedFiles}
       />
+      <CustomExpiryModal />
     </div>
   )
 })

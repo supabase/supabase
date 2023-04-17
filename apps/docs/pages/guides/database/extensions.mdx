@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'extensions',
-  title: 'Overview',
+  title: 'Postgres Extensions Overview',
   description: 'Using Postgres extensions.',
 }
 
@@ -23,32 +23,35 @@ Supabase has pre-installed some of the most useful open source extensions.
 2. Click **Extensions** in the sidebar.
 3. Enable or disable an extension.
 
-<video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
-</video>
-
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
 ```sql
--- Example: enable the "pgtap" extension and ensure it is installed
-create extension pgtap with schema extensions;
+ -- Example: enable the "pgtap" extension and ensure it is installed
+create extension pgtap
+with
+  schema extensions;
 
 -- Example: disable the "pgtap" extension
-drop extension pgtap;
+drop
+  extension pgtap;
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension call `drop extension`.
 
-<Admonition type="caution">
-
-Enabling some extensions with `create extension <extension-name> with schema extensions` may lead to permission issues (e.g., `dblink`, `http`, `pg_cron`).
-
-</Admonition>
-
 </TabPanel>
 </Tabs>
+
+<Admonition type="note">
+
+Most extensions are installed under the `extensions` schema, which is accessible to public by default. To avoid namespace pollution, we do not recommend creating other entities in the `extensions` schema.
+
+If you need to restrict user access to tables managed by extensions, we recommend creating a separate schema for installing that specific extension.
+
+Some extensions can only be created under a specific schema, for eg. `postgis_tiger_geocoder` extension creates a schema named `tiger`. Before enabling such extensions, make sure you have not created a conflicting schema with the same name.
+
+</Admonition>
 
 ### Full list of extensions
 
