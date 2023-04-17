@@ -85,7 +85,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                   const property = properties[x]
                   if (property.type === 'string') {
                     return (
-                      <div className="space-y-3">
+                      <div key={x} className="space-y-3">
                         <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
                           {property.title}
                         </label>

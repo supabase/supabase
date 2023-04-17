@@ -199,7 +199,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         <Tabs type="underlined" size="medium">
           <Tabs.Panel key={1} id="1" label="Most time consuming">
             <div className={panelClassNames}>
-              <ReactMarkdown className={helperTextClassNames} children={TimeConsumingHelperText} />
+              <ReactMarkdown className={helperTextClassNames}>
+                {TimeConsumingHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={
@@ -248,7 +250,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
           <Tabs.Panel key={2} id="2" label="Most frequent">
             <div className={panelClassNames}>
-              <ReactMarkdown className={helperTextClassNames} children={MostFrequentHelperText} />
+              <ReactMarkdown className={helperTextClassNames}>
+                {MostFrequentHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={
@@ -310,10 +314,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
           <Tabs.Panel key={3} id="3" label="Slowest execution time">
             <div className={panelClassNames}>
-              <ReactMarkdown
-                className={helperTextClassNames}
-                children={SlowestExecutionHelperText}
-              />
+              <ReactMarkdown className={helperTextClassNames}>
+                {SlowestExecutionHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={
