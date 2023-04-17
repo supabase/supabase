@@ -146,7 +146,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables.map((table: any) => (
-                          <Link href={`/project/${ref}/editor/${table.id}`}>
+                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
                             <a>
                               <div
                                 key={table.id}

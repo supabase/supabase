@@ -132,6 +132,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                 resetForm({ values: formValues, initialValues: formValues })
               }
             }, [selectedFunction])
+
             return (
               <>
                 <FormPanel
