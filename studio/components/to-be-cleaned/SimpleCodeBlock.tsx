@@ -12,6 +12,7 @@ import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
 import { Button } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
+import { useStore } from 'hooks'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
 const prism = {
@@ -21,6 +22,7 @@ const prism = {
 
 const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, metastring }) => {
   const [showCopied, setShowCopied] = useState(false)
+  const { ui } = useStore()
   const target = useRef(null)
   const button = useRef(null)
   let highlightLines: any = []
@@ -63,6 +65,10 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
 
   const handleCopyCode = (code: any) => {
     copyToClipboard(code, () => setShowCopied(true))
+    ui.setNotification({
+      category: 'success',
+      message: 'Sample code has been copied',
+    })
   }
 
   return (
@@ -74,7 +80,7 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => {
         return (
-          <div className="Code codeBlockWrapper group">
+          <div className="Code codeBlockWrapper group cursor-pointer" onClick={() => handleCopyCode(children)}>
             <pre ref={target} className={`codeBlock ${className}`}>
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i })
