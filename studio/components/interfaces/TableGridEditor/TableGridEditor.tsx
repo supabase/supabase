@@ -236,7 +236,7 @@ const TableGridEditor = ({
           {
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
             relationships: formattedRelationships,
           },
           encryptedColumns

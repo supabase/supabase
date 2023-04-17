@@ -664,7 +664,6 @@ export default class MetaStore implements IMetaStore {
 
       // If the user is importing data via a spreadsheet
       if (!isUndefined(importContent)) {
-        console.log({ importContent })
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
