@@ -46,6 +46,7 @@ const getDay5omt02Motion = (index: number) => {
 const Day5 = ({ day }: { day: WeekDayProps }) => {
   const isMobile = useMobileViewport(767)
   const isTablet = useMobileViewport(1023)
+  const isDesktop = useMobileViewport(1279)
 
   return (
     <>
@@ -397,7 +398,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
         </motion.div>
         <motion.div
           className={`
-                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between text-xl sm:text-2xl md:text-xl shadow-lg
+                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 md:items-start justify-between text-xl sm:text-2xl md:text-xl shadow-lg
                       w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 text-center 
                       min-h-[350px] md:min-h-[220px] 
                     `}
@@ -409,10 +410,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           <Link href={`${day.steps[1].blog}${day.steps[1].steps[6].url}`}>
             <a className="absolute inset-0 z-10" />
           </Link>
-          <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
+          <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row md:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[6].title}</CartTitle>
             <div className="flex gap-2">
-              <StyledArticleBadge className="lg:ml-2">
+              <StyledArticleBadge className="md:ml-2">
                 {day.steps[1].steps[6].badge}
               </StyledArticleBadge>
               <ChipLink
@@ -437,8 +438,8 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
+                      objectPosition={isMobile ? '0% 50%' : isDesktop ? '100% 50%' : '0% 50%'}
+                      objectFit={isMobile ? 'cover' : isDesktop ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
