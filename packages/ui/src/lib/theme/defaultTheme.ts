@@ -123,7 +123,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ export default {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -187,7 +187,11 @@ export default {
     chevron: {
       base: `
         text-scale-900
-        rotate-0 group-state-open:rotate-180
+        rotate-0
+        group-state-open:rotate-180
+        group-data-[state=open]:rotate-180
+        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        transition-transform duration-300
         duration-200
       `,
       align: {
@@ -251,7 +255,11 @@ export default {
 
   alert: {
     base: `
+<<<<<<< HEAD
       relative rounded border py-4 px-6
+=======
+      relative rounded-md border py-4 px-6
+>>>>>>> @{-1}
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -270,10 +278,10 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-blue-200 dark:bg-blue-100 border-blue-700`,
-        icon: `text-blue-900`,
-        header: `text-blue-1200`,
-        description: `text-blue-1100`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
+        icon: `text-scale-900`,
+        header: `text-scale-1200`,
+        description: `text-scale-1100`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
@@ -348,7 +356,7 @@ export default {
         hover:text-scale-1200
       `,
       active: `
-        text-scale-1200
+        !text-scale-1200
         border-b-2 border-scale-1200
       `,
     },
@@ -364,6 +372,10 @@ export default {
         transition
         shadow-sm
         rounded
+<<<<<<< HEAD
+=======
+        border
+>>>>>>> @{-1}
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -371,13 +383,19 @@ export default {
         `,
       inactive: `
         bg-scale-200
-        border border-scale-700 hover:border-scale-900
+        border-scale-700 hover:border-scale-900
         text-scale-900 hover:text-scale-1200
       `,
       active: `
+<<<<<<< HEAD
         bg-scale-1200
         text-scale-200
         border-scale-1200
+=======
+        bg-scale-600
+        text-scale-1200
+        border-scale-800
+>>>>>>> @{-1}
       `,
     },
     'rounded-pills': {
@@ -440,9 +458,9 @@ export default {
     container: 'inline-flex font-medium',
     type: {
       primary: `
-        bg-brand-fixed-800 hover:bg-brand-fixed-900
+        bg-brand-fixed-1100 hover:bg-brand-fixed-1000
         text-white
-        bordershadow-brand-fixed-800 hover:bordershadow-brand-fixed-1000
+        bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000
         focus-visible:outline-brand-600
       `,
       secondary: `
@@ -617,7 +635,7 @@ export default {
     disabled: 'opacity-50',
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-scale-600',
+    chevron: 'h-5 w-5 text-scale-800',
   },
 
   /*
@@ -967,11 +985,15 @@ export default {
 
   sidepanel: {
     base: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
       inset-y-0
+<<<<<<< HEAD
       max-w-full
+=======
+>>>>>>> @{-1}
       h-screen
       border-l border-overlay-border
       shadow-xl
@@ -997,6 +1019,7 @@ export default {
       medium: `w-screen max-w-md h-full`,
       large: `w-screen max-w-2xl h-full`,
       xlarge: `w-screen max-w-3xl h-full`,
+      xxlarge: `w-screen max-w-4xl h-full`,
     },
     align: {
       left: `
@@ -1017,6 +1040,7 @@ export default {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1053,8 +1077,13 @@ export default {
       hover:bg-scale-700
     `,
     active: `
+<<<<<<< HEAD
       bg-brand-900
       hover:bg-brand-900
+=======
+      !bg-brand-900
+      !hover:bg-brand-900
+>>>>>>> @{-1}
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1073,11 +1102,11 @@ export default {
         transition
         ease-in-out duration-200
       `,
-      tiny: 'h-3 w-3',
-      small: 'h-5 w-5',
-      medium: 'h-5 w-5',
-      large: 'h-6 w-6',
-      xlarge: 'h-6 w-6',
+      tiny: '!h-3 !w-3',
+      small: '!h-5 !w-5',
+      medium: '!h-5 !w-5',
+      large: '!h-6 !w-6',
+      xlarge: '!h-6 !w-6',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
@@ -1111,7 +1140,7 @@ export default {
       },
     },
 
-    responsive: 'md:grid md:grid-cols-12 md:gap-x-4',
+    responsive: 'md:grid md:grid-cols-12',
     non_responsive: 'grid grid-cols-12 gap-2',
 
     labels_horizontal_layout: 'flex flex-row space-x-2 justify-between col-span-12',
@@ -1145,13 +1174,13 @@ export default {
       },
     },
     label_before: {
-      base: 'text-scale-500 ',
+      base: 'text-scale-1000 ',
       size: {
         ...defaults.size.text,
       },
     },
     label_after: {
-      base: 'text-scale-500',
+      base: 'text-scale-1000',
       size: {
         ...defaults.size.text,
       },
@@ -1204,12 +1233,12 @@ export default {
       data-open:text-scale-1200
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1239,6 +1268,7 @@ export default {
       border-none
       focus:outline-none
     `,
+    disabled: `opacity-50 cursor-default`,
     label: `
       text-scale-900
       px-4 flex items-center space-x-2 py-1.5
@@ -1291,6 +1321,7 @@ export default {
 
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1463,6 +1494,7 @@ export default {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1474,6 +1506,7 @@ export default {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-40
       fixed
       inset-0
       grid

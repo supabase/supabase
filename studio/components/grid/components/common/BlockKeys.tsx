@@ -1,4 +1,5 @@
-import { FC, useCallback, KeyboardEvent, ReactNode } from 'react'
+import { useClickedOutside } from 'hooks'
+import { FC, useRef, useEffect, useCallback, KeyboardEvent, ReactNode } from 'react'
 
 interface BlockKeysProps {
   value: string | null
@@ -13,6 +14,9 @@ interface BlockKeysProps {
  * Example: press enter to add newline on textEditor
  */
 export const BlockKeys: FC<BlockKeysProps> = ({ value, children, onEscape, onEnter }) => {
+  const ref = useRef(null)
+  const isClickedOutside = useClickedOutside(ref)
+
   const handleKeyDown = useCallback(
     (ev: KeyboardEvent<HTMLDivElement>) => {
       switch (ev.key) {
@@ -32,12 +36,12 @@ export const BlockKeys: FC<BlockKeysProps> = ({ value, children, onEscape, onEnt
     [value]
   )
 
-  function onBlur() {
-    if (onEnter) onEnter(value)
-  }
+  useEffect(() => {
+    if (isClickedOutside && onEnter !== undefined) onEnter(value)
+  }, [isClickedOutside])
 
   return (
-    <div onKeyDown={handleKeyDown} onBlur={onBlur}>
+    <div ref={ref} onKeyDown={handleKeyDown}>
       {children}
     </div>
   )

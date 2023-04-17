@@ -14,7 +14,7 @@ module.exports = ui({
     './_blog/*.mdx',
     // purge styles from supabase ui theme
   ],
-  darkMode: 'class', // 'media' or 'class'
+  darkMode: 'class',
   theme: {
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -147,6 +147,7 @@ module.exports = ui({
               position: 'relative',
               transition: 'color 0.3s ease-in-out',
               paddingBottom: '2px',
+              fontWeight: '400',
               color: 'var(--colors-scale12)',
               textDecorationLine: 'underline',
               textDecorationColor: 'var(--colors-brand7)',
@@ -155,6 +156,15 @@ module.exports = ui({
             },
             'a:hover': {
               textDecorationColor: 'var(--colors-brand9)',
+            },
+            figcaption: {
+              color: 'var(--colors-scale9)',
+            },
+            'figure.quote-figure p:first-child': {
+              marginTop: '0 !important',
+            },
+            'figure.quote-figure p:last-child': {
+              marginBottom: '0 !important',
             },
           },
         },
@@ -227,5 +237,16 @@ module.exports = ui({
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    function ({ addUtilities, addVariant }) {
+      addUtilities({
+        // prose (tailwind typography) helpers
+        // useful for removing margins in prose styled sections
+        '.prose--remove-p-margin p': {
+          margin: '0',
+        },
+      })
+    },
+  ],
 })

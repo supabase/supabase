@@ -20,7 +20,9 @@ const Param: FC<IParamProps> = (paramItem) => {
         </span>
         <span className="text-scale-900 text-xs">{paramItem.type ?? 'no type'}</span>
       </div>
-      <p className="text-sm text-scale-1000 m-0">{paramItem.description ?? 'nodescription'}</p>
+      {paramItem.description && (
+        <p className="text-sm text-scale-1000 m-0">{paramItem.description} </p>
+      )}
       {paramItem.children}
     </li>
   )

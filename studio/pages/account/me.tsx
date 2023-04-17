@@ -1,17 +1,16 @@
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
-import { Button, IconArrowRight, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
 
-import { Session } from '@supabase/supabase-js'
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
-import { useProfile, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { auth } from 'lib/gotrue'
-import { NextPageWithLayout } from 'types'
+import { Profile as ProfileType, useProfileQuery } from 'data/profile/profile-query'
+import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useStore } from 'hooks'
+import { useSession } from 'lib/auth'
 import Link from 'next/link'
+import { NextPageWithLayout } from 'types'
+import { useTheme } from 'common'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -39,14 +38,18 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateProfile } = useProfile()
-  const user = ui.profile
+  const { mutateAsync } = useProfileUpdateMutation()
+
+  const { data: profile } = useProfileQuery()
+  // TODO: ^ handle loading state
 
   const updateUser = async (model: any) => {
     try {
-      const updatedUser = await post(`${API_URL}/profile/update`, model)
-      mutateProfile(updatedUser, false)
-      ui.setProfile(updatedUser)
+      await mutateAsync({
+        firstName: model.first_name,
+        lastName: model.last_name,
+      })
+
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
     } catch (error) {
       ui.setNotification({
@@ -57,26 +60,10 @@ const ProfileCard = observer(() => {
     }
   }
 
-  const [session, setSession] = useState<Session | null>(null)
-
-  useEffect(() => {
-    let cancel = false
-    ;(async () => {
-      const {
-        data: { session },
-      } = await auth.getSession()
-      if (session && !cancel) setSession(session)
-    })()
-
-    return () => {
-      cancel = true
-    }
-  }, [])
-
   return (
     <article className="max-w-4xl p-4">
       <section>
-        <Profile session={session} />
+        <Profile profile={profile} />
       </section>
 
       <section>
@@ -92,8 +79,8 @@ const ProfileCard = observer(() => {
             },
           }}
           model={{
-            first_name: user?.first_name ?? '',
-            last_name: user?.last_name ?? '',
+            first_name: profile?.first_name ?? '',
+            last_name: profile?.last_name ?? '',
           }}
           onSubmit={updateUser}
         />
@@ -106,8 +93,8 @@ const ProfileCard = observer(() => {
   )
 })
 
-const Profile = observer(({ session }: any) => {
-  const { ui } = useStore()
+const Profile = ({ profile }: { profile?: ProfileType }) => {
+  const session = useSession()
 
   return (
     <Panel
@@ -124,14 +111,14 @@ const Profile = observer(({ session }: any) => {
             disabled
             label="Username"
             layout="horizontal"
-            value={ui.profile?.username ?? ''}
+            value={profile?.username ?? ''}
           />
           <Input
             readOnly
             disabled
             label="Email"
             layout="horizontal"
-            value={ui.profile?.primary_email ?? ''}
+            value={profile?.primary_email ?? ''}
           />
           {session?.user.app_metadata.provider === 'email' && (
             <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
@@ -153,32 +140,27 @@ const Profile = observer(({ session }: any) => {
       </Panel.Content>
     </Panel>
   )
-})
+}
 
 const ThemeSettings = observer(() => {
-  const { ui } = useStore()
+  const { isDarkMode, toggleTheme } = useTheme()
 
   return (
     <Panel title={<h5 key="panel-title">Theme</h5>}>
       <Panel.Content>
         <Listbox
-          value={ui.themeOption}
+          value={isDarkMode ? 'dark' : 'light'}
           label="Interface theme"
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={
-            ui.themeOption === 'light' ? (
-              <IconSun />
-            ) : ui.themeOption === 'dark' ? (
-              <IconMoon />
-            ) : undefined
-          }
-          onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
+          icon={isDarkMode ? <IconMoon /> : <IconSun />}
+          onChange={(themeOption: any) => toggleTheme(themeOption === 'dark')}
         >
-          <Listbox.Option label="System default" value="system">
+          {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
+          {/* <Listbox.Option label="System default" value="system">
             System default
-          </Listbox.Option>
+          </Listbox.Option> */}
           <Listbox.Option label="Dark" value="dark">
             Dark
           </Listbox.Option>

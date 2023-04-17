@@ -89,6 +89,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                 type="default"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
+                disabled={isDeleting}
                 className="self-end"
               >
                 Cancel
@@ -110,6 +111,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                     />
                   </svg>
                 }
+                disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"
               >

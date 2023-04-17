@@ -6,7 +6,7 @@ import PolicyDefinition from './PolicyDefinition'
 import PolicyAllowedOperation from './PolicyAllowedOperation'
 import PolicyRoles from './PolicyRoles'
 import PolicyEditorFooter from './PolicyEditorFooter'
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 // Exposed for StoragePoliciesEditor.js
 export { PolicyName, PolicyRoles }

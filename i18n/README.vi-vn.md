@@ -12,9 +12,9 @@
 - [x] Cơ sở dữ liệu Postgres tự quản lý. [Tài liệu](https://supabase.com/docs/guides/database)
 - [x] Xác thực và uỷ quyền. [Tài liệu](https://supabase.com/docs/guides/auth)
 - [x] APIs tự động khởi tạo.
-  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Chức năng hàm.
   - [x] Hàm dành cho cơ sở dữ liệu (Database functions). [Tài liệu](https://supabase.com/docs/guides/database/functions)
   - [x] Hàm được phân phối trên toàn cầu (Edge Functions). [Tài liệu](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Để có tài liệu đầy đủ, hãy truy cập [supabase.com/docs](https://supabase.com/docs)
 
-Để biết cách Đóng góp, hãy truy cập [Bắt đầu](./DEVELOPERS.md)
+Để biết cách Đóng góp, hãy truy cập [Bắt đầu](../DEVELOPERS.md)
 
 ## Hỗ trợ & Cộng đồng
 

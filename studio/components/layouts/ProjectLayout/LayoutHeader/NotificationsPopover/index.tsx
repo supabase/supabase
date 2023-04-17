@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Alert, Button, IconBell, Popover, IconArrowRight } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   Notification,
   NotificationStatus,
@@ -9,18 +10,19 @@ import {
 } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
-import { useNotifications, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import NotificationRow from './NotificationRow'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useNotificationsQuery } from 'data/notifications/notifications-query'
 
 interface Props {}
 
 const NotificationsPopover: FC<Props> = () => {
   const router = useRouter()
   const { app, meta, ui } = useStore()
-  const { notifications, refresh } = useNotifications()
+  const { data: notifications, refetch } = useNotificationsQuery()
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
@@ -36,6 +38,7 @@ const NotificationsPopover: FC<Props> = () => {
   )
 
   const onOpenChange = async (open: boolean) => {
+    // TODO(alaister): move this to a mutation
     if (!open) {
       // Mark notifications as seen
       const notificationIds = notifications
@@ -44,7 +47,7 @@ const NotificationsPopover: FC<Props> = () => {
       if (notificationIds.length > 0) {
         const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
         if (error) console.error('Failed to update notifications', error)
-        refresh()
+        refetch()
       }
     }
   }
@@ -219,20 +222,37 @@ const NotificationsPopover: FC<Props> = () => {
           </div>
         }
       >
-        <div className="relative flex">
-          <Button
-            as="span"
-            id="notification-button"
-            type="default"
-            icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
-          />
-          {hasNewNotifications && (
-            <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
-              <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-              <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <div className="relative flex">
+              <Button
+                as="span"
+                id="notification-button"
+                type="default"
+                icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
+              />
+              {hasNewNotifications && (
+                <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
+                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200 flex items-center space-x-1',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">Notifications</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       </Popover>
 
       <ConfirmModal

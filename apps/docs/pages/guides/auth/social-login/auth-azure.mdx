@@ -74,14 +74,12 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/aut
 
 ```js
 async function signInWithAzure() {
-  const { data, error } = await supabase.auth.signInWithOAuth(
-    {
-      provider: 'azure',
-    },
-    {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: {
       scopes: 'email',
-    }
-  )
+    },
+  })
 }
 ```
 

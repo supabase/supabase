@@ -577,7 +577,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   }
 
   return (
-    <div className="flex flex-row space-x-1">
+    <div className="flex flex-row space-x-1 items-center">
       <Input
         id={`name-${idx}`}
         className="flex-1 flex-grow"
@@ -699,7 +699,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
   }
 
   return (
-    <div className="flex space-x-1">
+    <div className="flex space-x-1 items-center">
       <Input
         id={`name-${idx}`}
         className="flex-1"

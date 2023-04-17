@@ -16,7 +16,8 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useParams, useStore } from 'hooks'
+import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 
@@ -65,7 +66,7 @@ const EditWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canUpdateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const initialValues =
     wrapperMeta !== undefined
@@ -248,7 +249,7 @@ const EditWrapper = () => {
 
             return (
               <FormPanel
-                disabled={!canCreateWrapper}
+                disabled={!canUpdateWrapper}
                 footer={
                   <div className="flex px-8 py-4">
                     <FormActions
@@ -259,9 +260,10 @@ const EditWrapper = () => {
                         handleReset()
                         setWrapperTables(initialTables)
                       }}
+                      disabled={!canUpdateWrapper}
                       helper={
-                        !canCreateWrapper
-                          ? 'You need additional permissions to create a foreign data wrapper'
+                        !canUpdateWrapper
+                          ? 'You need additional permissions to edit a foreign data wrapper'
                           : undefined
                       }
                     />

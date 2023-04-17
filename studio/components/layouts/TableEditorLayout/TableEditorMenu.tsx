@@ -1,18 +1,15 @@
-import { FC, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { partition } from 'lodash'
+import { useMemo, useState } from 'react'
+import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
-  IconChevronDown,
-  IconCopy,
+  IconCheck,
+  IconChevronsDown,
   IconEdit,
   IconLoader,
   IconRefreshCw,
   IconSearch,
-  IconTrash,
   IconX,
   Input,
   Listbox,
@@ -20,90 +17,81 @@ import {
 } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresSchema } from '@supabase/postgres-meta'
 
-import Base64 from 'lib/base64'
-import { checkPermissions, useStore } from 'hooks'
-import { SchemaView } from './TableEditorLayout.types'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { useParams } from 'common/hooks'
+import { checkPermissions, useStore, useLocalStorage } from 'hooks'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { Entity } from 'data/entity-types/entity-type-query'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import InfiniteList from 'components/ui/InfiniteList'
+import EntityListItem from './EntityListItem'
 
-interface Props {
+export interface TableEditorMenuProps {
   selectedSchema?: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
-  onEditTable: (table: PostgresTable) => void
-  onDeleteTable: (table: PostgresTable) => void
-  onDuplicateTable: (table: PostgresTable) => void
+  onEditTable: (table: Entity) => void
+  onDeleteTable: (table: Entity) => void
+  onDuplicateTable: (table: Entity) => void
 }
 
-const TableEditorMenu: FC<Props> = ({
+const TableEditorMenu = ({
   selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onDuplicateTable = () => {},
-}) => {
-  const { meta, ui } = useStore()
-  const router = useRouter()
-  const { id } = router.query
+  onSelectSchema = noop,
+  onAddTable = noop,
+  onEditTable = noop,
+  onDeleteTable = noop,
+  onDuplicateTable = noop,
+}: TableEditorMenuProps) => {
+  const { meta } = useStore()
+  const { id } = useParams()
 
-  const projectRef = ui.selectedProject?.ref
+  const [searchText, setSearchText] = useState<string>('')
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
+    'table-editor-sort',
+    'alphabetical'
+  )
+
+  const { project } = useProjectContext()
+  const {
+    data,
+    isLoading,
+    refetch,
+    isRefetching,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    isPreviousData: isSearching,
+  } = useEntityTypesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: selectedSchema,
+      search: searchText || undefined,
+      sort,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  const totalCount = data?.pages?.[0].data.count
+  const entityTypes = useMemo(
+    () => data?.pages.flatMap((page) => page.data.entities),
+    [data?.pages]
+  )
+
   const schemas: PostgresSchema[] = meta.schemas.list()
-  const tables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
-  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
 
-  // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const [searchText, setSearchText] = useState<string>('')
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-
-  // We may need to shift this to the schema store and do something like meta.schema.loadViews()
-  // I don't need we need a separate store for views
-  useEffect(() => {
-    let cancel = false
-    const fetchViews = async (selectedSchema: string) => {
-      await meta.schemas.loadViews(selectedSchema)
-    }
-    if (selectedSchema) fetchViews(selectedSchema)
-
-    return () => {
-      cancel = true
-    }
-  }, [selectedSchema])
+  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
   const refreshTables = async () => {
-    setIsRefreshing(true)
-    await meta.tables.load()
-    if (selectedSchema) await meta.schemas.loadViews(selectedSchema)
-    setIsRefreshing(false)
+    await refetch()
   }
-
-  const filteredTables =
-    searchText.length === 0
-      ? tables
-      : // @ts-ignore
-        tables.filter((table) => table.name.toLowerCase().includes(searchText.toLowerCase()))
-
-  const filteredViews =
-    searchText.length === 0
-      ? meta.schemas.views || []
-      : (meta.schemas.views || []).filter((view) =>
-          view.name.toLowerCase().includes(searchText.toLowerCase())
-        )
-
-  const filteredForeignTables =
-    searchText.length === 0
-      ? foreignTables
-      : foreignTables.filter((table) =>
-          (table?.name ?? '').toLowerCase().includes(searchText.toLowerCase())
-        )
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
@@ -112,7 +100,7 @@ const TableEditorMenu: FC<Props> = ({
 
   return (
     <div
-      className="pt-6 flex flex-grow flex-col space-y-6"
+      className="pt-6 flex flex-col flex-grow space-y-6 h-full"
       style={{ maxHeight: 'calc(100vh - 48px)' }}
     >
       {/* Schema selection dropdown */}
@@ -126,7 +114,6 @@ const TableEditorMenu: FC<Props> = ({
           <Listbox
             size="tiny"
             value={selectedSchema}
-            // @ts-ignore
             onChange={(name: string) => {
               setSearchText('')
               onSelectSchema(name)
@@ -135,7 +122,6 @@ const TableEditorMenu: FC<Props> = ({
             <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
               <p className="text-xs text-scale-1100">Schemas</p>
             </Listbox.Option>
-            {/* @ts-ignore */}
             {openSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
@@ -192,19 +178,21 @@ const TableEditorMenu: FC<Props> = ({
                 </Button>
               </Tooltip.Trigger>
               {!canCreateTables && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to create tables
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to create tables
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>
@@ -213,9 +201,15 @@ const TableEditorMenu: FC<Props> = ({
         <div className="mb-2 block px-3">
           <Input
             className="table-editor-search border-none"
-            icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
+            icon={
+              isSearching ? (
+                <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
+              ) : (
+                <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
+              )
+            }
             placeholder="Search tables"
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => setSearchText(e.target.value.trim())}
             value={searchText}
             size="tiny"
             actions={
@@ -229,162 +223,131 @@ const TableEditorMenu: FC<Props> = ({
         </div>
       </div>
 
-      <div className="flex-auto px-4 overflow-y-auto space-y-6 pb-4">
-        {/* List of tables belonging to selected schema */}
-        {filteredTables.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <>
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center space-x-1">
-                      <p>Tables</p>
-                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>
-                        ({filteredTables.length})
-                      </p>
-                    </div>
-                    <button className="cursor-pointer" onClick={refreshTables}>
-                      <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
+      {isLoading ? (
+        <div className="mx-7 flex items-center space-x-2">
+          <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1000">Loading entities...</p>
+        </div>
+      ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
+        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No entities available</p>
+          <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
+        </div>
+      ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
+        <div className="mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
+          <p className="text-xs">No results found</p>
+          <p className="text-xs text-scale-1100">There are no entities that match your search</p>
+        </div>
+      ) : (
+        <Menu
+          type="pills"
+          className="flex flex-auto px-4 space-y-6 pb-4"
+          ulClassName="flex flex-auto flex-col"
+        >
+          <Menu.Group
+            // @ts-ignore
+            title={
+              <>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex items-center space-x-1">
+                    <p>Tables</p>
+                    {totalCount !== undefined && (
+                      <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 items-center">
+                    <Dropdown
+                      size="small"
+                      side="bottom"
+                      align="start"
+                      style={{ zIndex: 1 }}
+                      overlay={[
+                        <Dropdown.Item
+                          key="alphabetical"
+                          icon={
+                            sort === 'alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('alphabetical')
+                          }}
+                        >
+                          Alphabetical
+                        </Dropdown.Item>,
+                        <Dropdown.Item
+                          key="grouped-alphabetical"
+                          icon={
+                            sort === 'grouped-alphabetical' ? (
+                              <IconCheck size="tiny" />
+                            ) : (
+                              <div className="w-[14px] h-[14px]" />
+                            )
+                          }
+                          onClick={() => {
+                            setSort('grouped-alphabetical')
+                          }}
+                        >
+                          Entity Type
+                        </Dropdown.Item>,
+                      ]}
+                    >
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <IconChevronsDown size={18} strokeWidth={1} />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs">Sort By</span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Dropdown>
+
+                    <button
+                      className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                      onClick={refreshTables}
+                    >
+                      <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
                     </button>
                   </div>
-                </>
-              }
-            />
-
-            <div>
-              {filteredTables.map((table) => {
-                const isActive = Number(id) === table.id
-                return (
-                  <ProductMenuItem
-                    key={table.name}
-                    url={`/project/${projectRef}/editor/${table.id}`}
-                    name={table.name}
-                    hoverText={table.comment ? table.comment : table.name}
-                    isActive={isActive}
-                    action={
-                      isActive &&
-                      !isLocked && (
-                        <Dropdown
-                          size="small"
-                          side="bottom"
-                          align="start"
-                          overlay={[
-                            <Dropdown.Item
-                              key="edit-table"
-                              icon={<IconEdit size="tiny" />}
-                              onClick={() => onEditTable(table)}
-                            >
-                              Edit Table
-                            </Dropdown.Item>,
-                            <Dropdown.Item
-                              key="duplicate-table"
-                              icon={<IconCopy size="tiny" />}
-                              onClick={() => onDuplicateTable(table)}
-                            >
-                              Duplicate Table
-                            </Dropdown.Item>,
-                            <Dropdown.Separator key="separator" />,
-                            <Dropdown.Item
-                              key="delete-table"
-                              icon={<IconTrash size="tiny" />}
-                              onClick={() => onDeleteTable(table)}
-                            >
-                              Delete Table
-                            </Dropdown.Item>,
-                          ]}
-                        >
-                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                            <IconChevronDown size={14} strokeWidth={2} />
-                          </div>
-                        </Dropdown>
-                      )
-                    }
-                  />
-                )
-              })}
-            </div>
-          </Menu>
-        )}
-
-        {/* List of views belonging to selected schema */}
-        {filteredViews.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <div className="flex w-full items-center space-x-1">
-                  <p>Views</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>({filteredViews.length})</p>
                 </div>
-              }
+              </>
+            }
+          />
+
+          <div className="flex flex-1">
+            <InfiniteList
+              items={entityTypes}
+              ItemComponent={EntityListItem}
+              itemProps={{
+                projectRef: project?.ref,
+                id: Number(id),
+                onEditTable,
+                onDeleteTable,
+                onDuplicateTable,
+                isLoadingTableMetadata,
+              }}
+              getItemSize={() => 28}
+              hasNextPage={hasNextPage}
+              isLoadingNextPage={isFetchingNextPage}
+              onLoadNextPage={() => fetchNextPage()}
             />
-
-            {filteredViews.map((view: SchemaView) => {
-              const viewId = Base64.encode(JSON.stringify(view))
-              const isActive = id === viewId
-              return (
-                <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
-                  <a>
-                    <Menu.Item key={viewId} rounded active={isActive}>
-                      <div className="flex justify-between">
-                        <p className="truncate">{view.name}</p>
-                      </div>
-                    </Menu.Item>
-                  </a>
-                </Link>
-              )
-            })}
-          </Menu>
-        )}
-
-        {/* List of foreign tables belonging to selected schema */}
-        {filteredForeignTables.length > 0 && (
-          <Menu type="pills">
-            <Menu.Group
-              // @ts-ignore
-              title={
-                <div className="flex w-full items-center space-x-1">
-                  <p>Foreign Tables</p>
-                  <p style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    ({filteredForeignTables.length})
-                  </p>
-                </div>
-              }
-            />
-
-            {filteredForeignTables.map((table: Partial<PostgresTable>) => {
-              const isActive = Number(id) === table.id
-              return (
-                <Link key={table.id} href={`/project/${projectRef}/editor/${table.id}`}>
-                  <a>
-                    <Menu.Item key={table.id} rounded active={isActive}>
-                      <div className="flex justify-between">
-                        <p className="truncate">{table.name}</p>
-                      </div>
-                    </Menu.Item>
-                  </a>
-                </Link>
-              )
-            })}
-          </Menu>
-        )}
-      </div>
-
-      {searchText.length > 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
-        <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No results found</p>
-          <p className="text-xs text-scale-1100">
-            There are no tables or views that match your search
-          </p>
-        </div>
-      )}
-
-      {searchText.length === 0 && filteredTables.length === 0 && filteredViews.length === 0 && (
-        <div className="!mt-0 mx-7 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
-          <p className="text-xs">No tables available</p>
-          <p className="text-xs text-scale-1100">This schema has no tables available yet</p>
-        </div>
+          </div>
+        </Menu>
       )}
     </div>
   )
