@@ -163,9 +163,9 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
         {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
-          <ChipLink href={blog} className="!w-auto">
+          <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post
-            <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+            <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
               <PencilSvg />
             </div>
           </ChipLink>
@@ -191,7 +191,7 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 pl-3 pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
@@ -203,7 +203,7 @@ export const ChipLink = ({
         target={target ?? '_self'}
         rel="noopener"
         className={[
-          'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 pl-3 pr-2',
+          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
           className,
         ].join(' ')}
       >
@@ -232,14 +232,14 @@ export const SectionButtons = ({
   return (
     <div
       className={[
-        'flex w-full md:w-auto justify-center gap-2 z-10',
+        'flex w-full max-w-full md:w-auto justify-center gap-2 z-10',
         mobileGrid && 'grid grid-cols-2 gap-2 sm:flex',
       ].join(' ')}
     >
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <PencilSvg />
           </div>
         </ChipLink>
@@ -247,7 +247,7 @@ export const SectionButtons = ({
       {!!docs && (
         <ChipLink href={docs}>
           Docs
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <DocsSvg />
           </div>
         </ChipLink>
@@ -255,15 +255,15 @@ export const SectionButtons = ({
       {!!video && (
         <ChipLink href={video} target="_blank">
           Video
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <PlaySvg />
           </div>
         </ChipLink>
       )}
       {!!github && (
         <ChipLink href={github} target="_blank">
-          View on Github
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          Github
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <GithubSvg />
           </div>
         </ChipLink>
@@ -271,15 +271,15 @@ export const SectionButtons = ({
       {!!url && (
         <ChipLink href={url}>
           Read
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <LinkSvg />
           </div>
         </ChipLink>
       )}
       {hackernews && (
         <ChipLink href={hackernews} target="_blank">
-          Read more
-          <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+          Hackernews
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
           </div>
         </ChipLink>
