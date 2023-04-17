@@ -6,7 +6,7 @@ const brandColors = require('./default-colors')
 
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
-// exclude these colours from the included set from Radix
+// exclude these colors from the included set from Radix
 const excludedRadixColors = [
   'bronze',
   'brown',
@@ -48,7 +48,7 @@ function radixColorKeys() {
 
   keys = filterItems(keys, 'Dark')
 
-  // remove excluded colours
+  // remove excluded colors
   keys = keys.filter(
     (key) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
   )
