@@ -120,6 +120,7 @@ interface ICreateFunctionStore {
   formState: CreateFunctionFormState
   meta: any
   schemas: Dictionary<any>[]
+  isEditing: boolean
   onFormChange: (value: { key: string; value: any }) => void
   onFormArrayChange: (value: {
     operation: 'add' | 'delete' | 'update'
@@ -732,7 +733,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
 })
 
 const InputDefinition: FC = observer(({}) => {
-  const _localState = useContext(CreateFunctionContext) as CreateFunctionStore
+  const _localState = useContext(CreateFunctionContext)
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
@@ -740,7 +741,7 @@ const InputDefinition: FC = observer(({}) => {
         <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
-        {!_localState.isEditing && (
+        {!_localState?.isEditing && (
           <p className="text-sm text-scale-1100">
             Change the language in the Advanced Settings below.
           </p>
