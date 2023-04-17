@@ -2,7 +2,7 @@ import remarkGfm from 'remark-gfm'
 import ReactMarkdown from 'react-markdown'
 import { PropsWithChildren, useMemo } from 'react'
 import { useParams } from 'common'
-import { CommandMenuProvider } from 'ui'
+import { CommandMenuProvider, markdownComponents } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -98,7 +98,9 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       site="studio"
       projectRef={ref}
       apiKeys={apiKeys}
-      MarkdownHandler={(props) => <ReactMarkdown remarkPlugins={[remarkGfm]} {...props} />}
+      MarkdownHandler={(props) => (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents} {...props} />
+      )}
       metadata={cmdkMetadata}
       isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}

@@ -94,7 +94,7 @@
 	</div>
 	<div>
 		<label for="website">Website</label>
-		<input id="website" type="website" bind:value={website} />
+		<input id="website" type="url" bind:value={website} />
 	</div>
 
 	<div>
