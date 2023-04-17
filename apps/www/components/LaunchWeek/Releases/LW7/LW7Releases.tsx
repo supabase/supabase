@@ -15,7 +15,7 @@ import {
   StyledArticleBadge,
 } from './components'
 
-import { useMobileViewport } from '../../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { motion } from 'framer-motion'
 import Day5 from './Day5'
 
@@ -144,7 +144,7 @@ const getDay4Motion = (index: number) => {
 
 export default function LW7Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
-  const isTablet = useMobileViewport(1023)
+  const isTablet = useBreakpoint(1023)
   const showAll = false
   const publishedSections =
     days
@@ -194,13 +194,13 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-white mr-2">Supabase AI Hackathon has begun. Join now!</span>
+                <span className="text-white mr-2">Supabase AI Hackathon</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
-                <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
                   <PencilSvg />
                 </div>
               </ChipLink>
@@ -238,7 +238,7 @@ export default function LW7Releases() {
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
-              <ChipLink href="#lw-7-prizes" className="pr-3 !justify-center">
+              <ChipLink href="#lw-7-prizes" className="!pr-3 !justify-center">
                 More info
               </ChipLink>
             </div>
@@ -423,7 +423,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day1.steps[0].docs}
                       blog={day1.steps[0].blog}
                       video={day1.steps[0].video}
                       hackernews={day1.steps[0].hackernews}
@@ -511,7 +510,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day2.steps[0].docs}
                       blog={day2.steps[0].blog}
                       video={day2.steps[0].video}
                       hackernews={day2.steps[0].hackernews}
