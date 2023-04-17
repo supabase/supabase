@@ -252,7 +252,7 @@ export function useAiChat({
 
       setIsLoading?.(true)
     },
-    [currentMessageIndex, messages]
+    [currentMessageIndex, messages, messageTemplate]
   )
 
   function reset() {
