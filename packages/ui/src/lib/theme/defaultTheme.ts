@@ -255,11 +255,7 @@ export default {
 
   alert: {
     base: `
-<<<<<<< HEAD
-      relative rounded border py-4 px-6
-=======
       relative rounded-md border py-4 px-6
->>>>>>> @{-1}
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -372,10 +368,7 @@ export default {
         transition
         shadow-sm
         rounded
-<<<<<<< HEAD
-=======
         border
->>>>>>> @{-1}
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -387,15 +380,9 @@ export default {
         text-scale-900 hover:text-scale-1200
       `,
       active: `
-<<<<<<< HEAD
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
-=======
         bg-scale-600
         text-scale-1200
         border-scale-800
->>>>>>> @{-1}
       `,
     },
     'rounded-pills': {
@@ -990,10 +977,6 @@ export default {
       flex flex-col
       fixed
       inset-y-0
-<<<<<<< HEAD
-      max-w-full
-=======
->>>>>>> @{-1}
       h-screen
       border-l border-overlay-border
       shadow-xl
@@ -1077,13 +1060,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-<<<<<<< HEAD
-      bg-brand-900
-      hover:bg-brand-900
-=======
       !bg-brand-900
       !hover:bg-brand-900
->>>>>>> @{-1}
     `,
     handle_container: {
       tiny: 'h-4 w-7',
