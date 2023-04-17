@@ -10,8 +10,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
-import Announcement from '~/components/Nav/Announcement'
-import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+// import Announcement from '~/components/Nav/Announcement'
 import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
@@ -197,9 +196,9 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
+      {/* <Announcement>
         <CountdownBanner />
-      </Announcement>
+      </Announcement> */}
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
