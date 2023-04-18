@@ -313,14 +313,6 @@ function arrayMergeFn(destinationArray, sourceArray) {
  * @return {object} new config object
  */
 function wrapper(tailwindConfig) {
-  // let purge
-  // if (Array.isArray(tailwindConfig.purge)) {
-  //   purge = {
-  //     content: tailwindConfig.purge,
-  //   }
-  // } else {
-  //   purge = tailwindConfig.purge
-  // }
   return deepMerge({ ...tailwindConfig }, uiConfig, {
     arrayMerge: arrayMergeFn,
   })
