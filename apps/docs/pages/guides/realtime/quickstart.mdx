@@ -5,6 +5,7 @@ export const meta = {
   title: 'Realtime Quickstart',
   description: "Getting started with Realtime's Features",
   sidebar_label: 'Quickstart',
+  video: 'https://www.youtube.com/v/BelYEMJ2N00',
 }
 
 Learn how to build [multiplayer.dev](https://multiplayer.dev), a collaborative app that demonstrates Broadcast, Presence, and Postgres Changes using [Realtime](/docs/guides/realtime).
@@ -26,7 +27,7 @@ npm install @supabase/supabase-js
 
 ## Cursor Positions
 
-[Broadcast](/docs/guides/realtime#broadcast) allows a client to send messages and multiple clients to receive the messages. The broadcasted messages are ephemeral. They are not persisted to the database and are directly relayed through the Realtime servers. This is ideal for sending information like cursor positions where minimal latency is important, but persisting them is not.
+[Broadcast](/docs/guides/realtime/broadcast) allows a client to send messages and multiple clients to receive the messages. The broadcasted messages are ephemeral. They are not persisted to the database and are directly relayed through the Realtime servers. This is ideal for sending information like cursor positions where minimal latency is important, but persisting them is not.
 
 In [multiplayer.dev](https://multiplayer.dev), client's cursor positions are sent to other clients in the room. However, cursor positions will be randomly generated for this example.
 
@@ -123,7 +124,7 @@ channel.subscribe(async (status) => {
 
 ## Track and Display Which Users Are Online
 
-[Presence](/docs/guides/realtime#presence) stores and synchronize shared state across clients. The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when new clients join the channel and `leave` event is triggered when clients leave.
+[Presence](/docs/guides/realtime/presence) stores and synchronize shared state across clients. The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when new clients join the channel and `leave` event is triggered when clients leave.
 
 Each client can use the channel's `track` method to store an object in shared state. Each client can only track one object, and if `track` is called again by the same client, then the new object overwrites the previously tracked object in the shared state. You can use one client to track and display users who are online:
 

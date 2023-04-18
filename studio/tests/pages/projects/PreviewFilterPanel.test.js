@@ -1,6 +1,7 @@
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import { render, waitFor, screen } from '@testing-library/react'
+import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { render } from '../../helpers'
 
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'

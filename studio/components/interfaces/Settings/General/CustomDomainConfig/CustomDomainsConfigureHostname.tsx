@@ -4,7 +4,8 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormPanel,
@@ -12,7 +13,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 
 const schema = yup.object({
@@ -23,10 +24,10 @@ const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
-  const { data: settings } = useProjectSettingsQuery({ projectRef: ref })
+  const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? undefined
+  const endpoint = settings?.autoApiService.endpoint
   const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
@@ -123,7 +124,7 @@ const CustomDomainsConfigureHostname = () => {
                     'your custom domain'
                   )}
                   , resolving to{' '}
-                  {endpoint !== undefined ? (
+                  {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"

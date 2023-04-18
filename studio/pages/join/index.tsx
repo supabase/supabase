@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
-import { useProfile, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -23,7 +24,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { profile } = useProfile()
+  const { data: profile } = useProfileQuery()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(false)
@@ -180,7 +181,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -211,14 +212,14 @@ const JoinOrganizationPage = () => {
               </p>
               <div className="flex justify-center gap-3">
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Sign in
-                  </Button>
+                  <a>
+                    <Button type="default">Sign in</Button>
+                  </a>
                 </Link>
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Create an account
-                  </Button>
+                  <a>
+                    <Button type="default">Create an account</Button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -239,7 +240,7 @@ const JoinOrganizationPage = () => {
       <Link href="/projects">
         <a className="flex items-center justify-center gap-4">
           <img
-            src="/img/supabase-logo.svg"
+            src={`${router.basePath}/img/supabase-logo.svg`}
             alt="Supabase"
             className="block h-[24px] cursor-pointer rounded"
           />

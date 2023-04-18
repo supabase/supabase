@@ -6,7 +6,8 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   FormPanel,
   FormActions,
@@ -36,7 +37,7 @@ const CreateWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
@@ -164,6 +165,7 @@ const CreateWrapper = () => {
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
                       handleReset={handleReset}
+                      disabled={!canCreateWrapper}
                       helper={
                         !canCreateWrapper
                           ? 'You need additional permissions to create a foreign data wrapper'

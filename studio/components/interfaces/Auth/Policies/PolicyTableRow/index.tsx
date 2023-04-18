@@ -1,11 +1,11 @@
 import { FC } from 'react'
-import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
 import Panel from 'components/ui/Panel'
+import { Alert } from 'ui'
 
 interface Props {
   table: PostgresTable
@@ -25,7 +25,9 @@ const PolicyTableRow: FC<Props> = ({
   onSelectDeletePolicy = () => {},
 }) => {
   const { meta } = useStore()
-  const policies = meta.policies.list((x: PostgresPolicy) => x.table === table.name)
+  const policies = meta.policies.list(
+    (policy: PostgresPolicy) => policy.schema === table.schema && policy.table === table.name
+  )
 
   return (
     <Panel
@@ -41,15 +43,22 @@ const PolicyTableRow: FC<Props> = ({
       {policies.length === 0 && (
         <div className="p-4 px-6 space-y-1">
           <p className="text-scale-1100 text-sm">No policies created yet</p>
-          {table.rls_enabled ? (
-            <p className="text-scale-1000 text-sm">
-              RLS is enabled - create a policy to allow access to this table.
-            </p>
-          ) : (
-            <p className="text-amber-900 text-sm opacity-50">
-              Warning: RLS is disabled - anonymous access is allowed to this table
-            </p>
-          )}
+          {!isLocked &&
+            (table.rls_enabled ? (
+              <p className="text-scale-1000 text-sm">
+                RLS is enabled - create a policy to allow access to this table.
+              </p>
+            ) : (
+              <Alert
+                withIcon
+                variant="warning"
+                className="!px-4 !py-3 !mt-3"
+                title="Warning: RLS is disabled. Your table is publicly readable and writable."
+              >
+                Anyone with the anon. key can modify or delete your data. You should turn on RLS and
+                create access policies to keep your data secure.
+              </Alert>
+            ))}
         </div>
       )}
 

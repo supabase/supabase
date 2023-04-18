@@ -15,7 +15,7 @@ Explore a variety of integrations from Supabase partners. Need a different integ
   <div>
     <h2>{item.name}</h2>
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 not-prose">
-      {item.items.map((integration) => (
+      {item.items?.map((integration) => (
         <Link href={`/${integration.url}`} key={integration.title} passHref>
           <a>
             <GlassPanel
